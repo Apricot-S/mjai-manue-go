@@ -35,6 +35,6 @@ to the original author, Hiroshi Ichikawa.
 
 Files used:
 
-- app/src/main/resources/danger_tree.all.json
-- app/src/main/resources/game_stats.json
-- app/src/main/resources/light_game_stats.json
+- configs/danger_tree.all.json
+- configs/game_stats.json
+- configs/light_game_stats.json
