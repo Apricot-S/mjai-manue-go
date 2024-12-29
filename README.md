@@ -23,7 +23,7 @@ Download the executable file for your platform from the [releases page](https://
 ### Option 2: Build from source
 
 ```sh
-go build github.com/Apricot-S/mjai-manue-go/cmd/manue
+go install github.com/Apricot-S/mjai-manue-go/cmd/mjai-manue
 ```
 
 `mjai-manue` will be built in current directory.
