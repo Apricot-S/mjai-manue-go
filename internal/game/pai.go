@@ -33,7 +33,7 @@ const (
 )
 
 var (
-	Unknown = newWithIDUnchecked(unknownID)
+	Unknown = newPaiWithIDUnchecked(unknownID)
 
 	types   = [...]rune{'m', 'p', 's', 't'}
 	paiStrs = [...]string{
@@ -73,14 +73,14 @@ func (p *Pai) IsRed() bool {
 	return p.isRed
 }
 
-func NewWithID(id uint8) (*Pai, error) {
+func NewPaiWithID(id uint8) (*Pai, error) {
 	if id > maxID {
 		return nil, fmt.Errorf("id out of range: %d", id)
 	}
-	return newWithIDUnchecked(id), nil
+	return newPaiWithIDUnchecked(id), nil
 }
 
-func newWithIDUnchecked(id uint8) *Pai {
+func newPaiWithIDUnchecked(id uint8) *Pai {
 	if id == unknownID {
 		return &Pai{
 			id:     unknownID,
@@ -102,17 +102,17 @@ func newWithIDUnchecked(id uint8) *Pai {
 	}
 }
 
-func NewWithName(name string) (*Pai, error) {
+func NewPaiWithName(name string) (*Pai, error) {
 	for i, p := range paiStrs {
 		if p == name {
-			return newWithIDUnchecked(uint8(i)), nil
+			return newPaiWithIDUnchecked(uint8(i)), nil
 		}
 	}
 
 	return nil, fmt.Errorf("unknown pai string: %s", name)
 }
 
-func NewWithDetail(typ rune, number uint8, isRed bool) (*Pai, error) {
+func NewPaiWithDetail(typ rune, number uint8, isRed bool) (*Pai, error) {
 	exists := false
 	for _, t := range types {
 		if t == typ {
@@ -134,10 +134,10 @@ func NewWithDetail(typ rune, number uint8, isRed bool) (*Pai, error) {
 		return nil, fmt.Errorf("no reds other than 5: %d", number)
 	}
 
-	return newWithDetailUnchecked(typ, number, isRed), nil
+	return newPaiWithDetailUnchecked(typ, number, isRed), nil
 }
 
-func newWithDetailUnchecked(typ rune, number uint8, isRed bool) *Pai {
+func newPaiWithDetailUnchecked(typ rune, number uint8, isRed bool) *Pai {
 	id := toId(typ, number, isRed)
 	return &Pai{
 		id:     id,
@@ -190,7 +190,7 @@ func (p *Pai) HasSameSymbol(other *Pai) bool {
 
 func (p *Pai) NextForDora() *Pai {
 	if p.IsUnknown() {
-		return newWithIDUnchecked(unknownID)
+		return newPaiWithIDUnchecked(unknownID)
 	}
 
 	number := p.number
@@ -218,7 +218,7 @@ func (p *Pai) NextForDora() *Pai {
 		}
 	}
 
-	return newWithDetailUnchecked(p.typ, nextNumber, false)
+	return newPaiWithDetailUnchecked(p.typ, nextNumber, false)
 }
 
 func (p *Pai) IsYaochu() bool {
@@ -228,9 +228,9 @@ func (p *Pai) IsYaochu() bool {
 
 func (p *Pai) RemoveRed() *Pai {
 	if p.IsUnknown() {
-		return newWithIDUnchecked(unknownID)
+		return newPaiWithIDUnchecked(unknownID)
 	}
-	return newWithDetailUnchecked(p.typ, p.number, false)
+	return newPaiWithDetailUnchecked(p.typ, p.number, false)
 }
 
 func (p *Pai) Next(n int8) *Pai {
@@ -240,7 +240,7 @@ func (p *Pai) Next(n int8) *Pai {
 
 	nextNumber := int8(p.number) + n
 	if 1 <= nextNumber && nextNumber <= 9 {
-		return newWithDetailUnchecked(p.typ, uint8(nextNumber), false)
+		return newPaiWithDetailUnchecked(p.typ, uint8(nextNumber), false)
 	}
 	return nil
 }
@@ -276,7 +276,7 @@ func PaisToStr(pais []Pai) string {
 func StrToPais(str string) ([]Pai, error) {
 	pais := []Pai{}
 	for _, f := range strings.Fields(str) {
-		pai, err := NewWithName(f)
+		pai, err := NewPaiWithName(f)
 		if err != nil {
 			return nil, err
 		}

@@ -71,7 +71,7 @@ func getTestCaseValid(i int) struct {
 	}
 }
 
-func TestNewWithID_Valid(t *testing.T) {
+func TestNewPaiWithID_Valid(t *testing.T) {
 	var tests = []struct {
 		name    string
 		id      uint8
@@ -88,36 +88,36 @@ func TestNewWithID_Valid(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := NewWithID(tt.id)
+			got, err := NewPaiWithID(tt.id)
 			if (err != nil) != tt.wantErr {
-				t.Errorf("NewWithID() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("NewPaiWithID() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
 			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("NewWithID() = %v, want %v", got, tt.want)
+				t.Errorf("NewPaiWithID() = %v, want %v", got, tt.want)
 				return
 			}
 			if !reflect.DeepEqual(got.ID(), tt.id) {
-				t.Errorf("NewWithID().ID() = %v, id %v", got, tt.want)
+				t.Errorf("NewPaiWithID().ID() = %v, id %v", got, tt.want)
 				return
 			}
 			if !reflect.DeepEqual(got.Type(), tt.typ) {
-				t.Errorf("NewWithID().Type() = %v, typ %v", got, tt.want)
+				t.Errorf("NewPaiWithID().Type() = %v, typ %v", got, tt.want)
 				return
 			}
 			if !reflect.DeepEqual(got.Number(), tt.number) {
-				t.Errorf("NewWithID().Number() = %v, number %v", got, tt.want)
+				t.Errorf("NewPaiWithID().Number() = %v, number %v", got, tt.want)
 				return
 			}
 			if !reflect.DeepEqual(got.IsRed(), tt.isRed) {
-				t.Errorf("NewWithID().IsRed() = %v, isRed %v", got, tt.want)
+				t.Errorf("NewPaiWithID().IsRed() = %v, isRed %v", got, tt.want)
 				return
 			}
 		})
 	}
 }
 
-func TestNewWithID_Invalid(t *testing.T) {
+func TestNewPaiWithID_Invalid(t *testing.T) {
 	type args struct {
 		id uint8
 	}
@@ -131,20 +131,20 @@ func TestNewWithID_Invalid(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := NewWithID(tt.args.id)
+			got, err := NewPaiWithID(tt.args.id)
 			if (err != nil) != tt.wantErr {
-				t.Errorf("NewWithID() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("NewPaiWithID() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
 			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("NewWithID() = %v, want %v", got, tt.want)
+				t.Errorf("NewPaiWithID() = %v, want %v", got, tt.want)
 				return
 			}
 		})
 	}
 }
 
-func TestNewWithName_Valid(t *testing.T) {
+func TestNewPaiWithName_Valid(t *testing.T) {
 	var tests = []struct {
 		name    string
 		id      uint8
@@ -161,36 +161,36 @@ func TestNewWithName_Valid(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := NewWithName(tt.name)
+			got, err := NewPaiWithName(tt.name)
 			if (err != nil) != tt.wantErr {
-				t.Errorf("NewWithName() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("NewPaiWithName() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
 			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("NewWithName() = %v, want %v", got, tt.want)
+				t.Errorf("NewPaiWithName() = %v, want %v", got, tt.want)
 				return
 			}
 			if !reflect.DeepEqual(got.ID(), tt.id) {
-				t.Errorf("NewWithName().ID() = %v, id %v", got, tt.want)
+				t.Errorf("NewPaiWithName().ID() = %v, id %v", got, tt.want)
 				return
 			}
 			if !reflect.DeepEqual(got.Type(), tt.typ) {
-				t.Errorf("NewWithName().Type() = %v, typ %v", got, tt.want)
+				t.Errorf("NewPaiWithName().Type() = %v, typ %v", got, tt.want)
 				return
 			}
 			if !reflect.DeepEqual(got.Number(), tt.number) {
-				t.Errorf("NewWithName().Number() = %v, number %v", got, tt.want)
+				t.Errorf("NewPaiWithName().Number() = %v, number %v", got, tt.want)
 				return
 			}
 			if !reflect.DeepEqual(got.IsRed(), tt.isRed) {
-				t.Errorf("NewWithName().IsRed() = %v, isRed %v", got, tt.want)
+				t.Errorf("NewPaiWithName().IsRed() = %v, isRed %v", got, tt.want)
 				return
 			}
 		})
 	}
 }
 
-func TestNewWithName_Invalid(t *testing.T) {
+func TestNewPaiWithName_Invalid(t *testing.T) {
 	type args struct {
 		name string
 	}
@@ -212,20 +212,20 @@ func TestNewWithName_Invalid(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := NewWithName(tt.args.name)
+			got, err := NewPaiWithName(tt.args.name)
 			if (err != nil) != tt.wantErr {
-				t.Errorf("NewWithName() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("NewPaiWithName() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
 			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("NewWithName() = %v, want %v", got, tt.want)
+				t.Errorf("NewPaiWithName() = %v, want %v", got, tt.want)
 				return
 			}
 		})
 	}
 }
 
-func TestNewWithDetail_Valid(t *testing.T) {
+func TestNewPaiWithDetail_Valid(t *testing.T) {
 	var tests = []struct {
 		name    string
 		id      uint8
@@ -243,36 +243,36 @@ func TestNewWithDetail_Valid(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := NewWithDetail(tt.typ, tt.number, tt.isRed)
+			got, err := NewPaiWithDetail(tt.typ, tt.number, tt.isRed)
 			if (err != nil) != tt.wantErr {
-				t.Errorf("NewWithDetail() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("NewPaiWithDetail() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
 			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("NewWithDetail() = %v, want %v", got, tt.want)
+				t.Errorf("NewPaiWithDetail() = %v, want %v", got, tt.want)
 				return
 			}
 			if !reflect.DeepEqual(got.ID(), tt.id) {
-				t.Errorf("NewWithDetail().ID() = %v, id %v", got, tt.want)
+				t.Errorf("NewPaiWithDetail().ID() = %v, id %v", got, tt.want)
 				return
 			}
 			if !reflect.DeepEqual(got.Type(), tt.typ) {
-				t.Errorf("NewWithDetail().Type() = %v, typ %v", got, tt.want)
+				t.Errorf("NewPaiWithDetail().Type() = %v, typ %v", got, tt.want)
 				return
 			}
 			if !reflect.DeepEqual(got.Number(), tt.number) {
-				t.Errorf("NewWithDetail().Number() = %v, number %v", got, tt.want)
+				t.Errorf("NewPaiWithDetail().Number() = %v, number %v", got, tt.want)
 				return
 			}
 			if !reflect.DeepEqual(got.IsRed(), tt.isRed) {
-				t.Errorf("NewWithDetail().IsRed() = %v, isRed %v", got, tt.want)
+				t.Errorf("NewPaiWithDetail().IsRed() = %v, isRed %v", got, tt.want)
 				return
 			}
 		})
 	}
 }
 
-func TestNewWithDetail_Invalid(t *testing.T) {
+func TestNewPaiWithDetail_Invalid(t *testing.T) {
 	type args struct {
 		typ    rune
 		number uint8
@@ -294,13 +294,13 @@ func TestNewWithDetail_Invalid(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := NewWithDetail(tt.args.typ, tt.args.number, tt.args.isRed)
+			got, err := NewPaiWithDetail(tt.args.typ, tt.args.number, tt.args.isRed)
 			if (err != nil) != tt.wantErr {
-				t.Errorf("NewWithDetail() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("NewPaiWithDetail() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
 			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("NewWithDetail() = %v, want %v", got, tt.want)
+				t.Errorf("NewPaiWithDetail() = %v, want %v", got, tt.want)
 				return
 			}
 		})
@@ -322,7 +322,7 @@ func TestPai_IsUnknown(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			p, _ := NewWithID(tt.id)
+			p, _ := NewPaiWithID(tt.id)
 			if got := p.IsUnknown(); got != tt.want {
 				t.Errorf("Pai.IsUnknown() = %v, want %v", got, tt.want)
 				return
@@ -342,22 +342,22 @@ func TestPai_HasSameSymbol(t *testing.T) {
 
 	// same Pai has same symbol
 	for i, n := range allNames {
-		first, _ := NewWithName(n)
-		second, _ := NewWithName(n)
+		first, _ := NewPaiWithName(n)
+		second, _ := NewPaiWithName(n)
 		tests = append(tests, testCase{allNames[i], first, second, true})
 	}
 
 	// normal 5 suits and red 5 suits has same symbol
 	for _, typ := range []rune{'m', 'p', 's'} {
-		first, _ := NewWithDetail(typ, 5, false)
-		second, _ := NewWithDetail(typ, 5, true)
+		first, _ := NewPaiWithDetail(typ, 5, false)
+		second, _ := NewPaiWithDetail(typ, 5, true)
 		tests = append(tests, testCase{fmt.Sprintf("5%c 5%cr", typ, typ), first, second, true})
 	}
 
 	// different Pai has not same symbol
 	for _, n := range [][]string{{"1m", "2m"}, {"9m", "9p"}, {"E", "S"}, {"1m", "?"}} {
-		first, _ := NewWithName(n[0])
-		second, _ := NewWithName(n[1])
+		first, _ := NewPaiWithName(n[0])
+		second, _ := NewPaiWithName(n[1])
 		tests = append(tests, testCase{fmt.Sprintf("%s %s", n[0], n[1]), first, second, false})
 	}
 
@@ -389,8 +389,8 @@ func TestPai_NextForDora(t *testing.T) {
 			nextN = i + 1
 		}
 
-		doraMarker, _ := NewWithID(uint8(i))
-		dora, _ := NewWithID(uint8(nextN))
+		doraMarker, _ := NewPaiWithID(uint8(i))
+		dora, _ := NewPaiWithID(uint8(nextN))
 		tests = append(tests, testCase{allNames[i], doraMarker, dora, true})
 	}
 
@@ -404,8 +404,8 @@ func TestPai_NextForDora(t *testing.T) {
 			nextN = i + 1
 		}
 
-		doraMarker, _ := NewWithName(winds[i])
-		dora, _ := NewWithName(winds[nextN])
+		doraMarker, _ := NewPaiWithName(winds[i])
+		dora, _ := NewPaiWithName(winds[nextN])
 		tests = append(tests, testCase{winds[i], doraMarker, dora, true})
 	}
 
@@ -419,22 +419,22 @@ func TestPai_NextForDora(t *testing.T) {
 			nextN = i + 1
 		}
 
-		doraMarker, _ := NewWithName(dragons[i])
-		dora, _ := NewWithName(dragons[nextN])
+		doraMarker, _ := NewPaiWithName(dragons[i])
+		dora, _ := NewPaiWithName(dragons[nextN])
 		tests = append(tests, testCase{dragons[i], doraMarker, dora, true})
 	}
 
 	// red 5 suits
 	for _, typ := range []rune{'m', 'p', 's'} {
-		doraMarker, _ := NewWithDetail(typ, 5, true)
-		dora, _ := NewWithDetail(typ, 6, false)
+		doraMarker, _ := NewPaiWithDetail(typ, 5, true)
+		dora, _ := NewPaiWithDetail(typ, 6, false)
 		tests = append(tests, testCase{fmt.Sprintf("5%cr", typ), doraMarker, dora, true})
 	}
 
 	// unknown
 	{
-		doraMarker, _ := NewWithName("?")
-		dora, _ := NewWithName("?")
+		doraMarker, _ := NewPaiWithName("?")
+		dora, _ := NewPaiWithName("?")
 		tests = append(tests, testCase{"?", doraMarker, dora, true})
 	}
 
@@ -482,7 +482,7 @@ func TestPai_IsYaochu(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			p, _ := NewWithName(tt.name)
+			p, _ := NewPaiWithName(tt.name)
 			if got := p.IsYaochu(); got != tt.want {
 				t.Errorf("Pai.IsYaochu() = %v, want %v", got, tt.want)
 			}
@@ -498,9 +498,9 @@ func TestPai_RemoveRed(t *testing.T) {
 	var tests []testCase
 
 	for _, n := range allNames {
-		p, _ := NewWithName(n)
+		p, _ := NewPaiWithName(n)
 		if p.IsRed() {
-			normal, _ := NewWithName(n[0:2])
+			normal, _ := NewPaiWithName(n[0:2])
 			tests = append(tests, testCase{n, normal})
 		} else {
 			tests = append(tests, testCase{n, p})
@@ -509,7 +509,7 @@ func TestPai_RemoveRed(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			p, _ := NewWithName(tt.name)
+			p, _ := NewPaiWithName(tt.name)
 			if got := p.RemoveRed(); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("Pai.RemoveRed() = %v, want %v", got, tt.want)
 			}
@@ -532,12 +532,12 @@ func TestPai_Next(t *testing.T) {
 	// suits
 	for _, typ := range []rune{'m', 'p', 's'} {
 		for i := 1; i <= 9; i++ {
-			p, _ := NewWithDetail(typ, uint8(i), false)
+			p, _ := NewPaiWithDetail(typ, uint8(i), false)
 
 			// plus
 			for j := 0; j <= 9-i; j++ {
 				n := uint8(i + j)
-				next, _ := NewWithDetail(typ, n, false)
+				next, _ := NewPaiWithDetail(typ, n, false)
 				name := fmt.Sprintf("%d%c + %d: %d%c", i, typ, j, n, typ)
 				tests = append(tests, testCase{name, p, args{int8(j)}, next})
 			}
@@ -551,7 +551,7 @@ func TestPai_Next(t *testing.T) {
 			// minus
 			for j := 0; j < i; j++ {
 				n := uint8(i - j)
-				prev, _ := NewWithDetail(typ, n, false)
+				prev, _ := NewPaiWithDetail(typ, n, false)
 				name := fmt.Sprintf("%d%c - %d: %d%c", i, typ, j, n, typ)
 				tests = append(tests, testCase{name, p, args{int8(-j)}, prev})
 			}
@@ -564,12 +564,12 @@ func TestPai_Next(t *testing.T) {
 		}
 
 		// red 5
-		red, _ := NewWithDetail(typ, uint8(5), true)
+		red, _ := NewPaiWithDetail(typ, uint8(5), true)
 
 		// plus
 		for j := 0; j <= 5; j++ {
 			n := uint8(5 + j)
-			next, _ := NewWithDetail(typ, n, false)
+			next, _ := NewPaiWithDetail(typ, n, false)
 			name := fmt.Sprintf("5%cr + %d: %d%c", typ, j, n, typ)
 			tests = append(tests, testCase{name, red, args{int8(j)}, next})
 		}
@@ -583,7 +583,7 @@ func TestPai_Next(t *testing.T) {
 		// minus
 		for j := 0; j < 5; j++ {
 			n := uint8(5 - j)
-			prev, _ := NewWithDetail(typ, n, false)
+			prev, _ := NewPaiWithDetail(typ, n, false)
 			name := fmt.Sprintf("5%cr - %d: %d%c", typ, j, n, typ)
 			tests = append(tests, testCase{name, red, args{int8(-j)}, prev})
 		}
@@ -597,7 +597,7 @@ func TestPai_Next(t *testing.T) {
 
 	// honors, unknown
 	for _, symbol := range []string{"E", "S", "W", "N", "P", "F", "C", "?"} {
-		p, _ := NewWithName(symbol)
+		p, _ := NewPaiWithName(symbol)
 		tests = append(tests, testCase{fmt.Sprintf("%s + 0: nil", symbol), p, args{0}, nil})
 		tests = append(tests, testCase{fmt.Sprintf("%s + 1: nil", symbol), p, args{1}, nil})
 		tests = append(tests, testCase{fmt.Sprintf("%s - 1: nil", symbol), p, args{-1}, nil})
@@ -630,7 +630,7 @@ func TestPai_ToString(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			p, _ := NewWithName(tt.args.name)
+			p, _ := NewPaiWithName(tt.args.name)
 			if got := p.ToString(); got != tt.want {
 				t.Errorf("Pai.ToString() = %v, want %v", got, tt.want)
 			}
@@ -653,7 +653,7 @@ func TestPaisToStr(t *testing.T) {
 
 	// 1 pai
 	for _, name := range allNames {
-		pai, _ := NewWithName(name)
+		pai, _ := NewPaiWithName(name)
 		pais := []Pai{*pai}
 		tests = append(tests, testCase{name, args{pais}, name})
 	}
@@ -661,7 +661,7 @@ func TestPaisToStr(t *testing.T) {
 	// 2 pais
 	for _, name := range allNames {
 		names := fmt.Sprintf("%s %s", name, name)
-		pai, _ := NewWithName(name)
+		pai, _ := NewPaiWithName(name)
 		pais := []Pai{*pai, *pai}
 		tests = append(tests, testCase{names, args{pais}, names})
 	}
@@ -690,7 +690,7 @@ func TestStrToPais(t *testing.T) {
 
 	// 1 pai
 	for _, name := range allNames {
-		pai, _ := NewWithName(name)
+		pai, _ := NewPaiWithName(name)
 		pais := []Pai{*pai}
 		tests = append(tests, testCase{name, args{name}, pais})
 	}
@@ -698,7 +698,7 @@ func TestStrToPais(t *testing.T) {
 	// 2 pais
 	for _, name := range allNames {
 		names := fmt.Sprintf("%s %s", name, name)
-		pai, _ := NewWithName(name)
+		pai, _ := NewPaiWithName(name)
 		pais := []Pai{*pai, *pai}
 		tests = append(tests, testCase{names, args{names}, pais})
 	}
@@ -724,7 +724,7 @@ func TestSortPais(t *testing.T) {
 
 	pais := make(Pais, 0, len(names))
 	for _, name := range names {
-		pai, _ := NewWithName(name)
+		pai, _ := NewPaiWithName(name)
 		pais = append(pais, *pai)
 	}
 	sort.Sort(pais)
