@@ -50,38 +50,41 @@ func AnalyzeShantenWithOption(ps *PaiSet, allowedExtraPais int, upperbound int) 
 	}
 
 	targetVector := [NumIDs]int{}
-	goals := []Goal{}
+	tempGoals := []Goal{}
 	numMentsus := sum(currentVector) / 3
 	if numMentsus > 4 {
 		numMentsus = 4
 	}
 
-	shanten :=
-		analyzeShantenInternal(
-			&currentVector,
-			&targetVector,
-			-1,
-			numMentsus,
-			0,
-			upperbound,
-			[]Mentsu{},
-			goals,
-			allowedExtraPais)
+	shanten := analyzeShantenInternal(
+		&currentVector,
+		&targetVector,
+		-1,
+		numMentsus,
+		0,
+		upperbound,
+		[]Mentsu{},
+		&tempGoals,
+		allowedExtraPais,
+	)
 	newUpperbound := min(shanten+allowedExtraPais, upperbound)
 
-	for i, goal := range goals {
+	goals := []Goal{}
+	for _, goal := range tempGoals {
 		if goal.Shanten <= newUpperbound {
 			requiredVector := [NumIDs]int{}
 			for pid := 0; pid < int(NumIDs); pid++ {
 				requiredVector[pid] = max(goal.CountVector[pid]-currentVector[pid], 0)
 			}
-			goals[i].RequiredVector = requiredVector
+			goal.RequiredVector = requiredVector
 
 			throwableVector := [NumIDs]int{}
 			for pid := 0; pid < int(NumIDs); pid++ {
 				throwableVector[pid] = max(currentVector[pid]-goal.CountVector[pid], 0)
 			}
-			goals[i].ThrowableVector = throwableVector
+			goal.ThrowableVector = throwableVector
+
+			goals = append(goals, goal)
 		}
 	}
 
@@ -107,7 +110,7 @@ func analyzeShantenInternal(
 	minMeldId uint8,
 	upperbound int,
 	mentsus []Mentsu,
-	goals []Goal,
+	goals *[]Goal,
 	allowedExtraPais int,
 ) int {
 	if numMeldsLeft == 0 {
@@ -134,7 +137,7 @@ func analyzeShantenInternal(
 					Mentsus:     newMentsus,
 					CountVector: goalVector,
 				}
-				goals = append(goals, goal)
+				*goals = append(*goals, goal)
 
 				if newShanten < upperbound {
 					upperbound = newShanten
