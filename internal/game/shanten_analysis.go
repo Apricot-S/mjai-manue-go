@@ -53,7 +53,7 @@ func AnalyzeShantenWithOption(ps *PaiSet, allowedExtraPais int, upperbound int) 
 	}
 
 	targetVector := [NumIDs]int{}
-	tempGoals := []Goal{}
+	allGoals := []Goal{}
 	numMentsus := sum(currentVector) / 3
 	if numMentsus > 4 {
 		numMentsus = 4
@@ -67,13 +67,13 @@ func AnalyzeShantenWithOption(ps *PaiSet, allowedExtraPais int, upperbound int) 
 		0,
 		upperbound,
 		[]Mentsu{},
-		&tempGoals,
+		&allGoals,
 		allowedExtraPais,
 	)
 	newUpperbound := min(shanten+allowedExtraPais, upperbound)
 
 	goals := []Goal{}
-	for _, goal := range tempGoals {
+	for _, goal := range allGoals {
 		if goal.Shanten <= newUpperbound {
 			requiredVector := [NumIDs]int{}
 			for pid := 0; pid < int(NumIDs); pid++ {
