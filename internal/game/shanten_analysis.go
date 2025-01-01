@@ -24,7 +24,7 @@ type Goal struct {
 
 const (
 	maxShantenNumber = 8
-	numChows         = 21
+	numChows         = 7 * 3
 )
 
 var (
