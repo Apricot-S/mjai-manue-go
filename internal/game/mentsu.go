@@ -35,3 +35,28 @@ func NewMentsu(t MentsuType, pais []Pai) (*Mentsu, error) {
 	}
 	return &Mentsu{Type: t, Pais: pais}, nil
 }
+
+func (m *Mentsu) ToString() string {
+	str := ""
+	switch m.Type {
+	case Shuntsu:
+		str = "shuntsu"
+	case Kotsu:
+		str = "kotsu"
+	case Kantsu:
+		str = "kantsu"
+	case Toitsu:
+		str = "toitsu"
+	}
+
+	str += "["
+	for i, p := range m.Pais {
+		str += p.ToString()
+		if i < len(m.Pais)-1 {
+			str += " "
+		}
+	}
+	str += "]"
+
+	return str
+}
