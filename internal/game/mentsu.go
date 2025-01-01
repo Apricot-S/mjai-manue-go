@@ -8,7 +8,7 @@ import (
 type MentsuType int
 
 const (
-	Shuntsu MentsuType = iota
+	Shuntsu MentsuType = iota + 1
 	Kotsu
 	Kantsu
 	Toitsu
