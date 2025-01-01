@@ -1,6 +1,9 @@
 package game
 
-import "fmt"
+import (
+	"fmt"
+	"strings"
+)
 
 type MentsuType int
 
@@ -49,14 +52,11 @@ func (m *Mentsu) ToString() string {
 		str = "toitsu"
 	}
 
-	str += "["
+	paiStrs := make([]string, len(m.Pais))
 	for i, p := range m.Pais {
-		str += p.ToString()
-		if i < len(m.Pais)-1 {
-			str += " "
-		}
+		paiStrs[i] = p.ToString()
 	}
-	str += "]"
 
+	str += fmt.Sprintf("[%s]", strings.Join(paiStrs, " "))
 	return str
 }
