@@ -16,14 +16,14 @@ type Pai struct {
 const (
 	NumIDs uint8 = 9*3 + 7
 
-	minID      uint8 = 0
+	minPaiID   uint8 = 0
 	maxSuitID  uint8 = 9*3 - 1
 	minHonorID uint8 = maxSuitID + 1
 	maxHonorID uint8 = minHonorID + 7 - 1
 	minRedID   uint8 = maxHonorID + 1
 	maxRedID   uint8 = minRedID + 3 - 1
 	unknownID  uint8 = maxRedID + 1
-	maxID      uint8 = unknownID
+	maxPaiID   uint8 = unknownID
 
 	tsupaiType rune = 't'
 
@@ -74,7 +74,7 @@ func (p *Pai) IsRed() bool {
 }
 
 func NewPaiWithID(id uint8) (*Pai, error) {
-	if id > maxID {
+	if id > maxPaiID {
 		return nil, fmt.Errorf("id out of range: %d", id)
 	}
 	return newPaiWithIDUnchecked(id), nil
