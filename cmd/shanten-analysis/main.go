@@ -1,7 +1,9 @@
 package main
 
 import (
+	"bufio"
 	"fmt"
+	"os"
 
 	"github.com/Apricot-S/mjai-manue-go/internal/game"
 )
@@ -46,9 +48,15 @@ func printShantenAnalysis(paiStr string) {
 }
 
 func main() {
-	var paiStr string
 	fmt.Print("Enter tiles (e.g. '1m 1m 1m 1m 2m 3m 4m 4m 4m 4m 1p 1p 1p 1p'): ")
-	fmt.Scanln(&paiStr)
+
+	r := bufio.NewReader(os.Stdin)
+	paiStr, err := r.ReadString('\n')
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+
 	fmt.Println()
 	printShantenAnalysis(paiStr)
 }
