@@ -250,14 +250,14 @@ func (p *Player) OnTargeted(furo Furo) error {
 
 func (p *Player) deleteTehai(pai *Pai) error {
 	paiIndex := -1
-	for i, v := range p.Tehais {
+	for i, v := range slices.Backward(p.Tehais) {
 		if v == *pai {
 			paiIndex = i
 			break
 		}
 	}
 	if paiIndex == -1 {
-		for i, v := range p.Tehais {
+		for i, v := range slices.Backward(p.Tehais) {
 			if v == *Unknown {
 				paiIndex = i
 				break
@@ -269,6 +269,6 @@ func (p *Player) deleteTehai(pai *Pai) error {
 		return fmt.Errorf("trying to delete %s which is not in tehais: %v", pai.ToString(), p.Tehais)
 	}
 
-	p.Tehais = p.Tehais[:paiIndex+copy(p.Tehais[paiIndex:], p.Tehais[paiIndex+1:])]
+	p.Tehais = slices.Delete(p.Tehais, paiIndex, paiIndex+1)
 	return nil
 }
