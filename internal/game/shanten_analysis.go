@@ -76,13 +76,13 @@ func AnalyzeShantenWithOption(ps *PaiSet, allowedExtraPais int, upperbound int) 
 	for _, goal := range allGoals {
 		if goal.Shanten <= newUpperbound {
 			requiredVector := [NumIDs]int{}
-			for pid := 0; pid < int(NumIDs); pid++ {
+			for pid := 0; pid < NumIDs; pid++ {
 				requiredVector[pid] = max(goal.CountVector[pid]-currentVector[pid], 0)
 			}
 			goal.RequiredVector = requiredVector
 
 			throwableVector := [NumIDs]int{}
-			for pid := 0; pid < int(NumIDs); pid++ {
+			for pid := 0; pid < NumIDs; pid++ {
 				throwableVector[pid] = max(currentVector[pid]-goal.CountVector[pid], 0)
 			}
 			goal.ThrowableVector = throwableVector

@@ -14,22 +14,22 @@ type Pai struct {
 }
 
 const (
-	NumIDs uint8 = 9*3 + 7
+	NumIDs = 9*3 + 7
 
-	minPaiID   uint8 = 0
-	maxSuitID  uint8 = 9*3 - 1
-	minHonorID uint8 = maxSuitID + 1
-	maxHonorID uint8 = minHonorID + 7 - 1
-	minRedID   uint8 = maxHonorID + 1
-	maxRedID   uint8 = minRedID + 3 - 1
-	unknownID  uint8 = maxRedID + 1
-	maxPaiID   uint8 = unknownID
+	minPaiID   = 0
+	maxSuitID  = 9*3 - 1
+	minHonorID = maxSuitID + 1
+	maxHonorID = minHonorID + 7 - 1
+	minRedID   = maxHonorID + 1
+	maxRedID   = minRedID + 3 - 1
+	unknownID  = maxRedID + 1
+	maxPaiID   = unknownID
 
-	tsupaiType rune = 't'
+	tsupaiType = 't'
 
-	unknownStr    string = "?"
-	unknownType   rune   = '?'
-	unknownNumber uint8  = 10
+	unknownStr    = "?"
+	unknownType   = '?'
+	unknownNumber = 10
 )
 
 var (
@@ -309,9 +309,9 @@ func (p *Pai) convertToCompare() int {
 	case 23 <= id && id <= 33:
 		// 6s - C
 		return id + 3
-	case id == int(unknownID):
+	case id == unknownID:
 		// ? (Unknown)
-		return int(unknownID) + 3
+		return unknownID + 3
 	default:
 		log.Panicf("invalid pai id: %d", id)
 		return -1
