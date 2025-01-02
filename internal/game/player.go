@@ -44,7 +44,7 @@ func NewPlayer(id int, name string, initScore int) (*Player, error) {
 	return &Player{
 		ID:                id,
 		Name:              name,
-		Tehais:            nil,
+		Tehais:            make(Pais, 0, initTehaisSize+1), // +1 for tsumo
 		Furos:             make([]Furo, 0, maxNumFuro),
 		Ho:                nil,
 		Sutehais:          nil,
@@ -65,7 +65,8 @@ func (p *Player) OnStartKyoku(tehais []Pai, score *int) error {
 		return fmt.Errorf("the length of haipai is not 13: %d", len(tehais))
 	}
 
-	p.Tehais = tehais
+	p.Tehais = p.Tehais[:len(tehais)]
+	copy(p.Tehais, tehais)
 	p.Furos = make([]Furo, 0, maxNumFuro)
 	p.Ho = nil
 	p.Sutehais = nil
