@@ -110,7 +110,7 @@ func (p *Player) OnDahai(pai Pai) error {
 	p.Sutehais = append(p.Sutehais, pai)
 
 	if p.ReachState != Accepted {
-		p.ExtraAnpais = make([]Pai, 0)
+		p.ExtraAnpais = nil
 	}
 
 	return nil
