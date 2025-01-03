@@ -44,7 +44,6 @@ var (
 		"5mr", "5pr", "5sr",
 		"?",
 	}
-	tsupaiStrs = [...]string{"E", "S", "W", "N", "P", "F", "C"}
 )
 
 func (p *Pai) assertInitialized() {
@@ -247,22 +246,7 @@ func (p *Pai) Next(n int8) *Pai {
 
 func (p *Pai) ToString() string {
 	p.assertInitialized()
-
-	switch p.typ {
-	case unknownType:
-		return unknownStr
-	case tsupaiType:
-		return tsupaiStrs[p.number-1]
-	default:
-		r := func() string {
-			if p.isRed {
-				return "r"
-			} else {
-				return ""
-			}
-		}()
-		return fmt.Sprintf("%d%c%s", p.number, p.typ, r)
-	}
+	return paiStrs[p.id]
 }
 
 func PaisToStr(pais []Pai) string {
