@@ -2,6 +2,7 @@ package game
 
 import (
 	"fmt"
+	"slices"
 	"sort"
 )
 
@@ -50,9 +51,7 @@ func NewFuro(t FuroType, taken *Pai, consumed []Pai, target *int) (*Furo, error)
 		tk = *taken
 	}
 
-	numConsumed := len(consumed)
-	c := make([]Pai, numConsumed, numConsumed+1)
-	copy(c, consumed)
+	c := slices.Clone(consumed)
 
 	var tg *int
 	if target != nil {
@@ -60,7 +59,7 @@ func NewFuro(t FuroType, taken *Pai, consumed []Pai, target *int) (*Furo, error)
 		tg = &tgCopy
 	}
 
-	var pais Pais = c
+	var pais Pais = slices.Clone(c)
 	if taken != nil {
 		pais = append(pais, *taken)
 	}
