@@ -3,6 +3,7 @@ package game
 import (
 	"fmt"
 	"log"
+	"slices"
 	"strings"
 )
 
@@ -102,13 +103,11 @@ func newPaiWithIDUnchecked(id uint8) *Pai {
 }
 
 func NewPaiWithName(name string) (*Pai, error) {
-	for i, p := range paiStrs {
-		if p == name {
-			return newPaiWithIDUnchecked(uint8(i)), nil
-		}
+	id := slices.Index(paiStrs[:], name)
+	if id == -1 {
+		return nil, fmt.Errorf("unknown pai string: %s", name)
 	}
-
-	return nil, fmt.Errorf("unknown pai string: %s", name)
+	return newPaiWithIDUnchecked(uint8(id)), nil
 }
 
 func NewPaiWithDetail(typ rune, number uint8, isRed bool) (*Pai, error) {
