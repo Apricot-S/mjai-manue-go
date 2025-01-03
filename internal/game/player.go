@@ -184,13 +184,9 @@ func (p *Player) OnKakan(furo Furo) error {
 		return fmt.Errorf("failed to delete tehais on kakan: %w", err)
 	}
 
-	ponIndex := -1
-	for i, f := range p.Furos {
-		if slices.Contains(f.Pais, furo.Taken) {
-			ponIndex = i
-			break
-		}
-	}
+	ponIndex := slices.IndexFunc(p.Furos, func(f Furo) bool {
+		return slices.Contains(f.Pais, furo.Taken)
+	})
 	if ponIndex == -1 {
 		return fmt.Errorf("failed to find pon mentsu for kakan: %v", furo)
 	}
