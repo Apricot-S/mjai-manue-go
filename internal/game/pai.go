@@ -156,13 +156,7 @@ func toNumber(id uint8, isRed bool) uint8 {
 }
 
 func toId(typ rune, number uint8, isRed bool) uint8 {
-	var typeIndex uint8
-	for i, t := range types {
-		if t == typ {
-			typeIndex = uint8(i)
-			break
-		}
-	}
+	typeIndex := uint8(slices.Index(types[:], typ))
 	if isRed {
 		return minRedID + typeIndex
 	}
