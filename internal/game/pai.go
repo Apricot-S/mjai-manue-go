@@ -111,14 +111,7 @@ func NewPaiWithName(name string) (*Pai, error) {
 }
 
 func NewPaiWithDetail(typ rune, number uint8, isRed bool) (*Pai, error) {
-	exists := false
-	for _, t := range types {
-		if t == typ {
-			exists = true
-			break
-		}
-	}
-	if !exists {
+	if !slices.Contains(types[:], typ) {
 		return nil, fmt.Errorf("bad type: %c", typ)
 	}
 
