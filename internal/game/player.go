@@ -34,6 +34,7 @@ type Player struct {
 	ReachHoIndex      *int
 	ReachSutehaiIndex *int
 	Score             int
+	CanDahai          bool
 }
 
 func NewPlayer(id int, name string, initScore int) (*Player, error) {
@@ -53,6 +54,7 @@ func NewPlayer(id int, name string, initScore int) (*Player, error) {
 		ReachHoIndex:      nil,
 		ReachSutehaiIndex: nil,
 		Score:             initScore,
+		CanDahai:          false,
 	}, nil
 }
 
@@ -74,6 +76,7 @@ func (p *Player) OnStartKyoku(tehais []Pai, score *int) error {
 	p.ReachState = None
 	p.ReachHoIndex = nil
 	p.ReachSutehaiIndex = nil
+	p.CanDahai = false
 
 	if score != nil {
 		p.Score = *score
@@ -83,20 +86,17 @@ func (p *Player) OnStartKyoku(tehais []Pai, score *int) error {
 }
 
 func (p *Player) OnTsumo(pai Pai) error {
-	numTehai := len(p.Tehais)
-	numFuro := len(p.Furos)
-	if (numTehai + numFuro*3) != initTehaisSize {
+	if p.CanDahai {
 		return fmt.Errorf("it is not in a state to be tsumo")
 	}
 
 	p.Tehais = append(p.Tehais, pai)
+	p.CanDahai = true
 	return nil
 }
 
 func (p *Player) OnDahai(pai Pai) error {
-	numTehai := len(p.Tehais)
-	numFuro := len(p.Furos)
-	if (numTehai + numFuro*3) != (initTehaisSize + 1) {
+	if !p.CanDahai {
 		return fmt.Errorf("it is not in a state to be dahai")
 	}
 
@@ -113,16 +113,17 @@ func (p *Player) OnDahai(pai Pai) error {
 		p.ExtraAnpais = nil
 	}
 
+	p.CanDahai = false
 	return nil
 }
 
 func (p *Player) OnChiPonKan(furo Furo) error {
-	numTehai := len(p.Tehais)
 	numFuro := len(p.Furos)
 	if numFuro >= maxNumFuro {
 		return fmt.Errorf("a 5th furo is not possible")
 	}
-	if (numTehai + numFuro*3) != initTehaisSize {
+
+	if p.CanDahai {
 		return fmt.Errorf("it is not in a state to be chi/pon/kan")
 	}
 
@@ -140,16 +141,17 @@ func (p *Player) OnChiPonKan(furo Furo) error {
 	}
 
 	p.Furos = append(p.Furos, furo)
+	p.CanDahai = furo.Type != Daiminkan
 	return nil
 }
 
 func (p *Player) OnAnkan(furo Furo) error {
-	numTehai := len(p.Tehais)
 	numFuro := len(p.Furos)
 	if numFuro >= maxNumFuro {
 		return fmt.Errorf("a 5th furo is not possible")
 	}
-	if (numTehai + numFuro*3) != (initTehaisSize + 1) {
+
+	if !p.CanDahai {
 		return fmt.Errorf("it is not in a state to be ankan")
 	}
 
@@ -165,13 +167,12 @@ func (p *Player) OnAnkan(furo Furo) error {
 	}
 
 	p.Furos = append(p.Furos, furo)
+	p.CanDahai = false
 	return nil
 }
 
 func (p *Player) OnKakan(furo Furo) error {
-	numTehai := len(p.Tehais)
-	numFuro := len(p.Furos)
-	if (numTehai + numFuro*3) != (initTehaisSize + 1) {
+	if !p.CanDahai {
 		return fmt.Errorf("it is not in a state to be kakan")
 	}
 
@@ -199,11 +200,12 @@ func (p *Player) OnKakan(furo Furo) error {
 	}
 
 	p.Furos[ponIndex] = *kanMentsu
+	p.CanDahai = false
 	return nil
 }
 
 func (p *Player) OnReach() error {
-	if p.ReachState != None {
+	if !p.CanDahai || p.ReachState != None {
 		return fmt.Errorf("it is not in a state to be reach declaration")
 	}
 
@@ -212,7 +214,7 @@ func (p *Player) OnReach() error {
 }
 
 func (p *Player) OnReachAccepted(score *int) error {
-	if p.ReachState != Declared {
+	if p.CanDahai || p.ReachState != Declared {
 		return fmt.Errorf("it is not in a state to be reach acception")
 	}
 
