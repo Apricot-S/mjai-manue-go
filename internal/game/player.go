@@ -234,11 +234,12 @@ func (p *Player) OnReachAccepted(score *int) error {
 func (p *Player) OnTargeted(furo Furo) error {
 	switch furo.Type {
 	case Chi, Pon, Daiminkan:
-		pai := p.Ho[len(p.Ho)-1]
+		numHo := len(p.Ho)
+		pai := p.Ho[numHo-1]
 		if pai != furo.Taken {
 			return fmt.Errorf("pai %v is not equal to taken %v", pai, furo.Taken)
 		}
-		p.Ho = p.Ho[:len(p.Ho)-1]
+		p.Ho = slices.Delete(p.Ho, numHo-1, numHo)
 	}
 
 	return nil
