@@ -1,0 +1,1322 @@
+package game
+
+import (
+	"fmt"
+	"reflect"
+	"testing"
+)
+
+func TestNewPlayer(t *testing.T) {
+	type args struct {
+		id        int
+		name      string
+		initScore int
+	}
+	type testCase struct {
+		name    string
+		args    args
+		want    *Player
+		wantErr bool
+	}
+	var tests []testCase
+
+	// valid id
+	for i := 0; i < 4; i++ {
+		tests = append(tests, testCase{
+			name: fmt.Sprintf("validID_%d", i),
+			args: args{id: i, name: "", initScore: 25_000},
+			want: &Player{
+				ID: i, Name: "",
+				Tehais:     make([]Pai, 0, 14),
+				Furos:      make([]Furo, 0, 4),
+				ReachState: None,
+				Score:      25_000,
+			},
+			wantErr: false,
+		})
+	}
+
+	// invalid id
+	for _, i := range []int{-1, 4} {
+		tests = append(tests, testCase{
+			name:    fmt.Sprintf("invalidID_%d", i),
+			args:    args{id: i, name: "", initScore: 25_000},
+			want:    nil,
+			wantErr: true,
+		})
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := NewPlayer(tt.args.id, tt.args.name, tt.args.initScore)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("NewPlayer() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("NewPlayer() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestPlayer_OnStartKyoku(t *testing.T) {
+	type fields struct {
+		id        int
+		name      string
+		initScore int
+	}
+	type args struct {
+		tehais []Pai
+		score  *int
+	}
+	type testCase struct {
+		name    string
+		fields  fields
+		args    args
+		want    *Player
+		wantErr bool
+	}
+	var tests []testCase
+
+	// valid cases without score
+	{
+		tehais, _ := StrToPais("1m 2m 3m 6m 7m 8m 1p 2p 3p 6p 8p N N")
+		tests = append(tests, testCase{
+			name:    "validNoScore",
+			fields:  fields{id: 0, name: "", initScore: 25_000},
+			args:    args{tehais: tehais, score: nil},
+			want:    &Player{ID: 0, Name: "", Furos: make([]Furo, 0, 4), Tehais: tehais, Score: 25_000},
+			wantErr: false,
+		})
+	}
+
+	// valid cases with score
+	{
+		tehais, _ := StrToPais("1m 2m 3m 6m 7m 8m 1p 2p 3p 6p 8p N N")
+		initScore := 30_000
+		tests = append(tests, testCase{
+			name:    "validWithScore",
+			fields:  fields{id: 0, name: "", initScore: 25_000},
+			args:    args{tehais: tehais, score: &initScore},
+			want:    &Player{ID: 0, Name: "", Furos: make([]Furo, 0, 4), Tehais: tehais, Score: initScore},
+			wantErr: false,
+		})
+	}
+
+	// short hand
+	{
+		tehais, _ := StrToPais("1m 2m 3m 6m 7m 8m 1p 2p 3p 6p 8p N")
+		tests = append(tests, testCase{
+			name:    "shortHand",
+			fields:  fields{id: 0, name: "", initScore: 25_000},
+			args:    args{tehais: tehais, score: nil},
+			want:    nil,
+			wantErr: true,
+		})
+	}
+
+	// long hand
+	{
+		tehais, _ := StrToPais("1m 2m 3m 6m 7m 8m 1p 2p 3p 6p 8p N N N")
+		tests = append(tests, testCase{
+			name:    "longHand",
+			fields:  fields{id: 0, name: "", initScore: 25_000},
+			args:    args{tehais: tehais, score: nil},
+			want:    nil,
+			wantErr: true,
+		})
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			p, _ := NewPlayer(tt.fields.id, tt.fields.name, tt.fields.initScore)
+			if err := p.OnStartKyoku(tt.args.tehais, tt.args.score); (err != nil) != tt.wantErr {
+				t.Errorf("Player.OnStartKyoku() error = %v, wantErr %v", err, tt.wantErr)
+			}
+		})
+	}
+}
+
+func TestPlayer_OnTsumo(t *testing.T) {
+	type fields struct {
+		id        int
+		name      string
+		initScore int
+		tehais    []Pai
+	}
+	type args struct {
+		pai Pai
+	}
+	type testCase struct {
+		name    string
+		fields  fields
+		args    args
+		want    *Player
+		wantErr bool
+	}
+	var tests []testCase
+
+	// valid cases
+	{
+		tehais, _ := StrToPais("1m 2m 3m 6m 7m 8m 1p 2p 3p 6p 8p N N")
+		p, _ := NewPaiWithName("4m")
+		tests = append(tests, testCase{
+			name:   "valid",
+			fields: fields{id: 0, name: "", initScore: 25_000, tehais: tehais},
+			args:   args{pai: *p},
+			want: &Player{
+				ID:                0,
+				Name:              "",
+				Tehais:            append(tehais, *p),
+				Furos:             make([]Furo, 0, 4),
+				Ho:                nil,
+				Sutehais:          nil,
+				ExtraAnpais:       nil,
+				ReachState:        None,
+				ReachHoIndex:      nil,
+				ReachSutehaiIndex: nil,
+				Score:             25_000,
+			},
+			wantErr: false,
+		})
+	}
+
+	// long hand
+	{
+		tehais, _ := StrToPais("1m 2m 3m 6m 7m 8m 1p 2p 3p 6p 8p N N N")
+		p, _ := NewPaiWithName("4m")
+		tests = append(tests, testCase{
+			name:    "longHand",
+			fields:  fields{id: 0, name: "", initScore: 25_000, tehais: tehais},
+			args:    args{pai: *p},
+			want:    nil,
+			wantErr: true,
+		})
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			p, _ := NewPlayer(tt.fields.id, tt.fields.name, tt.fields.initScore)
+			p.OnStartKyoku(tt.fields.tehais, nil)
+			err := p.OnTsumo(tt.args.pai)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("Player.OnTsumo() error = %v, wantErr %v", err, tt.wantErr)
+			}
+			if err == nil && !reflect.DeepEqual(p, tt.want) {
+				t.Errorf("Player = %v, want %v", p, tt.want)
+			}
+		})
+	}
+}
+
+func TestPlayer_OnDahai(t *testing.T) {
+	// before reach
+	t.Run("before reach", func(t *testing.T) {
+		tehais, _ := StrToPais("1m 2m 3m 6m 7m 8m 1p 2p 3p 6p 8p N N")
+		tsumoPai, _ := NewPaiWithName("4m")
+		dahai, _ := NewPaiWithName("2m")
+		tehaisAfterDahai, _ := StrToPais("1m 3m 4m 6m 7m 8m 1p 2p 3p 6p 8p N N")
+
+		p, _ := NewPlayer(0, "", 25_000)
+		p.OnStartKyoku(tehais, nil)
+		p.OnTsumo(*tsumoPai)
+		err := p.OnDahai(*dahai)
+
+		if err != nil {
+			t.Errorf("Player.OnDahai() error = %v", err)
+		}
+
+		want := &Player{
+			ID:                0,
+			Name:              "",
+			Tehais:            tehaisAfterDahai,
+			Furos:             make([]Furo, 0, 4),
+			Ho:                []Pai{*dahai},
+			Sutehais:          []Pai{*dahai},
+			ExtraAnpais:       nil,
+			ReachState:        None,
+			ReachHoIndex:      nil,
+			ReachSutehaiIndex: nil,
+			Score:             25_000,
+		}
+
+		if !reflect.DeepEqual(p, want) {
+			t.Errorf("Player = %v, want %v", p, want)
+		}
+	})
+
+	// after reach
+	t.Run("after reach", func(t *testing.T) {
+		tehais, _ := StrToPais("1m 2m 3m 6m 7m 8m 1p 2p 3p 6p 8p N N")
+		tsumoPai1, _ := NewPaiWithName("E")
+		tsumoPai2, _ := NewPaiWithName("4m")
+		dahai1, _ := NewPaiWithName("E")
+		dahai2, _ := NewPaiWithName("4m")
+		tehaisAfterDahai, _ := StrToPais("1m 2m 3m 6m 7m 8m 1p 2p 3p 6p 8p N N")
+		reachHoIndex := 0
+		reachSutehaiIndex := 0
+
+		p, _ := NewPlayer(0, "", 25_000)
+		p.OnStartKyoku(tehais, nil)
+		p.OnTsumo(*tsumoPai1)
+		p.OnReach()
+		p.OnDahai(*dahai1)
+		p.OnReachAccepted(nil)
+		p.AddExtraAnpais(*dahai1)
+		p.OnTsumo(*tsumoPai2)
+
+		err := p.OnDahai(*dahai2)
+		if err != nil {
+			t.Errorf("Player.OnDahai() error = %v", err)
+		}
+
+		want := &Player{
+			ID:                0,
+			Name:              "",
+			Tehais:            tehaisAfterDahai,
+			Furos:             make([]Furo, 0, 4),
+			Ho:                []Pai{*dahai1, *dahai2},
+			Sutehais:          []Pai{*dahai1, *dahai2},
+			ExtraAnpais:       []Pai{*dahai1},
+			ReachState:        Accepted,
+			ReachHoIndex:      &reachHoIndex,
+			ReachSutehaiIndex: &reachSutehaiIndex,
+			Score:             24_000,
+		}
+
+		if !reflect.DeepEqual(p, want) {
+			t.Errorf("Player = %v, want %v", p, want)
+		}
+	})
+
+	// unknown instead not have pai
+	t.Run("unknown instead not have pai", func(t *testing.T) {
+		tehais, _ := StrToPais("1m 2m 3m 6m 7m 8m 1p 2p 3p 6p 8p N ?")
+		tsumoPai, _ := NewPaiWithName("4m")
+		dahai, _ := NewPaiWithName("5m")
+		tehaisAfterDahai, _ := StrToPais("1m 2m 3m 4m 6m 7m 8m 1p 2p 3p 6p 8p N")
+
+		p, _ := NewPlayer(0, "", 25_000)
+		p.OnStartKyoku(tehais, nil)
+		p.OnTsumo(*tsumoPai)
+
+		err := p.OnDahai(*dahai)
+		if err != nil {
+			t.Errorf("Player.OnDahai() error = %v", err)
+		}
+
+		want := &Player{
+			ID:                0,
+			Name:              "",
+			Tehais:            tehaisAfterDahai,
+			Furos:             make([]Furo, 0, 4),
+			Ho:                []Pai{*dahai},
+			Sutehais:          []Pai{*dahai},
+			ExtraAnpais:       nil,
+			ReachState:        None,
+			ReachHoIndex:      nil,
+			ReachSutehaiIndex: nil,
+			Score:             25_000,
+		}
+
+		if !reflect.DeepEqual(p, want) {
+			t.Errorf("Player = %v, want %v", p, want)
+		}
+	})
+
+	// invalid: before tsumo
+	t.Run("before tsumo", func(t *testing.T) {
+		tehais, _ := StrToPais("1m 2m 3m 6m 7m 8m 1p 2p 3p 6p 8p N N")
+		dahai, _ := NewPaiWithName("2m")
+
+		p, _ := NewPlayer(0, "", 25_000)
+		p.OnStartKyoku(tehais, nil)
+
+		err := p.OnDahai(*dahai)
+		if err == nil {
+			t.Errorf("Player.OnDahai() error = %v, wantErr %v", err, true)
+		}
+	})
+
+	// invalid: not have pai
+	t.Run("not have pai", func(t *testing.T) {
+		tehais, _ := StrToPais("1m 2m 3m 6m 7m 8m 1p 2p 3p 6p 8p N N")
+		tsumoPai, _ := NewPaiWithName("4m")
+		dahai, _ := NewPaiWithName("5m")
+
+		p, _ := NewPlayer(0, "", 25_000)
+		p.OnStartKyoku(tehais, nil)
+		p.OnTsumo(*tsumoPai)
+
+		err := p.OnDahai(*dahai)
+		if err == nil {
+			t.Errorf("Player.OnDahai() error = %v, wantErr %v", err, true)
+		}
+	})
+}
+
+func TestPlayer_OnChiPonKan(t *testing.T) {
+	// on chi
+	t.Run("on chi", func(t *testing.T) {
+		tehais, _ := StrToPais("1m 2m 3m 6m 7m 8m 1p 2p 3p 6p 8p N N")
+		taken, _ := NewPaiWithName("7p")
+		consumed, _ := StrToPais("6p 8p")
+		target := 3
+		furo, _ := NewFuro(Chi, taken, consumed, &target)
+		tehaisAfterFuro, _ := StrToPais("1m 2m 3m 6m 7m 8m 1p 2p 3p N N")
+
+		p, _ := NewPlayer(0, "", 25_000)
+		p.OnStartKyoku(tehais, nil)
+
+		err := p.OnChiPonKan(*furo)
+		if err != nil {
+			t.Errorf("Player.OnChiPonKan() error = %v", err)
+		}
+
+		want := &Player{
+			ID:                0,
+			Name:              "",
+			Tehais:            tehaisAfterFuro,
+			Furos:             []Furo{*furo},
+			Ho:                nil,
+			Sutehais:          nil,
+			ExtraAnpais:       nil,
+			ReachState:        None,
+			ReachHoIndex:      nil,
+			ReachSutehaiIndex: nil,
+			Score:             25_000,
+		}
+
+		if !reflect.DeepEqual(p, want) {
+			t.Errorf("Player = %v, want %v", p, want)
+		}
+	})
+
+	// on pon
+	t.Run("on pon", func(t *testing.T) {
+		tehais, _ := StrToPais("1m 2m 3m 6m 7m 8m 1p 2p 3p 6p 8p N N")
+		taken, _ := NewPaiWithName("N")
+		consumed, _ := StrToPais("N N")
+		target := 2
+		furo, _ := NewFuro(Pon, taken, consumed, &target)
+		tehaisAfterFuro, _ := StrToPais("1m 2m 3m 6m 7m 8m 1p 2p 3p 6p 8p")
+
+		p, _ := NewPlayer(0, "", 25_000)
+		p.OnStartKyoku(tehais, nil)
+
+		err := p.OnChiPonKan(*furo)
+		if err != nil {
+			t.Errorf("Player.OnChiPonKan() error = %v", err)
+		}
+
+		want := &Player{
+			ID:                0,
+			Name:              "",
+			Tehais:            tehaisAfterFuro,
+			Furos:             []Furo{*furo},
+			Ho:                nil,
+			Sutehais:          nil,
+			ExtraAnpais:       nil,
+			ReachState:        None,
+			ReachHoIndex:      nil,
+			ReachSutehaiIndex: nil,
+			Score:             25_000,
+		}
+
+		if !reflect.DeepEqual(p, want) {
+			t.Errorf("Player = %v, want %v", p, want)
+		}
+	})
+
+	// on daiminkan
+	t.Run("on daiminkan", func(t *testing.T) {
+		tehais, _ := StrToPais("1m 2m 3m 6m 7m 8m 1p 2p 3p 6p N N N")
+		taken, _ := NewPaiWithName("N")
+		consumed, _ := StrToPais("N N N")
+		target := 2
+		furo, _ := NewFuro(Daiminkan, taken, consumed, &target)
+		tehaisAfterFuro, _ := StrToPais("1m 2m 3m 6m 7m 8m 1p 2p 3p 6p")
+
+		p, _ := NewPlayer(0, "", 25_000)
+		p.OnStartKyoku(tehais, nil)
+
+		err := p.OnChiPonKan(*furo)
+		if err != nil {
+			t.Errorf("Player.OnChiPonKan() error = %v", err)
+		}
+
+		want := &Player{
+			ID:                0,
+			Name:              "",
+			Tehais:            tehaisAfterFuro,
+			Furos:             []Furo{*furo},
+			Ho:                nil,
+			Sutehais:          nil,
+			ExtraAnpais:       nil,
+			ReachState:        None,
+			ReachHoIndex:      nil,
+			ReachSutehaiIndex: nil,
+			Score:             25_000,
+		}
+
+		if !reflect.DeepEqual(p, want) {
+			t.Errorf("Player = %v, want %v", p, want)
+		}
+	})
+
+	// cannot 5th furo
+	t.Run("cannot 5th furo", func(t *testing.T) {
+		tehais, _ := StrToPais("2m 3m 1p 1p 2p 3p 1s 1s 1s 2s N N N")
+		target := 2
+
+		taken1, _ := NewPaiWithName("N")
+		consumed1, _ := StrToPais("N N N")
+		furo1, _ := NewFuro(Daiminkan, taken1, consumed1, &target)
+
+		taken2, _ := NewPaiWithName("1s")
+		consumed2, _ := StrToPais("1s 1s 1s")
+		furo2, _ := NewFuro(Daiminkan, taken2, consumed2, &target)
+
+		taken3, _ := NewPaiWithName("1p")
+		consumed3, _ := StrToPais("1p 1p")
+		furo3, _ := NewFuro(Pon, taken3, consumed3, &target)
+		dahai3, _ := NewPaiWithName("2s")
+
+		taken4, _ := NewPaiWithName("1m")
+		consumed4, _ := StrToPais("2m 3m")
+		furo4, _ := NewFuro(Chi, taken4, consumed4, &target)
+		dahai4, _ := NewPaiWithName("3p")
+
+		taken5, _ := NewPaiWithName("4p")
+		consumed5, _ := StrToPais("2p 3p")
+		furo5, _ := NewFuro(Chi, taken5, consumed5, &target)
+
+		p, _ := NewPlayer(0, "", 25_000)
+		p.OnStartKyoku(tehais, nil)
+		p.OnChiPonKan(*furo1)
+		p.OnChiPonKan(*furo2)
+		p.OnChiPonKan(*furo3)
+		p.OnDahai(*dahai3)
+		p.OnChiPonKan(*furo4)
+		p.OnDahai(*dahai4)
+
+		err := p.OnChiPonKan(*furo5)
+		if err == nil {
+			t.Errorf("Player.OnChiPonKan() error = %v, wantErr %v", err, true)
+		}
+	})
+
+	// after tsumo
+	t.Run("after tsumo", func(t *testing.T) {
+		tehais, _ := StrToPais("2m 3m 1p 1p 2p 3p 1s 1s 1s 2s N N N")
+		tsumoPai, _ := NewPaiWithName("4m")
+		target := 2
+		taken, _ := NewPaiWithName("N")
+		consumed, _ := StrToPais("N N N")
+		furo, _ := NewFuro(Daiminkan, taken, consumed, &target)
+
+		p, _ := NewPlayer(0, "", 25_000)
+		p.OnStartKyoku(tehais, nil)
+		p.OnTsumo(*tsumoPai)
+
+		err := p.OnChiPonKan(*furo)
+		if err == nil {
+			t.Errorf("Player.OnChiPonKan() error = %v, wantErr %v", err, true)
+		}
+	})
+
+	// cannot ankan
+	t.Run("cannot ankan", func(t *testing.T) {
+		tehais, _ := StrToPais("2m 3m 1p 1p 2p 3p 1s 1s 1s N N N N")
+		consumed, _ := StrToPais("N N N N")
+		furo, _ := NewFuro(Ankan, nil, consumed, nil)
+
+		p, _ := NewPlayer(0, "", 25_000)
+		p.OnStartKyoku(tehais, nil)
+
+		err := p.OnChiPonKan(*furo)
+		if err == nil {
+			t.Errorf("Player.OnChiPonKan() error = %v, wantErr %v", err, true)
+		}
+	})
+
+	// cannot kakan
+	t.Run("cannot kakan", func(t *testing.T) {
+		tehais, _ := StrToPais("2m 3m 1p 1p 2p 3p 1s 1s 1s 2s N N N")
+		taken, _ := NewPaiWithName("N")
+		consumed, _ := StrToPais("N N N")
+		target := 2
+		furo, _ := NewFuro(Kakan, taken, consumed, &target)
+
+		p, _ := NewPlayer(0, "", 25_000)
+		p.OnStartKyoku(tehais, nil)
+
+		err := p.OnChiPonKan(*furo)
+		if err == nil {
+			t.Errorf("Player.OnChiPonKan() error = %v, wantErr %v", err, true)
+		}
+	})
+}
+
+func TestPlayer_OnAnkan(t *testing.T) {
+	// on ankan
+	t.Run("on ankan", func(t *testing.T) {
+		tehais, _ := StrToPais("1m 2m 3m 6m 7m 8m 1p 2p 3p 6p N N N")
+		tsumoPai, _ := NewPaiWithName("N")
+		consumed, _ := StrToPais("N N N N")
+		furo, _ := NewFuro(Ankan, nil, consumed, nil)
+		tehaisAfterFuro, _ := StrToPais("1m 2m 3m 6m 7m 8m 1p 2p 3p 6p")
+
+		p, _ := NewPlayer(0, "", 25_000)
+		p.OnStartKyoku(tehais, nil)
+		p.OnTsumo(*tsumoPai)
+
+		err := p.OnAnkan(*furo)
+		if err != nil {
+			t.Errorf("Player.OnAnkan() error = %v", err)
+		}
+
+		want := &Player{
+			ID:                0,
+			Name:              "",
+			Tehais:            tehaisAfterFuro,
+			Furos:             []Furo{*furo},
+			Ho:                nil,
+			Sutehais:          nil,
+			ExtraAnpais:       nil,
+			ReachState:        None,
+			ReachHoIndex:      nil,
+			ReachSutehaiIndex: nil,
+			Score:             25_000,
+		}
+
+		if !reflect.DeepEqual(p, want) {
+			t.Errorf("Player = %v, want %v", p, want)
+		}
+	})
+
+	// cannot 5th furo
+	t.Run("cannot 5th furo", func(t *testing.T) {
+		tehais, _ := StrToPais("2m 3m 1p 1p 2p 3p 1s 1s 1s 2s N N N")
+		target := 2
+
+		taken1, _ := NewPaiWithName("N")
+		consumed1, _ := StrToPais("N N N")
+		furo1, _ := NewFuro(Daiminkan, taken1, consumed1, &target)
+
+		taken2, _ := NewPaiWithName("1s")
+		consumed2, _ := StrToPais("1s 1s 1s")
+		furo2, _ := NewFuro(Daiminkan, taken2, consumed2, &target)
+
+		taken3, _ := NewPaiWithName("1p")
+		consumed3, _ := StrToPais("1p 1p")
+		furo3, _ := NewFuro(Pon, taken3, consumed3, &target)
+		dahai3, _ := NewPaiWithName("2s")
+
+		taken4, _ := NewPaiWithName("1m")
+		consumed4, _ := StrToPais("2m 3m")
+		furo4, _ := NewFuro(Chi, taken4, consumed4, &target)
+		dahai4, _ := NewPaiWithName("3p")
+
+		consumed5, _ := StrToPais("E E E E")
+		furo5, _ := NewFuro(Ankan, nil, consumed5, nil)
+
+		p, _ := NewPlayer(0, "", 25_000)
+		p.OnStartKyoku(tehais, nil)
+		p.OnChiPonKan(*furo1)
+		p.OnChiPonKan(*furo2)
+		p.OnChiPonKan(*furo3)
+		p.OnDahai(*dahai3)
+		p.OnChiPonKan(*furo4)
+		p.OnDahai(*dahai4)
+
+		err := p.OnAnkan(*furo5)
+		if err == nil {
+			t.Errorf("Player.OnAnkan() error = %v, wantErr %v", err, true)
+		}
+	})
+
+	// before tsumo
+	t.Run("before tsumo", func(t *testing.T) {
+		tehais, _ := StrToPais("1m 2m 3m 6m 7m 8m 1p 2p 3p N N N N")
+		consumed, _ := StrToPais("N N N N")
+		furo, _ := NewFuro(Ankan, nil, consumed, nil)
+
+		p, _ := NewPlayer(0, "", 25_000)
+		p.OnStartKyoku(tehais, nil)
+
+		err := p.OnAnkan(*furo)
+		if err == nil {
+			t.Errorf("Player.OnAnkan() error = %v, wantErr %v", err, true)
+		}
+	})
+
+	// cannot chi
+	t.Run("cannot chi", func(t *testing.T) {
+		tehais, _ := StrToPais("1m 2m 3m 6m 7m 8m 1p 2p 3p 6p N N N")
+		tsumoPai, _ := NewPaiWithName("N")
+		taken, _ := NewPaiWithName("1p")
+		consumed, _ := StrToPais("2p 3p")
+		target := 3
+		furo, _ := NewFuro(Chi, taken, consumed, &target)
+
+		p, _ := NewPlayer(0, "", 25_000)
+		p.OnStartKyoku(tehais, nil)
+		p.OnTsumo(*tsumoPai)
+
+		err := p.OnAnkan(*furo)
+		if err == nil {
+			t.Errorf("Player.OnAnkan() error = %v, wantErr %v", err, true)
+		}
+	})
+
+	// cannot pon
+	t.Run("cannot pon", func(t *testing.T) {
+		tehais, _ := StrToPais("1m 2m 3m 6m 7m 8m 1p 2p 3p 6p N N N")
+		tsumoPai, _ := NewPaiWithName("N")
+		taken, _ := NewPaiWithName("N")
+		consumed, _ := StrToPais("N N")
+		target := 3
+		furo, _ := NewFuro(Pon, taken, consumed, &target)
+
+		p, _ := NewPlayer(0, "", 25_000)
+		p.OnStartKyoku(tehais, nil)
+		p.OnTsumo(*tsumoPai)
+
+		err := p.OnAnkan(*furo)
+		if err == nil {
+			t.Errorf("Player.OnAnkan() error = %v, wantErr %v", err, true)
+		}
+	})
+
+	// cannot daiminkan
+	t.Run("cannot daiminkan", func(t *testing.T) {
+		tehais, _ := StrToPais("1m 2m 3m 6m 7m 8m 1p 2p 3p 6p N N N")
+		tsumoPai, _ := NewPaiWithName("N")
+		taken, _ := NewPaiWithName("N")
+		consumed, _ := StrToPais("N N N")
+		target := 3
+		furo, _ := NewFuro(Daiminkan, taken, consumed, &target)
+
+		p, _ := NewPlayer(0, "", 25_000)
+		p.OnStartKyoku(tehais, nil)
+		p.OnTsumo(*tsumoPai)
+
+		err := p.OnAnkan(*furo)
+		if err == nil {
+			t.Errorf("Player.OnAnkan() error = %v, wantErr %v", err, true)
+		}
+	})
+
+	// cannot kakan
+	t.Run("cannot kakan", func(t *testing.T) {
+		tehais, _ := StrToPais("1m 2m 3m 6m 7m 8m 1p 2p 3p 6p N N N")
+		tsumoPai, _ := NewPaiWithName("N")
+		taken, _ := NewPaiWithName("N")
+		consumed, _ := StrToPais("N N N")
+		furo, _ := NewFuro(Kakan, taken, consumed, nil)
+
+		p, _ := NewPlayer(0, "", 25_000)
+		p.OnStartKyoku(tehais, nil)
+		p.OnTsumo(*tsumoPai)
+
+		err := p.OnAnkan(*furo)
+		if err == nil {
+			t.Errorf("Player.OnAnkan() error = %v, wantErr %v", err, true)
+		}
+	})
+}
+
+func TestPlayer_OnKakan(t *testing.T) {
+	// on kakan
+	t.Run("on kakan", func(t *testing.T) {
+		tehais, _ := StrToPais("1m 2m 3m 6m 7m 8m 1p 2p 3p 6p N N N")
+		tsumoPai, _ := NewPaiWithName("6p")
+
+		taken1, _ := NewPaiWithName("N")
+		consumed1, _ := StrToPais("N N")
+		target := 3
+		furo1, _ := NewFuro(Pon, taken1, consumed1, &target)
+		dahai1, _ := NewPaiWithName("6p")
+
+		taken2, _ := NewPaiWithName("N")
+		consumed2, _ := StrToPais("N N N")
+		furo2, _ := NewFuro(Kakan, taken2, consumed2, nil)
+		tehaisAfterFuro, _ := StrToPais("1m 2m 3m 6m 7m 8m 1p 2p 3p 6p")
+
+		kantsu := Furo{
+			Type:     Kakan,
+			Taken:    *taken2,
+			Consumed: consumed2,
+			Target:   &target,
+			Pais:     append(consumed2, *taken2),
+		}
+
+		p, _ := NewPlayer(0, "", 25_000)
+		p.OnStartKyoku(tehais, nil)
+		p.OnChiPonKan(*furo1)
+		p.OnDahai(*dahai1)
+		p.OnTsumo(*tsumoPai)
+
+		err := p.OnKakan(*furo2)
+		if err != nil {
+			t.Errorf("Player.OnKakan() error = %v", err)
+		}
+
+		want := &Player{
+			ID:                0,
+			Name:              "",
+			Tehais:            tehaisAfterFuro,
+			Furos:             []Furo{kantsu},
+			Ho:                []Pai{*dahai1},
+			Sutehais:          []Pai{*dahai1},
+			ExtraAnpais:       nil,
+			ReachState:        None,
+			ReachHoIndex:      nil,
+			ReachSutehaiIndex: nil,
+			Score:             25_000,
+		}
+
+		if !reflect.DeepEqual(p, want) {
+			t.Errorf("Player = %v, want %v", p, want)
+		}
+	})
+
+	// 5th furo
+	t.Run("5th furo", func(t *testing.T) {
+		tehais, _ := StrToPais("2m 3m 1p 1p 2p 3p 1s 1s 1s 2s N N N")
+		target := 2
+
+		taken1, _ := NewPaiWithName("N")
+		consumed1, _ := StrToPais("N N N")
+		furo1, _ := NewFuro(Daiminkan, taken1, consumed1, &target)
+
+		taken2, _ := NewPaiWithName("1s")
+		consumed2, _ := StrToPais("1s 1s 1s")
+		furo2, _ := NewFuro(Daiminkan, taken2, consumed2, &target)
+
+		taken3, _ := NewPaiWithName("1p")
+		consumed3, _ := StrToPais("1p 1p")
+		furo3, _ := NewFuro(Pon, taken3, consumed3, &target)
+		dahai3, _ := NewPaiWithName("2s")
+
+		taken4, _ := NewPaiWithName("1m")
+		consumed4, _ := StrToPais("2m 3m")
+		furo4, _ := NewFuro(Chi, taken4, consumed4, &target)
+		dahai4, _ := NewPaiWithName("3p")
+
+		tsumoPai, _ := NewPaiWithName("1p")
+		taken5, _ := NewPaiWithName("1p")
+		consumed5, _ := StrToPais("1p 1p 1p")
+		furo5, _ := NewFuro(Kakan, taken5, consumed5, nil)
+		tehaisAfterFuro, _ := StrToPais("2p")
+
+		kantsu := Furo{
+			Type:     Kakan,
+			Taken:    *taken5,
+			Consumed: consumed5,
+			Target:   &target,
+			Pais:     append(consumed5, *taken5),
+		}
+
+		p, _ := NewPlayer(0, "", 25_000)
+		p.OnStartKyoku(tehais, nil)
+		p.OnChiPonKan(*furo1)
+		p.OnChiPonKan(*furo2)
+		p.OnChiPonKan(*furo3)
+		p.OnDahai(*dahai3)
+		p.OnChiPonKan(*furo4)
+		p.OnDahai(*dahai4)
+		p.OnTsumo(*tsumoPai)
+
+		err := p.OnKakan(*furo5)
+		if err != nil {
+			t.Errorf("Player.OnKakan() error = %v", err)
+		}
+
+		want := &Player{
+			ID:                0,
+			Name:              "",
+			Tehais:            tehaisAfterFuro,
+			Furos:             []Furo{*furo1, *furo2, kantsu, *furo4},
+			Ho:                []Pai{*dahai3, *dahai4},
+			Sutehais:          []Pai{*dahai3, *dahai4},
+			ExtraAnpais:       nil,
+			ReachState:        None,
+			ReachHoIndex:      nil,
+			ReachSutehaiIndex: nil,
+			Score:             25_000,
+		}
+
+		if !reflect.DeepEqual(p, want) {
+			t.Errorf("Player = %v, want %v", p, want)
+		}
+	})
+
+	// before tsumo
+	t.Run("before tsumo", func(t *testing.T) {
+		tehais, _ := StrToPais("1m 2m 3m 6m 7m 8m 1p 2p 3p N N N N")
+		target := 2
+
+		taken1, _ := NewPaiWithName("N")
+		consumed1, _ := StrToPais("N N")
+		furo1, _ := NewFuro(Pon, taken1, consumed1, &target)
+		dahai1, _ := NewPaiWithName("6m")
+
+		taken2, _ := NewPaiWithName("N")
+		consumed2, _ := StrToPais("N N N")
+		furo2, _ := NewFuro(Kakan, taken2, consumed2, nil)
+
+		p, _ := NewPlayer(0, "", 25_000)
+		p.OnStartKyoku(tehais, nil)
+		p.OnChiPonKan(*furo1)
+		p.OnDahai(*dahai1)
+
+		err := p.OnKakan(*furo2)
+		if err == nil {
+			t.Errorf("Player.OnKakan() error = %v, wantErr %v", err, true)
+		}
+	})
+
+	// cannot chi
+	t.Run("cannot chi", func(t *testing.T) {
+		tehais, _ := StrToPais("1m 2m 3m 6m 7m 8m 1p 2p 3p 6p N N N")
+		tsumoPai, _ := NewPaiWithName("N")
+		taken, _ := NewPaiWithName("1m")
+		consumed, _ := StrToPais("2m 3m")
+		target := 3
+		furo, _ := NewFuro(Chi, taken, consumed, &target)
+
+		p, _ := NewPlayer(0, "", 25_000)
+		p.OnStartKyoku(tehais, nil)
+		p.OnTsumo(*tsumoPai)
+
+		err := p.OnKakan(*furo)
+		if err == nil {
+			t.Errorf("Player.OnKakan() error = %v, wantErr %v", err, true)
+		}
+	})
+
+	// cannot pon
+	t.Run("cannot pon", func(t *testing.T) {
+		tehais, _ := StrToPais("1m 2m 3m 6m 7m 8m 1p 2p 3p 6p N N N")
+		tsumoPai, _ := NewPaiWithName("N")
+		taken, _ := NewPaiWithName("N")
+		consumed, _ := StrToPais("N N")
+		target := 3
+		furo, _ := NewFuro(Pon, taken, consumed, &target)
+
+		p, _ := NewPlayer(0, "", 25_000)
+		p.OnStartKyoku(tehais, nil)
+		p.OnTsumo(*tsumoPai)
+
+		err := p.OnKakan(*furo)
+		if err == nil {
+			t.Errorf("Player.OnKakan() error = %v, wantErr %v", err, true)
+		}
+	})
+
+	// cannot daiminkan
+	t.Run("cannot daiminkan", func(t *testing.T) {
+		tehais, _ := StrToPais("1m 2m 3m 6m 7m 8m 1p 2p 3p 6p N N N")
+		tsumoPai, _ := NewPaiWithName("7p")
+		taken, _ := NewPaiWithName("N")
+		consumed, _ := StrToPais("N N N")
+		target := 3
+		furo, _ := NewFuro(Daiminkan, taken, consumed, &target)
+
+		p, _ := NewPlayer(0, "", 25_000)
+		p.OnStartKyoku(tehais, nil)
+		p.OnTsumo(*tsumoPai)
+
+		err := p.OnKakan(*furo)
+		if err == nil {
+			t.Errorf("Player.OnKakan() error = %v, wantErr %v", err, true)
+		}
+	})
+
+	// cannot ankan
+	t.Run("cannot ankan", func(t *testing.T) {
+		tehais, _ := StrToPais("1m 2m 3m 6m 7m 8m 1p 2p 3p 6p N N N")
+		tsumoPai, _ := NewPaiWithName("N")
+		consumed, _ := StrToPais("N N N N")
+		furo, _ := NewFuro(Ankan, nil, consumed, nil)
+
+		p, _ := NewPlayer(0, "", 25_000)
+		p.OnStartKyoku(tehais, nil)
+		p.OnTsumo(*tsumoPai)
+
+		err := p.OnKakan(*furo)
+		if err == nil {
+			t.Errorf("Player.OnKakan() error = %v, wantErr %v", err, true)
+		}
+	})
+
+	// without pon
+	t.Run("without pon", func(t *testing.T) {
+		tehais, _ := StrToPais("1m 2m 3m 6m 7m 8m 1p 2p 3p 6p N N N")
+		tsumoPai, _ := NewPaiWithName("7p")
+		taken, _ := NewPaiWithName("N")
+		consumed, _ := StrToPais("N N N")
+		furo, _ := NewFuro(Kakan, taken, consumed, nil)
+
+		p, _ := NewPlayer(0, "", 25_000)
+		p.OnStartKyoku(tehais, nil)
+		p.OnTsumo(*tsumoPai)
+
+		err := p.OnKakan(*furo)
+		if err == nil {
+			t.Errorf("Player.OnKakan() error = %v, wantErr %v", err, true)
+		}
+	})
+}
+
+func TestPlayer_OnReach(t *testing.T) {
+	// valid case
+	t.Run("on reach", func(t *testing.T) {
+		tehais, _ := StrToPais("1m 2m 3m 6m 7m 8m 1p 2p 3p 6p 8p N N")
+		tsumoPai, _ := NewPaiWithName("E")
+		tehaisAfterTsumo, _ := StrToPais("1m 2m 3m 6m 7m 8m 1p 2p 3p 6p 8p N N E")
+
+		p, _ := NewPlayer(0, "", 25_000)
+		p.OnStartKyoku(tehais, nil)
+		p.OnTsumo(*tsumoPai)
+
+		err := p.OnReach()
+		if err != nil {
+			t.Errorf("Player.OnReach() error = %v", err)
+		}
+
+		want := &Player{
+			ID:                0,
+			Name:              "",
+			Tehais:            tehaisAfterTsumo,
+			Furos:             make([]Furo, 0, 4),
+			Ho:                nil,
+			Sutehais:          nil,
+			ExtraAnpais:       nil,
+			ReachState:        Declared,
+			ReachHoIndex:      nil,
+			ReachSutehaiIndex: nil,
+			Score:             25_000,
+		}
+
+		if !reflect.DeepEqual(p, want) {
+			t.Errorf("Player = %v, want %v", p, want)
+		}
+	})
+
+	// cannot twice
+	t.Run("cannot twice", func(t *testing.T) {
+		tehais, _ := StrToPais("1m 2m 3m 6m 7m 8m 1p 2p 3p 6p 8p N N")
+		tsumoPai, _ := NewPaiWithName("E")
+
+		p, _ := NewPlayer(0, "", 25_000)
+		p.OnStartKyoku(tehais, nil)
+		p.OnTsumo(*tsumoPai)
+		p.OnReach()
+
+		err := p.OnReach()
+		if err == nil {
+			t.Errorf("Player.OnReach() error = %v, wantErr %v", err, true)
+		}
+	})
+
+	// cannot after reach
+	t.Run("cannot after reach", func(t *testing.T) {
+		tehais, _ := StrToPais("1m 2m 3m 6m 7m 8m 1p 2p 3p 6p 8p N N")
+		tsumoPai1, _ := NewPaiWithName("E")
+		tsumoPai2, _ := NewPaiWithName("E")
+
+		p, _ := NewPlayer(0, "", 25_000)
+		p.OnStartKyoku(tehais, nil)
+		p.OnTsumo(*tsumoPai1)
+		p.OnReach()
+		p.OnDahai(*tsumoPai1)
+		p.OnReachAccepted(nil)
+		p.OnTsumo(*tsumoPai2)
+
+		err := p.OnReach()
+		if err == nil {
+			t.Errorf("Player.OnReach() error = %v, wantErr %v", err, true)
+		}
+	})
+
+	// cannot before tsumo
+	t.Run("cannot before tsumo", func(t *testing.T) {
+		tehais, _ := StrToPais("1m 2m 3m 6m 7m 8m 1p 2p 3p 6p 8p N N")
+
+		p, _ := NewPlayer(0, "", 25_000)
+		p.OnStartKyoku(tehais, nil)
+
+		err := p.OnReach()
+		if err == nil {
+			t.Errorf("Player.OnReach() error = %v, wantErr %v", err, true)
+		}
+	})
+}
+
+func TestPlayer_OnReachAccepted(t *testing.T) {
+	// on reach accepted
+	t.Run("on reach accepted", func(t *testing.T) {
+		tehais, _ := StrToPais("1m 2m 3m 6m 7m 8m 1p 2p 3p 6p 8p N N")
+		tsumoPai, _ := NewPaiWithName("E")
+		dahaiIndex := 0
+
+		p, _ := NewPlayer(0, "", 25_000)
+		p.OnStartKyoku(tehais, nil)
+		p.OnTsumo(*tsumoPai)
+		p.OnReach()
+		p.OnDahai(*tsumoPai)
+
+		err := p.OnReachAccepted(nil)
+		if err != nil {
+			t.Errorf("Player.OnReachAccepted() error = %v", err)
+		}
+
+		want := &Player{
+			ID:                0,
+			Name:              "",
+			Tehais:            tehais,
+			Furos:             make([]Furo, 0, 4),
+			Ho:                []Pai{*tsumoPai},
+			Sutehais:          []Pai{*tsumoPai},
+			ExtraAnpais:       nil,
+			ReachState:        Accepted,
+			ReachHoIndex:      &dahaiIndex,
+			ReachSutehaiIndex: &dahaiIndex,
+			Score:             24_000,
+		}
+
+		if !reflect.DeepEqual(p, want) {
+			t.Errorf("Player = %v, want %v", p, want)
+		}
+	})
+
+	// with score
+	t.Run("with score", func(t *testing.T) {
+		tehais, _ := StrToPais("1m 2m 3m 6m 7m 8m 1p 2p 3p 6p 8p N N")
+		tsumoPai, _ := NewPaiWithName("E")
+		dahaiIndex := 0
+		scoreAfterReach := 23_000
+
+		p, _ := NewPlayer(0, "", 25_000)
+		p.OnStartKyoku(tehais, nil)
+		p.OnTsumo(*tsumoPai)
+		p.OnReach()
+		p.OnDahai(*tsumoPai)
+
+		err := p.OnReachAccepted(&scoreAfterReach)
+		if err != nil {
+			t.Errorf("Player.OnReachAccepted() error = %v", err)
+		}
+
+		want := &Player{
+			ID:                0,
+			Name:              "",
+			Tehais:            tehais,
+			Furos:             make([]Furo, 0, 4),
+			Ho:                []Pai{*tsumoPai},
+			Sutehais:          []Pai{*tsumoPai},
+			ExtraAnpais:       nil,
+			ReachState:        Accepted,
+			ReachHoIndex:      &dahaiIndex,
+			ReachSutehaiIndex: &dahaiIndex,
+			Score:             23_000,
+		}
+
+		if !reflect.DeepEqual(p, want) {
+			t.Errorf("Player = %v, want %v", p, want)
+		}
+	})
+
+	// cannot twice
+	t.Run("cannot twice", func(t *testing.T) {
+		tehais, _ := StrToPais("1m 2m 3m 6m 7m 8m 1p 2p 3p 6p 8p N N")
+		tsumoPai, _ := NewPaiWithName("E")
+
+		p, _ := NewPlayer(0, "", 25_000)
+		p.OnStartKyoku(tehais, nil)
+		p.OnTsumo(*tsumoPai)
+		p.OnReach()
+		p.OnDahai(*tsumoPai)
+		p.OnReachAccepted(nil)
+
+		err := p.OnReachAccepted(nil)
+		if err == nil {
+			t.Errorf("Player.OnReachAccepted() error = %v, wantErr %v", err, true)
+		}
+	})
+
+	// cannot before reach
+	t.Run("cannot before reach", func(t *testing.T) {
+		tehais, _ := StrToPais("1m 2m 3m 6m 7m 8m 1p 2p 3p 6p 8p N N")
+
+		p, _ := NewPlayer(0, "", 25_000)
+		p.OnStartKyoku(tehais, nil)
+
+		err := p.OnReachAccepted(nil)
+		if err == nil {
+			t.Errorf("Player.OnReachAccepted() error = %v, wantErr %v", err, true)
+		}
+	})
+}
+
+func TestPlayer_OnTargeted(t *testing.T) {
+	// on chi
+	t.Run("on chi", func(t *testing.T) {
+		tehais, _ := StrToPais("1m 2m 3m 6m 7m 8m 1p 2p 3p 6p 8p N N")
+		tsumoPai, _ := NewPaiWithName("7p")
+
+		taken, _ := NewPaiWithName("7p")
+		consumed, _ := StrToPais("6p 8p")
+		target := 0
+		furo, _ := NewFuro(Chi, taken, consumed, &target)
+
+		p, _ := NewPlayer(0, "", 25_000)
+		p.OnStartKyoku(tehais, nil)
+		p.OnTsumo(*tsumoPai)
+		p.OnDahai(*tsumoPai)
+
+		err := p.OnTargeted(*furo)
+		if err != nil {
+			t.Errorf("Player.OnTargeted() error = %v", err)
+		}
+
+		want := &Player{
+			ID:                0,
+			Name:              "",
+			Tehais:            tehais,
+			Furos:             make([]Furo, 0, 4),
+			Ho:                []Pai{},
+			Sutehais:          []Pai{*tsumoPai},
+			ExtraAnpais:       nil,
+			ReachState:        None,
+			ReachHoIndex:      nil,
+			ReachSutehaiIndex: nil,
+			Score:             25_000,
+		}
+
+		if !reflect.DeepEqual(p, want) {
+			t.Errorf("Player = %v, want %v", p, want)
+		}
+	})
+
+	// on pon
+	t.Run("on pon", func(t *testing.T) {
+		tehais, _ := StrToPais("1m 2m 3m 6m 7m 8m 1p 2p 3p 6p 8p N N")
+		tsumoPai, _ := NewPaiWithName("E")
+
+		taken, _ := NewPaiWithName("E")
+		consumed, _ := StrToPais("E E")
+		target := 0
+		furo, _ := NewFuro(Pon, taken, consumed, &target)
+
+		p, _ := NewPlayer(0, "", 25_000)
+		p.OnStartKyoku(tehais, nil)
+		p.OnTsumo(*tsumoPai)
+		p.OnDahai(*tsumoPai)
+
+		err := p.OnTargeted(*furo)
+		if err != nil {
+			t.Errorf("Player.OnTargeted() error = %v", err)
+		}
+
+		want := &Player{
+			ID:                0,
+			Name:              "",
+			Tehais:            tehais,
+			Furos:             make([]Furo, 0, 4),
+			Ho:                []Pai{},
+			Sutehais:          []Pai{*tsumoPai},
+			ExtraAnpais:       nil,
+			ReachState:        None,
+			ReachHoIndex:      nil,
+			ReachSutehaiIndex: nil,
+			Score:             25_000,
+		}
+
+		if !reflect.DeepEqual(p, want) {
+			t.Errorf("Player = %v, want %v", p, want)
+		}
+	})
+
+	// on daiminkan
+	t.Run("on daiminkan", func(t *testing.T) {
+		tehais, _ := StrToPais("1m 2m 3m 6m 7m 8m 1p 2p 3p 6p 8p N N")
+		tsumoPai, _ := NewPaiWithName("E")
+
+		taken, _ := NewPaiWithName("E")
+		consumed, _ := StrToPais("E E E")
+		target := 0
+		furo, _ := NewFuro(Daiminkan, taken, consumed, &target)
+
+		p, _ := NewPlayer(0, "", 25_000)
+		p.OnStartKyoku(tehais, nil)
+		p.OnTsumo(*tsumoPai)
+		p.OnDahai(*tsumoPai)
+
+		err := p.OnTargeted(*furo)
+		if err != nil {
+			t.Errorf("Player.OnTargeted() error = %v", err)
+		}
+
+		want := &Player{
+			ID:                0,
+			Name:              "",
+			Tehais:            tehais,
+			Furos:             make([]Furo, 0, 4),
+			Ho:                []Pai{},
+			Sutehais:          []Pai{*tsumoPai},
+			ExtraAnpais:       nil,
+			ReachState:        None,
+			ReachHoIndex:      nil,
+			ReachSutehaiIndex: nil,
+			Score:             25_000,
+		}
+
+		if !reflect.DeepEqual(p, want) {
+			t.Errorf("Player = %v, want %v", p, want)
+		}
+	})
+
+	// cannot on ankan
+	t.Run("cannot on ankan", func(t *testing.T) {
+		tehais, _ := StrToPais("1m 2m 3m 6m 7m 8m 1p 2p 3p 6p 8p N N")
+		tsumoPai, _ := NewPaiWithName("E")
+
+		consumed, _ := StrToPais("E E E E")
+		furo, _ := NewFuro(Ankan, nil, consumed, nil)
+
+		p, _ := NewPlayer(0, "", 25_000)
+		p.OnStartKyoku(tehais, nil)
+		p.OnTsumo(*tsumoPai)
+		p.OnDahai(*tsumoPai)
+
+		err := p.OnTargeted(*furo)
+		if err == nil {
+			t.Errorf("Player.OnTargeted() error = %v, wantErr %v", err, true)
+		}
+	})
+
+	// cannot on kakan
+	t.Run("cannot on kakan", func(t *testing.T) {
+		tehais, _ := StrToPais("1m 2m 3m 6m 7m 8m 1p 2p 3p 6p 8p N N")
+		tsumoPai, _ := NewPaiWithName("E")
+
+		taken, _ := NewPaiWithName("E")
+		consumed, _ := StrToPais("E E E")
+		furo, _ := NewFuro(Kakan, taken, consumed, nil)
+
+		p, _ := NewPlayer(0, "", 25_000)
+		p.OnStartKyoku(tehais, nil)
+		p.OnTsumo(*tsumoPai)
+		p.OnDahai(*tsumoPai)
+
+		err := p.OnTargeted(*furo)
+		if err == nil {
+			t.Errorf("Player.OnTargeted() error = %v, wantErr %v", err, true)
+		}
+	})
+}
