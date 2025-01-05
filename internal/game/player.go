@@ -35,6 +35,7 @@ type Player struct {
 	ReachSutehaiIndex *int
 	Score             int
 	CanDahai          bool
+	IsMenzen          bool
 }
 
 func NewPlayer(id int, name string, initScore int) (*Player, error) {
@@ -55,6 +56,7 @@ func NewPlayer(id int, name string, initScore int) (*Player, error) {
 		ReachSutehaiIndex: nil,
 		Score:             initScore,
 		CanDahai:          false,
+		IsMenzen:          true,
 	}, nil
 }
 
@@ -77,6 +79,7 @@ func (p *Player) OnStartKyoku(tehais []Pai, score *int) error {
 	p.ReachHoIndex = nil
 	p.ReachSutehaiIndex = nil
 	p.CanDahai = false
+	p.IsMenzen = true
 
 	if score != nil {
 		p.Score = *score
@@ -123,7 +126,7 @@ func (p *Player) OnChiPonKan(furo Furo) error {
 		return fmt.Errorf("a 5th furo is not possible")
 	}
 
-	if p.CanDahai {
+	if p.CanDahai || p.ReachState != None {
 		return fmt.Errorf("it is not in a state to be chi/pon/kan")
 	}
 
@@ -142,6 +145,7 @@ func (p *Player) OnChiPonKan(furo Furo) error {
 
 	p.Furos = append(p.Furos, furo)
 	p.CanDahai = furo.Type != Daiminkan
+	p.IsMenzen = false
 	return nil
 }
 
@@ -172,7 +176,7 @@ func (p *Player) OnAnkan(furo Furo) error {
 }
 
 func (p *Player) OnKakan(furo Furo) error {
-	if !p.CanDahai {
+	if !p.CanDahai || p.ReachState != None {
 		return fmt.Errorf("it is not in a state to be kakan")
 	}
 
@@ -180,16 +184,16 @@ func (p *Player) OnKakan(furo Furo) error {
 		return fmt.Errorf("invalid furo for `onKakan`: %v", furo.Type)
 	}
 
-	err := p.deleteTehai(&furo.Taken)
-	if err != nil {
-		return fmt.Errorf("failed to delete tehais on kakan: %w", err)
-	}
-
 	ponIndex := slices.IndexFunc(p.Furos, func(f Furo) bool {
 		return slices.Contains(f.Pais, furo.Taken)
 	})
 	if ponIndex == -1 {
 		return fmt.Errorf("failed to find pon mentsu for kakan: %v", furo)
+	}
+
+	err := p.deleteTehai(&furo.Taken)
+	if err != nil {
+		return fmt.Errorf("failed to delete tehais on kakan: %w", err)
 	}
 
 	ponMentsu := p.Furos[ponIndex]
@@ -205,7 +209,7 @@ func (p *Player) OnKakan(furo Furo) error {
 }
 
 func (p *Player) OnReach() error {
-	if !p.CanDahai || p.ReachState != None {
+	if !p.CanDahai || p.ReachState != None || !p.IsMenzen {
 		return fmt.Errorf("it is not in a state to be reach declaration")
 	}
 
@@ -214,7 +218,7 @@ func (p *Player) OnReach() error {
 }
 
 func (p *Player) OnReachAccepted(score *int) error {
-	if p.CanDahai || p.ReachState != Declared {
+	if p.CanDahai || p.ReachState != Declared || !p.IsMenzen {
 		return fmt.Errorf("it is not in a state to be reach acception")
 	}
 

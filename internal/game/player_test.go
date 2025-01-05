@@ -31,6 +31,7 @@ func TestNewPlayer(t *testing.T) {
 				Furos:      make([]Furo, 0, 4),
 				ReachState: None,
 				Score:      25_000,
+				IsMenzen:   true,
 			},
 			wantErr: false,
 		})
@@ -83,10 +84,17 @@ func TestPlayer_OnStartKyoku(t *testing.T) {
 	{
 		tehais, _ := StrToPais("1m 2m 3m 6m 7m 8m 1p 2p 3p 6p 8p N N")
 		tests = append(tests, testCase{
-			name:    "validNoScore",
-			fields:  fields{id: 0, name: "", initScore: 25_000},
-			args:    args{tehais: tehais, score: nil},
-			want:    &Player{ID: 0, Name: "", Furos: make([]Furo, 0, 4), Tehais: tehais, Score: 25_000},
+			name:   "validNoScore",
+			fields: fields{id: 0, name: "", initScore: 25_000},
+			args:   args{tehais: tehais, score: nil},
+			want: &Player{
+				ID:       0,
+				Name:     "",
+				Furos:    make([]Furo, 0, 4),
+				Tehais:   tehais,
+				Score:    25_000,
+				IsMenzen: true,
+			},
 			wantErr: false,
 		})
 	}
@@ -96,10 +104,17 @@ func TestPlayer_OnStartKyoku(t *testing.T) {
 		tehais, _ := StrToPais("1m 2m 3m 6m 7m 8m 1p 2p 3p 6p 8p N N")
 		initScore := 30_000
 		tests = append(tests, testCase{
-			name:    "validWithScore",
-			fields:  fields{id: 0, name: "", initScore: 25_000},
-			args:    args{tehais: tehais, score: &initScore},
-			want:    &Player{ID: 0, Name: "", Furos: make([]Furo, 0, 4), Tehais: tehais, Score: initScore},
+			name:   "validWithScore",
+			fields: fields{id: 0, name: "", initScore: 25_000},
+			args:   args{tehais: tehais, score: &initScore},
+			want: &Player{
+				ID:       0,
+				Name:     "",
+				Furos:    make([]Furo, 0, 4),
+				Tehais:   tehais,
+				Score:    initScore,
+				IsMenzen: true,
+			},
 			wantErr: false,
 		})
 	}
@@ -165,6 +180,7 @@ func TestPlayer_OnTsumo(t *testing.T) {
 			ReachSutehaiIndex: nil,
 			Score:             25_000,
 			CanDahai:          true,
+			IsMenzen:          true,
 		}
 
 		if !reflect.DeepEqual(p, want) {
@@ -218,6 +234,7 @@ func TestPlayer_OnDahai(t *testing.T) {
 			ReachHoIndex:      nil,
 			ReachSutehaiIndex: nil,
 			Score:             25_000,
+			IsMenzen:          true,
 		}
 
 		if !reflect.DeepEqual(p, want) {
@@ -262,6 +279,7 @@ func TestPlayer_OnDahai(t *testing.T) {
 			ReachHoIndex:      &reachHoIndex,
 			ReachSutehaiIndex: &reachSutehaiIndex,
 			Score:             24_000,
+			IsMenzen:          true,
 		}
 
 		if !reflect.DeepEqual(p, want) {
@@ -297,6 +315,7 @@ func TestPlayer_OnDahai(t *testing.T) {
 			ReachHoIndex:      nil,
 			ReachSutehaiIndex: nil,
 			Score:             25_000,
+			IsMenzen:          true,
 		}
 
 		if !reflect.DeepEqual(p, want) {
@@ -366,6 +385,7 @@ func TestPlayer_OnChiPonKan(t *testing.T) {
 			ReachSutehaiIndex: nil,
 			Score:             25_000,
 			CanDahai:          true,
+			IsMenzen:          false,
 		}
 
 		if !reflect.DeepEqual(p, want) {
@@ -403,6 +423,7 @@ func TestPlayer_OnChiPonKan(t *testing.T) {
 			ReachSutehaiIndex: nil,
 			Score:             25_000,
 			CanDahai:          true,
+			IsMenzen:          false,
 		}
 
 		if !reflect.DeepEqual(p, want) {
@@ -440,6 +461,7 @@ func TestPlayer_OnChiPonKan(t *testing.T) {
 			ReachSutehaiIndex: nil,
 			Score:             25_000,
 			CanDahai:          false,
+			IsMenzen:          false,
 		}
 
 		if !reflect.DeepEqual(p, want) {
@@ -516,6 +538,28 @@ func TestPlayer_OnChiPonKan(t *testing.T) {
 		}
 	})
 
+	// after reach
+	t.Run("after reach", func(t *testing.T) {
+		tehais, _ := StrToPais("2m 3m 1p 1p 2p 3p 1s 1s 1s 2s N N N")
+		tsumoPai, _ := NewPaiWithName("4m")
+		target := 2
+		taken, _ := NewPaiWithName("N")
+		consumed, _ := StrToPais("N N N")
+		furo, _ := NewFuro(Daiminkan, taken, consumed, &target)
+
+		p, _ := NewPlayer(0, "", 25_000)
+		p.OnStartKyoku(tehais, nil)
+		p.OnTsumo(*tsumoPai)
+		p.OnReach()
+		p.OnDahai(*tsumoPai)
+		p.OnReachAccepted(nil)
+
+		err := p.OnChiPonKan(*furo)
+		if err == nil {
+			t.Errorf("Player.OnChiPonKan() error = %v, wantErr %v", err, true)
+		}
+	})
+
 	// cannot ankan
 	t.Run("cannot ankan", func(t *testing.T) {
 		tehais, _ := StrToPais("2m 3m 1p 1p 2p 3p 1s 1s 1s N N N N")
@@ -579,6 +623,7 @@ func TestPlayer_OnAnkan(t *testing.T) {
 			ReachHoIndex:      nil,
 			ReachSutehaiIndex: nil,
 			Score:             25_000,
+			IsMenzen:          true,
 		}
 
 		if !reflect.DeepEqual(p, want) {
@@ -774,6 +819,7 @@ func TestPlayer_OnKakan(t *testing.T) {
 			ReachHoIndex:      nil,
 			ReachSutehaiIndex: nil,
 			Score:             25_000,
+			IsMenzen:          false,
 		}
 
 		if !reflect.DeepEqual(p, want) {
@@ -854,6 +900,7 @@ func TestPlayer_OnKakan(t *testing.T) {
 			ReachSutehaiIndex: nil,
 			Score:             25_000,
 			CanDahai:          false,
+			IsMenzen:          false,
 		}
 
 		if !reflect.DeepEqual(p, want) {
@@ -1008,6 +1055,7 @@ func TestPlayer_OnReach(t *testing.T) {
 			ReachSutehaiIndex: nil,
 			Score:             25_000,
 			CanDahai:          true,
+			IsMenzen:          true,
 		}
 
 		if !reflect.DeepEqual(p, want) {
@@ -1063,6 +1111,29 @@ func TestPlayer_OnReach(t *testing.T) {
 			t.Errorf("Player.OnReach() error = %v, wantErr %v", err, true)
 		}
 	})
+
+	// cannot after furo
+	t.Run("cannot after furo", func(t *testing.T) {
+		tehais, _ := StrToPais("1m 2m 3m 6m 7m 8m 1p 2p 3p 6p 8p N N")
+		tsumoPai1, _ := NewPaiWithName("E")
+
+		target := 3
+		taken, _ := NewPaiWithName("N")
+		consumed, _ := StrToPais("N N")
+		furo, _ := NewFuro(Pon, taken, consumed, &target)
+		dahai, _ := NewPaiWithName("8p")
+
+		p, _ := NewPlayer(0, "", 25_000)
+		p.OnStartKyoku(tehais, nil)
+		p.OnChiPonKan(*furo)
+		p.OnDahai(*dahai)
+		p.OnTsumo(*tsumoPai1)
+
+		err := p.OnReach()
+		if err == nil {
+			t.Errorf("Player.OnReach() error = %v, wantErr %v", err, true)
+		}
+	})
 }
 
 func TestPlayer_OnReachAccepted(t *testing.T) {
@@ -1095,6 +1166,7 @@ func TestPlayer_OnReachAccepted(t *testing.T) {
 			ReachHoIndex:      &dahaiIndex,
 			ReachSutehaiIndex: &dahaiIndex,
 			Score:             24_000,
+			IsMenzen:          true,
 		}
 
 		if !reflect.DeepEqual(p, want) {
@@ -1132,6 +1204,7 @@ func TestPlayer_OnReachAccepted(t *testing.T) {
 			ReachHoIndex:      &dahaiIndex,
 			ReachSutehaiIndex: &dahaiIndex,
 			Score:             23_000,
+			IsMenzen:          true,
 		}
 
 		if !reflect.DeepEqual(p, want) {
@@ -1204,6 +1277,7 @@ func TestPlayer_OnTargeted(t *testing.T) {
 			ReachHoIndex:      nil,
 			ReachSutehaiIndex: nil,
 			Score:             25_000,
+			IsMenzen:          true,
 		}
 
 		if !reflect.DeepEqual(p, want) {
@@ -1243,6 +1317,7 @@ func TestPlayer_OnTargeted(t *testing.T) {
 			ReachHoIndex:      nil,
 			ReachSutehaiIndex: nil,
 			Score:             25_000,
+			IsMenzen:          true,
 		}
 
 		if !reflect.DeepEqual(p, want) {
@@ -1282,6 +1357,7 @@ func TestPlayer_OnTargeted(t *testing.T) {
 			ReachHoIndex:      nil,
 			ReachSutehaiIndex: nil,
 			Score:             25_000,
+			IsMenzen:          true,
 		}
 
 		if !reflect.DeepEqual(p, want) {
