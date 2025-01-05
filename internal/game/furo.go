@@ -17,11 +17,11 @@ const (
 )
 
 type Furo struct {
-	Type     FuroType
-	Taken    Pai
-	Consumed []Pai
-	Target   *int
-	Pais     []Pai
+	typ      FuroType
+	taken    Pai
+	consumed []Pai
+	target   *int
+	pais     []Pai
 }
 
 func NewFuro(t FuroType, taken *Pai, consumed []Pai, target *int) (*Furo, error) {
@@ -66,10 +66,30 @@ func NewFuro(t FuroType, taken *Pai, consumed []Pai, target *int) (*Furo, error)
 	sort.Sort(pais)
 
 	return &Furo{
-		Type:     t,
-		Taken:    tk,
-		Consumed: c,
-		Target:   tg,
-		Pais:     pais,
+		typ:      t,
+		taken:    tk,
+		consumed: c,
+		target:   tg,
+		pais:     pais,
 	}, nil
+}
+
+func (f *Furo) Type() FuroType {
+	return f.typ
+}
+
+func (f *Furo) Taken() Pai {
+	return f.taken
+}
+
+func (f *Furo) Consumed() []Pai {
+	return f.consumed
+}
+
+func (f *Furo) Target() *int {
+	return f.target
+}
+
+func (f *Furo) Pais() []Pai {
+	return f.pais
 }

@@ -789,11 +789,11 @@ func TestPlayer_OnKakan(t *testing.T) {
 		tehaisAfterFuro, _ := StrToPais("1m 2m 3m 6m 7m 8m 1p 2p 3p 6p")
 
 		kantsu := Furo{
-			Type:     Kakan,
-			Taken:    *taken2,
-			Consumed: consumed2,
-			Target:   &target,
-			Pais:     append(consumed2, *taken2),
+			typ:      Kakan,
+			taken:    *taken2,
+			consumed: consumed2,
+			target:   &target,
+			pais:     append(consumed2, *taken2),
 		}
 
 		p, _ := NewPlayer(0, "", 25_000)
@@ -861,11 +861,11 @@ func TestPlayer_OnKakan(t *testing.T) {
 		tehaisAfterFuro, _ := StrToPais("2p")
 
 		kantsu := Furo{
-			Type:     Kakan,
-			Taken:    *taken5,
-			Consumed: consumed5,
-			Target:   &target,
-			Pais:     append(consumed5, *taken5),
+			typ:      Kakan,
+			taken:    *taken5,
+			consumed: consumed5,
+			target:   &target,
+			pais:     append(consumed5, *taken5),
 		}
 
 		p, _ := NewPlayer(0, "", 25_000)
