@@ -26,12 +26,12 @@ func TestNewPlayer(t *testing.T) {
 			name: fmt.Sprintf("validID_%d", i),
 			args: args{id: i, name: "", initScore: 25_000},
 			want: &Player{
-				ID: i, Name: "",
-				Tehais:     make([]Pai, 0, 14),
-				Furos:      make([]Furo, 0, 4),
-				ReachState: None,
-				Score:      25_000,
-				IsMenzen:   true,
+				id: i, name: "",
+				tehais:     make([]Pai, 0, 14),
+				furos:      make([]Furo, 0, 4),
+				reachState: None,
+				score:      25_000,
+				isMenzen:   true,
 			},
 			wantErr: false,
 		})
@@ -88,12 +88,12 @@ func TestPlayer_OnStartKyoku(t *testing.T) {
 			fields: fields{id: 0, name: "", initScore: 25_000},
 			args:   args{tehais: tehais, score: nil},
 			want: &Player{
-				ID:       0,
-				Name:     "",
-				Furos:    make([]Furo, 0, 4),
-				Tehais:   tehais,
-				Score:    25_000,
-				IsMenzen: true,
+				id:       0,
+				name:     "",
+				furos:    make([]Furo, 0, 4),
+				tehais:   tehais,
+				score:    25_000,
+				isMenzen: true,
 			},
 			wantErr: false,
 		})
@@ -108,12 +108,12 @@ func TestPlayer_OnStartKyoku(t *testing.T) {
 			fields: fields{id: 0, name: "", initScore: 25_000},
 			args:   args{tehais: tehais, score: &initScore},
 			want: &Player{
-				ID:       0,
-				Name:     "",
-				Furos:    make([]Furo, 0, 4),
-				Tehais:   tehais,
-				Score:    initScore,
-				IsMenzen: true,
+				id:       0,
+				name:     "",
+				furos:    make([]Furo, 0, 4),
+				tehais:   tehais,
+				score:    initScore,
+				isMenzen: true,
 			},
 			wantErr: false,
 		})
@@ -168,19 +168,19 @@ func TestPlayer_OnTsumo(t *testing.T) {
 		}
 
 		want := &Player{
-			ID:                0,
-			Name:              "",
-			Tehais:            append(tehais, *tsumoPai),
-			Furos:             make([]Furo, 0, 4),
-			Ho:                nil,
-			Sutehais:          nil,
-			ExtraAnpais:       nil,
-			ReachState:        None,
-			ReachHoIndex:      nil,
-			ReachSutehaiIndex: nil,
-			Score:             25_000,
-			CanDahai:          true,
-			IsMenzen:          true,
+			id:                0,
+			name:              "",
+			tehais:            append(tehais, *tsumoPai),
+			furos:             make([]Furo, 0, 4),
+			ho:                nil,
+			sutehais:          nil,
+			extraAnpais:       nil,
+			reachState:        None,
+			reachHoIndex:      nil,
+			reachSutehaiIndex: nil,
+			score:             25_000,
+			canDahai:          true,
+			isMenzen:          true,
 		}
 
 		if !reflect.DeepEqual(p, want) {
@@ -223,18 +223,18 @@ func TestPlayer_OnDahai(t *testing.T) {
 		}
 
 		want := &Player{
-			ID:                0,
-			Name:              "",
-			Tehais:            tehaisAfterDahai,
-			Furos:             make([]Furo, 0, 4),
-			Ho:                []Pai{*dahai},
-			Sutehais:          []Pai{*dahai},
-			ExtraAnpais:       nil,
-			ReachState:        None,
-			ReachHoIndex:      nil,
-			ReachSutehaiIndex: nil,
-			Score:             25_000,
-			IsMenzen:          true,
+			id:                0,
+			name:              "",
+			tehais:            tehaisAfterDahai,
+			furos:             make([]Furo, 0, 4),
+			ho:                []Pai{*dahai},
+			sutehais:          []Pai{*dahai},
+			extraAnpais:       nil,
+			reachState:        None,
+			reachHoIndex:      nil,
+			reachSutehaiIndex: nil,
+			score:             25_000,
+			isMenzen:          true,
 		}
 
 		if !reflect.DeepEqual(p, want) {
@@ -268,18 +268,18 @@ func TestPlayer_OnDahai(t *testing.T) {
 		}
 
 		want := &Player{
-			ID:                0,
-			Name:              "",
-			Tehais:            tehaisAfterDahai,
-			Furos:             make([]Furo, 0, 4),
-			Ho:                []Pai{*dahai1, *dahai2},
-			Sutehais:          []Pai{*dahai1, *dahai2},
-			ExtraAnpais:       []Pai{*dahai1},
-			ReachState:        Accepted,
-			ReachHoIndex:      &reachHoIndex,
-			ReachSutehaiIndex: &reachSutehaiIndex,
-			Score:             24_000,
-			IsMenzen:          true,
+			id:                0,
+			name:              "",
+			tehais:            tehaisAfterDahai,
+			furos:             make([]Furo, 0, 4),
+			ho:                []Pai{*dahai1, *dahai2},
+			sutehais:          []Pai{*dahai1, *dahai2},
+			extraAnpais:       []Pai{*dahai1},
+			reachState:        Accepted,
+			reachHoIndex:      &reachHoIndex,
+			reachSutehaiIndex: &reachSutehaiIndex,
+			score:             24_000,
+			isMenzen:          true,
 		}
 
 		if !reflect.DeepEqual(p, want) {
@@ -304,18 +304,18 @@ func TestPlayer_OnDahai(t *testing.T) {
 		}
 
 		want := &Player{
-			ID:                0,
-			Name:              "",
-			Tehais:            tehaisAfterDahai,
-			Furos:             make([]Furo, 0, 4),
-			Ho:                []Pai{*dahai},
-			Sutehais:          []Pai{*dahai},
-			ExtraAnpais:       nil,
-			ReachState:        None,
-			ReachHoIndex:      nil,
-			ReachSutehaiIndex: nil,
-			Score:             25_000,
-			IsMenzen:          true,
+			id:                0,
+			name:              "",
+			tehais:            tehaisAfterDahai,
+			furos:             make([]Furo, 0, 4),
+			ho:                []Pai{*dahai},
+			sutehais:          []Pai{*dahai},
+			extraAnpais:       nil,
+			reachState:        None,
+			reachHoIndex:      nil,
+			reachSutehaiIndex: nil,
+			score:             25_000,
+			isMenzen:          true,
 		}
 
 		if !reflect.DeepEqual(p, want) {
@@ -373,19 +373,19 @@ func TestPlayer_OnChiPonKan(t *testing.T) {
 		}
 
 		want := &Player{
-			ID:                0,
-			Name:              "",
-			Tehais:            tehaisAfterFuro,
-			Furos:             []Furo{*furo},
-			Ho:                nil,
-			Sutehais:          nil,
-			ExtraAnpais:       nil,
-			ReachState:        None,
-			ReachHoIndex:      nil,
-			ReachSutehaiIndex: nil,
-			Score:             25_000,
-			CanDahai:          true,
-			IsMenzen:          false,
+			id:                0,
+			name:              "",
+			tehais:            tehaisAfterFuro,
+			furos:             []Furo{*furo},
+			ho:                nil,
+			sutehais:          nil,
+			extraAnpais:       nil,
+			reachState:        None,
+			reachHoIndex:      nil,
+			reachSutehaiIndex: nil,
+			score:             25_000,
+			canDahai:          true,
+			isMenzen:          false,
 		}
 
 		if !reflect.DeepEqual(p, want) {
@@ -411,19 +411,19 @@ func TestPlayer_OnChiPonKan(t *testing.T) {
 		}
 
 		want := &Player{
-			ID:                0,
-			Name:              "",
-			Tehais:            tehaisAfterFuro,
-			Furos:             []Furo{*furo},
-			Ho:                nil,
-			Sutehais:          nil,
-			ExtraAnpais:       nil,
-			ReachState:        None,
-			ReachHoIndex:      nil,
-			ReachSutehaiIndex: nil,
-			Score:             25_000,
-			CanDahai:          true,
-			IsMenzen:          false,
+			id:                0,
+			name:              "",
+			tehais:            tehaisAfterFuro,
+			furos:             []Furo{*furo},
+			ho:                nil,
+			sutehais:          nil,
+			extraAnpais:       nil,
+			reachState:        None,
+			reachHoIndex:      nil,
+			reachSutehaiIndex: nil,
+			score:             25_000,
+			canDahai:          true,
+			isMenzen:          false,
 		}
 
 		if !reflect.DeepEqual(p, want) {
@@ -449,19 +449,19 @@ func TestPlayer_OnChiPonKan(t *testing.T) {
 		}
 
 		want := &Player{
-			ID:                0,
-			Name:              "",
-			Tehais:            tehaisAfterFuro,
-			Furos:             []Furo{*furo},
-			Ho:                nil,
-			Sutehais:          nil,
-			ExtraAnpais:       nil,
-			ReachState:        None,
-			ReachHoIndex:      nil,
-			ReachSutehaiIndex: nil,
-			Score:             25_000,
-			CanDahai:          false,
-			IsMenzen:          false,
+			id:                0,
+			name:              "",
+			tehais:            tehaisAfterFuro,
+			furos:             []Furo{*furo},
+			ho:                nil,
+			sutehais:          nil,
+			extraAnpais:       nil,
+			reachState:        None,
+			reachHoIndex:      nil,
+			reachSutehaiIndex: nil,
+			score:             25_000,
+			canDahai:          false,
+			isMenzen:          false,
 		}
 
 		if !reflect.DeepEqual(p, want) {
@@ -612,18 +612,18 @@ func TestPlayer_OnAnkan(t *testing.T) {
 		}
 
 		want := &Player{
-			ID:                0,
-			Name:              "",
-			Tehais:            tehaisAfterFuro,
-			Furos:             []Furo{*furo},
-			Ho:                nil,
-			Sutehais:          nil,
-			ExtraAnpais:       nil,
-			ReachState:        None,
-			ReachHoIndex:      nil,
-			ReachSutehaiIndex: nil,
-			Score:             25_000,
-			IsMenzen:          true,
+			id:                0,
+			name:              "",
+			tehais:            tehaisAfterFuro,
+			furos:             []Furo{*furo},
+			ho:                nil,
+			sutehais:          nil,
+			extraAnpais:       nil,
+			reachState:        None,
+			reachHoIndex:      nil,
+			reachSutehaiIndex: nil,
+			score:             25_000,
+			isMenzen:          true,
 		}
 
 		if !reflect.DeepEqual(p, want) {
@@ -808,18 +808,18 @@ func TestPlayer_OnKakan(t *testing.T) {
 		}
 
 		want := &Player{
-			ID:                0,
-			Name:              "",
-			Tehais:            tehaisAfterFuro,
-			Furos:             []Furo{kantsu},
-			Ho:                []Pai{*dahai1},
-			Sutehais:          []Pai{*dahai1},
-			ExtraAnpais:       nil,
-			ReachState:        None,
-			ReachHoIndex:      nil,
-			ReachSutehaiIndex: nil,
-			Score:             25_000,
-			IsMenzen:          false,
+			id:                0,
+			name:              "",
+			tehais:            tehaisAfterFuro,
+			furos:             []Furo{kantsu},
+			ho:                []Pai{*dahai1},
+			sutehais:          []Pai{*dahai1},
+			extraAnpais:       nil,
+			reachState:        None,
+			reachHoIndex:      nil,
+			reachSutehaiIndex: nil,
+			score:             25_000,
+			isMenzen:          false,
 		}
 
 		if !reflect.DeepEqual(p, want) {
@@ -888,19 +888,19 @@ func TestPlayer_OnKakan(t *testing.T) {
 		}
 
 		want := &Player{
-			ID:                0,
-			Name:              "",
-			Tehais:            tehaisAfterFuro,
-			Furos:             []Furo{*furo1, *furo2, kantsu, *furo4},
-			Ho:                []Pai{*dahai1, *dahai2, *dahai3, *dahai4},
-			Sutehais:          []Pai{*dahai1, *dahai2, *dahai3, *dahai4},
-			ExtraAnpais:       nil,
-			ReachState:        None,
-			ReachHoIndex:      nil,
-			ReachSutehaiIndex: nil,
-			Score:             25_000,
-			CanDahai:          false,
-			IsMenzen:          false,
+			id:                0,
+			name:              "",
+			tehais:            tehaisAfterFuro,
+			furos:             []Furo{*furo1, *furo2, kantsu, *furo4},
+			ho:                []Pai{*dahai1, *dahai2, *dahai3, *dahai4},
+			sutehais:          []Pai{*dahai1, *dahai2, *dahai3, *dahai4},
+			extraAnpais:       nil,
+			reachState:        None,
+			reachHoIndex:      nil,
+			reachSutehaiIndex: nil,
+			score:             25_000,
+			canDahai:          false,
+			isMenzen:          false,
 		}
 
 		if !reflect.DeepEqual(p, want) {
@@ -1043,19 +1043,19 @@ func TestPlayer_OnReach(t *testing.T) {
 		}
 
 		want := &Player{
-			ID:                0,
-			Name:              "",
-			Tehais:            tehaisAfterTsumo,
-			Furos:             make([]Furo, 0, 4),
-			Ho:                nil,
-			Sutehais:          nil,
-			ExtraAnpais:       nil,
-			ReachState:        Declared,
-			ReachHoIndex:      nil,
-			ReachSutehaiIndex: nil,
-			Score:             25_000,
-			CanDahai:          true,
-			IsMenzen:          true,
+			id:                0,
+			name:              "",
+			tehais:            tehaisAfterTsumo,
+			furos:             make([]Furo, 0, 4),
+			ho:                nil,
+			sutehais:          nil,
+			extraAnpais:       nil,
+			reachState:        Declared,
+			reachHoIndex:      nil,
+			reachSutehaiIndex: nil,
+			score:             25_000,
+			canDahai:          true,
+			isMenzen:          true,
 		}
 
 		if !reflect.DeepEqual(p, want) {
@@ -1155,18 +1155,18 @@ func TestPlayer_OnReachAccepted(t *testing.T) {
 		}
 
 		want := &Player{
-			ID:                0,
-			Name:              "",
-			Tehais:            tehais,
-			Furos:             make([]Furo, 0, 4),
-			Ho:                []Pai{*tsumoPai},
-			Sutehais:          []Pai{*tsumoPai},
-			ExtraAnpais:       nil,
-			ReachState:        Accepted,
-			ReachHoIndex:      &dahaiIndex,
-			ReachSutehaiIndex: &dahaiIndex,
-			Score:             24_000,
-			IsMenzen:          true,
+			id:                0,
+			name:              "",
+			tehais:            tehais,
+			furos:             make([]Furo, 0, 4),
+			ho:                []Pai{*tsumoPai},
+			sutehais:          []Pai{*tsumoPai},
+			extraAnpais:       nil,
+			reachState:        Accepted,
+			reachHoIndex:      &dahaiIndex,
+			reachSutehaiIndex: &dahaiIndex,
+			score:             24_000,
+			isMenzen:          true,
 		}
 
 		if !reflect.DeepEqual(p, want) {
@@ -1193,18 +1193,18 @@ func TestPlayer_OnReachAccepted(t *testing.T) {
 		}
 
 		want := &Player{
-			ID:                0,
-			Name:              "",
-			Tehais:            tehais,
-			Furos:             make([]Furo, 0, 4),
-			Ho:                []Pai{*tsumoPai},
-			Sutehais:          []Pai{*tsumoPai},
-			ExtraAnpais:       nil,
-			ReachState:        Accepted,
-			ReachHoIndex:      &dahaiIndex,
-			ReachSutehaiIndex: &dahaiIndex,
-			Score:             23_000,
-			IsMenzen:          true,
+			id:                0,
+			name:              "",
+			tehais:            tehais,
+			furos:             make([]Furo, 0, 4),
+			ho:                []Pai{*tsumoPai},
+			sutehais:          []Pai{*tsumoPai},
+			extraAnpais:       nil,
+			reachState:        Accepted,
+			reachHoIndex:      &dahaiIndex,
+			reachSutehaiIndex: &dahaiIndex,
+			score:             23_000,
+			isMenzen:          true,
 		}
 
 		if !reflect.DeepEqual(p, want) {
@@ -1266,18 +1266,18 @@ func TestPlayer_OnTargeted(t *testing.T) {
 		}
 
 		want := &Player{
-			ID:                0,
-			Name:              "",
-			Tehais:            tehais,
-			Furos:             make([]Furo, 0, 4),
-			Ho:                []Pai{},
-			Sutehais:          []Pai{*tsumoPai},
-			ExtraAnpais:       nil,
-			ReachState:        None,
-			ReachHoIndex:      nil,
-			ReachSutehaiIndex: nil,
-			Score:             25_000,
-			IsMenzen:          true,
+			id:                0,
+			name:              "",
+			tehais:            tehais,
+			furos:             make([]Furo, 0, 4),
+			ho:                []Pai{},
+			sutehais:          []Pai{*tsumoPai},
+			extraAnpais:       nil,
+			reachState:        None,
+			reachHoIndex:      nil,
+			reachSutehaiIndex: nil,
+			score:             25_000,
+			isMenzen:          true,
 		}
 
 		if !reflect.DeepEqual(p, want) {
@@ -1306,18 +1306,18 @@ func TestPlayer_OnTargeted(t *testing.T) {
 		}
 
 		want := &Player{
-			ID:                0,
-			Name:              "",
-			Tehais:            tehais,
-			Furos:             make([]Furo, 0, 4),
-			Ho:                []Pai{},
-			Sutehais:          []Pai{*tsumoPai},
-			ExtraAnpais:       nil,
-			ReachState:        None,
-			ReachHoIndex:      nil,
-			ReachSutehaiIndex: nil,
-			Score:             25_000,
-			IsMenzen:          true,
+			id:                0,
+			name:              "",
+			tehais:            tehais,
+			furos:             make([]Furo, 0, 4),
+			ho:                []Pai{},
+			sutehais:          []Pai{*tsumoPai},
+			extraAnpais:       nil,
+			reachState:        None,
+			reachHoIndex:      nil,
+			reachSutehaiIndex: nil,
+			score:             25_000,
+			isMenzen:          true,
 		}
 
 		if !reflect.DeepEqual(p, want) {
@@ -1346,18 +1346,18 @@ func TestPlayer_OnTargeted(t *testing.T) {
 		}
 
 		want := &Player{
-			ID:                0,
-			Name:              "",
-			Tehais:            tehais,
-			Furos:             make([]Furo, 0, 4),
-			Ho:                []Pai{},
-			Sutehais:          []Pai{*tsumoPai},
-			ExtraAnpais:       nil,
-			ReachState:        None,
-			ReachHoIndex:      nil,
-			ReachSutehaiIndex: nil,
-			Score:             25_000,
-			IsMenzen:          true,
+			id:                0,
+			name:              "",
+			tehais:            tehais,
+			furos:             make([]Furo, 0, 4),
+			ho:                []Pai{},
+			sutehais:          []Pai{*tsumoPai},
+			extraAnpais:       nil,
+			reachState:        None,
+			reachHoIndex:      nil,
+			reachSutehaiIndex: nil,
+			score:             25_000,
+			isMenzen:          true,
 		}
 
 		if !reflect.DeepEqual(p, want) {

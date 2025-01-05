@@ -23,19 +23,19 @@ const (
 )
 
 type Player struct {
-	ID                int
-	Name              string
-	Tehais            Pais
-	Furos             []Furo
-	Ho                []Pai
-	Sutehais          []Pai
-	ExtraAnpais       []Pai
-	ReachState        ReachState
-	ReachHoIndex      *int
-	ReachSutehaiIndex *int
-	Score             int
-	CanDahai          bool
-	IsMenzen          bool
+	id                int
+	name              string
+	tehais            Pais
+	furos             []Furo
+	ho                []Pai
+	sutehais          []Pai
+	extraAnpais       []Pai
+	reachState        ReachState
+	reachHoIndex      *int
+	reachSutehaiIndex *int
+	score             int
+	canDahai          bool
+	isMenzen          bool
 }
 
 func NewPlayer(id int, name string, initScore int) (*Player, error) {
@@ -44,24 +44,76 @@ func NewPlayer(id int, name string, initScore int) (*Player, error) {
 	}
 
 	return &Player{
-		ID:                id,
-		Name:              name,
-		Tehais:            make(Pais, 0, initTehaisSize+1), // +1 for tsumo
-		Furos:             make([]Furo, 0, maxNumFuro),
-		Ho:                nil,
-		Sutehais:          nil,
-		ExtraAnpais:       nil,
-		ReachState:        None,
-		ReachHoIndex:      nil,
-		ReachSutehaiIndex: nil,
-		Score:             initScore,
-		CanDahai:          false,
-		IsMenzen:          true,
+		id:                id,
+		name:              name,
+		tehais:            make(Pais, 0, initTehaisSize+1), // +1 for tsumo
+		furos:             make([]Furo, 0, maxNumFuro),
+		ho:                nil,
+		sutehais:          nil,
+		extraAnpais:       nil,
+		reachState:        None,
+		reachHoIndex:      nil,
+		reachSutehaiIndex: nil,
+		score:             initScore,
+		canDahai:          false,
+		isMenzen:          true,
 	}, nil
 }
 
+func (p *Player) ID() int {
+	return p.id
+}
+
+func (p *Player) Name() string {
+	return p.name
+}
+
+func (p *Player) Tehais() []Pai {
+	return p.tehais
+}
+
+func (p *Player) Furos() []Furo {
+	return p.furos
+}
+
+func (p *Player) Ho() []Pai {
+	return p.ho
+}
+
+func (p *Player) Sutehais() []Pai {
+	return p.sutehais
+}
+
+func (p *Player) ExtraAnpais() []Pai {
+	return p.extraAnpais
+}
+
+func (p *Player) ReachState() ReachState {
+	return p.reachState
+}
+
+func (p *Player) ReachHoIndex() *int {
+	return p.reachHoIndex
+}
+
+func (p *Player) ReachSutehaiIndex() *int {
+	return p.reachSutehaiIndex
+}
+
+func (p *Player) Score() int {
+	return p.score
+}
+
+func (p *Player) CanDahai() bool {
+	return p.canDahai
+}
+
+func (p *Player) IsMenzen() bool {
+	return p.isMenzen
+}
+
 func (p *Player) AddExtraAnpais(pai Pai) {
-	p.ExtraAnpais = append(p.ExtraAnpais, pai)
+	p.extraAnpais = append(p.extraAnpais, pai)
 }
 
 func (p *Player) OnStartKyoku(tehais []Pai, score *int) error {
@@ -69,37 +121,37 @@ func (p *Player) OnStartKyoku(tehais []Pai, score *int) error {
 		return fmt.Errorf("the length of haipai is not 13: %d", len(tehais))
 	}
 
-	p.Tehais = p.Tehais[:len(tehais)]
-	copy(p.Tehais, tehais)
-	p.Furos = make([]Furo, 0, maxNumFuro)
-	p.Ho = nil
-	p.Sutehais = nil
-	p.ExtraAnpais = nil
-	p.ReachState = None
-	p.ReachHoIndex = nil
-	p.ReachSutehaiIndex = nil
-	p.CanDahai = false
-	p.IsMenzen = true
+	p.tehais = p.tehais[:len(tehais)]
+	copy(p.tehais, tehais)
+	p.furos = make([]Furo, 0, maxNumFuro)
+	p.ho = nil
+	p.sutehais = nil
+	p.extraAnpais = nil
+	p.reachState = None
+	p.reachHoIndex = nil
+	p.reachSutehaiIndex = nil
+	p.canDahai = false
+	p.isMenzen = true
 
 	if score != nil {
-		p.Score = *score
+		p.score = *score
 	}
 
 	return nil
 }
 
 func (p *Player) OnTsumo(pai Pai) error {
-	if p.CanDahai {
+	if p.canDahai {
 		return fmt.Errorf("it is not in a state to be tsumo")
 	}
 
-	p.Tehais = append(p.Tehais, pai)
-	p.CanDahai = true
+	p.tehais = append(p.tehais, pai)
+	p.canDahai = true
 	return nil
 }
 
 func (p *Player) OnDahai(pai Pai) error {
-	if !p.CanDahai {
+	if !p.canDahai {
 		return fmt.Errorf("it is not in a state to be dahai")
 	}
 
@@ -108,28 +160,28 @@ func (p *Player) OnDahai(pai Pai) error {
 		return fmt.Errorf("failed to delete tehais on dahai: %w", err)
 	}
 
-	sort.Sort(p.Tehais)
-	p.Ho = append(p.Ho, pai)
-	p.Sutehais = append(p.Sutehais, pai)
+	sort.Sort(p.tehais)
+	p.ho = append(p.ho, pai)
+	p.sutehais = append(p.sutehais, pai)
 
-	if p.ReachState != Accepted {
-		p.ExtraAnpais = nil
+	if p.reachState != Accepted {
+		p.extraAnpais = nil
 	}
 
-	p.CanDahai = false
+	p.canDahai = false
 	return nil
 }
 
 func (p *Player) OnChiPonKan(furo Furo) error {
-	if p.CanDahai {
+	if p.canDahai {
 		return fmt.Errorf("it is not in a state to be chi/pon/kan")
 	}
 
-	if p.ReachState != None {
+	if p.reachState != None {
 		return fmt.Errorf("chi/pon/kan are not possible during reach")
 	}
 
-	numFuro := len(p.Furos)
+	numFuro := len(p.furos)
 	if numFuro >= maxNumFuro {
 		return fmt.Errorf("a 5th furo is not possible")
 	}
@@ -147,18 +199,18 @@ func (p *Player) OnChiPonKan(furo Furo) error {
 		}
 	}
 
-	p.Furos = append(p.Furos, furo)
-	p.CanDahai = furo.typ != Daiminkan
-	p.IsMenzen = false
+	p.furos = append(p.furos, furo)
+	p.canDahai = furo.typ != Daiminkan
+	p.isMenzen = false
 	return nil
 }
 
 func (p *Player) OnAnkan(furo Furo) error {
-	if !p.CanDahai {
+	if !p.canDahai {
 		return fmt.Errorf("it is not in a state to be ankan")
 	}
 
-	numFuro := len(p.Furos)
+	numFuro := len(p.furos)
 	if numFuro >= maxNumFuro {
 		return fmt.Errorf("a 5th furo is not possible")
 	}
@@ -174,17 +226,17 @@ func (p *Player) OnAnkan(furo Furo) error {
 		}
 	}
 
-	p.Furos = append(p.Furos, furo)
-	p.CanDahai = false
+	p.furos = append(p.furos, furo)
+	p.canDahai = false
 	return nil
 }
 
 func (p *Player) OnKakan(furo Furo) error {
-	if !p.CanDahai {
+	if !p.canDahai {
 		return fmt.Errorf("it is not in a state to be kakan")
 	}
 
-	if p.ReachState != None {
+	if p.reachState != None {
 		return fmt.Errorf("kakan is not possible during reach")
 	}
 
@@ -192,7 +244,7 @@ func (p *Player) OnKakan(furo Furo) error {
 		return fmt.Errorf("invalid furo for `onKakan`: %v", furo.typ)
 	}
 
-	ponIndex := slices.IndexFunc(p.Furos, func(f Furo) bool {
+	ponIndex := slices.IndexFunc(p.furos, func(f Furo) bool {
 		return slices.Contains(f.pais, furo.taken)
 	})
 	if ponIndex == -1 {
@@ -204,58 +256,58 @@ func (p *Player) OnKakan(furo Furo) error {
 		return fmt.Errorf("failed to delete tehais on kakan: %w", err)
 	}
 
-	ponMentsu := p.Furos[ponIndex]
+	ponMentsu := p.furos[ponIndex]
 	consumed := append(ponMentsu.consumed, furo.taken)
 	kanMentsu, err := NewFuro(Kakan, &ponMentsu.taken, consumed, ponMentsu.target)
 	if err != nil {
 		return fmt.Errorf("failed to create kakan mentsu: %w", err)
 	}
 
-	p.Furos[ponIndex] = *kanMentsu
-	p.CanDahai = false
+	p.furos[ponIndex] = *kanMentsu
+	p.canDahai = false
 	return nil
 }
 
 func (p *Player) OnReach() error {
-	if !p.CanDahai {
+	if !p.canDahai {
 		return fmt.Errorf("it is not in a state to be reach declaration")
 	}
 
-	if p.ReachState != None {
+	if p.reachState != None {
 		return fmt.Errorf("reach again is not possible during a reach")
 	}
 
-	if !p.IsMenzen {
+	if !p.isMenzen {
 		return fmt.Errorf("reach is not possible after furo")
 	}
 
-	p.ReachState = Declared
+	p.reachState = Declared
 	return nil
 }
 
 func (p *Player) OnReachAccepted(score *int) error {
-	if p.CanDahai {
+	if p.canDahai {
 		return fmt.Errorf("it is not in a state to be reach acception")
 	}
 
-	if p.ReachState != Declared {
+	if p.reachState != Declared {
 		return fmt.Errorf("reach acception cannot be made except after reach declaration")
 	}
 
-	if !p.IsMenzen {
+	if !p.isMenzen {
 		return fmt.Errorf("reach acception is not possible after furo")
 	}
 
-	p.ReachState = Accepted
-	p.ReachHoIndex = new(int)
-	*p.ReachHoIndex = len(p.Ho) - 1
-	p.ReachSutehaiIndex = new(int)
-	*p.ReachSutehaiIndex = len(p.Sutehais) - 1
+	p.reachState = Accepted
+	p.reachHoIndex = new(int)
+	*p.reachHoIndex = len(p.ho) - 1
+	p.reachSutehaiIndex = new(int)
+	*p.reachSutehaiIndex = len(p.sutehais) - 1
 
 	if score != nil {
-		p.Score = *score
+		p.score = *score
 	} else {
-		p.Score -= kyotakuPoint
+		p.score -= kyotakuPoint
 	}
 
 	return nil
@@ -267,30 +319,30 @@ func (p *Player) OnTargeted(furo Furo) error {
 		return fmt.Errorf("invalid furo for `onTargeted`: %v", furo.typ)
 	}
 
-	if *furo.target != p.ID {
+	if *furo.target != p.id {
 		return fmt.Errorf("furo target is not me: %d", *furo.target)
 	}
 
-	numHo := len(p.Ho)
-	pai := p.Ho[numHo-1]
+	numHo := len(p.ho)
+	pai := p.ho[numHo-1]
 	if pai != furo.taken {
 		return fmt.Errorf("pai %v is not equal to taken %v", pai, furo.taken)
 	}
-	p.Ho = slices.Delete(p.Ho, numHo-1, numHo)
+	p.ho = slices.Delete(p.ho, numHo-1, numHo)
 
 	return nil
 }
 
 func (p *Player) deleteTehai(pai *Pai) error {
 	paiIndex := -1
-	for i, v := range slices.Backward(p.Tehais) {
+	for i, v := range slices.Backward(p.tehais) {
 		if v == *pai {
 			paiIndex = i
 			break
 		}
 	}
 	if paiIndex == -1 {
-		for i, v := range slices.Backward(p.Tehais) {
+		for i, v := range slices.Backward(p.tehais) {
 			if v == *Unknown {
 				paiIndex = i
 				break
@@ -299,9 +351,9 @@ func (p *Player) deleteTehai(pai *Pai) error {
 	}
 
 	if paiIndex == -1 {
-		return fmt.Errorf("trying to delete %s which is not in tehais: %v", pai.ToString(), p.Tehais)
+		return fmt.Errorf("trying to delete %s which is not in tehais: %v", pai.ToString(), p.tehais)
 	}
 
-	p.Tehais = slices.Delete(p.Tehais, paiIndex, paiIndex+1)
+	p.tehais = slices.Delete(p.tehais, paiIndex, paiIndex+1)
 	return nil
 }
