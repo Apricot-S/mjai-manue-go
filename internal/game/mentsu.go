@@ -15,8 +15,8 @@ const (
 )
 
 type Mentsu struct {
-	Type MentsuType
-	Pais []Pai
+	typ  MentsuType
+	pais []Pai
 }
 
 func NewMentsu(t MentsuType, pais []Pai) (*Mentsu, error) {
@@ -36,12 +36,12 @@ func NewMentsu(t MentsuType, pais []Pai) (*Mentsu, error) {
 	default:
 		return nil, fmt.Errorf("unknown type")
 	}
-	return &Mentsu{Type: t, Pais: pais}, nil
+	return &Mentsu{typ: t, pais: pais}, nil
 }
 
 func (m *Mentsu) ToString() string {
 	str := ""
-	switch m.Type {
+	switch m.typ {
 	case Shuntsu:
 		str = "shuntsu"
 	case Kotsu:
@@ -52,11 +52,19 @@ func (m *Mentsu) ToString() string {
 		str = "toitsu"
 	}
 
-	paiStrs := make([]string, len(m.Pais))
-	for i, p := range m.Pais {
+	paiStrs := make([]string, len(m.pais))
+	for i, p := range m.pais {
 		paiStrs[i] = p.ToString()
 	}
 
 	str += fmt.Sprintf("[%s]", strings.Join(paiStrs, " "))
 	return str
+}
+
+func (m *Mentsu) Type() MentsuType {
+	return m.typ
+}
+
+func (m *Mentsu) Pais() []Pai {
+	return m.pais
 }
