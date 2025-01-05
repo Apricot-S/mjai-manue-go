@@ -121,13 +121,17 @@ func (p *Player) OnDahai(pai Pai) error {
 }
 
 func (p *Player) OnChiPonKan(furo Furo) error {
+	if p.CanDahai {
+		return fmt.Errorf("it is not in a state to be chi/pon/kan")
+	}
+
+	if p.ReachState != None {
+		return fmt.Errorf("chi/pon/kan are not possible during reach")
+	}
+
 	numFuro := len(p.Furos)
 	if numFuro >= maxNumFuro {
 		return fmt.Errorf("a 5th furo is not possible")
-	}
-
-	if p.CanDahai || p.ReachState != None {
-		return fmt.Errorf("it is not in a state to be chi/pon/kan")
 	}
 
 	switch furo.Type {
@@ -150,13 +154,13 @@ func (p *Player) OnChiPonKan(furo Furo) error {
 }
 
 func (p *Player) OnAnkan(furo Furo) error {
+	if !p.CanDahai {
+		return fmt.Errorf("it is not in a state to be ankan")
+	}
+
 	numFuro := len(p.Furos)
 	if numFuro >= maxNumFuro {
 		return fmt.Errorf("a 5th furo is not possible")
-	}
-
-	if !p.CanDahai {
-		return fmt.Errorf("it is not in a state to be ankan")
 	}
 
 	if furo.Type != Ankan {
@@ -176,8 +180,12 @@ func (p *Player) OnAnkan(furo Furo) error {
 }
 
 func (p *Player) OnKakan(furo Furo) error {
-	if !p.CanDahai || p.ReachState != None {
+	if !p.CanDahai {
 		return fmt.Errorf("it is not in a state to be kakan")
+	}
+
+	if p.ReachState != None {
+		return fmt.Errorf("kakan is not possible during reach")
 	}
 
 	if furo.Type != Kakan {
@@ -209,8 +217,16 @@ func (p *Player) OnKakan(furo Furo) error {
 }
 
 func (p *Player) OnReach() error {
-	if !p.CanDahai || p.ReachState != None || !p.IsMenzen {
+	if !p.CanDahai {
 		return fmt.Errorf("it is not in a state to be reach declaration")
+	}
+
+	if p.ReachState != None {
+		return fmt.Errorf("reach again is not possible during a reach")
+	}
+
+	if !p.IsMenzen {
+		return fmt.Errorf("reach is not possible after furo")
 	}
 
 	p.ReachState = Declared
@@ -218,8 +234,16 @@ func (p *Player) OnReach() error {
 }
 
 func (p *Player) OnReachAccepted(score *int) error {
-	if p.CanDahai || p.ReachState != Declared || !p.IsMenzen {
+	if p.CanDahai {
 		return fmt.Errorf("it is not in a state to be reach acception")
+	}
+
+	if p.ReachState != Declared {
+		return fmt.Errorf("reach acception cannot be made except after reach declaration")
+	}
+
+	if !p.IsMenzen {
+		return fmt.Errorf("reach acception is not possible after furo")
 	}
 
 	p.ReachState = Accepted
