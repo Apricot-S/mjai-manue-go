@@ -121,7 +121,7 @@ func (p *Player) OnStartKyoku(tehais []Pai, score *int) error {
 		return fmt.Errorf("the length of haipai is not 13: %d", len(tehais))
 	}
 
-	p.tehais = p.tehais[:len(tehais)]
+	p.tehais = p.tehais[:initTehaisSize]
 	copy(p.tehais, tehais)
 	p.furos = make([]Furo, 0, maxNumFuro)
 	p.ho = nil
