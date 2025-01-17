@@ -3,8 +3,8 @@ module github.com/Apricot-S/mjai-manue-go
 go 1.23.4
 
 require (
-	github.com/go-json-experiment/json v0.0.0-20250108213703-50a1ba2c17a5
-	github.com/go-playground/validator/v10 v10.23.0
+	github.com/go-json-experiment/json v0.0.0-20250116043007-0640c115aea5
+	github.com/go-playground/validator/v10 v10.24.0
 )
 
 require (
