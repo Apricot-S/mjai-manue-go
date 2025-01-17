@@ -88,23 +88,23 @@ func TestMessage_Serialize(t *testing.T) {
 func TestMessage_Validate(t *testing.T) {
 	type testCase struct {
 		name    string
-		wantMsg *Message
+		msg     *Message
 		wantErr bool
 	}
 	tests := []testCase{
 		{
 			name:    "none",
-			wantMsg: &Message{Type: "none"},
+			msg:     &Message{Type: "none"},
 			wantErr: false,
 		},
 		{
 			name:    "start_game",
-			wantMsg: &Message{Type: "start_game"},
+			msg:     &Message{Type: "start_game"},
 			wantErr: false,
 		},
 		{
 			name:    "empty",
-			wantMsg: &Message{Type: ""},
+			msg:     &Message{Type: ""},
 			wantErr: true,
 		},
 	}
@@ -113,7 +113,7 @@ func TestMessage_Validate(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			validate := validator.New()
 
-			err := validate.Struct(tt.wantMsg)
+			err := validate.Struct(tt.msg)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("validate.Struct() error = %v, wantErr %v", err, tt.wantErr)
 			}
