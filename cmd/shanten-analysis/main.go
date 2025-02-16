@@ -48,7 +48,7 @@ func printShantenAnalysis(paiStr string) {
 }
 
 func main() {
-	fmt.Print("Enter tiles (e.g. '1m 1m 1m 1m 2m 3m 4m 4m 4m 4m 1p 1p 1p 1p'): ")
+	fmt.Print("Enter tiles (e.g., '1m 1m 1m 1m 2m 3m 4m 4m 4m 4m 1p 1p 1p 1p'): ")
 
 	r := bufio.NewReader(os.Stdin)
 	paiStr, err := r.ReadString('\n')
