@@ -23,10 +23,10 @@
   <dd>Han.</dd>
 
   <dt>score change</dt>
-  <dd>あるプレーヤのある局におけるscoreの変動。</dd>
+  <dd>Change in a player's score in a certain round.</dd>
 
   <dt>score changes</dt>
-  <dd>scoreChanges[player.id]がplayerのscore changeとなるような4要素のベクトル(配列)。 e.g., [8000, -8000, 0, 0]</dd>
+  <dd>A 4-element vector (array) where scoreChanges[player.id] is the player's score change. e.g., [8000, -8000, 0, 0]</dd>
 
   <dt>player ID</dt>
   <dd>Player ID between 0 and 3.</dd>
@@ -42,7 +42,7 @@
   <dd>An integer between 0 and 33 representing the type of tile.</dd>
 
   <dt>action</dt>
-  <dd>自摸とか打牌とかチーとか。</dd>
+  <dd>Self-draw, discard, chi, etc.</dd>
 
   <dt>metric</dt>
   <dd>あるアクション(2mを打牌、など)の結果についての様々な統計値/推定値。</dd>
