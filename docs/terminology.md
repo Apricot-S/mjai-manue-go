@@ -31,9 +31,9 @@
   <dt>player ID</dt>
   <dd>0～3のプレーヤID。</dt>
 
-<dt>hora factors</dt>
-  <dt>d>horaPoints * horaFactors[player.id] = scoreChanges[player.id] となるような4要素のベクトル(配列)。 </dt></dt>
-  <dd>ロンなら[1, -1, 0, 0]、子のツモなら[1, -1/2, -1/4, -1/4]など。</dt>
+  <dt>hora factors</dt>
+  <dd>horaPoints * horaFactors[player.id] = scoreChanges[player.id] となるような4要素のベクトル(配列)。 <br>
+  ロンなら[1, -1, 0, 0]、子のツモなら[1, -1/2, -1/4, -1/4]など。</dd>
 
   <dt>furo</dt>
   <dd>副露。なき。</dt>
