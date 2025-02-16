@@ -2,6 +2,8 @@
 
 Go port of [mjai-manue](https://github.com/gimite/mjai-manue)
 
+***Work in progress***
+
 Differences from the original:
 
 - Supports both [Gimite's original Mjai protocol](https://gimite.net/pukiwiki/index.php?Mjai%20%E9%BA%BB%E9%9B%80AI%E5%AF%BE%E6%88%A6%E3%82%B5%E3%83%BC%E3%83%90) and [a minor modified version of the Mjai protocol](https://mjai.app/docs/mjai-protocol) used by [RiichiLab](https://mjai.app/).
@@ -32,19 +34,20 @@ go install github.com/Apricot-S/mjai-manue-go/cmd/mjai-manue
 
 ## Usage
 
-(TODO)
-
-### For [mjai](https://github.com/gimite/mjai)
+### For [mjai](https://github.com/gimite/mjai) (Line-by-line, TCP/IP)
 
 ```sh
-mjai-manue --tcp http://example.com:11600/default-room
+mjai-manue http://example.com:11600/default
 ```
 
-### For [mjai.app](https://github.com/smly/mjai.app)
+### For [mjai.app](https://github.com/smly/mjai.app) (Batch, Standard I/O)
 
 ```sh
-mjai-manue --stdio --batch
+mjai-manue --batch --stdio
 ```
+
+In practice, `mjai.app` runs `bot.py` in the zip file.
+You need to call the above command from within `bot.py` and pipe the standard input and output.
 
 ## License
 
