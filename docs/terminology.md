@@ -1,3 +1,5 @@
+**This is a translation of [the original document (Japanese)](https://github.com/gimite/mjai-manue/blob/master/doc/terminology.txt).**
+
 - probability distribution (probDist, dist)
 -- 確率分布。
 

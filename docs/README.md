@@ -1,3 +1,5 @@
+**This is the translation of [the original document (Japanese)](https://github.com/gimite/mjai-manue/blob/master/README.md). Additionally, the broken links have been fixed.**
+
 ## 概要
 
 [Mjai 麻雀AI対戦サーバ](http://gimite.net/pukiwiki/index.php?Mjai%20%CB%E3%BF%FDAI%C2%D0%C0%EF%A5%B5%A1%BC%A5%D0) 用の麻雀AIです。
