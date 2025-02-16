@@ -2,11 +2,11 @@
 
 ## 概要
 
-[Mjai 麻雀AI対戦サーバ](http://gimite.net/pukiwiki/index.php?Mjai%20%CB%E3%BF%FDAI%C2%D0%C0%EF%A5%B5%A1%BC%A5%D0) 用の麻雀AIです。
+[Mjai 麻雀AI対戦サーバ](https://gimite.net/pukiwiki/index.php?Mjai%20%E9%BA%BB%E9%9B%80AI%E5%AF%BE%E6%88%A6%E3%82%B5%E3%83%BC%E3%83%90) 用の麻雀AIです。
 
 ## 仕組み
 
-[自己対戦の牌譜のサンプル](http://gimite.net/mjai/samples/manue011.tonnan/2013-11-26-143619.mjson.html)
+[自己対戦の牌譜のサンプル](https://gimite.net/mjai/samples/manue011.tonnan/2013-11-26-143619.mjson.html)
 
 まず、それぞれの打牌をした場合について、以下の数値を算出します。これらのスコアは、上の牌譜のデバッグ出力で確認できます。
 
@@ -20,7 +20,7 @@
 * unsafeProb / Unsafe probability / 放銃率
   * その打牌で誰かに放銃する確率。
   * 今のところ、リーチしている人への放銃だけを考慮。
-  * 決定木学習を使って推定。特徴量は「字牌」「スジ」など。学習データは天鳳の牌譜。[統計による麻雀危険牌分析](http://gimite.net/pukiwiki/index.php?%C5%FD%B7%D7%A4%CB%A4%E8%A4%EB%CB%E3%BF%FD%B4%ED%B8%B1%C7%D7%CA%AC%C0%CF)参照。
+  * 決定木学習を使って推定。特徴量は「字牌」「スジ」など。学習データは天鳳の牌譜。[統計による麻雀危険牌分析](https://gimite.net/pukiwiki/index.php?%E7%B5%B1%E8%A8%88%E3%81%AB%E3%82%88%E3%82%8B%E9%BA%BB%E9%9B%80%E5%8D%B1%E9%99%BA%E7%89%8C%E5%88%86%E6%9E%90)参照。
 * avgHojuPt / Average hoju points / 平均放銃点
   * 放銃した場合に払う額の平均。
   * 今のところは自己対戦のログから求めた固定値6265点。牌譜のデバッグ出力にはない。
@@ -39,4 +39,4 @@
 
 ## 作者
 
-[Hiroshi Ichikawa](http://gimite.net/pukiwiki/index.php?%CF%A2%CD%ED%C0%E8)
+[Hiroshi Ichikawa](https://gimite.net/pukiwiki/index.php?%E9%80%A3%E7%B5%A1%E5%85%88)
