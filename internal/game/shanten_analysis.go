@@ -105,6 +105,8 @@ func sum(arr [NumIDs]int) int {
 	return sum
 }
 
+// analyzeShantenInternal calculates the shanten number and
+// the set of nearest winning forms using pruning DFS.
 func analyzeShantenInternal(
 	currentVector *[NumIDs]int,
 	targetVector *[NumIDs]int,
