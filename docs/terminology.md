@@ -1,59 +1,61 @@
-**This is a translation of [the original document (Japanese)](https://github.com/gimite/mjai-manue/blob/master/doc/terminology.txt).**
+**This is a translation of [the original document (Japanese)](https://github.com/gimite/mjai-manue/blob/master/doc/terminology.txt). It has also been changed from plain text to a description list.**
 
-- probability distribution (probDist, dist)
--- 確率分布。
+<dl>
+  <dt>probability distribution (probDist, dist)</dt>
+  <dd>確率分布。</dt>
 
-- probability (prob)
--- 確率。
+  <dt>probability (prob)</dt>
+  <dd>確率。</dt>
 
-- hora
--- 和了。
+  <dt>hora</dt>
+  <dd>和了。</dt>
 
-- score
--- あるプレーヤのある時点での点数。
+  <dt>score</dt>
+  <dd>あるプレーヤのある時点での点数。</dt>
 
-- points
--- 和了の点数。
+  <dt>points</dt>
+  <dd>和了の点数。</dt>
 
-- fu
--- 30符とかの符。
+  <dt>fu</dt>
+  <dd>30符とかの符。</dt>
 
-- fan
--- 飜。
+  <dt>fan</dt>
+  <dd>飜。</dt>
 
-- score change
--- あるプレーヤのある局におけるscoreの変動。
+  <dt>score change</dt>
+  <dd>あるプレーヤのある局におけるscoreの変動。</dt>
 
-- score changes
--- scoreChanges[player.id]がplayerのscore changeとなるような4要素のベクトル(配列)。 e.g., [8000, -8000, 0, 0]
+  <dt>score changes</dt>
+  <dd>scoreChanges[player.id]がplayerのscore changeとなるような4要素のベクトル(配列)。 e.g., [8000, -8000, 0, 0]</dt>
 
-- player ID
--- 0～3のプレーヤID。
+  <dt>player ID</dt>
+  <dd>0～3のプレーヤID。</dt>
 
-- hora factors
--- horaPoints * horaFactors[player.id] = scoreChanges[player.id] となるような4要素のベクトル(配列)。 
--- ロンなら[1, -1, 0, 0]、子のツモなら[1, -1/2, -1/4, -1/4]など。
+<dt>hora factors</dt>
+  <dt>d>horaPoints * horaFactors[player.id] = scoreChanges[player.id] となるような4要素のベクトル(配列)。 </dt></dt>
+  <dd>ロンなら[1, -1, 0, 0]、子のツモなら[1, -1/2, -1/4, -1/4]など。</dt>
 
-- furo
--- 副露。なき。
+  <dt>furo</dt>
+  <dd>副露。なき。</dt>
 
-- pai ID (pid)
--- 牌の種類を表す0～33の整数。
+  <dt>pai ID (pid)</dt>
+  <dd>牌の種類を表す0～33の整数。</dt>
 
-- action
--- 自摸とか打牌とかチーとか。
+  <dt>action</dt>
+  <dd>自摸とか打牌とかチーとか。</dt>
 
-- metric
--- あるアクション(2mを打牌、など)の結果についての様々な統計値/推定値。
+  <dt>metric</dt>
+  <dd>あるアクション(2mを打牌、など)の結果についての様々な統計値/推定値。</dt>
 
-- count vector
--- 牌のmulti setを表すデータ構造の1つ。countVector[pai.id]がpaiの個数となるような配列。
+  <dt>count vector</dt>
+  <dd>牌のmulti setを表すデータ構造の1つ。countVector[pai.id]がpaiの個数となるような配列。</dt>
 
-- bit vectors
--- 牌のmulti setを表すデータ構造の1つ。bitVectors[i][pai.id] = (count(pai) > i)となるようなBitVectorの配列。
+  <dt>bit vectors</dt>
+  <dd>牌のmulti setを表すデータ構造の1つ。bitVectors[i][pai.id] = (count(pai) > i)となるようなBitVectorの配列。</dt>
 
-- rank
--- 順位。1～4の整数。
+  <dt>rank</dt>
+  <dd>順位。1～4の整数。</dt>
 
-- statistics (stats)
--- あらかじめ牌譜から収集された統計情報。
+  <dt>statistics (stats)</dt>
+  <dd>あらかじめ牌譜から収集された統計情報。</dt>
+</dl>
