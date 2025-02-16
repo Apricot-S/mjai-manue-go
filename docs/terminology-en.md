@@ -17,7 +17,7 @@
   <dd>The points of the win.</dd>
 
   <dt>fu</dt>
-  <dd>Fu like 30 fu.</dd>
+  <dd>Fu like 30 Fu.</dd>
 
   <dt>fan</dt>
   <dd>Han.</dd>
@@ -32,8 +32,10 @@
   <dd>Player ID between 0 and 3.</dd>
 
   <dt>hora factors</dt>
-  <dd>horaPoints * horaFactors[player.id] = scoreChanges[player.id] となるような4要素のベクトル(配列)。 <br>
-  ロンなら[1, -1, 0, 0]、子のツモなら[1, -1/2, -1/4, -1/4]など。</dd>
+  <dd>
+    A 4-element vector (array) where horaPoints * horaFactors[player.id] = scoreChanges[player.id].<br>
+    [1, -1, 0, 0] for Ron, [1, -1/2, -1/4, -1/4] for non-dealer's Tsumo, etc.
+  </dd>
 
   <dt>furo</dt>
   <dd>Meld. Call.</dd>
@@ -42,7 +44,7 @@
   <dd>An integer between 0 and 33 representing the type of tile.</dd>
 
   <dt>action</dt>
-  <dd>Self-draw, discard, chii, etc.</dd>
+  <dd>Self-draw, discard, Chii, etc.</dd>
 
   <dt>metric</dt>
   <dd>Various statistics/estimates about the outcome of a certain action (e.g., discarding 2m).</dd>
