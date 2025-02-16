@@ -42,7 +42,7 @@
   <dd>An integer between 0 and 33 representing the type of tile.</dd>
 
   <dt>action</dt>
-  <dd>Self-draw, discard, chi, etc.</dd>
+  <dd>Self-draw, discard, chii, etc.</dd>
 
   <dt>metric</dt>
   <dd>Various statistics/estimates about the outcome of a certain action (e.g., discarding 2m).</dd>
