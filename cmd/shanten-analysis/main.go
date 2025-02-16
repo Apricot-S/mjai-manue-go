@@ -8,20 +8,6 @@ import (
 	"github.com/Apricot-S/mjai-manue-go/internal/game"
 )
 
-func createPaiSetFromString(paiStr string) (*game.PaiSet, error) {
-	pais, err := game.StrToPais(paiStr)
-	if err != nil {
-		return nil, fmt.Errorf("failed to parse pai string: %w", err)
-	}
-
-	paiSet, err := game.NewPaiSetWithPais(&pais)
-	if err != nil {
-		return nil, fmt.Errorf("failed to create pai set: %w", err)
-	}
-
-	return paiSet, nil
-}
-
 func printAnalysisResults(paiStr string, shantenNumber int, goals []game.Goal) {
 	fmt.Printf("hand: %s\n", paiStr)
 	fmt.Printf("shanten number: %d\n", shantenNumber)
@@ -53,7 +39,13 @@ func main() {
 		return
 	}
 
-	paiSet, err := createPaiSetFromString(paiStr)
+	pais, err := game.StrToPais(paiStr)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	paiSet, err := game.NewPaiSetWithPais(&pais)
 	if err != nil {
 		fmt.Println(err)
 		return
