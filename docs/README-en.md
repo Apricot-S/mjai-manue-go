@@ -25,13 +25,13 @@ First, calculate the following scores for each possible discard. These scores ca
   * The average points paid if dealing into another player's hand.
   * Currently a fixed value of 6265 points derived from self-match logs. Not included in the game record debug output.
 
-以上の数値から、この局で自分が得る点数の期待値(expPt)を求めることができます。
+From the above scores, the expected points that can be gained in this round (expPt) can be calculated.
 
 * expPt = (1 - unsafeProb) * horaProb * avgHoraPt - unsafeProb * avgHojuPt
 
-このexpPtが最大となる打牌を採用します。
+The discard that maximizes this expPt is selected.
 
-「鳴くか、鳴かないか」「リーチか、ダマか」も同様の方法で判断します。
+Decisions such as "whether to call or not" and "whether to declare Riichi or not" are also made in a similar method.
 
 ## License
 
