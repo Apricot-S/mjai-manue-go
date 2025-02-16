@@ -8,25 +8,21 @@ import (
 	"github.com/Apricot-S/mjai-manue-go/internal/game"
 )
 
-func printShantenAnalysis(paiStr string) {
+func createPaiSetFromString(paiStr string) (*game.PaiSet, error) {
 	pais, err := game.StrToPais(paiStr)
 	if err != nil {
-		fmt.Println(err)
-		return
+		return nil, fmt.Errorf("failed to parse pai string: %w", err)
 	}
 
 	paiSet, err := game.NewPaiSetWithPais(&pais)
 	if err != nil {
-		fmt.Println(err)
-		return
+		return nil, fmt.Errorf("failed to create pai set: %w", err)
 	}
 
-	shantenNumber, goals, err := game.AnalyzeShanten(paiSet)
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
+	return paiSet, nil
+}
 
+func printAnalysisResults(paiStr string, shantenNumber int, goals []game.Goal) {
 	fmt.Printf("hand: %s\n", paiStr)
 	fmt.Printf("shanten number: %d\n", shantenNumber)
 	fmt.Printf("number of goals: %d\n", len(goals))
@@ -57,6 +53,18 @@ func main() {
 		return
 	}
 
+	paiSet, err := createPaiSetFromString(paiStr)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	shantenNumber, goals, err := game.AnalyzeShanten(paiSet)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+
 	fmt.Println()
-	printShantenAnalysis(paiStr)
+	printAnalysisResults(paiStr, shantenNumber, goals)
 }
