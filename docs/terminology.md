@@ -1,4 +1,4 @@
-**This is a translation of [the original document (Japanese)](https://github.com/gimite/mjai-manue/blob/master/doc/terminology.txt). It has also been changed from plain text to a description list.**
+\* This is a translation of [the original document (Japanese)](https://github.com/gimite/mjai-manue/blob/master/doc/terminology.txt). It has also been changed from plain text to a description list.
 
 <dl>
   <dt>probability distribution (probDist, dist)</dt>
