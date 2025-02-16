@@ -45,13 +45,13 @@
   <dd>Self-draw, discard, chi, etc.</dd>
 
   <dt>metric</dt>
-  <dd>あるアクション(2mを打牌、など)の結果についての様々な統計値/推定値。</dd>
+  <dd>Various statistics/estimates about the outcome of a certain action (such as discarding 2m).</dd>
 
   <dt>count vector</dt>
-  <dd>牌のmulti setを表すデータ構造の1つ。countVector[pai.id]がpaiの個数となるような配列。</dd>
+  <dd>A data structure representing a multi set of tiles. An array where countVector[pai.id] is the number of pai.</dd>
 
   <dt>bit vectors</dt>
-  <dd>牌のmulti setを表すデータ構造の1つ。bitVectors[i][pai.id] = (count(pai) > i)となるようなBitVectorの配列。</dd>
+  <dd>A data structure representing a multi set of tiles. An array of BitVector where bitVectors[i][pai.id] = (count(pai) > i).</dd>
 
   <dt>rank</dt>
   <dd>Rank. An integer between 1 and 4.</dd>
