@@ -45,7 +45,7 @@
   <dd>Self-draw, discard, chi, etc.</dd>
 
   <dt>metric</dt>
-  <dd>Various statistics/estimates about the outcome of a certain action (such as discarding 2m).</dd>
+  <dd>Various statistics/estimates about the outcome of a certain action (e.g., discarding 2m).</dd>
 
   <dt>count vector</dt>
   <dd>A data structure representing a multi set of tiles. An array where countVector[pai.id] is the number of pai.</dd>
