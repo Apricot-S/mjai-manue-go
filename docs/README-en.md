@@ -11,19 +11,19 @@ Mahjong AI for [Mjai Mahjong AI match server](https://gimite.net/pukiwiki/index.
 First, calculate the following scores for each possible discard. These scores can be seen in the debug output of the game record above.
 
 * horaProb / Hora probability / Win rate
-  * その打牌をした場合に、この局で自分が和了できる確率。
-  * モンテカルロで求める。終局までにNツモあるとすると、ランダムにN枚引いて、手牌13枚+N枚で和了を作れるかどうかをチェック。これを1000回繰り返す。
-  * 実際には高速化のために「今の手牌から和了するための必要牌」をあらかじめ求めておき、ランダムに引いたN枚に必要牌が含まれるかをチェックしている。
+  * The probability of winning in this round if that tile is discarded.
+  * Calculated using Monte Carlo simulations. If there are N self-draws until the end of the round, draw N tiles randomly and check if a winning hand can be formed with 13 tiles in the hand plus N tiles. This process is repeated 1000 times.
+  * In practice, to speed up the process, "the necessary tiles to win from the current hand" are pre-calculated, and it is checked if these necessary tiles are included in the N tiles drawn randomly.
 * avgHoraPt / Average hora points / Average win points
-  * 自分が和了した場合の平均和了点。
-  * horaProbと同時にモンテカルロで求める。手牌13枚+N枚で作れた和了の点数の平均。
+  * The average winning points when winning.
+  * Calculated using Monte Carlo simulations simultaneously with horaProb. It is the average points of the winning hands formed with 13 tiles in the hand plus N tiles.
 * unsafeProb / Unsafe probability / Deal-in rate
-  * その打牌で誰かに放銃する確率。
-  * 今のところ、リーチしている人への放銃だけを考慮。
-  * 決定木学習を使って推定。特徴量は「字牌」「スジ」など。学習データは天鳳の牌譜。[Analysis of Mahjong dangerous tile using statistics](https://gimite.net/pukiwiki/index.php?%E7%B5%B1%E8%A8%88%E3%81%AB%E3%82%88%E3%82%8B%E9%BA%BB%E9%9B%80%E5%8D%B1%E9%99%BA%E7%89%8C%E5%88%86%E6%9E%90)参照。
+  * The probability of dealing into another player's hand with that discard.
+  * Currently, only considers dealing into a player who has declared Riichi.
+  * Estimated using decision tree learning. Features include "Honors", "Suji", etc. Training data is from Tenhou's game records. [Analysis of Mahjong dangerous tile using statistics](https://gimite.net/pukiwiki/index.php?%E7%B5%B1%E8%A8%88%E3%81%AB%E3%82%88%E3%82%8B%E9%BA%BB%E9%9B%80%E5%8D%B1%E9%99%BA%E7%89%8C%E5%88%86%E6%9E%90) for more information.
 * avgHojuPt / Average hoju points / Average deal-in points
-  * 放銃した場合に払う額の平均。
-  * 今のところは自己対戦のログから求めた固定値6265点。牌譜のデバッグ出力にはない。
+  * The average points paid if dealing into another player's hand.
+  * Currently a fixed value of 6265 points derived from self-match logs. Not included in the game record debug output.
 
 以上の数値から、この局で自分が得る点数の期待値(expPt)を求めることができます。
 
