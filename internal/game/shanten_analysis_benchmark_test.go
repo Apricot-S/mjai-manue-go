@@ -19,6 +19,12 @@ func chooseHandLength(rng *rand.Rand) int {
 	return choices[rng.IntN(len(choices))]
 }
 
+func shuffleWall(rng *rand.Rand, wall []int) {
+	rng.Shuffle(len(wall), func(i, j int) {
+		wall[i], wall[j] = wall[j], wall[i]
+	})
+}
+
 func fillHand(wall []int, handLength int) *[34]int {
 	hand := [34]int{}
 	for _, tile := range wall[:handLength] {
@@ -32,9 +38,7 @@ func generateRandomPureHandImpl(rng *rand.Rand, handLength int) *[34]int {
 	for i := range wall {
 		wall[i] = i / 4
 	}
-	rng.Shuffle(len(wall), func(i, j int) {
-		wall[i], wall[j] = wall[j], wall[i]
-	})
+	shuffleWall(rng, wall[:])
 	return fillHand(wall[:], handLength)
 }
 
@@ -59,9 +63,7 @@ func generateRandomHalfFlushPureHandImpl(rng *rand.Rand, handLength int) *[34]in
 			wall[i] = (i-36)/4 + 27
 		}
 	}
-	rng.Shuffle(len(wall), func(i, j int) {
-		wall[i], wall[j] = wall[j], wall[i]
-	})
+	shuffleWall(rng, wall[:])
 	return fillHand(wall[:], handLength)
 }
 
@@ -82,9 +84,7 @@ func generateRandomFullFlushPureHandImpl(rng *rand.Rand, handLength int) *[34]in
 	for i := range wall {
 		wall[i] = i/4 + colorStart
 	}
-	rng.Shuffle(len(wall), func(i, j int) {
-		wall[i], wall[j] = wall[j], wall[i]
-	})
+	shuffleWall(rng, wall[:])
 	return fillHand(wall[:], handLength)
 }
 
@@ -104,9 +104,7 @@ func generateRandomNonSimplePureHandImpl(rng *rand.Rand, handLength int) *[34]in
 	for i := range wall {
 		wall[i] = nonSimples[i%13]
 	}
-	rng.Shuffle(len(wall), func(i, j int) {
-		wall[i], wall[j] = wall[j], wall[i]
-	})
+	shuffleWall(rng, wall[:])
 	return fillHand(wall[:], handLength)
 }
 
