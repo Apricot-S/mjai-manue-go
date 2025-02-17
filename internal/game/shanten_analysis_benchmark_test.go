@@ -19,7 +19,7 @@ func chooseHandLength(rng *rand.Rand) int {
 	return choices[rng.IntN(len(choices))]
 }
 
-func fillHand(wall *[136]int, handLength int) *[34]int {
+func fillHand(wall []int, handLength int) *[34]int {
 	hand := [34]int{}
 	for _, tile := range wall[:handLength] {
 		hand[tile]++
@@ -29,13 +29,13 @@ func fillHand(wall *[136]int, handLength int) *[34]int {
 
 func generateRandomPureHandImpl(rng *rand.Rand, handLength int) *[34]int {
 	wall := [136]int{}
-	for i := 0; i < 136; i++ {
+	for i := range wall {
 		wall[i] = i / 4
 	}
 	rng.Shuffle(len(wall), func(i, j int) {
 		wall[i], wall[j] = wall[j], wall[i]
 	})
-	return fillHand(&wall, handLength)
+	return fillHand(wall[:], handLength)
 }
 
 func generateRandomPureHand(rng *rand.Rand) *[34]int {
@@ -45,6 +45,78 @@ func generateRandomPureHand(rng *rand.Rand) *[34]int {
 
 func generateRandomFullPureHand(rng *rand.Rand) *[34]int {
 	return generateRandomPureHandImpl(rng, 14)
+}
+
+func generateRandomHalfFlushPureHandImpl(rng *rand.Rand, handLength int) *[34]int {
+	colorStartOptions := [...]int{0, 9, 18}
+	colorStart := colorStartOptions[rng.IntN(len(colorStartOptions))]
+
+	wall := [64]int{}
+	for i := range wall {
+		if i < 36 {
+			wall[i] = i/4 + colorStart
+		} else {
+			wall[i] = (i-36)/4 + 27
+		}
+	}
+	rng.Shuffle(len(wall), func(i, j int) {
+		wall[i], wall[j] = wall[j], wall[i]
+	})
+	return fillHand(wall[:], handLength)
+}
+
+func generateRandomHalfFlushPureHand(rng *rand.Rand) *[34]int {
+	handLength := chooseHandLength(rng)
+	return generateRandomHalfFlushPureHandImpl(rng, handLength)
+}
+
+func generateRandomHalfFlushFullPureHand(rng *rand.Rand) *[34]int {
+	return generateRandomHalfFlushPureHandImpl(rng, 14)
+}
+
+func generateRandomFullFlushPureHandImpl(rng *rand.Rand, handLength int) *[34]int {
+	colorStartOptions := [...]int{0, 9, 18}
+	colorStart := colorStartOptions[rng.IntN(len(colorStartOptions))]
+
+	wall := [36]int{}
+	for i := range wall {
+		wall[i] = i/4 + colorStart
+	}
+	rng.Shuffle(len(wall), func(i, j int) {
+		wall[i], wall[j] = wall[j], wall[i]
+	})
+	return fillHand(wall[:], handLength)
+}
+
+func generateRandomFullFlushPureHand(rng *rand.Rand) *[34]int {
+	handLength := chooseHandLength(rng)
+	return generateRandomFullFlushPureHandImpl(rng, handLength)
+}
+
+func generateRandomFullFlushFullPureHand(rng *rand.Rand) *[34]int {
+	return generateRandomFullFlushPureHandImpl(rng, 14)
+}
+
+var nonSimples = [...]int{0, 8, 9, 17, 18, 26, 27, 28, 29, 30, 31, 32, 33}
+
+func generateRandomNonSimplePureHandImpl(rng *rand.Rand, handLength int) *[34]int {
+	wall := [52]int{}
+	for i := range wall {
+		wall[i] = nonSimples[i%13]
+	}
+	rng.Shuffle(len(wall), func(i, j int) {
+		wall[i], wall[j] = wall[j], wall[i]
+	})
+	return fillHand(wall[:], handLength)
+}
+
+func generateRandomNonSimplePureHand(rng *rand.Rand) *[34]int {
+	handLength := chooseHandLength(rng)
+	return generateRandomNonSimplePureHandImpl(rng, handLength)
+}
+
+func generateRandomNonSimpleFullPureHand(rng *rand.Rand) *[34]int {
+	return generateRandomNonSimplePureHandImpl(rng, 14)
 }
 
 func BenchmarkShantenAnalysis_Normal(b *testing.B) {
@@ -66,6 +138,84 @@ func BenchmarkShantenAnalysis_FullNormal(b *testing.B) {
 	b.StopTimer()
 	for range b.N {
 		hand := generateRandomFullPureHand(rng)
+		ps := game.NewPaiSet(*hand)
+		b.StartTimer()
+		_, _, _ = game.AnalyzeShanten(ps)
+		b.StopTimer()
+	}
+}
+
+func BenchmarkShantenAnalysis_HalfFlush(b *testing.B) {
+	rng := createRNG()
+	b.ResetTimer()
+	b.StopTimer()
+	for range b.N {
+		hand := generateRandomHalfFlushPureHand(rng)
+		ps := game.NewPaiSet(*hand)
+		b.StartTimer()
+		_, _, _ = game.AnalyzeShanten(ps)
+		b.StopTimer()
+	}
+}
+
+func BenchmarkShantenAnalysis_FullHalfFlush(b *testing.B) {
+	rng := createRNG()
+	b.ResetTimer()
+	b.StopTimer()
+	for range b.N {
+		hand := generateRandomHalfFlushFullPureHand(rng)
+		ps := game.NewPaiSet(*hand)
+		b.StartTimer()
+		_, _, _ = game.AnalyzeShanten(ps)
+		b.StopTimer()
+	}
+}
+
+func BenchmarkShantenAnalysis_FullFlush(b *testing.B) {
+	rng := createRNG()
+	b.ResetTimer()
+	b.StopTimer()
+	for range b.N {
+		hand := generateRandomFullFlushPureHand(rng)
+		ps := game.NewPaiSet(*hand)
+		b.StartTimer()
+		_, _, _ = game.AnalyzeShanten(ps)
+		b.StopTimer()
+	}
+}
+
+func BenchmarkShantenAnalysis_FullFullFlush(b *testing.B) {
+	rng := createRNG()
+	b.ResetTimer()
+	b.StopTimer()
+	for range b.N {
+		hand := generateRandomFullFlushFullPureHand(rng)
+		ps := game.NewPaiSet(*hand)
+		b.StartTimer()
+		_, _, _ = game.AnalyzeShanten(ps)
+		b.StopTimer()
+	}
+}
+
+func BenchmarkShantenAnalysis_NonSimple(b *testing.B) {
+	rng := createRNG()
+	b.ResetTimer()
+	b.StopTimer()
+	for range b.N {
+		hand := generateRandomNonSimplePureHand(rng)
+		ps := game.NewPaiSet(*hand)
+		b.StartTimer()
+		_, _, _ = game.AnalyzeShanten(ps)
+		b.StopTimer()
+	}
+}
+
+func BenchmarkShantenAnalysis_FullNonSimple(b *testing.B) {
+	rng := createRNG()
+	b.ResetTimer()
+	b.StopTimer()
+	for range b.N {
+		hand := generateRandomNonSimpleFullPureHand(rng)
 		ps := game.NewPaiSet(*hand)
 		b.StartTimer()
 		_, _, _ = game.AnalyzeShanten(ps)
