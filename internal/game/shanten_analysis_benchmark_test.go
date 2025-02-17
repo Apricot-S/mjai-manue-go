@@ -27,7 +27,7 @@ func fillHand(wall *[136]int, handLength int) *[34]int {
 	return &hand
 }
 
-func generateRandomPureHand(rng *rand.Rand) *[34]int {
+func generateRandomPureHandImpl(rng *rand.Rand, handLength int) *[34]int {
 	wall := [136]int{}
 	for i := 0; i < 136; i++ {
 		wall[i] = i / 4
@@ -35,19 +35,16 @@ func generateRandomPureHand(rng *rand.Rand) *[34]int {
 	rng.Shuffle(len(wall), func(i, j int) {
 		wall[i], wall[j] = wall[j], wall[i]
 	})
-	handLength := chooseHandLength(rng)
 	return fillHand(&wall, handLength)
 }
 
+func generateRandomPureHand(rng *rand.Rand) *[34]int {
+	handLength := chooseHandLength(rng)
+	return generateRandomPureHandImpl(rng, handLength)
+}
+
 func generateRandomFullPureHand(rng *rand.Rand) *[34]int {
-	wall := [136]int{}
-	for i := 0; i < 136; i++ {
-		wall[i] = i / 4
-	}
-	rng.Shuffle(len(wall), func(i, j int) {
-		wall[i], wall[j] = wall[j], wall[i]
-	})
-	return fillHand(&wall, 14)
+	return generateRandomPureHandImpl(rng, 14)
 }
 
 func BenchmarkShantenAnalysis_Normal(b *testing.B) {
