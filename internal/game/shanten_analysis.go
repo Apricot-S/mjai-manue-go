@@ -54,10 +54,7 @@ func AnalyzeShantenWithOption(ps *PaiSet, allowedExtraPais int, upperbound int) 
 
 	targetVector := [NumIDs]int{}
 	allGoals := []Goal{}
-	numMentsus := sum(currentVector) / 3
-	if numMentsus > 4 {
-		numMentsus = 4
-	}
+	numMentsus := min(sum(currentVector)/3, 4)
 
 	shanten := analyzeShantenInternal(
 		&currentVector,
