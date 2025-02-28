@@ -21,7 +21,7 @@ func printAnalysisResults(paiStr string, shantenNumber int, goals []game.Goal) {
 			fmt.Printf("      %v,\n", mentsu.ToString())
 		}
 		fmt.Println("    ],")
-		fmt.Printf("    winning form tiles count: %v,\n", goal.CountVector)
+		fmt.Printf("    winning hand tiles count: %v,\n", goal.CountVector)
 		fmt.Printf("    necesaary tiles count:    %v,\n", goal.RequiredVector)
 		fmt.Printf("    unnecesaary tiles count:  %v,\n", goal.ThrowableVector)
 		fmt.Println("  ],")
