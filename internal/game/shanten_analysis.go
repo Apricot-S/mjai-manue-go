@@ -85,7 +85,7 @@ func AnalyzeShantenWithOption(ps *PaiSet, allowedExtraPais int, upperbound int) 
 	}
 
 	if len(goals) == 0 {
-		return math.MaxInt, []Goal{}, nil
+		return math.MaxInt, goals, nil
 	}
 	return shanten, goals, nil
 }
