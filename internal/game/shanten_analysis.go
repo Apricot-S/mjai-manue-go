@@ -6,19 +6,19 @@ import (
 	"slices"
 )
 
-// Goal represents a winning form that can be transitioned from the current hand.
+// Goal represents a winning hand that can be transitioned from the current hand.
 // It contains information about the current hand's shanten number,
-// the winning form's set composition, and the number of required and unrequired tiles.
+// the winning hand's set composition, and the number of required and unrequired tiles.
 type Goal struct {
 	// Shanten is the shanten number of the current hand.
 	Shanten int
-	// Mentsus is a list of sets in the winning form.
+	// Mentsus is a list of sets in the winning hand.
 	Mentsus []Mentsu
-	// CountVector is the number of each tile included in the winning form.
+	// CountVector is the number of each tile included in the winning hand.
 	CountVector [NumIDs]int
-	// RequiredVector is the number of each tile required for the winning form.
+	// RequiredVector is the number of each tile required for the winning hand.
 	RequiredVector [NumIDs]int
-	// ThrowableVector is the number of each tile not required for the winning form.
+	// ThrowableVector is the number of each tile not required for the winning hand.
 	ThrowableVector [NumIDs]int
 }
 
@@ -102,7 +102,7 @@ func sum(arr [NumIDs]int) int {
 }
 
 // analyzeShantenInternal calculates the shanten number and
-// the set of nearest winning forms using pruning DFS.
+// the set of nearest winning hands using pruning DFS.
 func analyzeShantenInternal(
 	currentVector *[NumIDs]int,
 	targetVector *[NumIDs]int,
