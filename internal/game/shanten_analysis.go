@@ -64,7 +64,7 @@ func AnalyzeShantenWithOption(ps *PaiSet, allowedExtraPais int, upperbound int) 
 		numMentsus,
 		0,
 		upperbound,
-		[]Mentsu{},
+		make([]Mentsu, 0, numMentsus+1), // +1 for the pair
 		&allGoals,
 		allowedExtraPais,
 	)
