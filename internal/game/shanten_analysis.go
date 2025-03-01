@@ -155,10 +155,8 @@ func analyzeShantenInternal(
 			continue
 		}
 
-		pungDistance := 0
-		if currentVector[i] <= targetVector[i] {
-			pungDistance = 3
-		} else {
+		pungDistance := 3
+		if currentVector[i] > targetVector[i] {
 			pungDistance = max(targetVector[i]+3-currentVector[i], 0)
 		}
 		newShanten := currentShanten + pungDistance
