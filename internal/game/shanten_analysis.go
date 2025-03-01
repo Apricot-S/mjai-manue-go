@@ -46,10 +46,10 @@ func AnalyzeShanten(ps *PaiSet) (int, []Goal, error) {
 func AnalyzeShantenWithOption(ps *PaiSet, allowedExtraPais int, upperbound int) (int, []Goal, error) {
 	currentVector := ps.Array()
 	if slices.Min(currentVector[:]) < 0 {
-		return -1, nil, fmt.Errorf("negative number of tiles in the PaiSet")
+		return math.MaxInt, nil, fmt.Errorf("negative number of tiles in the PaiSet")
 	}
 	if slices.Max(currentVector[:]) > 4 {
-		return -1, nil, fmt.Errorf("more than 4 tiles of the same type in the PaiSet")
+		return math.MaxInt, nil, fmt.Errorf("more than 4 tiles of the same type in the PaiSet")
 	}
 
 	targetVector := [NumIDs]int{}
