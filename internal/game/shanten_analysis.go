@@ -55,8 +55,7 @@ func AnalyzeShantenWithOption(ps *PaiSet, allowedExtraPais int, upperbound int) 
 
 	targetVector := [NumIDs]int{}
 	numMentsus := min(sum(currentVector)/3, 4)
-	mentsus := []Mentsu{}
-	mentsus = append(mentsus, make([]Mentsu, 0, numMentsus+1)...) // +1 for the pair
+	mentsus := make([]Mentsu, 0, numMentsus+1) // +1 for the pair
 	allGoals := []Goal{}
 
 	shanten := analyzeShantenInternal(
@@ -125,7 +124,9 @@ func analyzeShantenInternal(
 				pai, _ := NewPaiWithID(i)
 				pais := []Pai{*pai, *pai}
 				toitsu, _ := NewMentsu(Toitsu, pais)
-				newMentsus := append(mentsus, *toitsu)
+				newMentsus := make([]Mentsu, len(mentsus), cap(mentsus))
+				copy(newMentsus, mentsus)
+				newMentsus = append(newMentsus, *toitsu)
 
 				goalVector := *targetVector
 				goalVector[i] += 2
@@ -164,7 +165,9 @@ func analyzeShantenInternal(
 			pai, _ := NewPaiWithID(uint8(i))
 			pais := []Pai{*pai, *pai, *pai}
 			kotsu, _ := NewMentsu(Kotsu, pais)
-			newMentsus := append(mentsus, *kotsu)
+			newMentsus := make([]Mentsu, len(mentsus), cap(mentsus))
+			copy(newMentsus, mentsus)
+			newMentsus = append(newMentsus, *kotsu)
 
 			targetVector[i] += 3
 			upperbound = analyzeShantenInternal(
@@ -207,7 +210,9 @@ func analyzeShantenInternal(
 			pai, _ := NewPaiWithID(i)
 			pais := []Pai{*pai, *pai.Next(1), *pai.Next(2)}
 			shuntsu, _ := NewMentsu(Shuntsu, pais)
-			newMentsus := append(mentsus, *shuntsu)
+			newMentsus := make([]Mentsu, len(mentsus), cap(mentsus))
+			copy(newMentsus, mentsus)
+			newMentsus = append(newMentsus, *shuntsu)
 
 			targetVector[i]++
 			targetVector[i+1]++
