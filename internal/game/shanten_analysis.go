@@ -37,7 +37,7 @@ var (
 	}
 )
 
-// AnalyzeShanten calculates the shanten number and the list of Goal of the given PaiSet.
+// AnalyzeShanten calculates the shanten number and the list of Goal for the given PaiSet.
 // When the list of Goal is empty, [math.MaxInt] is returned as the shanten number.
 // It does not consider Seven Pairs or Thirteen Orphans.
 func AnalyzeShanten(ps *PaiSet) (int, []Goal, error) {
