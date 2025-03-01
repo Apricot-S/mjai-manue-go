@@ -10,7 +10,8 @@ import (
 // It contains information about the current hand's shanten number,
 // the winning hand's set composition, and the number of required and unrequired tiles.
 type Goal struct {
-	// Shanten is the shanten number of the current hand.
+	// Shanten is the shanten number from the current hand to the winning hand.
+	// If the current hand and the winning hand are the same, it will be -1.
 	Shanten int
 	// Mentsus is a list of sets in the winning hand.
 	Mentsus []Mentsu
