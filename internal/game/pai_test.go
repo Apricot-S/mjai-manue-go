@@ -155,7 +155,7 @@ func TestNewPaiWithName_Valid(t *testing.T) {
 		wantErr bool
 	}{}
 
-	for i := 0; i < len(allNames); i++ {
+	for i := range len(allNames) {
 		tests = append(tests, getTestCaseValid(i))
 	}
 
@@ -237,7 +237,7 @@ func TestNewPaiWithDetail_Valid(t *testing.T) {
 	}{}
 
 	// Exclude Unknown
-	for i := 0; i < len(allNames)-1; i++ {
+	for i := range len(allNames) - 1 {
 		tests = append(tests, getTestCaseValid(i))
 	}
 
@@ -316,7 +316,7 @@ func TestPai_IsUnknown(t *testing.T) {
 	tests := []testCase{{"?", 37, true}}
 
 	// Exclude Unknown
-	for i := 0; i < len(allNames)-1; i++ {
+	for i := range len(allNames) - 1 {
 		tests = append(tests, testCase{allNames[i], uint8(i), false})
 	}
 
@@ -381,7 +381,7 @@ func TestPai_NextForDora(t *testing.T) {
 	var tests []testCase
 
 	// suits
-	for i := 0; i < 9*3; i++ {
+	for i := range 9 * 3 {
 		var nextN int
 		if i%9 == 8 {
 			nextN = i - 8
@@ -396,7 +396,7 @@ func TestPai_NextForDora(t *testing.T) {
 
 	// winds
 	winds := []string{"E", "S", "W", "N"}
-	for i := 0; i < len(winds); i++ {
+	for i := range winds {
 		var nextN int
 		if i == 3 {
 			nextN = 0
@@ -411,7 +411,7 @@ func TestPai_NextForDora(t *testing.T) {
 
 	// dragons
 	dragons := []string{"P", "F", "C"}
-	for i := 0; i < len(dragons); i++ {
+	for i := range dragons {
 		var nextN int
 		if i == 2 {
 			nextN = 0

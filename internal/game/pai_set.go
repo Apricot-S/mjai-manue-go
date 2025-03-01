@@ -37,7 +37,7 @@ func (ps *PaiSet) Array() [NumIDs]int {
 func (ps *PaiSet) ToPais() []Pai {
 	pais := []Pai{}
 	for id, count := range ps.array {
-		for i := 0; i < count; i++ {
+		for range count {
 			pai, _ := NewPaiWithID(uint8(id))
 			pais = append(pais, *pai)
 		}
