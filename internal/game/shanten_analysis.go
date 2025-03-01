@@ -157,8 +157,8 @@ func analyzeShantenInternal(
 			pungDistance := 0
 			if currentVector[i] <= targetVector[i] {
 				pungDistance = 3
-			} else if currentVector[i] < targetVector[i]+3 {
-				pungDistance = (targetVector[i] + 3) - currentVector[i]
+			} else {
+				pungDistance = max(targetVector[i]+3-currentVector[i], 0)
 			}
 			newShanten := currentShanten + pungDistance
 
@@ -187,9 +187,7 @@ func analyzeShantenInternal(
 
 	// Add Chows
 	startChowId := uint8(0)
-	if minMeldId < NumIDs {
-		startChowId = 0
-	} else {
+	if minMeldId >= NumIDs {
 		startChowId = minMeldId - NumIDs
 	}
 
