@@ -147,41 +147,39 @@ func analyzeShantenInternal(
 	}
 
 	// Add Pungs
-	if minMeldId < NumIDs {
-		for i := minMeldId; i < NumIDs; i++ {
-			if targetVector[i] >= 2 {
-				// Can't add a Pung
-				continue
-			}
+	for i := minMeldId; i < NumIDs; i++ {
+		if targetVector[i] >= 2 {
+			// Can't add a Pung
+			continue
+		}
 
-			pungDistance := 0
-			if currentVector[i] <= targetVector[i] {
-				pungDistance = 3
-			} else {
-				pungDistance = max(targetVector[i]+3-currentVector[i], 0)
-			}
-			newShanten := currentShanten + pungDistance
+		pungDistance := 0
+		if currentVector[i] <= targetVector[i] {
+			pungDistance = 3
+		} else {
+			pungDistance = max(targetVector[i]+3-currentVector[i], 0)
+		}
+		newShanten := currentShanten + pungDistance
 
-			if pungDistance < 3 && newShanten <= upperbound+allowedExtraPais {
-				pai, _ := NewPaiWithID(uint8(i))
-				pais := []Pai{*pai, *pai, *pai}
-				kotsu, _ := NewMentsu(Kotsu, pais)
-				newMentsus := append(mentsus, *kotsu)
+		if pungDistance < 3 && newShanten <= upperbound+allowedExtraPais {
+			pai, _ := NewPaiWithID(uint8(i))
+			pais := []Pai{*pai, *pai, *pai}
+			kotsu, _ := NewMentsu(Kotsu, pais)
+			newMentsus := append(mentsus, *kotsu)
 
-				targetVector[i] += 3
-				upperbound = analyzeShantenInternal(
-					currentVector,
-					targetVector,
-					newShanten,
-					numMeldsLeft-1,
-					i,
-					upperbound,
-					newMentsus,
-					goals,
-					allowedExtraPais,
-				)
-				targetVector[i] -= 3
-			}
+			targetVector[i] += 3
+			upperbound = analyzeShantenInternal(
+				currentVector,
+				targetVector,
+				newShanten,
+				numMeldsLeft-1,
+				i,
+				upperbound,
+				newMentsus,
+				goals,
+				allowedExtraPais,
+			)
+			targetVector[i] -= 3
 		}
 	}
 
