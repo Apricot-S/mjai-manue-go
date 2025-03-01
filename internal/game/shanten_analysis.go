@@ -71,7 +71,8 @@ func AnalyzeShantenWithOption(ps *PaiSet, allowedExtraPais int, upperbound int) 
 	)
 	newUpperbound := min(shanten+allowedExtraPais, upperbound)
 
-	goals := []Goal{}
+	// Filter out the goals that exceed newUpperbound
+	goals := make([]Goal, 0, len(allGoals))
 	for _, goal := range allGoals {
 		if goal.Shanten <= newUpperbound {
 			for pid := range NumIDs {
@@ -81,6 +82,7 @@ func AnalyzeShantenWithOption(ps *PaiSet, allowedExtraPais int, upperbound int) 
 			goals = append(goals, goal)
 		}
 	}
+	goals = slices.Clip(goals)
 
 	if len(goals) == 0 {
 		return math.MaxInt, goals, nil
