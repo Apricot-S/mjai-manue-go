@@ -105,7 +105,7 @@ func analyzeShantenInternal(
 	targetVector *[NumIDs]int,
 	currentShanten int,
 	numMeldsLeft int,
-	minMeldId uint8,
+	minMeldId int,
 	upperbound int,
 	mentsus []Mentsu,
 	goals *[]Goal,
@@ -163,7 +163,7 @@ func analyzeShantenInternal(
 			newShanten := currentShanten + pungDistance
 
 			if pungDistance < 3 && newShanten <= upperbound+allowedExtraPais {
-				pai, _ := NewPaiWithID(i)
+				pai, _ := NewPaiWithID(uint8(i))
 				pais := []Pai{*pai, *pai, *pai}
 				kotsu, _ := NewMentsu(Kotsu, pais)
 				newMentsus := append(mentsus, *kotsu)
@@ -186,11 +186,7 @@ func analyzeShantenInternal(
 	}
 
 	// Add Chows
-	startChowId := uint8(0)
-	if minMeldId >= NumIDs {
-		startChowId = minMeldId - NumIDs
-	}
-
+	startChowId := max(minMeldId-NumIDs, 0)
 	for chowId := startChowId; chowId < numChows; chowId++ {
 		i := chows[chowId]
 		if targetVector[i] >= 4 || targetVector[i+1] >= 4 || targetVector[i+2] >= 4 {
