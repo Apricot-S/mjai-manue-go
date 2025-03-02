@@ -8,7 +8,8 @@ import (
 	"github.com/Apricot-S/mjai-manue-go/internal/game"
 )
 
-func printAnalysisResults(paiStr string, shantenNumber int, goals []game.Goal) {
+func printAnalysisResults(paiSet *game.PaiSet, shantenNumber int, goals []game.Goal) {
+	paiStr := paiSet.ToString()
 	fmt.Printf("hand: %s\n", paiStr)
 	fmt.Printf("shanten number: %d\n", shantenNumber)
 	fmt.Printf("number of goals: %d\n", len(goals))
@@ -58,5 +59,5 @@ func main() {
 	}
 
 	fmt.Println()
-	printAnalysisResults(paiStr, shantenNumber, goals)
+	printAnalysisResults(paiSet, shantenNumber, goals)
 }
