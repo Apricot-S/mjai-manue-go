@@ -161,6 +161,11 @@ func analyzeShantenInternal(
 		}
 		newShanten := currentShanten + pungDistance
 
+		// If pungDistance == 3:
+		// There are no common tiles between currentVector and the target Pung.
+		// Therefore, the winning hand containing the target Pung is not the nearest winning hand.
+		// Consequently, there is no need to search for a winning hand that contains
+		// the target Pung, so this branch is pruned.
 		if pungDistance < 3 && newShanten <= upperbound+allowedExtraPais {
 			pai, _ := NewPaiWithID(uint8(i))
 			pais := []Pai{*pai, *pai, *pai}
@@ -206,6 +211,11 @@ func analyzeShantenInternal(
 		}
 		newShanten := currentShanten + chowDistance
 
+		// If chowDistance == 3:
+		// There are no common tiles between currentVector and the target Chow.
+		// Therefore, the winning hand containing the target Chow is not the nearest winning hand.
+		// Consequently, there is no need to search for a winning hand that contains
+		// the target Chow, so this branch is pruned.
 		if chowDistance < 3 && newShanten <= upperbound+allowedExtraPais {
 			pai, _ := NewPaiWithID(i)
 			pais := []Pai{*pai, *pai.Next(1), *pai.Next(2)}
