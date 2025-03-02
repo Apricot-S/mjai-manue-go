@@ -9,25 +9,28 @@ import (
 )
 
 func printAnalysisResults(paiSet *game.PaiSet, shantenNumber int, goals []game.Goal) {
+	writer := bufio.NewWriter(os.Stdout)
+	defer writer.Flush()
+
 	paiStr := paiSet.ToString()
-	fmt.Printf("hand: %s\n", paiStr)
-	fmt.Printf("shanten number: %d\n", shantenNumber)
-	fmt.Printf("number of nearest winning hands: %d\n", len(goals))
-	fmt.Println("nearest winning hands: [")
+	fmt.Fprintf(writer, "hand: %s\n", paiStr)
+	fmt.Fprintf(writer, "shanten number: %d\n", shantenNumber)
+	fmt.Fprintf(writer, "number of nearest winning hands: %d\n", len(goals))
+	fmt.Fprintln(writer, "nearest winning hands: [")
 	for _, goal := range goals {
-		fmt.Println("  [")
-		fmt.Printf("    shanten number: %d,\n", goal.Shanten)
-		fmt.Println("    blocks: [")
+		fmt.Fprintln(writer, "  [")
+		fmt.Fprintf(writer, "    shanten number: %d,\n", goal.Shanten)
+		fmt.Fprintln(writer, "    blocks: [")
 		for _, mentsu := range goal.Mentsus {
-			fmt.Printf("      %v,\n", mentsu.ToString())
+			fmt.Fprintf(writer, "      %v,\n", mentsu.ToString())
 		}
-		fmt.Println("    ],")
-		fmt.Printf("    winning hand tiles count: %v,\n", goal.CountVector)
-		fmt.Printf("    necesaary tiles count:    %v,\n", goal.RequiredVector)
-		fmt.Printf("    unnecesaary tiles count:  %v,\n", goal.ThrowableVector)
-		fmt.Println("  ],")
+		fmt.Fprintln(writer, "    ],")
+		fmt.Fprintf(writer, "    winning hand tiles count: %v,\n", goal.CountVector)
+		fmt.Fprintf(writer, "    necesaary tiles count:    %v,\n", goal.RequiredVector)
+		fmt.Fprintf(writer, "    unnecesaary tiles count:  %v,\n", goal.ThrowableVector)
+		fmt.Fprintln(writer, "  ],")
 	}
-	fmt.Println("]")
+	fmt.Fprintln(writer, "]")
 }
 
 func main() {
