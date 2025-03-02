@@ -12,8 +12,8 @@ func printAnalysisResults(paiSet *game.PaiSet, shantenNumber int, goals []game.G
 	paiStr := paiSet.ToString()
 	fmt.Printf("hand: %s\n", paiStr)
 	fmt.Printf("shanten number: %d\n", shantenNumber)
-	fmt.Printf("number of goals: %d\n", len(goals))
-	fmt.Println("goals: [")
+	fmt.Printf("number of nearest winning hands: %d\n", len(goals))
+	fmt.Println("nearest winning hands: [")
 	for _, goal := range goals {
 		fmt.Println("  [")
 		fmt.Printf("    shanten number: %d,\n", goal.Shanten)
