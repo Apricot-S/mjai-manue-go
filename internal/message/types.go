@@ -1,5 +1,6 @@
 package message
 
+// Type represents the message type in Mjai protocol.
 type Type string
 
 const (
