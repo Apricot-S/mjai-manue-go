@@ -2,6 +2,7 @@ package game_test
 
 import (
 	"math"
+	"reflect"
 	"testing"
 
 	"github.com/Apricot-S/mjai-manue-go/internal/game"
@@ -149,6 +150,40 @@ func TestAnalyzeShanten(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.args.ps, func(t *testing.T) {
 			testAnalyzeShantenInternal(t, tt.args.ps, tt.want, tt.want1)
+		})
+	}
+}
+
+func TestAnalyzeShanten_Invalid(t *testing.T) {
+	type args struct {
+		ps string
+	}
+	type testCase struct {
+		args    args
+		shanten int
+		goals   []game.Goal
+	}
+	tests := []testCase{
+		// 5 identical tiles
+		{args{"1m 1m 1m 1m 1m"}, math.MaxInt, nil},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.args.ps, func(t *testing.T) {
+			pais, _ := game.StrToPais(tt.args.ps)
+			paiSet, _ := game.NewPaiSetWithPais(&pais)
+
+			shanten, goals, err := game.AnalyzeShanten(paiSet)
+			if err == nil {
+				t.Errorf("AnalyzeShanten() error = %v", err)
+				return
+			}
+			if shanten != tt.shanten {
+				t.Errorf("AnalyzeShanten() shanten = %v, want %v", shanten, tt.shanten)
+			}
+			if !reflect.DeepEqual(goals, tt.goals) {
+				t.Errorf("AnalyzeShanten() goals = %v, want %v", goals, tt.goals)
+			}
 		})
 	}
 }
