@@ -191,15 +191,15 @@ func analyzeShantenInternal(
 			continue
 		}
 
-		chowDistance := 0
-		if currentVector[i] <= targetVector[i] {
-			chowDistance++
+		chowDistance := 3
+		if currentVector[i] > targetVector[i] {
+			chowDistance--
 		}
-		if currentVector[i+1] <= targetVector[i+1] {
-			chowDistance++
+		if currentVector[i+1] > targetVector[i+1] {
+			chowDistance--
 		}
-		if currentVector[i+2] <= targetVector[i+2] {
-			chowDistance++
+		if currentVector[i+2] > targetVector[i+2] {
+			chowDistance--
 		}
 		newShanten := currentShanten + chowDistance
 
