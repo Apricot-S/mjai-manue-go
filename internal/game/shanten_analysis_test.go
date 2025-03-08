@@ -5,6 +5,14 @@ import (
 	"testing"
 )
 
+func sum(arr [NumIDs]int) int {
+	sum := 0
+	for _, c := range arr {
+		sum += c
+	}
+	return sum
+}
+
 func verifyShantenAndGoals(t *testing.T, paiSet *PaiSet, expectedShanten int, expectedGoalsSize int) {
 	shanten, goals, err := AnalyzeShanten(paiSet)
 	if err != nil {

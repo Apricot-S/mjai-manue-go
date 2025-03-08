@@ -46,15 +46,19 @@ func AnalyzeShanten(ps *PaiSet) (int, []Goal, error) {
 
 func AnalyzeShantenWithOption(ps *PaiSet, allowedExtraPais int, upperbound int) (int, []Goal, error) {
 	currentVector := ps.Array()
-	if slices.Min(currentVector[:]) < 0 {
-		return math.MaxInt, nil, fmt.Errorf("negative number of tiles in the PaiSet")
-	}
-	if slices.Max(currentVector[:]) > 4 {
-		return math.MaxInt, nil, fmt.Errorf("more than 4 tiles of the same type in the PaiSet")
+	sum := 0
+	for _, c := range currentVector {
+		if c < 0 {
+			return math.MaxInt, nil, fmt.Errorf("negative number of tiles in the PaiSet")
+		}
+		if c > 4 {
+			return math.MaxInt, nil, fmt.Errorf("more than 4 tiles of the same type in the PaiSet")
+		}
+		sum += c
 	}
 
 	targetVector := [NumIDs]int{}
-	numMentsus := min(sum(currentVector)/3, 4)
+	numMentsus := min(sum/3, 4)
 	mentsus := make([]Mentsu, 0, numMentsus+1) // +1 for the pair
 	allGoals := []Goal{}
 
@@ -88,14 +92,6 @@ func AnalyzeShantenWithOption(ps *PaiSet, allowedExtraPais int, upperbound int) 
 		return math.MaxInt, goals, nil
 	}
 	return shanten, goals, nil
-}
-
-func sum(arr [NumIDs]int) int {
-	sum := 0
-	for _, v := range arr {
-		sum += v
-	}
-	return sum
 }
 
 // analyzeShantenInternal calculates the shanten number and
