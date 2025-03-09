@@ -62,6 +62,13 @@ func TestAction_Serialize(t *testing.T) {
 			wantErr:  false,
 		},
 		{
+			name:     "with_log",
+			input:    `{"type":"action","actor":1,"log":"hello"}`,
+			wantMsg:  &Action{Message: actionMessage, Actor: 1, Log: "hello"},
+			wantJSON: `{"type":"action","actor":1,"log":"hello"}`,
+			wantErr:  false,
+		},
+		{
 			name:     "undefined",
 			input:    `{"type":"action","actor":undefined}`,
 			wantMsg:  &Action{Message: actionMessage},
