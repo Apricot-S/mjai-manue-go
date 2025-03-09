@@ -22,13 +22,6 @@ func getNextKyoku(bakaze *Pai, kyokuNum int) (*Pai, int) {
 }
 
 type Game struct {
-	prevActionType message.Type
-	// -1 if no dahai
-	prevDahaiActor    int
-	prevDahaiPai      *Pai
-	currentActionType message.Type
-	tenpais           [numPlayers]bool
-
 	players     [numPlayers]Player
 	bakaze      Pai
 	kyokuNum    int
@@ -37,6 +30,13 @@ type Game struct {
 	chicha      *Player
 	doraMarkers []Pai
 	numPipais   int
+
+	prevActionType message.Type
+	// -1 if no dahai
+	prevDahaiActor    int
+	prevDahaiPai      *Pai
+	currentActionType message.Type
+	tenpais           [numPlayers]bool
 }
 
 func (g *Game) Players() *[numPlayers]Player {
