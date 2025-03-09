@@ -6,7 +6,7 @@ const (
 	numPlayers        = 4
 	initScore         = 25_000
 	maxNumDoraMarkers = 5
-	numInitPipais     = NumIDs*4 - numPlayers*13 - 14
+	numInitPipais     = NumIDs*4 - 13*numPlayers - 14
 	finalTurn         = numInitPipais / numPlayers
 )
 
