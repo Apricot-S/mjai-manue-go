@@ -7,6 +7,7 @@ import (
 )
 
 type Bot struct {
+	name  string
 	state game.State
 	ai    ai.AI
 }
