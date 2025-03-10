@@ -21,7 +21,7 @@ func getNextKyoku(bakaze *Pai, kyokuNum int) (*Pai, int) {
 	return bakaze, kyokuNum + 1
 }
 
-type Game struct {
+type State struct {
 	players     [numPlayers]Player
 	bakaze      Pai
 	kyokuNum    int
@@ -39,34 +39,34 @@ type Game struct {
 	tenpais           [numPlayers]bool
 }
 
-func (g *Game) Players() *[numPlayers]Player {
-	return &g.players
+func (s *State) Players() *[numPlayers]Player {
+	return &s.players
 }
 
-func (g *Game) Bakaze() *Pai {
-	return &g.bakaze
+func (s *State) Bakaze() *Pai {
+	return &s.bakaze
 }
 
-func (g *Game) KyokuNum() int {
-	return g.kyokuNum
+func (s *State) KyokuNum() int {
+	return s.kyokuNum
 }
 
-func (g *Game) Honba() int {
-	return g.honba
+func (s *State) Honba() int {
+	return s.honba
 }
 
-func (g *Game) Oya() *Player {
-	return g.oya
+func (s *State) Oya() *Player {
+	return s.oya
 }
 
-func (g *Game) Chicha() *Player {
-	return g.chicha
+func (s *State) Chicha() *Player {
+	return s.chicha
 }
 
-func (g *Game) DoraMarkers() []Pai {
-	return g.doraMarkers
+func (s *State) DoraMarkers() []Pai {
+	return s.doraMarkers
 }
 
-func (g *Game) NumPipais() int {
-	return g.numPipais
+func (s *State) NumPipais() int {
+	return s.numPipais
 }
