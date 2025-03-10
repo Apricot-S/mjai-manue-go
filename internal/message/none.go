@@ -6,8 +6,6 @@ type None struct {
 
 func NewNone() *None {
 	return &None{
-		Message: Message{
-			Type: TypeNone,
-		},
+		Message: Message{Type: TypeNone},
 	}
 }

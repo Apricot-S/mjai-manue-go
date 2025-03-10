@@ -8,7 +8,7 @@ type Skip struct {
 func NewSkip(actor int, log string) *Skip {
 	return &Skip{
 		Action: Action{
-			Message: Message{TypeNone},
+			Message: Message{Type: TypeNone},
 			Actor:   actor,
 			Log:     log,
 		},
