@@ -1,6 +1,9 @@
 package game
 
-import "testing"
+import (
+	"reflect"
+	"testing"
+)
 
 func Test_getDistance(t *testing.T) {
 	type args struct {
@@ -97,6 +100,78 @@ func Test_getDistance(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			if got := getDistance(tt.args.p1, tt.args.p2); got != tt.want {
 				t.Errorf("getDistance() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func Test_getNextKyoku(t *testing.T) {
+	east, _ := NewPaiWithName("E")
+	south, _ := NewPaiWithName("S")
+	west, _ := NewPaiWithName("W")
+	north, _ := NewPaiWithName("N")
+
+	type args struct {
+		bakaze   *Pai
+		kyokuNum int
+	}
+	tests := []struct {
+		name  string
+		args  args
+		want  *Pai
+		want1 int
+	}{
+		{
+			name:  "E1 -> E2",
+			args:  args{bakaze: east, kyokuNum: 1},
+			want:  east,
+			want1: 2,
+		},
+		{
+			name:  "E4 -> S1",
+			args:  args{bakaze: east, kyokuNum: 4},
+			want:  south,
+			want1: 1,
+		},
+		{
+			name:  "S2 -> S3",
+			args:  args{bakaze: south, kyokuNum: 2},
+			want:  south,
+			want1: 3,
+		},
+		{
+			name:  "S4 -> W1",
+			args:  args{bakaze: south, kyokuNum: 4},
+			want:  west,
+			want1: 1,
+		},
+		{
+			name:  "W3 -> W4",
+			args:  args{bakaze: west, kyokuNum: 3},
+			want:  west,
+			want1: 4,
+		},
+		{
+			name:  "W4 -> N1",
+			args:  args{bakaze: west, kyokuNum: 4},
+			want:  north,
+			want1: 1,
+		},
+		{
+			name:  "N4 -> E1",
+			args:  args{bakaze: north, kyokuNum: 4},
+			want:  east,
+			want1: 1,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, got1 := getNextKyoku(tt.args.bakaze, tt.args.kyokuNum)
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("getNextKyoku() got = %v, want %v", got, tt.want)
+			}
+			if got1 != tt.want1 {
+				t.Errorf("getNextKyoku() got1 = %v, want %v", got1, tt.want1)
 			}
 		})
 	}
