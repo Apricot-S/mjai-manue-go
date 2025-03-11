@@ -7,9 +7,10 @@ import (
 )
 
 type Bot struct {
-	name  string
-	state game.State
-	ai    ai.AI
+	name     string
+	playerID int
+	state    game.State
+	ai       ai.AI
 }
 
 func (b *Bot) Respond(message jsontext.Value) (jsontext.Value, error) {

@@ -6,5 +6,5 @@ import (
 )
 
 type AI interface {
-	Respond(state *game.State, player int) (jsontext.Value, error)
+	Respond(state *game.State, playerID int) (jsontext.Value, error)
 }
