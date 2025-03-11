@@ -32,7 +32,7 @@ type State struct {
 	numPipais   int
 
 	prevActionType message.Type
-	// -1 if no dahai
+	// -1 if prev action is not dahai
 	prevDahaiActor    int
 	prevDahaiPai      *Pai
 	currentActionType message.Type
