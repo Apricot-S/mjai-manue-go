@@ -41,15 +41,13 @@ var rawGameStats []byte
 //go:embed light_game_stats.json
 var rawLightGameStats []byte
 
-var Stats GameStats
-
-// Call only once throughout the program.
-func InitializeStats() {
-	if err := json.Unmarshal(rawGameStats, &Stats); err != nil {
-		panic(err)
+func GetStats() (*GameStats, error) {
+	var stats GameStats
+	if err := json.Unmarshal(rawGameStats, &stats); err != nil {
+		return nil, err
 	}
-
-	if err := json.Unmarshal(rawLightGameStats, &Stats.LightGameStats); err != nil {
-		panic(err)
+	if err := json.Unmarshal(rawLightGameStats, &stats.LightGameStats); err != nil {
+		return nil, err
 	}
+	return &stats, nil
 }
