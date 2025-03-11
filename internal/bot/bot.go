@@ -13,7 +13,7 @@ type Bot struct {
 	ai       ai.AI
 }
 
-func (b *Bot) Respond(message jsontext.Value) (jsontext.Value, error) {
+func (b *Bot) Respond(message *jsontext.Value) (jsontext.Value, error) {
 	// Dummy implementation
 	return []byte{}, nil
 }
