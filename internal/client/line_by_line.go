@@ -9,5 +9,5 @@ import (
 type LineByLine struct {
 	reader io.Reader
 	writer io.Writer
-	bot    bot.Bot
+	bot    *bot.Bot
 }

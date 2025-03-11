@@ -9,7 +9,7 @@ import (
 type Bot struct {
 	name     string
 	playerID int
-	state    game.State
+	state    *game.State
 	ai       ai.AI
 }
 
