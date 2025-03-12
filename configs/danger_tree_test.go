@@ -1,7 +1,6 @@
 package configs
 
 import (
-	_ "embed"
 	"math"
 	"testing"
 )
