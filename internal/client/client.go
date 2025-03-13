@@ -9,7 +9,7 @@ import (
 type Client struct {
 	reader io.Reader
 	writer io.Writer
-	agent  *agent.Agent
+	agent  agent.Agent
 }
 
 func (c *Client) Run() error {
