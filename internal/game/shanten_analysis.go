@@ -35,6 +35,32 @@ var (
 		9, 10, 11, 12, 13, 14, 15,
 		18, 19, 20, 21, 22, 23, 24,
 	}
+
+	allPairs [NumIDs]Mentsu = func() [NumIDs]Mentsu {
+		p := [NumIDs]Mentsu{}
+		for i := range uint8(NumIDs) {
+			pai, _ := NewPaiWithID(i)
+			toitsu, _ := NewMentsu(Toitsu, []Pai{*pai, *pai})
+			p[i] = *toitsu
+		}
+		return p
+	}()
+
+	allMelds [NumIDs + numChows]Mentsu = func() [NumIDs + numChows]Mentsu {
+		m := [NumIDs + numChows]Mentsu{}
+		for i := range uint8(NumIDs) {
+			pai, _ := NewPaiWithID(i)
+			kotsu, _ := NewMentsu(Kotsu, []Pai{*pai, *pai, *pai})
+			m[i] = *kotsu
+		}
+		for chowId := range uint8(numChows) {
+			i := chowStartIDs[chowId]
+			pai, _ := NewPaiWithID(i)
+			shuntsu, _ := NewMentsu(Shuntsu, []Pai{*pai, *pai.Next(1), *pai.Next(2)})
+			m[chowId+NumIDs] = *shuntsu
+		}
+		return m
+	}()
 )
 
 // AnalyzeShanten calculates the shanten number and the list of Goal for the given PaiSet.
@@ -119,16 +145,11 @@ func analyzeShantenInternal(
 			newShanten := currentShanten + pairDistance
 
 			if newShanten <= upperbound+allowedExtraPais {
-				pai, _ := NewPaiWithID(i)
-				pais := []Pai{*pai, *pai}
-				toitsu, _ := NewMentsu(Toitsu, pais)
-				newMentsus := makeNewMentsus(mentsus, toitsu)
-
 				goalVector := *targetVector
 				goalVector[i] += 2
 				goal := Goal{
 					Shanten:     newShanten,
-					Mentsus:     newMentsus,
+					Mentsus:     makeNewMentsus(mentsus, allPairs[i]),
 					CountVector: goalVector,
 				}
 				*goals = append(*goals, goal)
@@ -161,11 +182,6 @@ func analyzeShantenInternal(
 		// Consequently, there is no need to search for a winning hand that contains
 		// the target Pung, so this branch is pruned.
 		if pungDistance < 3 && newShanten <= upperbound+allowedExtraPais {
-			pai, _ := NewPaiWithID(uint8(i))
-			pais := []Pai{*pai, *pai, *pai}
-			kotsu, _ := NewMentsu(Kotsu, pais)
-			newMentsus := makeNewMentsus(mentsus, kotsu)
-
 			targetVector[i] += 3
 			upperbound = analyzeShantenInternal(
 				currentVector,
@@ -174,7 +190,7 @@ func analyzeShantenInternal(
 				numMeldsLeft-1,
 				i,
 				upperbound,
-				newMentsus,
+				makeNewMentsus(mentsus, allMelds[i]),
 				goals,
 				allowedExtraPais,
 			)
@@ -209,11 +225,6 @@ func analyzeShantenInternal(
 		// Consequently, there is no need to search for a winning hand that contains
 		// the target Chow, so this branch is pruned.
 		if chowDistance < 3 && newShanten <= upperbound+allowedExtraPais {
-			pai, _ := NewPaiWithID(i)
-			pais := []Pai{*pai, *pai.Next(1), *pai.Next(2)}
-			shuntsu, _ := NewMentsu(Shuntsu, pais)
-			newMentsus := makeNewMentsus(mentsus, shuntsu)
-
 			targetVector[i]++
 			targetVector[i+1]++
 			targetVector[i+2]++
@@ -224,7 +235,7 @@ func analyzeShantenInternal(
 				numMeldsLeft-1,
 				chowId+NumIDs,
 				upperbound,
-				newMentsus,
+				makeNewMentsus(mentsus, allMelds[chowId+NumIDs]),
 				goals,
 				allowedExtraPais,
 			)
@@ -237,8 +248,8 @@ func analyzeShantenInternal(
 	return upperbound
 }
 
-func makeNewMentsus(mentsus []Mentsu, newMentsu *Mentsu) []Mentsu {
+func makeNewMentsus(mentsus []Mentsu, newMentsu Mentsu) []Mentsu {
 	newMentsus := make([]Mentsu, len(mentsus), cap(mentsus))
 	copy(newMentsus, mentsus)
-	return append(newMentsus, *newMentsu)
+	return append(newMentsus, newMentsu)
 }
