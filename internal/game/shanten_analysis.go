@@ -29,8 +29,8 @@ const (
 )
 
 var (
-	// 1-7{m,p,s}
-	chowStartIDs = [...]uint8{
+	// chowStartIDs is a set of IDs of first tile in chow.
+	chowStartIDs = [numChows]uint8{
 		0, 1, 2, 3, 4, 5, 6,
 		9, 10, 11, 12, 13, 14, 15,
 		18, 19, 20, 21, 22, 23, 24,
