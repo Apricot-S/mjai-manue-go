@@ -5,5 +5,5 @@ import (
 )
 
 type Agent interface {
-	Respond(message *jsontext.Value) (jsontext.Value, error)
+	Respond(msg *jsontext.Value) (jsontext.Value, error)
 }
