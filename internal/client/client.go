@@ -22,12 +22,28 @@ func NewClient(reader io.Reader, writer io.Writer, agent agent.Agent) *Client {
 func (c *Client) Run() error {
 	var raw jsontext.Value
 	if err := json.UnmarshalRead(c.reader, &raw); err != nil {
+		if err == io.EOF {
+			return nil
+		}
 		return fmt.Errorf("failed to read message: %w", err)
 	}
 
 	switch raw.Kind() {
 	case '{':
 		// single object
+		res, err := c.agent.Respond(&raw)
+		if err != nil {
+			return err
+		}
+
+		rawRes, err := json.Marshal(&res)
+		if err != nil {
+			return fmt.Errorf("failed to marshal response: %w", err)
+		}
+
+		if _, err := c.writer.Write(rawRes); err != nil {
+			return fmt.Errorf("failed to write response: %w", err)
+		}
 	case '[':
 		// array
 	default:
