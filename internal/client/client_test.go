@@ -46,6 +46,15 @@ func TestClient_Run(t *testing.T) {
 			},
 			wantErr: true,
 		},
+		{
+			name: "single message",
+			fields: fields{
+				reader: strings.NewReader(`{"type":"none"}`),
+				writer: &bytes.Buffer{},
+				agent:  &EchoAgent{},
+			},
+			wantErr: false,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

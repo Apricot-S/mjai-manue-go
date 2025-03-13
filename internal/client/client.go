@@ -21,7 +21,7 @@ func NewClient(reader io.Reader, writer io.Writer, agent agent.Agent) *Client {
 
 func (c *Client) Run() error {
 	var raw jsontext.Value
-	if err := json.UnmarshalRead(c.reader, raw); err != nil {
+	if err := json.UnmarshalRead(c.reader, &raw); err != nil {
 		return fmt.Errorf("failed to read message: %w", err)
 	}
 
