@@ -30,7 +30,7 @@ const (
 
 var (
 	// 1-7{m,p,s}
-	chows = [...]uint8{
+	chowStartIDs = [...]uint8{
 		0, 1, 2, 3, 4, 5, 6,
 		9, 10, 11, 12, 13, 14, 15,
 		18, 19, 20, 21, 22, 23, 24,
@@ -185,7 +185,7 @@ func analyzeShantenInternal(
 	// Add Chows
 	startChowId := max(minMeldId-NumIDs, 0)
 	for chowId := startChowId; chowId < numChows; chowId++ {
-		i := chows[chowId]
+		i := chowStartIDs[chowId]
 		if targetVector[i] >= 4 || targetVector[i+1] >= 4 || targetVector[i+2] >= 4 {
 			// Can't add a Chow
 			continue
