@@ -9,7 +9,7 @@ type TsumogiriAgent struct {
 	playerID int
 }
 
-func (a *TsumogiriAgent) Respond(msg *jsontext.Value) (jsontext.Value, error) {
+func (a *TsumogiriAgent) Respond(msgs []jsontext.Value) (jsontext.Value, error) {
 	// Dummy implementation
 	return []byte{}, nil
 }

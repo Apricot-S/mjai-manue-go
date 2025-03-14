@@ -13,7 +13,7 @@ type AIAgent struct {
 	ai       ai.AI
 }
 
-func (a *AIAgent) Respond(msg *jsontext.Value) (jsontext.Value, error) {
+func (a *AIAgent) Respond(msgs []jsontext.Value) (jsontext.Value, error) {
 	// Dummy implementation
 	return []byte{}, nil
 }
