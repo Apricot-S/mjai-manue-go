@@ -40,7 +40,7 @@ type Player struct {
 
 func NewPlayer(id int, name string, initScore int) (*Player, error) {
 	if id < minPlayerID || maxPlayerID < id {
-		return nil, fmt.Errorf("Player ID is invalid: %d", id)
+		return nil, fmt.Errorf("player ID is invalid: %d", id)
 	}
 
 	return &Player{
