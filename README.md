@@ -43,7 +43,7 @@ mjai-manue http://example.com:11600/default
 ### For [mjai.app](https://github.com/smly/mjai.app) (Batch, Standard I/O)
 
 ```sh
-mjai-manue --batch --stdio
+mjai-manue --stdio
 ```
 
 In practice, `mjai.app` runs `bot.py` in the submission zip file.
