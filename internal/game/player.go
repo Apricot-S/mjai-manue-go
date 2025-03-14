@@ -116,7 +116,7 @@ func (p *Player) AddExtraAnpais(pai Pai) {
 	p.extraAnpais = append(p.extraAnpais, pai)
 }
 
-func (p *Player) OnStartKyoku(tehais []Pai, score *int) error {
+func (p *Player) onStartKyoku(tehais []Pai, score *int) error {
 	if len(tehais) != initTehaisSize {
 		return fmt.Errorf("the length of haipai is not 13: %d", len(tehais))
 	}
@@ -140,7 +140,7 @@ func (p *Player) OnStartKyoku(tehais []Pai, score *int) error {
 	return nil
 }
 
-func (p *Player) OnTsumo(pai Pai) error {
+func (p *Player) onTsumo(pai Pai) error {
 	if p.canDahai {
 		return fmt.Errorf("it is not in a state to be tsumo")
 	}
@@ -150,7 +150,7 @@ func (p *Player) OnTsumo(pai Pai) error {
 	return nil
 }
 
-func (p *Player) OnDahai(pai Pai) error {
+func (p *Player) onDahai(pai Pai) error {
 	if !p.canDahai {
 		return fmt.Errorf("it is not in a state to be dahai")
 	}
@@ -172,7 +172,7 @@ func (p *Player) OnDahai(pai Pai) error {
 	return nil
 }
 
-func (p *Player) OnChiPonKan(furo Furo) error {
+func (p *Player) onChiPonKan(furo Furo) error {
 	if p.canDahai {
 		return fmt.Errorf("it is not in a state to be chi/pon/kan")
 	}
@@ -205,7 +205,7 @@ func (p *Player) OnChiPonKan(furo Furo) error {
 	return nil
 }
 
-func (p *Player) OnAnkan(furo Furo) error {
+func (p *Player) onAnkan(furo Furo) error {
 	if !p.canDahai {
 		return fmt.Errorf("it is not in a state to be ankan")
 	}
@@ -231,7 +231,7 @@ func (p *Player) OnAnkan(furo Furo) error {
 	return nil
 }
 
-func (p *Player) OnKakan(furo Furo) error {
+func (p *Player) onKakan(furo Furo) error {
 	if !p.canDahai {
 		return fmt.Errorf("it is not in a state to be kakan")
 	}
@@ -268,7 +268,7 @@ func (p *Player) OnKakan(furo Furo) error {
 	return nil
 }
 
-func (p *Player) OnReach() error {
+func (p *Player) onReach() error {
 	if !p.canDahai {
 		return fmt.Errorf("it is not in a state to be reach declaration")
 	}
@@ -285,7 +285,7 @@ func (p *Player) OnReach() error {
 	return nil
 }
 
-func (p *Player) OnReachAccepted(score *int) error {
+func (p *Player) onReachAccepted(score *int) error {
 	if p.canDahai {
 		return fmt.Errorf("it is not in a state to be reach acception")
 	}
@@ -313,7 +313,7 @@ func (p *Player) OnReachAccepted(score *int) error {
 	return nil
 }
 
-func (p *Player) OnTargeted(furo Furo) error {
+func (p *Player) onTargeted(furo Furo) error {
 	switch furo.typ {
 	case Ankan, Kakan:
 		return fmt.Errorf("invalid furo for `onTargeted`: %v", furo.typ)
