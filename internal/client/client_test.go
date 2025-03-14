@@ -3,7 +3,6 @@ package client
 import (
 	"bytes"
 	"fmt"
-	"io"
 	"strings"
 	"testing"
 
@@ -18,68 +17,6 @@ func (a *EchoAgent) Respond(msg []jsontext.Value) (jsontext.Value, error) {
 	return msg[len(msg)-1], nil
 }
 
-func TestClient_Run(t *testing.T) {
-	type fields struct {
-		reader io.Reader
-		writer io.Writer
-		agent  agent.Agent
-	}
-	tests := []struct {
-		name    string
-		fields  fields
-		wantErr bool
-	}{
-		{
-			name: "empty reader should return error",
-			fields: fields{
-				reader: strings.NewReader(""),
-				writer: &bytes.Buffer{},
-				agent:  &EchoAgent{},
-			},
-			wantErr: true,
-		},
-		{
-			name: "invalid JSON input should return error",
-			fields: fields{
-				reader: strings.NewReader("invalid json"),
-				writer: &bytes.Buffer{},
-				agent:  &EchoAgent{},
-			},
-			wantErr: true,
-		},
-		// {
-		// 	name: "single message",
-		// 	fields: fields{
-		// 		reader: strings.NewReader(`{"type":"none"}`),
-		// 		writer: &bytes.Buffer{},
-		// 		agent:  &EchoAgent{},
-		// 	},
-		// 	wantErr: false,
-		// },
-		// {
-		// 	name: "message array",
-		// 	fields: fields{
-		// 		reader: strings.NewReader(`[{"type":"none"},{"type":"none"}]`),
-		// 		writer: &bytes.Buffer{},
-		// 		agent:  &EchoAgent{},
-		// 	},
-		// 	wantErr: false,
-		// },
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			c := &Client{
-				reader: tt.fields.reader,
-				writer: tt.fields.writer,
-				agent:  tt.fields.agent,
-			}
-			if err := c.Run(); (err != nil) != tt.wantErr {
-				t.Errorf("Client.Run() error = %v, wantErr %v", err, tt.wantErr)
-			}
-		})
-	}
-}
-
 func TestClient_Run_OutputValidation(t *testing.T) {
 	tests := []struct {
 		name       string
@@ -89,7 +26,7 @@ func TestClient_Run_OutputValidation(t *testing.T) {
 		wantErr    bool
 	}{
 		{
-			name:       "single message should have newline",
+			name:       "single message",
 			input:      `{"type":"none"}`,
 			wantOutput: `{"type":"none"}`,
 			agent:      &EchoAgent{},
@@ -97,10 +34,24 @@ func TestClient_Run_OutputValidation(t *testing.T) {
 		},
 		{
 			name:       "array messages should write last response",
-			input:      `[{"type":"first"},{"type":"last"}]`,
-			wantOutput: `{"type":"last"}`,
+			input:      `[{"type":"none"},{"type":"end_game"}]`,
+			wantOutput: `{"type":"end_game"}`,
 			agent:      &EchoAgent{},
 			wantErr:    false,
+		},
+		{
+			name:       "empty reader",
+			input:      ``,
+			wantOutput: ``,
+			agent:      &EchoAgent{},
+			wantErr:    false,
+		},
+		{
+			name:       "invalid JSON input should return error",
+			input:      `invalid json`,
+			wantOutput: ``,
+			agent:      &EchoAgent{},
+			wantErr:    true,
 		},
 	}
 

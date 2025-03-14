@@ -20,11 +20,12 @@ func NewClient(reader io.Reader, writer io.Writer, agent agent.Agent) *Client {
 }
 
 func (c *Client) Run() error {
+	decoder := jsontext.NewDecoder(c.reader)
 	var raw jsontext.Value
 	var msgs []jsontext.Value
 
 	for {
-		if err := json.UnmarshalRead(c.reader, &raw); err != nil {
+		if err := json.UnmarshalDecode(decoder, &raw); err != nil {
 			if err == io.EOF {
 				return nil
 			}
