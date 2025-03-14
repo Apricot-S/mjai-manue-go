@@ -21,6 +21,7 @@ func NewClient(reader io.Reader, writer io.Writer, agent agent.Agent) *Client {
 
 func (c *Client) Run() error {
 	var raw jsontext.Value
+	var msgs []jsontext.Value
 
 	for {
 		if err := json.UnmarshalRead(c.reader, &raw); err != nil {
@@ -30,7 +31,6 @@ func (c *Client) Run() error {
 			return fmt.Errorf("failed to read message: %w", err)
 		}
 
-		var msgs []jsontext.Value
 		switch raw.Kind() {
 		case '{':
 			// single object
