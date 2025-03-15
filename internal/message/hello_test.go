@@ -96,6 +96,16 @@ func TestHello_Marshal(t *testing.T) {
 			wantErr: false,
 		},
 		{
+			name: "invalid type",
+			args: &Hello{
+				Message:         Message{Type: ""},
+				Protocol:        "mjsonp",
+				ProtocolVersion: 0,
+			},
+			want:    ``,
+			wantErr: true,
+		},
+		{
 			name: "invalid protocol version",
 			args: &Hello{
 				Message:         Message{Type: TypeHello},
