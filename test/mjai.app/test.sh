@@ -17,6 +17,8 @@ popd
 
 while true; do
     logs_dir="./logs.$(date +%Y-%m-%d-%H-%M-%S)"
-    uv run python "$tempdir/test.py" "$logs_dir" "$archive_path" || true
+
+    uv run "$tempdir/test.py" "$logs_dir" "$archive_path" || true
+
     grep -Fqr '"error"' "$logs_dir" || rm -rf "$logs_dir"
 done
