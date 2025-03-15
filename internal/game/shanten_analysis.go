@@ -29,7 +29,7 @@ const (
 )
 
 var (
-	// chowStartIDs is a set of IDs of first tile in chow.
+	// chowStartIDs is a set of IDs of first tile in Chow.
 	chowStartIDs = [numChows]uint8{
 		0, 1, 2, 3, 4, 5, 6,
 		9, 10, 11, 12, 13, 14, 15,
@@ -188,7 +188,7 @@ func analyzeShantenInternal(
 				targetVector,
 				newShanten,
 				numMeldsLeft-1,
-				i,
+				i+1, // The same Pung can only be taken out once.
 				upperbound,
 				makeNewMentsus(mentsus, allMelds[i]),
 				goals,
