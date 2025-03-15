@@ -13,11 +13,10 @@ func TestNewHello(t *testing.T) {
 		protocolVersion int
 	}
 	tests := []struct {
-		name     string
-		args     args
-		want     *Hello
-		wantJSON string
-		wantErr  bool
+		name    string
+		args    args
+		want    *Hello
+		wantErr bool
 	}{
 		{
 			name: "without protocol and protocol version",
@@ -28,8 +27,7 @@ func TestNewHello(t *testing.T) {
 			want: &Hello{
 				Message: Message{Type: TypeHello},
 			},
-			wantJSON: `{"type":"hello"}`,
-			wantErr:  false,
+			wantErr: false,
 		},
 		{
 			name: "with protocol and protocol version",
@@ -42,8 +40,7 @@ func TestNewHello(t *testing.T) {
 				Protocol:        "mjsonp",
 				ProtocolVersion: 1,
 			},
-			wantJSON: `{"type":"hello","protocol":"mjsonp","protocol_version":1}`,
-			wantErr:  false,
+			wantErr: false,
 		},
 		{
 			name: "invalid protocol version",
@@ -51,9 +48,8 @@ func TestNewHello(t *testing.T) {
 				protocol:        "mjsonp",
 				protocolVersion: -1,
 			},
-			want:     nil,
-			wantJSON: ``,
-			wantErr:  true,
+			want:    nil,
+			wantErr: true,
 		},
 	}
 	for _, tt := range tests {
