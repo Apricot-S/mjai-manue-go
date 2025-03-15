@@ -36,11 +36,18 @@ func TestNone(t *testing.T) {
 			wantJSON: `{"type":"none"}`,
 			wantErr:  false,
 		},
+		{
+			name:     "invalid type",
+			input:    `{"type":"invalid"}`,
+			wantMsg:  &None{Message{Type: "invalid"}},
+			wantJSON: ``,
+			wantErr:  true,
+		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			var msg Message
+			var msg None
 			err := json.Unmarshal([]byte(tt.input), &msg)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("unmarshal error: %v, wantErr %v", err, tt.wantErr)
@@ -50,8 +57,8 @@ func TestNone(t *testing.T) {
 				t.Errorf("expected type '%s', got '%s'", tt.wantMsg.Type, msg.Type)
 			}
 
-			jsonData, err := json.Marshal(msg)
-			if err != nil {
+			jsonData, err := json.Marshal(&msg)
+			if (err != nil) != tt.wantErr {
 				t.Errorf("marshal error: %v", err)
 			}
 
