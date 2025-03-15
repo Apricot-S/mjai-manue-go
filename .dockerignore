@@ -1,0 +1,13 @@
+.git/
+.gitignore
+
+.devcontainer/
+
+.dockerignore
+
+LICENSE
+README.md
+THIRD-PARTY-NOTICES.md
+
+docs/
+test/
