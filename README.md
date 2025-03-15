@@ -46,10 +46,12 @@ mjai-manue http://example.com:11600/default
 mjai-manue --stdio
 ```
 
-In practice, `mjai.app` runs `bot.py` in the submission zip file.
-You need to call the above command from within `bot.py` and pipe the standard input and output.
+> [!NOTE]
+> In practice, `mjai.app` runs `bot.py` in the submission zip file.
+> You need to call the above command from within `bot.py` and pipe the standard input and output.
 
-See [scripts/mjai.app/](scripts/mjai.app/) for how to generate a submission file for `mjai.app`.
+> [!TIP]
+> See [scripts/mjai.app/](scripts/mjai.app/) for how to generate a submission file for `mjai.app`.
 
 ## License
 
