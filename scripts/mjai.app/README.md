@@ -11,7 +11,3 @@ scripts/mjai.app/build.sh
 ```
 
 The `mjai-app.zip` file will be generated in the top-level directory.
-
-## `test.sh` (For Developpers Only)
-
-***Work in progress***
