@@ -34,13 +34,13 @@ go install github.com/Apricot-S/mjai-manue-go/cmd/mjai-manue
 
 ## Usage
 
-### For [mjai](https://github.com/gimite/mjai) (Line-by-line, TCP/IP)
+### For TCP/IP (e.g., [mjai](https://github.com/gimite/mjai))
 
 ```sh
 mjai-manue http://example.com:11600/default
 ```
 
-### For [mjai.app](https://github.com/smly/mjai.app) (Batch, Standard I/O)
+### For Standard I/O (e.g., [mjai.app](https://github.com/smly/mjai.app))
 
 ```sh
 mjai-manue --stdio
@@ -48,6 +48,8 @@ mjai-manue --stdio
 
 In practice, `mjai.app` runs `bot.py` in the submission zip file.
 You need to call the above command from within `bot.py` and pipe the standard input and output.
+
+See [scripts/mjai.app/](scripts/mjai.app) for how to generate a submission file for `mjai.app`.
 
 ## License
 
