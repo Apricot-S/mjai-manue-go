@@ -25,6 +25,6 @@ func main() {
 	fmt.Printf("%s\n", *root.FeatureName)
 	fmt.Println()
 
-	name := "mjai-manue"
+	name := "Manue020"
 	fmt.Println("Hello World!", name)
 }
