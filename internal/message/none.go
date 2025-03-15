@@ -27,10 +27,7 @@ func (m *None) MarshalJSONTo(e *jsontext.Encoder, opts jsontext.Options) error {
 
 	type inner None
 	mm := (inner)(*m)
-	if err := json.MarshalEncode(e, &mm); err != nil {
-		return err
-	}
-	return nil
+	return json.MarshalEncode(e, &mm)
 }
 
 func (m *None) UnmarshalJSONFrom(d *jsontext.Decoder, opts jsontext.Options) error {
@@ -44,8 +41,6 @@ func (m *None) UnmarshalJSONFrom(d *jsontext.Decoder, opts jsontext.Options) err
 	if m.Type != TypeNone {
 		return fmt.Errorf("invalid type: %v", m.Type)
 	}
-	if err := messageValidator.Struct(m); err != nil {
-		return err
-	}
-	return nil
+
+	return messageValidator.Struct(m)
 }
