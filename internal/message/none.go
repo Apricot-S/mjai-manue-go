@@ -25,8 +25,8 @@ func (m *None) MarshalJSONTo(e *jsontext.Encoder, opts jsontext.Options) error {
 		return err
 	}
 
-	type none None
-	mm := (none)(*m)
+	type inner None
+	mm := (inner)(*m)
 	if err := json.MarshalEncode(e, &mm); err != nil {
 		return err
 	}
@@ -34,8 +34,8 @@ func (m *None) MarshalJSONTo(e *jsontext.Encoder, opts jsontext.Options) error {
 }
 
 func (m *None) UnmarshalJSONFrom(d *jsontext.Decoder, opts jsontext.Options) error {
-	type none None
-	var mm none
+	type inner None
+	var mm inner
 	if err := json.UnmarshalDecode(d, &mm); err != nil {
 		return err
 	}

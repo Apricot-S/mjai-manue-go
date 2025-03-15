@@ -5,7 +5,6 @@ import (
 	"testing"
 
 	"github.com/go-json-experiment/json"
-	"github.com/go-playground/validator/v10"
 )
 
 func TestNewSkip(t *testing.T) {
@@ -63,7 +62,7 @@ func TestNewSkip(t *testing.T) {
 					Log:     "",
 				},
 			},
-			wantJSON: `{"type":"none","actor":-1}`,
+			wantJSON: ``,
 			wantErr:  true,
 		},
 	}
@@ -78,20 +77,13 @@ func TestNewSkip(t *testing.T) {
 			}
 
 			jsonData, err := json.Marshal(got)
-			if err != nil {
+			if (err != nil) != tt.wantErr {
 				t.Errorf("marshal error: %v", err)
 				return
 			}
 
 			if !reflect.DeepEqual(string(jsonData), tt.wantJSON) {
 				t.Errorf("expected JSON '%v', got '%v'", tt.wantJSON, string(jsonData))
-			}
-
-			validator := validator.New()
-			err = validator.Struct(got)
-			if (err != nil) != tt.wantErr {
-				t.Errorf("NewSkip() error = %v, wantErr %v", err, tt.wantErr)
-				return
 			}
 		})
 	}
