@@ -8,4 +8,9 @@ type Message struct {
 }
 
 // Validator used throughout the program.
-var messageValidator = validator.New()
+var messageValidator = func() *validator.Validate {
+	v := validator.New()
+	v.RegisterValidation("tile", isValidTile)
+	v.RegisterValidation("wind", isValidWind)
+	return v
+}()
