@@ -2,19 +2,19 @@ import subprocess
 
 
 proc = subprocess.Popen(
-    ['mjai-manue', '--stdio'],
+    ["mjai-manue", "--stdio"],
     stdin=subprocess.PIPE,
     stdout=subprocess.PIPE,
     stderr=subprocess.PIPE,
     text=True,
-    bufsize=1
+    bufsize=1,
 )
 
 try:
     while True:
         user_input = input()
         if user_input:
-            proc.stdin.write(user_input + '\n')
+            proc.stdin.write(user_input)
             proc.stdin.flush()
 
         output = proc.stdout.readline()
