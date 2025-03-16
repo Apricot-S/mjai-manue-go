@@ -66,12 +66,12 @@ func TestNone_Marshal(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			b, err := json.Marshal(tt.args)
+			got, err := json.Marshal(tt.args)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("marshal error = %v, want %v", err, tt.wantErr)
 			}
-			if string(b) != tt.want {
-				t.Errorf("Marshal() = %v, want %v", string(b), tt.want)
+			if string(got) != tt.want {
+				t.Errorf("Marshal() = %v, want %v", string(got), tt.want)
 			}
 		})
 	}
