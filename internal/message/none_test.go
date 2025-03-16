@@ -5,114 +5,133 @@ import (
 	"testing"
 
 	"github.com/go-json-experiment/json"
-	"github.com/go-playground/validator/v10"
 )
 
-func TestNone(t *testing.T) {
-	type testCase struct {
-		name     string
-		input    string
-		wantMsg  *None
-		wantJSON string
-		wantErr  bool
-	}
-	tests := []testCase{
+func TestNewNone(t *testing.T) {
+	tests := []struct {
+		name    string
+		want    *None
+		wantErr bool
+	}{
 		{
-			name:     "only type",
-			input:    `{"type":"none"}`,
-			wantMsg:  &None{Message{Type: "none"}},
-			wantJSON: `{"type":"none"}`,
-			wantErr:  false,
+			name: "test NewNone()",
+			want: &None{
+				Message: Message{Type: TypeNone},
+			},
+			wantErr: false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := NewNone()
+
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("NewHello() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestNone_Marshal(t *testing.T) {
+	tests := []struct {
+		name    string
+		args    *None
+		want    string
+		wantErr bool
+	}{
+		{
+			name: "valid",
+			args: &None{
+				Message: Message{Type: TypeNone},
+			},
+			want:    `{"type":"none"}`,
+			wantErr: false,
+		},
+		{
+			name: "empty type",
+			args: &None{
+				Message: Message{Type: ""},
+			},
+			want:    ``,
+			wantErr: true,
+		},
+		{
+			name: "invalid type",
+			args: &None{
+				Message: Message{Type: TypeHello},
+			},
+			want:    ``,
+			wantErr: true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			b, err := json.Marshal(tt.args)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("marshal error = %v, want %v", err, tt.wantErr)
+			}
+			if string(b) != tt.want {
+				t.Errorf("Marshal() = %v, want %v", string(b), tt.want)
+			}
+		})
+	}
+}
+
+func TestNone_Unmarshal(t *testing.T) {
+	tests := []struct {
+		name    string
+		args    string
+		want    None
+		wantErr bool
+	}{
+		{
+			name: "valid",
+			args: `{"type":"none"}`,
+			want: None{
+				Message: Message{Type: TypeNone},
+			},
+			wantErr: false,
 		},
 		{
 			name: "with metadata",
-			input: `{
+			args: `{
 				"type":"none",
 				"metadata": {
 					"foo": "bar"
 				}
 			}`,
-			wantMsg:  &None{Message{Type: "none"}},
-			wantJSON: `{"type":"none"}`,
-			wantErr:  false,
-		},
-		{
-			name:     "invalid type",
-			input:    `{"type":"invalid"}`,
-			wantMsg:  &None{Message{Type: "invalid"}},
-			wantJSON: ``,
-			wantErr:  true,
-		},
-	}
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			var msg None
-			err := json.Unmarshal([]byte(tt.input), &msg)
-			if (err != nil) != tt.wantErr {
-				t.Errorf("unmarshal error: %v, wantErr %v", err, tt.wantErr)
-			}
-
-			if !reflect.DeepEqual(msg.Type, tt.wantMsg.Type) {
-				t.Errorf("expected type '%s', got '%s'", tt.wantMsg.Type, msg.Type)
-			}
-
-			jsonData, err := json.Marshal(&msg)
-			if (err != nil) != tt.wantErr {
-				t.Errorf("marshal error: %v", err)
-			}
-
-			if !reflect.DeepEqual(string(jsonData), tt.wantJSON) {
-				t.Errorf("expected JSON '%s', got '%s'", tt.wantJSON, string(jsonData))
-			}
-		})
-	}
-}
-
-func TestNone_Validate(t *testing.T) {
-	type testCase struct {
-		name    string
-		msg     *None
-		wantErr bool
-	}
-	tests := []testCase{
-		{
-			name:    "valid",
-			msg:     &None{Message{Type: TypeNone}},
+			want: None{
+				Message: Message{Type: TypeNone},
+			},
 			wantErr: false,
 		},
 		{
-			name:    "invalid",
-			msg:     &None{Message{Type: ""}},
+			name: "empty type",
+			args: `{"type":""}`,
+			want: None{
+				Message: Message{Type: ""},
+			},
+			wantErr: true,
+		},
+		{
+			name: "invalid type",
+			args: `{"type":"hello"}`,
+			want: None{
+				Message: Message{Type: TypeHello},
+			},
 			wantErr: true,
 		},
 	}
-
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			validate := validator.New()
-
-			err := validate.Struct(tt.msg)
+			var got None
+			err := json.Unmarshal([]byte(tt.args), &got)
 			if (err != nil) != tt.wantErr {
-				t.Errorf("validate.Struct() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("unmarshal error = %v, want %v", err, tt.wantErr)
+			}
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("Unmarshal() = %v, want %v", got, tt.want)
 			}
 		})
-	}
-}
-
-func TestNewNone(t *testing.T) {
-	msg := NewNone()
-	if msg.Type != TypeNone {
-		t.Errorf("expected type '%s', got '%s'", TypeNone, msg.Type)
-	}
-
-	jsonData, err := json.Marshal(msg)
-	if err != nil {
-		t.Errorf("marshal error: %v", err)
-	}
-
-	wantJSON := `{"type":"none"}`
-	if !reflect.DeepEqual(string(jsonData), wantJSON) {
-		t.Errorf("expected JSON '%s', got '%s'", wantJSON, string(jsonData))
 	}
 }
