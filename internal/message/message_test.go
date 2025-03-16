@@ -38,7 +38,7 @@ func TestMessage_Marshal(t *testing.T) {
 			}
 
 			if err := messageValidator.Struct(tt.args); (err != nil) != tt.wantErr {
-				t.Errorf("marshal error = %v, want %v", err, tt.wantErr)
+				t.Errorf("validation error = %v, want %v", err, tt.wantErr)
 			}
 		})
 	}
