@@ -186,13 +186,13 @@ func (p *Player) onChiPonKan(furo Furo) error {
 		return fmt.Errorf("a 5th furo is not possible")
 	}
 
-	switch furo.typ {
-	case Chi, Pon, Daiminkan:
+	switch furo.(type) {
+	case *Chi, *Pon, *Daiminkan:
 	default:
-		return fmt.Errorf("invalid furo for `onChiPonKan`: %v", furo.typ)
+		return fmt.Errorf("invalid furo for `onChiPonKan`: %v", furo)
 	}
 
-	for _, pai := range furo.consumed {
+	for _, pai := range furo.Consumed() {
 		err := p.deleteTehai(&pai)
 		if err != nil {
 			return fmt.Errorf("failed to delete tehais on chi/pon/kan: %w", err)
@@ -200,7 +200,8 @@ func (p *Player) onChiPonKan(furo Furo) error {
 	}
 
 	p.furos = append(p.furos, furo)
-	p.canDahai = furo.typ != Daiminkan
+	_, isDaiminkan := furo.(*Daiminkan)
+	p.canDahai = !isDaiminkan
 	p.isMenzen = false
 	return nil
 }
@@ -215,11 +216,11 @@ func (p *Player) onAnkan(furo Furo) error {
 		return fmt.Errorf("a 5th furo is not possible")
 	}
 
-	if furo.typ != Ankan {
-		return fmt.Errorf("invalid furo for `onAnkan`: %v", furo.typ)
+	if _, isAnkan := furo.(*Ankan); !isAnkan {
+		return fmt.Errorf("invalid furo for `onAnkan`: %v", furo)
 	}
 
-	for _, pai := range furo.consumed {
+	for _, pai := range furo.Consumed() {
 		err := p.deleteTehai(&pai)
 		if err != nil {
 			return fmt.Errorf("failed to delete tehais on ankan: %w", err)
@@ -240,30 +241,30 @@ func (p *Player) onKakan(furo Furo) error {
 		return fmt.Errorf("kakan is not possible during reach")
 	}
 
-	if furo.typ != Kakan {
-		return fmt.Errorf("invalid furo for `onKakan`: %v", furo.typ)
+	if _, isKakan := furo.(*Kakan); !isKakan {
+		return fmt.Errorf("invalid furo for `onKakan`: %v", furo)
 	}
 
 	ponIndex := slices.IndexFunc(p.furos, func(f Furo) bool {
-		return slices.Contains(f.pais, furo.taken)
+		return slices.Contains(f.Pais(), *furo.Taken())
 	})
 	if ponIndex == -1 {
 		return fmt.Errorf("failed to find pon mentsu for kakan: %v", furo)
 	}
 
-	err := p.deleteTehai(&furo.taken)
+	err := p.deleteTehai(furo.Taken())
 	if err != nil {
 		return fmt.Errorf("failed to delete tehais on kakan: %w", err)
 	}
 
 	ponMentsu := p.furos[ponIndex]
-	consumed := append(ponMentsu.consumed, furo.taken)
-	kanMentsu, err := NewFuro(Kakan, &ponMentsu.taken, consumed, ponMentsu.target)
+	consumed := append(ponMentsu.Consumed(), *furo.Taken())
+	kanMentsu, err := NewKakan(*ponMentsu.Taken(), [3]Pai(consumed), ponMentsu.Target())
 	if err != nil {
 		return fmt.Errorf("failed to create kakan mentsu: %w", err)
 	}
 
-	p.furos[ponIndex] = *kanMentsu
+	p.furos[ponIndex] = kanMentsu
 	p.canDahai = false
 	return nil
 }
@@ -314,19 +315,19 @@ func (p *Player) onReachAccepted(score *int) error {
 }
 
 func (p *Player) onTargeted(furo Furo) error {
-	switch furo.typ {
-	case Ankan, Kakan:
-		return fmt.Errorf("invalid furo for `onTargeted`: %v", furo.typ)
+	switch furo.(type) {
+	case *Ankan, *Kakan:
+		return fmt.Errorf("invalid furo for `onTargeted`: %v", furo)
 	}
 
-	if *furo.target != p.id {
-		return fmt.Errorf("furo target is not me: %d", *furo.target)
+	if *furo.Target() != p.id {
+		return fmt.Errorf("furo target is not me: %d", *furo.Target())
 	}
 
 	numHo := len(p.ho)
 	pai := p.ho[numHo-1]
-	if pai != furo.taken {
-		return fmt.Errorf("pai %v is not equal to taken %v", pai, furo.taken)
+	if pai != *furo.Taken() {
+		return fmt.Errorf("pai %v is not equal to taken %v", pai, *furo.Taken())
 	}
 	p.ho = slices.Delete(p.ho, numHo-1, numHo)
 

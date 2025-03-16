@@ -2,113 +2,24 @@ package game
 
 import (
 	"fmt"
-	"slices"
 	"sort"
 )
 
-type FuroType int
-
-const (
-	Chi FuroType = iota + 1
-	Pon
-	Daiminkan
-	Ankan
-	Kakan
-)
-
-type Furo struct {
-	typ      FuroType
-	taken    Pai
-	consumed []Pai
-	target   *int
-	pais     []Pai
-}
-
-func NewFuro(t FuroType, taken *Pai, consumed []Pai, target *int) (*Furo, error) {
-	switch t {
-	case Ankan:
-		if len(consumed) != 4 || taken != nil || target != nil {
-			return nil, fmt.Errorf("invalid ankan")
-		}
-	case Kakan:
-		if len(consumed) != 3 || taken == nil {
-			return nil, fmt.Errorf("invalid kakan")
-		}
-	case Daiminkan:
-		if len(consumed) != 3 || taken == nil || target == nil {
-			return nil, fmt.Errorf("invalid daiminkan")
-		}
-	case Chi, Pon:
-		if len(consumed) != 2 || taken == nil || target == nil {
-			return nil, fmt.Errorf("invalid chi or pon")
-		}
-	default:
-		return nil, fmt.Errorf("invalid furo type")
-	}
-
-	var tk Pai
-	if taken != nil {
-		tk = *taken
-	}
-
-	c := slices.Clone(consumed)
-
-	var tg *int
-	if target != nil {
-		tgCopy := *target
-		tg = &tgCopy
-	}
-
-	var pais Pais = slices.Clone(c)
-	if taken != nil {
-		pais = append(pais, *taken)
-	}
-	sort.Sort(pais)
-
-	return &Furo{
-		typ:      t,
-		taken:    tk,
-		consumed: c,
-		target:   tg,
-		pais:     pais,
-	}, nil
-}
-
-func (f *Furo) Type() FuroType {
-	return f.typ
-}
-
-func (f *Furo) Taken() Pai {
-	return f.taken
-}
-
-func (f *Furo) Consumed() []Pai {
-	return f.consumed
-}
-
-func (f *Furo) Target() *int {
-	return f.target
-}
-
-func (f *Furo) Pais() []Pai {
-	return f.pais
-}
-
-type FuroBase interface {
+type Furo interface {
 	Taken() *Pai
 	Consumed() []Pai
 	Target() *int
 	Pais() []Pai
 }
 
-type FuroChi struct {
+type Chi struct {
 	taken    Pai
 	consumed [2]Pai
 	target   int
 	pais     []Pai
 }
 
-func NewChi(taken Pai, consumed [2]Pai, target int) (*FuroChi, error) {
+func NewChi(taken Pai, consumed [2]Pai, target int) (*Chi, error) {
 	if target < 0 || target > 3 {
 		return nil, fmt.Errorf("chi: invalid target player index (must be 0-3, got: %d)", target)
 	}
@@ -116,7 +27,7 @@ func NewChi(taken Pai, consumed [2]Pai, target int) (*FuroChi, error) {
 	var pais Pais = []Pai{taken, consumed[0], consumed[1]}
 	sort.Sort(pais)
 
-	return &FuroChi{
+	return &Chi{
 		taken:    taken,
 		consumed: consumed,
 		target:   target,
@@ -124,30 +35,30 @@ func NewChi(taken Pai, consumed [2]Pai, target int) (*FuroChi, error) {
 	}, nil
 }
 
-func (c *FuroChi) Taken() *Pai {
+func (c *Chi) Taken() *Pai {
 	return &c.taken
 }
 
-func (c *FuroChi) Consumed() []Pai {
+func (c *Chi) Consumed() []Pai {
 	return c.consumed[:]
 }
 
-func (c *FuroChi) Target() *int {
+func (c *Chi) Target() *int {
 	return &c.target
 }
 
-func (c *FuroChi) Pais() []Pai {
+func (c *Chi) Pais() []Pai {
 	return c.pais
 }
 
-type FuroPon struct {
+type Pon struct {
 	taken    Pai
 	consumed [2]Pai
 	target   int
 	pais     []Pai
 }
 
-func NewPon(taken Pai, consumed [2]Pai, target int) (*FuroPon, error) {
+func NewPon(taken Pai, consumed [2]Pai, target int) (*Pon, error) {
 	if target < 0 || target > 3 {
 		return nil, fmt.Errorf("pon: invalid target player index (must be 0-3, got: %d)", target)
 	}
@@ -155,7 +66,7 @@ func NewPon(taken Pai, consumed [2]Pai, target int) (*FuroPon, error) {
 	var pais Pais = []Pai{taken, consumed[0], consumed[1]}
 	sort.Sort(pais)
 
-	return &FuroPon{
+	return &Pon{
 		taken:    taken,
 		consumed: consumed,
 		target:   target,
@@ -163,30 +74,30 @@ func NewPon(taken Pai, consumed [2]Pai, target int) (*FuroPon, error) {
 	}, nil
 }
 
-func (p *FuroPon) Taken() *Pai {
+func (p *Pon) Taken() *Pai {
 	return &p.taken
 }
 
-func (p *FuroPon) Consumed() []Pai {
+func (p *Pon) Consumed() []Pai {
 	return p.consumed[:]
 }
 
-func (p *FuroPon) Target() *int {
+func (p *Pon) Target() *int {
 	return &p.target
 }
 
-func (p *FuroPon) Pais() []Pai {
+func (p *Pon) Pais() []Pai {
 	return p.pais
 }
 
-type FuroDaiminkan struct {
+type Daiminkan struct {
 	taken    Pai
 	consumed [3]Pai
 	target   int
 	pais     []Pai
 }
 
-func NewDaiminkan(taken Pai, consumed [3]Pai, target int) (*FuroDaiminkan, error) {
+func NewDaiminkan(taken Pai, consumed [3]Pai, target int) (*Daiminkan, error) {
 	if target < 0 || target > 3 {
 		return nil, fmt.Errorf("daiminkan: invalid target player index (must be 0-3, got: %d)", target)
 	}
@@ -194,7 +105,7 @@ func NewDaiminkan(taken Pai, consumed [3]Pai, target int) (*FuroDaiminkan, error
 	var pais Pais = []Pai{taken, consumed[0], consumed[1], consumed[2]}
 	sort.Sort(pais)
 
-	return &FuroDaiminkan{
+	return &Daiminkan{
 		taken:    taken,
 		consumed: consumed,
 		target:   target,
@@ -202,54 +113,54 @@ func NewDaiminkan(taken Pai, consumed [3]Pai, target int) (*FuroDaiminkan, error
 	}, nil
 }
 
-func (d *FuroDaiminkan) Taken() *Pai {
+func (d *Daiminkan) Taken() *Pai {
 	return &d.taken
 }
 
-func (d *FuroDaiminkan) Consumed() []Pai {
+func (d *Daiminkan) Consumed() []Pai {
 	return d.consumed[:]
 }
 
-func (d *FuroDaiminkan) Target() *int {
+func (d *Daiminkan) Target() *int {
 	return &d.target
 }
 
-func (d *FuroDaiminkan) Pais() []Pai {
+func (d *Daiminkan) Pais() []Pai {
 	return d.pais
 }
 
-type FuroAnkan struct {
+type Ankan struct {
 	consumed [4]Pai
 	pais     []Pai
 }
 
-func NewAnkan(consumed [4]Pai) (*FuroAnkan, error) {
+func NewAnkan(consumed [4]Pai) (*Ankan, error) {
 	var pais Pais = []Pai{consumed[0], consumed[1], consumed[2], consumed[3]}
 	sort.Sort(pais)
 
-	return &FuroAnkan{
+	return &Ankan{
 		consumed: consumed,
 		pais:     pais,
 	}, nil
 }
 
-func (a *FuroAnkan) Taken() *Pai {
+func (a *Ankan) Taken() *Pai {
 	return nil
 }
 
-func (a *FuroAnkan) Consumed() []Pai {
+func (a *Ankan) Consumed() []Pai {
 	return a.consumed[:]
 }
 
-func (a *FuroAnkan) Target() *int {
+func (a *Ankan) Target() *int {
 	return nil
 }
 
-func (a *FuroAnkan) Pais() []Pai {
+func (a *Ankan) Pais() []Pai {
 	return a.pais
 }
 
-type FuroKakan struct {
+type Kakan struct {
 	taken    Pai
 	consumed [3]Pai
 	target   *int
@@ -260,7 +171,7 @@ type FuroKakan struct {
 // The target parameter is optional (can be nil).
 // If target is provided, it must be between 0 and 3.
 // The target value is deep copied to prevent modifications from the caller.
-func NewKakan(taken Pai, consumed [3]Pai, target *int) (*FuroKakan, error) {
+func NewKakan(taken Pai, consumed [3]Pai, target *int) (*Kakan, error) {
 	if (target != nil) && (*target < 0 || *target > 3) {
 		return nil, fmt.Errorf("kakan: invalid target player index (must be 0-3, got: %d)", target)
 	}
@@ -274,7 +185,7 @@ func NewKakan(taken Pai, consumed [3]Pai, target *int) (*FuroKakan, error) {
 		tg = &targetCopy
 	}
 
-	return &FuroKakan{
+	return &Kakan{
 		taken:    taken,
 		consumed: consumed,
 		target:   tg,
@@ -282,18 +193,18 @@ func NewKakan(taken Pai, consumed [3]Pai, target *int) (*FuroKakan, error) {
 	}, nil
 }
 
-func (k *FuroKakan) Taken() *Pai {
+func (k *Kakan) Taken() *Pai {
 	return &k.taken
 }
 
-func (k *FuroKakan) Consumed() []Pai {
+func (k *Kakan) Consumed() []Pai {
 	return k.consumed[:]
 }
 
-func (k *FuroKakan) Target() *int {
+func (k *Kakan) Target() *int {
 	return k.target
 }
 
-func (k *FuroKakan) Pais() []Pai {
+func (k *Kakan) Pais() []Pai {
 	return k.pais
 }

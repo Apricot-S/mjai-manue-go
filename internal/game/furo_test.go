@@ -16,7 +16,7 @@ func TestNewChi(t *testing.T) {
 	type testCase struct {
 		name    string
 		args    args
-		want    *FuroChi
+		want    *Chi
 		wantErr bool
 	}
 	tests := []testCase{}
@@ -29,7 +29,7 @@ func TestNewChi(t *testing.T) {
 			target := i
 			pais := Pais{*taken, consumed[0], consumed[1]}
 			sort.Sort(pais)
-			want := &FuroChi{
+			want := &Chi{
 				taken:    *taken,
 				consumed: [2]Pai(consumed),
 				target:   target,
@@ -86,7 +86,7 @@ func TestNewPon(t *testing.T) {
 	type testCase struct {
 		name    string
 		args    args
-		want    *FuroPon
+		want    *Pon
 		wantErr bool
 	}
 	tests := []testCase{}
@@ -99,7 +99,7 @@ func TestNewPon(t *testing.T) {
 			target := i
 			pais := Pais{*taken, consumed[0], consumed[1]}
 			sort.Sort(pais)
-			want := &FuroPon{
+			want := &Pon{
 				taken:    *taken,
 				consumed: [2]Pai(consumed),
 				target:   target,
@@ -156,7 +156,7 @@ func TestNewDaiminkan(t *testing.T) {
 	type testCase struct {
 		name    string
 		args    args
-		want    *FuroDaiminkan
+		want    *Daiminkan
 		wantErr bool
 	}
 	tests := []testCase{}
@@ -169,7 +169,7 @@ func TestNewDaiminkan(t *testing.T) {
 			target := i
 			pais := Pais{*taken, consumed[0], consumed[1], consumed[2]}
 			sort.Sort(pais)
-			want := &FuroDaiminkan{
+			want := &Daiminkan{
 				taken:    *taken,
 				consumed: [3]Pai(consumed),
 				target:   target,
@@ -224,7 +224,7 @@ func TestNewAnkan(t *testing.T) {
 	type testCase struct {
 		name    string
 		args    args
-		want    *FuroAnkan
+		want    *Ankan
 		wantErr bool
 	}
 	tests := []testCase{}
@@ -234,7 +234,7 @@ func TestNewAnkan(t *testing.T) {
 		consumed, _ := StrToPais(strs)
 		pais := Pais{consumed[0], consumed[1], consumed[2], consumed[3]}
 		sort.Sort(pais)
-		want := &FuroAnkan{
+		want := &Ankan{
 			consumed: [4]Pai(consumed),
 			pais:     pais,
 		}
@@ -271,7 +271,7 @@ func TestNewKakan(t *testing.T) {
 	type testCase struct {
 		name    string
 		args    args
-		want    *FuroKakan
+		want    *Kakan
 		wantErr bool
 	}
 	tests := []testCase{}
@@ -284,7 +284,7 @@ func TestNewKakan(t *testing.T) {
 			target := i
 			pais := Pais{*taken, consumed[0], consumed[1], consumed[2]}
 			sort.Sort(pais)
-			want := &FuroKakan{
+			want := &Kakan{
 				taken:    *taken,
 				consumed: [3]Pai(consumed),
 				target:   &target,
@@ -307,7 +307,7 @@ func TestNewKakan(t *testing.T) {
 		consumed, _ := StrToPais(strs[1])
 		pais := Pais{*taken, consumed[0], consumed[1], consumed[2]}
 		sort.Sort(pais)
-		want := &FuroKakan{
+		want := &Kakan{
 			taken:    *taken,
 			consumed: [3]Pai(consumed),
 			target:   nil,
