@@ -3,6 +3,7 @@ package game
 import (
 	"fmt"
 	"reflect"
+	"sort"
 	"testing"
 )
 
@@ -26,7 +27,14 @@ func TestNewChi(t *testing.T) {
 			taken, _ := NewPaiWithName(strs[0])
 			consumed, _ := StrToPais(strs[1])
 			target := i
-			want, _ := NewChi(*taken, [2]Pai(consumed), target)
+			pais := Pais{*taken, consumed[0], consumed[1]}
+			sort.Sort(pais)
+			want := &FuroChi{
+				taken:    *taken,
+				consumed: [2]Pai(consumed),
+				target:   target,
+				pais:     pais,
+			}
 
 			testCase := testCase{
 				fmt.Sprintf("chi valid: target %d", target),
@@ -89,7 +97,14 @@ func TestNewPon(t *testing.T) {
 			taken, _ := NewPaiWithName(strs[0])
 			consumed, _ := StrToPais(strs[1])
 			target := i
-			want, _ := NewPon(*taken, [2]Pai(consumed), target)
+			pais := Pais{*taken, consumed[0], consumed[1]}
+			sort.Sort(pais)
+			want := &FuroPon{
+				taken:    *taken,
+				consumed: [2]Pai(consumed),
+				target:   target,
+				pais:     pais,
+			}
 
 			testCase := testCase{
 				fmt.Sprintf("pon valid: target %d", target),
@@ -152,7 +167,14 @@ func TestNewDaiminkan(t *testing.T) {
 			taken, _ := NewPaiWithName(strs[0])
 			consumed, _ := StrToPais(strs[1])
 			target := i
-			want, _ := NewDaiminkan(*taken, [3]Pai(consumed), target)
+			pais := Pais{*taken, consumed[0], consumed[1], consumed[2]}
+			sort.Sort(pais)
+			want := &FuroDaiminkan{
+				taken:    *taken,
+				consumed: [3]Pai(consumed),
+				target:   target,
+				pais:     pais,
+			}
 
 			testCase := testCase{
 				fmt.Sprintf("daiminkan valid: target %d", target),
@@ -210,7 +232,12 @@ func TestNewAnkan(t *testing.T) {
 	// valid cases
 	for _, strs := range []string{"E E E E", "5mr 5m 5m 5m", "5p 5pr 5p 5p", "5s 5s 5sr 5s", "5s 5s 5s 5sr"} {
 		consumed, _ := StrToPais(strs)
-		want, _ := NewAnkan([4]Pai(consumed))
+		pais := Pais{consumed[0], consumed[1], consumed[2], consumed[3]}
+		sort.Sort(pais)
+		want := &FuroAnkan{
+			consumed: [4]Pai(consumed),
+			pais:     pais,
+		}
 
 		testCase := testCase{
 			"ankan valid: target",
@@ -255,7 +282,14 @@ func TestNewKakan(t *testing.T) {
 			taken, _ := NewPaiWithName(strs[0])
 			consumed, _ := StrToPais(strs[1])
 			target := i
-			want, _ := NewKakan(*taken, [3]Pai(consumed), &target)
+			pais := Pais{*taken, consumed[0], consumed[1], consumed[2]}
+			sort.Sort(pais)
+			want := &FuroKakan{
+				taken:    *taken,
+				consumed: [3]Pai(consumed),
+				target:   &target,
+				pais:     pais,
+			}
 
 			testCase := testCase{
 				fmt.Sprintf("kakan valid: target %d", target),
@@ -271,7 +305,14 @@ func TestNewKakan(t *testing.T) {
 	for _, strs := range [][2]string{{"E", "E E E"}, {"5mr", "5m 5m 5m"}, {"5p", "5pr 5p 5p"}, {"5s", "5s 5sr 5s"}, {"5s", "5s 5s 5sr"}} {
 		taken, _ := NewPaiWithName(strs[0])
 		consumed, _ := StrToPais(strs[1])
-		want, _ := NewKakan(*taken, [3]Pai(consumed), nil)
+		pais := Pais{*taken, consumed[0], consumed[1], consumed[2]}
+		sort.Sort(pais)
+		want := &FuroKakan{
+			taken:    *taken,
+			consumed: [3]Pai(consumed),
+			target:   nil,
+			pais:     pais,
+		}
 
 		testCase := testCase{
 			"kakan valid: target nil",
