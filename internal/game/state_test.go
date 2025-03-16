@@ -221,3 +221,35 @@ func getDefaultStateForTest() *State {
 		tenpais:           [numPlayers]bool{false, false, false, false},
 	}
 }
+
+func TestState_Anpais(t *testing.T) {
+	type args struct {
+		player *Player
+	}
+	type testCase struct {
+		name  string
+		state *State
+		args  args
+		want  []Pai
+	}
+	tests := []testCase{}
+
+	{
+		state := getDefaultStateForTest()
+		player := state.players[0]
+		tests = append(tests, testCase{
+			name:  "",
+			state: state,
+			args:  args{player: &player},
+			want:  nil,
+		})
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := tt.state.Anpais(tt.args.player); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("State.Anpais() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
