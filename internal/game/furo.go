@@ -256,6 +256,10 @@ type FuroKakan struct {
 	pais     []Pai
 }
 
+// NewKakan creates a new Kakan instance.
+// The target parameter is optional (can be nil).
+// If target is provided, it must be between 0 and 3.
+// The target value is deep copied to prevent modifications from the caller.
 func NewKakan(taken Pai, consumed [3]Pai, target *int) (*FuroKakan, error) {
 	if (target != nil) && (*target < 0 || *target > 3) {
 		return nil, fmt.Errorf("kakan: invalid target player index (must be 0-3, got: %d)", target)
@@ -264,10 +268,16 @@ func NewKakan(taken Pai, consumed [3]Pai, target *int) (*FuroKakan, error) {
 	var pais Pais = []Pai{taken, consumed[0], consumed[1], consumed[2]}
 	sort.Sort(pais)
 
+	var tg *int = nil
+	if target != nil {
+		targetCopy := *target
+		tg = &targetCopy
+	}
+
 	return &FuroKakan{
 		taken:    taken,
 		consumed: consumed,
-		target:   target,
+		target:   tg,
 		pais:     pais,
 	}, nil
 }
