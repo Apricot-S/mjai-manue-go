@@ -168,3 +168,87 @@ func TestNewToitsu(t *testing.T) {
 		})
 	}
 }
+
+func TestShuntsu_ToString(t *testing.T) {
+	tests := []struct {
+		name string
+		s    Shuntsu
+		want string
+	}{
+		{
+			name: "Shuntsu.ToString()",
+			s:    Shuntsu([3]Pai{s2P(t, "1m"), s2P(t, "2m"), s2P(t, "3m")}),
+			want: "shuntsu: [1m 2m 3m]",
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := tt.s.ToString(); got != tt.want {
+				t.Errorf("Shuntsu.ToString() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestKotsu_ToString(t *testing.T) {
+	tests := []struct {
+		name string
+		k    Kotsu
+		want string
+	}{
+		{
+			name: "Kotsu.ToString()",
+			k:    Kotsu([3]Pai{s2P(t, "1m"), s2P(t, "1m"), s2P(t, "1m")}),
+			want: "kotsu: [1m 1m 1m]",
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := tt.k.ToString(); got != tt.want {
+				t.Errorf("Kotsu.ToString() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestKantsu_ToString(t *testing.T) {
+	tests := []struct {
+		name string
+		k    Kantsu
+		want string
+	}{
+		{
+			name: "Kantsu.ToString()",
+			k:    Kantsu([4]Pai{s2P(t, "1m"), s2P(t, "1m"), s2P(t, "1m"), s2P(t, "1m")}),
+			want: "kantsu: [1m 1m 1m 1m]",
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := tt.k.ToString(); got != tt.want {
+				t.Errorf("Kantsu.ToString() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestToitsu_ToString(t *testing.T) {
+	tests := []struct {
+		name string
+		t    Toitsu
+		want string
+	}{
+		{
+			name: "Toitsu.ToString()",
+			t:    Toitsu([2]Pai{s2P(t, "1m"), s2P(t, "1m")}),
+			want: "toitsu: [1m 1m]",
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := tt.t.ToString(); got != tt.want {
+				t.Errorf("Toitsu.ToString() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
