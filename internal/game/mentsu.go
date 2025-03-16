@@ -20,9 +20,8 @@ func mentsuToString(name string, pais []Pai) string {
 
 type Shuntsu [3]Pai
 
-func NewShuntsu(pais [3]Pai) *Shuntsu {
-	s := Shuntsu(pais)
-	return &s
+func NewShuntsu(pai1, pai2, pai3 Pai) *Shuntsu {
+	return &Shuntsu{pai1, pai2, pai3}
 }
 
 func (s *Shuntsu) ToString() string {
@@ -35,9 +34,8 @@ func (s *Shuntsu) Pais() []Pai {
 
 type Kotsu [3]Pai
 
-func NewKotsu(pais [3]Pai) *Kotsu {
-	k := Kotsu(pais)
-	return &k
+func NewKotsu(pai1, pai2, pai3 Pai) *Kotsu {
+	return &Kotsu{pai1, pai2, pai3}
 }
 
 func (k *Kotsu) ToString() string {
@@ -50,9 +48,8 @@ func (k *Kotsu) Pais() []Pai {
 
 type Kantsu [4]Pai
 
-func NewKantsu(pais [4]Pai) *Kantsu {
-	k := Kantsu(pais)
-	return &k
+func NewKantsu(pai1, pai2, pai3, pai4 Pai) *Kantsu {
+	return &Kantsu{pai1, pai2, pai3, pai4}
 }
 
 func (k *Kantsu) ToString() string {
@@ -65,9 +62,8 @@ func (k *Kantsu) Pais() []Pai {
 
 type Toitsu [2]Pai
 
-func NewToitsu(pais [2]Pai) *Toitsu {
-	t := Toitsu(pais)
-	return &t
+func NewToitsu(pai1, pai2 Pai) *Toitsu {
+	return &Toitsu{pai1, pai2}
 }
 
 func (t *Toitsu) ToString() string {
