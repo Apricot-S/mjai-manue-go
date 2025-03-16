@@ -103,27 +103,16 @@ func (s *State) Anpais(player *Player) []Pai {
 }
 
 func (s *State) VisiblePais(player *Player) []Pai {
-	// Calculate the required size of slice.
-	numPais := len(s.doraMarkers) + len(player.tehais)
-	for _, p := range s.players {
-		numPais += len(p.ho)
-		for _, furo := range p.furos {
-			numPais += len(furo.Pais())
-		}
-	}
-	var visiblePais = make([]Pai, 0, numPais)
+	visiblePais := []Pai{}
 
 	for _, p := range s.players {
-		visiblePais = append(visiblePais, p.ho...)
+		visiblePais = slices.Concat(visiblePais, p.ho)
 		for _, furo := range p.furos {
-			visiblePais = append(visiblePais, furo.Pais()...)
+			visiblePais = slices.Concat(visiblePais, furo.Pais())
 		}
 	}
 
-	visiblePais = append(visiblePais, s.doraMarkers...)
-	visiblePais = append(visiblePais, player.tehais...)
-
-	return visiblePais
+	return slices.Concat(visiblePais, s.doraMarkers, player.tehais)
 }
 
 func (s *State) Doras() []Pai {
