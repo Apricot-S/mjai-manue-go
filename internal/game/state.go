@@ -84,7 +84,7 @@ func (s *State) Update(event any) error {
 	panic("unimplemented!")
 }
 
-func (s *State) PrintState() {
+func (s *State) Print() {
 	for _, p := range s.players {
 		fmt.Fprintf(
 			os.Stderr,
