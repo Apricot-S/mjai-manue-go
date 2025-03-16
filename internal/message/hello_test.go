@@ -92,9 +92,19 @@ func TestHello_Marshal(t *testing.T) {
 			wantErr: false,
 		},
 		{
-			name: "invalid type",
+			name: "empty type",
 			args: &Hello{
 				Message:         Message{Type: ""},
+				Protocol:        "mjsonp",
+				ProtocolVersion: 0,
+			},
+			want:    ``,
+			wantErr: true,
+		},
+		{
+			name: "invalid type",
+			args: &Hello{
+				Message:         Message{Type: TypeNone},
 				Protocol:        "mjsonp",
 				ProtocolVersion: 0,
 			},
@@ -151,6 +161,26 @@ func TestHello_Unmarshal(t *testing.T) {
 				ProtocolVersion: 1,
 			},
 			wantErr: false,
+		},
+		{
+			name: "empty type",
+			args: `{"type":""}`,
+			want: Hello{
+				Message:         Message{Type: ""},
+				Protocol:        "",
+				ProtocolVersion: 0,
+			},
+			wantErr: true,
+		},
+		{
+			name: "invalid type",
+			args: `{"type":"none"}`,
+			want: Hello{
+				Message:         Message{Type: TypeNone},
+				Protocol:        "",
+				ProtocolVersion: 0,
+			},
+			wantErr: true,
 		},
 		{
 			name: "invalid protocol version",
