@@ -15,7 +15,7 @@ func mentsuToString(name string, pais []Pai) string {
 	for i, p := range pais {
 		paiStrs[i] = p.ToString()
 	}
-	return fmt.Sprintf("%s: [%s]", name, strings.Join(paiStrs, ", "))
+	return fmt.Sprintf("%s: [%s]", name, strings.Join(paiStrs, " "))
 }
 
 type Shuntsu [3]Pai
