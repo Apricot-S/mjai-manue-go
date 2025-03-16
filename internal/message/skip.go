@@ -12,14 +12,19 @@ type Skip struct {
 	Action
 }
 
-func NewSkip(actor int, log string) *Skip {
-	return &Skip{
+func NewSkip(actor int, log string) (*Skip, error) {
+	m := &Skip{
 		Action: Action{
 			Message: Message{Type: TypeNone},
 			Actor:   actor,
 			Log:     log,
 		},
 	}
+
+	if err := messageValidator.Struct(m); err != nil {
+		return nil, err
+	}
+	return m, nil
 }
 
 func (m *Skip) MarshalJSONTo(e *jsontext.Encoder, opts jsontext.Options) error {
