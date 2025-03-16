@@ -1,6 +1,13 @@
 package game
 
-import "github.com/Apricot-S/mjai-manue-go/internal/message"
+import (
+	"cmp"
+	"fmt"
+	"os"
+	"slices"
+
+	"github.com/Apricot-S/mjai-manue-go/internal/message"
+)
 
 const (
 	numPlayers        = 4
@@ -69,4 +76,108 @@ func (s *State) DoraMarkers() []Pai {
 
 func (s *State) NumPipais() int {
 	return s.numPipais
+}
+
+func (s *State) Update(event any) error {
+	s.prevActionType = s.currentActionType
+
+	panic("unimplemented!")
+}
+
+func (s *State) PrintState() {
+	for _, p := range s.players {
+		fmt.Fprintf(
+			os.Stderr,
+			`[%d] tehai: %s
+       ho: %s
+
+`,
+			p.id,
+			PaisToStr(p.tehais),
+			PaisToStr(p.ho))
+	}
+}
+
+func (s *State) Anpais(player *Player) []Pai {
+	return slices.Concat(player.sutehais, player.extraAnpais)
+}
+
+func (s *State) VisiblePais(player *Player) []Pai {
+	// Calculate the required size of slice.
+	numPais := len(s.doraMarkers) + len(player.tehais)
+	for _, p := range s.players {
+		numPais += len(p.ho)
+		for _, furo := range p.furos {
+			numPais += len(furo.Pais())
+		}
+	}
+	var visiblePais = make([]Pai, 0, numPais)
+
+	for _, p := range s.players {
+		visiblePais = append(visiblePais, p.ho...)
+		for _, furo := range p.furos {
+			visiblePais = append(visiblePais, furo.Pais()...)
+		}
+	}
+
+	visiblePais = append(visiblePais, s.doraMarkers...)
+	visiblePais = append(visiblePais, player.tehais...)
+
+	return visiblePais
+}
+
+func (s *State) Doras() []Pai {
+	doras := make([]Pai, len(s.doraMarkers))
+	for i, d := range s.doraMarkers {
+		doras[i] = *d.NextForDora()
+	}
+	return doras
+}
+
+func (s *State) Jikaze(player *Player) *Pai {
+	j := 1 + (4+player.id-s.oya.id)%4
+	p, _ := NewPaiWithDetail(tsupaiType, uint8(j), false)
+	return p
+}
+
+func (s *State) YakuhaiFan(pai *Pai, player *Player) int {
+	if pai.Type() != tsupaiType {
+		// Suhai
+		return 0
+	}
+
+	// Jihai
+	n := pai.Number()
+	if 5 <= n && n <= 7 {
+		// Sangenpai
+		return 1
+	}
+
+	// Kazehai
+	fan := 0
+	if pai.HasSameSymbol(&s.bakaze) {
+		fan++
+	}
+	if pai.HasSameSymbol(s.Jikaze(player)) {
+		fan++
+	}
+	return fan
+}
+
+func (s *State) Turn() int {
+	return (numInitPipais - s.numPipais) / numPlayers
+}
+
+func (s *State) RankedPlayers() [numPlayers]Player {
+	players := s.players
+	slices.SortStableFunc(players[:], func(p1, p2 Player) int {
+		if c := cmp.Compare(p1.score, p2.score); c != 0 {
+			// Sort descending.
+			return -c
+		}
+		// In case of a tie, sort by closest to chicha.
+		return getDistance(&p1, s.chicha) - getDistance(&p2, s.chicha)
+	})
+
+	return players
 }
