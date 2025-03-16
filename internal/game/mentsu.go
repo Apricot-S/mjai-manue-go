@@ -5,66 +5,75 @@ import (
 	"strings"
 )
 
-type MentsuType int
-
-const (
-	Shuntsu MentsuType = iota + 1
-	Kotsu
-	Kantsu
-	Toitsu
-)
-
-type Mentsu struct {
-	typ  MentsuType
-	pais []Pai
+type Mentsu interface {
+	ToString() string
+	Pais() []Pai
 }
 
-func NewMentsu(t MentsuType, pais []Pai) (*Mentsu, error) {
-	switch t {
-	case Shuntsu, Kotsu:
-		if len(pais) != 3 {
-			return nil, fmt.Errorf("invalid %v", t)
-		}
-	case Kantsu:
-		if len(pais) != 4 {
-			return nil, fmt.Errorf("invalid kantsu")
-		}
-	case Toitsu:
-		if len(pais) != 2 {
-			return nil, fmt.Errorf("invalid toitsu")
-		}
-	default:
-		return nil, fmt.Errorf("unknown type")
-	}
-	return &Mentsu{typ: t, pais: pais}, nil
-}
-
-func (m *Mentsu) ToString() string {
-	str := ""
-	switch m.typ {
-	case Shuntsu:
-		str = "shuntsu"
-	case Kotsu:
-		str = "kotsu"
-	case Kantsu:
-		str = "kantsu"
-	case Toitsu:
-		str = "toitsu"
-	}
-
-	paiStrs := make([]string, len(m.pais))
-	for i, p := range m.pais {
+func mentsuToString(name string, pais []Pai) string {
+	paiStrs := make([]string, len(pais))
+	for i, p := range pais {
 		paiStrs[i] = p.ToString()
 	}
-
-	str += fmt.Sprintf("[%s]", strings.Join(paiStrs, " "))
-	return str
+	return fmt.Sprintf("%s: [%s]", name, strings.Join(paiStrs, ", "))
 }
 
-func (m *Mentsu) Type() MentsuType {
-	return m.typ
+type Shuntsu [3]Pai
+
+func NewShuntsu(pais [3]Pai) *Shuntsu {
+	s := Shuntsu(pais)
+	return &s
 }
 
-func (m *Mentsu) Pais() []Pai {
-	return m.pais
+func (s *Shuntsu) ToString() string {
+	return mentsuToString("shuntsu", s[:])
+}
+
+func (s *Shuntsu) Pais() []Pai {
+	return s[:]
+}
+
+type Kotsu [3]Pai
+
+func NewKotsu(pais [3]Pai) *Kotsu {
+	k := Kotsu(pais)
+	return &k
+}
+
+func (k *Kotsu) ToString() string {
+	return mentsuToString("kotsu", k[:])
+}
+
+func (k *Kotsu) Pais() []Pai {
+	return k[:]
+}
+
+type Kantsu [4]Pai
+
+func NewKantsu(pais [4]Pai) *Kantsu {
+	k := Kantsu(pais)
+	return &k
+}
+
+func (k *Kantsu) ToString() string {
+	return mentsuToString("kantsu", k[:])
+}
+
+func (k *Kantsu) Pais() []Pai {
+	return k[:]
+}
+
+type Toitsu [2]Pai
+
+func NewToitsu(pais [2]Pai) *Toitsu {
+	t := Toitsu(pais)
+	return &t
+}
+
+func (t *Toitsu) ToString() string {
+	return mentsuToString("toitsu", t[:])
+}
+
+func (t *Toitsu) Pais() []Pai {
+	return t[:]
 }
