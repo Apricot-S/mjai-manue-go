@@ -40,8 +40,7 @@ var (
 		p := [NumIDs]Mentsu{}
 		for i := range uint8(NumIDs) {
 			pai, _ := NewPaiWithID(i)
-			toitsu := NewToitsu([2]Pai{*pai, *pai})
-			p[i] = toitsu
+			p[i] = NewToitsu([2]Pai{*pai, *pai})
 		}
 		return p
 	}()
@@ -50,14 +49,12 @@ var (
 		m := [NumIDs + numChows]Mentsu{}
 		for i := range uint8(NumIDs) {
 			pai, _ := NewPaiWithID(i)
-			kotsu := NewKotsu([3]Pai{*pai, *pai, *pai})
-			m[i] = kotsu
+			m[i] = NewKotsu([3]Pai{*pai, *pai, *pai})
 		}
 		for chowId := range uint8(numChows) {
 			i := chowStartIDs[chowId]
 			pai, _ := NewPaiWithID(i)
-			shuntsu := NewShuntsu([3]Pai{*pai, *pai.Next(1), *pai.Next(2)})
-			m[chowId+NumIDs] = shuntsu
+			m[chowId+NumIDs] = NewShuntsu([3]Pai{*pai, *pai.Next(1), *pai.Next(2)})
 		}
 		return m
 	}()
