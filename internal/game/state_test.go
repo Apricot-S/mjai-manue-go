@@ -176,3 +176,48 @@ func Test_getNextKyoku(t *testing.T) {
 		})
 	}
 }
+
+func getDefaultStateForTest() *State {
+	east, _ := NewPaiWithName("E")
+	players := [numPlayers]Player{}
+
+	for i := range numPlayers {
+		tehais := make([]Pai, 13)
+		for j := range 13 {
+			tehais[j] = *Unknown
+		}
+
+		players[i] = Player{
+			id:                i,
+			name:              "",
+			tehais:            tehais,
+			furos:             make([]Furo, 0, maxNumFuro),
+			ho:                make([]Pai, 0),
+			sutehais:          make([]Pai, 0),
+			extraAnpais:       make([]Pai, 0),
+			reachState:        None,
+			reachHoIndex:      nil,
+			reachSutehaiIndex: nil,
+			score:             initScore,
+			canDahai:          false,
+			isMenzen:          true,
+		}
+	}
+
+	return &State{
+		players:     players,
+		bakaze:      *east,
+		kyokuNum:    1,
+		honba:       0,
+		oya:         &players[0],
+		chicha:      &players[0],
+		doraMarkers: make([]Pai, 0, maxNumDoraMarkers),
+		numPipais:   numInitPipais,
+
+		prevActionType:    "",
+		prevDahaiActor:    -1,
+		prevDahaiPai:      nil,
+		currentActionType: "",
+		tenpais:           [numPlayers]bool{false, false, false, false},
+	}
+}
