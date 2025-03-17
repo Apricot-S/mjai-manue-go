@@ -13,17 +13,12 @@ type Join struct {
 	Room string `json:"room,omitempty"`
 }
 
-func NewJoin(name string, room string) (*Join, error) {
-	m := &Join{
+func NewJoin(name string, room string) *Join {
+	return &Join{
 		Message: Message{Type: TypeJoin},
 		Name:    name,
 		Room:    room,
 	}
-
-	if err := messageValidator.Struct(m); err != nil {
-		return nil, err
-	}
-	return m, nil
 }
 
 func (m *Join) MarshalJSONTo(e *jsontext.Encoder, opts jsontext.Options) error {

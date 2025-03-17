@@ -13,10 +13,9 @@ func TestNewJoin(t *testing.T) {
 		room string
 	}
 	tests := []struct {
-		name    string
-		args    args
-		want    *Join
-		wantErr bool
+		name string
+		args args
+		want *Join
 	}{
 		{
 			name: "without name and room",
@@ -27,7 +26,6 @@ func TestNewJoin(t *testing.T) {
 			want: &Join{
 				Message: Message{Type: TypeJoin},
 			},
-			wantErr: false,
 		},
 		{
 			name: "with name and room",
@@ -40,16 +38,11 @@ func TestNewJoin(t *testing.T) {
 				Name:    "shanten",
 				Room:    "default",
 			},
-			wantErr: false,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := NewJoin(tt.args.name, tt.args.room)
-			if (err != nil) != tt.wantErr {
-				t.Errorf("NewJoin() error = %v, want %v", err, tt.wantErr)
-			}
-
+			got := NewJoin(tt.args.name, tt.args.room)
 			if !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("NewJoin() = %v, want %v", got, tt.want)
 			}
