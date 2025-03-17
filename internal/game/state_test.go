@@ -2,6 +2,7 @@ package game
 
 import (
 	"reflect"
+	"slices"
 	"testing"
 )
 
@@ -237,11 +238,25 @@ func TestState_Anpais(t *testing.T) {
 	{
 		state := getDefaultStateForTest()
 		player := state.players[0]
+
 		tests = append(tests, testCase{
 			name:  "",
 			state: state,
 			args:  args{player: &player},
 			want:  nil,
+		})
+	}
+	{
+		state := getDefaultStateForTest()
+		pais, _ := StrToPais("1m 7z")
+		state.players[3].ho = slices.Concat(state.players[3].ho, pais)
+		player := state.players[3]
+
+		tests = append(tests, testCase{
+			name:  "",
+			state: state,
+			args:  args{player: &player},
+			want:  pais,
 		})
 	}
 
