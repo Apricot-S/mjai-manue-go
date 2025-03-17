@@ -8,6 +8,7 @@ import (
 
 type AIAgent struct {
 	name     string
+	room     string
 	playerID int
 	state    *game.State
 	ai       ai.AI
