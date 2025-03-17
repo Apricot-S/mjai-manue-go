@@ -14,6 +14,13 @@ type TsumogiriAgent struct {
 	playerID int
 }
 
+func NewTsumogiriAgent(name string, room string) *TsumogiriAgent {
+	return &TsumogiriAgent{
+		name: name,
+		room: room,
+	}
+}
+
 func (a *TsumogiriAgent) Respond(msgs []jsontext.Value) (jsontext.Value, error) {
 	lastMsg := msgs[len(msgs)-1]
 	var msg message.Message
