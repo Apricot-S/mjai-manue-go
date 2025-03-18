@@ -94,11 +94,11 @@ func TestNewTsumo(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			got, err := NewTsumo(tt.args.actor, tt.args.pai, tt.args.log)
 			if (err != nil) != tt.wantErr {
-				t.Errorf("NewHello() error = %v, want %v", err, tt.wantErr)
+				t.Errorf("NewTsumo() error = %v, want %v", err, tt.wantErr)
 			}
 
 			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("NewHello() = %v, want %v", got, tt.want)
+				t.Errorf("NewTsumo() = %v, want %v", got, tt.want)
 			}
 		})
 	}

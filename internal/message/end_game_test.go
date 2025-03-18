@@ -26,7 +26,7 @@ func TestNewEndGame(t *testing.T) {
 			got := NewEndGame()
 
 			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("NewHello() = %v, want %v", got, tt.want)
+				t.Errorf("NewEndGame() = %v, want %v", got, tt.want)
 			}
 		})
 	}

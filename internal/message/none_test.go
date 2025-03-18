@@ -26,7 +26,7 @@ func TestNewNone(t *testing.T) {
 			got := NewNone()
 
 			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("NewHello() = %v, want %v", got, tt.want)
+				t.Errorf("NewNone() = %v, want %v", got, tt.want)
 			}
 		})
 	}

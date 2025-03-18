@@ -26,7 +26,7 @@ func TestNewEndKyoku(t *testing.T) {
 			got := NewEndKyoku()
 
 			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("NewHello() = %v, want %v", got, tt.want)
+				t.Errorf("NewEndKyoku() = %v, want %v", got, tt.want)
 			}
 		})
 	}

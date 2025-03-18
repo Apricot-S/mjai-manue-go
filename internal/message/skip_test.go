@@ -69,11 +69,11 @@ func TestNewSkip(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			got, err := NewSkip(tt.args.actor, tt.args.log)
 			if (err != nil) != tt.wantErr {
-				t.Errorf("NewHello() error = %v, want %v", err, tt.wantErr)
+				t.Errorf("NewSkip() error = %v, want %v", err, tt.wantErr)
 			}
 
 			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("NewHello() = %v, want %v", got, tt.want)
+				t.Errorf("NewSkip() = %v, want %v", got, tt.want)
 			}
 		})
 	}
