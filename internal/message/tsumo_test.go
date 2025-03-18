@@ -329,11 +329,11 @@ func TestTsumo_Unmarshal(t *testing.T) {
 		},
 		{
 			name: "empty pai",
-			args: `{"type":"tsumo","actor":-1,"pai":""}`,
+			args: `{"type":"tsumo","actor":0,"pai":""}`,
 			want: Tsumo{
 				Action: Action{
 					Message: Message{TypeTsumo},
-					Actor:   -1,
+					Actor:   0,
 					Log:     "",
 				},
 				Pai: "",
@@ -342,11 +342,11 @@ func TestTsumo_Unmarshal(t *testing.T) {
 		},
 		{
 			name: "invalid pai",
-			args: `{"type":"tsumo","actor":4,"pai":"4pr"}`,
+			args: `{"type":"tsumo","actor":3,"pai":"4pr"}`,
 			want: Tsumo{
 				Action: Action{
 					Message: Message{TypeTsumo},
-					Actor:   4,
+					Actor:   3,
 					Log:     "",
 				},
 				Pai: "4pr",
