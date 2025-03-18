@@ -1,8 +1,22 @@
 package main
 
-import "fmt"
+import (
+	"log"
+	"os"
+
+	"github.com/Apricot-S/mjai-manue-go/internal/agent"
+	"github.com/Apricot-S/mjai-manue-go/internal/client"
+)
 
 func main() {
 	name := "tsumogiri"
-	fmt.Println("Hello World!", name)
+	room := "default"
+
+	agent := agent.NewTsumogiriAgent(name, room)
+
+	client := client.NewClient(os.Stdin, os.Stdout, true, agent)
+
+	if err := client.Run(); err != nil {
+		log.Fatalf("error running client: %v", err)
+	}
 }
