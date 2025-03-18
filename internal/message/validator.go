@@ -24,3 +24,11 @@ var winds = []string{"E", "S", "W", "N"}
 func isValidWind(fl validator.FieldLevel) bool {
 	return slices.Contains(winds, fl.Field().String())
 }
+
+// Validator used throughout the program.
+var messageValidator = func() *validator.Validate {
+	v := validator.New()
+	v.RegisterValidation("tile", isValidTile)
+	v.RegisterValidation("wind", isValidWind)
+	return v
+}()
