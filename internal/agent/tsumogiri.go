@@ -40,8 +40,17 @@ func (a *TsumogiriAgent) Respond(msgs []jsontext.Value) (jsontext.Value, error) 
 			return makeNoneResponse()
 		}
 
-		// Dummy implementation
-		res := []byte{}
+		// Self tsumo
+		dahai, err := message.NewDahai(a.playerID, tsumo.Pai, true, "")
+		if err != nil {
+			return nil, fmt.Errorf("failed to make dahai: %w", err)
+		}
+
+		res, err := json.Marshal(&dahai)
+		if err != nil {
+			return nil, fmt.Errorf("failed to unmarshal dahai message: %w", err)
+		}
+
 		return res, nil
 	case message.TypeHello:
 		return makeJoinResponse(a.name, a.room)
