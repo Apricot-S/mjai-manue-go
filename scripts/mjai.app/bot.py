@@ -2,7 +2,7 @@ import subprocess
 
 
 proc = subprocess.Popen(
-    ["mjai-manue", "--stdio"],
+    ["./mjai-manue", "--pipe"],
     stdin=subprocess.PIPE,
     stdout=subprocess.PIPE,
     stderr=subprocess.PIPE,
