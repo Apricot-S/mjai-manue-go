@@ -181,8 +181,8 @@ func NewKakan(taken Pai, consumed [3]Pai, target *int) (*Kakan, error) {
 
 	var tg *int = nil
 	if target != nil {
-		targetCopy := *target
-		tg = &targetCopy
+		tg = new(int)
+		*tg = *target
 	}
 
 	return &Kakan{
