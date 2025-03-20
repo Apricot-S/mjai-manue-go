@@ -72,27 +72,70 @@ func NewScene(gameState *game.State, me *game.Player, target *game.Player) (*Sce
 	return s, nil
 }
 
-func (s *Scene) Evaluate(name string, pai *game.Pai) bool {
+func (s *Scene) Evaluate(name string, pai *game.Pai) (bool, error) {
 	switch name {
 	case "anpai":
 		return s.isAnpai(pai)
 	case "tsupai":
-		return s.isTsupai(pai)
-	// case "suji":
-	// 	return s.Suji(pai)
+		return s.isTsupai(pai), nil
+	case "suji":
+		return s.isSuji(pai)
 	// // ... 他のすべてのfeature判定メソッドをcase文で列挙
 	default:
-		return false
+		return false, nil
 	}
 }
 
-func (s *Scene) isAnpai(pai *game.Pai) bool {
-	ret, _ := s.anpaiSet.Has(pai)
-	return ret
+func (s *Scene) isAnpai(pai *game.Pai) (bool, error) {
+	return s.anpaiSet.Has(pai)
 }
 
 func (s *Scene) isTsupai(pai *game.Pai) bool {
 	return pai.IsTsupai()
+}
+
+func (s *Scene) isSuji(pai *game.Pai) (bool, error) {
+	return isSujiOf(pai, s.anpaiSet)
+}
+
+func isSujiOf(pai *game.Pai, targetPaiSet *game.PaiSet) (bool, error) {
+	if pai.IsTsupai() {
+		return false, nil
+	}
+
+	typ := pai.Type()
+	sujiNumbers := getSujiNumbers(pai)
+	for _, n := range sujiNumbers {
+		sujiPai, err := game.NewPaiWithDetail(typ, n, false)
+		if err != nil {
+			return false, err
+		}
+		hasPai, err := targetPaiSet.Has(sujiPai)
+		if err != nil {
+			return false, err
+		}
+
+		if !hasPai {
+			return false, nil
+		}
+	}
+	return true, nil
+}
+
+func getSujiNumbers(pai *game.Pai) []uint8 {
+	if pai.IsTsupai() {
+		return []uint8{}
+	}
+
+	result := make([]uint8, 0, 2)
+	candidates := []uint8{pai.Number() - 3, pai.Number() + 3}
+	for _, n := range candidates {
+		if 1 <= n && n <= 9 {
+			result = append(result, n)
+		}
+	}
+
+	return result
 }
 
 type Feature struct {
@@ -115,7 +158,11 @@ func (e *DangerEstimator) EstimateProb(scene *Scene, pai *game.Pai) (*ProbInfo, 
 	features := make([]Feature, 0)
 
 	for node.FeatureName != nil {
-		value := scene.Evaluate(*node.FeatureName, pai)
+		value, err := scene.Evaluate(*node.FeatureName, pai)
+		if err != nil {
+			return nil, err
+		}
+
 		features = append(features, Feature{
 			Name:  *node.FeatureName,
 			Value: value,
