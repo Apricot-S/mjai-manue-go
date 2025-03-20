@@ -1,6 +1,9 @@
 package ai
 
-import "github.com/Apricot-S/mjai-manue-go/internal/game"
+import (
+	"github.com/Apricot-S/mjai-manue-go/configs"
+	"github.com/Apricot-S/mjai-manue-go/internal/game"
+)
 
 type Scene struct {
 	gameState *game.State
@@ -67,4 +70,8 @@ func NewScene(gameState *game.State, me *game.Player, target *game.Player) (*Sce
 	}
 
 	return s, nil
+}
+
+type DangerEstimator struct {
+	root *configs.DangerNode
 }
