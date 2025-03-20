@@ -5,6 +5,7 @@ import (
 	"fmt"
 )
 
+// PaiSet represents the number of each tile.
 type PaiSet [NumIDs]int
 
 func NewPaiSetWithPais(pais []Pai) (*PaiSet, error) {
