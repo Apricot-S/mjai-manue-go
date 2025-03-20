@@ -68,9 +68,8 @@ func AnalyzeShanten(ps *PaiSet) (int, []Goal, error) {
 }
 
 func AnalyzeShantenWithOption(ps *PaiSet, allowedExtraPais int, upperbound int) (int, []Goal, error) {
-	currentVector := ps
 	sum := 0
-	for _, c := range currentVector {
+	for _, c := range ps {
 		if c < 0 {
 			return math.MaxInt, nil, fmt.Errorf("negative number of tiles in the PaiSet")
 		}
@@ -86,7 +85,7 @@ func AnalyzeShantenWithOption(ps *PaiSet, allowedExtraPais int, upperbound int) 
 	allGoals := []Goal{}
 
 	shanten := analyzeShantenInternal(
-		currentVector,
+		ps,
 		&targetVector,
 		-1,
 		numMentsus,
@@ -103,8 +102,8 @@ func AnalyzeShantenWithOption(ps *PaiSet, allowedExtraPais int, upperbound int) 
 	for _, goal := range allGoals {
 		if goal.Shanten <= newUpperbound {
 			for pid := range NumIDs {
-				goal.RequiredVector[pid] = max(goal.CountVector[pid]-currentVector[pid], 0)
-				goal.ThrowableVector[pid] = max(currentVector[pid]-goal.CountVector[pid], 0)
+				goal.RequiredVector[pid] = max(goal.CountVector[pid]-ps[pid], 0)
+				goal.ThrowableVector[pid] = max(ps[pid]-goal.CountVector[pid], 0)
 			}
 			goals = append(goals, goal)
 		}
