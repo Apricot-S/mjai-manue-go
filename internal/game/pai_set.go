@@ -13,9 +13,9 @@ func NewPaiSet(array [NumIDs]int) *PaiSet {
 	return &PaiSet{array}
 }
 
-func NewPaiSetWithPais(pais *[]Pai) (*PaiSet, error) {
+func NewPaiSetWithPais(pais []Pai) (*PaiSet, error) {
 	ps := &PaiSet{}
-	err := ps.AddPais(*pais)
+	err := ps.AddPais(pais)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create PaiSet with pais: %w", err)
 	}

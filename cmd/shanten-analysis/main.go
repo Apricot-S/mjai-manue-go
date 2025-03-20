@@ -49,7 +49,7 @@ func main() {
 		return
 	}
 
-	paiSet, err := game.NewPaiSetWithPais(&pais)
+	paiSet, err := game.NewPaiSetWithPais(pais)
 	if err != nil {
 		fmt.Println(err)
 		return

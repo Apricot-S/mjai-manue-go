@@ -49,7 +49,7 @@ func TestNewPaiSet(t *testing.T) {
 
 func TestNewPaiSetWithPais(t *testing.T) {
 	type args struct {
-		pais *[]Pai
+		pais []Pai
 	}
 	type testCase struct {
 		name    string
@@ -60,7 +60,7 @@ func TestNewPaiSetWithPais(t *testing.T) {
 	tests := []testCase{}
 
 	pais0 := []Pai{}
-	tests = append(tests, testCase{"empty", args{&pais0}, &PaiSet{}, false})
+	tests = append(tests, testCase{"empty", args{pais0}, &PaiSet{}, false})
 
 	pais1 := []Pai{}
 	for i := uint8(0); i < NumIDs; i++ {
@@ -71,7 +71,7 @@ func TestNewPaiSetWithPais(t *testing.T) {
 	for i := range array1 {
 		array1[i] = 1
 	}
-	tests = append(tests, testCase{"all1", args{&pais1}, &PaiSet{array1}, false})
+	tests = append(tests, testCase{"all1", args{pais1}, &PaiSet{array1}, false})
 
 	pais2 := []Pai{}
 	for i := uint8(0); i < NumIDs; i++ {
@@ -82,7 +82,7 @@ func TestNewPaiSetWithPais(t *testing.T) {
 	for i := range array2 {
 		array2[i] = 2
 	}
-	tests = append(tests, testCase{"all2", args{&pais2}, &PaiSet{array2}, false})
+	tests = append(tests, testCase{"all2", args{pais2}, &PaiSet{array2}, false})
 
 	redPais := []Pai{}
 	for _, n := range []string{"5mr", "5pr", "5sr"} {
@@ -90,12 +90,12 @@ func TestNewPaiSetWithPais(t *testing.T) {
 		redPais = append(redPais, *r)
 	}
 	redArray := [NumIDs]int{4: 1, 4 + 9: 1, 4 + 18: 1}
-	tests = append(tests, testCase{"red", args{&redPais}, &PaiSet{redArray}, false})
+	tests = append(tests, testCase{"red", args{redPais}, &PaiSet{redArray}, false})
 
 	unknowns := []Pai{}
 	u, _ := NewPaiWithName("?")
 	unknowns = append(unknowns, *u)
-	tests = append(tests, testCase{"cannot add unknown", args{&unknowns}, nil, true})
+	tests = append(tests, testCase{"cannot add unknown", args{unknowns}, nil, true})
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -519,7 +519,7 @@ func TestPaiSet_RemovePaiSet(t *testing.T) {
 		array := [NumIDs]int{}
 		array[i] = 1
 		p, _ := NewPaiWithID(i)
-		ps, _ := NewPaiSetWithPais(&[]Pai{*p})
+		ps, _ := NewPaiSetWithPais([]Pai{*p})
 		want := PaiSet{}
 		tests = append(tests, testCase{p.ToString() + "+1-1", fields{array}, args{ps}, want})
 	}
@@ -527,7 +527,7 @@ func TestPaiSet_RemovePaiSet(t *testing.T) {
 		array := [NumIDs]int{}
 		array[4+i*9] = 1
 		r, _ := NewPaiWithName(n)
-		ps, _ := NewPaiSetWithPais(&[]Pai{*r})
+		ps, _ := NewPaiSetWithPais([]Pai{*r})
 		want := PaiSet{}
 		tests = append(tests, testCase{r.ToString() + "+1-1", fields{array}, args{ps}, want})
 	}
