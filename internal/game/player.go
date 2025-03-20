@@ -19,6 +19,9 @@ const (
 	maxPlayerID    = 3
 	initTehaisSize = 13
 	maxNumFuro     = 4
+	// Reference: <https://note.com/daku_longyi/n/n51fe08566f1b>
+	maxNumHo       = 24
+	maxNumSutehais = 27
 	kyotakuPoint   = 1_000
 )
 
@@ -48,8 +51,8 @@ func NewPlayer(id int, name string, initScore int) (*Player, error) {
 		name:              name,
 		tehais:            make(Pais, 0, initTehaisSize+1), // +1 for tsumo
 		furos:             make([]Furo, 0, maxNumFuro),
-		ho:                nil,
-		sutehais:          nil,
+		ho:                make([]Pai, 0, maxNumHo),
+		sutehais:          make([]Pai, 0, maxNumSutehais),
 		extraAnpais:       nil,
 		reachState:        None,
 		reachHoIndex:      nil,
@@ -124,8 +127,8 @@ func (p *Player) onStartKyoku(tehais []Pai, score *int) error {
 	p.tehais = p.tehais[:initTehaisSize]
 	copy(p.tehais, tehais)
 	p.furos = make([]Furo, 0, maxNumFuro)
-	p.ho = nil
-	p.sutehais = nil
+	p.ho = make([]Pai, 0, maxNumHo)
+	p.sutehais = make([]Pai, 0, maxNumSutehais)
 	p.extraAnpais = nil
 	p.reachState = None
 	p.reachHoIndex = nil
