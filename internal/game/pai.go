@@ -206,6 +206,11 @@ func (p *Pai) NextForDora() *Pai {
 	return newPaiWithDetailUnchecked(p.typ, nextNumber, false)
 }
 
+func (p *Pai) IsTsupai() bool {
+	p.assertInitialized()
+	return p.typ == tsupaiType
+}
+
 func (p *Pai) IsYaochu() bool {
 	p.assertInitialized()
 	return p.typ == tsupaiType || p.number == 1 || p.number == 9

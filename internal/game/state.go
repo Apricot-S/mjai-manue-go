@@ -130,7 +130,7 @@ func (s *State) Jikaze(player *Player) *Pai {
 }
 
 func (s *State) YakuhaiFan(pai *Pai, player *Player) int {
-	if pai.Type() != tsupaiType {
+	if !pai.IsTsupai() {
 		// Suhai
 		return 0
 	}
