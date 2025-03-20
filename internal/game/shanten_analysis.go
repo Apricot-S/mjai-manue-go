@@ -68,7 +68,7 @@ func AnalyzeShanten(ps *PaiSet) (int, []Goal, error) {
 }
 
 func AnalyzeShantenWithOption(ps *PaiSet, allowedExtraPais int, upperbound int) (int, []Goal, error) {
-	currentVector := ps.Array()
+	currentVector := [NumIDs]int(*ps)
 	sum := 0
 	for _, c := range currentVector {
 		if c < 0 {

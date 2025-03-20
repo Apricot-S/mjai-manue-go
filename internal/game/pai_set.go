@@ -5,13 +5,7 @@ import (
 	"fmt"
 )
 
-type PaiSet struct {
-	array [NumIDs]int
-}
-
-func NewPaiSet(array [NumIDs]int) *PaiSet {
-	return &PaiSet{array}
-}
+type PaiSet [NumIDs]int
 
 func NewPaiSetWithPais(pais []Pai) (*PaiSet, error) {
 	ps := &PaiSet{}
@@ -23,20 +17,16 @@ func NewPaiSetWithPais(pais []Pai) (*PaiSet, error) {
 }
 
 func GetAll() *PaiSet {
-	var array [NumIDs]int
-	for i := range array {
-		array[i] = 4
+	var ps PaiSet
+	for i := range ps {
+		ps[i] = 4
 	}
-	return &PaiSet{array}
-}
-
-func (ps *PaiSet) Array() [NumIDs]int {
-	return ps.array
+	return &ps
 }
 
 func (ps *PaiSet) ToPais() []Pai {
 	pais := []Pai{}
-	for id, count := range ps.array {
+	for id, count := range ps {
 		for range count {
 			pai, _ := NewPaiWithID(uint8(id))
 			pais = append(pais, *pai)
@@ -57,7 +47,7 @@ func (ps *PaiSet) Count(pai *Pai) (int, error) {
 		id = pai.ID()
 	}
 
-	return ps.array[id], nil
+	return ps[id], nil
 }
 
 func (ps *PaiSet) Has(pai *Pai) (bool, error) {
@@ -79,7 +69,7 @@ func (ps *PaiSet) AddPai(pai *Pai, n int) error {
 	} else {
 		id = pai.ID()
 	}
-	ps.array[id] += n
+	ps[id] += n
 
 	return nil
 }
@@ -95,8 +85,8 @@ func (ps *PaiSet) AddPais(pais []Pai) error {
 }
 
 func (ps *PaiSet) RemovePaiSet(paiSet *PaiSet) {
-	for i, c := range paiSet.array {
-		ps.array[i] -= c
+	for i, c := range paiSet {
+		ps[i] -= c
 	}
 }
 

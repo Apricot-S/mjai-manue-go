@@ -29,7 +29,7 @@ func verifyShantenAndGoals(t *testing.T, paiSet *game.PaiSet, expectedShanten in
 		t.Errorf("AnalyzeShanten() len(goals) = %v, want %v", len(goals), expectedGoalsSize)
 	}
 
-	numRequiredBlock := sum(paiSet.Array())/3 + 1
+	numRequiredBlock := sum(*paiSet)/3 + 1
 	for _, goal := range goals {
 		if len(goal.Mentsus) != numRequiredBlock {
 			t.Errorf("AnalyzeShanten() len(goal.Mentsus) = %v, want %v", len(goals), expectedGoalsSize)
@@ -60,7 +60,7 @@ func verifyShantenWithUpperBounds(t *testing.T, paiSet *game.PaiSet, expectedSha
 			t.Errorf("i = %v, AnalyzeShantenWithOption() len(goals) = %v, want %v", i, len(goals), expectedGoalsSizeWithUpperBound)
 		}
 
-		numRequiredBlock := sum(paiSet.Array())/3 + 1
+		numRequiredBlock := sum(*paiSet)/3 + 1
 		for _, goal := range goals {
 			if len(goal.Mentsus) != numRequiredBlock {
 				t.Errorf("i = %v, AnalyzeShantenWithOption() len(goal.Mentsus) = %v, want %v", i, len(goals), expectedGoalsSizeWithUpperBound)

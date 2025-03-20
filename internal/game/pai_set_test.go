@@ -6,47 +6,6 @@ import (
 	"testing"
 )
 
-func TestNewPaiSet(t *testing.T) {
-	type args struct {
-		array [NumIDs]int
-	}
-	type testCase struct {
-		name string
-		args args
-		want *PaiSet
-	}
-	tests := []testCase{}
-
-	array0 := [NumIDs]int{}
-	tests = append(tests, testCase{"empty", args{array0}, &PaiSet{array0}})
-
-	array1 := [NumIDs]int{}
-	for i := range array1 {
-		array1[i] = 1
-	}
-	tests = append(tests, testCase{"all1", args{array1}, &PaiSet{array1}})
-
-	array4 := [NumIDs]int{}
-	for i := range array4 {
-		array4[i] = 4
-	}
-	tests = append(tests, testCase{"all4", args{array4}, &PaiSet{array4}})
-
-	arrayMinus1 := [NumIDs]int{}
-	for i := range arrayMinus1 {
-		arrayMinus1[i] = -1
-	}
-	tests = append(tests, testCase{"all-1", args{arrayMinus1}, &PaiSet{arrayMinus1}})
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if got := NewPaiSet(tt.args.array); !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("NewPaiSet() = %v, want %v", got, tt.want)
-			}
-		})
-	}
-}
-
 func TestNewPaiSetWithPais(t *testing.T) {
 	type args struct {
 		pais []Pai
@@ -60,7 +19,9 @@ func TestNewPaiSetWithPais(t *testing.T) {
 	tests := []testCase{}
 
 	pais0 := []Pai{}
-	tests = append(tests, testCase{"empty", args{pais0}, &PaiSet{}, false})
+	array0 := [NumIDs]int{}
+	ps0 := PaiSet(array0)
+	tests = append(tests, testCase{"empty", args{pais0}, &ps0, false})
 
 	pais1 := []Pai{}
 	for i := uint8(0); i < NumIDs; i++ {
@@ -71,7 +32,8 @@ func TestNewPaiSetWithPais(t *testing.T) {
 	for i := range array1 {
 		array1[i] = 1
 	}
-	tests = append(tests, testCase{"all1", args{pais1}, &PaiSet{array1}, false})
+	ps1 := PaiSet(array1)
+	tests = append(tests, testCase{"all1", args{pais1}, &ps1, false})
 
 	pais2 := []Pai{}
 	for i := uint8(0); i < NumIDs; i++ {
@@ -82,7 +44,8 @@ func TestNewPaiSetWithPais(t *testing.T) {
 	for i := range array2 {
 		array2[i] = 2
 	}
-	tests = append(tests, testCase{"all2", args{pais2}, &PaiSet{array2}, false})
+	ps2 := PaiSet(array2)
+	tests = append(tests, testCase{"all2", args{pais2}, &ps2, false})
 
 	redPais := []Pai{}
 	for _, n := range []string{"5mr", "5pr", "5sr"} {
@@ -90,7 +53,8 @@ func TestNewPaiSetWithPais(t *testing.T) {
 		redPais = append(redPais, *r)
 	}
 	redArray := [NumIDs]int{4: 1, 4 + 9: 1, 4 + 18: 1}
-	tests = append(tests, testCase{"red", args{redPais}, &PaiSet{redArray}, false})
+	redPs := PaiSet(redArray)
+	tests = append(tests, testCase{"red", args{redPais}, &redPs, false})
 
 	unknowns := []Pai{}
 	u, _ := NewPaiWithName("?")
@@ -126,7 +90,8 @@ func TestGetAll(t *testing.T) {
 	for i := range array4 {
 		array4[i] = 4
 	}
-	tests = append(tests, testCase{"all4", args{array4}, &PaiSet{array4}})
+	ps := PaiSet(array4)
+	tests = append(tests, testCase{"all4", args{array4}, &ps})
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -182,9 +147,7 @@ func TestPaiSet_ToPais(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			ps := &PaiSet{
-				array: tt.fields.array,
-			}
+			ps := PaiSet(tt.fields.array)
 			if got := ps.ToPais(); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("PaiSet.ToPais() = %v, want %v", got, tt.want)
 			}
@@ -249,9 +212,7 @@ func TestPaiSet_Count(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			ps := &PaiSet{
-				array: tt.fields.array,
-			}
+			ps := PaiSet(tt.fields.array)
 			got, err := ps.Count(tt.args.pai)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("PaiSet.Count() error = %v, wantErr %v", err, tt.wantErr)
@@ -321,9 +282,7 @@ func TestPaiSet_Has(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			ps := &PaiSet{
-				array: tt.fields.array,
-			}
+			ps := PaiSet(tt.fields.array)
 			got, err := ps.Has(tt.args.pai)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("PaiSet.Has() error = %v, wantErr %v", err, tt.wantErr)
@@ -408,9 +367,7 @@ func TestPaiSet_AddPai(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			ps := &PaiSet{
-				array: tt.fields.array,
-			}
+			ps := PaiSet(tt.fields.array)
 			if err := ps.AddPai(tt.args.pai, tt.args.n); (err != nil) != tt.wantErr {
 				t.Errorf("PaiSet.AddPai() error = %v, wantErr %v", err, tt.wantErr)
 			}
@@ -486,9 +443,7 @@ func TestPaiSet_AddPais(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			ps := &PaiSet{
-				array: tt.fields.array,
-			}
+			ps := PaiSet(tt.fields.array)
 			if err := ps.AddPais(tt.args.pais); (err != nil) != tt.wantErr {
 				t.Errorf("PaiSet.AddPais() error = %v, wantErr %v", err, tt.wantErr)
 			}
@@ -534,12 +489,10 @@ func TestPaiSet_RemovePaiSet(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			ps := &PaiSet{
-				array: tt.fields.array,
-			}
+			ps := PaiSet(tt.fields.array)
 			ps.RemovePaiSet(tt.args.paiSet)
 
-			if !reflect.DeepEqual(*ps, tt.want) {
+			if !reflect.DeepEqual(ps, tt.want) {
 				t.Errorf("removed = %v, want %v", ps, tt.want)
 			}
 		})
@@ -577,9 +530,7 @@ func TestPaiSet_ToString(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			ps := &PaiSet{
-				array: tt.fields.array,
-			}
+			ps := PaiSet(tt.fields.array)
 			if got := ps.ToString(); got != tt.want {
 				t.Errorf("PaiSet.ToString() = %v, want %v", got, tt.want)
 			}

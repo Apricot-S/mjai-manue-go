@@ -123,9 +123,9 @@ func BenchmarkShantenAnalysis_Normal(b *testing.B) {
 	b.ResetTimer()
 	for range b.N {
 		hand := generateRandomPureHand(rng)
-		ps := game.NewPaiSet(*hand)
+		var ps game.PaiSet = *hand
 		b.StartTimer()
-		_, _, _ = game.AnalyzeShanten(ps)
+		_, _, _ = game.AnalyzeShanten(&ps)
 		b.StopTimer()
 	}
 }
@@ -136,9 +136,9 @@ func BenchmarkShantenAnalysis_Normal14(b *testing.B) {
 	b.ResetTimer()
 	for range b.N {
 		hand := generateRandomPureHand14(rng)
-		ps := game.NewPaiSet(*hand)
+		var ps game.PaiSet = *hand
 		b.StartTimer()
-		_, _, _ = game.AnalyzeShanten(ps)
+		_, _, _ = game.AnalyzeShanten(&ps)
 		b.StopTimer()
 	}
 }
@@ -149,9 +149,9 @@ func BenchmarkShantenAnalysis_HalfFlush(b *testing.B) {
 	b.ResetTimer()
 	for range b.N {
 		hand := generateRandomHalfFlushPureHand(rng)
-		ps := game.NewPaiSet(*hand)
+		var ps game.PaiSet = *hand
 		b.StartTimer()
-		_, _, _ = game.AnalyzeShanten(ps)
+		_, _, _ = game.AnalyzeShanten(&ps)
 		b.StopTimer()
 	}
 }
@@ -162,9 +162,9 @@ func BenchmarkShantenAnalysis_HalfFlush14(b *testing.B) {
 	b.ResetTimer()
 	for range b.N {
 		hand := generateRandomHalfFlushPureHand14(rng)
-		ps := game.NewPaiSet(*hand)
+		var ps game.PaiSet = *hand
 		b.StartTimer()
-		_, _, _ = game.AnalyzeShanten(ps)
+		_, _, _ = game.AnalyzeShanten(&ps)
 		b.StopTimer()
 	}
 }
@@ -175,9 +175,9 @@ func BenchmarkShantenAnalysis_FullFlush(b *testing.B) {
 	b.ResetTimer()
 	for range b.N {
 		hand := generateRandomFullFlushPureHand(rng)
-		ps := game.NewPaiSet(*hand)
+		var ps game.PaiSet = *hand
 		b.StartTimer()
-		_, _, _ = game.AnalyzeShanten(ps)
+		_, _, _ = game.AnalyzeShanten(&ps)
 		b.StopTimer()
 	}
 }
@@ -188,9 +188,9 @@ func BenchmarkShantenAnalysis_FullFlush14(b *testing.B) {
 	b.ResetTimer()
 	for range b.N {
 		hand := generateRandomFullFlushPureHand14(rng)
-		ps := game.NewPaiSet(*hand)
+		var ps game.PaiSet = *hand
 		b.StartTimer()
-		_, _, _ = game.AnalyzeShanten(ps)
+		_, _, _ = game.AnalyzeShanten(&ps)
 		b.StopTimer()
 	}
 }
@@ -201,9 +201,9 @@ func BenchmarkShantenAnalysis_NonSimple(b *testing.B) {
 	b.ResetTimer()
 	for range b.N {
 		hand := generateRandomNonSimplePureHand(rng)
-		ps := game.NewPaiSet(*hand)
+		var ps game.PaiSet = *hand
 		b.StartTimer()
-		_, _, _ = game.AnalyzeShanten(ps)
+		_, _, _ = game.AnalyzeShanten(&ps)
 		b.StopTimer()
 	}
 }
@@ -214,9 +214,9 @@ func BenchmarkShantenAnalysis_NonSimple14(b *testing.B) {
 	b.ResetTimer()
 	for range b.N {
 		hand := generateRandomNonSimplePureHand14(rng)
-		ps := game.NewPaiSet(*hand)
+		var ps game.PaiSet = *hand
 		b.StartTimer()
-		_, _, _ = game.AnalyzeShanten(ps)
+		_, _, _ = game.AnalyzeShanten(&ps)
 		b.StopTimer()
 	}
 }
