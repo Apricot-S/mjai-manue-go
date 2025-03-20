@@ -25,3 +25,24 @@ func makeJoinResponse(name string, room string) (jsontext.Value, error) {
 	}
 	return res, nil
 }
+
+type gameStateHandler interface {
+	setPlayerID(id int)
+	setInGame(inGame bool)
+}
+
+func onStartGame(handler gameStateHandler, rawMsg jsontext.Value) (jsontext.Value, error) {
+	var startGame message.StartGame
+	if err := json.Unmarshal(rawMsg, &startGame); err != nil {
+		return nil, fmt.Errorf("failed to unmarshal start_game message: %w", err)
+	}
+	handler.setPlayerID(startGame.ID)
+	handler.setInGame(true)
+	return makeNoneResponse()
+}
+
+func onEndGame(handler gameStateHandler) (jsontext.Value, error) {
+	handler.setPlayerID(-1)
+	handler.setInGame(false)
+	return makeNoneResponse()
+}

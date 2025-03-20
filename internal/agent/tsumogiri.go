@@ -24,6 +24,14 @@ func NewTsumogiriAgent(name string, room string) *TsumogiriAgent {
 	}
 }
 
+func (a *TsumogiriAgent) setPlayerID(id int) {
+	a.playerID = id
+}
+
+func (a *TsumogiriAgent) setInGame(inGame bool) {
+	a.inGame = inGame
+}
+
 func (a *TsumogiriAgent) Respond(msgs []jsontext.Value) (jsontext.Value, error) {
 	var msg message.Message
 
@@ -34,17 +42,9 @@ func (a *TsumogiriAgent) Respond(msgs []jsontext.Value) (jsontext.Value, error) 
 
 	switch msg.Type {
 	case message.TypeStartGame:
-		var startGame message.StartGame
-		if err := json.Unmarshal(firstMsg, &startGame); err != nil {
-			return nil, fmt.Errorf("failed to unmarshal start_game message: %w", err)
-		}
-		a.playerID = startGame.ID
-		a.inGame = true
-		return makeNoneResponse()
+		return onStartGame(a, firstMsg)
 	case message.TypeEndGame:
-		a.playerID = -1
-		a.inGame = false
-		return makeNoneResponse()
+		return onEndGame(a)
 	}
 
 	lastMsg := msgs[len(msgs)-1]
