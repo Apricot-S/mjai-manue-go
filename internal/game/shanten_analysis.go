@@ -16,11 +16,11 @@ type Goal struct {
 	// Mentsus is a list of sets in the winning hand.
 	Mentsus []Mentsu
 	// CountVector is the number of each tile included in the winning hand.
-	CountVector [NumIDs]int
+	CountVector PaiSet
 	// RequiredVector is the number of each tile required for the winning hand.
-	RequiredVector [NumIDs]int
+	RequiredVector PaiSet
 	// ThrowableVector is the number of each tile not required for the winning hand.
-	ThrowableVector [NumIDs]int
+	ThrowableVector PaiSet
 }
 
 const (
@@ -68,7 +68,7 @@ func AnalyzeShanten(ps *PaiSet) (int, []Goal, error) {
 }
 
 func AnalyzeShantenWithOption(ps *PaiSet, allowedExtraPais int, upperbound int) (int, []Goal, error) {
-	currentVector := [NumIDs]int(*ps)
+	currentVector := ps
 	sum := 0
 	for _, c := range currentVector {
 		if c < 0 {
@@ -80,13 +80,13 @@ func AnalyzeShantenWithOption(ps *PaiSet, allowedExtraPais int, upperbound int) 
 		sum += c
 	}
 
-	targetVector := [NumIDs]int{}
+	targetVector := PaiSet{}
 	numMentsus := min(sum/3, 4)
 	mentsus := make([]Mentsu, 0, numMentsus+1) // +1 for the pair
 	allGoals := []Goal{}
 
 	shanten := analyzeShantenInternal(
-		&currentVector,
+		currentVector,
 		&targetVector,
 		-1,
 		numMentsus,
@@ -120,8 +120,8 @@ func AnalyzeShantenWithOption(ps *PaiSet, allowedExtraPais int, upperbound int) 
 // analyzeShantenInternal calculates the shanten number and
 // the set of nearest winning hands using pruning DFS.
 func analyzeShantenInternal(
-	currentVector *[NumIDs]int,
-	targetVector *[NumIDs]int,
+	currentVector *PaiSet,
+	targetVector *PaiSet,
 	currentShanten int,
 	numMeldsLeft int,
 	minMeldId int,
