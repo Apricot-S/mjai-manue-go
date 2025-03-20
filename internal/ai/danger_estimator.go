@@ -72,6 +72,64 @@ func NewScene(gameState *game.State, me *game.Player, target *game.Player) (*Sce
 	return s, nil
 }
 
+func (s *Scene) Evaluate(name string, pai *game.Pai) bool {
+	switch name {
+	case "anpai":
+		return s.isAnpai(pai)
+	case "tsupai":
+		return s.isTsupai(pai)
+	// case "suji":
+	// 	return s.Suji(pai)
+	// // ... 他のすべてのfeature判定メソッドをcase文で列挙
+	default:
+		return false
+	}
+}
+
+func (s *Scene) isAnpai(pai *game.Pai) bool {
+	ret, _ := s.anpaiSet.Has(pai)
+	return ret
+}
+
+func (s *Scene) isTsupai(pai *game.Pai) bool {
+	return pai.IsTsupai()
+}
+
+type Feature struct {
+	Name  string
+	Value bool
+}
+
+type ProbInfo struct {
+	Prob     float64
+	Features []Feature
+}
+
 type DangerEstimator struct {
 	root *configs.DangerNode
+}
+
+func (e *DangerEstimator) EstimateProb(scene *Scene, pai *game.Pai) (*ProbInfo, error) {
+	pai = pai.RemoveRed()
+	node := e.root
+	features := make([]Feature, 0)
+
+	for node.FeatureName != nil {
+		value := scene.Evaluate(*node.FeatureName, pai)
+		features = append(features, Feature{
+			Name:  *node.FeatureName,
+			Value: value,
+		})
+
+		if value {
+			node = node.Positive
+		} else {
+			node = node.Negative
+		}
+	}
+
+	return &ProbInfo{
+		Prob:     node.AverageProb,
+		Features: features,
+	}, nil
 }
