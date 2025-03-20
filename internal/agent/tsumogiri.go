@@ -41,10 +41,14 @@ func (a *TsumogiriAgent) Respond(msgs []jsontext.Value) (jsontext.Value, error) 
 	}
 
 	switch msg.Type {
+	case message.TypeHello:
+		return makeJoinResponse(a.name, a.room)
 	case message.TypeStartGame:
 		return onStartGame(a, firstMsg)
-	case message.TypeEndGame:
-		return onEndGame(a)
+	}
+
+	if !a.inGame {
+		return nil, fmt.Errorf("received message while not in game: %v", msgs)
 	}
 
 	lastMsg := msgs[len(msgs)-1]
@@ -76,8 +80,8 @@ func (a *TsumogiriAgent) Respond(msgs []jsontext.Value) (jsontext.Value, error) 
 		}
 
 		return res, nil
-	case message.TypeHello:
-		return makeJoinResponse(a.name, a.room)
+	case message.TypeEndGame:
+		return onEndGame(a)
 	default:
 		return makeNoneResponse()
 	}
