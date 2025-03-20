@@ -9,7 +9,7 @@ import (
 
 type Dora struct {
 	Message
-	DoraMarker string `json:"dora_marker" validate:"required,tile"`
+	DoraMarker string `json:"dora_marker" validate:"tile"`
 }
 
 func NewDora(doraMarker string) (*Dora, error) {

@@ -9,7 +9,7 @@ import (
 
 type Dahai struct {
 	Action
-	Pai       string `json:"pai" validate:"required,tile"`
+	Pai       string `json:"pai" validate:"tile"`
 	Tsumogiri bool   `json:"tsumogiri"`
 }
 
