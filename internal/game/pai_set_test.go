@@ -18,6 +18,11 @@ func TestNewPaiSetWithPais(t *testing.T) {
 	}
 	tests := []testCase{}
 
+	var paisNil []Pai = nil
+	arrayNil := [NumIDs]int{}
+	psNil := PaiSet(arrayNil)
+	tests = append(tests, testCase{"nil", args{paisNil}, &psNil, false})
+
 	pais0 := []Pai{}
 	array0 := [NumIDs]int{}
 	ps0 := PaiSet(array0)
