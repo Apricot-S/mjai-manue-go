@@ -152,6 +152,12 @@ type DangerEstimator struct {
 	root *configs.DangerNode
 }
 
+func NewDangerEstimator(root *configs.DangerNode) *DangerEstimator {
+	return &DangerEstimator{
+		root: root,
+	}
+}
+
 func (e *DangerEstimator) EstimateProb(scene *Scene, pai *game.Pai) (*ProbInfo, error) {
 	pai = pai.RemoveRed()
 	node := e.root

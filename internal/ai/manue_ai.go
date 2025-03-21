@@ -16,8 +16,8 @@ type ManueAI struct {
 func NewManueAI(stats *configs.GameStats, root *configs.DangerNode) *ManueAI {
 	return NewManueAIWithEstimators(
 		stats,
-		&DangerEstimator{root: root},
-		&TenpaiProbEstimator{stats: stats},
+		NewDangerEstimator(root),
+		NewTenpaiProbEstimator(stats),
 	)
 }
 
