@@ -61,12 +61,12 @@ func getHostAndPort(rawURL string) (string, string, error) {
 	return host, port, nil
 }
 
-func runPipeMode(agent *agent.TsumogiriAgent) error {
+func runPipeMode(agent agent.Agent) error {
 	c := client.NewClient(os.Stdin, os.Stdout, true, agent)
 	return c.Run()
 }
 
-func runServerMode(rawURL string, agent *agent.TsumogiriAgent) error {
+func runServerMode(rawURL string, agent agent.Agent) error {
 	_, port, err := getHostAndPort(rawURL)
 	if err != nil {
 		return err
