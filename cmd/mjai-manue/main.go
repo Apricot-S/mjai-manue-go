@@ -103,11 +103,11 @@ func main() {
 
 	stats, err := configs.GetStats()
 	if err != nil {
-		panic(err) //TODO
+		log.Fatalf("failed to get the stats: %v", err)
 	}
 	root, err := configs.GetDangerTree()
 	if err != nil {
-		panic(err) //TODO
+		log.Fatalf("failed to get the danger tree: %v", err)
 	}
 	ai := ai.NewManueAI(stats, root)
 	agent := agent.NewAIAgent(name, room, ai)
