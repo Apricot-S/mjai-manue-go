@@ -14,8 +14,11 @@ import (
 	"github.com/Apricot-S/mjai-manue-go/internal/client"
 )
 
+const defaultName = "Tsumogiri"
+const defaultPort = "11600"
+
 func parseOptions() (name string, room string, rawURL string, usePipe bool) {
-	flag.StringVar(&name, "name", "Tsumogiri", "Player's name")
+	flag.StringVar(&name, "name", defaultName, "Player's name")
 	flag.StringVar(&room, "room", "", "Room name (overrides the last path segment of URL if specified)")
 	flag.StringVar(&rawURL, "url", "", "Server URL (e.g., http://localhost:11600/default)")
 	flag.BoolVar(&usePipe, "pipe", false, "Use pipe instead of HTTP (ignore --url if specified)")
@@ -50,8 +53,8 @@ func getHostAndPort(rawURL string) (string, string, error) {
 		return "", "", fmt.Errorf("invalid URL: %v", err)
 	}
 
-	port := "11600"
 	host := u.Host
+	port := defaultPort
 
 	if h, p, err := net.SplitHostPort(u.Host); err == nil {
 		host = h
