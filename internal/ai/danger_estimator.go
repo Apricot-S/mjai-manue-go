@@ -1,6 +1,8 @@
 package ai
 
 import (
+	"fmt"
+
 	"github.com/Apricot-S/mjai-manue-go/configs"
 	"github.com/Apricot-S/mjai-manue-go/internal/game"
 )
@@ -21,6 +23,8 @@ type Scene struct {
 	earlySutehaiSet    *game.PaiSet
 	lateSutehaiSet     *game.PaiSet
 	reachPaiSet        *game.PaiSet
+
+	evaluators map[string]func(*game.Pai) (bool, error)
 }
 
 func NewScene(gameState *game.State, me *game.Player, target *game.Player) (*Scene, error) {
@@ -69,10 +73,16 @@ func NewScene(gameState *game.State, me *game.Player, target *game.Player) (*Sce
 		return nil, err
 	}
 
+	s.registerEvaluators()
+
 	return s, nil
 }
 
 func (s *Scene) Evaluate(name string, pai *game.Pai) (bool, error) {
+	if evaluator, ok := s.evaluators[name]; ok {
+		return evaluator(pai)
+	}
+
 	switch name {
 	case "anpai":
 		return s.isAnpai(pai)
@@ -348,7 +358,8 @@ func getSuji(pai *game.Pai) ([]game.Pai, error) {
 	}
 
 	result := make([]game.Pai, 0, 2)
-	candidates := []uint8{pai.Number() - 3, pai.Number() + 3}
+	paiNumber := pai.Number()
+	candidates := []uint8{paiNumber - 3, paiNumber + 3}
 	for _, n := range candidates {
 		if 1 <= n && n <= 9 {
 			sujiPai, err := game.NewPaiWithDetail(pai.Type(), n, false)
@@ -370,7 +381,8 @@ func getPossibleSujis(pai *game.Pai, anpaiSet *game.PaiSet) ([]game.Pai, error) 
 	}
 
 	sujis := make([]game.Pai, 0, 2)
-	candidates := []uint8{pai.Number() - 3, pai.Number()}
+	paiNumber := pai.Number()
+	candidates := []uint8{paiNumber - 3, paiNumber}
 
 	for _, n := range candidates {
 		allAlive := true
@@ -405,6 +417,38 @@ func getPossibleSujis(pai *game.Pai, anpaiSet *game.PaiSet) ([]game.Pai, error) 
 	}
 
 	return sujis, nil
+}
+
+func isNChanceOrLess(pai *game.Pai, n int, visibleSet *game.PaiSet) (bool, error) {
+	paiNumber := pai.Number()
+	if pai.IsTsupai() || (4 <= paiNumber && paiNumber <= 6) {
+		return false, nil
+	}
+
+	for i := uint8(1); i < 3; i++ {
+		var num uint8 = 0
+		if paiNumber < 5 {
+			num = paiNumber + i
+		} else {
+			num = paiNumber - i
+		}
+
+		kabePai, err := game.NewPaiWithDetail(pai.Type(), num, false)
+		if err != nil {
+			return false, err
+		}
+
+		count, err := visibleSet.Count(kabePai)
+		if err != nil {
+			return false, err
+		}
+
+		if count >= 4-n {
+			return true, nil
+		}
+	}
+
+	return false, nil
 }
 
 func isUrasujiOf(pai *game.Pai, targetPaiSet *game.PaiSet, anpaiSet *game.PaiSet) (bool, error) {
@@ -502,17 +546,18 @@ func isMatagisujiOf(pai *game.Pai, targetPaiSet *game.PaiSet, anpaiSet *game.Pai
 }
 
 func isOuter(pai *game.Pai, targetPaiSet *game.PaiSet) (bool, error) {
-	if pai.IsTsupai() || pai.Number() == 5 {
+	paiNumber := pai.Number()
+	if pai.IsTsupai() || paiNumber == 5 {
 		return false, nil
 	}
 
 	var innerNumbers []uint8
-	if pai.Number() < 5 {
-		for i := pai.Number() + 1; i < 6; i++ {
+	if paiNumber < 5 {
+		for i := paiNumber + 1; i < 6; i++ {
 			innerNumbers = append(innerNumbers, i)
 		}
 	} else {
-		for i := uint8(5); i < pai.Number(); i++ {
+		for i := uint8(5); i < paiNumber; i++ {
 			innerNumbers = append(innerNumbers, i)
 		}
 	}
@@ -533,6 +578,15 @@ func isOuter(pai *game.Pai, targetPaiSet *game.PaiSet) (bool, error) {
 	}
 
 	return false, nil
+}
+
+func (s *Scene) registerEvaluators() {
+	for i := range 4 {
+		featureName := fmt.Sprintf("chances<=%d", i)
+		s.evaluators[featureName] = func(pai *game.Pai) (bool, error) {
+			return isNChanceOrLess(pai, i, s.visibleSet)
+		}
+	}
 }
 
 type Feature struct {
