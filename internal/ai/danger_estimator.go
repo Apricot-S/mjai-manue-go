@@ -139,7 +139,7 @@ func (s *Scene) Evaluate(name string, pai *game.Pai) (bool, error) {
 	case "jikaze":
 		return s.isJikaze(pai), nil
 	default:
-		return false, nil
+		return false, fmt.Errorf("an unknown feature name was specified: %v", name)
 	}
 }
 
