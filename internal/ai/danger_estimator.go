@@ -80,6 +80,30 @@ func (s *Scene) Evaluate(name string, pai *game.Pai) (bool, error) {
 		return s.isTsupai(pai), nil
 	case "suji":
 		return s.isSuji(pai)
+	case "weak_suji":
+		return s.isWeakSuji(pai)
+	case "reach_suji":
+		return s.isReachSuji(pai)
+	case "prereach_suji":
+		return s.isPrereachSuji(pai)
+	case "urasuji":
+		return s.isUrasuji(pai)
+	case "early_urasuji":
+		return s.isEarlyUrasuji(pai)
+	case "reach_urasuji":
+		return s.isReachUrasuji(pai)
+	case "matagisuji":
+		return s.isMatagisuji(pai)
+	case "early_matagisuji":
+		return s.isEarlyMatagisuji(pai)
+	case "late_matagisuji":
+		return s.isLateMatagisuji(pai)
+	case "reach_matagisuji":
+		return s.isReachMatagisuji(pai)
+	case "senkisuji":
+		return s.isSenkisuji(pai)
+	case "early_senkisuji":
+		return s.isEarlySenkisuji(pai)
 	// // ... 他のすべてのfeature判定メソッドをcase文で列挙
 	default:
 		return false, nil
@@ -96,6 +120,56 @@ func (s *Scene) isTsupai(pai *game.Pai) bool {
 
 func (s *Scene) isSuji(pai *game.Pai) (bool, error) {
 	return isSujiOf(pai, s.anpaiSet)
+}
+
+func (s *Scene) isWeakSuji(pai *game.Pai) (bool, error) {
+	return isWeakSujiOf(pai, s.anpaiSet)
+}
+
+func (s *Scene) isReachSuji(pai *game.Pai) (bool, error) {
+	return isWeakSujiOf(pai, s.reachPaiSet)
+}
+
+func (s *Scene) isPrereachSuji(pai *game.Pai) (bool, error) {
+	return isSujiOf(pai, s.prereachSutehaiSet)
+}
+
+func (s *Scene) isUrasuji(pai *game.Pai) (bool, error) {
+	return isUrasujiOf(pai, s.prereachSutehaiSet, s.anpaiSet)
+}
+
+func (s *Scene) isEarlyUrasuji(pai *game.Pai) (bool, error) {
+	return isUrasujiOf(pai, s.earlySutehaiSet, s.anpaiSet)
+}
+
+func (s *Scene) isReachUrasuji(pai *game.Pai) (bool, error) {
+	return isUrasujiOf(pai, s.reachPaiSet, s.anpaiSet)
+}
+
+// TODO: aida4ken
+
+func (s *Scene) isMatagisuji(pai *game.Pai) (bool, error) {
+	return isMatagisujiOf(pai, s.prereachSutehaiSet, s.anpaiSet)
+}
+
+func (s *Scene) isEarlyMatagisuji(pai *game.Pai) (bool, error) {
+	return isMatagisujiOf(pai, s.earlySutehaiSet, s.anpaiSet)
+}
+
+func (s *Scene) isLateMatagisuji(pai *game.Pai) (bool, error) {
+	return isMatagisujiOf(pai, s.lateSutehaiSet, s.anpaiSet)
+}
+
+func (s *Scene) isReachMatagisuji(pai *game.Pai) (bool, error) {
+	return isMatagisujiOf(pai, s.reachPaiSet, s.anpaiSet)
+}
+
+func (s *Scene) isSenkisuji(pai *game.Pai) (bool, error) {
+	return isSenkisujiOf(pai, s.prereachSutehaiSet, s.anpaiSet)
+}
+
+func (s *Scene) isEarlySenkisuji(pai *game.Pai) (bool, error) {
+	return isSenkisujiOf(pai, s.earlySutehaiSet, s.anpaiSet)
 }
 
 func isSujiOf(pai *game.Pai, targetPaiSet *game.PaiSet) (bool, error) {
@@ -122,6 +196,30 @@ func isSujiOf(pai *game.Pai, targetPaiSet *game.PaiSet) (bool, error) {
 	return true, nil
 }
 
+func isWeakSujiOf(pai *game.Pai, targetPaiSet *game.PaiSet) (bool, error) {
+	if pai.IsTsupai() {
+		return false, nil
+	}
+
+	typ := pai.Type()
+	sujiNumbers := getSujiNumbers(pai)
+	for _, n := range sujiNumbers {
+		sujiPai, err := game.NewPaiWithDetail(typ, n, false)
+		if err != nil {
+			return false, err
+		}
+		hasPai, err := targetPaiSet.Has(sujiPai)
+		if err != nil {
+			return false, err
+		}
+
+		if hasPai {
+			return true, nil
+		}
+	}
+	return false, nil
+}
+
 func getSujiNumbers(pai *game.Pai) []uint8 {
 	if pai.IsTsupai() {
 		return []uint8{}
@@ -136,6 +234,145 @@ func getSujiNumbers(pai *game.Pai) []uint8 {
 	}
 
 	return result
+}
+
+// Returns sujis which contain the given pai and is alive i.e. none of pais in the suji are anpai.
+// Uses the first pai to represent the suji. e.g. 1p for 14p suji
+func getPossibleSujis(pai *game.Pai, anpaiSet *game.PaiSet) ([]game.Pai, error) {
+	if pai.IsTsupai() {
+		return []game.Pai{}, nil
+	}
+
+	sujis := make([]game.Pai, 0, 2)
+	candidates := []uint8{pai.Number() - 3, pai.Number()}
+
+	for _, n := range candidates {
+		allAlive := true
+		for _, m := range []uint8{n, n + 3} {
+			if m < 1 || 9 < m {
+				allAlive = false
+				break
+			}
+
+			sujiPai, err := game.NewPaiWithDetail(pai.Type(), m, false)
+			if err != nil {
+				return nil, err
+			}
+
+			isAnpai, err := anpaiSet.Has(sujiPai)
+			if err != nil {
+				return nil, err
+			}
+			if isAnpai {
+				allAlive = false
+				break
+			}
+		}
+
+		if allAlive {
+			sujiPai, err := game.NewPaiWithDetail(pai.Type(), n, false)
+			if err != nil {
+				return nil, err
+			}
+			sujis = append(sujis, *sujiPai)
+		}
+	}
+
+	return sujis, nil
+}
+
+func isUrasujiOf(pai *game.Pai, targetPaiSet *game.PaiSet, anpaiSet *game.PaiSet) (bool, error) {
+	sujis, err := getPossibleSujis(pai, anpaiSet)
+	if err != nil {
+		return false, err
+	}
+
+	for _, s := range sujis {
+		if low := s.Next(-1); low != nil {
+			hasLow, err := targetPaiSet.Has(low)
+			if err != nil {
+				return false, err
+			}
+			if hasLow {
+				return true, nil
+			}
+		}
+
+		if high := s.Next(4); high != nil {
+			hasHigh, err := targetPaiSet.Has(high)
+			if err != nil {
+				return false, err
+			}
+			if hasHigh {
+				return true, nil
+			}
+		}
+	}
+
+	return false, nil
+}
+
+// Senkisuji (疝気筋) : Urasuji (裏筋) of urasuji
+func isSenkisujiOf(pai *game.Pai, targetPaiSet *game.PaiSet, anpaiSet *game.PaiSet) (bool, error) {
+	sujis, err := getPossibleSujis(pai, anpaiSet)
+	if err != nil {
+		return false, err
+	}
+
+	for _, s := range sujis {
+		if low := s.Next(-2); low != nil {
+			hasLow, err := targetPaiSet.Has(low)
+			if err != nil {
+				return false, err
+			}
+			if hasLow {
+				return true, nil
+			}
+		}
+
+		if high := s.Next(5); high != nil {
+			hasHigh, err := targetPaiSet.Has(high)
+			if err != nil {
+				return false, err
+			}
+			if hasHigh {
+				return true, nil
+			}
+		}
+	}
+
+	return false, nil
+}
+
+func isMatagisujiOf(pai *game.Pai, targetPaiSet *game.PaiSet, anpaiSet *game.PaiSet) (bool, error) {
+	sujis, err := getPossibleSujis(pai, anpaiSet)
+	if err != nil {
+		return false, err
+	}
+
+	for _, s := range sujis {
+		if low := s.Next(1); low != nil {
+			hasLow, err := targetPaiSet.Has(low)
+			if err != nil {
+				return false, err
+			}
+			if hasLow {
+				return true, nil
+			}
+		}
+
+		if high := s.Next(2); high != nil {
+			hasHigh, err := targetPaiSet.Has(high)
+			if err != nil {
+				return false, err
+			}
+			if hasHigh {
+				return true, nil
+			}
+		}
+	}
+
+	return false, nil
 }
 
 type Feature struct {
