@@ -106,6 +106,10 @@ func (s *Scene) Evaluate(name string, pai *game.Pai) (bool, error) {
 		return s.isSenkisuji(pai)
 	case "early_senkisuji":
 		return s.isEarlySenkisuji(pai)
+	case "outer_prereach_sutehai":
+		return s.isOuterPrereachSutehai(pai)
+	case "outer_early_sutehai":
+		return s.isOuterEarlySutehai(pai)
 	case "dora":
 		return s.isDora(pai)
 	case "dora_suji":
@@ -124,7 +128,6 @@ func (s *Scene) Evaluate(name string, pai *game.Pai) (bool, error) {
 		return s.isBakaze(pai), nil
 	case "jikaze":
 		return s.isJikaze(pai), nil
-	// // ... 他のすべてのfeature判定メソッドをcase文で列挙
 	default:
 		return false, nil
 	}
@@ -249,9 +252,13 @@ func (s *Scene) isEarlySenkisuji(pai *game.Pai) (bool, error) {
 	return isSenkisujiOf(pai, s.earlySutehaiSet, s.anpaiSet)
 }
 
-// TODO:
-// outerPrereachSutehai
-// outerEarlySutehai
+func (s *Scene) isOuterPrereachSutehai(pai *game.Pai) (bool, error) {
+	return isOuter(pai, s.prereachSutehaiSet)
+}
+
+func (s *Scene) isOuterEarlySutehai(pai *game.Pai) (bool, error) {
+	return isOuter(pai, s.earlySutehaiSet)
+}
 
 func (s *Scene) isDora(pai *game.Pai) (bool, error) {
 	return s.doraSet.Has(pai)
@@ -488,6 +495,40 @@ func isMatagisujiOf(pai *game.Pai, targetPaiSet *game.PaiSet, anpaiSet *game.Pai
 			if hasHigh {
 				return true, nil
 			}
+		}
+	}
+
+	return false, nil
+}
+
+func isOuter(pai *game.Pai, targetPaiSet *game.PaiSet) (bool, error) {
+	if pai.IsTsupai() || pai.Number() == 5 {
+		return false, nil
+	}
+
+	var innerNumbers []uint8
+	if pai.Number() < 5 {
+		for i := pai.Number() + 1; i < 6; i++ {
+			innerNumbers = append(innerNumbers, i)
+		}
+	} else {
+		for i := uint8(5); i < pai.Number(); i++ {
+			innerNumbers = append(innerNumbers, i)
+		}
+	}
+
+	for _, n := range innerNumbers {
+		innerPai, err := game.NewPaiWithDetail(pai.Type(), n, false)
+		if err != nil {
+			return false, err
+		}
+		has, err := targetPaiSet.Has(innerPai)
+		if err != nil {
+			return false, err
+		}
+
+		if has {
+			return true, nil
 		}
 	}
 
