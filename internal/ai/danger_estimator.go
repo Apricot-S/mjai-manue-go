@@ -92,6 +92,8 @@ func (s *Scene) Evaluate(name string, pai *game.Pai) (bool, error) {
 		return s.isEarlyUrasuji(pai)
 	case "reach_urasuji":
 		return s.isReachUrasuji(pai)
+	case "aida4ken":
+		return s.isAida4ken(pai)
 	case "matagisuji":
 		return s.isMatagisuji(pai)
 	case "early_matagisuji":
@@ -146,7 +148,64 @@ func (s *Scene) isReachUrasuji(pai *game.Pai) (bool, error) {
 	return isUrasujiOf(pai, s.reachPaiSet, s.anpaiSet)
 }
 
-// TODO: aida4ken
+func (s *Scene) isAida4ken(pai *game.Pai) (bool, error) {
+	if pai.IsTsupai() {
+		return false, nil
+	}
+
+	num := pai.Number()
+	typ := pai.Type()
+
+	if 2 <= num && num <= 5 {
+		low, err := game.NewPaiWithDetail(typ, num-1, false)
+		if err != nil {
+			return false, err
+		}
+		hasLow, err := s.prereachSutehaiSet.Has(low)
+		if err != nil {
+			return false, err
+		}
+
+		high, err := game.NewPaiWithDetail(typ, num+4, false)
+		if err != nil {
+			return false, err
+		}
+		hasHigh, err := s.prereachSutehaiSet.Has(high)
+		if err != nil {
+			return false, err
+		}
+
+		if hasLow && hasHigh {
+			return true, nil
+		}
+	}
+
+	if 5 <= num && num <= 8 {
+		low, err := game.NewPaiWithDetail(typ, num-4, false)
+		if err != nil {
+			return false, err
+		}
+		hasLow, err := s.prereachSutehaiSet.Has(low)
+		if err != nil {
+			return false, err
+		}
+
+		high, err := game.NewPaiWithDetail(typ, num+1, false)
+		if err != nil {
+			return false, err
+		}
+		hasHigh, err := s.prereachSutehaiSet.Has(high)
+		if err != nil {
+			return false, err
+		}
+
+		if hasLow && hasHigh {
+			return true, nil
+		}
+	}
+
+	return false, nil
+}
 
 func (s *Scene) isMatagisuji(pai *game.Pai) (bool, error) {
 	return isMatagisujiOf(pai, s.prereachSutehaiSet, s.anpaiSet)
