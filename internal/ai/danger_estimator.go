@@ -236,14 +236,13 @@ func isSujiOf(pai *game.Pai, targetPaiSet *game.PaiSet) (bool, error) {
 		return false, nil
 	}
 
-	typ := pai.Type()
-	sujiNumbers := getSujiNumbers(pai)
-	for _, n := range sujiNumbers {
-		sujiPai, err := game.NewPaiWithDetail(typ, n, false)
-		if err != nil {
-			return false, err
-		}
-		hasPai, err := targetPaiSet.Has(sujiPai)
+	suji, err := getSuji(pai)
+	if err != nil {
+		return false, err
+	}
+
+	for _, s := range suji {
+		hasPai, err := targetPaiSet.Has(&s)
 		if err != nil {
 			return false, err
 		}
@@ -260,14 +259,13 @@ func isWeakSujiOf(pai *game.Pai, targetPaiSet *game.PaiSet) (bool, error) {
 		return false, nil
 	}
 
-	typ := pai.Type()
-	sujiNumbers := getSujiNumbers(pai)
-	for _, n := range sujiNumbers {
-		sujiPai, err := game.NewPaiWithDetail(typ, n, false)
-		if err != nil {
-			return false, err
-		}
-		hasPai, err := targetPaiSet.Has(sujiPai)
+	suji, err := getSuji(pai)
+	if err != nil {
+		return false, err
+	}
+
+	for _, s := range suji {
+		hasPai, err := targetPaiSet.Has(&s)
 		if err != nil {
 			return false, err
 		}
@@ -279,20 +277,24 @@ func isWeakSujiOf(pai *game.Pai, targetPaiSet *game.PaiSet) (bool, error) {
 	return false, nil
 }
 
-func getSujiNumbers(pai *game.Pai) []uint8 {
+func getSuji(pai *game.Pai) ([]game.Pai, error) {
 	if pai.IsTsupai() {
-		return []uint8{}
+		return []game.Pai{}, nil
 	}
 
-	result := make([]uint8, 0, 2)
+	result := make([]game.Pai, 0, 2)
 	candidates := []uint8{pai.Number() - 3, pai.Number() + 3}
 	for _, n := range candidates {
 		if 1 <= n && n <= 9 {
-			result = append(result, n)
+			sujiPai, err := game.NewPaiWithDetail(pai.Type(), n, false)
+			if err != nil {
+				return nil, err
+			}
+			result = append(result, *sujiPai)
 		}
 	}
 
-	return result
+	return result, nil
 }
 
 // Returns sujis which contain the given pai and is alive i.e. none of pais in the suji are anpai.
