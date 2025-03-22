@@ -106,6 +106,20 @@ func (s *Scene) Evaluate(name string, pai *game.Pai) (bool, error) {
 		return s.isSenkisuji(pai)
 	case "early_senkisuji":
 		return s.isEarlySenkisuji(pai)
+	case "dora":
+		return s.isDora(pai)
+	case "dora_suji":
+		return s.isDoraSuji(pai)
+	case "dora_matagi":
+		return s.isDoraMatagi(pai)
+	case "sangenpai":
+		return s.isSangenpai(pai), nil
+	case "fonpai":
+		return s.isFonpai(pai), nil
+	case "bakaze":
+		return s.isBakaze(pai), nil
+	case "jikaze":
+		return s.isJikaze(pai), nil
 	// // ... 他のすべてのfeature判定メソッドをcase文で列挙
 	default:
 		return false, nil
@@ -229,6 +243,42 @@ func (s *Scene) isSenkisuji(pai *game.Pai) (bool, error) {
 
 func (s *Scene) isEarlySenkisuji(pai *game.Pai) (bool, error) {
 	return isSenkisujiOf(pai, s.earlySutehaiSet, s.anpaiSet)
+}
+
+// TODO:
+// outerPrereachSutehai
+// outerEarlySutehai
+
+func (s *Scene) isDora(pai *game.Pai) (bool, error) {
+	return s.doraSet.Has(pai)
+}
+
+func (s *Scene) isDoraSuji(pai *game.Pai) (bool, error) {
+	return isWeakSujiOf(pai, s.doraSet)
+}
+
+func (s *Scene) isDoraMatagi(pai *game.Pai) (bool, error) {
+	return isMatagisujiOf(pai, s.doraSet, s.anpaiSet)
+}
+
+// TODO:
+// fanpai
+// ryenfonpai
+
+func (s *Scene) isSangenpai(pai *game.Pai) bool {
+	return pai.IsTsupai() && pai.Number() >= 5
+}
+
+func (s *Scene) isFonpai(pai *game.Pai) bool {
+	return pai.IsTsupai() && pai.Number() < 5
+}
+
+func (s *Scene) isBakaze(pai *game.Pai) bool {
+	return pai.HasSameSymbol(s.bakaze)
+}
+
+func (s *Scene) isJikaze(pai *game.Pai) bool {
+	return pai.HasSameSymbol(s.targetKaze)
 }
 
 func isSujiOf(pai *game.Pai, targetPaiSet *game.PaiSet) (bool, error) {
