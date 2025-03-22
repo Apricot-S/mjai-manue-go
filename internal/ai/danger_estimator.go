@@ -112,6 +112,10 @@ func (s *Scene) Evaluate(name string, pai *game.Pai) (bool, error) {
 		return s.isDoraSuji(pai)
 	case "dora_matagi":
 		return s.isDoraMatagi(pai)
+	case "fanpai":
+		return s.isFanpai(pai), nil
+	case "ryenfonpai":
+		return s.isRyenfonpai(pai), nil
 	case "sangenpai":
 		return s.isSangenpai(pai), nil
 	case "fonpai":
@@ -261,9 +265,13 @@ func (s *Scene) isDoraMatagi(pai *game.Pai) (bool, error) {
 	return isMatagisujiOf(pai, s.doraSet, s.anpaiSet)
 }
 
-// TODO:
-// fanpai
-// ryenfonpai
+func (s *Scene) isFanpai(pai *game.Pai) bool {
+	return s.gameState.YakuhaiFan(pai, s.target) >= 1
+}
+
+func (s *Scene) isRyenfonpai(pai *game.Pai) bool {
+	return s.gameState.YakuhaiFan(pai, s.target) >= 2
+}
 
 func (s *Scene) isSangenpai(pai *game.Pai) bool {
 	return pai.IsTsupai() && pai.Number() >= 5
