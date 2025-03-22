@@ -468,6 +468,14 @@ func isNumNOrInner(pai *game.Pai, n uint8) bool {
 	return false
 }
 
+func isVisibleNOrMore(pai *game.Pai, n int, visibleSet *game.PaiSet) (bool, error) {
+	c, err := visibleSet.Count(pai)
+	if err != nil {
+		return false, err
+	}
+	return c >= n, nil
+}
+
 func isUrasujiOf(pai *game.Pai, targetPaiSet *game.PaiSet, anpaiSet *game.PaiSet) (bool, error) {
 	sujis, err := getPossibleSujis(pai, anpaiSet)
 	if err != nil {
@@ -604,15 +612,52 @@ func isOuter(pai *game.Pai, targetPaiSet *game.PaiSet) (bool, error) {
 func (s *Scene) registerEvaluators() {
 	for i := range 4 {
 		featureName := fmt.Sprintf("chances<=%d", i)
+		n := i
 		s.evaluators[featureName] = func(pai *game.Pai) (bool, error) {
-			return isNChanceOrLess(pai, i, s.visibleSet)
+			return isNChanceOrLess(pai, n, s.visibleSet)
+		}
+	}
+
+	for i := 1; i < 4; i++ {
+		featureName := fmt.Sprintf("visible>=%d", i)
+		n := i
+		s.evaluators[featureName] = func(pai *game.Pai) (bool, error) {
+			return isVisibleNOrMore(pai, n+1, s.visibleSet)
+		}
+	}
+
+	for i := range 4 {
+		featureName := fmt.Sprintf("sujiVisible<=%d", i)
+		n := i
+		s.evaluators[featureName] = func(pai *game.Pai) (bool, error) {
+			if pai.IsTsupai() {
+				return false, nil
+			}
+
+			suji, err := getSuji(pai)
+			if err != nil {
+				return false, err
+			}
+
+			for _, sujiPai := range suji {
+				visible, err := isVisibleNOrMore(&sujiPai, n+1, s.visibleSet)
+				if err != nil {
+					return false, err
+				}
+				if !visible {
+					return true, nil
+				}
+			}
+
+			return false, nil
 		}
 	}
 
 	for i := uint8(2); i < 6; i++ {
 		featureName := fmt.Sprintf("%d<=n<=%d", i, 10-i)
+		n := i
 		s.evaluators[featureName] = func(pai *game.Pai) (bool, error) {
-			return isNumNOrInner(pai, i), nil
+			return isNumNOrInner(pai, n), nil
 		}
 	}
 }
