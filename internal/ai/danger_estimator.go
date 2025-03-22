@@ -420,8 +420,12 @@ func getPossibleSujis(pai *game.Pai, anpaiSet *game.PaiSet) ([]game.Pai, error) 
 }
 
 func isNChanceOrLess(pai *game.Pai, n int, visibleSet *game.PaiSet) (bool, error) {
+	if pai.IsTsupai() {
+		return false, nil
+	}
+
 	paiNumber := pai.Number()
-	if pai.IsTsupai() || (4 <= paiNumber && paiNumber <= 6) {
+	if 4 <= paiNumber && paiNumber <= 6 {
 		return false, nil
 	}
 
@@ -449,6 +453,19 @@ func isNChanceOrLess(pai *game.Pai, n int, visibleSet *game.PaiSet) (bool, error
 	}
 
 	return false, nil
+}
+
+func isNumNOrInner(pai *game.Pai, n uint8) bool {
+	if pai.IsTsupai() {
+		return false
+	}
+
+	paiNumber := pai.Number()
+	if n <= paiNumber && paiNumber <= 10-n {
+		return true
+	}
+
+	return false
 }
 
 func isUrasujiOf(pai *game.Pai, targetPaiSet *game.PaiSet, anpaiSet *game.PaiSet) (bool, error) {
@@ -546,8 +563,12 @@ func isMatagisujiOf(pai *game.Pai, targetPaiSet *game.PaiSet, anpaiSet *game.Pai
 }
 
 func isOuter(pai *game.Pai, targetPaiSet *game.PaiSet) (bool, error) {
+	if pai.IsTsupai() {
+		return false, nil
+	}
+
 	paiNumber := pai.Number()
-	if pai.IsTsupai() || paiNumber == 5 {
+	if paiNumber == 5 {
 		return false, nil
 	}
 
@@ -585,6 +606,13 @@ func (s *Scene) registerEvaluators() {
 		featureName := fmt.Sprintf("chances<=%d", i)
 		s.evaluators[featureName] = func(pai *game.Pai) (bool, error) {
 			return isNChanceOrLess(pai, i, s.visibleSet)
+		}
+	}
+
+	for i := uint8(2); i < 6; i++ {
+		featureName := fmt.Sprintf("%d<=n<=%d", i, 10-i)
+		s.evaluators[featureName] = func(pai *game.Pai) (bool, error) {
+			return isNumNOrInner(pai, i), nil
 		}
 	}
 }
