@@ -307,17 +307,17 @@ func (s *Scene) isJikaze(pai *game.Pai) bool {
 }
 
 // n can be negative.
-func isNOuterPrereachSutehai(pai *game.Pai, n int8, prereachSutehaiSet *game.PaiSet) (bool, error) {
+func isNOuterPrereachSutehai(pai *game.Pai, n int, prereachSutehaiSet *game.PaiSet) (bool, error) {
 	if pai.IsTsupai() {
 		return false, nil
 	}
 
-	paiNumber := int8(pai.Number())
+	paiNumber := int(pai.Number())
 	if paiNumber == 5 {
 		return false, nil
 	}
 
-	var nInnerNumber int8
+	nInnerNumber := 0
 	if paiNumber < 5 {
 		nInnerNumber = paiNumber + n
 	} else {
@@ -338,6 +338,41 @@ func isNOuterPrereachSutehai(pai *game.Pai, n int8, prereachSutehaiSet *game.Pai
 	}
 
 	return prereachSutehaiSet.Has(innerPai)
+}
+
+func isNOrMoreOfNeighborsInPrereachSutehais(pai *game.Pai, n int, neighborDistance int, prereachSutehaiSet *game.PaiSet) (bool, error) {
+	if pai.IsTsupai() {
+		return false, nil
+	}
+
+	paiNumber := int(pai.Number())
+	numbers := make([]int, 0, 2*neighborDistance+1)
+	for i := -neighborDistance; i <= neighborDistance; i++ {
+		numbers = append(numbers, paiNumber+i)
+	}
+
+	numNeighbors, err := count(numbers, func(num int) (bool, error) {
+		if num < 1 || 9 < num {
+			return false, nil
+		}
+
+		neighborPai, err := game.NewPaiWithDetail(pai.Type(), uint8(num), false)
+		if err != nil {
+			return false, err
+		}
+
+		count, err := prereachSutehaiSet.Count(neighborPai)
+		if err != nil {
+			return false, err
+		}
+
+		return count > 0, nil
+	})
+	if err != nil {
+		return false, err
+	}
+
+	return numNeighbors >= n, nil
 }
 
 func isSujiOf(pai *game.Pai, targetPaiSet *game.PaiSet) (bool, error) {
@@ -666,7 +701,18 @@ func (s *Scene) registerEvaluators() {
 		}
 	}
 
-	for i := int8(1); i < 3; i++ {
+	for i := 1; i < 3; i++ {
+		for j := 1; j < (i*2 + 1); j++ {
+			featureName := fmt.Sprintf("+-%dInPrereachSutehais>=%d", i, j)
+			distance := i
+			threshold := j
+			s.evaluators[featureName] = func(pai *game.Pai) (bool, error) {
+				return isNOrMoreOfNeighborsInPrereachSutehais(pai, threshold, distance, s.prereachSutehaiSet)
+			}
+		}
+	}
+
+	for i := 1; i < 3; i++ {
 		featureName := fmt.Sprintf("%dOuterPrereachSutehai", i)
 		n := i
 		s.evaluators[featureName] = func(pai *game.Pai) (bool, error) {
@@ -674,7 +720,7 @@ func (s *Scene) registerEvaluators() {
 		}
 	}
 
-	for i := int8(1); i < 3; i++ {
+	for i := 1; i < 3; i++ {
 		featureName := fmt.Sprintf("%dInnerPrereachSutehai", i)
 		n := i
 		s.evaluators[featureName] = func(pai *game.Pai) (bool, error) {
