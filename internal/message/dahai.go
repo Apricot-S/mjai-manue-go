@@ -30,7 +30,7 @@ func NewDahai(actor int, pai string, tsumogiri bool, log string) (*Dahai, error)
 	return m, nil
 }
 
-func (m *Dahai) MarshalJSONTo(e *jsontext.Encoder, opts jsontext.Options) error {
+func (m *Dahai) MarshalJSONTo(e *jsontext.Encoder) error {
 	if m.Type != TypeDahai {
 		return fmt.Errorf("invalid type: %v", m.Type)
 	}
@@ -43,7 +43,7 @@ func (m *Dahai) MarshalJSONTo(e *jsontext.Encoder, opts jsontext.Options) error 
 	return json.MarshalEncode(e, &mm)
 }
 
-func (m *Dahai) UnmarshalJSONFrom(d *jsontext.Decoder, opts jsontext.Options) error {
+func (m *Dahai) UnmarshalJSONFrom(d *jsontext.Decoder) error {
 	type inner Dahai
 	var mm inner
 	if err := json.UnmarshalDecode(d, &mm); err != nil {

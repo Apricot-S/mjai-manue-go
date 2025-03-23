@@ -24,7 +24,7 @@ func NewDora(doraMarker string) (*Dora, error) {
 	return m, nil
 }
 
-func (m *Dora) MarshalJSONTo(e *jsontext.Encoder, opts jsontext.Options) error {
+func (m *Dora) MarshalJSONTo(e *jsontext.Encoder) error {
 	if m.Type != TypeDora {
 		return fmt.Errorf("invalid type: %v", m.Type)
 	}
@@ -37,7 +37,7 @@ func (m *Dora) MarshalJSONTo(e *jsontext.Encoder, opts jsontext.Options) error {
 	return json.MarshalEncode(e, &mm)
 }
 
-func (m *Dora) UnmarshalJSONFrom(d *jsontext.Decoder, opts jsontext.Options) error {
+func (m *Dora) UnmarshalJSONFrom(d *jsontext.Decoder) error {
 	type inner Dora
 	var mm inner
 	if err := json.UnmarshalDecode(d, &mm); err != nil {

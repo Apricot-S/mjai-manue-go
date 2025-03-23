@@ -17,7 +17,7 @@ func NewNone() *None {
 	}
 }
 
-func (m *None) MarshalJSONTo(e *jsontext.Encoder, opts jsontext.Options) error {
+func (m *None) MarshalJSONTo(e *jsontext.Encoder) error {
 	if m.Type != TypeNone {
 		return fmt.Errorf("invalid type: %v", m.Type)
 	}
@@ -30,7 +30,7 @@ func (m *None) MarshalJSONTo(e *jsontext.Encoder, opts jsontext.Options) error {
 	return json.MarshalEncode(e, &mm)
 }
 
-func (m *None) UnmarshalJSONFrom(d *jsontext.Decoder, opts jsontext.Options) error {
+func (m *None) UnmarshalJSONFrom(d *jsontext.Decoder) error {
 	type inner None
 	var mm inner
 	if err := json.UnmarshalDecode(d, &mm); err != nil {

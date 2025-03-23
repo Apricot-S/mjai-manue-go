@@ -32,7 +32,7 @@ func NewChi(actor int, target int, pai string, consumed [2]string, log string) (
 	return m, nil
 }
 
-func (m *Chi) MarshalJSONTo(e *jsontext.Encoder, opts jsontext.Options) error {
+func (m *Chi) MarshalJSONTo(e *jsontext.Encoder) error {
 	if m.Type != TypeChi {
 		return fmt.Errorf("invalid type: %v", m.Type)
 	}
@@ -45,7 +45,7 @@ func (m *Chi) MarshalJSONTo(e *jsontext.Encoder, opts jsontext.Options) error {
 	return json.MarshalEncode(e, &mm)
 }
 
-func (m *Chi) UnmarshalJSONFrom(d *jsontext.Decoder, opts jsontext.Options) error {
+func (m *Chi) UnmarshalJSONFrom(d *jsontext.Decoder) error {
 	type inner Chi
 	var mm inner
 	if err := json.UnmarshalDecode(d, &mm); err != nil {

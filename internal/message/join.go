@@ -21,7 +21,7 @@ func NewJoin(name string, room string) *Join {
 	}
 }
 
-func (m *Join) MarshalJSONTo(e *jsontext.Encoder, opts jsontext.Options) error {
+func (m *Join) MarshalJSONTo(e *jsontext.Encoder) error {
 	if m.Type != TypeJoin {
 		return fmt.Errorf("invalid type: %v", m.Type)
 	}
@@ -34,7 +34,7 @@ func (m *Join) MarshalJSONTo(e *jsontext.Encoder, opts jsontext.Options) error {
 	return json.MarshalEncode(e, &mm)
 }
 
-func (m *Join) UnmarshalJSONFrom(d *jsontext.Decoder, opts jsontext.Options) error {
+func (m *Join) UnmarshalJSONFrom(d *jsontext.Decoder) error {
 	type inner Join
 	var mm inner
 	if err := json.UnmarshalDecode(d, &mm); err != nil {

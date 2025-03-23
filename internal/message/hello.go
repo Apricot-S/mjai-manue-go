@@ -26,7 +26,7 @@ func NewHello(protocol string, protocolVersion int) (*Hello, error) {
 	return m, nil
 }
 
-func (m *Hello) MarshalJSONTo(e *jsontext.Encoder, opts jsontext.Options) error {
+func (m *Hello) MarshalJSONTo(e *jsontext.Encoder) error {
 	if m.Type != TypeHello {
 		return fmt.Errorf("invalid type: %v", m.Type)
 	}
@@ -39,7 +39,7 @@ func (m *Hello) MarshalJSONTo(e *jsontext.Encoder, opts jsontext.Options) error 
 	return json.MarshalEncode(e, &mm)
 }
 
-func (m *Hello) UnmarshalJSONFrom(d *jsontext.Decoder, opts jsontext.Options) error {
+func (m *Hello) UnmarshalJSONFrom(d *jsontext.Decoder) error {
 	type inner Hello
 	var mm inner
 	if err := json.UnmarshalDecode(d, &mm); err != nil {

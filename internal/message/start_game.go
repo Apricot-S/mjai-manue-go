@@ -30,7 +30,7 @@ func NewStartGame(id int, names []string) (*StartGame, error) {
 	return m, nil
 }
 
-func (m *StartGame) MarshalJSONTo(e *jsontext.Encoder, opts jsontext.Options) error {
+func (m *StartGame) MarshalJSONTo(e *jsontext.Encoder) error {
 	if m.Type != TypeStartGame {
 		return fmt.Errorf("invalid type: %v", m.Type)
 	}
@@ -46,7 +46,7 @@ func (m *StartGame) MarshalJSONTo(e *jsontext.Encoder, opts jsontext.Options) er
 	return json.MarshalEncode(e, &mm)
 }
 
-func (m *StartGame) UnmarshalJSONFrom(d *jsontext.Decoder, opts jsontext.Options) error {
+func (m *StartGame) UnmarshalJSONFrom(d *jsontext.Decoder) error {
 	type inner StartGame
 	var mm inner
 	if err := json.UnmarshalDecode(d, &mm); err != nil {

@@ -26,7 +26,7 @@ func NewReach(actor int, log string) (*Reach, error) {
 	return m, nil
 }
 
-func (m *Reach) MarshalJSONTo(e *jsontext.Encoder, opts jsontext.Options) error {
+func (m *Reach) MarshalJSONTo(e *jsontext.Encoder) error {
 	if m.Type != TypeReach {
 		return fmt.Errorf("invalid type: %v", m.Type)
 	}
@@ -39,7 +39,7 @@ func (m *Reach) MarshalJSONTo(e *jsontext.Encoder, opts jsontext.Options) error 
 	return json.MarshalEncode(e, &mm)
 }
 
-func (m *Reach) UnmarshalJSONFrom(d *jsontext.Decoder, opts jsontext.Options) error {
+func (m *Reach) UnmarshalJSONFrom(d *jsontext.Decoder) error {
 	type inner Reach
 	var mm inner
 	if err := json.UnmarshalDecode(d, &mm); err != nil {

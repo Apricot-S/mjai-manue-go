@@ -27,7 +27,7 @@ func NewSkip(actor int, log string) (*Skip, error) {
 	return m, nil
 }
 
-func (m *Skip) MarshalJSONTo(e *jsontext.Encoder, opts jsontext.Options) error {
+func (m *Skip) MarshalJSONTo(e *jsontext.Encoder) error {
 	if m.Type != TypeNone {
 		return fmt.Errorf("invalid type: %v", m.Type)
 	}
@@ -40,7 +40,7 @@ func (m *Skip) MarshalJSONTo(e *jsontext.Encoder, opts jsontext.Options) error {
 	return json.MarshalEncode(e, &mm)
 }
 
-func (m *Skip) UnmarshalJSONFrom(d *jsontext.Decoder, opts jsontext.Options) error {
+func (m *Skip) UnmarshalJSONFrom(d *jsontext.Decoder) error {
 	type inner Skip
 	var mm inner
 	if err := json.UnmarshalDecode(d, &mm); err != nil {

@@ -17,7 +17,7 @@ func NewEndKyoku() *EndKyoku {
 	}
 }
 
-func (m *EndKyoku) MarshalJSONTo(e *jsontext.Encoder, opts jsontext.Options) error {
+func (m *EndKyoku) MarshalJSONTo(e *jsontext.Encoder) error {
 	if m.Type != TypeEndKyoku {
 		return fmt.Errorf("invalid type: %v", m.Type)
 	}
@@ -30,7 +30,7 @@ func (m *EndKyoku) MarshalJSONTo(e *jsontext.Encoder, opts jsontext.Options) err
 	return json.MarshalEncode(e, &mm)
 }
 
-func (m *EndKyoku) UnmarshalJSONFrom(d *jsontext.Decoder, opts jsontext.Options) error {
+func (m *EndKyoku) UnmarshalJSONFrom(d *jsontext.Decoder) error {
 	type inner EndKyoku
 	var mm inner
 	if err := json.UnmarshalDecode(d, &mm); err != nil {
