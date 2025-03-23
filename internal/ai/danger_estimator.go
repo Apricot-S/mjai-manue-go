@@ -29,9 +29,10 @@ type Scene struct {
 
 func NewScene(gameState *game.State, me *game.Player, target *game.Player) (*Scene, error) {
 	s := &Scene{
-		gameState: gameState,
-		me:        me,
-		target:    target,
+		gameState:  gameState,
+		me:         me,
+		target:     target,
+		evaluators: make(map[string]func(*game.Pai) (bool, error)),
 	}
 
 	var err error
