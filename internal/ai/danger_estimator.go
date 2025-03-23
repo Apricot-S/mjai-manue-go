@@ -55,8 +55,9 @@ func NewScene(gameState *game.State, me *game.Player, target *game.Player) (*Sce
 	var prereachSutehais game.Pais = nil
 	var reachPais game.Pais = nil
 	if idx := target.ReachSutehaiIndex(); idx != nil {
-		prereachSutehais = target.Sutehais()[:*idx+1]
-		reachPai := target.Sutehais()[*idx]
+		sutehais := target.Sutehais()
+		prereachSutehais = sutehais[:*idx+1]
+		reachPai := sutehais[*idx]
 		reachPais = game.Pais{reachPai}
 	}
 	if s.prereachSutehaiSet, err = game.NewPaiSetWithPais(prereachSutehais); err != nil {
