@@ -316,17 +316,9 @@ func isSujiOf(pai *game.Pai, targetPaiSet *game.PaiSet) (bool, error) {
 		return false, err
 	}
 
-	for _, s := range suji {
-		hasPai, err := targetPaiSet.Has(&s)
-		if err != nil {
-			return false, err
-		}
-
-		if !hasPai {
-			return false, nil
-		}
-	}
-	return true, nil
+	return allMatch(suji, func(s game.Pai) (bool, error) {
+		return targetPaiSet.Has(&s)
+	})
 }
 
 func isWeakSujiOf(pai *game.Pai, targetPaiSet *game.PaiSet) (bool, error) {
@@ -339,17 +331,9 @@ func isWeakSujiOf(pai *game.Pai, targetPaiSet *game.PaiSet) (bool, error) {
 		return false, err
 	}
 
-	for _, s := range suji {
-		hasPai, err := targetPaiSet.Has(&s)
-		if err != nil {
-			return false, err
-		}
-
-		if hasPai {
-			return true, nil
-		}
-	}
-	return false, nil
+	return anyMatch(suji, func(s game.Pai) (bool, error) {
+		return targetPaiSet.Has(&s)
+	})
 }
 
 func getSuji(pai *game.Pai) ([]game.Pai, error) {
@@ -385,29 +369,27 @@ func getPossibleSujis(pai *game.Pai, anpaiSet *game.PaiSet) ([]game.Pai, error) 
 	candidates := []uint8{paiNumber - 3, paiNumber}
 
 	for _, n := range candidates {
-		allAlive := true
-		for _, m := range []uint8{n, n + 3} {
-			if m < 1 || 9 < m {
-				allAlive = false
-				break
+		isAlive, err := allMatch([]uint8{n, n + 3}, func(m uint8) (bool, error) {
+			if m < 1 || m > 9 {
+				return false, nil
 			}
 
 			sujiPai, err := game.NewPaiWithDetail(pai.Type(), m, false)
 			if err != nil {
-				return nil, err
+				return false, err
 			}
 
 			isAnpai, err := anpaiSet.Has(sujiPai)
 			if err != nil {
-				return nil, err
+				return false, err
 			}
-			if isAnpai {
-				allAlive = false
-				break
-			}
+			return !isAnpai, nil
+		})
+		if err != nil {
+			return nil, err
 		}
 
-		if allAlive {
+		if isAlive {
 			sujiPai, err := game.NewPaiWithDetail(pai.Type(), n, false)
 			if err != nil {
 				return nil, err
@@ -429,14 +411,16 @@ func isNChanceOrLess(pai *game.Pai, n int, visibleSet *game.PaiSet) (bool, error
 		return false, nil
 	}
 
+	candidates := make([]uint8, 2)
 	for i := uint8(1); i < 3; i++ {
-		var num uint8 = 0
 		if paiNumber < 5 {
-			num = paiNumber + i
+			candidates[i-1] = paiNumber + i
 		} else {
-			num = paiNumber - i
+			candidates[i-1] = paiNumber - i
 		}
+	}
 
+	return anyMatch(candidates, func(num uint8) (bool, error) {
 		kabePai, err := game.NewPaiWithDetail(pai.Type(), num, false)
 		if err != nil {
 			return false, err
@@ -447,12 +431,8 @@ func isNChanceOrLess(pai *game.Pai, n int, visibleSet *game.PaiSet) (bool, error
 			return false, err
 		}
 
-		if count >= 4-n {
-			return true, nil
-		}
-	}
-
-	return false, nil
+		return count >= 4-n, nil
+	})
 }
 
 func isNumNOrInner(pai *game.Pai, n uint8) bool {
@@ -482,7 +462,7 @@ func isUrasujiOf(pai *game.Pai, targetPaiSet *game.PaiSet, anpaiSet *game.PaiSet
 		return false, err
 	}
 
-	for _, s := range sujis {
+	return anyMatch(sujis, func(s game.Pai) (bool, error) {
 		if low := s.Next(-1); low != nil {
 			hasLow, err := targetPaiSet.Has(low)
 			if err != nil {
@@ -502,9 +482,9 @@ func isUrasujiOf(pai *game.Pai, targetPaiSet *game.PaiSet, anpaiSet *game.PaiSet
 				return true, nil
 			}
 		}
-	}
 
-	return false, nil
+		return false, nil
+	})
 }
 
 // Senkisuji (疝気筋) : Urasuji (裏筋) of urasuji
@@ -514,7 +494,7 @@ func isSenkisujiOf(pai *game.Pai, targetPaiSet *game.PaiSet, anpaiSet *game.PaiS
 		return false, err
 	}
 
-	for _, s := range sujis {
+	return anyMatch(sujis, func(s game.Pai) (bool, error) {
 		if low := s.Next(-2); low != nil {
 			hasLow, err := targetPaiSet.Has(low)
 			if err != nil {
@@ -534,9 +514,9 @@ func isSenkisujiOf(pai *game.Pai, targetPaiSet *game.PaiSet, anpaiSet *game.PaiS
 				return true, nil
 			}
 		}
-	}
 
-	return false, nil
+		return false, nil
+	})
 }
 
 func isMatagisujiOf(pai *game.Pai, targetPaiSet *game.PaiSet, anpaiSet *game.PaiSet) (bool, error) {
@@ -545,7 +525,7 @@ func isMatagisujiOf(pai *game.Pai, targetPaiSet *game.PaiSet, anpaiSet *game.Pai
 		return false, err
 	}
 
-	for _, s := range sujis {
+	return anyMatch(sujis, func(s game.Pai) (bool, error) {
 		if low := s.Next(1); low != nil {
 			hasLow, err := targetPaiSet.Has(low)
 			if err != nil {
@@ -565,9 +545,9 @@ func isMatagisujiOf(pai *game.Pai, targetPaiSet *game.PaiSet, anpaiSet *game.Pai
 				return true, nil
 			}
 		}
-	}
 
-	return false, nil
+		return false, nil
+	})
 }
 
 func isOuter(pai *game.Pai, targetPaiSet *game.PaiSet) (bool, error) {
@@ -591,7 +571,7 @@ func isOuter(pai *game.Pai, targetPaiSet *game.PaiSet) (bool, error) {
 		}
 	}
 
-	for _, n := range innerNumbers {
+	return anyMatch(innerNumbers, func(n uint8) (bool, error) {
 		innerPai, err := game.NewPaiWithDetail(pai.Type(), n, false)
 		if err != nil {
 			return false, err
@@ -600,13 +580,8 @@ func isOuter(pai *game.Pai, targetPaiSet *game.PaiSet) (bool, error) {
 		if err != nil {
 			return false, err
 		}
-
-		if has {
-			return true, nil
-		}
-	}
-
-	return false, nil
+		return has, nil
+	})
 }
 
 func (s *Scene) registerEvaluators() {
@@ -639,17 +614,13 @@ func (s *Scene) registerEvaluators() {
 				return false, err
 			}
 
-			for _, sujiPai := range suji {
+			return anyMatch(suji, func(sujiPai game.Pai) (bool, error) {
 				visible, err := isVisibleNOrMore(&sujiPai, n+1, s.visibleSet)
 				if err != nil {
 					return false, err
 				}
-				if !visible {
-					return true, nil
-				}
-			}
-
-			return false, nil
+				return !visible, nil
+			})
 		}
 	}
 
