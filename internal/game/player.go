@@ -63,6 +63,27 @@ func NewPlayer(id int, name string, initScore int) (*Player, error) {
 	}, nil
 }
 
+// For test only.
+func NewPlayerForTest(
+	id int,
+	tehais []Pai,
+	furos []Furo,
+	ho []Pai,
+	sutehais []Pai,
+	reachState ReachState,
+	reachSutehaiIndex *int,
+) *Player {
+	return &Player{
+		id:                id,
+		tehais:            tehais,
+		furos:             furos,
+		ho:                ho,
+		sutehais:          sutehais,
+		reachState:        reachState,
+		reachSutehaiIndex: reachSutehaiIndex,
+	}
+}
+
 func (p *Player) ID() int {
 	return p.id
 }
