@@ -673,7 +673,7 @@ func (s *Scene) registerEvaluators() {
 	}
 
 	for i := range 4 {
-		featureName := fmt.Sprintf("sujiVisible<=%d", i)
+		featureName := fmt.Sprintf("suji_visible<=%d", i)
 		n := i
 		s.evaluators[featureName] = func(pai *game.Pai) (bool, error) {
 			if pai.IsTsupai() {
@@ -704,7 +704,7 @@ func (s *Scene) registerEvaluators() {
 	}
 
 	for i := 2; i < 5; i++ {
-		featureName := fmt.Sprintf("inTehais>=%d", i)
+		featureName := fmt.Sprintf("in_tehais>=%d", i)
 		n := i
 		s.evaluators[featureName] = func(pai *game.Pai) (bool, error) {
 			c, err := s.tehaiSet.Count(pai)
@@ -713,7 +713,7 @@ func (s *Scene) registerEvaluators() {
 	}
 
 	for i := 1; i < 5; i++ {
-		featureName := fmt.Sprintf("sujiInTehais>=%d", i)
+		featureName := fmt.Sprintf("suji_in_tehais>=%d", i)
 		n := i
 		s.evaluators[featureName] = func(pai *game.Pai) (bool, error) {
 			if pai.IsTsupai() {
@@ -734,7 +734,7 @@ func (s *Scene) registerEvaluators() {
 
 	for i := 1; i < 3; i++ {
 		for j := 1; j < (i*2 + 1); j++ {
-			featureName := fmt.Sprintf("+-%dInPrereachSutehais>=%d", i, j)
+			featureName := fmt.Sprintf("+-%d_in_prereach_sutehais>=%d", i, j)
 			distance := i
 			threshold := j
 			s.evaluators[featureName] = func(pai *game.Pai) (bool, error) {
@@ -744,7 +744,7 @@ func (s *Scene) registerEvaluators() {
 	}
 
 	for i := 1; i < 3; i++ {
-		featureName := fmt.Sprintf("%dOuterPrereachSutehai", i)
+		featureName := fmt.Sprintf("%d_outer_prereach_sutehai", i)
 		n := i
 		s.evaluators[featureName] = func(pai *game.Pai) (bool, error) {
 			return isNOuterPrereachSutehai(pai, n, s.prereachSutehaiSet)
@@ -752,7 +752,7 @@ func (s *Scene) registerEvaluators() {
 	}
 
 	for i := 1; i < 3; i++ {
-		featureName := fmt.Sprintf("%dInnerPrereachSutehai", i)
+		featureName := fmt.Sprintf("%d_inner_prereach_sutehai", i)
 		n := i
 		s.evaluators[featureName] = func(pai *game.Pai) (bool, error) {
 			return isNOuterPrereachSutehai(pai, -n, s.prereachSutehaiSet)
@@ -760,7 +760,7 @@ func (s *Scene) registerEvaluators() {
 	}
 
 	for i := 1; i < 9; i++ {
-		featureName := fmt.Sprintf("sameTypeInPrereach>=%d", i)
+		featureName := fmt.Sprintf("same_type_in_prereach>=%d", i)
 		n := i
 		s.evaluators[featureName] = func(pai *game.Pai) (bool, error) {
 			if pai.IsTsupai() {
