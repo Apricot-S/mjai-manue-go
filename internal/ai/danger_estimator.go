@@ -701,6 +701,35 @@ func (s *Scene) registerEvaluators() {
 		}
 	}
 
+	for i := 2; i < 5; i++ {
+		featureName := fmt.Sprintf("inTehais>=%d", i)
+		n := i
+		s.evaluators[featureName] = func(pai *game.Pai) (bool, error) {
+			c, err := s.tehaiSet.Count(pai)
+			return c >= n, err
+		}
+	}
+
+	for i := 1; i < 5; i++ {
+		featureName := fmt.Sprintf("sujiInTehais>=%d", i)
+		n := i
+		s.evaluators[featureName] = func(pai *game.Pai) (bool, error) {
+			if pai.IsTsupai() {
+				return false, nil
+			}
+
+			suji, err := getSuji(pai)
+			if err != nil {
+				return false, err
+			}
+
+			return anyMatch(suji, func(sujiPai game.Pai) (bool, error) {
+				c, err := s.tehaiSet.Count(&sujiPai)
+				return c >= n, err
+			})
+		}
+	}
+
 	for i := 1; i < 3; i++ {
 		for j := 1; j < (i*2 + 1); j++ {
 			featureName := fmt.Sprintf("+-%dInPrereachSutehais>=%d", i, j)
