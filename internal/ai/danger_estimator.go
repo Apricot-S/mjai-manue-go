@@ -306,6 +306,40 @@ func (s *Scene) isJikaze(pai *game.Pai) bool {
 	return pai.HasSameSymbol(s.targetKaze)
 }
 
+// n can be negative.
+func isNOuterPrereachSutehai(pai *game.Pai, n int8, prereachSutehaiSet *game.PaiSet) (bool, error) {
+	if pai.IsTsupai() {
+		return false, nil
+	}
+
+	paiNumber := int8(pai.Number())
+	if paiNumber == 5 {
+		return false, nil
+	}
+
+	var nInnerNumber int8
+	if paiNumber < 5 {
+		nInnerNumber = paiNumber + n
+	} else {
+		nInnerNumber = paiNumber - n
+	}
+
+	if nInnerNumber < 1 || 9 < nInnerNumber {
+		return false, nil
+	}
+
+	if (paiNumber >= 5 || nInnerNumber > 5) && (paiNumber <= 5 || nInnerNumber < 5) {
+		return false, nil
+	}
+
+	innerPai, err := game.NewPaiWithDetail(pai.Type(), uint8(nInnerNumber), false)
+	if err != nil {
+		return false, err
+	}
+
+	return prereachSutehaiSet.Has(innerPai)
+}
+
 func isSujiOf(pai *game.Pai, targetPaiSet *game.PaiSet) (bool, error) {
 	if pai.IsTsupai() {
 		return false, nil
@@ -629,6 +663,22 @@ func (s *Scene) registerEvaluators() {
 		n := i
 		s.evaluators[featureName] = func(pai *game.Pai) (bool, error) {
 			return isNumNOrInner(pai, n), nil
+		}
+	}
+
+	for i := int8(1); i < 3; i++ {
+		featureName := fmt.Sprintf("%dOuterPrereachSutehai", i)
+		n := i
+		s.evaluators[featureName] = func(pai *game.Pai) (bool, error) {
+			return isNOuterPrereachSutehai(pai, n, s.prereachSutehaiSet)
+		}
+	}
+
+	for i := int8(1); i < 3; i++ {
+		featureName := fmt.Sprintf("%dInnerPrereachSutehai", i)
+		n := i
+		s.evaluators[featureName] = func(pai *game.Pai) (bool, error) {
+			return isNOuterPrereachSutehai(pai, -n, s.prereachSutehaiSet)
 		}
 	}
 }
