@@ -756,6 +756,30 @@ func (s *Scene) registerEvaluators() {
 			return isNOuterPrereachSutehai(pai, -n, s.prereachSutehaiSet)
 		}
 	}
+
+	for i := 1; i < 9; i++ {
+		featureName := fmt.Sprintf("sameTypeInPrereach>=%d", i)
+		n := i
+		s.evaluators[featureName] = func(pai *game.Pai) (bool, error) {
+			if pai.IsTsupai() {
+				return false, nil
+			}
+
+			numbers := []uint8{1, 2, 3, 4, 5, 6, 7, 8, 9}
+			numSameType, err := count(numbers, func(num uint8) (bool, error) {
+				target, err := game.NewPaiWithDetail(pai.Type(), num, false)
+				if err != nil {
+					return false, err
+				}
+				return s.prereachSutehaiSet.Has(target)
+			})
+			if err != nil {
+				return false, err
+			}
+
+			return numSameType+1 >= n, nil
+		}
+	}
 }
 
 type Feature struct {
