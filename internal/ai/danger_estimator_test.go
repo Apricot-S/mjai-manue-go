@@ -2,7 +2,9 @@ package ai_test
 
 import (
 	"slices"
+	"testing"
 
+	"github.com/Apricot-S/mjai-manue-go/internal/ai"
 	"github.com/Apricot-S/mjai-manue-go/internal/game"
 )
 
@@ -119,3 +121,20 @@ func (s *MockState) Turn() int                     { panic("not implemented") }
 func (s *MockState) RankedPlayers() [4]game.Player { panic("not implemented") }
 func (s *MockState) Update(event any) error        { panic("not implemented") }
 func (s *MockState) Print()                        { panic("not implemented") }
+
+func TestScene(t *testing.T) {
+	t.Run("tsupai", func(t *testing.T) {
+		state := NewMockState(nil, nil, nil, nil, nil, nil, nil)
+		scene, _ := ai.NewScene(state, &state.players[0], &state.players[1])
+
+		east, _ := game.NewPaiWithName("E")
+		man1, _ := game.NewPaiWithName("1m")
+
+		if b, _ := scene.Evaluate("tsupai", east); !b {
+			t.Errorf("expected tsupai(E) to be true, but got false")
+		}
+		if b, _ := scene.Evaluate("tsupai", man1); b {
+			t.Errorf("expected tsupai(1m) to be false, but got true")
+		}
+	})
+}
