@@ -28,7 +28,27 @@ func getNextKyoku(bakaze *Pai, kyokuNum int) (*Pai, int) {
 	return bakaze, kyokuNum + 1
 }
 
-type State struct {
+type State interface {
+	Players() *[numPlayers]Player
+	Bakaze() *Pai
+	KyokuNum() int
+	Honba() int
+	Oya() *Player
+	Chicha() *Player
+	DoraMarkers() []Pai
+	NumPipais() int
+	Anpais(player *Player) []Pai
+	VisiblePais(player *Player) []Pai
+	Doras() []Pai
+	Jikaze(player *Player) *Pai
+	YakuhaiFan(pai *Pai, player *Player) int
+	Turn() int
+	RankedPlayers() [numPlayers]Player
+	Update(event any) error
+	Print()
+}
+
+type StateImpl struct {
 	players     [numPlayers]Player
 	bakaze      Pai
 	kyokuNum    int
@@ -46,63 +66,43 @@ type State struct {
 	tenpais           [numPlayers]bool
 }
 
-func (s *State) Players() *[numPlayers]Player {
+func (s *StateImpl) Players() *[numPlayers]Player {
 	return &s.players
 }
 
-func (s *State) Bakaze() *Pai {
+func (s *StateImpl) Bakaze() *Pai {
 	return &s.bakaze
 }
 
-func (s *State) KyokuNum() int {
+func (s *StateImpl) KyokuNum() int {
 	return s.kyokuNum
 }
 
-func (s *State) Honba() int {
+func (s *StateImpl) Honba() int {
 	return s.honba
 }
 
-func (s *State) Oya() *Player {
+func (s *StateImpl) Oya() *Player {
 	return s.oya
 }
 
-func (s *State) Chicha() *Player {
+func (s *StateImpl) Chicha() *Player {
 	return s.chicha
 }
 
-func (s *State) DoraMarkers() []Pai {
+func (s *StateImpl) DoraMarkers() []Pai {
 	return s.doraMarkers
 }
 
-func (s *State) NumPipais() int {
+func (s *StateImpl) NumPipais() int {
 	return s.numPipais
 }
 
-func (s *State) Update(event any) error {
-	s.prevActionType = s.currentActionType
-
-	panic("unimplemented!")
-}
-
-func (s *State) Print() {
-	for _, p := range s.players {
-		fmt.Fprintf(
-			os.Stderr,
-			`[%d] tehai: %s
-       ho: %s
-
-`,
-			p.id,
-			PaisToStr(p.tehais),
-			PaisToStr(p.ho))
-	}
-}
-
-func (s *State) Anpais(player *Player) []Pai {
+func (s *StateImpl) Anpais(player *Player) []Pai {
 	return slices.Concat(player.sutehais, player.extraAnpais)
 }
 
-func (s *State) VisiblePais(player *Player) []Pai {
+func (s *StateImpl) VisiblePais(player *Player) []Pai {
 	visiblePais := []Pai{}
 
 	for _, p := range s.players {
@@ -115,7 +115,7 @@ func (s *State) VisiblePais(player *Player) []Pai {
 	return slices.Concat(visiblePais, s.doraMarkers, player.tehais)
 }
 
-func (s *State) Doras() []Pai {
+func (s *StateImpl) Doras() []Pai {
 	doras := make([]Pai, len(s.doraMarkers))
 	for i, d := range s.doraMarkers {
 		doras[i] = *d.NextForDora()
@@ -123,13 +123,13 @@ func (s *State) Doras() []Pai {
 	return doras
 }
 
-func (s *State) Jikaze(player *Player) *Pai {
+func (s *StateImpl) Jikaze(player *Player) *Pai {
 	j := 1 + (4+player.id-s.oya.id)%4
 	p, _ := NewPaiWithDetail(tsupaiType, uint8(j), false)
 	return p
 }
 
-func (s *State) YakuhaiFan(pai *Pai, player *Player) int {
+func (s *StateImpl) YakuhaiFan(pai *Pai, player *Player) int {
 	if !pai.IsTsupai() {
 		// Suhai
 		return 0
@@ -153,11 +153,11 @@ func (s *State) YakuhaiFan(pai *Pai, player *Player) int {
 	return fan
 }
 
-func (s *State) Turn() int {
+func (s *StateImpl) Turn() int {
 	return (numInitPipais - s.numPipais) / numPlayers
 }
 
-func (s *State) RankedPlayers() [numPlayers]Player {
+func (s *StateImpl) RankedPlayers() [numPlayers]Player {
 	players := s.players
 	slices.SortStableFunc(players[:], func(p1, p2 Player) int {
 		if c := cmp.Compare(p1.score, p2.score); c != 0 {
@@ -169,4 +169,24 @@ func (s *State) RankedPlayers() [numPlayers]Player {
 	})
 
 	return players
+}
+
+func (s *StateImpl) Update(event any) error {
+	s.prevActionType = s.currentActionType
+
+	panic("unimplemented!")
+}
+
+func (s *StateImpl) Print() {
+	for _, p := range s.players {
+		fmt.Fprintf(
+			os.Stderr,
+			`[%d] tehai: %s
+       ho: %s
+
+`,
+			p.id,
+			PaisToStr(p.tehais),
+			PaisToStr(p.ho))
+	}
 }

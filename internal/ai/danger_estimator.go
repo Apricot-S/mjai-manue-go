@@ -8,7 +8,7 @@ import (
 )
 
 type Scene struct {
-	gameState *game.State
+	gameState game.State
 	me        *game.Player
 	target    *game.Player
 
@@ -27,7 +27,7 @@ type Scene struct {
 	evaluators map[string]func(*game.Pai) (bool, error)
 }
 
-func NewScene(gameState *game.State, me *game.Player, target *game.Player) (*Scene, error) {
+func NewScene(gameState game.State, me *game.Player, target *game.Player) (*Scene, error) {
 	s := &Scene{
 		gameState:  gameState,
 		me:         me,

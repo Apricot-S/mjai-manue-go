@@ -30,6 +30,6 @@ func NewManueAIWithEstimators(stats *configs.GameStats, dangerEstimator *DangerE
 	}
 }
 
-func (a *ManueAI) DecideAction(state *game.State, playerID int) (jsontext.Value, error) {
+func (a *ManueAI) DecideAction(state game.State, playerID int) (jsontext.Value, error) {
 	panic("unimplemented!")
 }

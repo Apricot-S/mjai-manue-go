@@ -12,7 +12,7 @@ type AIAgent struct {
 	ai       ai.AI
 	playerID int
 	inGame   bool
-	state    *game.State
+	state    game.State
 }
 
 func NewAIAgent(name string, room string, ai ai.AI) *AIAgent {

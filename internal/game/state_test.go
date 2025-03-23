@@ -178,7 +178,7 @@ func Test_getNextKyoku(t *testing.T) {
 	}
 }
 
-func getDefaultStateForTest() *State {
+func getDefaultStateForTest() *StateImpl {
 	east, _ := NewPaiWithName("E")
 	players := [numPlayers]Player{}
 
@@ -205,7 +205,7 @@ func getDefaultStateForTest() *State {
 		}
 	}
 
-	return &State{
+	return &StateImpl{
 		players:     players,
 		bakaze:      *east,
 		kyokuNum:    1,
@@ -229,7 +229,7 @@ func TestState_Anpais(t *testing.T) {
 	}
 	type testCase struct {
 		name  string
-		state *State
+		state State
 		args  args
 		want  []Pai
 	}
