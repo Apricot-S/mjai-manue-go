@@ -158,6 +158,74 @@ func TestScene_Evaluate(t *testing.T) {
 		})
 	}
 
+	{
+		anpai, _ := game.NewPaiWithName("4p")
+		anpais := []game.Pai{*anpai}
+		state := NewMockState(nil, nil, nil, nil, anpais, nil, nil)
+		scene, _ := ai.NewScene(state, &state.players[0], &state.players[1])
+		pin1, _ := game.NewPaiWithName("1p")
+		pin7, _ := game.NewPaiWithName("7p")
+		pin2, _ := game.NewPaiWithName("2p")
+		man1, _ := game.NewPaiWithName("1m")
+
+		tests = append(tests, testCase{
+			name:    "suji true",
+			scene:   scene,
+			args:    args{name: "suji", pai: pin1},
+			want:    true,
+			wantErr: false,
+		})
+		tests = append(tests, testCase{
+			name:    "weak_suji true",
+			scene:   scene,
+			args:    args{name: "weak_suji", pai: pin1},
+			want:    true,
+			wantErr: false,
+		})
+		tests = append(tests, testCase{
+			name:    "suji true 2",
+			scene:   scene,
+			args:    args{name: "suji", pai: pin7},
+			want:    true,
+			wantErr: false,
+		})
+		tests = append(tests, testCase{
+			name:    "weak_suji true 2",
+			scene:   scene,
+			args:    args{name: "weak_suji", pai: pin7},
+			want:    true,
+			wantErr: false,
+		})
+		tests = append(tests, testCase{
+			name:    "suji false",
+			scene:   scene,
+			args:    args{name: "suji", pai: pin2},
+			want:    false,
+			wantErr: false,
+		})
+		tests = append(tests, testCase{
+			name:    "weak_suji false",
+			scene:   scene,
+			args:    args{name: "weak_suji", pai: pin2},
+			want:    false,
+			wantErr: false,
+		})
+		tests = append(tests, testCase{
+			name:    "suji false 2",
+			scene:   scene,
+			args:    args{name: "suji", pai: man1},
+			want:    false,
+			wantErr: false,
+		})
+		tests = append(tests, testCase{
+			name:    "weak_suji false 2",
+			scene:   scene,
+			args:    args{name: "weak_suji", pai: man1},
+			want:    false,
+			wantErr: false,
+		})
+	}
+
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			got, err := tt.scene.Evaluate(tt.args.name, tt.args.pai)
