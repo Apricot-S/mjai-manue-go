@@ -122,19 +122,52 @@ func (s *MockState) RankedPlayers() [4]game.Player { panic("not implemented") }
 func (s *MockState) Update(event any) error        { panic("not implemented") }
 func (s *MockState) Print()                        { panic("not implemented") }
 
-func TestScene(t *testing.T) {
-	t.Run("tsupai", func(t *testing.T) {
+func TestScene_Evaluate(t *testing.T) {
+	type args struct {
+		name string
+		pai  *game.Pai
+	}
+	type testCase struct {
+		name    string
+		scene   *ai.Scene
+		args    args
+		want    bool
+		wantErr bool
+	}
+	tests := []testCase{}
+
+	{
 		state := NewMockState(nil, nil, nil, nil, nil, nil, nil)
 		scene, _ := ai.NewScene(state, &state.players[0], &state.players[1])
-
 		east, _ := game.NewPaiWithName("E")
 		man1, _ := game.NewPaiWithName("1m")
 
-		if b, _ := scene.Evaluate("tsupai", east); !b {
-			t.Errorf("expected tsupai(E) to be true, but got false")
-		}
-		if b, _ := scene.Evaluate("tsupai", man1); b {
-			t.Errorf("expected tsupai(1m) to be false, but got true")
-		}
-	})
+		tests = append(tests, testCase{
+			name:    "tsupai true",
+			scene:   scene,
+			args:    args{name: "tsupai", pai: east},
+			want:    true,
+			wantErr: false,
+		})
+		tests = append(tests, testCase{
+			name:    "tsupai false",
+			scene:   scene,
+			args:    args{name: "tsupai", pai: man1},
+			want:    false,
+			wantErr: false,
+		})
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := tt.scene.Evaluate(tt.args.name, tt.args.pai)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("Scene.Evaluate() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if got != tt.want {
+				t.Errorf("Scene.Evaluate() = %v, want %v", got, tt.want)
+			}
+		})
+	}
 }
