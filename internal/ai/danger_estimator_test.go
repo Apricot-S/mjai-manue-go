@@ -544,6 +544,32 @@ func TestScene_Evaluate(t *testing.T) {
 		}...)
 	}
 
+	{
+		anpais, _ := game.StrToPais("3p E S 7p")
+		prereachSutehais, _ := game.StrToPais("3p E S 7p")
+		state := NewMockState(nil, prereachSutehais, nil, nil, anpais, nil, nil)
+		scene, _ := ai.NewScene(state, &state.players[0], &state.players[1])
+		pin1, _ := game.NewPaiWithName("1p")
+		pin9, _ := game.NewPaiWithName("9p")
+
+		tests = append(tests, []testCase{
+			{
+				name:    "reach_matagisuji true",
+				scene:   scene,
+				args:    args{name: "reach_matagisuji", pai: pin9},
+				want:    true,
+				wantErr: false,
+			},
+			{
+				name:    "reach_matagisuji false",
+				scene:   scene,
+				args:    args{name: "reach_matagisuji", pai: pin1},
+				want:    false,
+				wantErr: false,
+			},
+		}...)
+	}
+
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			got, err := tt.scene.Evaluate(tt.args.name, tt.args.pai)
