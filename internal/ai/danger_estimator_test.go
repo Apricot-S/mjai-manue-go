@@ -416,6 +416,134 @@ func TestScene_Evaluate(t *testing.T) {
 		})
 	}
 
+	{
+		anpais, _ := game.StrToPais("1p 6p")
+		prereachSutehais, _ := game.StrToPais("1p 6p")
+		state := NewMockState(nil, prereachSutehais, nil, nil, anpais, nil, nil)
+		scene, _ := ai.NewScene(state, &state.players[0], &state.players[1])
+		man2, _ := game.NewPaiWithName("2m")
+
+		for i, v := range [9]bool{false, true, false, false, true, false, false, false, false} {
+			pin, _ := game.NewPaiWithName(fmt.Sprintf("%dp", i+1))
+			tests = append(tests, testCase{
+				name:    fmt.Sprintf("aida4ken %v", v),
+				scene:   scene,
+				args:    args{name: "aida4ken", pai: pin},
+				want:    v,
+				wantErr: false,
+			})
+		}
+
+		tests = append(tests, testCase{
+			name:    "aida4ken false",
+			scene:   scene,
+			args:    args{name: "aida4ken", pai: man2},
+			want:    false,
+			wantErr: false,
+		})
+	}
+
+	{
+		anpais, _ := game.StrToPais("3p")
+		prereachSutehais, _ := game.StrToPais("3p")
+		state := NewMockState(nil, prereachSutehais, nil, nil, anpais, nil, nil)
+		scene, _ := ai.NewScene(state, &state.players[0], &state.players[1])
+		man1, _ := game.NewPaiWithName("1m")
+
+		for i, v := range [9]bool{true, true, false, true, true, false, false, false, false} {
+			pin, _ := game.NewPaiWithName(fmt.Sprintf("%dp", i+1))
+			tests = append(tests, testCase{
+				name:    fmt.Sprintf("matagisuji %v", v),
+				scene:   scene,
+				args:    args{name: "matagisuji", pai: pin},
+				want:    v,
+				wantErr: false,
+			})
+		}
+
+		tests = append(tests, testCase{
+			name:    "matagisuji false for different suit",
+			scene:   scene,
+			args:    args{name: "matagisuji", pai: man1},
+			want:    false,
+			wantErr: false,
+		})
+	}
+
+	{
+		anpais, _ := game.StrToPais("2p")
+		prereachSutehais, _ := game.StrToPais("2p")
+		state := NewMockState(nil, prereachSutehais, nil, nil, anpais, nil, nil)
+		scene, _ := ai.NewScene(state, &state.players[0], &state.players[1])
+
+		for i, v := range [9]bool{true, false, false, true, false, false, false, false, false} {
+			pin, _ := game.NewPaiWithName(fmt.Sprintf("%dp", i+1))
+			tests = append(tests, testCase{
+				name:    fmt.Sprintf("matagisuji %v", v),
+				scene:   scene,
+				args:    args{name: "matagisuji", pai: pin},
+				want:    v,
+				wantErr: false,
+			})
+		}
+	}
+
+	{
+		anpais, _ := game.StrToPais("3p 4p")
+		prereachSutehais, _ := game.StrToPais("3p")
+		state := NewMockState(nil, prereachSutehais, nil, nil, anpais, nil, nil)
+		scene, _ := ai.NewScene(state, &state.players[0], &state.players[1])
+		pin1, _ := game.NewPaiWithName("1p")
+
+		tests = append(tests, testCase{
+			name:    "matagisuji false",
+			scene:   scene,
+			args:    args{name: "matagisuji", pai: pin1},
+			want:    false,
+			wantErr: false,
+		})
+	}
+
+	{
+		anpais, _ := game.StrToPais("3p E S 7p W")
+		prereachSutehais, _ := game.StrToPais("3p E S 7p W")
+		state := NewMockState(nil, prereachSutehais, nil, nil, anpais, nil, nil)
+		scene, _ := ai.NewScene(state, &state.players[0], &state.players[1])
+		pin1, _ := game.NewPaiWithName("1p")
+		pin9, _ := game.NewPaiWithName("9p")
+
+		tests = append(tests, []testCase{
+			{
+				name:    "late_matagisuji true for 9p",
+				scene:   scene,
+				args:    args{name: "late_matagisuji", pai: pin9},
+				want:    true,
+				wantErr: false,
+			},
+			{
+				name:    "early_matagisuji false for 9p",
+				scene:   scene,
+				args:    args{name: "early_matagisuji", pai: pin9},
+				want:    false,
+				wantErr: false,
+			},
+			{
+				name:    "early_matagisuji true for 1p",
+				scene:   scene,
+				args:    args{name: "early_matagisuji", pai: pin1},
+				want:    true,
+				wantErr: false,
+			},
+			{
+				name:    "late_matagisuji false for 1p",
+				scene:   scene,
+				args:    args{name: "late_matagisuji", pai: pin1},
+				want:    false,
+				wantErr: false,
+			},
+		}...)
+	}
+
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			got, err := tt.scene.Evaluate(tt.args.name, tt.args.pai)
