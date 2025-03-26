@@ -1,6 +1,7 @@
 package ai_test
 
 import (
+	"fmt"
 	"slices"
 	"testing"
 
@@ -283,7 +284,7 @@ func TestScene_Evaluate(t *testing.T) {
 		pin4, _ := game.NewPaiWithName("4p")
 
 		tests = append(tests, testCase{
-			name:    "suji true",
+			name:    "reach_suji true",
 			scene:   scene,
 			args:    args{name: "reach_suji", pai: pin4},
 			want:    true,
@@ -313,6 +314,60 @@ func TestScene_Evaluate(t *testing.T) {
 			name:    "prereach_suji false",
 			scene:   scene,
 			args:    args{name: "prereach_suji", pai: sou1},
+			want:    false,
+			wantErr: false,
+		})
+	}
+
+	{
+		pin1, _ := game.NewPaiWithName("1p")
+		anpais := []game.Pai{*pin1}
+		state := NewMockState(nil, anpais, nil, nil, anpais, nil, nil)
+		scene, _ := ai.NewScene(state, &state.players[0], &state.players[1])
+		man2, _ := game.NewPaiWithName("2m")
+
+		for i, v := range [9]bool{false, true, false, false, true, false, false, false, false} {
+			pin, _ := game.NewPaiWithName(fmt.Sprintf("%dp", i+1))
+			tests = append(tests, testCase{
+				name:    fmt.Sprintf("urasuji %v", v),
+				scene:   scene,
+				args:    args{name: "urasuji", pai: pin},
+				want:    v,
+				wantErr: false,
+			})
+		}
+
+		tests = append(tests, testCase{
+			name:    "urasuji false",
+			scene:   scene,
+			args:    args{name: "urasuji", pai: man2},
+			want:    false,
+			wantErr: false,
+		})
+	}
+
+	{
+		pin5, _ := game.NewPaiWithName("5p")
+		anpais := []game.Pai{*pin5}
+		state := NewMockState(nil, anpais, nil, nil, anpais, nil, nil)
+		scene, _ := ai.NewScene(state, &state.players[0], &state.players[1])
+		man1, _ := game.NewPaiWithName("1m")
+
+		for i, v := range [9]bool{true, false, false, true, false, true, false, false, true} {
+			pin, _ := game.NewPaiWithName(fmt.Sprintf("%dp", i+1))
+			tests = append(tests, testCase{
+				name:    fmt.Sprintf("urasuji %v", v),
+				scene:   scene,
+				args:    args{name: "urasuji", pai: pin},
+				want:    v,
+				wantErr: false,
+			})
+		}
+
+		tests = append(tests, testCase{
+			name:    "urasuji false",
+			scene:   scene,
+			args:    args{name: "urasuji", pai: man1},
 			want:    false,
 			wantErr: false,
 		})
