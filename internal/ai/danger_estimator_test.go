@@ -260,16 +260,59 @@ func TestScene_Evaluate(t *testing.T) {
 		pin2, _ := game.NewPaiWithName("2p")
 
 		tests = append(tests, testCase{
-			name:    "suji true",
+			name:    "reach_suji true",
 			scene:   scene,
 			args:    args{name: "reach_suji", pai: pin1},
 			want:    true,
 			wantErr: false,
 		})
 		tests = append(tests, testCase{
-			name:    "weak_suji false",
+			name:    "reach_suji false",
 			scene:   scene,
 			args:    args{name: "reach_suji", pai: pin2},
+			want:    false,
+			wantErr: false,
+		})
+	}
+
+	{
+		pin1, _ := game.NewPaiWithName("1p")
+		anpais := []game.Pai{*pin1}
+		state := NewMockState(nil, anpais, nil, nil, anpais, nil, nil)
+		scene, _ := ai.NewScene(state, &state.players[0], &state.players[1])
+		pin4, _ := game.NewPaiWithName("4p")
+
+		tests = append(tests, testCase{
+			name:    "suji true",
+			scene:   scene,
+			args:    args{name: "reach_suji", pai: pin4},
+			want:    true,
+			wantErr: false,
+		})
+	}
+
+	{
+		pin4, _ := game.NewPaiWithName("4p")
+		east, _ := game.NewPaiWithName("E")
+		sou4, _ := game.NewPaiWithName("4s")
+		anpais := []game.Pai{*pin4, *east, *sou4}
+		prereachSutehais := []game.Pai{*pin4, *east}
+		state := NewMockState(nil, prereachSutehais, nil, nil, anpais, nil, nil)
+		scene, _ := ai.NewScene(state, &state.players[0], &state.players[1])
+		pin1, _ := game.NewPaiWithName("1p")
+		sou1, _ := game.NewPaiWithName("1s")
+
+		tests = append(tests, testCase{
+			name:    "prereach_suji true",
+			scene:   scene,
+			args:    args{name: "prereach_suji", pai: pin1},
+			want:    true,
+			wantErr: false,
+		})
+		tests = append(tests, testCase{
+			name:    "prereach_suji false",
+			scene:   scene,
+			args:    args{name: "prereach_suji", pai: sou1},
 			want:    false,
 			wantErr: false,
 		})
