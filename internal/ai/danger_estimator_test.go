@@ -160,8 +160,7 @@ func TestScene_Evaluate(t *testing.T) {
 	}
 
 	{
-		pin4, _ := game.NewPaiWithName("4p")
-		anpais := []game.Pai{*pin4}
+		anpais, _ := game.StrToPais("4p")
 		state := NewMockState(nil, nil, nil, nil, anpais, nil, nil)
 		scene, _ := ai.NewScene(state, &state.players[0], &state.players[1])
 		pin1, _ := game.NewPaiWithName("1p")
@@ -228,9 +227,7 @@ func TestScene_Evaluate(t *testing.T) {
 	}
 
 	{
-		pin1, _ := game.NewPaiWithName("1p")
-		pin7, _ := game.NewPaiWithName("7p")
-		anpais := []game.Pai{*pin1, *pin7}
+		anpais, _ := game.StrToPais("1p 7p")
 		state := NewMockState(nil, nil, nil, nil, anpais, nil, nil)
 		scene, _ := ai.NewScene(state, &state.players[0], &state.players[1])
 		pin4, _ := game.NewPaiWithName("4p")
@@ -252,9 +249,7 @@ func TestScene_Evaluate(t *testing.T) {
 	}
 
 	{
-		pin5, _ := game.NewPaiWithName("5p")
-		pin4, _ := game.NewPaiWithName("4p")
-		anpais := []game.Pai{*pin5, *pin4}
+		anpais, _ := game.StrToPais("5p 4p")
 		state := NewMockState(nil, anpais, nil, nil, anpais, nil, nil)
 		scene, _ := ai.NewScene(state, &state.players[0], &state.players[1])
 		pin1, _ := game.NewPaiWithName("1p")
@@ -277,8 +272,7 @@ func TestScene_Evaluate(t *testing.T) {
 	}
 
 	{
-		pin1, _ := game.NewPaiWithName("1p")
-		anpais := []game.Pai{*pin1}
+		anpais, _ := game.StrToPais("1p")
 		state := NewMockState(nil, anpais, nil, nil, anpais, nil, nil)
 		scene, _ := ai.NewScene(state, &state.players[0], &state.players[1])
 		pin4, _ := game.NewPaiWithName("4p")
@@ -293,11 +287,8 @@ func TestScene_Evaluate(t *testing.T) {
 	}
 
 	{
-		pin4, _ := game.NewPaiWithName("4p")
-		east, _ := game.NewPaiWithName("E")
-		sou4, _ := game.NewPaiWithName("4s")
-		anpais := []game.Pai{*pin4, *east, *sou4}
-		prereachSutehais := []game.Pai{*pin4, *east}
+		anpais, _ := game.StrToPais("4p E 4s")
+		prereachSutehais, _ := game.StrToPais("4p E")
 		state := NewMockState(nil, prereachSutehais, nil, nil, anpais, nil, nil)
 		scene, _ := ai.NewScene(state, &state.players[0], &state.players[1])
 		pin1, _ := game.NewPaiWithName("1p")
@@ -320,8 +311,7 @@ func TestScene_Evaluate(t *testing.T) {
 	}
 
 	{
-		pin1, _ := game.NewPaiWithName("1p")
-		anpais := []game.Pai{*pin1}
+		anpais, _ := game.StrToPais("1p")
 		state := NewMockState(nil, anpais, nil, nil, anpais, nil, nil)
 		scene, _ := ai.NewScene(state, &state.players[0], &state.players[1])
 		man2, _ := game.NewPaiWithName("2m")
@@ -347,8 +337,7 @@ func TestScene_Evaluate(t *testing.T) {
 	}
 
 	{
-		pin5, _ := game.NewPaiWithName("5p")
-		anpais := []game.Pai{*pin5}
+		anpais, _ := game.StrToPais("5p")
 		state := NewMockState(nil, anpais, nil, nil, anpais, nil, nil)
 		scene, _ := ai.NewScene(state, &state.players[0], &state.players[1])
 		man1, _ := game.NewPaiWithName("1m")
@@ -374,10 +363,8 @@ func TestScene_Evaluate(t *testing.T) {
 	}
 
 	{
-		pin1, _ := game.NewPaiWithName("1p")
-		pin5, _ := game.NewPaiWithName("5p")
-		anpais := []game.Pai{*pin1, *pin5}
-		prereachSutehais := []game.Pai{*pin1}
+		anpais, _ := game.StrToPais("1p 5p")
+		prereachSutehais, _ := game.StrToPais("1p")
 		state := NewMockState(nil, prereachSutehais, nil, nil, anpais, nil, nil)
 		scene, _ := ai.NewScene(state, &state.players[0], &state.players[1])
 		pin2, _ := game.NewPaiWithName("2p")
