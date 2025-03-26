@@ -570,6 +570,37 @@ func TestScene_Evaluate(t *testing.T) {
 		}...)
 	}
 
+	{
+		anpais, _ := game.StrToPais("1p")
+		prereachSutehais, _ := game.StrToPais("1p")
+		state := NewMockState(nil, prereachSutehais, nil, nil, anpais, nil, nil)
+		scene, _ := ai.NewScene(state, &state.players[0], &state.players[1])
+		man3, _ := game.NewPaiWithName("3m")
+
+		for i, v := range [9]bool{false, false, true, false, false, true, false, false, false} {
+			pin, _ := game.NewPaiWithName(fmt.Sprintf("%dp", i+1))
+			tests = append(tests, testCase{
+				name:    fmt.Sprintf("senkisuji %v", v),
+				scene:   scene,
+				args:    args{name: "senkisuji", pai: pin},
+				want:    v,
+				wantErr: false,
+			})
+		}
+
+		tests = append(tests, testCase{
+			name:    "senkisuji false for different suit",
+			scene:   scene,
+			args:    args{name: "senkisuji", pai: man3},
+			want:    false,
+			wantErr: false,
+		})
+	}
+
+	// Doesn't count the pai which I'm going to discard.
+
+	// TODO Add test for rest of features.
+
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			got, err := tt.scene.Evaluate(tt.args.name, tt.args.pai)
