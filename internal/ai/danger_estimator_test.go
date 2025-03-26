@@ -598,6 +598,101 @@ func TestScene_Evaluate(t *testing.T) {
 	}
 
 	// Doesn't count the pai which I'm going to discard.
+	{
+		visiblePais, _ := game.StrToPais("1p 1p")
+		state := NewMockState(nil, nil, nil, nil, nil, visiblePais, nil)
+		scene, _ := ai.NewScene(state, &state.players[0], &state.players[1])
+		pin1, _ := game.NewPaiWithName("1p")
+
+		tests = append(tests, []testCase{
+			{
+				name:    "visible>=1 true",
+				scene:   scene,
+				args:    args{name: "visible>=1", pai: pin1},
+				want:    true,
+				wantErr: false,
+			},
+			{
+				name:    "visible>=2 false",
+				scene:   scene,
+				args:    args{name: "visible>=2", pai: pin1},
+				want:    false,
+				wantErr: false,
+			},
+		}...)
+	}
+
+	{
+		visiblePais, _ := game.StrToPais("1p 1p 1p")
+		state := NewMockState(nil, nil, nil, nil, nil, visiblePais, nil)
+		scene, _ := ai.NewScene(state, &state.players[0], &state.players[1])
+		pin1, _ := game.NewPaiWithName("1p")
+
+		tests = append(tests, []testCase{
+			{
+				name:    "visible>=2 true",
+				scene:   scene,
+				args:    args{name: "visible>=2", pai: pin1},
+				want:    true,
+				wantErr: false,
+			},
+			{
+				name:    "visible>=3 false",
+				scene:   scene,
+				args:    args{name: "visible>=3", pai: pin1},
+				want:    false,
+				wantErr: false,
+			},
+		}...)
+	}
+
+	{
+		visiblePais, _ := game.StrToPais("4p")
+		state := NewMockState(nil, nil, nil, nil, nil, visiblePais, nil)
+		scene, _ := ai.NewScene(state, &state.players[0], &state.players[1])
+		pin1, _ := game.NewPaiWithName("1p")
+
+		tests = append(tests, []testCase{
+			{
+				name:    "suji_visible<=1 true",
+				scene:   scene,
+				args:    args{name: "suji_visible<=1", pai: pin1},
+				want:    true,
+				wantErr: false,
+			},
+			{
+				name:    "suji_visible<=0 false",
+				scene:   scene,
+				args:    args{name: "suji_visible<=0", pai: pin1},
+				want:    false,
+				wantErr: false,
+			},
+		}...)
+	}
+
+	{
+		visiblePais, _ := game.StrToPais("4p 4p")
+		state := NewMockState(nil, nil, nil, nil, nil, visiblePais, nil)
+		scene, _ := ai.NewScene(state, &state.players[0], &state.players[1])
+		pin1, _ := game.NewPaiWithName("1p")
+
+		tests = append(tests, []testCase{
+			{
+				name:    "suji_visible<=2 true",
+				scene:   scene,
+				args:    args{name: "suji_visible<=2", pai: pin1},
+				want:    true,
+				wantErr: false,
+			},
+			{
+				name:    "suji_visible<=1 false",
+				scene:   scene,
+				args:    args{name: "suji_visible<=1", pai: pin1},
+				want:    false,
+				wantErr: false,
+			},
+		}...)
+	}
 
 	// TODO Add test for rest of features.
 
