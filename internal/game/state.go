@@ -191,3 +191,43 @@ func (s *StateImpl) Print() {
 			PaisToStr(p.ho))
 	}
 }
+
+func (s *StateImpl) OnStartGame(names []string) error {
+	if names == nil {
+		names = []string{"", "", "", ""}
+	}
+	if len(names) != numPlayers {
+		return fmt.Errorf("number of players must be 4, but got %d", len(names))
+	}
+
+	east, err := NewPaiWithName("E")
+	if err != nil {
+		return err
+	}
+
+	var players [numPlayers]Player
+	for i, name := range names {
+		p, err := NewPlayer(i, name, initScore)
+		if err != nil {
+			return err
+		}
+		players[i] = *p
+	}
+
+	s.players = players
+	s.bakaze = *east
+	s.kyokuNum = 1
+	s.honba = 0
+	s.oya = &players[0]
+	s.chicha = &players[0]
+	s.doraMarkers = make([]Pai, 0, maxNumDoraMarkers)
+	s.numPipais = numInitPipais
+
+	s.prevActionType = ""
+	s.prevDahaiActor = -1
+	s.prevDahaiPai = nil
+	s.currentActionType = ""
+	s.tenpais = [numPlayers]bool{false, false, false, false}
+
+	return nil
+}
