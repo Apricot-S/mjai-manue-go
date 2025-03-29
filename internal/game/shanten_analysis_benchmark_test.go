@@ -128,32 +128,10 @@ func BenchmarkShantenAnalysis_Normal(b *testing.B) {
 	}
 }
 
-func BenchmarkShantenAnalysis_Normal14(b *testing.B) {
-	rng := createRNG()
-	for b.Loop() {
-		hand := generateRandomPureHand14(rng)
-		var ps game.PaiSet = *hand
-		b.StartTimer()
-		_, _, _ = game.AnalyzeShanten(&ps)
-		b.StopTimer()
-	}
-}
-
 func BenchmarkShantenAnalysis_HalfFlush(b *testing.B) {
 	rng := createRNG()
 	for b.Loop() {
 		hand := generateRandomHalfFlushPureHand(rng)
-		var ps game.PaiSet = *hand
-		b.StartTimer()
-		_, _, _ = game.AnalyzeShanten(&ps)
-		b.StopTimer()
-	}
-}
-
-func BenchmarkShantenAnalysis_HalfFlush14(b *testing.B) {
-	rng := createRNG()
-	for b.Loop() {
-		hand := generateRandomHalfFlushPureHand14(rng)
 		var ps game.PaiSet = *hand
 		b.StartTimer()
 		_, _, _ = game.AnalyzeShanten(&ps)
@@ -172,17 +150,6 @@ func BenchmarkShantenAnalysis_FullFlush(b *testing.B) {
 	}
 }
 
-func BenchmarkShantenAnalysis_FullFlush14(b *testing.B) {
-	rng := createRNG()
-	for b.Loop() {
-		hand := generateRandomFullFlushPureHand14(rng)
-		var ps game.PaiSet = *hand
-		b.StartTimer()
-		_, _, _ = game.AnalyzeShanten(&ps)
-		b.StopTimer()
-	}
-}
-
 func BenchmarkShantenAnalysis_NonSimple(b *testing.B) {
 	rng := createRNG()
 	for b.Loop() {
@@ -194,7 +161,40 @@ func BenchmarkShantenAnalysis_NonSimple(b *testing.B) {
 	}
 }
 
-func BenchmarkShantenAnalysis_NonSimple14(b *testing.B) {
+func BenchmarkShantenAnalysis_14_Normal(b *testing.B) {
+	rng := createRNG()
+	for b.Loop() {
+		hand := generateRandomPureHand14(rng)
+		var ps game.PaiSet = *hand
+		b.StartTimer()
+		_, _, _ = game.AnalyzeShanten(&ps)
+		b.StopTimer()
+	}
+}
+
+func BenchmarkShantenAnalysis_14_HalfFlush(b *testing.B) {
+	rng := createRNG()
+	for b.Loop() {
+		hand := generateRandomHalfFlushPureHand14(rng)
+		var ps game.PaiSet = *hand
+		b.StartTimer()
+		_, _, _ = game.AnalyzeShanten(&ps)
+		b.StopTimer()
+	}
+}
+
+func BenchmarkShantenAnalysis_14_FullFlush(b *testing.B) {
+	rng := createRNG()
+	for b.Loop() {
+		hand := generateRandomFullFlushPureHand14(rng)
+		var ps game.PaiSet = *hand
+		b.StartTimer()
+		_, _, _ = game.AnalyzeShanten(&ps)
+		b.StopTimer()
+	}
+}
+
+func BenchmarkShantenAnalysis_14_NonSimple(b *testing.B) {
 	rng := createRNG()
 	for b.Loop() {
 		hand := generateRandomNonSimplePureHand14(rng)
