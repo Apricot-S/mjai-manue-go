@@ -82,7 +82,7 @@ func TestNewPaiWithID_Valid(t *testing.T) {
 		wantErr bool
 	}{}
 
-	for i := 0; i < len(allNames); i++ {
+	for i := range len(allNames) {
 		tests = append(tests, getTestCaseValid(i))
 	}
 
@@ -549,7 +549,7 @@ func TestPai_Next(t *testing.T) {
 			}
 
 			// minus
-			for j := 0; j < i; j++ {
+			for j := range i {
 				n := uint8(i - j)
 				prev, _ := NewPaiWithDetail(typ, n, false)
 				name := fmt.Sprintf("%d%c - %d: %d%c", i, typ, j, n, typ)
@@ -581,7 +581,7 @@ func TestPai_Next(t *testing.T) {
 		}
 
 		// minus
-		for j := 0; j < 5; j++ {
+		for j := range 5 {
 			n := uint8(5 - j)
 			prev, _ := NewPaiWithDetail(typ, n, false)
 			name := fmt.Sprintf("5%cr - %d: %d%c", typ, j, n, typ)
