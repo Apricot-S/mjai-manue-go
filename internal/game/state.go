@@ -45,6 +45,7 @@ type State interface {
 	Turn() int
 	RankedPlayers() [numPlayers]Player
 
+	OnStartGame(names []string) error
 	Update(event any) error
 	Print()
 }
@@ -172,26 +173,6 @@ func (s *StateImpl) RankedPlayers() [numPlayers]Player {
 	return players
 }
 
-func (s *StateImpl) Update(event any) error {
-	s.prevActionType = s.currentActionType
-
-	panic("unimplemented!")
-}
-
-func (s *StateImpl) Print() {
-	for _, p := range s.players {
-		fmt.Fprintf(
-			os.Stderr,
-			`[%d] tehai: %s
-       ho: %s
-
-`,
-			p.id,
-			PaisToStr(p.tehais),
-			PaisToStr(p.ho))
-	}
-}
-
 func (s *StateImpl) OnStartGame(names []string) error {
 	if names == nil {
 		names = []string{"", "", "", ""}
@@ -230,4 +211,24 @@ func (s *StateImpl) OnStartGame(names []string) error {
 	s.tenpais = [numPlayers]bool{false, false, false, false}
 
 	return nil
+}
+
+func (s *StateImpl) Update(event any) error {
+	s.prevActionType = s.currentActionType
+
+	panic("unimplemented!")
+}
+
+func (s *StateImpl) Print() {
+	for _, p := range s.players {
+		fmt.Fprintf(
+			os.Stderr,
+			`[%d] tehai: %s
+       ho: %s
+
+`,
+			p.id,
+			PaisToStr(p.tehais),
+			PaisToStr(p.ho))
+	}
 }
