@@ -4,7 +4,7 @@ import "github.com/Apricot-S/mjai-manue-go/internal/game"
 
 type BitVector uint64
 
-func NewBitVector(countVector *[game.NumIDs]int, threshold int) BitVector {
+func NewBitVector(countVector *game.PaiSet, threshold int) BitVector {
 	var bv BitVector
 	for i, c := range countVector {
 		if c >= threshold {
