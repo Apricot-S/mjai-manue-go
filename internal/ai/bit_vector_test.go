@@ -165,3 +165,67 @@ func TestBitVector_IsSubsetOf(t *testing.T) {
 		})
 	}
 }
+
+func TestBitVector_HasIntersectionWith(t *testing.T) {
+	type args struct {
+		other BitVector
+	}
+	type testCase struct {
+		name string
+		bv   BitVector
+		args args
+		want bool
+	}
+	tests := []testCase{
+		{
+			name: "empty vectors",
+			bv:   BitVector(0),
+			args: args{other: BitVector(0)},
+			want: false,
+		},
+		{
+			name: "one empty, one non-empty",
+			bv:   BitVector(0),
+			args: args{other: BitVector(0xFF)},
+			want: false,
+		},
+		{
+			name: "overlapping vectors",
+			bv:   BitVector(0x0F),
+			args: args{other: BitVector(0xFF)},
+			want: true,
+		},
+		{
+			name: "disjoint vectors",
+			bv:   BitVector(0xF0),
+			args: args{other: BitVector(0x0F)},
+			want: false,
+		},
+		{
+			name: "single bit overlap",
+			bv:   BitVector(0x01),
+			args: args{other: BitVector(0x01)},
+			want: true,
+		},
+		{
+			name: "large numbers with overlap",
+			bv:   BitVector(0x2_0000_0000),
+			args: args{other: BitVector(0x3_0000_0000)},
+			want: true,
+		},
+		{
+			name: "large numbers without overlap",
+			bv:   BitVector(0x2_0000_0000),
+			args: args{other: BitVector(0x1_0000_0000)},
+			want: false,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := tt.bv.HasIntersectionWith(tt.args.other); got != tt.want {
+				t.Errorf("BitVector.HasIntersectionWith() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
