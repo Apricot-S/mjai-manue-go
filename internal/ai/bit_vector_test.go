@@ -64,10 +64,103 @@ func TestNewBitVector(t *testing.T) {
 		})
 	}
 
+	{
+		ps := game.PaiSet{33: 4}
+		tests = append(tests, testCase{
+			name: "threshold 0",
+			args: args{countVector: &ps, threshold: 0},
+			want: BitVector(0x3_FFFF_FFFF),
+		})
+		tests = append(tests, testCase{
+			name: "threshold 1",
+			args: args{countVector: &ps, threshold: 1},
+			want: BitVector(0x2_0000_0000),
+		})
+		tests = append(tests, testCase{
+			name: "threshold 2",
+			args: args{countVector: &ps, threshold: 2},
+			want: BitVector(0x2_0000_0000),
+		})
+		tests = append(tests, testCase{
+			name: "threshold 3",
+			args: args{countVector: &ps, threshold: 3},
+			want: BitVector(0x2_0000_0000),
+		})
+		tests = append(tests, testCase{
+			name: "threshold 4",
+			args: args{countVector: &ps, threshold: 4},
+			want: BitVector(0x2_0000_0000),
+		})
+	}
+
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			if got := NewBitVector(tt.args.countVector, tt.args.threshold); got != tt.want {
 				t.Errorf("NewBitVector() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestBitVector_IsSubsetOf(t *testing.T) {
+	type args struct {
+		other BitVector
+	}
+	type testCase struct {
+		name string
+		bv   BitVector
+		args args
+		want bool
+	}
+	tests := []testCase{
+		{
+			name: "empty subset of empty",
+			bv:   BitVector(0),
+			args: args{other: BitVector(0)},
+			want: true,
+		},
+		{
+			name: "empty subset of non-empty",
+			bv:   BitVector(0),
+			args: args{other: BitVector(0xFF)},
+			want: true,
+		},
+		{
+			name: "same sets",
+			bv:   BitVector(0xFF),
+			args: args{other: BitVector(0xFF)},
+			want: true,
+		},
+		{
+			name: "proper subset",
+			bv:   BitVector(0x0F),
+			args: args{other: BitVector(0xFF)},
+			want: true,
+		},
+		{
+			name: "not a subset - different bits",
+			bv:   BitVector(0xF0),
+			args: args{other: BitVector(0x0F)},
+			want: false,
+		},
+		{
+			name: "not a subset - extra bits",
+			bv:   BitVector(0xFF),
+			args: args{other: BitVector(0x0F)},
+			want: false,
+		},
+		{
+			name: "large numbers",
+			bv:   BitVector(0x2_0000_0000),
+			args: args{other: BitVector(0x3_FFFF_FFFF)},
+			want: true,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := tt.bv.IsSubsetOf(tt.args.other); got != tt.want {
+				t.Errorf("BitVector.IsSubsetOf() = %v, want %v", got, tt.want)
 			}
 		})
 	}
