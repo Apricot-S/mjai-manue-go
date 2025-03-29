@@ -44,6 +44,7 @@ type State interface {
 	YakuhaiFan(pai *Pai, player *Player) int
 	Turn() int
 	RankedPlayers() [numPlayers]Player
+
 	Update(event any) error
 	Print()
 }
