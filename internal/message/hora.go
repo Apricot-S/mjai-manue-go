@@ -11,7 +11,7 @@ type Hora struct {
 	Action
 	Target     int    `json:"target" validate:"min=0,max=3"`
 	Pai        string `json:"pai" validate:"tile"`
-	HoraPoints int    `json:"hora_points,omitzero"`
+	HoraPoints int    `json:"hora_points,omitzero" validate:"min=0"`
 	Scores     []int  `json:"scores,omitempty"`
 }
 
