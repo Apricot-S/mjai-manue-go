@@ -45,7 +45,7 @@ type State interface {
 	Turn() int
 	RankedPlayers() [numPlayers]Player
 
-	OnStartGame(message *message.StartGame) error
+	OnStartGame(event *message.StartGame) error
 	Update(event any) error
 	Print()
 }
@@ -173,14 +173,14 @@ func (s *StateImpl) RankedPlayers() [numPlayers]Player {
 	return players
 }
 
-func (s *StateImpl) OnStartGame(message *message.StartGame) error {
-	if message == nil {
+func (s *StateImpl) OnStartGame(event *message.StartGame) error {
+	if event == nil {
 		return fmt.Errorf("StartGame message is nil")
 	}
 
 	names := []string{"", "", "", ""}
-	if message.Names != nil {
-		names = slices.Clone(message.Names)
+	if event.Names != nil {
+		names = slices.Clone(event.Names)
 	}
 	if len(names) != numPlayers {
 		return fmt.Errorf("number of players must be 4, but got %d", len(names))
