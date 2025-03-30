@@ -7,6 +7,7 @@ import (
 
 	"github.com/Apricot-S/mjai-manue-go/internal/ai"
 	"github.com/Apricot-S/mjai-manue-go/internal/game"
+	"github.com/Apricot-S/mjai-manue-go/internal/message"
 )
 
 type MockState struct {
@@ -112,17 +113,17 @@ func (s *MockState) YakuhaiFan(pai *game.Pai, player *game.Player) int {
 	return fan
 }
 
-func (s *MockState) KyokuNum() int                    { panic("not implemented") }
-func (s *MockState) Honba() int                       { panic("not implemented") }
-func (s *MockState) Oya() *game.Player                { panic("not implemented") }
-func (s *MockState) Chicha() *game.Player             { panic("not implemented") }
-func (s *MockState) DoraMarkers() []game.Pai          { panic("not implemented") }
-func (s *MockState) NumPipais() int                   { panic("not implemented") }
-func (s *MockState) Turn() int                        { panic("not implemented") }
-func (s *MockState) RankedPlayers() [4]game.Player    { panic("not implemented") }
-func (s *MockState) OnStartGame(names []string) error { panic("not implemented") }
-func (s *MockState) Update(event any) error           { panic("not implemented") }
-func (s *MockState) Print()                           { panic("not implemented") }
+func (s *MockState) KyokuNum() int                                { panic("not implemented") }
+func (s *MockState) Honba() int                                   { panic("not implemented") }
+func (s *MockState) Oya() *game.Player                            { panic("not implemented") }
+func (s *MockState) Chicha() *game.Player                         { panic("not implemented") }
+func (s *MockState) DoraMarkers() []game.Pai                      { panic("not implemented") }
+func (s *MockState) NumPipais() int                               { panic("not implemented") }
+func (s *MockState) Turn() int                                    { panic("not implemented") }
+func (s *MockState) RankedPlayers() [4]game.Player                { panic("not implemented") }
+func (s *MockState) OnStartGame(message *message.StartGame) error { panic("not implemented") }
+func (s *MockState) Update(event any) error                       { panic("not implemented") }
+func (s *MockState) Print()                                       { panic("not implemented") }
 
 func TestScene_Evaluate(t *testing.T) {
 	type args struct {
