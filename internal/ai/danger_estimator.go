@@ -153,14 +153,17 @@ func (s *Scene) isTsupai(pai *game.Pai) bool {
 	return pai.IsTsupai()
 }
 
+// Omotesuji (表筋) or Nakasuji (中筋)
 func (s *Scene) isSuji(pai *game.Pai) (bool, error) {
 	return isSujiOf(pai, s.anpaiSet)
 }
 
+// Katasuji (片筋) or Suji (筋)
 func (s *Scene) isWeakSuji(pai *game.Pai) (bool, error) {
 	return isWeakSujiOf(pai, s.anpaiSet)
 }
 
+// Suji for Riichi declaration tile. Including tiles like 4p against 1p Riichi.
 func (s *Scene) isReachSuji(pai *game.Pai) (bool, error) {
 	return isWeakSujiOf(pai, s.reachPaiSet)
 }
@@ -169,6 +172,8 @@ func (s *Scene) isPrereachSuji(pai *game.Pai) (bool, error) {
 	return isSujiOf(pai, s.prereachSutehaiSet)
 }
 
+// Urasuji (裏筋)
+// http://ja.wikipedia.org/wiki/%E7%AD%8B_(%E9%BA%BB%E9%9B%80)#.E8.A3.8F.E3.82.B9.E3.82.B8
 func (s *Scene) isUrasuji(pai *game.Pai) (bool, error) {
 	return isUrasujiOf(pai, s.prereachSutehaiSet, s.anpaiSet)
 }
@@ -181,6 +186,8 @@ func (s *Scene) isReachUrasuji(pai *game.Pai) (bool, error) {
 	return isUrasujiOf(pai, s.reachPaiSet, s.anpaiSet)
 }
 
+// Aidayonken (間四間)
+// http://ja.wikipedia.org/wiki/%E7%AD%8B_(%E9%BA%BB%E9%9B%80)#.E9.96.93.E5.9B.9B.E9.96.93
 func (s *Scene) isAida4ken(pai *game.Pai) (bool, error) {
 	if pai.IsTsupai() {
 		return false, nil
@@ -240,6 +247,8 @@ func (s *Scene) isAida4ken(pai *game.Pai) (bool, error) {
 	return false, nil
 }
 
+// Matagisuji (跨ぎ筋)
+// http://ja.wikipedia.org/wiki/%E7%AD%8B_(%E9%BA%BB%E9%9B%80)#.E3.81.BE.E3.81.9F.E3.81.8E.E3.82.B9.E3.82.B8
 func (s *Scene) isMatagisuji(pai *game.Pai) (bool, error) {
 	return isMatagisujiOf(pai, s.prereachSutehaiSet, s.anpaiSet)
 }
@@ -256,6 +265,8 @@ func (s *Scene) isReachMatagisuji(pai *game.Pai) (bool, error) {
 	return isMatagisujiOf(pai, s.reachPaiSet, s.anpaiSet)
 }
 
+// Senkisuji (疝気筋)
+// # http://ja.wikipedia.org/wiki/%E7%AD%8B_(%E9%BA%BB%E9%9B%80)#.E7.96.9D.E6.B0.97.E3.82.B9.E3.82.B8
 func (s *Scene) isSenkisuji(pai *game.Pai) (bool, error) {
 	return isSenkisujiOf(pai, s.prereachSutehaiSet, s.anpaiSet)
 }
@@ -664,6 +675,8 @@ func (s *Scene) registerEvaluators() {
 		}
 	}
 
+	// Whether i tiles are visible from one's perspective.
+	// Includes one's own hand. Excludes the tile one is about to discard.
 	for i := 1; i < 4; i++ {
 		featureName := fmt.Sprintf("visible>=%d", i)
 		n := i
@@ -672,6 +685,10 @@ func (s *Scene) registerEvaluators() {
 		}
 	}
 
+	// Among the Suji of that tile, whether one is visible no more than i copies.
+	// The tile itself should not be counted.
+	// In the case of 5p, this means "either 2p or 8p is visible no more than i copies,"
+	// not "the combined visibility of 2p and 8p is no more than i copies."
 	for i := range 4 {
 		featureName := fmt.Sprintf("suji_visible<=%d", i)
 		n := i
@@ -712,6 +729,10 @@ func (s *Scene) registerEvaluators() {
 		}
 	}
 
+	// Among the Suji of that tile, whether one is held at least i copies.
+	// The tile itself should not be counted.
+	// In the case of 5p, this means "either 2p or 8p is held at least i copies,"
+	// not "the combined total of 2p and 8p is at least i copies."
 	for i := 1; i < 5; i++ {
 		featureName := fmt.Sprintf("suji_in_tehais>=%d", i)
 		n := i
