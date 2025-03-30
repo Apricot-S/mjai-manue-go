@@ -9,8 +9,8 @@ import (
 
 func TestNewReachAccepted(t *testing.T) {
 	type args struct {
-		actor int
-		log   string
+		actor  int
+		scores []int
 	}
 	tests := []struct {
 		name    string
@@ -19,14 +19,28 @@ func TestNewReachAccepted(t *testing.T) {
 		wantErr bool
 	}{
 		{
-			name: "valid",
+			name: "without scores",
 			args: args{
-				actor: 0,
-				log:   "",
+				actor:  0,
+				scores: nil,
 			},
 			want: &ReachAccepted{
 				Message: Message{TypeReachAccepted},
 				Actor:   0,
+				Scores:  nil,
+			},
+			wantErr: false,
+		},
+		{
+			name: "with scores",
+			args: args{
+				actor:  0,
+				scores: []int{28000, 23000, 24000, 24000},
+			},
+			want: &ReachAccepted{
+				Message: Message{TypeReachAccepted},
+				Actor:   0,
+				Scores:  []int{28000, 23000, 24000, 24000},
 			},
 			wantErr: false,
 		},
@@ -46,10 +60,37 @@ func TestNewReachAccepted(t *testing.T) {
 			want:    nil,
 			wantErr: true,
 		},
+		{
+			name: "invalid scores empty",
+			args: args{
+				actor:  0,
+				scores: []int{},
+			},
+			want:    nil,
+			wantErr: true,
+		},
+		{
+			name: "invalid scores 3",
+			args: args{
+				actor:  0,
+				scores: []int{28000, 23000, 24000},
+			},
+			want:    nil,
+			wantErr: true,
+		},
+		{
+			name: "invalid scores 5",
+			args: args{
+				actor:  0,
+				scores: []int{28000, 23000, 24000, 24000, 24000},
+			},
+			want:    nil,
+			wantErr: true,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := NewReachAccepted(tt.args.actor)
+			got, err := NewReachAccepted(tt.args.actor, tt.args.scores)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("NewReachAccepted() error = %v, want %v", err, tt.wantErr)
 			}
@@ -69,12 +110,23 @@ func TestReachAccepted_Marshal(t *testing.T) {
 		wantErr bool
 	}{
 		{
-			name: "valid",
+			name: "without scores",
 			args: &ReachAccepted{
 				Message: Message{TypeReachAccepted},
 				Actor:   0,
+				Scores:  nil,
 			},
 			want:    `{"type":"reach_accepted","actor":0}`,
+			wantErr: false,
+		},
+		{
+			name: "with scores",
+			args: &ReachAccepted{
+				Message: Message{TypeReachAccepted},
+				Actor:   0,
+				Scores:  []int{28000, 23000, 24000, 24000},
+			},
+			want:    `{"type":"reach_accepted","actor":0,"scores":[28000,23000,24000,24000]}`,
 			wantErr: false,
 		},
 		{
@@ -113,6 +165,36 @@ func TestReachAccepted_Marshal(t *testing.T) {
 			want:    ``,
 			wantErr: true,
 		},
+		{
+			name: "invalid scores empty",
+			args: &ReachAccepted{
+				Message: Message{TypeReachAccepted},
+				Actor:   0,
+				Scores:  []int{},
+			},
+			want:    ``,
+			wantErr: true,
+		},
+		{
+			name: "invalid scores 3",
+			args: &ReachAccepted{
+				Message: Message{TypeReachAccepted},
+				Actor:   0,
+				Scores:  []int{28000, 23000, 24000},
+			},
+			want:    ``,
+			wantErr: true,
+		},
+		{
+			name: "invalid scores 5",
+			args: &ReachAccepted{
+				Message: Message{TypeReachAccepted},
+				Actor:   0,
+				Scores:  []int{28000, 23000, 24000, 24000, 24000},
+			},
+			want:    ``,
+			wantErr: true,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -140,15 +222,27 @@ func TestReachAccepted_Unmarshal(t *testing.T) {
 			want: ReachAccepted{
 				Message: Message{TypeReachAccepted},
 				Actor:   0,
+				Scores:  nil,
 			},
 			wantErr: false,
 		},
 		{
-			name: "valid",
+			name: "without scores",
 			args: `{"type":"reach_accepted","actor":0}`,
 			want: ReachAccepted{
 				Message: Message{TypeReachAccepted},
 				Actor:   0,
+				Scores:  nil,
+			},
+			wantErr: false,
+		},
+		{
+			name: "with scores",
+			args: `{"type":"reach_accepted","actor":1,"deltas":[0,-1000,0,0],"scores":[28000,23000,24000,24000]}`,
+			want: ReachAccepted{
+				Message: Message{TypeReachAccepted},
+				Actor:   1,
+				Scores:  []int{28000, 23000, 24000, 24000},
 			},
 			wantErr: false,
 		},
@@ -185,6 +279,36 @@ func TestReachAccepted_Unmarshal(t *testing.T) {
 			want: ReachAccepted{
 				Message: Message{TypeReachAccepted},
 				Actor:   4,
+			},
+			wantErr: true,
+		},
+		{
+			name: "invalid scores empty",
+			args: `{"type":"reach_accepted","actor":1,"deltas":[0,-1000,0,0],"scores":[]}`,
+			want: ReachAccepted{
+				Message: Message{TypeReachAccepted},
+				Actor:   1,
+				Scores:  []int{},
+			},
+			wantErr: true,
+		},
+		{
+			name: "invalid scores 3",
+			args: `{"type":"reach_accepted","actor":1,"deltas":[0,-1000,0,0],"scores":[28000,23000,24000]}`,
+			want: ReachAccepted{
+				Message: Message{TypeReachAccepted},
+				Actor:   1,
+				Scores:  []int{28000, 23000, 24000},
+			},
+			wantErr: true,
+		},
+		{
+			name: "invalid scores 5",
+			args: `{"type":"reach_accepted","actor":1,"deltas":[0,-1000,0,0],"scores":[28000,23000,24000,24000,24000]}`,
+			want: ReachAccepted{
+				Message: Message{TypeReachAccepted},
+				Actor:   1,
+				Scores:  []int{28000, 23000, 24000, 24000, 24000},
 			},
 			wantErr: true,
 		},

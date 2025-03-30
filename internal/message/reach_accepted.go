@@ -9,13 +9,19 @@ import (
 
 type ReachAccepted struct {
 	Message
-	Actor int `json:"actor" validate:"min=0,max=3"`
+	Actor  int   `json:"actor" validate:"min=0,max=3"`
+	Scores []int `json:"scores,omitempty"`
 }
 
-func NewReachAccepted(actor int) (*ReachAccepted, error) {
+func NewReachAccepted(actor int, scores []int) (*ReachAccepted, error) {
+	if scores != nil && len(scores) != 4 {
+		return nil, fmt.Errorf("invalid number of scores: %v", scores)
+	}
+
 	m := &ReachAccepted{
 		Message: Message{Type: TypeReachAccepted},
 		Actor:   actor,
+		Scores:  scores,
 	}
 
 	if err := messageValidator.Struct(m); err != nil {
@@ -27,6 +33,9 @@ func NewReachAccepted(actor int) (*ReachAccepted, error) {
 func (m *ReachAccepted) MarshalJSONTo(e *jsontext.Encoder) error {
 	if m.Type != TypeReachAccepted {
 		return fmt.Errorf("invalid type: %v", m.Type)
+	}
+	if m.Scores != nil && len(m.Scores) != 4 {
+		return fmt.Errorf("invalid number of scores: %v", m.Scores)
 	}
 	if err := messageValidator.Struct(m); err != nil {
 		return err
@@ -47,6 +56,9 @@ func (m *ReachAccepted) UnmarshalJSONFrom(d *jsontext.Decoder) error {
 	*m = (ReachAccepted)(mm)
 	if m.Type != TypeReachAccepted {
 		return fmt.Errorf("invalid type: %v", m.Type)
+	}
+	if m.Scores != nil && len(m.Scores) != 4 {
+		return fmt.Errorf("invalid number of scores: %v", m.Scores)
 	}
 
 	return messageValidator.Struct(m)
