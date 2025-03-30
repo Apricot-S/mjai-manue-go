@@ -37,7 +37,7 @@ go install github.com/Apricot-S/mjai-manue-go/cmd/mjai-manue
 ### For TCP/IP (e.g., [mjai](https://github.com/gimite/mjai))
 
 ```sh
-mjai-manue --url http://example.com:11600/default
+mjai-manue --url mjsonp://example.com:11600/default
 ```
 
 ### For Standard I/O (e.g., [mjai.app](https://github.com/smly/mjai.app))
