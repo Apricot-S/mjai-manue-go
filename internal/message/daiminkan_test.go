@@ -113,7 +113,7 @@ func TestNewDaiminkan(t *testing.T) {
 			name: "empty pai",
 			args: args{
 				actor:    0,
-				target:   4,
+				target:   3,
 				pai:      "",
 				consumed: [3]string{"C", "C", "C"},
 				log:      "",
@@ -125,7 +125,7 @@ func TestNewDaiminkan(t *testing.T) {
 			name: "invalid pai",
 			args: args{
 				actor:    0,
-				target:   4,
+				target:   3,
 				pai:      "6sr",
 				consumed: [3]string{"6s", "6s", "6s"},
 				log:      "",
@@ -137,7 +137,7 @@ func TestNewDaiminkan(t *testing.T) {
 			name: "empty consumed",
 			args: args{
 				actor:    0,
-				target:   4,
+				target:   3,
 				pai:      "C",
 				consumed: [3]string{"", "", ""},
 				log:      "",
@@ -149,7 +149,7 @@ func TestNewDaiminkan(t *testing.T) {
 			name: "invalid consumed",
 			args: args{
 				actor:    0,
-				target:   4,
+				target:   3,
 				pai:      "7s",
 				consumed: [3]string{"7s", "7sr", "7s"},
 				log:      "",

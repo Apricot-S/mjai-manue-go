@@ -113,7 +113,7 @@ func TestNewChi(t *testing.T) {
 			name: "empty pai",
 			args: args{
 				actor:    0,
-				target:   4,
+				target:   3,
 				pai:      "",
 				consumed: [2]string{"5sr", "7s"},
 				log:      "",
@@ -125,7 +125,7 @@ func TestNewChi(t *testing.T) {
 			name: "invalid pai",
 			args: args{
 				actor:    0,
-				target:   4,
+				target:   3,
 				pai:      "6sr",
 				consumed: [2]string{"5sr", "7s"},
 				log:      "",
@@ -137,7 +137,7 @@ func TestNewChi(t *testing.T) {
 			name: "empty consumed",
 			args: args{
 				actor:    0,
-				target:   4,
+				target:   3,
 				pai:      "6s",
 				consumed: [2]string{"", ""},
 				log:      "",
@@ -149,7 +149,7 @@ func TestNewChi(t *testing.T) {
 			name: "invalid consumed",
 			args: args{
 				actor:    0,
-				target:   4,
+				target:   3,
 				pai:      "6s",
 				consumed: [2]string{"5sr", "7sr"},
 				log:      "",
