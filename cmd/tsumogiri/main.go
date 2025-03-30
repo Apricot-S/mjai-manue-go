@@ -5,10 +5,10 @@ import (
 	"fmt"
 	"log"
 	"net"
-	"net/http"
 	"net/url"
 	"os"
 	"path"
+	"strings"
 
 	"github.com/Apricot-S/mjai-manue-go/internal/agent"
 	"github.com/Apricot-S/mjai-manue-go/internal/client"
@@ -17,22 +17,17 @@ import (
 const defaultName = "Tsumogiri"
 const defaultPort = "11600"
 
-func parseOptions() (name string, room string, rawURL string, usePipe bool) {
+func parseOptions() (name string, rawURL string, usePipe bool) {
 	flag.StringVar(&name, "name", defaultName, "Player's name")
-	flag.StringVar(&room, "room", "", "Room name (overrides the last path segment of URL if specified)")
-	flag.StringVar(&rawURL, "url", "", "Server URL (e.g., http://localhost:11600/default)")
-	flag.BoolVar(&usePipe, "pipe", false, "Use pipe instead of HTTP (ignore --url if specified)")
+	flag.StringVar(&rawURL, "url", "", "Server URL (e.g., mjsonp://localhost:11600/default)")
+	flag.BoolVar(&usePipe, "pipe", false, "Use pipe instead of TCP/IP (ignore --url if specified)")
 	flag.Parse()
 	return
 }
 
-func getRoomName(rawURL, room string) (string, error) {
-	if room != "" {
-		return room, nil
-	}
-
+func getRoom(rawURL string) (string, error) {
 	if rawURL == "" {
-		return room, nil
+		return "", nil
 	}
 
 	u, err := url.Parse(rawURL)
@@ -40,28 +35,25 @@ func getRoomName(rawURL, room string) (string, error) {
 		return "", fmt.Errorf("invalid URL: %v", err)
 	}
 
-	room = path.Base(u.Path)
+	room := path.Base(u.Path)
 	if room == "." || room == "/" {
 		room = ""
 	}
 	return room, nil
 }
 
-func getHostAndPort(rawURL string) (string, string, error) {
+func getHost(rawURL string) (string, error) {
 	u, err := url.Parse(rawURL)
 	if err != nil {
-		return "", "", fmt.Errorf("invalid URL: %v", err)
+		return "", fmt.Errorf("invalid URL: %v", err)
 	}
 
 	host := u.Host
-	port := defaultPort
-
-	if h, p, err := net.SplitHostPort(u.Host); err == nil {
-		host = h
-		port = p
+	if !strings.Contains(host, ":") {
+		host += fmt.Sprintf(":%s", defaultPort)
 	}
 
-	return host, port, nil
+	return host, nil
 }
 
 func runPipeMode(agent agent.Agent) error {
@@ -69,45 +61,49 @@ func runPipeMode(agent agent.Agent) error {
 	return c.Run()
 }
 
-func runServerMode(rawURL string, agent agent.Agent) error {
-	_, port, err := getHostAndPort(rawURL)
+func runTCPClientMode(rawURL string, agent agent.Agent) error {
+	host, err := getHost(rawURL)
 	if err != nil {
 		return err
 	}
 
-	http.HandleFunc(rawURL, func(w http.ResponseWriter, r *http.Request) {
-		c := client.NewClient(r.Body, w, false, agent)
-		if err := c.Run(); err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-		}
-	})
+	conn, err := net.Dial("tcp", host)
+	if err != nil {
+		return fmt.Errorf("error accepting connection: %v", err)
+	}
+	defer conn.Close()
 
-	addr := ":" + port
-	fmt.Fprintf(os.Stderr, "Server is running at %s (port: %s)\n", rawURL, port)
-	return http.ListenAndServe(addr, nil)
+	fmt.Fprintf(os.Stderr, "connecting server: %s", host)
+
+	c := client.NewClient(conn, conn, false, agent)
+	if err := c.Run(); err != nil {
+		return fmt.Errorf("client error: %v", err)
+	}
+
+	return nil
 }
 
 func main() {
-	name, room, rawURL, usePipe := parseOptions()
+	name, rawURL, usePipe := parseOptions()
 
 	if !usePipe && rawURL == "" {
 		log.Fatal("specify --url or --pipe")
 	}
 
-	room, err := getRoomName(rawURL, room)
+	room, err := getRoom(rawURL)
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	agent := agent.NewTsumogiriAgent(name, room)
 
-	if usePipe {
-		if err := runPipeMode(agent); err != nil {
-			log.Fatalf("error running client: %v", err)
-		}
+	if usePipe && rawURL == "" {
+		err = runPipeMode(agent)
 	} else {
-		if err := runServerMode(rawURL, agent); err != nil {
-			log.Fatalf("error starting server: %v", err)
-		}
+		err = runTCPClientMode(rawURL, agent)
+	}
+
+	if err != nil {
+		log.Fatalf("error running client: %v", err)
 	}
 }
