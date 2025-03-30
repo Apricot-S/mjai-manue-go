@@ -13,7 +13,7 @@ type ManueAI struct {
 	noChanges           [4]int
 }
 
-func NewManueAI(stats *configs.GameStats, root *configs.DangerNode) *ManueAI {
+func NewManueAI(stats *configs.GameStats, root *configs.DecisionNode) *ManueAI {
 	return NewManueAIWithEstimators(
 		stats,
 		NewDangerEstimator(root),

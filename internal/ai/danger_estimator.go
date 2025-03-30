@@ -816,10 +816,10 @@ type ProbInfo struct {
 }
 
 type DangerEstimator struct {
-	root *configs.DangerNode
+	root *configs.DecisionNode
 }
 
-func NewDangerEstimator(root *configs.DangerNode) *DangerEstimator {
+func NewDangerEstimator(root *configs.DecisionNode) *DangerEstimator {
 	return &DangerEstimator{
 		root: root,
 	}
