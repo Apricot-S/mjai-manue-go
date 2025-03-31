@@ -10,7 +10,7 @@ import (
 type StartKyoku struct {
 	Message
 	Bakaze     string        `json:"bakaze" validate:"wind"`
-	Kyoku      int           `json:"kyoku" validate:"min=1"`
+	Kyoku      int           `json:"kyoku" validate:"min=1,max=4"`
 	Honba      int           `json:"honba" validate:"min=0"`
 	Kyotaku    int           `json:"kyotaku" validate:"min=0"`
 	Oya        int           `json:"oya" validate:"min=0,max=3"`
