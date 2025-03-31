@@ -10,6 +10,7 @@ Differences from the original:
 - Fixed the miscalculation of the shanten number when the hand contains four identical tiles.
 - Improved error handling to more reliably reject invalid or anomalous input.
 - Refactored the code to improve readability and maintainability.
+- Does not include tools to generate stats and decision trees from game records, as there is no motivation to modify the pre-generated files provided in the original project.
 
 > [!NOTE]
 > The original project includes an older version written in Ruby and a newer version written in CoffeeScript. This project ports only the new version.
