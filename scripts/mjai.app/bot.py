@@ -16,10 +16,12 @@ assert proc.stderr is not None
 
 try:
     while True:
-        user_input = input()
-        if user_input:
-            proc.stdin.write(user_input)
-            proc.stdin.flush()
+        input_ = input()
+        if input_.strip() == "":
+            # Workaround
+            continue
+        proc.stdin.write(input_)
+        proc.stdin.flush()
 
         output = proc.stdout.readline()
         if output:
