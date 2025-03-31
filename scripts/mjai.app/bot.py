@@ -2,12 +2,17 @@ import subprocess
 
 proc = subprocess.Popen(
     ["./mjai-manue", "--pipe"],
+    bufsize=1,
     stdin=subprocess.PIPE,
     stdout=subprocess.PIPE,
     stderr=subprocess.PIPE,
     text=True,
-    bufsize=1,
+    encoding="utf-8",
 )
+
+assert proc.stdin is not None
+assert proc.stdout is not None
+assert proc.stderr is not None
 
 try:
     while True:
