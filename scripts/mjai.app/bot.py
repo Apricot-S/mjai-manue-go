@@ -1,6 +1,5 @@
 import subprocess
 
-
 proc = subprocess.Popen(
     ["./mjai-manue", "--pipe"],
     stdin=subprocess.PIPE,
