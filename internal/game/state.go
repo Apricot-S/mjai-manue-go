@@ -253,6 +253,9 @@ func (s *StateImpl) Update(event any) error {
 	case *message.Kakan:
 		s.currentActionType = message.TypeKakan
 		s.onKakan(e)
+	case *message.Dora:
+		s.currentActionType = message.TypeDora
+		s.onDora(e)
 	case *message.Reach:
 		s.currentActionType = message.TypeReach
 		s.onReach(e)
@@ -481,6 +484,24 @@ func (s *StateImpl) onKakan(event *message.Kakan) error {
 		return fmt.Errorf("kakan message is nil")
 	}
 	panic("unimplemented!")
+}
+
+func (s *StateImpl) onDora(event *message.Dora) error {
+	if event == nil {
+		return fmt.Errorf("dora message is nil")
+	}
+
+	if len(s.doraMarkers) >= maxNumDoraMarkers {
+		return fmt.Errorf("a 6th dora cannot be added")
+	}
+
+	pai, err := NewPaiWithName(event.DoraMarker)
+	if err != nil {
+		return err
+	}
+	s.doraMarkers = append(s.doraMarkers, *pai)
+
+	return nil
 }
 
 func (s *StateImpl) onReach(event *message.Reach) error {
