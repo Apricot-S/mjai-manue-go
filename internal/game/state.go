@@ -175,7 +175,7 @@ func (s *StateImpl) RankedPlayers() [numPlayers]Player {
 
 func (s *StateImpl) OnStartGame(event *message.StartGame) error {
 	if event == nil {
-		return fmt.Errorf("StartGame message is nil")
+		return fmt.Errorf("start_game message is nil")
 	}
 
 	names := []string{"", "", "", ""}
