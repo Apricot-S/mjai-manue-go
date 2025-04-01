@@ -66,6 +66,7 @@ type StateImpl struct {
 	prevDahaiPai      *Pai
 	currentActionType message.Type
 	tenpais           [numPlayers]bool
+	shantenLowerBound [numPlayers]int
 }
 
 func (s *StateImpl) Players() *[numPlayers]Player {
@@ -214,6 +215,7 @@ func (s *StateImpl) OnStartGame(event *message.StartGame) error {
 	s.prevDahaiPai = nil
 	s.currentActionType = ""
 	s.tenpais = [numPlayers]bool{false, false, false, false}
+	s.shantenLowerBound = [numPlayers]int{0, 0, 0, 0}
 
 	return nil
 }
@@ -334,6 +336,7 @@ func (s *StateImpl) onStartKyoku(event *message.StartKyoku) error {
 			return err
 		}
 		s.tenpais[i] = shanten <= 0
+		s.shantenLowerBound[i] = shanten
 	}
 
 	return nil
@@ -357,15 +360,18 @@ func (s *StateImpl) onTsumo(event *message.Tsumo) error {
 	}
 	player.onTsumo(*pai)
 
-	ps, err := NewPaiSetWithPais(player.Tehais())
-	if err != nil {
-		return err
+	if s.shantenLowerBound[actor] <= 0 {
+		ps, err := NewPaiSetWithPais(player.Tehais())
+		if err != nil {
+			return err
+		}
+		shanten, _, err := AnalyzeShanten(ps)
+		if err != nil {
+			return err
+		}
+		s.tenpais[actor] = shanten <= 0
+		s.shantenLowerBound[actor] = shanten
 	}
-	shanten, _, err := AnalyzeShanten(ps)
-	if err != nil {
-		return err
-	}
-	s.tenpais[actor] = shanten <= 0
 
 	return nil
 }
