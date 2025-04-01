@@ -17,20 +17,20 @@ const (
 	finalTurn         = numInitPipais / numPlayers
 )
 
-var validPrevEventsMap = map[message.Type]map[message.Type]bool{
+var validPrevEventsMap = map[message.Type]map[message.Type]struct{}{
 	message.TypeTsumo: {
-		message.TypeDahai:         true,
-		message.TypeDaiminkan:     true,
-		message.TypeAnkan:         true,
-		message.TypeKakan:         true,
-		message.TypeDora:          true,
-		message.TypeReachAccepted: true,
+		message.TypeDahai:         struct{}{},
+		message.TypeDaiminkan:     struct{}{},
+		message.TypeAnkan:         struct{}{},
+		message.TypeKakan:         struct{}{},
+		message.TypeDora:          struct{}{},
+		message.TypeReachAccepted: struct{}{},
 	},
 	message.TypeDahai: {
-		message.TypeTsumo: true,
-		message.TypeChi:   true,
-		message.TypePon:   true,
-		message.TypeReach: true,
+		message.TypeTsumo: struct{}{},
+		message.TypeChi:   struct{}{},
+		message.TypePon:   struct{}{},
+		message.TypeReach: struct{}{},
 	},
 }
 
@@ -39,7 +39,7 @@ func validateCurrentEvent(current, prev message.Type) error {
 	if !exists {
 		return fmt.Errorf("invalid current event: %s", current)
 	}
-	if !validPrevs[prev] {
+	if _, ok := validPrevs[prev]; !ok {
 		return fmt.Errorf("%s is invalid after %s", current, prev)
 	}
 	return nil
