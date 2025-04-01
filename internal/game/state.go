@@ -317,7 +317,10 @@ func (s *StateImpl) onStartKyoku(event *message.StartKyoku) error {
 			tehais[j] = *tehai
 		}
 
-		s.players[i].onStartKyoku(tehais, nil)
+		err := s.players[i].onStartKyoku(tehais, nil)
+		if err != nil {
+			return err
+		}
 
 		if event.Scores != nil {
 			s.players[i].SetScore(event.Scores[i])
@@ -343,7 +346,10 @@ func (s *StateImpl) onTsumo(event *message.Tsumo) error {
 	}
 	actor := event.Actor
 	player := &s.players[actor]
-	player.onTsumo(*pai)
+	err = player.onTsumo(*pai)
+	if err != nil {
+		return err
+	}
 
 	return nil
 }
@@ -359,7 +365,10 @@ func (s *StateImpl) onDahai(event *message.Dahai) error {
 	}
 	actor := event.Actor
 	player := &s.players[actor]
-	player.onDahai(*pai)
+	err = player.onDahai(*pai)
+	if err != nil {
+		return err
+	}
 
 	s.prevDahaiActor = actor
 	s.prevDahaiPai = pai
@@ -371,21 +380,93 @@ func (s *StateImpl) onChi(event *message.Chi) error {
 	if event == nil {
 		return fmt.Errorf("chi message is nil")
 	}
-	panic("unimplemented!")
+
+	pai, err := NewPaiWithName(event.Pai)
+	if err != nil {
+		return err
+	}
+	var consumed [2]Pai
+	for i, c := range event.Consumed {
+		p, err := NewPaiWithName(c)
+		if err != nil {
+			return err
+		}
+		consumed[i] = *p
+	}
+	furo, err := NewChi(*pai, consumed, event.Target)
+	if err != nil {
+		return err
+	}
+
+	actor := event.Actor
+	err = s.players[actor].onChiPonKan(furo)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func (s *StateImpl) onPon(event *message.Pon) error {
 	if event == nil {
 		return fmt.Errorf("pon message is nil")
 	}
-	panic("unimplemented!")
+
+	pai, err := NewPaiWithName(event.Pai)
+	if err != nil {
+		return err
+	}
+	var consumed [2]Pai
+	for i, c := range event.Consumed {
+		p, err := NewPaiWithName(c)
+		if err != nil {
+			return err
+		}
+		consumed[i] = *p
+	}
+	furo, err := NewPon(*pai, consumed, event.Target)
+	if err != nil {
+		return err
+	}
+
+	actor := event.Actor
+	err = s.players[actor].onChiPonKan(furo)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func (s *StateImpl) onDaiminkan(event *message.Daiminkan) error {
 	if event == nil {
 		return fmt.Errorf("daiminkan message is nil")
 	}
-	panic("unimplemented!")
+
+	pai, err := NewPaiWithName(event.Pai)
+	if err != nil {
+		return err
+	}
+	var consumed [3]Pai
+	for i, c := range event.Consumed {
+		p, err := NewPaiWithName(c)
+		if err != nil {
+			return err
+		}
+		consumed[i] = *p
+	}
+	furo, err := NewDaiminkan(*pai, consumed, event.Target)
+	if err != nil {
+		return err
+	}
+
+	actor := event.Actor
+	err = s.players[actor].onChiPonKan(furo)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func (s *StateImpl) onAnkan(event *message.Ankan) error {
