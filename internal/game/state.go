@@ -26,6 +26,12 @@ var validPrevEventsMap = map[message.Type]map[message.Type]bool{
 		message.TypeDora:          true,
 		message.TypeReachAccepted: true,
 	},
+	message.TypeDahai: {
+		message.TypeTsumo: true,
+		message.TypeChi:   true,
+		message.TypePon:   true,
+		message.TypeReach: true,
+	},
 }
 
 func validateCurrentEvent(current, prev message.Type) error {
@@ -386,6 +392,10 @@ func (s *StateImpl) onTsumo(event *message.Tsumo) error {
 func (s *StateImpl) onDahai(event *message.Dahai) error {
 	if event == nil {
 		return fmt.Errorf("dahai message is nil")
+	}
+
+	if err := validateCurrentEvent(message.TypeDahai, s.prevActionType); err != nil {
+		return err
 	}
 
 	pai, err := NewPaiWithName(event.Pai)
