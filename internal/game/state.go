@@ -221,7 +221,48 @@ func (s *StateImpl) OnStartGame(event *message.StartGame) error {
 func (s *StateImpl) Update(event any) error {
 	s.prevActionType = s.currentActionType
 
-	panic("unimplemented!")
+	switch e := event.(type) {
+	case *message.StartKyoku:
+		s.currentActionType = message.TypeStartKyoku
+		s.onStartKyoku(e)
+	case *message.Tsumo:
+		s.currentActionType = message.TypeTsumo
+		s.onTsumo(e)
+	case *message.Dahai:
+		s.currentActionType = message.TypeDahai
+		s.onDahai(e)
+	case *message.Chi:
+		s.currentActionType = message.TypeChi
+		s.onChi(e)
+	case *message.Pon:
+		s.currentActionType = message.TypePon
+		s.onPon(e)
+	case *message.Daiminkan:
+		s.currentActionType = message.TypeDaiminkan
+		s.onDaiminkan(e)
+	case *message.Ankan:
+		s.currentActionType = message.TypeAnkan
+		s.onAnkan(e)
+	case *message.Kakan:
+		s.currentActionType = message.TypeKakan
+		s.onKakan(e)
+	case *message.Reach:
+		s.currentActionType = message.TypeReach
+		s.onReach(e)
+	case *message.ReachAccepted:
+		s.currentActionType = message.TypeReachAccepted
+		s.onReachAccepted(e)
+	case *message.Hora:
+		s.currentActionType = message.TypeHora
+		s.onHora(e)
+	case *message.Ryukyoku:
+		s.currentActionType = message.TypeRyukyoku
+		s.onRyukyoku(e)
+	default:
+		return fmt.Errorf("unknown event type: %T", e)
+	}
+
+	return nil
 }
 
 func (s *StateImpl) Print() {
@@ -236,4 +277,88 @@ func (s *StateImpl) Print() {
 			PaisToStr(p.tehais),
 			PaisToStr(p.ho))
 	}
+}
+
+func (s *StateImpl) onStartKyoku(event *message.StartKyoku) error {
+	if event == nil {
+		return fmt.Errorf("start_kyoku message is nil")
+	}
+	panic("unimplemented!")
+}
+
+func (s *StateImpl) onTsumo(event *message.Tsumo) error {
+	if event == nil {
+		return fmt.Errorf("tsumo message is nil")
+	}
+	panic("unimplemented!")
+}
+
+func (s *StateImpl) onDahai(event *message.Dahai) error {
+	if event == nil {
+		return fmt.Errorf("dahai message is nil")
+	}
+	panic("unimplemented!")
+}
+
+func (s *StateImpl) onChi(event *message.Chi) error {
+	if event == nil {
+		return fmt.Errorf("chi message is nil")
+	}
+	panic("unimplemented!")
+}
+
+func (s *StateImpl) onPon(event *message.Pon) error {
+	if event == nil {
+		return fmt.Errorf("pon message is nil")
+	}
+	panic("unimplemented!")
+}
+
+func (s *StateImpl) onDaiminkan(event *message.Daiminkan) error {
+	if event == nil {
+		return fmt.Errorf("daiminkan message is nil")
+	}
+	panic("unimplemented!")
+}
+
+func (s *StateImpl) onAnkan(event *message.Ankan) error {
+	if event == nil {
+		return fmt.Errorf("ankan message is nil")
+	}
+	panic("unimplemented!")
+}
+
+func (s *StateImpl) onKakan(event *message.Kakan) error {
+	if event == nil {
+		return fmt.Errorf("kakan message is nil")
+	}
+	panic("unimplemented!")
+}
+
+func (s *StateImpl) onReach(event *message.Reach) error {
+	if event == nil {
+		return fmt.Errorf("reach message is nil")
+	}
+	panic("unimplemented!")
+}
+
+func (s *StateImpl) onReachAccepted(event *message.ReachAccepted) error {
+	if event == nil {
+		return fmt.Errorf("reach_accepted message is nil")
+	}
+	panic("unimplemented!")
+}
+
+func (s *StateImpl) onHora(event *message.Hora) error {
+	if event == nil {
+		return fmt.Errorf("hora message is nil")
+	}
+	panic("unimplemented!")
+}
+
+func (s *StateImpl) onRyukyoku(event *message.Ryukyoku) error {
+	if event == nil {
+		return fmt.Errorf("ryukyoku message is nil")
+	}
+	panic("unimplemented!")
 }
