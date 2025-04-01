@@ -17,6 +17,28 @@ const (
 	finalTurn         = numInitPipais / numPlayers
 )
 
+var validPrevEventsMap = map[message.Type]map[message.Type]bool{
+	message.TypeTsumo: {
+		message.TypeDahai:         true,
+		message.TypeDaiminkan:     true,
+		message.TypeAnkan:         true,
+		message.TypeKakan:         true,
+		message.TypeDora:          true,
+		message.TypeReachAccepted: true,
+	},
+}
+
+func validateCurrentEvent(current, prev message.Type) error {
+	validPrevs, exists := validPrevEventsMap[current]
+	if !exists {
+		return fmt.Errorf("invalid current event: %s", current)
+	}
+	if !validPrevs[prev] {
+		return fmt.Errorf("%s is invalid after %s", current, prev)
+	}
+	return nil
+}
+
 func getDistance(p1 *Player, p2 *Player) int {
 	return (numPlayers + p1.ID() - p2.ID()) % numPlayers
 }
@@ -336,6 +358,10 @@ func (s *StateImpl) onStartKyoku(event *message.StartKyoku) error {
 func (s *StateImpl) onTsumo(event *message.Tsumo) error {
 	if event == nil {
 		return fmt.Errorf("tsumo message is nil")
+	}
+
+	if err := validateCurrentEvent(message.TypeTsumo, s.prevActionType); err != nil {
+		return err
 	}
 
 	s.numPipais--
