@@ -292,7 +292,41 @@ func (s *StateImpl) onStartKyoku(event *message.StartKyoku) error {
 	if event == nil {
 		return fmt.Errorf("start_kyoku message is nil")
 	}
-	panic("unimplemented!")
+
+	bakaze, err := NewPaiWithName(event.Bakaze)
+	if err != nil {
+		return err
+	}
+	s.bakaze = *bakaze
+	s.kyokuNum = event.Kyoku
+	s.honba = event.Honba
+	s.oya = &s.players[event.Oya]
+	s.doraMarkers = make([]Pai, 0, maxNumDoraMarkers)
+	doraMarker, err := NewPaiWithName(event.DoraMarker)
+	if err != nil {
+		return err
+	}
+	s.doraMarkers = append(s.doraMarkers, *doraMarker)
+	s.numPipais = numInitPipais
+
+	for i := range numPlayers {
+		tehais := make([]Pai, initTehaisSize)
+		for j := range tehais {
+			tehai, err := NewPaiWithName(event.Tehais[i][j])
+			if err != nil {
+				return err
+			}
+			tehais[j] = *tehai
+		}
+
+		s.players[i].onStartKyoku(tehais, nil)
+
+		if event.Scores != nil {
+			s.players[i].SetScore(event.Scores[i])
+		}
+	}
+
+	return nil
 }
 
 func (s *StateImpl) onTsumo(event *message.Tsumo) error {
