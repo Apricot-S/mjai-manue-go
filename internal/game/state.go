@@ -324,6 +324,16 @@ func (s *StateImpl) onStartKyoku(event *message.StartKyoku) error {
 		if event.Scores != nil {
 			s.players[i].SetScore(event.Scores[i])
 		}
+
+		ps, err := NewPaiSetWithPais(s.players[i].Tehais())
+		if err != nil {
+			return err
+		}
+		shanten, _, err := AnalyzeShanten(ps)
+		if err != nil {
+			return err
+		}
+		s.tenpais[i] = shanten <= 0
 	}
 
 	return nil
