@@ -76,7 +76,7 @@ func (a *TsumogiriAgent) Respond(msgs []jsontext.Value) (jsontext.Value, error) 
 
 		res, err := json.Marshal(&dahai)
 		if err != nil {
-			return nil, fmt.Errorf("failed to unmarshal dahai message: %w", err)
+			return nil, fmt.Errorf("failed to marshal dahai message: %w", err)
 		}
 
 		return res, nil
