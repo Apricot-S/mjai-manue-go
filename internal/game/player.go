@@ -128,6 +128,10 @@ func (p *Player) Score() int {
 	return p.score
 }
 
+func (p *Player) SetScore(score int) {
+	p.score = score
+}
+
 func (p *Player) CanDahai() bool {
 	return p.canDahai
 }
