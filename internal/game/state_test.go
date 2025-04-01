@@ -219,7 +219,6 @@ func getDefaultStateForTest() *StateImpl {
 		prevDahaiActor:    -1,
 		prevDahaiPai:      nil,
 		currentActionType: "",
-		tenpais:           [numPlayers]bool{false, false, false, false},
 	}
 }
 
