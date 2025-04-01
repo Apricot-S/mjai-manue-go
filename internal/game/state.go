@@ -221,6 +221,15 @@ func (s *StateImpl) OnStartGame(event *message.StartGame) error {
 func (s *StateImpl) Update(event any) error {
 	s.prevActionType = s.currentActionType
 
+	// This is specially handled here because it's not an anpai if the dahai is followed by a hora.
+	if _, isHora := event.(*message.Hora); !isHora && s.prevActionType == message.TypeDahai {
+		for _, p := range s.players {
+			if p.ID() != s.prevDahaiActor {
+				p.AddExtraAnpais(*s.prevDahaiPai)
+			}
+		}
+	}
+
 	switch e := event.(type) {
 	case *message.StartKyoku:
 		s.currentActionType = message.TypeStartKyoku
