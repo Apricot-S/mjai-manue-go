@@ -333,7 +333,31 @@ func (s *StateImpl) onTsumo(event *message.Tsumo) error {
 	if event == nil {
 		return fmt.Errorf("tsumo message is nil")
 	}
-	panic("unimplemented!")
+
+	s.numPipais--
+	if s.numPipais < 0 {
+		return fmt.Errorf("numPipais is negative: %d", s.numPipais)
+	}
+
+	actor := event.Actor
+	player := &s.players[actor]
+	pai, err := NewPaiWithName(event.Pai)
+	if err != nil {
+		return err
+	}
+	player.onTsumo(*pai)
+
+	ps, err := NewPaiSetWithPais(player.Tehais())
+	if err != nil {
+		return err
+	}
+	shanten, _, err := AnalyzeShanten(ps)
+	if err != nil {
+		return err
+	}
+	s.tenpais[actor] = shanten <= 0
+
+	return nil
 }
 
 func (s *StateImpl) onDahai(event *message.Dahai) error {
@@ -405,3 +429,130 @@ func (s *StateImpl) onRyukyoku(event *message.Ryukyoku) error {
 	}
 	panic("unimplemented!")
 }
+
+// Java version
+
+// private void onTsumo(final Tsumo tsumo) {
+// 	this.numPipais--;
+
+// 	final var actor = tsumo.getActor();
+// 	var player = this.players.get(actor);
+// 	player.onTsumo(new Pai(tsumo.getPai()));
+
+// 	final var analysis = new ShantenAnalysis(new PaiSet(player.getTehais()));
+// 	this.tenpais[actor] = analysis.getShanten() <= 0;
+// }
+
+// private void onDahai(final Dahai dahai) {
+// 	final var actor = dahai.getActor();
+// 	final var pai = new Pai(dahai.getPai());
+// 	var player = this.players.get(actor);
+// 	player.onDahai(pai);
+
+// 	final var analysis = new ShantenAnalysis(new PaiSet(player.getTehais()));
+// 	this.tenpais[actor] = analysis.getShanten() <= 0;
+
+// 	this.previousDahaiActor = OptionalInt.of(actor);
+// 	this.previousDahaiPai = Optional.of(pai);
+// }
+
+// private void onChi(final Chi chi) {
+// 	final var actor = chi.getActor();
+// 	final var consumed = chi.getConsumed().stream().map(Pai::new).toList();
+// 	final var furo =
+// 			new Furo(
+// 					Furo.Type.CHI,
+// 					Optional.of(new Pai(chi.getPai())),
+// 					consumed,
+// 					OptionalInt.of(chi.getTarget()));
+// 	this.onChiPonKan(actor, furo);
+// }
+
+// private void onPon(final Pon pon) {
+// 	final var actor = pon.getActor();
+// 	final var consumed = pon.getConsumed().stream().map(Pai::new).toList();
+// 	final var furo =
+// 			new Furo(
+// 					Furo.Type.PON,
+// 					Optional.of(new Pai(pon.getPai())),
+// 					consumed,
+// 					OptionalInt.of(pon.getTarget()));
+// 	this.onChiPonKan(actor, furo);
+// }
+
+// private void onDaiminkan(final Daiminkan daiminkan) {
+// 	final var actor = daiminkan.getActor();
+// 	final var consumed = daiminkan.getConsumed().stream().map(Pai::new).toList();
+// 	final var furo =
+// 			new Furo(
+// 					Furo.Type.DAIMINKAN,
+// 					Optional.of(new Pai(daiminkan.getPai())),
+// 					consumed,
+// 					OptionalInt.of(daiminkan.getTarget()));
+// 	this.onChiPonKan(actor, furo);
+// }
+
+// private void onChiPonKan(final int actor, final Furo furo) {
+// 	var player = this.players.get(actor);
+// 	player.onChiPonKan(furo);
+// 	this.players.get(furo.getTarget().orElseThrow()).onTargeted(furo);
+
+// 	final var analysis = new ShantenAnalysis(new PaiSet(player.getTehais()));
+// 	this.tenpais[actor] = analysis.getShanten() <= 0;
+// }
+
+// private void onAnkan(final Ankan ankan) {
+// 	final var actor = ankan.getActor();
+// 	final var consumed = ankan.getConsumed().stream().map(Pai::new).toList();
+// 	final var furo = new Furo(Furo.Type.ANKAN, Optional.empty(), consumed, OptionalInt.empty());
+// 	this.players.get(actor).onAnkan(furo);
+// }
+
+// private void onKakan(final Kakan kakan) {
+// 	final var actor = kakan.getActor();
+// 	final var consumed = kakan.getConsumed().stream().map(Pai::new).toList();
+// 	final var furo =
+// 			new Furo(
+// 					Furo.Type.KAKAN,
+// 					Optional.of(new Pai(kakan.getPai())),
+// 					consumed,
+// 					OptionalInt.empty());
+// 	this.players.get(actor).onKakan(furo);
+// }
+
+// private void onDora(final Dora dora) throws IllegalArgumentException {
+// 	if (this.doraMarkers.size() >= Game.MAX_NUM_DORA_MARKER) {
+// 		throw new IllegalArgumentException("A 6th dora cannot be added.");
+// 	}
+// 	this.doraMarkers.add(new Pai(dora.getDoraMarker()));
+// }
+
+// private void onReach(final Reach reach) {
+// 	this.players.get(reach.getActor()).onReach();
+// }
+
+// private void onReachAccepted(final ReachAccepted reachAccepted) {
+// 	final var scores = reachAccepted.getScores();
+// 	final var score =
+// 			scores != null
+// 					? OptionalInt.of(scores[reachAccepted.getActor()])
+// 					: OptionalInt.empty();
+// 	this.players.get(reachAccepted.getActor()).onReachAccepted(score);
+// }
+
+// private void onHora(final Hora hora) {
+// 	Optional.ofNullable(hora.getScores())
+// 			.ifPresent(
+// 					scores ->
+// 							IntStream.range(0, scores.length)
+// 									.forEach(i -> this.players.get(i).setScore(scores[i])));
+// }
+
+// private void onRyukyoku(final Ryukyoku ryukyoku) {
+// 	Optional.ofNullable(ryukyoku.getScores())
+// 			.ifPresent(
+// 					scores ->
+// 							IntStream.range(0, scores.length)
+// 									.forEach(i -> this.players.get(i).setScore(scores[i])));
+// }
+// }
