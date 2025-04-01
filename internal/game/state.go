@@ -337,12 +337,12 @@ func (s *StateImpl) onTsumo(event *message.Tsumo) error {
 		return fmt.Errorf("numPipais is negative: %d", s.numPipais)
 	}
 
-	actor := event.Actor
-	player := &s.players[actor]
 	pai, err := NewPaiWithName(event.Pai)
 	if err != nil {
 		return err
 	}
+	actor := event.Actor
+	player := &s.players[actor]
 	player.onTsumo(*pai)
 
 	return nil
@@ -352,7 +352,19 @@ func (s *StateImpl) onDahai(event *message.Dahai) error {
 	if event == nil {
 		return fmt.Errorf("dahai message is nil")
 	}
-	panic("unimplemented!")
+
+	pai, err := NewPaiWithName(event.Pai)
+	if err != nil {
+		return err
+	}
+	actor := event.Actor
+	player := &s.players[actor]
+	player.onDahai(*pai)
+
+	s.prevDahaiActor = actor
+	s.prevDahaiPai = pai
+
+	return nil
 }
 
 func (s *StateImpl) onChi(event *message.Chi) error {
