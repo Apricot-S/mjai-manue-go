@@ -595,7 +595,30 @@ func (s *StateImpl) onKakan(event *message.Kakan) error {
 		return fmt.Errorf("kakan is not possible if numPipais is 0 or negative: %d", s.numPipais)
 	}
 
-	panic("unimplemented!")
+	pai, err := NewPaiWithName(event.Pai)
+	if err != nil {
+		return err
+	}
+	var consumed [3]Pai
+	for i, c := range event.Consumed {
+		p, err := NewPaiWithName(c)
+		if err != nil {
+			return err
+		}
+		consumed[i] = *p
+	}
+	furo, err := NewKakan(*pai, consumed, nil)
+	if err != nil {
+		return err
+	}
+
+	actor := event.Actor
+	err = s.players[actor].onKakan(furo)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func (s *StateImpl) onDora(event *message.Dora) error {
