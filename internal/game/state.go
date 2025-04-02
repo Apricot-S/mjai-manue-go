@@ -55,6 +55,9 @@ var validPrevEventsMap = map[message.Type]map[message.Type]struct{}{
 	message.TypeReach: {
 		message.TypeTsumo: struct{}{},
 	},
+	message.TypeReachAccepted: {
+		message.TypeDahai: struct{}{},
+	},
 }
 
 func validateCurrentEvent(current, prev message.Type) error {
@@ -678,7 +681,24 @@ func (s *StateImpl) onReachAccepted(event *message.ReachAccepted) error {
 	if event == nil {
 		return fmt.Errorf("reach_accepted message is nil")
 	}
-	panic("unimplemented!")
+
+	if err := validateCurrentEvent(message.TypeReachAccepted, s.prevActionType); err != nil {
+		return err
+	}
+
+	actor := event.Actor
+	player := &s.players[actor]
+	var err error
+	if event.Scores != nil {
+		err = player.onReachAccepted(&event.Scores[actor])
+	} else {
+		err = player.onReachAccepted(nil)
+	}
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func (s *StateImpl) onHora(event *message.Hora) error {
