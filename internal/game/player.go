@@ -234,7 +234,11 @@ func (p *Player) onChiPonKan(furo Furo) error {
 	return nil
 }
 
-func (p *Player) onAnkan(furo Furo) error {
+func (p *Player) onAnkan(furo *Ankan) error {
+	if furo == nil {
+		return fmt.Errorf("furo is nil")
+	}
+
 	if !p.canDahai {
 		return fmt.Errorf("it is not in a state to be ankan")
 	}
@@ -242,10 +246,6 @@ func (p *Player) onAnkan(furo Furo) error {
 	numFuro := len(p.furos)
 	if numFuro >= maxNumFuro {
 		return fmt.Errorf("a 5th furo is not possible")
-	}
-
-	if _, isAnkan := furo.(*Ankan); !isAnkan {
-		return fmt.Errorf("invalid furo for `onAnkan`: %v", furo)
 	}
 
 	for _, pai := range furo.Consumed() {
