@@ -47,6 +47,11 @@ var validPrevEventsMap = map[message.Type]map[message.Type]struct{}{
 	message.TypeKakan: {
 		message.TypeTsumo: struct{}{},
 	},
+	message.TypeDora: {
+		message.TypeTsumo: struct{}{},
+		message.TypeDahai: struct{}{},
+		message.TypeAnkan: struct{}{},
+	},
 }
 
 func validateCurrentEvent(current, prev message.Type) error {
@@ -624,6 +629,10 @@ func (s *StateImpl) onKakan(event *message.Kakan) error {
 func (s *StateImpl) onDora(event *message.Dora) error {
 	if event == nil {
 		return fmt.Errorf("dora message is nil")
+	}
+
+	if err := validateCurrentEvent(message.TypeDora, s.prevActionType); err != nil {
+		return err
 	}
 
 	if len(s.doraMarkers) >= maxNumDoraMarkers {
