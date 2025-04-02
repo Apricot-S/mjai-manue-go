@@ -260,7 +260,11 @@ func (p *Player) onAnkan(furo Furo) error {
 	return nil
 }
 
-func (p *Player) onKakan(furo Furo) error {
+func (p *Player) onKakan(furo *Kakan) error {
+	if furo == nil {
+		return fmt.Errorf("furo is nil")
+	}
+
 	if !p.canDahai {
 		return fmt.Errorf("it is not in a state to be kakan")
 	}
@@ -269,12 +273,12 @@ func (p *Player) onKakan(furo Furo) error {
 		return fmt.Errorf("kakan is not possible during reach")
 	}
 
-	if _, isKakan := furo.(*Kakan); !isKakan {
-		return fmt.Errorf("invalid furo for `onKakan`: %v", furo)
-	}
-
 	ponIndex := slices.IndexFunc(p.furos, func(f Furo) bool {
-		return slices.Contains(f.Pais(), *furo.Taken())
+		p, isPon := f.(*Pon)
+		if !isPon {
+			return false
+		}
+		return slices.Contains(p.Pais(), *furo.Taken())
 	})
 	if ponIndex == -1 {
 		return fmt.Errorf("failed to find pon mentsu for kakan: %v", furo)
