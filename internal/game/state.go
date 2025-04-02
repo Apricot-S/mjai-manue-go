@@ -32,6 +32,15 @@ var validPrevEventsMap = map[message.Type]map[message.Type]struct{}{
 		message.TypePon:   struct{}{},
 		message.TypeReach: struct{}{},
 	},
+	message.TypeChi: {
+		message.TypeDahai: struct{}{},
+	},
+	message.TypePon: {
+		message.TypeDahai: struct{}{},
+	},
+	message.TypeDaiminkan: {
+		message.TypeDahai: struct{}{},
+	},
 }
 
 func validateCurrentEvent(current, prev message.Type) error {
@@ -420,6 +429,10 @@ func (s *StateImpl) onChi(event *message.Chi) error {
 		return fmt.Errorf("chi message is nil")
 	}
 
+	if err := validateCurrentEvent(message.TypeDahai, s.prevActionType); err != nil {
+		return err
+	}
+
 	pai, err := NewPaiWithName(event.Pai)
 	if err != nil {
 		return err
@@ -451,6 +464,10 @@ func (s *StateImpl) onPon(event *message.Pon) error {
 		return fmt.Errorf("pon message is nil")
 	}
 
+	if err := validateCurrentEvent(message.TypeDahai, s.prevActionType); err != nil {
+		return err
+	}
+
 	pai, err := NewPaiWithName(event.Pai)
 	if err != nil {
 		return err
@@ -480,6 +497,10 @@ func (s *StateImpl) onPon(event *message.Pon) error {
 func (s *StateImpl) onDaiminkan(event *message.Daiminkan) error {
 	if event == nil {
 		return fmt.Errorf("daiminkan message is nil")
+	}
+
+	if err := validateCurrentEvent(message.TypeDahai, s.prevActionType); err != nil {
+		return err
 	}
 
 	pai, err := NewPaiWithName(event.Pai)
