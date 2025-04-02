@@ -58,6 +58,11 @@ var validPrevEventsMap = map[message.Type]map[message.Type]struct{}{
 	message.TypeReachAccepted: {
 		message.TypeDahai: struct{}{},
 	},
+	message.TypeHora: {
+		message.TypeTsumo: struct{}{},
+		message.TypeDahai: struct{}{},
+		message.TypeKakan: struct{}{},
+	},
 }
 
 func validateCurrentEvent(current, prev message.Type) error {
@@ -705,7 +710,18 @@ func (s *StateImpl) onHora(event *message.Hora) error {
 	if event == nil {
 		return fmt.Errorf("hora message is nil")
 	}
-	panic("unimplemented!")
+
+	if err := validateCurrentEvent(message.TypeHora, s.prevActionType); err != nil {
+		return err
+	}
+
+	if event.Scores != nil {
+		for i, score := range event.Scores {
+			s.players[i].SetScore(score)
+		}
+	}
+
+	return nil
 }
 
 func (s *StateImpl) onRyukyoku(event *message.Ryukyoku) error {
