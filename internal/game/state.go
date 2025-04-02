@@ -41,6 +41,12 @@ var validPrevEventsMap = map[message.Type]map[message.Type]struct{}{
 	message.TypeDaiminkan: {
 		message.TypeDahai: struct{}{},
 	},
+	message.TypeAnkan: {
+		message.TypeTsumo: struct{}{},
+	},
+	message.TypeKakan: {
+		message.TypeTsumo: struct{}{},
+	},
 }
 
 func validateCurrentEvent(current, prev message.Type) error {
@@ -379,10 +385,10 @@ func (s *StateImpl) onTsumo(event *message.Tsumo) error {
 		return err
 	}
 
-	s.numPipais--
-	if s.numPipais < 0 {
-		return fmt.Errorf("numPipais is negative: %d", s.numPipais)
+	if s.numPipais <= 0 {
+		return fmt.Errorf("tsumo is not possible if numPipais is 0 or negative: %d", s.numPipais)
 	}
+	s.numPipais--
 
 	pai, err := NewPaiWithName(event.Pai)
 	if err != nil {
@@ -429,8 +435,12 @@ func (s *StateImpl) onChi(event *message.Chi) error {
 		return fmt.Errorf("chi message is nil")
 	}
 
-	if err := validateCurrentEvent(message.TypeDahai, s.prevActionType); err != nil {
+	if err := validateCurrentEvent(message.TypeChi, s.prevActionType); err != nil {
 		return err
+	}
+
+	if s.numPipais <= 0 {
+		return fmt.Errorf("chi is not possible if numPipais is 0 or negative: %d", s.numPipais)
 	}
 
 	pai, err := NewPaiWithName(event.Pai)
@@ -464,8 +474,12 @@ func (s *StateImpl) onPon(event *message.Pon) error {
 		return fmt.Errorf("pon message is nil")
 	}
 
-	if err := validateCurrentEvent(message.TypeDahai, s.prevActionType); err != nil {
+	if err := validateCurrentEvent(message.TypePon, s.prevActionType); err != nil {
 		return err
+	}
+
+	if s.numPipais <= 0 {
+		return fmt.Errorf("pon is not possible if numPipais is 0 or negative: %d", s.numPipais)
 	}
 
 	pai, err := NewPaiWithName(event.Pai)
@@ -499,8 +513,12 @@ func (s *StateImpl) onDaiminkan(event *message.Daiminkan) error {
 		return fmt.Errorf("daiminkan message is nil")
 	}
 
-	if err := validateCurrentEvent(message.TypeDahai, s.prevActionType); err != nil {
+	if err := validateCurrentEvent(message.TypeDaiminkan, s.prevActionType); err != nil {
 		return err
+	}
+
+	if s.numPipais <= 0 {
+		return fmt.Errorf("daiminkan is not possible if numPipais is 0 or negative: %d", s.numPipais)
 	}
 
 	pai, err := NewPaiWithName(event.Pai)
@@ -533,13 +551,50 @@ func (s *StateImpl) onAnkan(event *message.Ankan) error {
 	if event == nil {
 		return fmt.Errorf("ankan message is nil")
 	}
-	panic("unimplemented!")
+
+	if err := validateCurrentEvent(message.TypeAnkan, s.prevActionType); err != nil {
+		return err
+	}
+
+	if s.numPipais <= 0 {
+		return fmt.Errorf("ankan is not possible if numPipais is 0 or negative: %d", s.numPipais)
+	}
+
+	var consumed [4]Pai
+	for i, c := range event.Consumed {
+		p, err := NewPaiWithName(c)
+		if err != nil {
+			return err
+		}
+		consumed[i] = *p
+	}
+	furo, err := NewAnkan(consumed)
+	if err != nil {
+		return err
+	}
+
+	actor := event.Actor
+	err = s.players[actor].onAnkan(furo)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func (s *StateImpl) onKakan(event *message.Kakan) error {
 	if event == nil {
 		return fmt.Errorf("kakan message is nil")
 	}
+
+	if err := validateCurrentEvent(message.TypeKakan, s.prevActionType); err != nil {
+		return err
+	}
+
+	if s.numPipais <= 0 {
+		return fmt.Errorf("kakan is not possible if numPipais is 0 or negative: %d", s.numPipais)
+	}
+
 	panic("unimplemented!")
 }
 
