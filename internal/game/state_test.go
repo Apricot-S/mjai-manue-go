@@ -99,7 +99,7 @@ func Test_getDistance(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := getDistance(tt.args.p1, tt.args.p2); got != tt.want {
+			if got := GetPlayerDistance(tt.args.p1, tt.args.p2); got != tt.want {
 				t.Errorf("getDistance() = %v, want %v", got, tt.want)
 			}
 		})
@@ -167,7 +167,7 @@ func Test_getNextKyoku(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, got1 := getNextKyoku(tt.args.bakaze, tt.args.kyokuNum)
+			got, got1 := GetNextKyoku(tt.args.bakaze, tt.args.kyokuNum)
 			if !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("getNextKyoku() got = %v, want %v", got, tt.want)
 			}

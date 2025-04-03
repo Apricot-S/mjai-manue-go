@@ -84,11 +84,11 @@ func validateCurrentEvent(current, prev message.Type) error {
 	return nil
 }
 
-func getDistance(p1 *Player, p2 *Player) int {
+func GetPlayerDistance(p1 *Player, p2 *Player) int {
 	return (numPlayers + p1.ID() - p2.ID()) % numPlayers
 }
 
-func getNextKyoku(bakaze *Pai, kyokuNum int) (*Pai, int) {
+func GetNextKyoku(bakaze *Pai, kyokuNum int) (*Pai, int) {
 	if kyokuNum == 4 {
 		return bakaze.NextForDora(), 1
 	}
@@ -234,7 +234,7 @@ func (s *StateImpl) RankedPlayers() [numPlayers]Player {
 			return -c
 		}
 		// In case of a tie, sort by closest to chicha.
-		return getDistance(&p1, s.chicha) - getDistance(&p2, s.chicha)
+		return GetPlayerDistance(&p1, s.chicha) - GetPlayerDistance(&p2, s.chicha)
 	})
 
 	return players
