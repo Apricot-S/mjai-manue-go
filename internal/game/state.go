@@ -104,6 +104,7 @@ type State interface {
 	Chicha() *Player
 	DoraMarkers() []Pai
 	NumPipais() int
+
 	Anpais(player *Player) []Pai
 	VisiblePais(player *Player) []Pai
 	Doras() []Pai
