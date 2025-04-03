@@ -8,6 +8,7 @@ import (
 	"github.com/Apricot-S/mjai-manue-go/internal/ai"
 	"github.com/Apricot-S/mjai-manue-go/internal/game"
 	"github.com/Apricot-S/mjai-manue-go/internal/message"
+	"github.com/go-json-experiment/json/jsontext"
 )
 
 type MockState struct {
@@ -122,7 +123,7 @@ func (s *MockState) NumPipais() int                             { panic("not imp
 func (s *MockState) Turn() int                                  { panic("not implemented") }
 func (s *MockState) RankedPlayers() [4]game.Player              { panic("not implemented") }
 func (s *MockState) OnStartGame(event *message.StartGame) error { panic("not implemented") }
-func (s *MockState) Update(event any) error                     { panic("not implemented") }
+func (s *MockState) Update(event jsontext.Value) error          { panic("not implemented") }
 func (s *MockState) Print()                                     { panic("not implemented") }
 
 func TestScene_Evaluate(t *testing.T) {
