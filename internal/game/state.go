@@ -33,13 +33,16 @@ var validPrevEventsMap = map[message.Type]map[message.Type]struct{}{
 		message.TypeReach: struct{}{},
 	},
 	message.TypeChi: {
-		message.TypeDahai: struct{}{},
+		message.TypeDahai:         struct{}{},
+		message.TypeReachAccepted: struct{}{},
 	},
 	message.TypePon: {
-		message.TypeDahai: struct{}{},
+		message.TypeDahai:         struct{}{},
+		message.TypeReachAccepted: struct{}{},
 	},
 	message.TypeDaiminkan: {
-		message.TypeDahai: struct{}{},
+		message.TypeDahai:         struct{}{},
+		message.TypeReachAccepted: struct{}{},
 	},
 	message.TypeAnkan: {
 		message.TypeTsumo: struct{}{},
