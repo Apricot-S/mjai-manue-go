@@ -267,8 +267,8 @@ func (s *StateImpl) OnStartGame(event *message.StartGame) error {
 	s.bakaze = *east
 	s.kyokuNum = 1
 	s.honba = 0
-	s.oya = &players[0]
-	s.chicha = &players[0]
+	s.oya = &s.players[0]
+	s.chicha = &s.players[0]
 	s.doraMarkers = make([]Pai, 0, maxNumDoraMarkers)
 	s.numPipais = numInitPipais
 
