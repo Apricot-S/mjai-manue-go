@@ -398,6 +398,11 @@ func (s *StateImpl) onStartKyoku(event *message.StartKyoku) error {
 		}
 	}
 
+	s.prevActionType = ""
+	s.prevDahaiActor = -1
+	s.prevDahaiPai = nil
+	s.currentActionType = ""
+
 	return nil
 }
 
