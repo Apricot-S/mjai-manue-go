@@ -19,73 +19,6 @@ const (
 	finalTurn         = numInitPipais / numPlayers
 )
 
-var validPrevEventsMap = map[message.Type]map[message.Type]struct{}{
-	message.TypeTsumo: {
-		message.TypeDahai:         struct{}{},
-		message.TypeDaiminkan:     struct{}{},
-		message.TypeAnkan:         struct{}{},
-		message.TypeKakan:         struct{}{},
-		message.TypeDora:          struct{}{},
-		message.TypeReachAccepted: struct{}{},
-	},
-	message.TypeDahai: {
-		message.TypeTsumo: struct{}{},
-		message.TypeChi:   struct{}{},
-		message.TypePon:   struct{}{},
-		message.TypeReach: struct{}{},
-	},
-	message.TypeChi: {
-		message.TypeDahai:         struct{}{},
-		message.TypeReachAccepted: struct{}{},
-	},
-	message.TypePon: {
-		message.TypeDahai:         struct{}{},
-		message.TypeReachAccepted: struct{}{},
-	},
-	message.TypeDaiminkan: {
-		message.TypeDahai:         struct{}{},
-		message.TypeReachAccepted: struct{}{},
-	},
-	message.TypeAnkan: {
-		message.TypeTsumo: struct{}{},
-	},
-	message.TypeKakan: {
-		message.TypeTsumo: struct{}{},
-	},
-	message.TypeDora: {
-		message.TypeTsumo: struct{}{},
-		message.TypeDahai: struct{}{},
-		message.TypeAnkan: struct{}{},
-	},
-	message.TypeReach: {
-		message.TypeTsumo: struct{}{},
-	},
-	message.TypeReachAccepted: {
-		message.TypeDahai: struct{}{},
-	},
-	message.TypeHora: {
-		message.TypeTsumo: struct{}{},
-		message.TypeDahai: struct{}{},
-		message.TypeKakan: struct{}{},
-	},
-	message.TypeRyukyoku: {
-		message.TypeTsumo:         struct{}{}, // Nine Different Terminals and Honors (九種九牌)
-		message.TypeDahai:         struct{}{},
-		message.TypeReachAccepted: struct{}{}, // Four-Player Riichi (四人立直)
-	},
-}
-
-func validateCurrentEvent(current, prev message.Type) error {
-	validPrevs, exists := validPrevEventsMap[current]
-	if !exists {
-		return fmt.Errorf("invalid current event: %s", current)
-	}
-	if _, ok := validPrevs[prev]; !ok {
-		return fmt.Errorf("%s is invalid after %s", current, prev)
-	}
-	return nil
-}
-
 func GetPlayerDistance(p1 *Player, p2 *Player) int {
 	return (numPlayers + p1.ID() - p2.ID()) % numPlayers
 }
@@ -292,10 +225,6 @@ func (s *StateImpl) Update(event jsontext.Value) error {
 	var msg message.Message
 	if err := json.Unmarshal(event, &msg); err != nil {
 		return fmt.Errorf("failed to unmarshal message: %w", err)
-	}
-
-	if err := validateCurrentEvent(msg.Type, s.prevActionType); err != nil {
-		return err
 	}
 
 	// This is specially handled here because it's not an anpai if the dahai is followed by a hora.
