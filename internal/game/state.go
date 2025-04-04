@@ -294,6 +294,10 @@ func (s *StateImpl) Update(event jsontext.Value) error {
 		return fmt.Errorf("failed to unmarshal message: %w", err)
 	}
 
+	if err := validateCurrentEvent(msg.Type, s.prevActionType); err != nil {
+		return err
+	}
+
 	// This is specially handled here because it's not an anpai if the dahai is followed by a hora.
 	if msg.Type != message.TypeHora && s.prevActionType == message.TypeDahai {
 		for _, p := range s.players {
@@ -470,10 +474,6 @@ func (s *StateImpl) onTsumo(event *message.Tsumo) error {
 		return fmt.Errorf("tsumo message is nil")
 	}
 
-	if err := validateCurrentEvent(message.TypeTsumo, s.prevActionType); err != nil {
-		return err
-	}
-
 	if s.numPipais <= 0 {
 		return fmt.Errorf("tsumo is not possible if numPipais is 0 or negative: %d", s.numPipais)
 	}
@@ -498,10 +498,6 @@ func (s *StateImpl) onDahai(event *message.Dahai) error {
 		return fmt.Errorf("dahai message is nil")
 	}
 
-	if err := validateCurrentEvent(message.TypeDahai, s.prevActionType); err != nil {
-		return err
-	}
-
 	pai, err := NewPaiWithName(event.Pai)
 	if err != nil {
 		return err
@@ -522,10 +518,6 @@ func (s *StateImpl) onDahai(event *message.Dahai) error {
 func (s *StateImpl) onChi(event *message.Chi) error {
 	if event == nil {
 		return fmt.Errorf("chi message is nil")
-	}
-
-	if err := validateCurrentEvent(message.TypeChi, s.prevActionType); err != nil {
-		return err
 	}
 
 	if s.numPipais <= 0 {
@@ -569,10 +561,6 @@ func (s *StateImpl) onPon(event *message.Pon) error {
 		return fmt.Errorf("pon message is nil")
 	}
 
-	if err := validateCurrentEvent(message.TypePon, s.prevActionType); err != nil {
-		return err
-	}
-
 	if s.numPipais <= 0 {
 		return fmt.Errorf("pon is not possible if numPipais is 0 or negative: %d", s.numPipais)
 	}
@@ -612,10 +600,6 @@ func (s *StateImpl) onPon(event *message.Pon) error {
 func (s *StateImpl) onDaiminkan(event *message.Daiminkan) error {
 	if event == nil {
 		return fmt.Errorf("daiminkan message is nil")
-	}
-
-	if err := validateCurrentEvent(message.TypeDaiminkan, s.prevActionType); err != nil {
-		return err
 	}
 
 	if s.numPipais <= 0 {
@@ -659,10 +643,6 @@ func (s *StateImpl) onAnkan(event *message.Ankan) error {
 		return fmt.Errorf("ankan message is nil")
 	}
 
-	if err := validateCurrentEvent(message.TypeAnkan, s.prevActionType); err != nil {
-		return err
-	}
-
 	if s.numPipais <= 0 {
 		return fmt.Errorf("ankan is not possible if numPipais is 0 or negative: %d", s.numPipais)
 	}
@@ -692,10 +672,6 @@ func (s *StateImpl) onAnkan(event *message.Ankan) error {
 func (s *StateImpl) onKakan(event *message.Kakan) error {
 	if event == nil {
 		return fmt.Errorf("kakan message is nil")
-	}
-
-	if err := validateCurrentEvent(message.TypeKakan, s.prevActionType); err != nil {
-		return err
 	}
 
 	if s.numPipais <= 0 {
@@ -733,10 +709,6 @@ func (s *StateImpl) onDora(event *message.Dora) error {
 		return fmt.Errorf("dora message is nil")
 	}
 
-	if err := validateCurrentEvent(message.TypeDora, s.prevActionType); err != nil {
-		return err
-	}
-
 	if len(s.doraMarkers) >= maxNumDoraMarkers {
 		return fmt.Errorf("a 6th dora cannot be added")
 	}
@@ -753,10 +725,6 @@ func (s *StateImpl) onDora(event *message.Dora) error {
 func (s *StateImpl) onReach(event *message.Reach) error {
 	if event == nil {
 		return fmt.Errorf("reach message is nil")
-	}
-
-	if err := validateCurrentEvent(message.TypeReach, s.prevActionType); err != nil {
-		return err
 	}
 
 	if s.numPipais <= 0 {
@@ -776,10 +744,6 @@ func (s *StateImpl) onReach(event *message.Reach) error {
 func (s *StateImpl) onReachAccepted(event *message.ReachAccepted) error {
 	if event == nil {
 		return fmt.Errorf("reach_accepted message is nil")
-	}
-
-	if err := validateCurrentEvent(message.TypeReachAccepted, s.prevActionType); err != nil {
-		return err
 	}
 
 	actor := event.Actor
@@ -802,10 +766,6 @@ func (s *StateImpl) onHora(event *message.Hora) error {
 		return fmt.Errorf("hora message is nil")
 	}
 
-	if err := validateCurrentEvent(message.TypeHora, s.prevActionType); err != nil {
-		return err
-	}
-
 	if event.Scores != nil {
 		for i, score := range event.Scores {
 			s.players[i].SetScore(score)
@@ -818,10 +778,6 @@ func (s *StateImpl) onHora(event *message.Hora) error {
 func (s *StateImpl) onRyukyoku(event *message.Ryukyoku) error {
 	if event == nil {
 		return fmt.Errorf("ryukyoku message is nil")
-	}
-
-	if err := validateCurrentEvent(message.TypeRyukyoku, s.prevActionType); err != nil {
-		return err
 	}
 
 	if event.Scores != nil {
