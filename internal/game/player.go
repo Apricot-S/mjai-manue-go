@@ -51,11 +51,11 @@ type Player struct {
 	// Reach state
 	reachState ReachState
 	// The index of the tile that was declared as reach in the river.
-	// It is nil if the player has not declared reach.
-	reachHoIndex *int
+	// It is -1 if the player has not declared reach.
+	reachHoIndex int
 	// The index of the tile that was declared as reach in the discarded tiles.
-	// It is nil if the player has not declared reach.
-	reachSutehaiIndex *int
+	// It is -1 if the player has not declared reach.
+	reachSutehaiIndex int
 	// Player score
 	score int
 	// Whether the player can discard a tile (打牌)
@@ -78,8 +78,8 @@ func NewPlayer(id int, name string, initScore int) (*Player, error) {
 		sutehais:          make([]Pai, 0, maxNumSutehais),
 		extraAnpais:       nil,
 		reachState:        None,
-		reachHoIndex:      nil,
-		reachSutehaiIndex: nil,
+		reachHoIndex:      -1,
+		reachSutehaiIndex: -1,
 		score:             initScore,
 		canDahai:          false,
 		isMenzen:          true,
@@ -94,7 +94,7 @@ func NewPlayerForTest(
 	ho []Pai,
 	sutehais []Pai,
 	reachState ReachState,
-	reachSutehaiIndex *int,
+	reachSutehaiIndex int,
 ) *Player {
 	return &Player{
 		id:                id,
@@ -139,11 +139,11 @@ func (p *Player) ReachState() ReachState {
 	return p.reachState
 }
 
-func (p *Player) ReachHoIndex() *int {
+func (p *Player) ReachHoIndex() int {
 	return p.reachHoIndex
 }
 
-func (p *Player) ReachSutehaiIndex() *int {
+func (p *Player) ReachSutehaiIndex() int {
 	return p.reachSutehaiIndex
 }
 
@@ -179,8 +179,8 @@ func (p *Player) onStartKyoku(tehais []Pai, score *int) error {
 	p.sutehais = make([]Pai, 0, maxNumSutehais)
 	p.extraAnpais = nil
 	p.reachState = None
-	p.reachHoIndex = nil
-	p.reachSutehaiIndex = nil
+	p.reachHoIndex = -1
+	p.reachSutehaiIndex = -1
 	p.canDahai = false
 	p.isMenzen = true
 
@@ -355,10 +355,8 @@ func (p *Player) onReachAccepted(score *int) error {
 	}
 
 	p.reachState = Accepted
-	p.reachHoIndex = new(int)
-	*p.reachHoIndex = len(p.ho) - 1
-	p.reachSutehaiIndex = new(int)
-	*p.reachSutehaiIndex = len(p.sutehais) - 1
+	p.reachHoIndex = len(p.ho) - 1
+	p.reachSutehaiIndex = len(p.sutehais) - 1
 
 	if score != nil {
 		p.score = *score
