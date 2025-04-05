@@ -26,19 +26,42 @@ const (
 )
 
 type Player struct {
-	id                int
-	name              string
-	tehais            Pais
-	furos             []Furo
-	ho                []Pai
-	sutehais          []Pai
-	extraAnpais       []Pai
-	reachState        ReachState
-	reachHoIndex      *int
+	// Player ID
+	// 0: the dealer at the start of a game (起家)
+	// 1: the right next to the 0th seat (起家の下家)
+	// 2: the one across from the 0th seat (起家の対面)
+	// 3: the left next to the 0th seat (起家の上家)
+	id int
+	// Player name
+	name string
+	// Hand (手牌) excluding the furos (副露)
+	// The last element is for tsumo.
+	tehais Pais
+	// Furos (副露)
+	furos []Furo
+	// River (河)
+	// It does not include the tiles that have been called.
+	ho []Pai
+	// Discarded tiles (捨て牌)
+	// It includes the tiles that have been called.
+	sutehais []Pai
+	// Extra safe tiles (安全牌)
+	// The tiles that are safe in the same turn and the tiles that are safe after reach.
+	extraAnpais []Pai
+	// Reach state
+	reachState ReachState
+	// The index of the tile that was declared as reach in the river.
+	// It is nil if the player has not declared reach.
+	reachHoIndex *int
+	// The index of the tile that was declared as reach in the discarded tiles.
+	// It is nil if the player has not declared reach.
 	reachSutehaiIndex *int
-	score             int
-	canDahai          bool
-	isMenzen          bool
+	// Player score
+	score int
+	// Whether the player can discard a tile (打牌)
+	canDahai bool
+	// Whether the player hand is concealed (門前)
+	isMenzen bool
 }
 
 func NewPlayer(id int, name string, initScore int) (*Player, error) {
