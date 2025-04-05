@@ -11,6 +11,18 @@ import (
 	"github.com/go-json-experiment/json/jsontext"
 )
 
+var (
+	selfTurnTypes = []message.Type{
+		message.TypeTsumo,
+		message.TypeChi,
+		message.TypePon,
+	}
+	otherTurnTypes = []message.Type{
+		message.TypeDahai,
+		message.TypeKakan,
+	}
+)
+
 type AIAgent struct {
 	name     string
 	room     string
@@ -43,28 +55,29 @@ func (a *AIAgent) setInGame(inGame bool) {
 	a.inGame = inGame
 }
 
-// isSelfTurnType はそのメッセージが自分の手番を表すかを判定します
-func isSelfTurnType(t message.Type) bool {
-	return t == message.TypeTsumo || t == message.TypeChi || t == message.TypePon
+// isMyTurn はそのメッセージが自分のアクションを要求するものかを判定します
+func isMyTurn(t message.Type, actor, playerID int) bool {
+	return actor == playerID && slices.Contains(selfTurnTypes, t)
 }
 
-// isOtherTurnType はそのメッセージが他家の手番を表すかを判定します
-func isOtherTurnType(t message.Type) bool {
-	return t == message.TypeDahai || t == message.TypeKakan
+// needsResponse はそのメッセージが自分の応答を要求するものかを判定します
+func needsResponse(t message.Type, actor, playerID int) bool {
+	return actor != playerID && slices.Contains(otherTurnTypes, t)
 }
 
-// findLastAction は配列の最後から、自分の手番または他家の手番のメッセージを探し、そのメッセージとTypeを返します
-func findLastAction(msgs []jsontext.Value) (*jsontext.Value, message.Type, error) {
-	for i, m := range slices.Backward(msgs) {
-		var msg message.Message
-		if err := json.Unmarshal(m, &msg); err != nil {
-			return nil, "", err
+// findRelevantAction は配列の最後から、自分に関係のあるメッセージのTypeとActorを返します
+func findRelevantAction(msgs []jsontext.Value, playerID int) (message.Type, error) {
+	for _, m := range slices.Backward(msgs) {
+		var action message.Action
+		if err := json.Unmarshal(m, &action); err != nil {
+			// Action型としてパースできないメッセージはスキップ
+			continue
 		}
-		if isSelfTurnType(msg.Type) || isOtherTurnType(msg.Type) {
-			return &msgs[len(msgs)-1-i], msg.Type, nil
+		if isMyTurn(action.Type, action.Actor, playerID) || needsResponse(action.Type, action.Actor, playerID) {
+			return action.Type, nil
 		}
 	}
-	return nil, "", nil
+	return "", nil
 }
 
 func (a *AIAgent) Respond(msgs []jsontext.Value) (jsontext.Value, error) {
@@ -80,6 +93,8 @@ func (a *AIAgent) Respond(msgs []jsontext.Value) (jsontext.Value, error) {
 		return makeJoinResponse(a.name, a.room)
 	case message.TypeStartGame:
 		return onStartGame(a, firstMsg)
+	case message.TypeEndKyoku:
+		return makeNoneResponse()
 	case message.TypeEndGame:
 		return onEndGame(a)
 	}
@@ -95,141 +110,28 @@ func (a *AIAgent) Respond(msgs []jsontext.Value) (jsontext.Value, error) {
 		}
 	}
 
-	// Find last tsumo or dahai message
-	lastActionMsg, lastActionType, err := findLastAction(msgs)
+	// Find relevant action
+	lastActionType, err := findRelevantAction(msgs, a.playerID)
 	if err != nil {
 		return nil, fmt.Errorf("failed to find last action: %w", err)
 	}
 
-	if lastActionMsg == nil {
-		// Not self action
+	// No action needed
+	if lastActionType == "" {
 		return makeNoneResponse()
 	}
 
-	switch lastActionType {
-	case message.TypeTsumo:
-		var tsumo message.Tsumo
-		if err := json.Unmarshal(*lastActionMsg, &tsumo); err != nil {
-			return nil, fmt.Errorf("failed to unmarshal tsumo message: %w", err)
-		}
-
-		if tsumo.Actor != a.playerID {
-			// Not self tsumo
-			return makeNoneResponse()
-		}
-
-		// Ask AI for decision
-		action, err := a.ai.DecideAction(a.state, a.playerID)
-		if err != nil {
-			return nil, fmt.Errorf("failed to decide action: %w", err)
-		}
-		if action == nil {
-			return makeNoneResponse()
-		}
-		res, err := json.Marshal(action)
-		if err != nil {
-			return nil, fmt.Errorf("failed to marshal action: %w", err)
-		}
-		return res, nil
-
-	case message.TypeChi:
-		var chi message.Chi
-		if err := json.Unmarshal(*lastActionMsg, &chi); err != nil {
-			return nil, fmt.Errorf("failed to unmarshal chi message: %w", err)
-		}
-
-		if chi.Actor != a.playerID {
-			// Not self action
-			return makeNoneResponse()
-		}
-
-		// Self action
-		action, err := a.ai.DecideAction(a.state, a.playerID)
-		if err != nil {
-			return nil, fmt.Errorf("failed to decide action: %w", err)
-		}
-		if action == nil {
-			return makeNoneResponse()
-		}
-		res, err := json.Marshal(action)
-		if err != nil {
-			return nil, fmt.Errorf("failed to marshal action: %w", err)
-		}
-		return res, nil
-
-	case message.TypePon:
-		var pon message.Pon
-		if err := json.Unmarshal(*lastActionMsg, &pon); err != nil {
-			return nil, fmt.Errorf("failed to unmarshal pon message: %w", err)
-		}
-
-		if pon.Actor != a.playerID {
-			// Not self action
-			return makeNoneResponse()
-		}
-
-		action, err := a.ai.DecideAction(a.state, a.playerID)
-		if err != nil {
-			return nil, fmt.Errorf("failed to decide action: %w", err)
-		}
-		if action == nil {
-			return makeNoneResponse()
-		}
-		res, err := json.Marshal(action)
-		if err != nil {
-			return nil, fmt.Errorf("failed to marshal action: %w", err)
-		}
-		return res, nil
-
-	case message.TypeDahai:
-		var dahai message.Dahai
-		if err := json.Unmarshal(*lastActionMsg, &dahai); err != nil {
-			return nil, fmt.Errorf("failed to unmarshal dahai message: %w", err)
-		}
-
-		if dahai.Actor == a.playerID {
-			return makeNoneResponse()
-		}
-
-		// Ask AI for decision on opponent's action
-		action, err := a.ai.DecideAction(a.state, a.playerID)
-		if err != nil {
-			return nil, fmt.Errorf("failed to decide action: %w", err)
-		}
-		if action == nil {
-			return makeNoneResponse()
-		}
-		res, err := json.Marshal(action)
-		if err != nil {
-			return nil, fmt.Errorf("failed to marshal action: %w", err)
-		}
-		return res, nil
-
-	case message.TypeKakan:
-		var kakan message.Kakan
-		if err := json.Unmarshal(*lastActionMsg, &kakan); err != nil {
-			return nil, fmt.Errorf("failed to unmarshal kakan message: %w", err)
-		}
-
-		if kakan.Actor == a.playerID {
-			return makeNoneResponse()
-		}
-
-		// Ask AI for decision on opponent's action
-		action, err := a.ai.DecideAction(a.state, a.playerID)
-		if err != nil {
-			return nil, fmt.Errorf("failed to decide action: %w", err)
-		}
-		if action == nil {
-			return makeNoneResponse()
-		}
-		res, err := json.Marshal(action)
-		if err != nil {
-			return nil, fmt.Errorf("failed to marshal action: %w", err)
-		}
-		return res, nil
-
-	default:
+	// Ask AI for decision
+	action, err := a.ai.DecideAction(a.state, a.playerID)
+	if err != nil {
+		return nil, fmt.Errorf("failed to decide action: %w", err)
+	}
+	if action == nil {
 		return makeNoneResponse()
 	}
+	res, err := json.Marshal(action)
+	if err != nil {
+		return nil, fmt.Errorf("failed to marshal action: %w", err)
+	}
+	return res, nil
 }
