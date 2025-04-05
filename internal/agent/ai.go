@@ -80,6 +80,8 @@ func (a *AIAgent) Respond(msgs []jsontext.Value) (jsontext.Value, error) {
 		return makeJoinResponse(a.name, a.room)
 	case message.TypeStartGame:
 		return onStartGame(a, firstMsg)
+	case message.TypeEndGame:
+		return onEndGame(a)
 	}
 
 	if !a.inGame {
@@ -227,8 +229,6 @@ func (a *AIAgent) Respond(msgs []jsontext.Value) (jsontext.Value, error) {
 		}
 		return res, nil
 
-	case message.TypeEndGame:
-		return onEndGame(a)
 	default:
 		return makeNoneResponse()
 	}
