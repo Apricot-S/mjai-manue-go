@@ -44,7 +44,15 @@ func (a *TsumogiriAgent) Respond(msgs []jsontext.Value) (jsontext.Value, error) 
 	case message.TypeHello:
 		return makeJoinResponse(a.name, a.room)
 	case message.TypeStartGame:
-		return onStartGame(a, firstMsg)
+		if err := onStartGame(a, firstMsg); err != nil {
+			return nil, err
+		}
+		return makeNoneResponse()
+	case message.TypeEndKyoku:
+		return makeNoneResponse()
+	case message.TypeEndGame:
+		onEndGame(a)
+		return makeNoneResponse()
 	}
 
 	if !a.inGame {
@@ -80,8 +88,6 @@ func (a *TsumogiriAgent) Respond(msgs []jsontext.Value) (jsontext.Value, error) 
 		}
 
 		return res, nil
-	case message.TypeEndGame:
-		return onEndGame(a)
 	default:
 		return makeNoneResponse()
 	}

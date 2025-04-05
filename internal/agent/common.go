@@ -31,18 +31,19 @@ type gameStateHandler interface {
 	setInGame(inGame bool)
 }
 
-func onStartGame(handler gameStateHandler, rawMsg jsontext.Value) (jsontext.Value, error) {
+func onStartGame(handler gameStateHandler, rawMsg jsontext.Value) error {
 	var startGame message.StartGame
 	if err := json.Unmarshal(rawMsg, &startGame); err != nil {
-		return nil, fmt.Errorf("failed to unmarshal start_game message: %w", err)
+		return fmt.Errorf("failed to unmarshal start_game message: %w", err)
 	}
+
 	handler.setPlayerID(startGame.ID)
 	handler.setInGame(true)
-	return makeNoneResponse()
+
+	return nil
 }
 
-func onEndGame(handler gameStateHandler) (jsontext.Value, error) {
+func onEndGame(handler gameStateHandler) {
 	handler.setPlayerID(-1)
 	handler.setInGame(false)
-	return makeNoneResponse()
 }
