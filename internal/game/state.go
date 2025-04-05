@@ -52,10 +52,10 @@ type State interface {
 	Update(event jsontext.Value) error
 	Print()
 
-	DahaiCandidate(player *Player) []Pai
-	ReachDahaiCandidate(player *Player) []Pai
-	ChiCandidate(player *Player) []Pai
-	PonCandidate(player *Player) []Pai
+	DahaiCandidates(player *Player) []Pai
+	ReachDahaiCandidates(player *Player) []Pai
+	ChiCandidates(player *Player) []Pai
+	PonCandidates(player *Player) []Pai
 	// TODO: Daiminkan, Ankan, and Kakan.
 	CanHora(player *Player) bool
 }
@@ -730,19 +730,19 @@ func (s *StateImpl) onRyukyoku(event *message.Ryukyoku) error {
 	return nil
 }
 
-func (s *StateImpl) DahaiCandidate(player *Player) []Pai {
+func (s *StateImpl) DahaiCandidates(player *Player) []Pai {
 	panic("not implemented!")
 }
 
-func (s *StateImpl) ReachDahaiCandidate(player *Player) []Pai {
+func (s *StateImpl) ReachDahaiCandidates(player *Player) []Pai {
 	panic("not implemented!")
 }
 
-func (s *StateImpl) ChiCandidate(player *Player) []Pai {
+func (s *StateImpl) ChiCandidates(player *Player) []Pai {
 	panic("not implemented!")
 }
 
-func (s *StateImpl) PonCandidate(player *Player) []Pai {
+func (s *StateImpl) PonCandidates(player *Player) []Pai {
 	panic("not implemented!")
 }
 
