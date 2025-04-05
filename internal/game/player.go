@@ -395,6 +395,8 @@ func (p *Player) deleteTehai(pai *Pai) error {
 			break
 		}
 	}
+
+	// If the pai is not found, check if it is an unknown tile.
 	if paiIndex == -1 {
 		for i, v := range slices.Backward(p.tehais) {
 			if v == *Unknown {
