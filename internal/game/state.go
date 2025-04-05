@@ -729,3 +729,23 @@ func (s *StateImpl) onRyukyoku(event *message.Ryukyoku) error {
 
 	return nil
 }
+
+func (s *StateImpl) DahaiCandidate(player *Player) []Pai {
+	panic("not implemented!")
+}
+
+func (s *StateImpl) ReachDahaiCandidate(player *Player) []Pai {
+	panic("not implemented!")
+}
+
+func (s *StateImpl) ChiCandidate(player *Player) []Pai {
+	panic("not implemented!")
+}
+
+func (s *StateImpl) PonCandidate(player *Player) []Pai {
+	panic("not implemented!")
+}
+
+func (s *StateImpl) CanHora(player *Player) bool {
+	panic("not implemented!")
+}
