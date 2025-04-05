@@ -16,6 +16,7 @@ var (
 		message.TypeTsumo,
 		message.TypeChi,
 		message.TypePon,
+		message.TypeReach,
 	}
 	otherTurnTypes = []message.Type{
 		message.TypeDahai,
