@@ -7,7 +7,6 @@ import (
 
 	"github.com/Apricot-S/mjai-manue-go/internal/ai"
 	"github.com/Apricot-S/mjai-manue-go/internal/game"
-	"github.com/Apricot-S/mjai-manue-go/internal/message"
 	"github.com/go-json-experiment/json/jsontext"
 )
 
@@ -113,17 +112,22 @@ func (s *MockState) YakuhaiFan(pai *game.Pai, player *game.Player) int {
 	return fan
 }
 
-func (s *MockState) KyokuNum() int                              { panic("not implemented") }
-func (s *MockState) Honba() int                                 { panic("not implemented") }
-func (s *MockState) Oya() *game.Player                          { panic("not implemented") }
-func (s *MockState) Chicha() *game.Player                       { panic("not implemented") }
-func (s *MockState) DoraMarkers() []game.Pai                    { panic("not implemented") }
-func (s *MockState) NumPipais() int                             { panic("not implemented") }
-func (s *MockState) Turn() int                                  { panic("not implemented") }
-func (s *MockState) RankedPlayers() [4]game.Player              { panic("not implemented") }
-func (s *MockState) OnStartGame(event *message.StartGame) error { panic("not implemented") }
-func (s *MockState) Update(event jsontext.Value) error          { panic("not implemented") }
-func (s *MockState) Print()                                     { panic("not implemented") }
+func (s *MockState) KyokuNum() int                                      { panic("not implemented") }
+func (s *MockState) Honba() int                                         { panic("not implemented") }
+func (s *MockState) Oya() *game.Player                                  { panic("not implemented") }
+func (s *MockState) Chicha() *game.Player                               { panic("not implemented") }
+func (s *MockState) DoraMarkers() []game.Pai                            { panic("not implemented") }
+func (s *MockState) NumPipais() int                                     { panic("not implemented") }
+func (s *MockState) Turn() int                                          { panic("not implemented") }
+func (s *MockState) RankedPlayers() [4]game.Player                      { panic("not implemented") }
+func (s *MockState) OnStartGame(event jsontext.Value) error             { panic("not implemented") }
+func (s *MockState) Update(event jsontext.Value) error                  { panic("not implemented") }
+func (s *MockState) Print()                                             { panic("not implemented") }
+func (s *MockState) DahaiCandidate(player *game.Player) []game.Pai      { panic("not implemented") }
+func (s *MockState) ReachDahaiCandidate(player *game.Player) []game.Pai { panic("not implemented") }
+func (s *MockState) ChiCandidate(player *game.Player) []game.Pai        { panic("not implemented") }
+func (s *MockState) PonCandidate(player *game.Player) []game.Pai        { panic("not implemented") }
+func (s *MockState) CanHora(player *game.Player) bool                   { panic("not implemented") }
 
 func TestScene_Evaluate(t *testing.T) {
 	type args struct {

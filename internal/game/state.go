@@ -48,9 +48,16 @@ type State interface {
 	Turn() int
 	RankedPlayers() [numPlayers]Player
 
-	OnStartGame(event *message.StartGame) error
+	OnStartGame(event jsontext.Value) error
 	Update(event jsontext.Value) error
 	Print()
+
+	DahaiCandidate(player *Player) []Pai
+	ReachDahaiCandidate(player *Player) []Pai
+	ChiCandidate(player *Player) []Pai
+	PonCandidate(player *Player) []Pai
+	// TODO: Daiminkan, Ankan, and Kakan.
+	CanHora(player *Player) bool
 }
 
 type StateImpl struct {
@@ -175,14 +182,19 @@ func (s *StateImpl) RankedPlayers() [numPlayers]Player {
 	return players
 }
 
-func (s *StateImpl) OnStartGame(event *message.StartGame) error {
+func (s *StateImpl) OnStartGame(event jsontext.Value) error {
 	if event == nil {
 		return fmt.Errorf("start_game message is nil")
 	}
 
+	var e message.StartGame
+	if err := json.Unmarshal(event, &e); err != nil {
+		return fmt.Errorf("failed to unmarshal start_game: %w", err)
+	}
+
 	names := []string{"", "", "", ""}
-	if event.Names != nil {
-		names = slices.Clone(event.Names)
+	if e.Names != nil {
+		names = slices.Clone(e.Names)
 	}
 	if len(names) != numPlayers {
 		return fmt.Errorf("number of players must be 4, but got %d", len(names))
