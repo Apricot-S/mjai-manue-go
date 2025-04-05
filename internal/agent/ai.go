@@ -56,22 +56,22 @@ func (a *AIAgent) setInGame(inGame bool) {
 	a.inGame = inGame
 }
 
-// isMyTurn はそのメッセージが自分のアクションを要求するものかを判定します
+// isMyTurn checks if the message requires an action from the player.
 func isMyTurn(t message.Type, actor, playerID int) bool {
 	return actor == playerID && slices.Contains(selfTurnTypes, t)
 }
 
-// needsResponse はそのメッセージが自分の応答を要求するものかを判定します
+// needsResponse checks if the message requires a response from the player.
 func needsResponse(t message.Type, actor, playerID int) bool {
 	return actor != playerID && slices.Contains(otherTurnTypes, t)
 }
 
-// findRelevantAction は配列の最後から、自分に関係のあるメッセージのTypeとActorを返します
+// findRelevantAction returns the Type of the last message that is relevant to the player.
 func findRelevantAction(msgs []jsontext.Value, playerID int) (message.Type, error) {
 	for _, m := range slices.Backward(msgs) {
 		var action message.Action
 		if err := json.Unmarshal(m, &action); err != nil {
-			// Action型としてパースできないメッセージはスキップ
+			// Skip messages that cannot be parsed as Action
 			continue
 		}
 		if isMyTurn(action.Type, action.Actor, playerID) || needsResponse(action.Type, action.Actor, playerID) {
