@@ -96,6 +96,9 @@ func (a *AIAgent) Respond(msgs []jsontext.Value) (jsontext.Value, error) {
 		if err := onStartGame(a, firstMsg); err != nil {
 			return nil, err
 		}
+		if err := a.state.OnStartGame(firstMsg); err != nil {
+			return nil, fmt.Errorf("failed to update state: %w", err)
+		}
 		return makeNoneResponse()
 	case message.TypeEndKyoku:
 		return makeNoneResponse()
