@@ -66,8 +66,8 @@ func needsResponse(t message.Type, actor, playerID int) bool {
 	return actor != playerID && slices.Contains(otherTurnTypes, t)
 }
 
-// findRelevantAction returns the Type of the last message that is relevant to the player.
-func findRelevantAction(msgs []jsontext.Value, playerID int) (message.Type, error) {
+// shouldDecideAction checks if AI needs to make a decision.
+func shouldDecideAction(msgs []jsontext.Value, playerID int) (bool, error) {
 	for _, m := range slices.Backward(msgs) {
 		var action message.Action
 		if err := json.Unmarshal(m, &action); err != nil {
@@ -75,10 +75,10 @@ func findRelevantAction(msgs []jsontext.Value, playerID int) (message.Type, erro
 			continue
 		}
 		if isMyTurn(action.Type, action.Actor, playerID) || needsResponse(action.Type, action.Actor, playerID) {
-			return action.Type, nil
+			return true, nil
 		}
 	}
-	return "", nil
+	return false, nil
 }
 
 func (a *AIAgent) Respond(msgs []jsontext.Value) (jsontext.Value, error) {
@@ -118,14 +118,14 @@ func (a *AIAgent) Respond(msgs []jsontext.Value) (jsontext.Value, error) {
 		}
 	}
 
-	// Find relevant action
-	lastActionType, err := findRelevantAction(msgs, a.playerID)
+	// Check if AI needs to make a decision
+	needsDecision, err := shouldDecideAction(msgs, a.playerID)
 	if err != nil {
-		return nil, fmt.Errorf("failed to find last action: %w", err)
+		return nil, fmt.Errorf("failed to check if decision is needed: %w", err)
 	}
 
 	// No action needed
-	if lastActionType == "" {
+	if !needsDecision {
 		return makeNoneResponse()
 	}
 
