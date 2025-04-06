@@ -60,12 +60,12 @@ mjai-manue --pipe
 
 Licensed under the [New BSD License](LICENSE) (3-Clause BSD License).
 
-This project includes the following files from the original mjai-manue project,
-which are licensed under the New BSD License. Full credit for these files goes
-to the original author, [Hiroshi Ichikawa](https://github.com/gimite).
+## Copyright and Attribution
 
-Files used:
+This project is a Go port of [mjai-manue](https://github.com/gimite/mjai-manue), originally created by [Hiroshi Ichikawa](https://github.com/gimite).
 
-- configs/danger_tree.all.json
-- configs/game_stats.json
-- configs/light_game_stats.json
+The following configuration files are copied from the original project and their copyright belongs to Hiroshi Ichikawa. These files are distributed under the New BSD License:
+
+- `configs/danger_tree.all.json`
+- `configs/game_stats.json`
+- `configs/light_game_stats.json`
