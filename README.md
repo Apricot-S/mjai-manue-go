@@ -2,7 +2,9 @@
 
 Go port of [mjai-manue](https://github.com/gimite/mjai-manue)
 
-***Work in progress***
+> 🚧 **Work in Progress**
+>
+> mjai-manue-go is currently in active development and not usable yet.
 
 Differences from the original:
 
