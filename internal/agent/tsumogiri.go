@@ -9,27 +9,13 @@ import (
 )
 
 type TsumogiriAgent struct {
-	name     string
-	room     string
-	playerID int
-	inGame   bool
+	baseAgent
 }
 
 func NewTsumogiriAgent(name string, room string) *TsumogiriAgent {
 	return &TsumogiriAgent{
-		name:     name,
-		room:     room,
-		playerID: -1,
-		inGame:   false,
+		baseAgent: newBaseAgent(name, room),
 	}
-}
-
-func (a *TsumogiriAgent) setPlayerID(id int) {
-	a.playerID = id
-}
-
-func (a *TsumogiriAgent) setInGame(inGame bool) {
-	a.inGame = inGame
 }
 
 func (a *TsumogiriAgent) Respond(msgs []jsontext.Value) (jsontext.Value, error) {

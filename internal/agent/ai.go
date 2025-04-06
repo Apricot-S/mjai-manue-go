@@ -25,12 +25,9 @@ var (
 )
 
 type AIAgent struct {
-	name     string
-	room     string
-	ai       ai.AI
-	playerID int
-	inGame   bool
-	state    game.State
+	baseAgent
+	ai    ai.AI
+	state game.State
 }
 
 func NewAIAgent(name string, room string, ai ai.AI) *AIAgent {
@@ -39,21 +36,10 @@ func NewAIAgent(name string, room string, ai ai.AI) *AIAgent {
 
 func NewAIAgentWithState(name string, room string, ai ai.AI, state game.State) *AIAgent {
 	return &AIAgent{
-		name:     name,
-		room:     room,
-		ai:       ai,
-		playerID: -1,
-		inGame:   false,
-		state:    state,
+		baseAgent: newBaseAgent(name, room),
+		ai:        ai,
+		state:     state,
 	}
-}
-
-func (a *AIAgent) setPlayerID(id int) {
-	a.playerID = id
-}
-
-func (a *AIAgent) setInGame(inGame bool) {
-	a.inGame = inGame
 }
 
 // isMyTurn checks if the message requires an action from the player.
