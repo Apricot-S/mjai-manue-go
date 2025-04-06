@@ -7,6 +7,11 @@ import (
 	"github.com/Apricot-S/mjai-manue-go/internal/game"
 )
 
+type evaluator func(*Scene, *game.Pai) (bool, error)
+type evaluators map[string]evaluator
+
+var defaultEvaluators = registerEvaluators()
+
 type Scene struct {
 	gameState game.State
 	me        *game.Player
@@ -24,7 +29,7 @@ type Scene struct {
 	lateSutehaiSet     *game.PaiSet
 	reachPaiSet        *game.PaiSet
 
-	evaluators map[string]func(*game.Pai) (bool, error)
+	evaluators *evaluators
 }
 
 func NewScene(gameState game.State, me *game.Player, target *game.Player) (*Scene, error) {
@@ -32,7 +37,7 @@ func NewScene(gameState game.State, me *game.Player, target *game.Player) (*Scen
 		gameState:  gameState,
 		me:         me,
 		target:     target,
-		evaluators: make(map[string]func(*game.Pai) (bool, error)),
+		evaluators: &defaultEvaluators,
 	}
 
 	var err error
@@ -75,14 +80,12 @@ func NewScene(gameState game.State, me *game.Player, target *game.Player) (*Scen
 		return nil, err
 	}
 
-	s.registerEvaluators()
-
 	return s, nil
 }
 
 func (s *Scene) Evaluate(name string, pai *game.Pai) (bool, error) {
-	if evaluator, ok := s.evaluators[name]; ok {
-		return evaluator(pai)
+	if evaluator, ok := (*s.evaluators)[name]; ok {
+		return evaluator(s, pai)
 	}
 
 	switch name {
@@ -666,12 +669,14 @@ func isOuter(pai *game.Pai, targetPaiSet *game.PaiSet) (bool, error) {
 	})
 }
 
-func (s *Scene) registerEvaluators() {
+func registerEvaluators() evaluators {
+	ev := evaluators{}
+
 	for i := range 4 {
 		featureName := fmt.Sprintf("chances<=%d", i)
 		n := i
-		s.evaluators[featureName] = func(pai *game.Pai) (bool, error) {
-			return isNChanceOrLess(pai, n, s.visibleSet)
+		ev[featureName] = func(scene *Scene, pai *game.Pai) (bool, error) {
+			return isNChanceOrLess(pai, n, scene.visibleSet)
 		}
 	}
 
@@ -680,8 +685,8 @@ func (s *Scene) registerEvaluators() {
 	for i := 1; i < 4; i++ {
 		featureName := fmt.Sprintf("visible>=%d", i)
 		n := i
-		s.evaluators[featureName] = func(pai *game.Pai) (bool, error) {
-			return isVisibleNOrMore(pai, n+1, s.visibleSet)
+		ev[featureName] = func(scene *Scene, pai *game.Pai) (bool, error) {
+			return isVisibleNOrMore(pai, n+1, scene.visibleSet)
 		}
 	}
 
@@ -692,7 +697,7 @@ func (s *Scene) registerEvaluators() {
 	for i := range 4 {
 		featureName := fmt.Sprintf("suji_visible<=%d", i)
 		n := i
-		s.evaluators[featureName] = func(pai *game.Pai) (bool, error) {
+		ev[featureName] = func(scene *Scene, pai *game.Pai) (bool, error) {
 			if pai.IsTsupai() {
 				return false, nil
 			}
@@ -703,7 +708,7 @@ func (s *Scene) registerEvaluators() {
 			}
 
 			return anyMatch(suji, func(sujiPai game.Pai) (bool, error) {
-				visible, err := isVisibleNOrMore(&sujiPai, n+1, s.visibleSet)
+				visible, err := isVisibleNOrMore(&sujiPai, n+1, scene.visibleSet)
 				if err != nil {
 					return false, err
 				}
@@ -715,7 +720,7 @@ func (s *Scene) registerEvaluators() {
 	for i := uint8(2); i < 6; i++ {
 		featureName := fmt.Sprintf("%d<=n<=%d", i, 10-i)
 		n := i
-		s.evaluators[featureName] = func(pai *game.Pai) (bool, error) {
+		ev[featureName] = func(scene *Scene, pai *game.Pai) (bool, error) {
 			return isNumNOrInner(pai, n), nil
 		}
 	}
@@ -723,8 +728,8 @@ func (s *Scene) registerEvaluators() {
 	for i := 2; i < 5; i++ {
 		featureName := fmt.Sprintf("in_tehais>=%d", i)
 		n := i
-		s.evaluators[featureName] = func(pai *game.Pai) (bool, error) {
-			c, err := s.tehaiSet.Count(pai)
+		ev[featureName] = func(scene *Scene, pai *game.Pai) (bool, error) {
+			c, err := scene.tehaiSet.Count(pai)
 			return c >= n, err
 		}
 	}
@@ -736,7 +741,7 @@ func (s *Scene) registerEvaluators() {
 	for i := 1; i < 5; i++ {
 		featureName := fmt.Sprintf("suji_in_tehais>=%d", i)
 		n := i
-		s.evaluators[featureName] = func(pai *game.Pai) (bool, error) {
+		ev[featureName] = func(scene *Scene, pai *game.Pai) (bool, error) {
 			if pai.IsTsupai() {
 				return false, nil
 			}
@@ -747,7 +752,7 @@ func (s *Scene) registerEvaluators() {
 			}
 
 			return anyMatch(suji, func(sujiPai game.Pai) (bool, error) {
-				c, err := s.tehaiSet.Count(&sujiPai)
+				c, err := scene.tehaiSet.Count(&sujiPai)
 				return c >= n, err
 			})
 		}
@@ -758,8 +763,8 @@ func (s *Scene) registerEvaluators() {
 			featureName := fmt.Sprintf("+-%d_in_prereach_sutehais>=%d", i, j)
 			distance := i
 			threshold := j
-			s.evaluators[featureName] = func(pai *game.Pai) (bool, error) {
-				return isNOrMoreOfNeighborsInPrereachSutehais(pai, threshold, distance, s.prereachSutehaiSet)
+			ev[featureName] = func(scene *Scene, pai *game.Pai) (bool, error) {
+				return isNOrMoreOfNeighborsInPrereachSutehais(pai, threshold, distance, scene.prereachSutehaiSet)
 			}
 		}
 	}
@@ -767,23 +772,23 @@ func (s *Scene) registerEvaluators() {
 	for i := 1; i < 3; i++ {
 		featureName := fmt.Sprintf("%d_outer_prereach_sutehai", i)
 		n := i
-		s.evaluators[featureName] = func(pai *game.Pai) (bool, error) {
-			return isNOuterPrereachSutehai(pai, n, s.prereachSutehaiSet)
+		ev[featureName] = func(scene *Scene, pai *game.Pai) (bool, error) {
+			return isNOuterPrereachSutehai(pai, n, scene.prereachSutehaiSet)
 		}
 	}
 
 	for i := 1; i < 3; i++ {
 		featureName := fmt.Sprintf("%d_inner_prereach_sutehai", i)
 		n := i
-		s.evaluators[featureName] = func(pai *game.Pai) (bool, error) {
-			return isNOuterPrereachSutehai(pai, -n, s.prereachSutehaiSet)
+		ev[featureName] = func(scene *Scene, pai *game.Pai) (bool, error) {
+			return isNOuterPrereachSutehai(pai, -n, scene.prereachSutehaiSet)
 		}
 	}
 
 	for i := 1; i < 9; i++ {
 		featureName := fmt.Sprintf("same_type_in_prereach>=%d", i)
 		n := i
-		s.evaluators[featureName] = func(pai *game.Pai) (bool, error) {
+		ev[featureName] = func(scene *Scene, pai *game.Pai) (bool, error) {
 			if pai.IsTsupai() {
 				return false, nil
 			}
@@ -794,7 +799,7 @@ func (s *Scene) registerEvaluators() {
 				if err != nil {
 					return false, err
 				}
-				return s.prereachSutehaiSet.Has(target)
+				return scene.prereachSutehaiSet.Has(target)
 			})
 			if err != nil {
 				return false, err
@@ -803,6 +808,8 @@ func (s *Scene) registerEvaluators() {
 			return numSameType+1 >= n, nil
 		}
 	}
+
+	return ev
 }
 
 type Feature struct {
