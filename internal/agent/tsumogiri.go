@@ -40,6 +40,7 @@ func (a *TsumogiriAgent) Respond(msgs []jsontext.Value) (jsontext.Value, error) 
 		return nil, err
 	}
 
+	// Process messages before and after the game
 	switch msg.Type {
 	case message.TypeHello:
 		return makeJoinResponse(a.name, a.room)
@@ -49,6 +50,7 @@ func (a *TsumogiriAgent) Respond(msgs []jsontext.Value) (jsontext.Value, error) 
 		}
 		return makeNoneResponse()
 	case message.TypeEndKyoku:
+		// Message during the game, but does not affect the game, so process it here
 		return makeNoneResponse()
 	case message.TypeEndGame:
 		onEndGame(a)
