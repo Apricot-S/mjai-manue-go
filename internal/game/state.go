@@ -52,12 +52,12 @@ type State interface {
 	Update(event jsontext.Value) error
 	Print()
 
-	DahaiCandidates(player *Player) []Pai
-	ReachDahaiCandidates(player *Player) []Pai
-	ChiCandidates(player *Player) []Pai
-	PonCandidates(player *Player) []Pai
+	DahaiCandidates(player *Player) ([]Pai, error)
+	ReachDahaiCandidates(player *Player) ([]Pai, error)
+	ChiCandidates(player *Player) ([]Pai, error)
+	PonCandidates(player *Player) ([]Pai, error)
 	// TODO: Daiminkan, Ankan, and Kakan.
-	CanHora(player *Player) bool
+	CanHora(player *Player) (bool, error)
 }
 
 type StateImpl struct {
@@ -730,22 +730,22 @@ func (s *StateImpl) onRyukyoku(event *message.Ryukyoku) error {
 	return nil
 }
 
-func (s *StateImpl) DahaiCandidates(player *Player) []Pai {
+func (s *StateImpl) DahaiCandidates(player *Player) ([]Pai, error) {
 	panic("not implemented!")
 }
 
-func (s *StateImpl) ReachDahaiCandidates(player *Player) []Pai {
+func (s *StateImpl) ReachDahaiCandidates(player *Player) ([]Pai, error) {
 	panic("not implemented!")
 }
 
-func (s *StateImpl) ChiCandidates(player *Player) []Pai {
+func (s *StateImpl) ChiCandidates(player *Player) ([]Pai, error) {
 	panic("not implemented!")
 }
 
-func (s *StateImpl) PonCandidates(player *Player) []Pai {
+func (s *StateImpl) PonCandidates(player *Player) ([]Pai, error) {
 	panic("not implemented!")
 }
 
-func (s *StateImpl) CanHora(player *Player) bool {
+func (s *StateImpl) CanHora(player *Player) (bool, error) {
 	panic("not implemented!")
 }
