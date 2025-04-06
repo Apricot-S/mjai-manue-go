@@ -11,3 +11,6 @@ THIRD-PARTY-NOTICES.md
 
 docs/
 test/
+
+.mypy_cache/
+.venv/
