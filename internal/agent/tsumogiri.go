@@ -29,18 +29,18 @@ func (a *TsumogiriAgent) Respond(msgs []jsontext.Value) (jsontext.Value, error) 
 	// Process messages before and after the game
 	switch msg.Type {
 	case message.TypeHello:
-		return makeJoinResponse(a.name, a.room)
+		return a.makeJoinResponse()
 	case message.TypeStartGame:
-		if err := onStartGame(a, firstMsg); err != nil {
+		if err := a.onStartGame(firstMsg); err != nil {
 			return nil, err
 		}
-		return makeNoneResponse()
+		return a.makeNoneResponse()
 	case message.TypeEndKyoku:
 		// Message during the game, but does not affect the game, so process it here
-		return makeNoneResponse()
+		return a.makeNoneResponse()
 	case message.TypeEndGame:
-		onEndGame(a)
-		return makeNoneResponse()
+		a.onEndGame()
+		return a.makeNoneResponse()
 	}
 
 	if !a.inGame {
@@ -61,7 +61,7 @@ func (a *TsumogiriAgent) Respond(msgs []jsontext.Value) (jsontext.Value, error) 
 
 		if tsumo.Actor != a.playerID {
 			// Not self tsumo
-			return makeNoneResponse()
+			return a.makeNoneResponse()
 		}
 
 		// Self tsumo
@@ -77,6 +77,6 @@ func (a *TsumogiriAgent) Respond(msgs []jsontext.Value) (jsontext.Value, error) 
 
 		return res, nil
 	default:
-		return makeNoneResponse()
+		return a.makeNoneResponse()
 	}
 }

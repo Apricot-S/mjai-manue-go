@@ -78,21 +78,21 @@ func (a *AIAgent) Respond(msgs []jsontext.Value) (jsontext.Value, error) {
 	// Process messages before and after the game
 	switch msg.Type {
 	case message.TypeHello:
-		return makeJoinResponse(a.name, a.room)
+		return a.makeJoinResponse()
 	case message.TypeStartGame:
-		if err := onStartGame(a, firstMsg); err != nil {
+		if err := a.onStartGame(firstMsg); err != nil {
 			return nil, err
 		}
 		if err := a.state.OnStartGame(firstMsg); err != nil {
 			return nil, fmt.Errorf("failed to update state: %w", err)
 		}
-		return makeNoneResponse()
+		return a.makeNoneResponse()
 	case message.TypeEndKyoku:
 		// Message during the game, but does not affect the game, so process it here
-		return makeNoneResponse()
+		return a.makeNoneResponse()
 	case message.TypeEndGame:
-		onEndGame(a)
-		return makeNoneResponse()
+		a.onEndGame()
+		return a.makeNoneResponse()
 	}
 
 	if !a.inGame {
@@ -114,7 +114,7 @@ func (a *AIAgent) Respond(msgs []jsontext.Value) (jsontext.Value, error) {
 
 	// No action needed
 	if !needsDecision {
-		return makeNoneResponse()
+		return a.makeNoneResponse()
 	}
 
 	// Ask AI for decision
@@ -123,7 +123,7 @@ func (a *AIAgent) Respond(msgs []jsontext.Value) (jsontext.Value, error) {
 		return nil, fmt.Errorf("failed to decide action: %w", err)
 	}
 	if action == nil {
-		return makeNoneResponse()
+		return a.makeNoneResponse()
 	}
 	res, err := json.Marshal(action)
 	if err != nil {
