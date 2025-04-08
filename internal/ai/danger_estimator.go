@@ -37,7 +37,7 @@ func NewScene(gameState game.StateViewer, me *game.Player, target *game.Player) 
 		gameState:  gameState,
 		me:         me,
 		target:     target,
-		evaluators: &defaultEvaluators,
+		evaluators: defaultEvaluators,
 	}
 
 	var err error
@@ -669,7 +669,7 @@ func isOuter(pai *game.Pai, targetPaiSet *game.PaiSet) (bool, error) {
 	})
 }
 
-func registerEvaluators() evaluators {
+func registerEvaluators() *evaluators {
 	ev := evaluators{}
 
 	for i := range 4 {
@@ -809,7 +809,7 @@ func registerEvaluators() evaluators {
 		}
 	}
 
-	return ev
+	return &ev
 }
 
 type Feature struct {
