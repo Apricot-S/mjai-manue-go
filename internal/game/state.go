@@ -94,6 +94,8 @@ type StateImpl struct {
 	prevDahaiActor    int
 	prevDahaiPai      *Pai
 	currentActionType message.Type
+
+	playerID int
 }
 
 func (s *StateImpl) Players() *[numPlayers]Player {
@@ -225,6 +227,11 @@ func (s *StateImpl) OnStartGame(event jsontext.Value) error {
 		return fmt.Errorf("failed to unmarshal start_game: %w", err)
 	}
 
+	id := e.ID
+	if id < 0 || id >= numPlayers {
+		return fmt.Errorf("invalid player ID: %d", id)
+	}
+
 	names := []string{"", "", "", ""}
 	if e.Names != nil {
 		names = slices.Clone(e.Names)
@@ -260,6 +267,8 @@ func (s *StateImpl) OnStartGame(event jsontext.Value) error {
 	s.prevDahaiActor = -1
 	s.prevDahaiPai = nil
 	s.currentActionType = ""
+
+	s.playerID = id
 
 	return nil
 }
