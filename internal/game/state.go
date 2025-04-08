@@ -23,7 +23,7 @@ func GetPlayerDistance(p1 *Player, p2 *Player) int {
 	return (numPlayers + p1.ID() - p2.ID()) % numPlayers
 }
 
-func GetNextKyoku(bakaze *Pai, kyokuNum int) (*Pai, int) {
+func getNextKyoku(bakaze *Pai, kyokuNum int) (*Pai, int) {
 	if kyokuNum == 4 {
 		return bakaze.NextForDora(), 1
 	}
