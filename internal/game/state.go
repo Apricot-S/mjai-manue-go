@@ -46,6 +46,7 @@ type StateViewer interface {
 	Doras() []Pai
 	Jikaze(player *Player) *Pai
 	YakuhaiFan(pai *Pai, player *Player) int
+	NextKyoku() (*Pai, int)
 	Turn() int
 	RankedPlayers() [numPlayers]Player
 
@@ -183,6 +184,10 @@ func (s *StateImpl) YakuhaiFan(pai *Pai, player *Player) int {
 		fan++
 	}
 	return fan
+}
+
+func (s *StateImpl) NextKyoku() (*Pai, int) {
+	return getNextKyoku(&s.bakaze, s.kyokuNum)
 }
 
 func (s *StateImpl) Turn() int {
