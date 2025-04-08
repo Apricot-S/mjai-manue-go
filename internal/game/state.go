@@ -30,7 +30,8 @@ func GetNextKyoku(bakaze *Pai, kyokuNum int) (*Pai, int) {
 	return bakaze, kyokuNum + 1
 }
 
-type State interface {
+// StateViewer is an interface for referencing the game state.
+type StateViewer interface {
 	Players() *[numPlayers]Player
 	Bakaze() *Pai
 	KyokuNum() int
@@ -48,16 +49,34 @@ type State interface {
 	Turn() int
 	RankedPlayers() [numPlayers]Player
 
+	Print()
+}
+
+// StateUpdater is an interface for updating the game state.
+type StateUpdater interface {
 	OnStartGame(event jsontext.Value) error
 	Update(event jsontext.Value) error
-	Print()
+}
 
-	DahaiCandidates(player *Player) ([]Pai, error)
-	ReachDahaiCandidates(player *Player) ([]Pai, error)
-	ChiCandidates(player *Player) ([]Pai, error)
-	PonCandidates(player *Player) ([]Pai, error)
+// ActionCalculator is an interface for calculating action candidates.
+type ActionCalculator interface {
+	DahaiCandidates() ([]Pai, error)
+	ReachDahaiCandidates() ([]Pai, error)
+	ChiCandidates() ([]Pai, error)
+	PonCandidates() ([]Pai, error)
 	// TODO: Daiminkan, Ankan, and Kakan.
-	CanHora(player *Player) (bool, error)
+	CanHora() (bool, error)
+}
+
+type StateAnalyzer interface {
+	StateViewer
+	ActionCalculator
+}
+
+type State interface {
+	StateViewer
+	StateUpdater
+	ActionCalculator
 }
 
 type StateImpl struct {
@@ -180,6 +199,20 @@ func (s *StateImpl) RankedPlayers() [numPlayers]Player {
 	})
 
 	return players
+}
+
+func (s *StateImpl) Print() {
+	for _, p := range s.players {
+		fmt.Fprintf(
+			os.Stderr,
+			`[%d] tehai: %s
+       ho: %s
+
+`,
+			p.id,
+			PaisToStr(p.tehais),
+			PaisToStr(p.ho))
+	}
 }
 
 func (s *StateImpl) OnStartGame(event jsontext.Value) error {
@@ -345,20 +378,6 @@ func (s *StateImpl) Update(event jsontext.Value) error {
 	}
 
 	return nil
-}
-
-func (s *StateImpl) Print() {
-	for _, p := range s.players {
-		fmt.Fprintf(
-			os.Stderr,
-			`[%d] tehai: %s
-       ho: %s
-
-`,
-			p.id,
-			PaisToStr(p.tehais),
-			PaisToStr(p.ho))
-	}
 }
 
 func (s *StateImpl) onStartKyoku(event *message.StartKyoku) error {
@@ -730,22 +749,22 @@ func (s *StateImpl) onRyukyoku(event *message.Ryukyoku) error {
 	return nil
 }
 
-func (s *StateImpl) DahaiCandidates(player *Player) ([]Pai, error) {
+func (s *StateImpl) DahaiCandidates() ([]Pai, error) {
 	panic("not implemented!")
 }
 
-func (s *StateImpl) ReachDahaiCandidates(player *Player) ([]Pai, error) {
+func (s *StateImpl) ReachDahaiCandidates() ([]Pai, error) {
 	panic("not implemented!")
 }
 
-func (s *StateImpl) ChiCandidates(player *Player) ([]Pai, error) {
+func (s *StateImpl) ChiCandidates() ([]Pai, error) {
 	panic("not implemented!")
 }
 
-func (s *StateImpl) PonCandidates(player *Player) ([]Pai, error) {
+func (s *StateImpl) PonCandidates() ([]Pai, error) {
 	panic("not implemented!")
 }
 
-func (s *StateImpl) CanHora(player *Player) (bool, error) {
+func (s *StateImpl) CanHora() (bool, error) {
 	panic("not implemented!")
 }

@@ -13,7 +13,7 @@ type evaluators map[string]evaluator
 var defaultEvaluators = registerEvaluators()
 
 type Scene struct {
-	gameState game.State
+	gameState game.StateViewer
 	me        *game.Player
 	target    *game.Player
 
@@ -32,7 +32,7 @@ type Scene struct {
 	evaluators *evaluators
 }
 
-func NewScene(gameState game.State, me *game.Player, target *game.Player) (*Scene, error) {
+func NewScene(gameState game.StateViewer, me *game.Player, target *game.Player) (*Scene, error) {
 	s := &Scene{
 		gameState:  gameState,
 		me:         me,
