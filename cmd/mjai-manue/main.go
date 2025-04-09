@@ -10,7 +10,6 @@ import (
 	"path"
 	"strings"
 
-	"github.com/Apricot-S/mjai-manue-go/configs"
 	"github.com/Apricot-S/mjai-manue-go/internal/agent"
 	"github.com/Apricot-S/mjai-manue-go/internal/ai"
 	"github.com/Apricot-S/mjai-manue-go/internal/client"
@@ -97,15 +96,10 @@ func main() {
 		log.Fatal(err)
 	}
 
-	stats, err := configs.GetStats()
+	ai, err := ai.NewManueAI()
 	if err != nil {
-		log.Fatalf("failed to get the stats: %v", err)
+		log.Fatalf("failed to create AI: %v", err)
 	}
-	root, err := configs.GetDangerTree()
-	if err != nil {
-		log.Fatalf("failed to get the danger tree: %v", err)
-	}
-	ai := ai.NewManueAI(stats, root)
 	agent := agent.NewAIAgent(name, room, ai)
 
 	if usePipe && rawURL == "" {
