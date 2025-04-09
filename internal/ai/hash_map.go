@@ -7,8 +7,7 @@ import (
 )
 
 type HashMapKey interface {
-	// ~[2]float64 for test only
-	~float64 | ~[2]float64 | ~[4]float64
+	~float64 | ~[]float64
 }
 
 type HashMapEntry[K HashMapKey] struct {
@@ -30,7 +29,7 @@ func keyToString[K HashMapKey](key K) string {
 	switch k := any(key).(type) {
 	case float64:
 		return strconv.FormatFloat(k, 'f', -1, 64)
-	case [2]float64, [4]float64:
+	case []float64:
 		jsonKey, err := json.Marshal(&key)
 		if err != nil {
 			panic(err)
