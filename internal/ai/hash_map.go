@@ -1,8 +1,6 @@
 package ai
 
 import (
-	"strconv"
-
 	"github.com/go-json-experiment/json"
 )
 
@@ -26,18 +24,11 @@ func NewHashMap[K HashMapKey]() *HashMap[K] {
 }
 
 func keyToString[K HashMapKey](key K) string {
-	switch k := any(key).(type) {
-	case float64:
-		return strconv.FormatFloat(k, 'f', -1, 64)
-	case []float64:
-		jsonKey, err := json.Marshal(&key)
-		if err != nil {
-			panic(err)
-		}
-		return string(jsonKey)
-	default:
-		panic("unsupported key type")
+	jsonKey, err := json.Marshal(&key)
+	if err != nil {
+		panic(err)
 	}
+	return string(jsonKey)
 }
 
 func (h *HashMap[K]) Set(key K, value float64) {
