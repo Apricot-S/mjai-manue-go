@@ -287,7 +287,7 @@ func (s *StateImpl) Update(event jsontext.Value) error {
 	}
 
 	// This is specially handled here because it's not an anpai if the dahai is followed by a hora.
-	if msg.Type != message.TypeHora && s.prevEventType == message.TypeDahai {
+	if msg.Type != message.TypeHora && (s.prevEventType == message.TypeDahai || s.prevEventType == message.TypeKakan) {
 		for _, p := range s.players {
 			if p.ID() != s.prevDahaiActor {
 				p.AddExtraAnpais(*s.prevDahaiPai)
@@ -674,6 +674,10 @@ func (s *StateImpl) onKakan(event *message.Kakan) error {
 	if err != nil {
 		return err
 	}
+
+	// For chankan
+	s.prevDahaiActor = actor
+	s.prevDahaiPai = pai
 
 	return nil
 }
