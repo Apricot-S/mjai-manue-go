@@ -24,6 +24,8 @@ type Goal struct {
 }
 
 const (
+	InfinityShanten = math.MaxInt
+
 	maxShantenNumber = 8
 	numChows         = 7 * 3
 )
@@ -61,7 +63,7 @@ var (
 )
 
 // AnalyzeShanten calculates the shanten number and the list of Goal for the given PaiSet.
-// When the list of Goal is empty, [math.MaxInt] is returned as the shanten number.
+// When the list of Goal is empty, [InfinityShanten] is returned as the shanten number.
 // It does not consider Seven Pairs or Thirteen Orphans.
 func AnalyzeShanten(ps *PaiSet) (int, []Goal, error) {
 	return AnalyzeShantenWithOption(ps, 0, maxShantenNumber)
@@ -71,10 +73,10 @@ func AnalyzeShantenWithOption(ps *PaiSet, allowedExtraPais int, upperbound int) 
 	sum := 0
 	for _, c := range ps {
 		if c < 0 {
-			return math.MaxInt, nil, fmt.Errorf("negative number of tiles in the PaiSet")
+			return InfinityShanten, nil, fmt.Errorf("negative number of tiles in the PaiSet")
 		}
 		if c > 4 {
-			return math.MaxInt, nil, fmt.Errorf("more than 4 tiles of the same type in the PaiSet")
+			return InfinityShanten, nil, fmt.Errorf("more than 4 tiles of the same type in the PaiSet")
 		}
 		sum += c
 	}
@@ -111,7 +113,7 @@ func AnalyzeShantenWithOption(ps *PaiSet, allowedExtraPais int, upperbound int) 
 	goals = slices.Clip(goals)
 
 	if len(goals) == 0 {
-		return math.MaxInt, goals, nil
+		return InfinityShanten, goals, nil
 	}
 	return shanten, goals, nil
 }

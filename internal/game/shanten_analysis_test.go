@@ -47,7 +47,7 @@ func verifyShantenWithUpperBounds(t *testing.T, paiSet *game.PaiSet, expectedSha
 
 		expectedShantenWithUpperBound := expectedShanten
 		if expectedShanten > i {
-			expectedShantenWithUpperBound = math.MaxInt
+			expectedShantenWithUpperBound = game.InfinityShanten
 		}
 		expectedGoalsSizeWithUpperBound := expectedGoalsSize
 		if expectedShanten > i {
