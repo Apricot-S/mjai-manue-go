@@ -97,6 +97,9 @@ type StateImpl struct {
 	currentEventType message.Type
 
 	playerID int
+	// en: -1 if there is no action
+	lastActor      int
+	lastActionType message.Type
 }
 
 func (s *StateImpl) Players() *[numPlayers]Player {
@@ -274,6 +277,8 @@ func (s *StateImpl) OnStartGame(event jsontext.Value) error {
 	s.currentEventType = ""
 
 	s.playerID = id
+	s.lastActor = -1
+	s.lastActionType = ""
 
 	return nil
 }
@@ -438,7 +443,9 @@ func (s *StateImpl) onStartKyoku(event *message.StartKyoku) error {
 	s.prevEventType = ""
 	s.prevDahaiActor = -1
 	s.prevDahaiPai = nil
-	s.currentEventType = ""
+
+	s.lastActor = -1
+	s.lastActionType = ""
 
 	return nil
 }
@@ -464,6 +471,9 @@ func (s *StateImpl) onTsumo(event *message.Tsumo) error {
 		return err
 	}
 
+	s.lastActor = actor
+	s.lastActionType = message.TypeTsumo
+
 	return nil
 }
 
@@ -485,6 +495,9 @@ func (s *StateImpl) onDahai(event *message.Dahai) error {
 
 	s.prevDahaiActor = actor
 	s.prevDahaiPai = pai
+
+	s.lastActor = actor
+	s.lastActionType = message.TypeDahai
 
 	return nil
 }
@@ -527,6 +540,9 @@ func (s *StateImpl) onChi(event *message.Chi) error {
 		return err
 	}
 
+	s.lastActor = actor
+	s.lastActionType = message.TypeChi
+
 	return nil
 }
 
@@ -567,6 +583,9 @@ func (s *StateImpl) onPon(event *message.Pon) error {
 	if err != nil {
 		return err
 	}
+
+	s.lastActor = actor
+	s.lastActionType = message.TypePon
 
 	return nil
 }
@@ -609,6 +628,9 @@ func (s *StateImpl) onDaiminkan(event *message.Daiminkan) error {
 		return err
 	}
 
+	s.lastActor = actor
+	s.lastActionType = message.TypeDaiminkan
+
 	return nil
 }
 
@@ -639,6 +661,9 @@ func (s *StateImpl) onAnkan(event *message.Ankan) error {
 	if err != nil {
 		return err
 	}
+
+	s.lastActor = actor
+	s.lastActionType = message.TypeAnkan
 
 	return nil
 }
@@ -679,6 +704,9 @@ func (s *StateImpl) onKakan(event *message.Kakan) error {
 	s.prevDahaiActor = actor
 	s.prevDahaiPai = pai
 
+	s.lastActor = actor
+	s.lastActionType = message.TypeKakan
+
 	return nil
 }
 
@@ -716,6 +744,9 @@ func (s *StateImpl) onReach(event *message.Reach) error {
 		return err
 	}
 
+	s.lastActor = actor
+	s.lastActionType = message.TypeReach
+
 	return nil
 }
 
@@ -750,6 +781,10 @@ func (s *StateImpl) onHora(event *message.Hora) error {
 		}
 	}
 
+	// After hora, only end_kyoku comes, so reset the last action.
+	s.lastActor = -1
+	s.lastActionType = ""
+
 	return nil
 }
 
@@ -763,6 +798,10 @@ func (s *StateImpl) onRyukyoku(event *message.Ryukyoku) error {
 			s.players[i].SetScore(score)
 		}
 	}
+
+	// After ryukyoku, only end_kyoku comes, so reset the last action.
+	s.lastActor = -1
+	s.lastActionType = ""
 
 	return nil
 }
@@ -784,5 +823,9 @@ func (s *StateImpl) PonCandidates() ([]Pai, error) {
 }
 
 func (s *StateImpl) CanHora() (bool, error) {
+	if s.lastActor == -1 {
+		return false, nil
+	}
+
 	panic("not implemented!")
 }
