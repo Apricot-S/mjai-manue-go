@@ -90,11 +90,11 @@ type StateImpl struct {
 	doraMarkers []Pai
 	numPipais   int
 
-	prevActionType message.Type
+	prevEventType message.Type
 	// -1 if prev action is not dahai
-	prevDahaiActor    int
-	prevDahaiPai      *Pai
-	currentActionType message.Type
+	prevDahaiActor   int
+	prevDahaiPai     *Pai
+	currentEventType message.Type
 
 	playerID int
 }
@@ -268,10 +268,10 @@ func (s *StateImpl) OnStartGame(event jsontext.Value) error {
 	s.doraMarkers = make([]Pai, 0, maxNumDoraMarkers)
 	s.numPipais = numInitPipais
 
-	s.prevActionType = ""
+	s.prevEventType = ""
 	s.prevDahaiActor = -1
 	s.prevDahaiPai = nil
-	s.currentActionType = ""
+	s.currentEventType = ""
 
 	s.playerID = id
 
@@ -279,7 +279,7 @@ func (s *StateImpl) OnStartGame(event jsontext.Value) error {
 }
 
 func (s *StateImpl) Update(event jsontext.Value) error {
-	s.prevActionType = s.currentActionType
+	s.prevEventType = s.currentEventType
 
 	var msg message.Message
 	if err := json.Unmarshal(event, &msg); err != nil {
@@ -287,7 +287,7 @@ func (s *StateImpl) Update(event jsontext.Value) error {
 	}
 
 	// This is specially handled here because it's not an anpai if the dahai is followed by a hora.
-	if msg.Type != message.TypeHora && s.prevActionType == message.TypeDahai {
+	if msg.Type != message.TypeHora && s.prevEventType == message.TypeDahai {
 		for _, p := range s.players {
 			if p.ID() != s.prevDahaiActor {
 				p.AddExtraAnpais(*s.prevDahaiPai)
@@ -301,91 +301,91 @@ func (s *StateImpl) Update(event jsontext.Value) error {
 		if err := json.Unmarshal(event, &e); err != nil {
 			return fmt.Errorf("failed to unmarshal start_kyoku: %w", err)
 		}
-		s.currentActionType = message.TypeStartKyoku
+		s.currentEventType = message.TypeStartKyoku
 		s.onStartKyoku(&e)
 	case message.TypeTsumo:
 		var e message.Tsumo
 		if err := json.Unmarshal(event, &e); err != nil {
 			return fmt.Errorf("failed to unmarshal tsumo: %w", err)
 		}
-		s.currentActionType = message.TypeTsumo
+		s.currentEventType = message.TypeTsumo
 		s.onTsumo(&e)
 	case message.TypeDahai:
 		var e message.Dahai
 		if err := json.Unmarshal(event, &e); err != nil {
 			return fmt.Errorf("failed to unmarshal dahai: %w", err)
 		}
-		s.currentActionType = message.TypeDahai
+		s.currentEventType = message.TypeDahai
 		s.onDahai(&e)
 	case message.TypeChi:
 		var e message.Chi
 		if err := json.Unmarshal(event, &e); err != nil {
 			return fmt.Errorf("failed to unmarshal chi: %w", err)
 		}
-		s.currentActionType = message.TypeChi
+		s.currentEventType = message.TypeChi
 		s.onChi(&e)
 	case message.TypePon:
 		var e message.Pon
 		if err := json.Unmarshal(event, &e); err != nil {
 			return fmt.Errorf("failed to unmarshal pon: %w", err)
 		}
-		s.currentActionType = message.TypePon
+		s.currentEventType = message.TypePon
 		s.onPon(&e)
 	case message.TypeDaiminkan:
 		var e message.Daiminkan
 		if err := json.Unmarshal(event, &e); err != nil {
 			return fmt.Errorf("failed to unmarshal daiminkan: %w", err)
 		}
-		s.currentActionType = message.TypeDaiminkan
+		s.currentEventType = message.TypeDaiminkan
 		s.onDaiminkan(&e)
 	case message.TypeAnkan:
 		var e message.Ankan
 		if err := json.Unmarshal(event, &e); err != nil {
 			return fmt.Errorf("failed to unmarshal ankan: %w", err)
 		}
-		s.currentActionType = message.TypeAnkan
+		s.currentEventType = message.TypeAnkan
 		s.onAnkan(&e)
 	case message.TypeKakan:
 		var e message.Kakan
 		if err := json.Unmarshal(event, &e); err != nil {
 			return fmt.Errorf("failed to unmarshal kakan: %w", err)
 		}
-		s.currentActionType = message.TypeKakan
+		s.currentEventType = message.TypeKakan
 		s.onKakan(&e)
 	case message.TypeDora:
 		var e message.Dora
 		if err := json.Unmarshal(event, &e); err != nil {
 			return fmt.Errorf("failed to unmarshal dora: %w", err)
 		}
-		s.currentActionType = message.TypeDora
+		s.currentEventType = message.TypeDora
 		s.onDora(&e)
 	case message.TypeReach:
 		var e message.Reach
 		if err := json.Unmarshal(event, &e); err != nil {
 			return fmt.Errorf("failed to unmarshal reach: %w", err)
 		}
-		s.currentActionType = message.TypeReach
+		s.currentEventType = message.TypeReach
 		s.onReach(&e)
 	case message.TypeReachAccepted:
 		var e message.ReachAccepted
 		if err := json.Unmarshal(event, &e); err != nil {
 			return fmt.Errorf("failed to unmarshal reach_accepted: %w", err)
 		}
-		s.currentActionType = message.TypeReachAccepted
+		s.currentEventType = message.TypeReachAccepted
 		s.onReachAccepted(&e)
 	case message.TypeHora:
 		var e message.Hora
 		if err := json.Unmarshal(event, &e); err != nil {
 			return fmt.Errorf("failed to unmarshal hora: %w", err)
 		}
-		s.currentActionType = message.TypeHora
+		s.currentEventType = message.TypeHora
 		s.onHora(&e)
 	case message.TypeRyukyoku:
 		var e message.Ryukyoku
 		if err := json.Unmarshal(event, &e); err != nil {
 			return fmt.Errorf("failed to unmarshal ryukyoku: %w", err)
 		}
-		s.currentActionType = message.TypeRyukyoku
+		s.currentEventType = message.TypeRyukyoku
 		s.onRyukyoku(&e)
 	default:
 		return fmt.Errorf("unknown event type: %v", event)
@@ -435,10 +435,10 @@ func (s *StateImpl) onStartKyoku(event *message.StartKyoku) error {
 		}
 	}
 
-	s.prevActionType = ""
+	s.prevEventType = ""
 	s.prevDahaiActor = -1
 	s.prevDahaiPai = nil
-	s.currentActionType = ""
+	s.currentEventType = ""
 
 	return nil
 }
