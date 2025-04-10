@@ -17,6 +17,11 @@ const (
 	maxNumDoraMarkers = 5
 	numInitPipais     = NumIDs*4 - 13*numPlayers - 14
 	finalTurn         = numInitPipais / numPlayers
+
+	// Indicates that no event has been triggered.
+	noEvent = ""
+	// Indicates that no action has been taken by anyone.
+	noActor = -1
 )
 
 func GetPlayerDistance(p1 *Player, p2 *Player) int {
@@ -271,14 +276,14 @@ func (s *StateImpl) OnStartGame(event jsontext.Value) error {
 	s.doraMarkers = make([]Pai, 0, maxNumDoraMarkers)
 	s.numPipais = numInitPipais
 
-	s.prevEventType = ""
-	s.prevDahaiActor = -1
+	s.prevEventType = noEvent
+	s.prevDahaiActor = noActor
 	s.prevDahaiPai = nil
-	s.currentEventType = ""
+	s.currentEventType = noEvent
 
 	s.playerID = id
-	s.lastActor = -1
-	s.lastActionType = ""
+	s.lastActor = noActor
+	s.lastActionType = noEvent
 
 	return nil
 }
@@ -440,12 +445,12 @@ func (s *StateImpl) onStartKyoku(event *message.StartKyoku) error {
 		}
 	}
 
-	s.prevEventType = ""
-	s.prevDahaiActor = -1
+	s.prevEventType = noEvent
+	s.prevDahaiActor = noActor
 	s.prevDahaiPai = nil
 
-	s.lastActor = -1
-	s.lastActionType = ""
+	s.lastActor = noActor
+	s.lastActionType = noEvent
 
 	return nil
 }
@@ -782,8 +787,8 @@ func (s *StateImpl) onHora(event *message.Hora) error {
 	}
 
 	// After hora, only end_kyoku comes, so reset the last action.
-	s.lastActor = -1
-	s.lastActionType = ""
+	s.lastActor = noActor
+	s.lastActionType = noEvent
 
 	return nil
 }
@@ -800,30 +805,74 @@ func (s *StateImpl) onRyukyoku(event *message.Ryukyoku) error {
 	}
 
 	// After ryukyoku, only end_kyoku comes, so reset the last action.
-	s.lastActor = -1
-	s.lastActionType = ""
+	s.lastActor = noActor
+	s.lastActionType = noEvent
 
 	return nil
 }
 
 func (s *StateImpl) DahaiCandidates() ([]Pai, error) {
+	if s.lastActor != s.playerID {
+		// Dahai is only possible if the last actor is the player itself.
+		return nil, nil
+	}
+	if s.lastActionType != message.TypeTsumo && s.lastActionType != message.TypeChi && s.lastActionType != message.TypePon {
+		// Dahai is only possible after tsumo, chi, or pon.
+		return nil, nil
+	}
+
 	panic("not implemented!")
 }
 
 func (s *StateImpl) ReachDahaiCandidates() ([]Pai, error) {
+	if s.lastActor != s.playerID {
+		// Reach is only possible if the last actor is the player itself.
+		return nil, nil
+	}
+	if s.lastActionType != message.TypeTsumo {
+		// Reach is only possible after tsumo.
+		return nil, nil
+	}
+
 	panic("not implemented!")
 }
 
 func (s *StateImpl) ChiCandidates() ([]Pai, error) {
+	if s.lastActor == noActor || s.lastActor == s.playerID {
+		// Chi is not possible if the last actor is the player itself or no actor.
+		return nil, nil
+	}
+	if s.lastActionType != message.TypeDahai {
+		// Chi is only possible after dahai.
+		return nil, nil
+	}
+
 	panic("not implemented!")
 }
 
 func (s *StateImpl) PonCandidates() ([]Pai, error) {
+	if s.lastActor == noActor || s.lastActor == s.playerID {
+		// Pon is not possible if the last actor is the player itself or no actor.
+		return nil, nil
+	}
+	if s.lastActionType != message.TypeDahai {
+		// Pon is only possible after dahai.
+		return nil, nil
+	}
+
 	panic("not implemented!")
 }
 
 func (s *StateImpl) CanHora() (bool, error) {
-	if s.lastActor == -1 {
+	if s.lastActor == noActor {
+		return false, nil
+	}
+	if s.lastActor == s.playerID && s.lastActionType != message.TypeTsumo {
+		// If the last actor is the player itself, it cannot be a ron hora.
+		return false, nil
+	}
+	if s.lastActor != s.playerID && s.lastActionType != message.TypeDahai && s.lastActionType != message.TypeKakan {
+		// If the last actor is not the player itself, it cannot be a tsumo hora.
 		return false, nil
 	}
 
