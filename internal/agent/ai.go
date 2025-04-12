@@ -90,7 +90,7 @@ func (a *AIAgent) Respond(msgs []jsontext.Value) (jsontext.Value, error) {
 	case message.TypeEndKyoku:
 		// Message during the game, but does not affect the game, so process it here
 		return a.makeNoneResponse()
-	case message.TypeEndGame:
+	case message.TypeEndGame, message.TypeError:
 		a.onEndGame()
 		return a.makeNoneResponse()
 	}

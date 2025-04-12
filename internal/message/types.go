@@ -23,4 +23,5 @@ const (
 	TypeRyukyoku      Type = "ryukyoku"
 	TypeEndKyoku      Type = "end_kyoku"
 	TypeEndGame       Type = "end_game"
+	TypeError         Type = "error"
 )
