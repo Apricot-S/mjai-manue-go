@@ -7,30 +7,30 @@ import (
 
 func TestHashMap(t *testing.T) {
 	t.Run("single element keys", func(t *testing.T) {
-		h := NewHashMap()
+		h := NewHashMap[float64]()
 
 		// Set & Get
-		h.Set([]float64{1.0}, 100.0)
-		if got := h.Get([]float64{1.0}, 0.0); got != 100.0 {
-			t.Errorf("Get([1.0]) = %v, want 100.0", got)
+		h.Set(1.0, 100.0)
+		if got := h.Get(1.0, 0.0); got != 100.0 {
+			t.Errorf("Get(1.0) = %v, want 100.0", got)
 		}
 
 		// Default value
-		if got := h.Get([]float64{2.0}, -1.0); got != -1.0 {
-			t.Errorf("Get([2.0]) with default = %v, want -1.0", got)
+		if got := h.Get(2.0, -1.0); got != -1.0 {
+			t.Errorf("Get(2.0) with default = %v, want -1.0", got)
 		}
 
 		// HasKey
-		if !h.HasKey([]float64{1.0}) {
-			t.Error("HasKey([1.0]) = false, want true")
+		if !h.HasKey(1.0) {
+			t.Error("HasKey(1.0) = false, want true")
 		}
-		if h.HasKey([]float64{2.0}) {
-			t.Error("HasKey([2.0]) = true, want false")
+		if h.HasKey(2.0) {
+			t.Error("HasKey(2.0) = true, want false")
 		}
 	})
 
 	t.Run("multiple element keys", func(t *testing.T) {
-		h := NewHashMap()
+		h := NewHashMap[[]float64]()
 
 		key1 := []float64{1.0, 2.0}
 		key2 := []float64{3.0, 4.0}
@@ -56,12 +56,12 @@ func TestHashMap(t *testing.T) {
 	})
 
 	t.Run("ForEach with single element keys", func(t *testing.T) {
-		h := NewHashMap()
-		h.Set([]float64{1.0}, 100.0)
-		h.Set([]float64{2.0}, 200.0)
+		h := NewHashMap[float64]()
+		h.Set(1.0, 100.0)
+		h.Set(2.0, 200.0)
 
 		sum := 0.0
-		h.ForEach(func(key []float64, value float64) {
+		h.ForEach(func(key float64, value float64) {
 			sum += value
 		})
 
@@ -71,7 +71,7 @@ func TestHashMap(t *testing.T) {
 	})
 
 	t.Run("ForEach with multiple element keys", func(t *testing.T) {
-		h := NewHashMap()
+		h := NewHashMap[[]float64]()
 		key1 := []float64{1.0, 2.0}
 		key2 := []float64{3.0, 4.0}
 		h.Set(key1, 100.0)

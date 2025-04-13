@@ -1,23 +1,25 @@
 package ai
 
 import (
-	"slices"
-
 	"github.com/go-json-experiment/json"
 )
 
-type HashMapEntry struct {
-	Key   []float64
+type HashMapKey interface {
+	float64 | []float64
+}
+
+type HashMapEntry[T HashMapKey] struct {
+	Key   T
 	Value float64
 }
 
-type HashMap map[string]HashMapEntry
+type HashMap[T HashMapKey] map[string]HashMapEntry[T]
 
-func NewHashMap() HashMap {
-	return make(map[string]HashMapEntry)
+func NewHashMap[T HashMapKey]() HashMap[T] {
+	return make(map[string]HashMapEntry[T])
 }
 
-func keyToString(key []float64) string {
+func keyToString[T HashMapKey](key T) string {
 	jsonKey, err := json.Marshal(&key)
 	if err != nil {
 		panic(err)
@@ -25,15 +27,15 @@ func keyToString(key []float64) string {
 	return string(jsonKey)
 }
 
-func (h *HashMap) Set(key []float64, value float64) {
+func (h *HashMap[T]) Set(key T, value float64) {
 	keyStr := keyToString(key)
-	(*h)[keyStr] = HashMapEntry{
-		Key:   slices.Clone(key),
+	(*h)[keyStr] = HashMapEntry[T]{
+		Key:   key,
 		Value: value,
 	}
 }
 
-func (h *HashMap) Get(key []float64, def float64) float64 {
+func (h *HashMap[T]) Get(key T, def float64) float64 {
 	keyStr := keyToString(key)
 	if entry, ok := (*h)[keyStr]; ok {
 		return entry.Value
@@ -41,13 +43,13 @@ func (h *HashMap) Get(key []float64, def float64) float64 {
 	return def
 }
 
-func (h *HashMap) HasKey(key []float64) bool {
+func (h *HashMap[T]) HasKey(key T) bool {
 	keyStr := keyToString(key)
 	_, ok := (*h)[keyStr]
 	return ok
 }
 
-func (h *HashMap) ForEach(callback func(key []float64, value float64)) {
+func (h *HashMap[T]) ForEach(callback func(key T, value float64)) {
 	for _, entry := range *h {
 		callback(entry.Key, entry.Value)
 	}
