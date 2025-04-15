@@ -68,8 +68,8 @@ type StateUpdater interface {
 type ActionCalculator interface {
 	DahaiCandidates() ([]Pai, error)
 	ReachDahaiCandidates() ([]Pai, error)
-	ChiCandidates() ([]Pai, error)
-	PonCandidates() ([]Pai, error)
+	ChiCandidates() ([]Chi, error)
+	PonCandidates() ([]Pon, error)
 	// TODO: Daiminkan.
 	// mjai-manue does not consider Ankan and Kakan, so it is not necessary to implement them.
 	CanHora() (bool, error)
@@ -841,7 +841,7 @@ func (s *StateImpl) ReachDahaiCandidates() ([]Pai, error) {
 	panic("not implemented!")
 }
 
-func (s *StateImpl) ChiCandidates() ([]Pai, error) {
+func (s *StateImpl) ChiCandidates() ([]Chi, error) {
 	if s.lastActor == noActor || s.lastActor == s.playerID {
 		// Chi is not possible if the last actor is the player itself or no actor.
 		return nil, nil
@@ -854,7 +854,7 @@ func (s *StateImpl) ChiCandidates() ([]Pai, error) {
 	panic("not implemented!")
 }
 
-func (s *StateImpl) PonCandidates() ([]Pai, error) {
+func (s *StateImpl) PonCandidates() ([]Pon, error) {
 	if s.lastActor == noActor || s.lastActor == s.playerID {
 		// Pon is not possible if the last actor is the player itself or no actor.
 		return nil, nil
