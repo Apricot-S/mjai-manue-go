@@ -833,8 +833,8 @@ func (s *StateImpl) ReachDahaiCandidates() ([]Pai, error) {
 		// Reach is only possible if the last actor is the player itself.
 		return nil, nil
 	}
-	if s.lastActionType != message.TypeTsumo {
-		// Reach is only possible after tsumo.
+	if s.lastActionType != message.TypeTsumo && s.lastActionType != message.TypeReach {
+		// Reach is only possible after tsumo or reach declaration.
 		return nil, nil
 	}
 
