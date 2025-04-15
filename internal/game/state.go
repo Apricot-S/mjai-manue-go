@@ -827,6 +827,7 @@ func (s *StateImpl) DahaiCandidates() ([]Pai, error) {
 	panic("not implemented!")
 }
 
+// ReachDahaiCandidates returns the candidates for the reach declaration tile.
 func (s *StateImpl) ReachDahaiCandidates() ([]Pai, error) {
 	if s.lastActor != s.playerID {
 		// Reach is only possible if the last actor is the player itself.
