@@ -48,6 +48,15 @@ func NewManueAIWithEstimators(
 }
 
 func (a *ManueAI) DecideAction(state game.StateAnalyzer, playerID int) (jsontext.Value, error) {
+	canHora, err := state.CanHora()
+	if err != nil {
+		return nil, err
+	}
+	if canHora {
+		// TODO: implement hora
+		panic("unimplemented!")
+	}
+
 	dc, err := state.DahaiCandidates()
 	if err != nil {
 		return nil, err
@@ -56,6 +65,12 @@ func (a *ManueAI) DecideAction(state game.StateAnalyzer, playerID int) (jsontext
 	if err != nil {
 		return nil, err
 	}
+	if dc != nil || rdc != nil {
+		// my turn
+		// TODO
+		panic("unimplemented!")
+	}
+
 	cc, err := state.ChiCandidates()
 	if err != nil {
 		return nil, err
@@ -64,23 +79,17 @@ func (a *ManueAI) DecideAction(state game.StateAnalyzer, playerID int) (jsontext
 	if err != nil {
 		return nil, err
 	}
-	canHora, err := state.CanHora()
+	if cc != nil || pc != nil {
+		// can call or ron
+		// TODO
+		panic("unimplemented!")
+	}
+
+	// no action is possible
+	none := message.NewNone()
+	res, err := json.Marshal(&none)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to marshal none message: %w", err)
 	}
-
-	isMyTurn := dc != nil || rdc != nil || canHora
-	canCallOrRon := cc != nil || pc != nil || canHora
-
-	if !isMyTurn && !canCallOrRon {
-		// no action is possible
-		none := message.NewNone()
-		res, err := json.Marshal(&none)
-		if err != nil {
-			return nil, fmt.Errorf("failed to marshal none message: %w", err)
-		}
-		return res, nil
-	}
-
-	panic("unimplemented!")
+	return res, nil
 }
