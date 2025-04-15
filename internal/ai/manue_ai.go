@@ -80,7 +80,7 @@ func (a *ManueAI) DecideAction(state game.StateAnalyzer, playerID int) (jsontext
 		return nil, err
 	}
 	if cc != nil || pc != nil {
-		// can call or ron
+		// can call
 		// TODO
 		panic("unimplemented!")
 	}
