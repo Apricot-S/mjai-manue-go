@@ -5,6 +5,8 @@ import (
 
 	"github.com/Apricot-S/mjai-manue-go/configs"
 	"github.com/Apricot-S/mjai-manue-go/internal/game"
+	"github.com/Apricot-S/mjai-manue-go/internal/message"
+	"github.com/go-json-experiment/json"
 	"github.com/go-json-experiment/json/jsontext"
 )
 
@@ -46,5 +48,36 @@ func NewManueAIWithEstimators(
 }
 
 func (a *ManueAI) DecideAction(state game.StateAnalyzer, playerID int) (jsontext.Value, error) {
+	dc, err := state.DahaiCandidates()
+	if err != nil {
+		return nil, err
+	}
+	rdc, err := state.ReachDahaiCandidates()
+	if err != nil {
+		return nil, err
+	}
+	cc, err := state.ChiCandidates()
+	if err != nil {
+		return nil, err
+	}
+	pc, err := state.PonCandidates()
+	if err != nil {
+		return nil, err
+	}
+	canHora, err := state.CanHora()
+	if err != nil {
+		return nil, err
+	}
+
+	if dc == nil && rdc == nil && cc == nil && pc == nil && !canHora {
+		// no action
+		none := message.NewNone()
+		res, err := json.Marshal(&none)
+		if err != nil {
+			return nil, fmt.Errorf("failed to marshal none message: %w", err)
+		}
+		return res, nil
+	}
+
 	panic("unimplemented!")
 }
