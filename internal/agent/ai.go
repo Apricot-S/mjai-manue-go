@@ -60,7 +60,8 @@ func shouldDecideAction(msgs []jsontext.Value, playerID int) (bool, error) {
 			// Skip messages that cannot be parsed as Action
 			continue
 		}
-		if isMyTurn(action.Type, action.Actor, playerID) || needsResponse(action.Type, action.Actor, playerID) {
+		if isMyTurn(action.Type, action.Actor, playerID) ||
+			needsResponse(action.Type, action.Actor, playerID) {
 			return true, nil
 		}
 	}

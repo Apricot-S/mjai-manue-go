@@ -32,7 +32,11 @@ func NewManueAI() (*ManueAI, error) {
 	), nil
 }
 
-func NewManueAIWithEstimators(stats *configs.GameStats, dangerEstimator *DangerEstimator, tenpaiProbEstimator *TenpaiProbEstimator) *ManueAI {
+func NewManueAIWithEstimators(
+	stats *configs.GameStats,
+	dangerEstimator *DangerEstimator,
+	tenpaiProbEstimator *TenpaiProbEstimator,
+) *ManueAI {
 	return &ManueAI{
 		stats:               stats,
 		dangerEstimator:     dangerEstimator,

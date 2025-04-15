@@ -297,7 +297,8 @@ func (s *StateImpl) Update(event jsontext.Value) error {
 	}
 
 	// This is specially handled here because it's not an anpai if the dahai is followed by a hora.
-	if msg.Type != message.TypeHora && (s.prevEventType == message.TypeDahai || s.prevEventType == message.TypeKakan) {
+	if msg.Type != message.TypeHora &&
+		(s.prevEventType == message.TypeDahai || s.prevEventType == message.TypeKakan) {
 		for _, p := range s.players {
 			if p.ID() != s.prevDahaiActor {
 				p.AddExtraAnpais(*s.prevDahaiPai)
@@ -816,7 +817,8 @@ func (s *StateImpl) DahaiCandidates() ([]Pai, error) {
 		// Dahai is only possible if the last actor is the player itself.
 		return nil, nil
 	}
-	if s.lastActionType != message.TypeTsumo && s.lastActionType != message.TypeChi && s.lastActionType != message.TypePon {
+	if s.lastActionType != message.TypeTsumo &&
+		s.lastActionType != message.TypeChi && s.lastActionType != message.TypePon {
 		// Dahai is only possible after tsumo, chi, or pon.
 		return nil, nil
 	}
@@ -871,7 +873,8 @@ func (s *StateImpl) CanHora() (bool, error) {
 		// If the last actor is the player itself, it cannot be a ron hora.
 		return false, nil
 	}
-	if s.lastActor != s.playerID && s.lastActionType != message.TypeDahai && s.lastActionType != message.TypeKakan {
+	if s.lastActor != s.playerID &&
+		s.lastActionType != message.TypeDahai && s.lastActionType != message.TypeKakan {
 		// If the last actor is not the player itself, it cannot be a tsumo hora.
 		return false, nil
 	}

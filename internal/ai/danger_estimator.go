@@ -356,7 +356,12 @@ func isNOuterPrereachSutehai(pai *game.Pai, n int, prereachSutehaiSet *game.PaiS
 	return prereachSutehaiSet.Has(innerPai)
 }
 
-func isNOrMoreOfNeighborsInPrereachSutehais(pai *game.Pai, n int, neighborDistance int, prereachSutehaiSet *game.PaiSet) (bool, error) {
+func isNOrMoreOfNeighborsInPrereachSutehais(
+	pai *game.Pai,
+	n int,
+	neighborDistance int,
+	prereachSutehaiSet *game.PaiSet,
+) (bool, error) {
 	if pai.IsTsupai() {
 		return false, nil
 	}
@@ -764,7 +769,12 @@ func registerEvaluators() *evaluators {
 			distance := i
 			threshold := j
 			ev[featureName] = func(scene *Scene, pai *game.Pai) (bool, error) {
-				return isNOrMoreOfNeighborsInPrereachSutehais(pai, threshold, distance, scene.prereachSutehaiSet)
+				return isNOrMoreOfNeighborsInPrereachSutehais(
+					pai,
+					threshold,
+					distance,
+					scene.prereachSutehaiSet,
+				)
 			}
 		}
 	}
