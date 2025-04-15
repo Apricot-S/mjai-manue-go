@@ -69,8 +69,11 @@ func (a *ManueAI) DecideAction(state game.StateAnalyzer, playerID int) (jsontext
 		return nil, err
 	}
 
-	if dc == nil && rdc == nil && cc == nil && pc == nil && !canHora {
-		// no action
+	isMyTurn := dc != nil || rdc != nil || canHora
+	canCallOrRon := cc != nil || pc != nil || canHora
+
+	if !isMyTurn && !canCallOrRon {
+		// no action is possible
 		none := message.NewNone()
 		res, err := json.Marshal(&none)
 		if err != nil {
