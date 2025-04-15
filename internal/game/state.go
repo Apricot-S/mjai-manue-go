@@ -102,7 +102,7 @@ type StateImpl struct {
 	currentEventType message.Type
 
 	playerID int
-	// en: -1 if there is no action
+	// -1 if there is no action
 	lastActor      int
 	lastActionType message.Type
 }
