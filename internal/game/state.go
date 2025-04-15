@@ -70,7 +70,8 @@ type ActionCalculator interface {
 	ReachDahaiCandidates() ([]Pai, error)
 	ChiCandidates() ([]Pai, error)
 	PonCandidates() ([]Pai, error)
-	// TODO: Daiminkan, Ankan, and Kakan.
+	// TODO: Daiminkan.
+	// mjai-manue does not consider Ankan and Kakan, so it is not necessary to implement them.
 	CanHora() (bool, error)
 }
 
