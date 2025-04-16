@@ -72,7 +72,7 @@ type ActionCalculator interface {
 	PonCandidates() ([]Pon, error)
 	// TODO: Daiminkan.
 	// mjai-manue does not consider Ankan and Kakan, so it is not necessary to implement them.
-	CanHora() (bool, error)
+	HoraCandidate() (*Hora, error)
 }
 
 type StateAnalyzer interface {
@@ -867,18 +867,18 @@ func (s *StateImpl) PonCandidates() ([]Pon, error) {
 	panic("not implemented!")
 }
 
-func (s *StateImpl) CanHora() (bool, error) {
+func (s *StateImpl) HoraCandidate() (*Hora, error) {
 	if s.lastActor == noActor {
-		return false, nil
+		return nil, nil
 	}
 	if s.lastActor == s.playerID && s.lastActionType != message.TypeTsumo {
 		// If the last actor is the player itself, it cannot be a ron hora.
-		return false, nil
+		return nil, nil
 	}
 	if s.lastActor != s.playerID &&
 		s.lastActionType != message.TypeDahai && s.lastActionType != message.TypeKakan {
 		// If the last actor is not the player itself, it cannot be a tsumo hora.
-		return false, nil
+		return nil, nil
 	}
 
 	panic("not implemented!")

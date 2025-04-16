@@ -48,11 +48,11 @@ func NewManueAIWithEstimators(
 }
 
 func (a *ManueAI) DecideAction(state game.StateAnalyzer, playerID int) (jsontext.Value, error) {
-	canHora, err := state.CanHora()
+	hc, err := state.HoraCandidate()
 	if err != nil {
 		return nil, err
 	}
-	if canHora {
+	if hc != nil {
 		// TODO: implement hora
 		panic("unimplemented!")
 	}
