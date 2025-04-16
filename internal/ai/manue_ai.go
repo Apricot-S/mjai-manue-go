@@ -53,8 +53,15 @@ func (a *ManueAI) DecideAction(state game.StateAnalyzer, playerID int) (jsontext
 		return nil, err
 	}
 	if hc != nil {
-		// TODO: implement hora
-		panic("unimplemented!")
+		hora, err := message.NewHora(playerID, hc.Target(), hc.Pai().ToString(), 0, nil, "")
+		if err != nil {
+			return nil, fmt.Errorf("failed to create hora message: %w", err)
+		}
+		res, err := json.Marshal(&hora)
+		if err != nil {
+			return nil, fmt.Errorf("failed to marshal hora message: %w", err)
+		}
+		return res, nil
 	}
 
 	dc, err := state.DahaiCandidates()
@@ -67,6 +74,19 @@ func (a *ManueAI) DecideAction(state game.StateAnalyzer, playerID int) (jsontext
 	}
 	if dc != nil || rdc != nil {
 		// my turn
+		if state.Players()[playerID].ReachState() == game.Accepted {
+			// in reach
+			dahai, err := message.NewDahai(playerID, dc[0].ToString(), true, "")
+			if err != nil {
+				return nil, fmt.Errorf("failed to create dahai message: %w", err)
+			}
+			res, err := json.Marshal(&dahai)
+			if err != nil {
+				return nil, fmt.Errorf("failed to marshal dahai message: %w", err)
+			}
+			return res, nil
+		}
+
 		// TODO
 		panic("unimplemented!")
 	}
