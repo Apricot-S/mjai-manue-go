@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"slices"
+	"sort"
 
 	"github.com/Apricot-S/mjai-manue-go/internal/message"
 	"github.com/go-json-experiment/json"
@@ -814,31 +815,64 @@ func (s *StateImpl) onRyukyoku(event *message.Ryukyoku) error {
 }
 
 func (s *StateImpl) DahaiCandidates() ([]Pai, error) {
-	if s.lastActor != s.playerID {
-		// Dahai is only possible if the last actor is the player itself.
-		return nil, nil
-	}
-	if s.lastActionType != message.TypeTsumo &&
-		s.lastActionType != message.TypeChi && s.lastActionType != message.TypePon {
-		// Dahai is only possible after tsumo, chi, or pon.
+	if !s.players[s.playerID].CanDahai() {
 		return nil, nil
 	}
 
-	panic("not implemented!")
+	candidates := slices.Clone(s.players[s.playerID].tehais)
+	sort.Sort(candidates)
+	candidates = slices.Compact(candidates)
+
+	// TODO: 喰い替えを候補から除外する
+
+	return candidates, nil
 }
 
 // ReachDahaiCandidates returns the candidates for the reach declaration tile.
 func (s *StateImpl) ReachDahaiCandidates() ([]Pai, error) {
-	if s.lastActor != s.playerID {
-		// Reach is only possible if the last actor is the player itself.
+	if !s.players[s.playerID].CanDahai() {
 		return nil, nil
 	}
-	if s.lastActionType != message.TypeTsumo && s.lastActionType != message.TypeReach {
-		// Reach is only possible after tsumo or reach declaration.
+	if !s.players[s.playerID].IsMenzen() {
 		return nil, nil
 	}
 
-	panic("not implemented!")
+	tehaiPais := slices.Clone(s.players[s.playerID].tehais)
+	tehaiCounts, err := NewPaiSetWithPais(tehaiPais)
+	if err != nil {
+		return nil, err
+	}
+	shanten, _, err := AnalyzeShantenWithOption(tehaiCounts, 0, 1)
+	if err != nil {
+		return nil, err
+	}
+	if shanten > 0 {
+		// If the hand is not tenpai, return nil.
+		return nil, nil
+	}
+
+	sort.Sort(tehaiPais)
+	tehaiPais = slices.CompactFunc(tehaiPais, func(p1, p2 Pai) bool {
+		return p1.ID() == p2.ID()
+	})
+
+	// The number of candidates will be equal or less than 13 except for
+	// Thirteen-wait Thirteen Orphans.
+	candidates := make([]Pai, 0, 13)
+	for _, p := range tehaiPais {
+		i := p.RemoveRed().ID()
+		tehaiCounts[i] -= 1
+		shanten, _, err := AnalyzeShantenWithOption(tehaiCounts, 0, 1)
+		if err != nil {
+			return nil, err
+		}
+		if shanten <= 0 {
+			candidates = append(candidates, p)
+		}
+		tehaiCounts[i] += 1
+	}
+
+	return candidates, nil
 }
 
 func (s *StateImpl) ChiCandidates() ([]Chi, error) {
