@@ -815,14 +815,23 @@ func (s *StateImpl) onRyukyoku(event *message.Ryukyoku) error {
 }
 
 func (s *StateImpl) DahaiCandidates() ([]Pai, error) {
-	if !s.players[s.playerID].CanDahai() {
+	player := &s.players[s.playerID]
+	if !player.CanDahai() {
 		return nil, nil
 	}
+	if player.ReachState() == Declared {
+		// If the player has already declared reach, return nil.
+		return nil, nil
+	}
+	if player.ReachState() == Accepted {
+		// If the player has already accepted the reach, only the drawn tile is a candidate.
+		candidates := []Pai{player.tehais[initTehaisSize]}
+		return candidates, nil
+	}
 
-	candidates := slices.Clone(s.players[s.playerID].tehais)
+	candidates := slices.Clone(player.tehais)
 	sort.Sort(candidates)
 	candidates = slices.Compact(candidates)
-
 	// TODO: 喰い替えを候補から除外する
 
 	return candidates, nil
