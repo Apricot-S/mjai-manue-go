@@ -830,14 +830,19 @@ func (s *StateImpl) DahaiCandidates() ([]Pai, error) {
 
 // ReachDahaiCandidates returns the candidates for the reach declaration tile.
 func (s *StateImpl) ReachDahaiCandidates() ([]Pai, error) {
-	if !s.players[s.playerID].CanDahai() {
+	player := &s.players[s.playerID]
+	if !player.CanDahai() {
 		return nil, nil
 	}
-	if !s.players[s.playerID].IsMenzen() {
+	if !player.IsMenzen() {
+		return nil, nil
+	}
+	if player.ReachState() != None {
+		// If the player has already declared reach, return nil.
 		return nil, nil
 	}
 
-	tehaiPais := slices.Clone(s.players[s.playerID].tehais)
+	tehaiPais := slices.Clone(player.tehais)
 	tehaiCounts, err := NewPaiSetWithPais(tehaiPais)
 	if err != nil {
 		return nil, err
