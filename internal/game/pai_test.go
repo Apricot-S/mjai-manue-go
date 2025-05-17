@@ -490,6 +490,33 @@ func TestPai_IsYaochu(t *testing.T) {
 	}
 }
 
+func TestPai_AddRed(t *testing.T) {
+	type testCase struct {
+		name string
+		want *Pai
+	}
+	var tests []testCase
+
+	for _, n := range allNames {
+		p, _ := NewPaiWithName(n)
+		if p.Type() != tsupaiType && p.Number() == 5 && !p.IsRed() {
+			red, _ := NewPaiWithName(n + "r")
+			tests = append(tests, testCase{n, red})
+		} else {
+			tests = append(tests, testCase{n, p})
+		}
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			p, _ := NewPaiWithName(tt.name)
+			if got := p.AddRed(); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("Pai.AddRed() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
 func TestPai_RemoveRed(t *testing.T) {
 	type testCase struct {
 		name string

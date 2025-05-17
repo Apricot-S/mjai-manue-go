@@ -216,6 +216,16 @@ func (p *Pai) IsYaochu() bool {
 	return p.typ == tsupaiType || p.number == 1 || p.number == 9
 }
 
+func (p *Pai) AddRed() *Pai {
+	if p.IsUnknown() {
+		return newPaiWithIDUnchecked(unknownID)
+	}
+	if p.Type() == tsupaiType || p.Number() != 5 {
+		return newPaiWithDetailUnchecked(p.typ, p.number, false)
+	}
+	return newPaiWithDetailUnchecked(p.typ, p.number, true)
+}
+
 func (p *Pai) RemoveRed() *Pai {
 	if p.IsUnknown() {
 		return newPaiWithIDUnchecked(unknownID)
