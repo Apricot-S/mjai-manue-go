@@ -53,6 +53,7 @@ func (a *ManueAI) DecideAction(state game.StateAnalyzer, playerID int) (jsontext
 		return nil, err
 	}
 	if hc != nil {
+		// If it can win, always win
 		hora, err := message.NewHora(playerID, hc.Target(), hc.Pai().ToString(), 0, nil, "")
 		if err != nil {
 			return nil, fmt.Errorf("failed to create hora message: %w", err)
@@ -87,7 +88,7 @@ func (a *ManueAI) DecideAction(state game.StateAnalyzer, playerID int) (jsontext
 			return res, nil
 		}
 
-		// TODO
+		// TODO: 非立直時の打牌
 		panic("unimplemented!")
 	}
 
@@ -112,4 +113,12 @@ func (a *ManueAI) DecideAction(state game.StateAnalyzer, playerID int) (jsontext
 		return nil, fmt.Errorf("failed to marshal none message: %w", err)
 	}
 	return res, nil
+}
+
+func (a *ManueAI) decideDahai(
+	dahaiCandidates []game.Pai,
+	reachDahaiCandidates []game.Pai,
+	forbiddenDahais []game.Pai,
+) (*game.Pai, bool, error) {
+	panic("unimplemented")
 }
