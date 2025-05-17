@@ -837,8 +837,8 @@ func (s *StateImpl) ReachDahaiCandidates() ([]Pai, error) {
 	if !player.IsMenzen() {
 		return nil, nil
 	}
-	if player.ReachState() != None {
-		// If the player has already declared reach, return nil.
+	if player.ReachState() == Accepted {
+		// If the player has already accepted the reach, return nil.
 		return nil, nil
 	}
 
