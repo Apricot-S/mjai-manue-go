@@ -851,7 +851,7 @@ func (s *StateImpl) DahaiCandidates() ([]Pai, error) {
 	}
 	if player.ReachState() == Accepted {
 		// If the player has already accepted the reach, only the drawn tile is a candidate.
-		candidates := []Pai{player.tehais[initTehaisSize]}
+		candidates := []Pai{player.tehais[len(player.tehais)-1]}
 		return candidates, nil
 	}
 
