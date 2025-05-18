@@ -25,7 +25,16 @@ func (s *StateImpl) DahaiCandidates() ([]Pai, error) {
 	candidates := slices.Clone(player.tehais)
 	sort.Sort(candidates)
 	candidates = slices.Compact(candidates)
-	// TODO: 喰い替えを候補から除外する
+
+	// Remove the kuikae tiles from the candidates.
+	kuikaeSet := make(map[uint8]struct{}, len(s.kuikaePais))
+	for _, k := range s.kuikaePais {
+		kuikaeSet[k.ID()] = struct{}{}
+	}
+	candidates = slices.DeleteFunc(candidates, func(p Pai) bool {
+		_, found := kuikaeSet[p.ID()]
+		return found
+	})
 
 	return candidates, nil
 }
