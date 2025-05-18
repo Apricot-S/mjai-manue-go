@@ -91,6 +91,14 @@ func (s *StateImpl) ChiCandidates() ([]Chi, error) {
 		// Chi is only possible after dahai.
 		return nil, nil
 	}
+	if GetPlayerDistance(&s.players[s.playerID], &s.players[s.lastActor]) != 1 {
+		// Chi is only possible for kamicha's discarded tile.
+		return nil, nil
+	}
+	if s.NumPipais() == 0 {
+		// Chi is not possible if discarded tile is a last tile.
+		return nil, nil
+	}
 
 	panic("not implemented!")
 }
@@ -102,6 +110,10 @@ func (s *StateImpl) PonCandidates() ([]Pon, error) {
 	}
 	if s.lastActionType != message.TypeDahai {
 		// Pon is only possible after dahai.
+		return nil, nil
+	}
+	if s.NumPipais() == 0 {
+		// Pon is not possible if discarded tile is a last tile.
 		return nil, nil
 	}
 
