@@ -107,6 +107,9 @@ type StateImpl struct {
 	// -1 if there is no action
 	lastActor      int
 	lastActionType message.Type
+
+	// The tiles that cannot be discarded because they would result in swap calling (喰い替え)
+	kuikaePais []Pai
 }
 
 func (s *StateImpl) Players() *[numPlayers]Player {
@@ -287,6 +290,8 @@ func (s *StateImpl) OnStartGame(event jsontext.Value) error {
 	s.lastActor = noActor
 	s.lastActionType = noEvent
 
+	s.kuikaePais = make([]Pai, 0, 3)
+
 	return nil
 }
 
@@ -455,6 +460,8 @@ func (s *StateImpl) onStartKyoku(event *message.StartKyoku) error {
 	s.lastActor = noActor
 	s.lastActionType = noEvent
 
+	s.kuikaePais = make([]Pai, 0, 3)
+
 	return nil
 }
 
@@ -507,6 +514,10 @@ func (s *StateImpl) onDahai(event *message.Dahai) error {
 	s.lastActor = actor
 	s.lastActionType = message.TypeDahai
 
+	if actor == s.playerID {
+		s.kuikaePais = make([]Pai, 0, 3)
+	}
+
 	return nil
 }
 
@@ -551,6 +562,14 @@ func (s *StateImpl) onChi(event *message.Chi) error {
 	s.lastActor = actor
 	s.lastActionType = message.TypeChi
 
+	if actor == s.playerID {
+		s.kuikaePais = append(s.kuikaePais, *pai.RemoveRed())
+		if !pai.IsTsupai() && pai.Number() == 5 {
+			s.kuikaePais = append(s.kuikaePais, *pai.AddRed())
+		}
+		// TODO: 両面チーのときの筋喰い替えを追加する
+	}
+
 	return nil
 }
 
@@ -594,6 +613,13 @@ func (s *StateImpl) onPon(event *message.Pon) error {
 
 	s.lastActor = actor
 	s.lastActionType = message.TypePon
+
+	if actor == s.playerID {
+		s.kuikaePais = append(s.kuikaePais, *pai.RemoveRed())
+		if !pai.IsTsupai() && pai.Number() == 5 {
+			s.kuikaePais = append(s.kuikaePais, *pai.AddRed())
+		}
+	}
 
 	return nil
 }
