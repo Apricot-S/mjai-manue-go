@@ -41,12 +41,7 @@ func (ps *PaiSet) Count(pai *Pai) (int, error) {
 		return 0, errors.New("PaiSet does not contain unknowns")
 	}
 
-	var id uint8
-	if pai.IsRed() {
-		id = pai.RemoveRed().ID()
-	} else {
-		id = pai.ID()
-	}
+	id := pai.RemoveRed().ID()
 
 	return ps[id], nil
 }
@@ -64,12 +59,7 @@ func (ps *PaiSet) AddPai(pai *Pai, n int) error {
 		return errors.New("PaiSet cannot contain unknowns")
 	}
 
-	var id uint8
-	if pai.IsRed() {
-		id = pai.RemoveRed().ID()
-	} else {
-		id = pai.ID()
-	}
+	id := pai.RemoveRed().ID()
 	ps[id] += n
 
 	return nil
