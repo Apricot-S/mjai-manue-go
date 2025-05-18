@@ -73,7 +73,7 @@ func (a *ManueAI) DecideAction(state game.StateAnalyzer, playerID int) (jsontext
 	if err != nil {
 		return nil, err
 	}
-	if dc != nil || rdc != nil {
+	if len(dc) != 0 || len(rdc) != 0 {
 		// my turn
 		if state.Players()[playerID].ReachState() == game.Accepted {
 			// in reach
@@ -100,7 +100,7 @@ func (a *ManueAI) DecideAction(state game.StateAnalyzer, playerID int) (jsontext
 	if err != nil {
 		return nil, err
 	}
-	if cc != nil || pc != nil {
+	if len(cc) != 0 || len(pc) != 0 {
 		// can call
 		// TODO
 		panic("unimplemented!")
