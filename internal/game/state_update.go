@@ -338,10 +338,42 @@ func (s *StateImpl) onChi(event *message.Chi) error {
 
 	if actor == s.playerID {
 		s.kuikaePais = append(s.kuikaePais, *pai.RemoveRed())
-		if !pai.IsTsupai() && pai.Number() == 5 {
+		if pai.Number() == 5 {
 			s.kuikaePais = append(s.kuikaePais, *pai.AddRed())
 		}
-		// TODO: 両面チーのときの筋喰い替えを追加する
+		// Add suji kuikae for ryanmen chi (two-sided chi)
+		n0 := int8(consumed[0].Number())
+		n1 := int8(consumed[1].Number())
+		diff := n0 - n1
+		if diff == 1 || diff == -1 {
+			// If consumed[0] and consumed[1] are consecutive, it's a ryanmen chi
+			// Number of the taken tile
+			nTaken := int8(pai.Number())
+			// Find the smaller and larger of the consumed tiles
+			nLow := n0
+			nHigh := n1
+			if nLow > nHigh {
+				nLow, nHigh = nHigh, nLow
+			}
+			// For ryanmen chi, nTaken is nLow-1 or nHigh+1
+			// Add the other end of the suji as a kuikae tile
+			if nTaken < 7 && nTaken == nLow-1 {
+				// Example: chi 4 with 5,6 -> also add 7 as kuikae
+				sujiPai := pai.Next(3)
+				s.kuikaePais = append(s.kuikaePais, *sujiPai)
+				if sujiPai.Number() == 5 {
+					s.kuikaePais = append(s.kuikaePais, *sujiPai.AddRed())
+				}
+			}
+			if nTaken > 3 && nTaken == nHigh+1 {
+				// Example: chi 5 with 3,4 -> also add 2 as kuikae
+				sujiPai := pai.Next(-3)
+				s.kuikaePais = append(s.kuikaePais, *sujiPai)
+				if sujiPai.Number() == 5 {
+					s.kuikaePais = append(s.kuikaePais, *sujiPai.AddRed())
+				}
+			}
+		}
 	}
 
 	return nil
