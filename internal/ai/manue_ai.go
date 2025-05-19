@@ -105,8 +105,7 @@ func (a *ManueAI) DecideAction(state game.StateAnalyzer, playerID int) (jsontext
 		}
 
 		// dahai
-		// TODO: check tsumogiri
-		isTsumogiri := false
+		isTsumogiri := state.IsTsumoPai(pai)
 		dahai, err := message.NewDahai(playerID, pai.ToString(), isTsumogiri, "")
 		if err != nil {
 			return nil, fmt.Errorf("failed to create dahai message: %w", err)

@@ -61,6 +61,7 @@ type StateUpdater interface {
 type ActionCandidatesProvider interface {
 	DahaiCandidates() []Pai
 	ReachDahaiCandidates() ([]Pai, error)
+	IsTsumoPai(pai *Pai) bool
 	ForbiddenDahais() []Pai
 	ChiCandidates() ([]Chi, error)
 	PonCandidates() ([]Pon, error)

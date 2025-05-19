@@ -92,6 +92,21 @@ func (s *StateImpl) ReachDahaiCandidates() ([]Pai, error) {
 	return candidates, nil
 }
 
+func (s *StateImpl) IsTsumoPai(pai *Pai) bool {
+	if s.lastActor == noActor {
+		return false
+	}
+	if s.lastActor != s.playerID {
+		return false
+	}
+	if s.lastActionType != message.TypeTsumo {
+		return false
+	}
+
+	tehais := s.players[s.playerID].tehais
+	return pai.ID() == tehais[len(tehais)-1].ID()
+}
+
 func (s *StateImpl) ForbiddenDahais() []Pai {
 	return s.kuikaePais
 }
