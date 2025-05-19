@@ -75,7 +75,7 @@ func runTCPClientMode(rawURL string, agent agent.Agent) error {
 
 	fmt.Fprintf(os.Stderr, "connecting server: %s", host)
 
-	c := client.NewClient(conn, conn, false, agent)
+	c := client.NewClient(conn, conn, true, agent)
 	if err := c.Run(); err != nil {
 		return fmt.Errorf("client error: %v", err)
 	}
