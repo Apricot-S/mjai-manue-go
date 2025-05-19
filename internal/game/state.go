@@ -63,7 +63,7 @@ type ActionCandidatesProvider interface {
 	ReachDahaiCandidates() ([]Pai, error)
 	ChiCandidates() ([]Chi, error)
 	PonCandidates() ([]Pon, error)
-	// TODO: Daiminkan.
+	DaiminkanCandidates() ([]Daiminkan, error)
 	// mjai-manue does not consider Ankan and Kakan, so it is not necessary to implement them.
 	HoraCandidate() (*Hora, error)
 }

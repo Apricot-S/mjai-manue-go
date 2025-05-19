@@ -130,6 +130,23 @@ func (s *StateImpl) PonCandidates() ([]Pon, error) {
 	panic("not implemented!")
 }
 
+func (s *StateImpl) DaiminkanCandidates() ([]Daiminkan, error) {
+	if s.lastActor == noActor || s.lastActor == s.playerID {
+		// DaiminkanCandidates is not possible if the last actor is the player itself or no actor.
+		return nil, nil
+	}
+	if s.lastActionType != message.TypeDahai {
+		// DaiminkanCandidates is only possible after dahai.
+		return nil, nil
+	}
+	if s.NumPipais() == 0 {
+		// DaiminkanCandidates is not possible if discarded tile is a last tile.
+		return nil, nil
+	}
+
+	panic("not implemented!")
+}
+
 func (s *StateImpl) HoraCandidate() (*Hora, error) {
 	if s.lastActor == noActor {
 		return nil, nil
