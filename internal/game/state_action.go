@@ -24,7 +24,9 @@ func (s *StateImpl) DahaiCandidates() ([]Pai, error) {
 
 	candidates := slices.Clone(player.tehais)
 	sort.Sort(candidates)
-	candidates = slices.Compact(candidates)
+	candidates = slices.CompactFunc(candidates, func(p1, p2 Pai) bool {
+		return p1.ID() == p2.ID()
+	})
 
 	// Remove the kuikae tiles from the candidates.
 	kuikaeSet := make(map[uint8]struct{}, len(s.kuikaePais))
