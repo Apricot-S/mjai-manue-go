@@ -142,7 +142,10 @@ func (a *ManueAI) DecideAction(state game.StateAnalyzer, playerID int) (jsontext
 	if len(fc) != 0 {
 		// can call
 		// TODO
-		panic("unimplemented!")
+		_, err := a.decideFuro(fc)
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	// no action is possible
@@ -159,5 +162,10 @@ func (a *ManueAI) decideDahai(
 	reachDahaiCandidates []game.Pai,
 	forbiddenDahais []game.Pai,
 ) (pai *game.Pai, isReach bool, err error) {
+	// TODO: Implement logic.
+	return &dahaiCandidates[len(dahaiCandidates)-1], false, nil
+}
+
+func (a *ManueAI) decideFuro(furoActions []game.Furo) (game.Furo, error) {
 	panic("unimplemented")
 }

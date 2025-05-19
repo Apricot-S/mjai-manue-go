@@ -129,7 +129,8 @@ func (s *StateImpl) ChiCandidates() ([]Chi, error) {
 		return nil, nil
 	}
 
-	panic("not implemented!")
+	// TODO: Implement logic.
+	return nil, nil
 }
 
 func (s *StateImpl) PonCandidates() ([]Pon, error) {
@@ -146,7 +147,8 @@ func (s *StateImpl) PonCandidates() ([]Pon, error) {
 		return nil, nil
 	}
 
-	panic("not implemented!")
+	// TODO: Implement logic.
+	return nil, nil
 }
 
 func (s *StateImpl) DaiminkanCandidates() ([]Daiminkan, error) {
@@ -163,7 +165,8 @@ func (s *StateImpl) DaiminkanCandidates() ([]Daiminkan, error) {
 		return nil, nil
 	}
 
-	panic("not implemented!")
+	// TODO: Implement logic.
+	return nil, nil
 }
 
 func (s *StateImpl) HoraCandidate() (*Hora, error) {
@@ -180,5 +183,6 @@ func (s *StateImpl) HoraCandidate() (*Hora, error) {
 		return nil, nil
 	}
 
-	panic("not implemented!")
+	// TODO: Implement logic.
+	return nil, nil
 }
