@@ -57,7 +57,7 @@ type StateUpdater interface {
 	Update(event jsontext.Value) error
 }
 
-// ActionCandidatesProvider is an interface for calculating action candidates.
+// ActionCandidatesProvider is an interface for providing action candidates.
 type ActionCandidatesProvider interface {
 	DahaiCandidates() []Pai
 	ReachDahaiCandidates() ([]Pai, error)
