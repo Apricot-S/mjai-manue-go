@@ -73,7 +73,7 @@ func runTCPClientMode(rawURL string, agent agent.Agent) error {
 	}
 	defer conn.Close()
 
-	fmt.Fprintf(os.Stderr, "connecting server: %s", host)
+	fmt.Fprintf(os.Stderr, "connected: %s\n", host)
 
 	c := client.NewClient(conn, conn, agent)
 	if err := c.Run(); err != nil {
