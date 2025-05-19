@@ -100,7 +100,11 @@ func (a *ManueAI) DecideAction(state game.StateAnalyzer, playerID int) (jsontext
 	if err != nil {
 		return nil, err
 	}
-	if len(cc) != 0 || len(pc) != 0 {
+	dkc, err := state.DaiminkanCandidates()
+	if err != nil {
+		return nil, err
+	}
+	if len(cc) != 0 || len(pc) != 0 || len(dkc) != 0 {
 		// can call
 		// TODO
 		panic("unimplemented!")
