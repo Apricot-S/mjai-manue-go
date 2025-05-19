@@ -3,7 +3,6 @@ package client
 import (
 	"fmt"
 	"io"
-	"os"
 
 	"github.com/Apricot-S/mjai-manue-go/internal/agent"
 	"github.com/go-json-experiment/json"
@@ -32,7 +31,6 @@ func (c *Client) Run() error {
 			}
 			return fmt.Errorf("failed to read message: %w", err)
 		}
-		fmt.Fprintf(os.Stderr, "<-\t%s\n", raw)
 
 		switch raw.Kind() {
 		case '{':
@@ -51,7 +49,6 @@ func (c *Client) Run() error {
 		if err != nil {
 			return fmt.Errorf("failed to respond from agent: %w", err)
 		}
-		fmt.Fprintf(os.Stderr, "->\t%s\n", res)
 
 		res = append(res, '\n')
 		if _, err := c.writer.Write(res); err != nil {
