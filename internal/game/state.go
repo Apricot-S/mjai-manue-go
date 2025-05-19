@@ -59,8 +59,9 @@ type StateUpdater interface {
 
 // ActionCandidatesProvider is an interface for calculating action candidates.
 type ActionCandidatesProvider interface {
-	DahaiCandidates() ([]Pai, error)
+	DahaiCandidates() []Pai
 	ReachDahaiCandidates() ([]Pai, error)
+	ForbiddenDahais() []Pai
 	ChiCandidates() ([]Chi, error)
 	PonCandidates() ([]Pon, error)
 	DaiminkanCandidates() ([]Daiminkan, error)

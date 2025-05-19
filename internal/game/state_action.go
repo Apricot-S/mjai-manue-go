@@ -7,19 +7,19 @@ import (
 	"github.com/Apricot-S/mjai-manue-go/internal/message"
 )
 
-func (s *StateImpl) DahaiCandidates() ([]Pai, error) {
+func (s *StateImpl) DahaiCandidates() []Pai {
 	player := &s.players[s.playerID]
 	if !player.CanDahai() {
-		return nil, nil
+		return nil
 	}
 	if player.ReachState() == Declared {
 		// If the player has already declared reach, return nil.
-		return nil, nil
+		return nil
 	}
 	if player.ReachState() == Accepted {
 		// If the player has already accepted the reach, only the drawn tile is a candidate.
 		candidates := []Pai{player.tehais[len(player.tehais)-1]}
-		return candidates, nil
+		return candidates
 	}
 
 	candidates := slices.Clone(player.tehais)
@@ -38,7 +38,7 @@ func (s *StateImpl) DahaiCandidates() ([]Pai, error) {
 		return found
 	})
 
-	return candidates, nil
+	return candidates
 }
 
 // ReachDahaiCandidates returns the candidates for the reach declaration tile.
@@ -90,6 +90,10 @@ func (s *StateImpl) ReachDahaiCandidates() ([]Pai, error) {
 	}
 
 	return candidates, nil
+}
+
+func (s *StateImpl) ForbiddenDahais() []Pai {
+	return s.kuikaePais
 }
 
 func (s *StateImpl) ChiCandidates() ([]Chi, error) {

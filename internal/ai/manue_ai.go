@@ -65,11 +65,9 @@ func (a *ManueAI) DecideAction(state game.StateAnalyzer, playerID int) (jsontext
 		return res, nil
 	}
 
-	dc, err := state.DahaiCandidates()
-	if err != nil {
-		return nil, err
-	}
+	dc := state.DahaiCandidates()
 	rdc, err := state.ReachDahaiCandidates()
+	fd := state.ForbiddenDahais()
 	if err != nil {
 		return nil, err
 	}
@@ -88,8 +86,36 @@ func (a *ManueAI) DecideAction(state game.StateAnalyzer, playerID int) (jsontext
 			return res, nil
 		}
 
-		// TODO: 非立直時の打牌
-		panic("unimplemented!")
+		pai, isReach, err := a.decideDahai(dc, rdc, fd)
+		if err != nil {
+			return nil, err
+		}
+
+		if isReach {
+			// reach declaration
+			reach, err := message.NewReach(playerID, "")
+			if err != nil {
+				return nil, fmt.Errorf("failed to create reach message: %w", err)
+			}
+			res, err := json.Marshal(&reach)
+			if err != nil {
+				return nil, fmt.Errorf("failed to marshal reach message: %w", err)
+			}
+			return res, nil
+		}
+
+		// dahai
+		// TODO: check tsumogiri
+		isTsumogiri := false
+		dahai, err := message.NewDahai(playerID, pai.ToString(), isTsumogiri, "")
+		if err != nil {
+			return nil, fmt.Errorf("failed to create dahai message: %w", err)
+		}
+		res, err := json.Marshal(&dahai)
+		if err != nil {
+			return nil, fmt.Errorf("failed to marshal dahai message: %w", err)
+		}
+		return res, nil
 	}
 
 	cc, err := state.ChiCandidates()
@@ -133,6 +159,6 @@ func (a *ManueAI) decideDahai(
 	dahaiCandidates []game.Pai,
 	reachDahaiCandidates []game.Pai,
 	forbiddenDahais []game.Pai,
-) (*game.Pai, bool, error) {
+) (pai *game.Pai, isReach bool, err error) {
 	panic("unimplemented")
 }
