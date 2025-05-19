@@ -74,8 +74,7 @@ func (s *StateImpl) ReachDahaiCandidates() ([]Pai, error) {
 		return p1.ID() == p2.ID()
 	})
 
-	// The number of candidates will be equal or less than 13 except for
-	// Thirteen-wait Thirteen Orphans.
+	// The number of candidates will be equal or less than 13.
 	candidates := make([]Pai, 0, 13)
 	for _, p := range tehaiPais {
 		i := p.RemoveRed().ID()
