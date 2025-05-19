@@ -58,7 +58,7 @@ func (s *StateImpl) ReachDahaiCandidates() ([]Pai, error) {
 	if err != nil {
 		return nil, err
 	}
-	shanten, _, err := AnalyzeShantenWithOption(tehaiCounts, 0, 1)
+	shanten, _, err := AnalyzeShantenWithOption(tehaiCounts, 0, 0)
 	if err != nil {
 		return nil, err
 	}
@@ -78,7 +78,7 @@ func (s *StateImpl) ReachDahaiCandidates() ([]Pai, error) {
 	for _, p := range tehaiPais {
 		i := p.RemoveRed().ID()
 		tehaiCounts[i] -= 1
-		shanten, _, err := AnalyzeShantenWithOption(tehaiCounts, 0, 1)
+		shanten, _, err := AnalyzeShantenWithOption(tehaiCounts, 0, 0)
 		if err != nil {
 			return nil, err
 		}
