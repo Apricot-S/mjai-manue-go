@@ -57,7 +57,7 @@ func getHost(rawURL string) (string, error) {
 }
 
 func runPipeMode(agent agent.Agent) error {
-	c := client.NewClient(os.Stdin, os.Stdout, true, agent)
+	c := client.NewClient(os.Stdin, os.Stdout, agent)
 	return c.Run()
 }
 
@@ -75,7 +75,7 @@ func runTCPClientMode(rawURL string, agent agent.Agent) error {
 
 	fmt.Fprintf(os.Stderr, "connecting server: %s", host)
 
-	c := client.NewClient(conn, conn, true, agent)
+	c := client.NewClient(conn, conn, agent)
 	if err := c.Run(); err != nil {
 		return fmt.Errorf("client error: %v", err)
 	}

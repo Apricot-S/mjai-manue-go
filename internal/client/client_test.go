@@ -19,62 +19,41 @@ func (a *EchoAgent) Respond(msg []jsontext.Value) (jsontext.Value, error) {
 
 func TestClient_Run_OutputValidation(t *testing.T) {
 	tests := []struct {
-		name         string
-		input        string
-		writeNewLine bool
-		agent        agent.Agent
-		wantOutput   string
-		wantErr      bool
+		name       string
+		input      string
+		agent      agent.Agent
+		wantOutput string
+		wantErr    bool
 	}{
 		{
-			name:         "single message",
-			input:        `{"type":"none"}`,
-			writeNewLine: false,
-			agent:        &EchoAgent{},
-			wantOutput:   `{"type":"none"}`,
-			wantErr:      false,
-		},
-		{
-			name:         "single message with new line",
-			input:        `{"type":"none"}`,
-			writeNewLine: true,
-			agent:        &EchoAgent{},
+			name:  "single message with new line",
+			input: `{"type":"none"}`,
+			agent: &EchoAgent{},
 			wantOutput: `{"type":"none"}
 `,
 			wantErr: false,
 		},
 		{
-			name:         "array messages should write last response",
-			input:        `[{"type":"none"},{"type":"end_game"}]`,
-			writeNewLine: false,
-			agent:        &EchoAgent{},
-			wantOutput:   `{"type":"end_game"}`,
-			wantErr:      false,
-		},
-		{
-			name:         "array messages should write last response with new line",
-			input:        `[{"type":"none"},{"type":"end_game"}]`,
-			writeNewLine: true,
-			agent:        &EchoAgent{},
+			name:  "array messages should write last response with new line",
+			input: `[{"type":"none"},{"type":"end_game"}]`,
+			agent: &EchoAgent{},
 			wantOutput: `{"type":"end_game"}
 `,
 			wantErr: false,
 		},
 		{
-			name:         "empty reader",
-			input:        ``,
-			wantOutput:   ``,
-			writeNewLine: false,
-			agent:        &EchoAgent{},
-			wantErr:      false,
+			name:       "empty reader",
+			input:      ``,
+			wantOutput: ``,
+			agent:      &EchoAgent{},
+			wantErr:    false,
 		},
 		{
-			name:         "invalid JSON input should return error",
-			input:        `invalid json`,
-			wantOutput:   ``,
-			writeNewLine: false,
-			agent:        &EchoAgent{},
-			wantErr:      true,
+			name:       "invalid JSON input should return error",
+			input:      `invalid json`,
+			wantOutput: ``,
+			agent:      &EchoAgent{},
+			wantErr:    true,
 		},
 	}
 
@@ -82,10 +61,9 @@ func TestClient_Run_OutputValidation(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			buf := &bytes.Buffer{}
 			c := &Client{
-				reader:       strings.NewReader(tt.input),
-				writer:       buf,
-				writeNewLine: tt.writeNewLine,
-				agent:        tt.agent,
+				reader: strings.NewReader(tt.input),
+				writer: buf,
+				agent:  tt.agent,
 			}
 
 			err := c.Run()

@@ -10,14 +10,13 @@ import (
 )
 
 type Client struct {
-	reader       io.Reader
-	writer       io.Writer
-	writeNewLine bool
-	agent        agent.Agent
+	reader io.Reader
+	writer io.Writer
+	agent  agent.Agent
 }
 
-func NewClient(reader io.Reader, writer io.Writer, writeNewLine bool, agent agent.Agent) *Client {
-	return &Client{reader, writer, writeNewLine, agent}
+func NewClient(reader io.Reader, writer io.Writer, agent agent.Agent) *Client {
+	return &Client{reader, writer, agent}
 }
 
 func (c *Client) Run() error {
@@ -51,9 +50,7 @@ func (c *Client) Run() error {
 			return fmt.Errorf("failed to respond from agent: %w", err)
 		}
 
-		if c.writeNewLine {
-			res = append(res, '\n')
-		}
+		res = append(res, '\n')
 
 		if _, err := c.writer.Write(res); err != nil {
 			return fmt.Errorf("failed to write response: %w", err)
