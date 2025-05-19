@@ -104,7 +104,17 @@ func (a *ManueAI) DecideAction(state game.StateAnalyzer, playerID int) (jsontext
 	if err != nil {
 		return nil, err
 	}
-	if len(cc) != 0 || len(pc) != 0 || len(dkc) != 0 {
+	var fc []game.Furo
+	for _, c := range cc {
+		fc = append(fc, &c)
+	}
+	for _, p := range pc {
+		fc = append(fc, &p)
+	}
+	for _, d := range dkc {
+		fc = append(fc, &d)
+	}
+	if len(fc) != 0 {
 		// can call
 		// TODO
 		panic("unimplemented!")
