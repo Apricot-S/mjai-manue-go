@@ -111,7 +111,23 @@ func (s *StateImpl) ForbiddenDahais() []Pai {
 	return s.kuikaePais
 }
 
-func (s *StateImpl) ChiCandidates() ([]Chi, error) {
+func (s *StateImpl) FuroCandidates() ([]Furo, error) {
+	cc, err := s.chiCandidates()
+	if err != nil {
+		return nil, err
+	}
+	pc, err := s.ponCandidates()
+	if err != nil {
+		return nil, err
+	}
+	dc, err := s.daiminkanCandidates()
+	if err != nil {
+		return nil, err
+	}
+	return slices.Concat(cc, pc, dc), nil
+}
+
+func (s *StateImpl) chiCandidates() ([]Furo, error) {
 	if s.lastActor == noActor || s.lastActor == s.playerID {
 		// Chi is not possible if the last actor is the player itself or no actor.
 		return nil, nil
@@ -133,7 +149,7 @@ func (s *StateImpl) ChiCandidates() ([]Chi, error) {
 	return nil, nil
 }
 
-func (s *StateImpl) PonCandidates() ([]Pon, error) {
+func (s *StateImpl) ponCandidates() ([]Furo, error) {
 	if s.lastActor == noActor || s.lastActor == s.playerID {
 		// Pon is not possible if the last actor is the player itself or no actor.
 		return nil, nil
@@ -151,7 +167,7 @@ func (s *StateImpl) PonCandidates() ([]Pon, error) {
 	return nil, nil
 }
 
-func (s *StateImpl) DaiminkanCandidates() ([]Daiminkan, error) {
+func (s *StateImpl) daiminkanCandidates() ([]Furo, error) {
 	if s.lastActor == noActor || s.lastActor == s.playerID {
 		// DaiminkanCandidates is not possible if the last actor is the player itself or no actor.
 		return nil, nil

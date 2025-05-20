@@ -117,27 +117,9 @@ func (a *ManueAI) DecideAction(state game.StateAnalyzer, playerID int) (jsontext
 		return res, nil
 	}
 
-	cc, err := state.ChiCandidates()
+	fc, err := state.FuroCandidates()
 	if err != nil {
 		return nil, err
-	}
-	pc, err := state.PonCandidates()
-	if err != nil {
-		return nil, err
-	}
-	dkc, err := state.DaiminkanCandidates()
-	if err != nil {
-		return nil, err
-	}
-	var fc []game.Furo
-	for _, c := range cc {
-		fc = append(fc, &c)
-	}
-	for _, p := range pc {
-		fc = append(fc, &p)
-	}
-	for _, d := range dkc {
-		fc = append(fc, &d)
 	}
 	if len(fc) != 0 {
 		// can call

@@ -63,9 +63,7 @@ type ActionCandidatesProvider interface {
 	ReachDahaiCandidates() ([]Pai, error)
 	IsTsumoPai(pai *Pai) bool
 	ForbiddenDahais() []Pai
-	ChiCandidates() ([]Chi, error)
-	PonCandidates() ([]Pon, error)
-	DaiminkanCandidates() ([]Daiminkan, error)
+	FuroCandidates() ([]Furo, error)
 	// mjai-manue does not consider Ankan and Kakan, so it is not necessary to implement them.
 	HoraCandidate() (*Hora, error)
 }
