@@ -10,7 +10,7 @@ def stderr_reader(stderr: io.TextIOWrapper) -> None:
 
 
 proc = subprocess.Popen(
-    ["./mjai-manue", "--pipe"],
+    ["./mjai-manue"],
     bufsize=1,
     stdin=subprocess.PIPE,
     stdout=subprocess.PIPE,
