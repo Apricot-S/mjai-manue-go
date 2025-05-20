@@ -18,14 +18,6 @@ import (
 const defaultName = "Manue020"
 const defaultPort = "11600"
 
-func parseOptions() (name string, rawURL string, usePipe bool) {
-	flag.StringVar(&name, "name", defaultName, "Player's name")
-	flag.StringVar(&rawURL, "url", "", "Server URL (e.g., mjsonp://localhost:11600/default)")
-	flag.BoolVar(&usePipe, "pipe", false, "Use pipe instead of TCP/IP (ignore --url if specified)")
-	flag.Parse()
-	return
-}
-
 func getRoom(rawURL string) (string, error) {
 	if rawURL == "" {
 		return "", nil
@@ -85,10 +77,22 @@ func runTCPClientMode(rawURL string, agent agent.Agent) error {
 }
 
 func main() {
-	name, rawURL, usePipe := parseOptions()
+	var name string
+	flag.StringVar(&name, "name", defaultName, "Player's name")
+	flag.Parse()
 
-	if !usePipe && rawURL == "" {
-		log.Fatal("specify --url or --pipe")
+	var rawURL string
+	var usePipe bool
+	args := flag.Args()
+	switch len(args) {
+	case 0:
+		usePipe = true
+	case 1:
+		rawURL = args[0]
+		usePipe = false
+	default:
+		fmt.Fprintf(os.Stderr, "Usage: %s [--name NAME] [url]\n", os.Args[0])
+		os.Exit(1)
 	}
 
 	room, err := getRoom(rawURL)
@@ -102,7 +106,7 @@ func main() {
 	}
 	agent := agent.NewAIAgent(name, room, ai)
 
-	if usePipe && rawURL == "" {
+	if usePipe {
 		err = runPipeMode(agent)
 	} else {
 		err = runTCPClientMode(rawURL, agent)
