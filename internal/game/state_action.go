@@ -112,6 +112,19 @@ func (s *StateImpl) ForbiddenDahais() []Pai {
 }
 
 func (s *StateImpl) FuroCandidates() ([]Furo, error) {
+	if s.lastActor == noActor || s.lastActor == s.playerID {
+		// Furo is not possible if the last actor is the player itself or no actor.
+		return nil, nil
+	}
+	if s.lastActionType != message.TypeDahai {
+		// Furo is only possible after dahai.
+		return nil, nil
+	}
+	if s.NumPipais() == 0 {
+		// Furo is not possible if discarded tile is a last tile.
+		return nil, nil
+	}
+
 	cc, err := s.chiCandidates()
 	if err != nil {
 		return nil, err
@@ -128,20 +141,8 @@ func (s *StateImpl) FuroCandidates() ([]Furo, error) {
 }
 
 func (s *StateImpl) chiCandidates() ([]Furo, error) {
-	if s.lastActor == noActor || s.lastActor == s.playerID {
-		// Chi is not possible if the last actor is the player itself or no actor.
-		return nil, nil
-	}
-	if s.lastActionType != message.TypeDahai {
-		// Chi is only possible after dahai.
-		return nil, nil
-	}
 	if GetPlayerDistance(&s.players[s.playerID], &s.players[s.lastActor]) != 1 {
 		// Chi is only possible for kamicha's discarded tile.
-		return nil, nil
-	}
-	if s.NumPipais() == 0 {
-		// Chi is not possible if discarded tile is a last tile.
 		return nil, nil
 	}
 
@@ -150,37 +151,11 @@ func (s *StateImpl) chiCandidates() ([]Furo, error) {
 }
 
 func (s *StateImpl) ponCandidates() ([]Furo, error) {
-	if s.lastActor == noActor || s.lastActor == s.playerID {
-		// Pon is not possible if the last actor is the player itself or no actor.
-		return nil, nil
-	}
-	if s.lastActionType != message.TypeDahai {
-		// Pon is only possible after dahai.
-		return nil, nil
-	}
-	if s.NumPipais() == 0 {
-		// Pon is not possible if discarded tile is a last tile.
-		return nil, nil
-	}
-
 	// TODO: Implement logic.
 	return nil, nil
 }
 
 func (s *StateImpl) daiminkanCandidates() ([]Furo, error) {
-	if s.lastActor == noActor || s.lastActor == s.playerID {
-		// DaiminkanCandidates is not possible if the last actor is the player itself or no actor.
-		return nil, nil
-	}
-	if s.lastActionType != message.TypeDahai {
-		// DaiminkanCandidates is only possible after dahai.
-		return nil, nil
-	}
-	if s.NumPipais() == 0 {
-		// DaiminkanCandidates is not possible if discarded tile is a last tile.
-		return nil, nil
-	}
-
 	// TODO: Implement logic.
 	return nil, nil
 }
