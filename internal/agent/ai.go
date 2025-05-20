@@ -66,6 +66,7 @@ func (a *AIAgent) Respond(msgs []jsontext.Value) (jsontext.Value, error) {
 			return nil, fmt.Errorf("failed to update state: %w", err)
 		}
 	}
+	a.state.Print()
 
 	// Ask AI for decision
 	action, err := a.ai.DecideAction(a.state, a.playerID)
