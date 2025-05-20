@@ -1,4 +1,13 @@
+import io
 import subprocess
+import sys
+from threading import Thread
+
+
+def stderr_reader(stderr: io.TextIOWrapper) -> None:
+    for line in stderr:
+        sys.stderr.write(line)
+
 
 proc = subprocess.Popen(
     ["./mjai-manue", "--pipe"],
@@ -17,6 +26,9 @@ assert proc.stdin is not None
 assert proc.stdout is not None
 assert proc.stderr is not None
 
+stderr_thread = Thread(target=stderr_reader, args=(proc.stderr,), daemon=True)
+stderr_thread.start()
+
 try:
     while True:
         input_ = input()
@@ -28,7 +40,8 @@ try:
 
         output = proc.stdout.readline()
         if output:
-            print(output.strip())
+            sys.stdout.write(output)
+            sys.stdout.flush()
 except KeyboardInterrupt:
     proc.terminate()
     proc.wait()
