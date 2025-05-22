@@ -1,14 +1,17 @@
 package ai
 
-import "github.com/Apricot-S/mjai-manue-go/internal/game"
+import (
+	"github.com/Apricot-S/mjai-manue-go/internal/ai/core"
+	"github.com/Apricot-S/mjai-manue-go/internal/game"
+)
 
 func (a *ManueAI) getScoreChangesDistOnHora(
 	state game.StateViewer,
 	playerID int,
-	horaPointsDist *ProbDist[[]float64],
-) *ProbDist[[]float64] {
+	horaPointsDist *core.ProbDist[[]float64],
+) *core.ProbDist[[]float64] {
 	tsumoHoraProb := float64(a.stats.NumTsumoHoras) / float64(a.stats.NumHoras)
-	unitDistMap := NewHashMap[[]float64]()
+	unitDistMap := core.NewHashMap[[]float64]()
 
 	for _, target := range state.Players() {
 		var changes []float64
@@ -34,5 +37,6 @@ func (a *ManueAI) getScoreChangesDistOnHora(
 		unitDistMap.Set(changes, prob)
 	}
 
-	return Mult[[]float64, []float64, []float64](horaPointsDist, NewProbDist(unitDistMap))
+	u := core.NewProbDist(unitDistMap)
+	return core.Mult[[]float64, []float64, []float64](horaPointsDist, u)
 }

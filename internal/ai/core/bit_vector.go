@@ -1,4 +1,4 @@
-package ai
+package core
 
 import "github.com/Apricot-S/mjai-manue-go/internal/game"
 
