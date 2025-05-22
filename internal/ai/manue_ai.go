@@ -65,69 +65,20 @@ func (a *ManueAI) DecideAction(state game.StateAnalyzer, playerID int) (jsontext
 		return res, nil
 	}
 
-	dc := state.DahaiCandidates()
-	rdc, err := state.ReachDahaiCandidates()
-	fd := state.ForbiddenDahais()
+	decision, err := a.decideDahai(state, playerID)
 	if err != nil {
 		return nil, err
 	}
-	if len(dc) != 0 || len(rdc) != 0 {
-		// my turn
-		if state.Players()[playerID].ReachState() == game.Accepted {
-			// in reach
-			dahai, err := message.NewDahai(playerID, dc[0].ToString(), true, "")
-			if err != nil {
-				return nil, fmt.Errorf("failed to create dahai message: %w", err)
-			}
-			res, err := json.Marshal(&dahai)
-			if err != nil {
-				return nil, fmt.Errorf("failed to marshal dahai message: %w", err)
-			}
-			return res, nil
-		}
-
-		pai, isReach, err := a.decideDahai(dc, rdc, fd)
-		if err != nil {
-			return nil, err
-		}
-
-		if isReach {
-			// reach declaration
-			reach, err := message.NewReach(playerID, "")
-			if err != nil {
-				return nil, fmt.Errorf("failed to create reach message: %w", err)
-			}
-			res, err := json.Marshal(&reach)
-			if err != nil {
-				return nil, fmt.Errorf("failed to marshal reach message: %w", err)
-			}
-			return res, nil
-		}
-
-		// dahai
-		isTsumogiri := state.IsTsumoPai(pai)
-		dahai, err := message.NewDahai(playerID, pai.ToString(), isTsumogiri, "")
-		if err != nil {
-			return nil, fmt.Errorf("failed to create dahai message: %w", err)
-		}
-		res, err := json.Marshal(&dahai)
-		if err != nil {
-			return nil, fmt.Errorf("failed to marshal dahai message: %w", err)
-		}
-		return res, nil
+	if decision != nil {
+		return decision, nil
 	}
 
-	fc, err := state.FuroCandidates()
+	decision, err = a.decideFuro(state, playerID)
 	if err != nil {
 		return nil, err
 	}
-	if len(fc) != 0 {
-		// can call
-		// TODO
-		_, err := a.decideFuro(fc)
-		if err != nil {
-			return nil, err
-		}
+	if decision != nil {
+		return decision, nil
 	}
 
 	// no action is possible
@@ -139,15 +90,82 @@ func (a *ManueAI) DecideAction(state game.StateAnalyzer, playerID int) (jsontext
 	return res, nil
 }
 
-func (a *ManueAI) decideDahai(
-	dahaiCandidates []game.Pai,
-	reachDahaiCandidates []game.Pai,
-	forbiddenDahais []game.Pai,
-) (pai *game.Pai, isReach bool, err error) {
-	// TODO: Implement logic.
-	return &dahaiCandidates[len(dahaiCandidates)-1], false, nil
+func (a *ManueAI) decideDahai(state game.StateAnalyzer, playerID int) (jsontext.Value, error) {
+	dc := state.DahaiCandidates()
+	rdc, err := state.ReachDahaiCandidates()
+	fd := state.ForbiddenDahais()
+	if err != nil {
+		return nil, err
+	}
+	if len(dc) == 0 && len(rdc) == 0 {
+		// no action is possible
+		none := message.NewNone()
+		res, err := json.Marshal(&none)
+		if err != nil {
+			return nil, fmt.Errorf("failed to marshal none message: %w", err)
+		}
+		return res, nil
+	}
+
+	// my turn
+	if state.Players()[playerID].ReachState() == game.Accepted {
+		// in reach
+		dahai, err := message.NewDahai(playerID, dc[0].ToString(), true, "")
+		if err != nil {
+			return nil, fmt.Errorf("failed to create dahai message: %w", err)
+		}
+		res, err := json.Marshal(&dahai)
+		if err != nil {
+			return nil, fmt.Errorf("failed to marshal dahai message: %w", err)
+		}
+		return res, nil
+	}
+
+	pai, isReach, err := a.getMetrics(dc, rdc, fd)
+	if err != nil {
+		return nil, err
+	}
+
+	if isReach {
+		// reach declaration
+		reach, err := message.NewReach(playerID, "")
+		if err != nil {
+			return nil, fmt.Errorf("failed to create reach message: %w", err)
+		}
+		res, err := json.Marshal(&reach)
+		if err != nil {
+			return nil, fmt.Errorf("failed to marshal reach message: %w", err)
+		}
+		return res, nil
+	}
+
+	// dahai
+	isTsumogiri := state.IsTsumoPai(pai)
+	dahai, err := message.NewDahai(playerID, pai.ToString(), isTsumogiri, "")
+	if err != nil {
+		return nil, fmt.Errorf("failed to create dahai message: %w", err)
+	}
+	res, err := json.Marshal(&dahai)
+	if err != nil {
+		return nil, fmt.Errorf("failed to marshal dahai message: %w", err)
+	}
+	return res, nil
 }
 
-func (a *ManueAI) decideFuro(furoActions []game.Furo) (game.Furo, error) {
+func (a *ManueAI) decideFuro(state game.StateAnalyzer, playerID int) (jsontext.Value, error) {
+	fc, err := state.FuroCandidates()
+	if err != nil {
+		return nil, err
+	}
+	if len(fc) == 0 {
+		// no action is possible
+		none := message.NewNone()
+		res, err := json.Marshal(&none)
+		if err != nil {
+			return nil, fmt.Errorf("failed to marshal none message: %w", err)
+		}
+		return res, nil
+	}
+
 	panic("unimplemented")
 }
