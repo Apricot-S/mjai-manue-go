@@ -1,6 +1,8 @@
 package ai
 
 import (
+	"strconv"
+
 	"github.com/Apricot-S/mjai-manue-go/internal/ai/core"
 	"github.com/Apricot-S/mjai-manue-go/internal/game"
 )
@@ -39,4 +41,18 @@ func (a *ManueAI) getScoreChangesDistOnHora(
 
 	u := core.NewProbDist(unitDistMap)
 	return core.Mult[[]float64, []float64, []float64](horaPointsDist, u)
+}
+
+// Probability that the player is tenpai at the end of the kyoku if
+// the player is currently noten and the kyoku ends with ryukyoku.
+func (a *ManueAI) getNotenRyukyokuTenpaiProb(state game.StateViewer) float64 {
+	notenFreq := float64(a.stats.RyukyokuTenpaiStat.Noten)
+	tenpaiFreq := 0.0
+	t := float64(state.Turn()) + 1.0/4.0
+	for t <= float64(game.FinalTurn) {
+		n := strconv.FormatFloat(t, 'f', -1, 64)
+		tenpaiFreq += float64(a.stats.RyukyokuTenpaiStat.TenpaiTurnDistribution[n])
+		t += 1.0 / 4.0
+	}
+	return tenpaiFreq / (tenpaiFreq + notenFreq)
 }

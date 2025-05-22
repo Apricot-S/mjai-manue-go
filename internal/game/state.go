@@ -9,7 +9,7 @@ const (
 	initScore         = 25_000
 	maxNumDoraMarkers = 5
 	numInitPipais     = NumIDs*4 - 13*numPlayers - 14
-	finalTurn         = numInitPipais / numPlayers
+	FinalTurn         = numInitPipais / numPlayers
 
 	// Indicates that no event has been triggered.
 	noEvent = ""
