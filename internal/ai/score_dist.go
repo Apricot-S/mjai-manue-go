@@ -93,7 +93,7 @@ func (a *ManueAI) getRyukyokuAveragePoints(
 				if numTenpais == 0 {
 					points = 0.0
 				} else {
-					points = -3000.0 / float64(numTenpais)
+					points = -3000.0 / float64(4-numTenpais)
 				}
 			}
 			result += prob * points
