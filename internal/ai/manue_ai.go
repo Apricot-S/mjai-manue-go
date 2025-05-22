@@ -99,12 +99,7 @@ func (a *ManueAI) decideDahai(state game.StateAnalyzer, playerID int) (jsontext.
 	}
 	if len(dc) == 0 && len(rdc) == 0 {
 		// no action is possible
-		none := message.NewNone()
-		res, err := json.Marshal(&none)
-		if err != nil {
-			return nil, fmt.Errorf("failed to marshal none message: %w", err)
-		}
-		return res, nil
+		return nil, nil
 	}
 
 	// my turn
@@ -159,12 +154,7 @@ func (a *ManueAI) decideFuro(state game.StateAnalyzer, playerID int) (jsontext.V
 	}
 	if len(fc) == 0 {
 		// no action is possible
-		none := message.NewNone()
-		res, err := json.Marshal(&none)
-		if err != nil {
-			return nil, fmt.Errorf("failed to marshal none message: %w", err)
-		}
-		return res, nil
+		return nil, nil
 	}
 
 	panic("unimplemented")
