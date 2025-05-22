@@ -43,6 +43,65 @@ func (a *ManueAI) getScoreChangesDistOnHora(
 	return core.Mult[[]float64, []float64, []float64](horaPointsDist, u)
 }
 
+func (a *ManueAI) getRyukyokuAveragePoints(
+	state game.StateViewer,
+	playerID int,
+	selfTenpai bool,
+) float64 {
+	notenRyukyokuTenpaiProb := a.getNotenRyukyokuTenpaiProb(state)
+	var ryukyokuTenpaiProbs [4]float64
+	for i := range 4 {
+		player := &state.Players()[i]
+		var currentTenpaiProb = 0.0
+		if player.ID() == playerID {
+			if selfTenpai {
+				currentTenpaiProb = 1.0
+			} else {
+				currentTenpaiProb = 0.0
+			}
+		} else {
+			currentTenpaiProb = a.tenpaiProbEstimator.Estimate(player, state)
+		}
+		ryukyokuTenpaiProbs[i] = currentTenpaiProb + (1.0-currentTenpaiProb)*notenRyukyokuTenpaiProb
+	}
+
+	result := 0.0
+	for i := range 1 << 4 {
+		var tenpais [4]bool
+		for j := range 4 {
+			tenpais[j] = (i & (1 << j)) != 0
+		}
+		prob := 1.0
+		numTenpais := 0
+		for j := range 4 {
+			if tenpais[j] {
+				prob *= ryukyokuTenpaiProbs[j]
+				numTenpais++
+			} else {
+				prob *= 1.0 - ryukyokuTenpaiProbs[j]
+			}
+		}
+		if prob > 0.0 {
+			var points float64
+			if tenpais[playerID] {
+				if numTenpais == 4 {
+					points = 0.0
+				} else {
+					points = 3000.0 / float64(numTenpais)
+				}
+			} else {
+				if numTenpais == 0 {
+					points = 0.0
+				} else {
+					points = -3000.0 / float64(numTenpais)
+				}
+			}
+			result += prob * points
+		}
+	}
+	return result
+}
+
 // Probability that the player is tenpai at the end of the kyoku if
 // the player is currently noten and the kyoku ends with ryukyoku.
 func (a *ManueAI) getNotenRyukyokuTenpaiProb(state game.StateViewer) float64 {

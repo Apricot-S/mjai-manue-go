@@ -17,7 +17,7 @@ func NewTenpaiProbEstimator(stats *configs.GameStats) *TenpaiProbEstimator {
 	}
 }
 
-func (e *TenpaiProbEstimator) Estimate(player *game.Player, state game.State) float64 {
+func (e *TenpaiProbEstimator) Estimate(player *game.Player, state game.StateViewer) float64 {
 	if player.ReachState() != game.None {
 		// If the player is in the riichi state, it is certain that the player is in tenpai.
 		return 1.0
