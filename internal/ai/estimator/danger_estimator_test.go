@@ -1,11 +1,11 @@
-package ai_test
+package estimator_test
 
 import (
 	"fmt"
 	"slices"
 	"testing"
 
-	"github.com/Apricot-S/mjai-manue-go/internal/ai"
+	"github.com/Apricot-S/mjai-manue-go/internal/ai/estimator"
 	"github.com/Apricot-S/mjai-manue-go/internal/game"
 )
 
@@ -129,7 +129,7 @@ func TestScene_Evaluate(t *testing.T) {
 	}
 	type testCase struct {
 		name    string
-		scene   *ai.Scene
+		scene   *estimator.Scene
 		args    args
 		want    bool
 		wantErr bool
@@ -138,7 +138,7 @@ func TestScene_Evaluate(t *testing.T) {
 
 	{
 		state := NewMockState(nil, nil, nil, nil, nil, nil, nil)
-		scene, _ := ai.NewScene(state, &state.players[0], &state.players[1])
+		scene, _ := estimator.NewScene(state, &state.players[0], &state.players[1])
 		east, _ := game.NewPaiWithName("E")
 		man1, _ := game.NewPaiWithName("1m")
 
@@ -161,7 +161,7 @@ func TestScene_Evaluate(t *testing.T) {
 	{
 		anpais, _ := game.StrToPais("4p")
 		state := NewMockState(nil, nil, nil, nil, anpais, nil, nil)
-		scene, _ := ai.NewScene(state, &state.players[0], &state.players[1])
+		scene, _ := estimator.NewScene(state, &state.players[0], &state.players[1])
 		pin1, _ := game.NewPaiWithName("1p")
 		pin7, _ := game.NewPaiWithName("7p")
 		pin2, _ := game.NewPaiWithName("2p")
@@ -228,7 +228,7 @@ func TestScene_Evaluate(t *testing.T) {
 	{
 		anpais, _ := game.StrToPais("1p 7p")
 		state := NewMockState(nil, nil, nil, nil, anpais, nil, nil)
-		scene, _ := ai.NewScene(state, &state.players[0], &state.players[1])
+		scene, _ := estimator.NewScene(state, &state.players[0], &state.players[1])
 		pin4, _ := game.NewPaiWithName("4p")
 
 		tests = append(tests, testCase{
@@ -250,7 +250,7 @@ func TestScene_Evaluate(t *testing.T) {
 	{
 		anpais, _ := game.StrToPais("5p 4p")
 		state := NewMockState(nil, anpais, nil, nil, anpais, nil, nil)
-		scene, _ := ai.NewScene(state, &state.players[0], &state.players[1])
+		scene, _ := estimator.NewScene(state, &state.players[0], &state.players[1])
 		pin1, _ := game.NewPaiWithName("1p")
 		pin2, _ := game.NewPaiWithName("2p")
 
@@ -273,7 +273,7 @@ func TestScene_Evaluate(t *testing.T) {
 	{
 		anpais, _ := game.StrToPais("1p")
 		state := NewMockState(nil, anpais, nil, nil, anpais, nil, nil)
-		scene, _ := ai.NewScene(state, &state.players[0], &state.players[1])
+		scene, _ := estimator.NewScene(state, &state.players[0], &state.players[1])
 		pin4, _ := game.NewPaiWithName("4p")
 
 		tests = append(tests, testCase{
@@ -289,7 +289,7 @@ func TestScene_Evaluate(t *testing.T) {
 		anpais, _ := game.StrToPais("4p E 4s")
 		prereachSutehais, _ := game.StrToPais("4p E")
 		state := NewMockState(nil, prereachSutehais, nil, nil, anpais, nil, nil)
-		scene, _ := ai.NewScene(state, &state.players[0], &state.players[1])
+		scene, _ := estimator.NewScene(state, &state.players[0], &state.players[1])
 		pin1, _ := game.NewPaiWithName("1p")
 		sou1, _ := game.NewPaiWithName("1s")
 
@@ -312,7 +312,7 @@ func TestScene_Evaluate(t *testing.T) {
 	{
 		anpais, _ := game.StrToPais("1p")
 		state := NewMockState(nil, anpais, nil, nil, anpais, nil, nil)
-		scene, _ := ai.NewScene(state, &state.players[0], &state.players[1])
+		scene, _ := estimator.NewScene(state, &state.players[0], &state.players[1])
 		man2, _ := game.NewPaiWithName("2m")
 
 		for i, v := range [9]bool{false, true, false, false, true, false, false, false, false} {
@@ -338,7 +338,7 @@ func TestScene_Evaluate(t *testing.T) {
 	{
 		anpais, _ := game.StrToPais("5p")
 		state := NewMockState(nil, anpais, nil, nil, anpais, nil, nil)
-		scene, _ := ai.NewScene(state, &state.players[0], &state.players[1])
+		scene, _ := estimator.NewScene(state, &state.players[0], &state.players[1])
 		man1, _ := game.NewPaiWithName("1m")
 
 		for i, v := range [9]bool{true, false, false, true, false, true, false, false, true} {
@@ -365,7 +365,7 @@ func TestScene_Evaluate(t *testing.T) {
 		anpais, _ := game.StrToPais("1p 5p")
 		prereachSutehais, _ := game.StrToPais("1p")
 		state := NewMockState(nil, prereachSutehais, nil, nil, anpais, nil, nil)
-		scene, _ := ai.NewScene(state, &state.players[0], &state.players[1])
+		scene, _ := estimator.NewScene(state, &state.players[0], &state.players[1])
 		pin2, _ := game.NewPaiWithName("2p")
 
 		tests = append(tests, testCase{
@@ -381,7 +381,7 @@ func TestScene_Evaluate(t *testing.T) {
 		anpais, _ := game.StrToPais("1p E S W 1s")
 		prereachSutehais, _ := game.StrToPais("1p E S W 1s")
 		state := NewMockState(nil, prereachSutehais, nil, nil, anpais, nil, nil)
-		scene, _ := ai.NewScene(state, &state.players[0], &state.players[1])
+		scene, _ := estimator.NewScene(state, &state.players[0], &state.players[1])
 		pin5, _ := game.NewPaiWithName("5p")
 		sou5, _ := game.NewPaiWithName("5s")
 
@@ -419,7 +419,7 @@ func TestScene_Evaluate(t *testing.T) {
 		anpais, _ := game.StrToPais("1p 6p")
 		prereachSutehais, _ := game.StrToPais("1p 6p")
 		state := NewMockState(nil, prereachSutehais, nil, nil, anpais, nil, nil)
-		scene, _ := ai.NewScene(state, &state.players[0], &state.players[1])
+		scene, _ := estimator.NewScene(state, &state.players[0], &state.players[1])
 		man2, _ := game.NewPaiWithName("2m")
 
 		for i, v := range [9]bool{false, true, false, false, true, false, false, false, false} {
@@ -446,7 +446,7 @@ func TestScene_Evaluate(t *testing.T) {
 		anpais, _ := game.StrToPais("3p")
 		prereachSutehais, _ := game.StrToPais("3p")
 		state := NewMockState(nil, prereachSutehais, nil, nil, anpais, nil, nil)
-		scene, _ := ai.NewScene(state, &state.players[0], &state.players[1])
+		scene, _ := estimator.NewScene(state, &state.players[0], &state.players[1])
 		man1, _ := game.NewPaiWithName("1m")
 
 		for i, v := range [9]bool{true, true, false, true, true, false, false, false, false} {
@@ -473,7 +473,7 @@ func TestScene_Evaluate(t *testing.T) {
 		anpais, _ := game.StrToPais("2p")
 		prereachSutehais, _ := game.StrToPais("2p")
 		state := NewMockState(nil, prereachSutehais, nil, nil, anpais, nil, nil)
-		scene, _ := ai.NewScene(state, &state.players[0], &state.players[1])
+		scene, _ := estimator.NewScene(state, &state.players[0], &state.players[1])
 
 		for i, v := range [9]bool{true, false, false, true, false, false, false, false, false} {
 			pin, _ := game.NewPaiWithName(fmt.Sprintf("%dp", i+1))
@@ -491,7 +491,7 @@ func TestScene_Evaluate(t *testing.T) {
 		anpais, _ := game.StrToPais("3p 4p")
 		prereachSutehais, _ := game.StrToPais("3p")
 		state := NewMockState(nil, prereachSutehais, nil, nil, anpais, nil, nil)
-		scene, _ := ai.NewScene(state, &state.players[0], &state.players[1])
+		scene, _ := estimator.NewScene(state, &state.players[0], &state.players[1])
 		pin1, _ := game.NewPaiWithName("1p")
 
 		tests = append(tests, testCase{
@@ -507,7 +507,7 @@ func TestScene_Evaluate(t *testing.T) {
 		anpais, _ := game.StrToPais("3p E S 7p W")
 		prereachSutehais, _ := game.StrToPais("3p E S 7p W")
 		state := NewMockState(nil, prereachSutehais, nil, nil, anpais, nil, nil)
-		scene, _ := ai.NewScene(state, &state.players[0], &state.players[1])
+		scene, _ := estimator.NewScene(state, &state.players[0], &state.players[1])
 		pin1, _ := game.NewPaiWithName("1p")
 		pin9, _ := game.NewPaiWithName("9p")
 
@@ -547,7 +547,7 @@ func TestScene_Evaluate(t *testing.T) {
 		anpais, _ := game.StrToPais("3p E S 7p")
 		prereachSutehais, _ := game.StrToPais("3p E S 7p")
 		state := NewMockState(nil, prereachSutehais, nil, nil, anpais, nil, nil)
-		scene, _ := ai.NewScene(state, &state.players[0], &state.players[1])
+		scene, _ := estimator.NewScene(state, &state.players[0], &state.players[1])
 		pin1, _ := game.NewPaiWithName("1p")
 		pin9, _ := game.NewPaiWithName("9p")
 
@@ -573,7 +573,7 @@ func TestScene_Evaluate(t *testing.T) {
 		anpais, _ := game.StrToPais("1p")
 		prereachSutehais, _ := game.StrToPais("1p")
 		state := NewMockState(nil, prereachSutehais, nil, nil, anpais, nil, nil)
-		scene, _ := ai.NewScene(state, &state.players[0], &state.players[1])
+		scene, _ := estimator.NewScene(state, &state.players[0], &state.players[1])
 		man3, _ := game.NewPaiWithName("3m")
 
 		for i, v := range [9]bool{false, false, true, false, false, true, false, false, false} {
@@ -600,7 +600,7 @@ func TestScene_Evaluate(t *testing.T) {
 	{
 		visiblePais, _ := game.StrToPais("1p 1p")
 		state := NewMockState(nil, nil, nil, nil, nil, visiblePais, nil)
-		scene, _ := ai.NewScene(state, &state.players[0], &state.players[1])
+		scene, _ := estimator.NewScene(state, &state.players[0], &state.players[1])
 		pin1, _ := game.NewPaiWithName("1p")
 
 		tests = append(tests, []testCase{
@@ -624,7 +624,7 @@ func TestScene_Evaluate(t *testing.T) {
 	{
 		visiblePais, _ := game.StrToPais("1p 1p 1p")
 		state := NewMockState(nil, nil, nil, nil, nil, visiblePais, nil)
-		scene, _ := ai.NewScene(state, &state.players[0], &state.players[1])
+		scene, _ := estimator.NewScene(state, &state.players[0], &state.players[1])
 		pin1, _ := game.NewPaiWithName("1p")
 
 		tests = append(tests, []testCase{
@@ -648,7 +648,7 @@ func TestScene_Evaluate(t *testing.T) {
 	{
 		visiblePais, _ := game.StrToPais("4p")
 		state := NewMockState(nil, nil, nil, nil, nil, visiblePais, nil)
-		scene, _ := ai.NewScene(state, &state.players[0], &state.players[1])
+		scene, _ := estimator.NewScene(state, &state.players[0], &state.players[1])
 		pin1, _ := game.NewPaiWithName("1p")
 
 		tests = append(tests, []testCase{
@@ -672,7 +672,7 @@ func TestScene_Evaluate(t *testing.T) {
 	{
 		visiblePais, _ := game.StrToPais("4p 4p")
 		state := NewMockState(nil, nil, nil, nil, nil, visiblePais, nil)
-		scene, _ := ai.NewScene(state, &state.players[0], &state.players[1])
+		scene, _ := estimator.NewScene(state, &state.players[0], &state.players[1])
 		pin1, _ := game.NewPaiWithName("1p")
 
 		tests = append(tests, []testCase{

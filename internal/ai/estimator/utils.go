@@ -1,4 +1,4 @@
-package ai
+package estimator
 
 // allMatch returns true if all elements satisfy the predicate.
 // Returns false if any element fails the predicate.

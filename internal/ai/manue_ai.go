@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/Apricot-S/mjai-manue-go/configs"
+	"github.com/Apricot-S/mjai-manue-go/internal/ai/estimator"
 	"github.com/Apricot-S/mjai-manue-go/internal/game"
 	"github.com/Apricot-S/mjai-manue-go/internal/message"
 	"github.com/go-json-experiment/json"
@@ -12,8 +13,8 @@ import (
 
 type ManueAI struct {
 	stats               *configs.GameStats
-	dangerEstimator     *DangerEstimator
-	tenpaiProbEstimator *TenpaiProbEstimator
+	dangerEstimator     *estimator.DangerEstimator
+	tenpaiProbEstimator *estimator.TenpaiProbEstimator
 	noChanges           [4]int
 }
 
@@ -29,15 +30,15 @@ func NewManueAI() (*ManueAI, error) {
 
 	return NewManueAIWithEstimators(
 		stats,
-		NewDangerEstimator(root),
-		NewTenpaiProbEstimator(stats),
+		estimator.NewDangerEstimator(root),
+		estimator.NewTenpaiProbEstimator(stats),
 	), nil
 }
 
 func NewManueAIWithEstimators(
 	stats *configs.GameStats,
-	dangerEstimator *DangerEstimator,
-	tenpaiProbEstimator *TenpaiProbEstimator,
+	dangerEstimator *estimator.DangerEstimator,
+	tenpaiProbEstimator *estimator.TenpaiProbEstimator,
 ) *ManueAI {
 	return &ManueAI{
 		stats:               stats,
