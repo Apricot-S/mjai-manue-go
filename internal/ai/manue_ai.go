@@ -116,7 +116,7 @@ func (a *ManueAI) decideDahai(state game.StateAnalyzer, playerID int) (jsontext.
 		return res, nil
 	}
 
-	pai, isReach, err := a.getMetrics(dc, rdc, fd)
+	pai, isReach, err := a.getMetrics(state, playerID, dc, rdc, fd)
 	if err != nil {
 		return nil, err
 	}
