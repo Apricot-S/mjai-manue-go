@@ -102,6 +102,62 @@ func (a *ManueAI) getRyukyokuAveragePoints(
 	return result
 }
 
+// Distribution of score changes assuming the kyoku ends with ryukyoku.
+func (a *ManueAI) getScoreChangesDistOnRyukyoku(
+	state game.StateViewer,
+	playerID int,
+	selfTenpai bool,
+) *core.ProbDist[[]float64] {
+	notenRyukyokuTenpaiProb := a.getNotenRyukyokuTenpaiProb(state)
+	hm1 := core.NewHashMap[[]float64]()
+	hm1.Set([]float64{0.0, 0.0, 0.0, 0.0}, 1.0)
+	tenpaisDist := core.NewProbDist(hm1)
+
+	for _, player := range state.Players() {
+		var currentTenpaiProb = 0.0
+		if player.ID() == playerID {
+			if selfTenpai {
+				currentTenpaiProb = 1.0
+			} else {
+				currentTenpaiProb = 0.0
+			}
+		} else {
+			currentTenpaiProb = a.tenpaiProbEstimator.Estimate(&player, state)
+		}
+		ryukyokuTenpaiProb := currentTenpaiProb + (1.0-currentTenpaiProb)*notenRyukyokuTenpaiProb
+
+		tenpais := make([]float64, 4)
+		for i := range 4 {
+			if player.ID() == playerID {
+				tenpais[i] = 1.0
+			} else {
+				tenpais[i] = 0.0
+			}
+		}
+
+		hm2 := core.NewHashMap[[]float64]()
+		hm2.Set([]float64{0.0, 0.0, 0.0, 0.0}, 1.0-ryukyokuTenpaiProb)
+		hm2.Set(tenpais, ryukyokuTenpaiProb)
+		dist := core.NewProbDist(hm2)
+		tenpaisDist = core.Add[[]float64, []float64, []float64](tenpaisDist, dist)
+	}
+
+	return tenpaisDist.MapValue(tenpaisToRyukyokuPointsFloat)
+}
+
+func tenpaisToRyukyokuPointsFloat(tenpais []float64) []float64 {
+	t := [4]bool{}
+	for i := range tenpais {
+		t[i] = tenpais[i] != 0.0
+	}
+	r := tenpaisToRyukyokuPoints(t)
+	ret := make([]float64, 4)
+	for i := range r {
+		ret[i] = float64(r[i])
+	}
+	return ret
+}
+
 // Probability that the player is tenpai at the end of the kyoku if
 // the player is currently noten and the kyoku ends with ryukyoku.
 func (a *ManueAI) getNotenRyukyokuTenpaiProb(state game.StateViewer) float64 {
