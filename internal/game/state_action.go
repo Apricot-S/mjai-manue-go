@@ -51,7 +51,15 @@ func (s *StateImpl) ReachDahaiCandidates() ([]Pai, error) {
 		return nil, nil
 	}
 	if player.ReachState() == Accepted {
-		// If the player has already accepted the reach, return nil.
+		// If the player has already accepted the reach, the player cannot declare reach.
+		return nil, nil
+	}
+	if s.NumPipais() < 4 {
+		// If there are no remaining tiles to draw, the player cannot declare reach.
+		return nil, nil
+	}
+	if player.Score() < kyotakuPoint {
+		// If the player does not have enough points to declare reach, return nil.
 		return nil, nil
 	}
 
