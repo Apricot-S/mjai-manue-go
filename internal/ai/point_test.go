@@ -2,6 +2,7 @@ package ai
 
 import (
 	"fmt"
+	"reflect"
 	"testing"
 )
 
@@ -82,6 +83,41 @@ func Test_getPoints(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			if got := getPoints(tt.args.fu, tt.args.fan, tt.args.oya); got != tt.want {
 				t.Errorf("getPoints() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func Test_tenpaisToRyukyokuPoints(t *testing.T) {
+	type args struct {
+		tenpais [4]bool
+	}
+	tests := []struct {
+		name string
+		args args
+		want [4]int
+	}{
+		{"0 tenpais", args{[4]bool{false, false, false, false}}, [4]int{0, 0, 0, 0}},
+		{"1 tenpai 0", args{[4]bool{true, false, false, false}}, [4]int{3000, -1000, -1000, -1000}},
+		{"1 tenpai 1", args{[4]bool{false, true, false, false}}, [4]int{-1000, 3000, -1000, -1000}},
+		{"1 tenpai 2", args{[4]bool{false, false, true, false}}, [4]int{-1000, -1000, 3000, -1000}},
+		{"1 tenpai 3", args{[4]bool{false, false, false, true}}, [4]int{-1000, -1000, -1000, 3000}},
+		{"2 tenpais 01", args{[4]bool{true, true, false, false}}, [4]int{1500, 1500, -1500, -1500}},
+		{"2 tenpais 02", args{[4]bool{true, false, true, false}}, [4]int{1500, -1500, 1500, -1500}},
+		{"2 tenpais 03", args{[4]bool{true, false, false, true}}, [4]int{1500, -1500, -1500, 1500}},
+		{"2 tenpais 12", args{[4]bool{false, true, true, false}}, [4]int{-1500, 1500, 1500, -1500}},
+		{"2 tenpais 13", args{[4]bool{false, true, false, true}}, [4]int{-1500, 1500, -1500, 1500}},
+		{"2 tenpais 23", args{[4]bool{false, false, true, true}}, [4]int{-1500, -1500, 1500, 1500}},
+		{"3 tenpais 012", args{[4]bool{true, true, true, false}}, [4]int{1000, 1000, 1000, -3000}},
+		{"3 tenpais 013", args{[4]bool{true, true, false, true}}, [4]int{1000, 1000, -3000, 1000}},
+		{"3 tenpais 023", args{[4]bool{true, false, true, true}}, [4]int{1000, -3000, 1000, 1000}},
+		{"3 tenpais 123", args{[4]bool{false, true, true, true}}, [4]int{-3000, 1000, 1000, 1000}},
+		{"4 tenpais", args{[4]bool{true, true, true, true}}, [4]int{0, 0, 0, 0}},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := tenpaisToRyukyokuPoints(tt.args.tenpais); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("tenpaisToRyukyokuPoints() = %v, want %v", got, tt.want)
 			}
 		})
 	}
