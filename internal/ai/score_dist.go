@@ -4,6 +4,7 @@ import (
 	"strconv"
 
 	"github.com/Apricot-S/mjai-manue-go/internal/ai/core"
+	"github.com/Apricot-S/mjai-manue-go/internal/ai/estimator"
 	"github.com/Apricot-S/mjai-manue-go/internal/game"
 )
 
@@ -170,4 +171,56 @@ func (a *ManueAI) getNotenRyukyokuTenpaiProb(state game.StateViewer) float64 {
 		t += 1.0 / 4.0
 	}
 	return tenpaiFreq / (tenpaiFreq + notenFreq)
+}
+
+func (a *ManueAI) getSafeProbs(
+	state game.StateViewer,
+	playerID int,
+	dahaiCandidates []game.Pai,
+) (map[string]float64, error) {
+	safeProbs := make(map[string]float64, len(dahaiCandidates))
+	for _, pai := range dahaiCandidates {
+		var key string
+		if pai.IsUnknown() {
+			key = pai.ToString()
+		} else {
+			key = "none"
+		}
+		safeProbs[key] = 1.0
+	}
+
+	me := &state.Players()[playerID]
+	for _, player := range state.Players() {
+		if player.ID() == playerID {
+			continue
+		}
+
+		scene, err := estimator.NewScene(state, me, &player)
+		if err != nil {
+			return nil, err
+		}
+		tenpaiProb := a.tenpaiProbEstimator.Estimate(&player, state)
+		for _, pai := range dahaiCandidates {
+			if pai.IsUnknown() {
+				continue
+			}
+
+			isAnpai, err := scene.Evaluate("anpai", &pai)
+			if err != nil {
+				return nil, err
+			}
+			if isAnpai {
+				continue
+			}
+
+			probInfo, err := a.dangerEstimator.EstimateProb(scene, &pai)
+			if err != nil {
+				return nil, err
+			}
+			safeProb := 1.0 - tenpaiProb*probInfo.Prob
+			safeProbs[pai.ToString()] *= safeProb
+		}
+	}
+
+	return safeProbs, nil
 }
