@@ -1,6 +1,7 @@
 package ai
 
 import (
+	"math"
 	"strconv"
 
 	"github.com/Apricot-S/mjai-manue-go/internal/ai/core"
@@ -225,11 +226,26 @@ func (a *ManueAI) getSafeProbs(
 	return safeProbs, nil
 }
 
+func (a *ManueAI) getNumExpectedRemainingTurns(state game.StateViewer) int {
+	currentTurn := math.Round(float64(game.NumInitPipais-state.NumPipais()) / 4.0)
+	num := 0.0
+	den := 0.0
+	for i, prob := range a.stats.NumTurnsDistribution[int(currentTurn):] {
+		num += prob * (float64(i) - currentTurn + 0.5)
+		den += prob
+	}
+	if den == 0.0 {
+		return 0
+	} else {
+		return int(math.Round(num / den))
+	}
+}
+
 func (a *ManueAI) getRyukyokuProb(state game.StateViewer) float64 {
 	currentTurn := state.Turn()
 	den := 0.0
-	for _, t := range a.stats.NumTurnsDistribution[currentTurn:] {
-		den += t
+	for _, prob := range a.stats.NumTurnsDistribution[currentTurn:] {
+		den += prob
 	}
 	return a.stats.RyukyokuRatio / den
 }
