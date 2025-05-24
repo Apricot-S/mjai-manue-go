@@ -1,9 +1,9 @@
-package estimator
+package core
 
-// allMatch returns true if all elements satisfy the predicate.
+// AllMatch returns true if all elements satisfy the predicate.
 // Returns false if any element fails the predicate.
 // Returns error if predicate returns an error.
-func allMatch[T any](collection []T, predicate func(T) (bool, error)) (bool, error) {
+func AllMatch[T any](collection []T, predicate func(T) (bool, error)) (bool, error) {
 	for _, item := range collection {
 		result, err := predicate(item)
 		if err != nil {
@@ -17,10 +17,10 @@ func allMatch[T any](collection []T, predicate func(T) (bool, error)) (bool, err
 	return true, nil
 }
 
-// anyMatch returns true if any element satisfies the predicate.
+// AnyMatch returns true if any element satisfies the predicate.
 // Returns false if no element satisfies the predicate.
 // Returns error if predicate returns an error.
-func anyMatch[T any](collection []T, predicate func(T) (bool, error)) (bool, error) {
+func AnyMatch[T any](collection []T, predicate func(T) (bool, error)) (bool, error) {
 	for _, item := range collection {
 		result, err := predicate(item)
 		if err != nil {
@@ -34,9 +34,9 @@ func anyMatch[T any](collection []T, predicate func(T) (bool, error)) (bool, err
 	return false, nil
 }
 
-// count returns the number of elements that satisfy the predicate.
+// Count returns the number of elements that satisfy the predicate.
 // Returns error if predicate returns an error.
-func count[T any](collection []T, predicate func(T) (bool, error)) (int, error) {
+func Count[T any](collection []T, predicate func(T) (bool, error)) (int, error) {
 	count := 0
 	for _, item := range collection {
 		result, err := predicate(item)

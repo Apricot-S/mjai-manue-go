@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/Apricot-S/mjai-manue-go/configs"
+	"github.com/Apricot-S/mjai-manue-go/internal/ai/core"
 	"github.com/Apricot-S/mjai-manue-go/internal/game"
 )
 
@@ -372,7 +373,7 @@ func isNOrMoreOfNeighborsInPrereachSutehais(
 		numbers = append(numbers, paiNumber+i)
 	}
 
-	numNeighbors, err := count(numbers, func(num int) (bool, error) {
+	numNeighbors, err := core.Count(numbers, func(num int) (bool, error) {
 		if num < 1 || 9 < num {
 			return false, nil
 		}
@@ -406,7 +407,7 @@ func isSujiOf(pai *game.Pai, targetPaiSet *game.PaiSet) (bool, error) {
 		return false, err
 	}
 
-	return allMatch(suji, func(s game.Pai) (bool, error) {
+	return core.AllMatch(suji, func(s game.Pai) (bool, error) {
 		return targetPaiSet.Has(&s)
 	})
 }
@@ -421,7 +422,7 @@ func isWeakSujiOf(pai *game.Pai, targetPaiSet *game.PaiSet) (bool, error) {
 		return false, err
 	}
 
-	return anyMatch(suji, func(s game.Pai) (bool, error) {
+	return core.AnyMatch(suji, func(s game.Pai) (bool, error) {
 		return targetPaiSet.Has(&s)
 	})
 }
@@ -459,7 +460,7 @@ func getPossibleSujis(pai *game.Pai, anpaiSet *game.PaiSet) ([]game.Pai, error) 
 	candidates := []uint8{paiNumber - 3, paiNumber}
 
 	for _, n := range candidates {
-		isAlive, err := allMatch([]uint8{n, n + 3}, func(m uint8) (bool, error) {
+		isAlive, err := core.AllMatch([]uint8{n, n + 3}, func(m uint8) (bool, error) {
 			if m < 1 || m > 9 {
 				return false, nil
 			}
@@ -510,7 +511,7 @@ func isNChanceOrLess(pai *game.Pai, n int, visibleSet *game.PaiSet) (bool, error
 		}
 	}
 
-	return anyMatch(candidates, func(num uint8) (bool, error) {
+	return core.AnyMatch(candidates, func(num uint8) (bool, error) {
 		kabePai, err := game.NewPaiWithDetail(pai.Type(), num, false)
 		if err != nil {
 			return false, err
@@ -552,7 +553,7 @@ func isUrasujiOf(pai *game.Pai, targetPaiSet *game.PaiSet, anpaiSet *game.PaiSet
 		return false, err
 	}
 
-	return anyMatch(sujis, func(s game.Pai) (bool, error) {
+	return core.AnyMatch(sujis, func(s game.Pai) (bool, error) {
 		if low := s.Next(-1); low != nil {
 			hasLow, err := targetPaiSet.Has(low)
 			if err != nil {
@@ -584,7 +585,7 @@ func isSenkisujiOf(pai *game.Pai, targetPaiSet *game.PaiSet, anpaiSet *game.PaiS
 		return false, err
 	}
 
-	return anyMatch(sujis, func(s game.Pai) (bool, error) {
+	return core.AnyMatch(sujis, func(s game.Pai) (bool, error) {
 		if low := s.Next(-2); low != nil {
 			hasLow, err := targetPaiSet.Has(low)
 			if err != nil {
@@ -615,7 +616,7 @@ func isMatagisujiOf(pai *game.Pai, targetPaiSet *game.PaiSet, anpaiSet *game.Pai
 		return false, err
 	}
 
-	return anyMatch(sujis, func(s game.Pai) (bool, error) {
+	return core.AnyMatch(sujis, func(s game.Pai) (bool, error) {
 		if low := s.Next(1); low != nil {
 			hasLow, err := targetPaiSet.Has(low)
 			if err != nil {
@@ -661,7 +662,7 @@ func isOuter(pai *game.Pai, targetPaiSet *game.PaiSet) (bool, error) {
 		}
 	}
 
-	return anyMatch(innerNumbers, func(n uint8) (bool, error) {
+	return core.AnyMatch(innerNumbers, func(n uint8) (bool, error) {
 		innerPai, err := game.NewPaiWithDetail(pai.Type(), n, false)
 		if err != nil {
 			return false, err
@@ -712,7 +713,7 @@ func registerEvaluators() *evaluators {
 				return false, err
 			}
 
-			return anyMatch(suji, func(sujiPai game.Pai) (bool, error) {
+			return core.AnyMatch(suji, func(sujiPai game.Pai) (bool, error) {
 				visible, err := isVisibleNOrMore(&sujiPai, n+1, scene.visibleSet)
 				if err != nil {
 					return false, err
@@ -756,7 +757,7 @@ func registerEvaluators() *evaluators {
 				return false, err
 			}
 
-			return anyMatch(suji, func(sujiPai game.Pai) (bool, error) {
+			return core.AnyMatch(suji, func(sujiPai game.Pai) (bool, error) {
 				c, err := scene.tehaiSet.Count(&sujiPai)
 				return c >= n, err
 			})
@@ -804,7 +805,7 @@ func registerEvaluators() *evaluators {
 			}
 
 			numbers := []uint8{1, 2, 3, 4, 5, 6, 7, 8, 9}
-			numSameType, err := count(numbers, func(num uint8) (bool, error) {
+			numSameType, err := core.Count(numbers, func(num uint8) (bool, error) {
 				target, err := game.NewPaiWithDetail(pai.Type(), num, false)
 				if err != nil {
 					return false, err
