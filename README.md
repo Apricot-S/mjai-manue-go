@@ -1,5 +1,7 @@
 # mjai-manue-go
 
+[![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/Apricot-S/mjai-manue-go)
+
 Go port of [mjai-manue](https://github.com/gimite/mjai-manue)
 
 > 🚧 **Work in Progress**
