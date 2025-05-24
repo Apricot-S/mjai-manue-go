@@ -2,6 +2,7 @@ package core
 
 import (
 	"fmt"
+	"reflect"
 	"testing"
 
 	"github.com/Apricot-S/mjai-manue-go/internal/game"
@@ -225,6 +226,56 @@ func TestBitVector_HasIntersectionWith(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			if got := tt.bv.HasIntersectionWith(tt.args.other); got != tt.want {
 				t.Errorf("BitVector.HasIntersectionWith() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestCountVectorToBitVectors(t *testing.T) {
+	type args struct {
+		countVector *game.PaiSet
+	}
+	type testCase struct {
+		name string
+		args args
+		want [4]BitVector
+	}
+	tests := []testCase{}
+
+	{
+		ps := game.PaiSet{0, 1, 2, 3, 4}
+		want := [4]BitVector{
+			BitVector(0x1E), // 11110 in binary
+			BitVector(0x1C), // 11100 in binary
+			BitVector(0x18), // 11000 in binary
+			BitVector(0x10), // 10000 in binary
+		}
+		tests = append(tests, testCase{
+			name: "12345m",
+			args: args{countVector: &ps},
+			want: want,
+		})
+	}
+
+	{
+		ps := game.PaiSet{33: 4}
+		want := [4]BitVector{
+			BitVector(0x2_0000_0000),
+			BitVector(0x2_0000_0000),
+			BitVector(0x2_0000_0000),
+			BitVector(0x2_0000_0000),
+		}
+		tests = append(tests, testCase{
+			name: "all pais",
+			args: args{countVector: &ps},
+			want: want,
+		})
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := CountVectorToBitVectors(tt.args.countVector); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("CountVectorToBitVectors() = %v, want %v", got, tt.want)
 			}
 		})
 	}

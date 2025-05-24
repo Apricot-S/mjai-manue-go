@@ -21,3 +21,11 @@ func (bv BitVector) IsSubsetOf(other BitVector) bool {
 func (bv BitVector) HasIntersectionWith(other BitVector) bool {
 	return (bv & other) != 0
 }
+
+func CountVectorToBitVectors(countVector *game.PaiSet) [4]BitVector {
+	var bitVectors [4]BitVector
+	for i := 1; i < 5; i++ {
+		bitVectors[i-1] = NewBitVector(countVector, i)
+	}
+	return bitVectors
+}
