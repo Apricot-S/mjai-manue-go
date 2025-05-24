@@ -224,3 +224,12 @@ func (a *ManueAI) getSafeProbs(
 
 	return safeProbs, nil
 }
+
+func (a *ManueAI) getRyukyokuProb(state game.StateViewer) float64 {
+	currentTurn := state.Turn()
+	den := 0.0
+	for _, t := range a.stats.NumTurnsDistribution[currentTurn:] {
+		den += t
+	}
+	return a.stats.RyukyokuRatio / den
+}
