@@ -226,6 +226,72 @@ func (a *ManueAI) getSafeProbs(
 	return safeProbs, nil
 }
 
+func (a *ManueAI) getRyukyokuProbOnMyNoHora(state game.StateViewer) float64 {
+	return math.Pow(a.getRyukyokuProb(state), 3.0/4.0)
+}
+
+func (a *ManueAI) getHoraFactorsDist(
+	state game.StateViewer,
+	playerID int,
+	actor *game.Player,
+) *core.ProbDist[[]float64] {
+	tsumoHoraProb := float64(a.stats.NumTsumoHoras) / float64(a.stats.NumHoras)
+	m := core.NewHashMap[[]float64]()
+	for _, target := range state.Players() {
+		var prob float64
+		if target.ID() == playerID {
+			prob = tsumoHoraProb
+		} else {
+			prob = (1.0 - tsumoHoraProb) / 3.0
+		}
+		m.Set(a.getHoraFactors(state, actor, &target), prob)
+	}
+	return core.NewProbDist(m)
+}
+
+func (a *ManueAI) getHoraFactors(state game.StateViewer, actor, target *game.Player) []float64 {
+	actorID := actor.ID()
+	targetID := target.ID()
+	if actorID != targetID {
+		// Ron hora
+		horaFactors := []float64{0.0, 0.0, 0.0, 0.0}
+		for i, p := range state.Players() {
+			switch p.ID() {
+			case actorID:
+				horaFactors[i] = 1.0
+			case targetID:
+				horaFactors[i] = -1.0
+			}
+		}
+		return horaFactors
+	}
+
+	oyaID := state.Oya().ID()
+	// Tsumo hora
+	if actorID == oyaID {
+		// Oya tsumo hora
+		horaFactors := []float64{-1.0 / 3.0, -1.0 / 3.0, -1.0 / 3.0, -1.0 / 3.0}
+		for i, p := range state.Players() {
+			if p.ID() == actorID {
+				horaFactors[i] = 1.0
+			}
+		}
+		return horaFactors
+	}
+
+	// Ko tsumo hora
+	horaFactors := []float64{-1.0 / 4.0, -1.0 / 4.0, -1.0 / 4.0, -1.0 / 4.0}
+	for i, p := range state.Players() {
+		switch p.ID() {
+		case actorID:
+			horaFactors[i] = 1.0
+		case oyaID:
+			horaFactors[i] = -1.0 / 2.0
+		}
+	}
+	return horaFactors
+}
+
 func (a *ManueAI) getNumExpectedRemainingTurns(state game.StateViewer) int {
 	currentTurn := math.Round(float64(game.NumInitPipais-state.NumPipais()) / 4.0)
 	num := 0.0
