@@ -1,6 +1,7 @@
-package ai
+package game
 
-func getPoints(fu, fan int, oya bool) int {
+// GetPoints calculates the winning point in case of Ron.
+func GetPoints(fu, fan int, oya bool) int {
 	var basePoints int
 	if fan >= 13 {
 		basePoints = 8000
@@ -28,7 +29,7 @@ func getPoints(fu, fan int, oya bool) int {
 	return (basePoints*multiplier + 99) / 100 * 100
 }
 
-func tenpaisToRyukyokuPoints(tenpais [4]bool) [4]int {
+func TenpaisToRyukyokuPoints(tenpais [4]bool) [4]int {
 	numTenpais := 0
 	for _, t := range tenpais {
 		if t {

@@ -151,7 +151,7 @@ func tenpaisToRyukyokuPointsFloat(tenpais []float64) []float64 {
 	for i := range tenpais {
 		t[i] = tenpais[i] != 0.0
 	}
-	r := tenpaisToRyukyokuPoints(t)
+	r := game.TenpaisToRyukyokuPoints(t)
 	ret := make([]float64, 4)
 	for i := range r {
 		ret[i] = float64(r[i])

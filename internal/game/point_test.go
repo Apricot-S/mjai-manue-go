@@ -1,4 +1,4 @@
-package ai
+package game
 
 import (
 	"fmt"
@@ -6,7 +6,7 @@ import (
 	"testing"
 )
 
-func Test_getPoints(t *testing.T) {
+func TestGetPoints(t *testing.T) {
 	type args struct {
 		fu  int
 		fan int
@@ -81,14 +81,14 @@ func Test_getPoints(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := getPoints(tt.args.fu, tt.args.fan, tt.args.oya); got != tt.want {
-				t.Errorf("getPoints() = %v, want %v", got, tt.want)
+			if got := GetPoints(tt.args.fu, tt.args.fan, tt.args.oya); got != tt.want {
+				t.Errorf("GetPoints() = %v, want %v", got, tt.want)
 			}
 		})
 	}
 }
 
-func Test_tenpaisToRyukyokuPoints(t *testing.T) {
+func TestTenpaisToRyukyokuPoints(t *testing.T) {
 	type args struct {
 		tenpais [4]bool
 	}
@@ -116,8 +116,8 @@ func Test_tenpaisToRyukyokuPoints(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := tenpaisToRyukyokuPoints(tt.args.tenpais); !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("tenpaisToRyukyokuPoints() = %v, want %v", got, tt.want)
+			if got := TenpaisToRyukyokuPoints(tt.args.tenpais); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("TenpaisToRyukyokuPoints() = %v, want %v", got, tt.want)
 			}
 		})
 	}
