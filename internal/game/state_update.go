@@ -20,7 +20,7 @@ func (s *StateImpl) OnStartGame(event jsontext.Value) error {
 	}
 
 	id := e.ID
-	if id < 0 || id >= numPlayers {
+	if id < 0 || id >= NumPlayers {
 		return fmt.Errorf("invalid player ID: %d", id)
 	}
 
@@ -28,7 +28,7 @@ func (s *StateImpl) OnStartGame(event jsontext.Value) error {
 	if e.Names != nil {
 		names = slices.Clone(e.Names)
 	}
-	if len(names) != numPlayers {
+	if len(names) != NumPlayers {
 		return fmt.Errorf("number of players must be 4, but got %d", len(names))
 	}
 
@@ -37,9 +37,9 @@ func (s *StateImpl) OnStartGame(event jsontext.Value) error {
 		return err
 	}
 
-	var players [numPlayers]Player
+	var players [NumPlayers]Player
 	for i, name := range names {
-		p, err := NewPlayer(i, name, initScore)
+		p, err := NewPlayer(i, name, InitScore)
 		if err != nil {
 			return err
 		}
@@ -52,8 +52,8 @@ func (s *StateImpl) OnStartGame(event jsontext.Value) error {
 	s.honba = 0
 	s.oya = &s.players[0]
 	s.chicha = &s.players[0]
-	s.doraMarkers = make([]Pai, 0, maxNumDoraMarkers)
-	s.numPipais = numInitPipais
+	s.doraMarkers = make([]Pai, 0, MaxNumDoraMarkers)
+	s.numPipais = NumInitPipais
 
 	s.prevEventType = noEvent
 	s.prevDahaiActor = noActor
@@ -199,15 +199,15 @@ func (s *StateImpl) onStartKyoku(event *message.StartKyoku) error {
 	s.kyokuNum = event.Kyoku
 	s.honba = event.Honba
 	s.oya = &s.players[event.Oya]
-	s.doraMarkers = make([]Pai, 0, maxNumDoraMarkers)
+	s.doraMarkers = make([]Pai, 0, MaxNumDoraMarkers)
 	doraMarker, err := NewPaiWithName(event.DoraMarker)
 	if err != nil {
 		return err
 	}
 	s.doraMarkers = append(s.doraMarkers, *doraMarker)
-	s.numPipais = numInitPipais
+	s.numPipais = NumInitPipais
 
-	for i := range numPlayers {
+	for i := range NumPlayers {
 		tehais := make([]Pai, initTehaisSize)
 		for j := range tehais {
 			tehai, err := NewPaiWithName(event.Tehais[i][j])
@@ -555,7 +555,7 @@ func (s *StateImpl) onDora(event *message.Dora) error {
 		return fmt.Errorf("dora message is nil")
 	}
 
-	if len(s.doraMarkers) >= maxNumDoraMarkers {
+	if len(s.doraMarkers) >= MaxNumDoraMarkers {
 		return fmt.Errorf("a 6th dora cannot be added")
 	}
 

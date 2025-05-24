@@ -8,9 +8,9 @@ import (
 
 func getDefaultStateForTest() *StateImpl {
 	east, _ := NewPaiWithName("E")
-	players := [numPlayers]Player{}
+	players := [NumPlayers]Player{}
 
-	for i := range numPlayers {
+	for i := range NumPlayers {
 		tehais := make([]Pai, 13)
 		for j := range 13 {
 			tehais[j] = *Unknown
@@ -27,7 +27,7 @@ func getDefaultStateForTest() *StateImpl {
 			reachState:        None,
 			reachHoIndex:      -1,
 			reachSutehaiIndex: -1,
-			score:             initScore,
+			score:             InitScore,
 			canDahai:          false,
 			isMenzen:          true,
 		}
@@ -40,8 +40,8 @@ func getDefaultStateForTest() *StateImpl {
 		honba:       0,
 		oya:         &players[0],
 		chicha:      &players[0],
-		doraMarkers: make([]Pai, 0, maxNumDoraMarkers),
-		numPipais:   numInitPipais,
+		doraMarkers: make([]Pai, 0, MaxNumDoraMarkers),
+		numPipais:   NumInitPipais,
 
 		prevEventType:    "",
 		prevDahaiActor:   -1,

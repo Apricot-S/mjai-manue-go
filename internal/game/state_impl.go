@@ -10,7 +10,7 @@ import (
 )
 
 type StateImpl struct {
-	players     [numPlayers]Player
+	players     [NumPlayers]Player
 	bakaze      Pai
 	kyokuNum    int
 	honba       int
@@ -34,7 +34,7 @@ type StateImpl struct {
 	kuikaePais []Pai
 }
 
-func (s *StateImpl) Players() *[numPlayers]Player {
+func (s *StateImpl) Players() *[NumPlayers]Player {
 	return &s.players
 }
 
@@ -126,10 +126,10 @@ func (s *StateImpl) NextKyoku() (*Pai, int) {
 }
 
 func (s *StateImpl) Turn() int {
-	return (numInitPipais - s.numPipais) / numPlayers
+	return (NumInitPipais - s.numPipais) / NumPlayers
 }
 
-func (s *StateImpl) RankedPlayers() [numPlayers]Player {
+func (s *StateImpl) RankedPlayers() [NumPlayers]Player {
 	players := s.players
 	slices.SortStableFunc(players[:], func(p1, p2 Player) int {
 		if c := cmp.Compare(p1.score, p2.score); c != 0 {
