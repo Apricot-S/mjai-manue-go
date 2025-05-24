@@ -217,13 +217,14 @@ func (s *StateImpl) onStartKyoku(event *message.StartKyoku) error {
 			tehais[j] = *tehai
 		}
 
-		err := s.players[i].onStartKyoku(tehais, nil)
+		var err error
+		if event.Scores != nil {
+			err = s.players[i].onStartKyoku(tehais, &event.Scores[i])
+		} else {
+			err = s.players[i].onStartKyoku(tehais, nil)
+		}
 		if err != nil {
 			return err
-		}
-
-		if event.Scores != nil {
-			s.players[i].SetScore(event.Scores[i])
 		}
 	}
 
