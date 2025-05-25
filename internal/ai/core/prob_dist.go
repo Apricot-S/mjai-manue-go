@@ -18,6 +18,10 @@ func NewProbDist[T HashMapKey](arg HashMap[T]) *ProbDist[T] {
 	return pd
 }
 
+func (p *ProbDist[T]) Dist() *HashMap[T] {
+	return &p.dist
+}
+
 func (p *ProbDist[T]) Expected() T {
 	var result T
 	first := true

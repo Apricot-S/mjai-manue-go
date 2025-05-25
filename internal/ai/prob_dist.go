@@ -491,5 +491,45 @@ func (a *ManueAI) getWinProb(
 	scoreChangesDist *core.ProbDist[[]float64],
 	other *game.Player,
 ) float64 {
-	panic("unimplemented")
+	me := &state.Players()[playerID]
+	// TODO Change this considering renchan.
+	nexttKyokuBakaze, nextKyokuNum := state.NextKyoku()
+	myPos := game.GetPlayerDistance(me, state.Chicha())
+	otherPos := game.GetPlayerDistance(other, state.Chicha())
+	key := fmt.Sprintf("%s%d,%d,%d", nexttKyokuBakaze.ToString(), nextKyokuNum, myPos, otherPos)
+	winProbs := a.stats.WinProbsMap[key]
+	relativeScoreDist := scoreChangesDist.MapValue2(func(scoreChanges []float64) float64 {
+		return (float64(me.Score()) + scoreChanges[playerID]) - (float64(other.Score()) + scoreChanges[other.ID()])
+	})
+	winProb := 0.0
+	relativeScoreDist.Dist().ForEach(func(relativeScore, prob float64) {
+		winProb += prob * a.getWinProbFromRelativeScore(relativeScore, winProbs, myPos, otherPos)
+	})
+	return winProb
+}
+
+func (a *ManueAI) getWinProbFromRelativeScore(
+	relativeScore float64,
+	winProbs map[string]float64,
+	myPos int,
+	otherPos int,
+) float64 {
+	if winProbs != nil {
+		key := fmt.Sprintf("%.0f", relativeScore)
+		if prob, ok := winProbs[key]; ok {
+			return prob
+		}
+	}
+	// abs(relativeScore) is so big that statistics are missing,
+	// or the current kyoku is S-4 (orasu).
+	if myPos < otherPos {
+		if relativeScore >= 0 {
+			return 1.0
+		}
+		return 0.0
+	}
+	if relativeScore > 0 {
+		return 1.0
+	}
+	return 0.0
 }
