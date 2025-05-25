@@ -184,10 +184,10 @@ func (a *ManueAI) getSafeProbs(
 	safeProbs := make(map[string]float64, len(dahaiCandidates))
 	for _, pai := range dahaiCandidates {
 		var key string
-		if !pai.IsUnknown() {
-			key = pai.ToString()
-		} else {
+		if pai.IsUnknown() {
 			key = "none"
+		} else {
+			key = pai.ToString()
 		}
 		safeProbs[key] = 1.0
 	}
@@ -234,8 +234,90 @@ func (a *ManueAI) getImmediateScoreChangesDists(
 	state game.StateViewer,
 	playerID int,
 	dahaiCandidates []game.Pai,
-) {
+) map[string]*core.ProbDist[[]float64] {
+	scoreChangesDists := make(map[string]*core.ProbDist[[]float64], len(dahaiCandidates))
+	for _, pai := range dahaiCandidates {
+		var key string
+		if pai.IsUnknown() {
+			key = "none"
+		} else {
+			key = pai.ToString()
+		}
+		hm := core.NewHashMap[[]float64]()
+		hm.Set(a.noChanges[:], 1.0)
+		scoreChangesDists[key] = core.NewProbDist(hm)
+	}
 
+	me := state.Players()[playerID]
+	for _, horaPlayer := range state.Players() {
+		if horaPlayer.ID() == playerID {
+			continue
+		}
+
+		scene, err := estimator.NewScene(state, &me, &horaPlayer)
+		if err != nil {
+			panic("TODO: 適切なメッセージを出す")
+		}
+
+		tenpaiProb := a.tenpaiProbEstimator.Estimate(&horaPlayer, state)
+
+		var horaPointsFreqs map[string]int
+		if horaPlayer.ID() == state.Oya().ID() {
+			horaPointsFreqs = a.stats.OyaHoraPointsFreqs
+		} else {
+			horaPointsFreqs = a.stats.KoHoraPointsFreqs
+		}
+		hm := core.NewHashMap[float64]()
+		totalFreqs := float64(horaPointsFreqs["total"])
+		for points, freq := range horaPointsFreqs {
+			if points == "total" {
+				continue
+			}
+			p, err := strconv.ParseFloat(points, 64)
+			if err != nil {
+				panic("Invalid stats file: failed to convert key of horaPointsFreqs to float64 (" + points + ").")
+			}
+			f := float64(freq) / totalFreqs
+			hm.Set(p, f)
+		}
+		horaPointsDist := core.NewProbDist(hm)
+
+		hojuChanges := []float64{0.0, 0.0, 0.0, 0.0}
+		hojuChanges[horaPlayer.ID()] = 1.0
+		hojuChanges[playerID] = -1.0
+
+		for _, pai := range dahaiCandidates {
+			if pai.IsUnknown() {
+				continue
+			}
+			key := pai.ToString()
+			isAnpai, err := scene.Evaluate("anpai", &pai)
+			if err != nil {
+				panic("TODO: 適切なメッセージを出す")
+			}
+
+			var hojuProb float64
+			if isAnpai {
+				hojuProb = 0.0
+			} else {
+				probInfo, err := a.dangerEstimator.EstimateProb(scene, &pai)
+				if err != nil {
+					panic("TODO: 適切なメッセージを出す")
+				}
+				hojuProb = tenpaiProb * probInfo.Prob
+			}
+
+			hm := core.NewHashMap[[]float64]()
+			hm.Set(hojuChanges, hojuProb)
+			hm.Set(a.noChanges[:], 1.0-hojuProb)
+			unitDist := core.NewProbDist(hm)
+			// Considers only the first ron for double/triple ron to avoid too many combinations.
+			new := core.Mult[float64, []float64, []float64](horaPointsDist, unitDist)
+			scoreChangesDists[key] = scoreChangesDists[key].Replace(a.noChanges[:], new)
+		}
+	}
+
+	return scoreChangesDists
 }
 
 func (a *ManueAI) getRyukyokuProbOnMyNoHora(state game.StateViewer) float64 {

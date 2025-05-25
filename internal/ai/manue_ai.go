@@ -16,7 +16,7 @@ type ManueAI struct {
 	stats               *configs.GameStats
 	dangerEstimator     *estimator.DangerEstimator
 	tenpaiProbEstimator *estimator.TenpaiProbEstimator
-	noChanges           [4]int
+	noChanges           [4]float64
 	logStr              string
 }
 
@@ -46,7 +46,7 @@ func NewManueAIWithEstimators(
 		stats:               stats,
 		dangerEstimator:     dangerEstimator,
 		tenpaiProbEstimator: tenpaiProbEstimator,
-		noChanges:           [4]int{},
+		noChanges:           [4]float64{},
 		logStr:              "",
 	}
 }
