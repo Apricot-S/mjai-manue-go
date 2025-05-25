@@ -4,6 +4,12 @@ import (
 	"testing"
 )
 
+func convertStrToPaiSetForTest(paiStr string) *PaiSet {
+	pais, _ := StrToPais(paiStr)
+	ps, _ := NewPaiSetWithPais(pais)
+	return ps
+}
+
 func TestIsHoraForm(t *testing.T) {
 	type args struct {
 		ps *PaiSet
@@ -75,13 +81,39 @@ func Test_isHoraFormKokushimuso(t *testing.T) {
 	type args struct {
 		ps *PaiSet
 	}
-	tests := []struct {
+	type testCase struct {
 		name string
 		args args
 		want bool
-	}{
-		// TODO: Add test cases.
 	}
+	tests := []testCase{}
+
+	{
+		paiStr := "1m 9m 9m 1p 9p 1s 9s E S W N P F C"
+		ps := convertStrToPaiSetForTest(paiStr)
+		tests = append(tests, testCase{name: paiStr, args: args{ps: ps}, want: true})
+	}
+	{
+		paiStr := "1m 9m 1p 9p 1s 9s E E S W N P F C"
+		ps := convertStrToPaiSetForTest(paiStr)
+		tests = append(tests, testCase{name: paiStr, args: args{ps: ps}, want: true})
+	}
+	{
+		paiStr := "1m 9m 1p 9p 1s 9s E S W N P F C C"
+		ps := convertStrToPaiSetForTest(paiStr)
+		tests = append(tests, testCase{name: paiStr, args: args{ps: ps}, want: true})
+	}
+	{
+		paiStr := "1m 2m 9m 1p 9p 1s 9s E S W N P F C"
+		ps := convertStrToPaiSetForTest(paiStr)
+		tests = append(tests, testCase{name: paiStr, args: args{ps: ps}, want: false})
+	}
+	{
+		paiStr := "1m 9m 1p 9p 1s 9s E E E W N P F C"
+		ps := convertStrToPaiSetForTest(paiStr)
+		tests = append(tests, testCase{name: paiStr, args: args{ps: ps}, want: false})
+	}
+
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			if got := isHoraFormKokushimuso(tt.args.ps); got != tt.want {
