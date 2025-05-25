@@ -61,13 +61,34 @@ func Test_isHoraFormChitoitsu(t *testing.T) {
 	type args struct {
 		ps *PaiSet
 	}
-	tests := []struct {
+	type testCase struct {
 		name string
 		args args
 		want bool
-	}{
-		// TODO: Add test cases.
 	}
+	tests := []testCase{}
+
+	{
+		paiStr := "1p 1p 9p 9p 1s 1s 3s 3s 5s 5s 7s 7s 9s 9s"
+		ps := convertStrToPaiSetForTest(paiStr)
+		tests = append(tests, testCase{name: paiStr, args: args{ps: ps}, want: true})
+	}
+	{
+		paiStr := "1m 1m 1p 1p 9p 9p 2s 2s 4s 4s S S C C"
+		ps := convertStrToPaiSetForTest(paiStr)
+		tests = append(tests, testCase{name: paiStr, args: args{ps: ps}, want: true})
+	}
+	{
+		paiStr := "1m 1m 2m 2m 3m 3m 4m 4m 5m 5m 6m 6m 7m 7m"
+		ps := convertStrToPaiSetForTest(paiStr)
+		tests = append(tests, testCase{name: paiStr, args: args{ps: ps}, want: true})
+	}
+	{
+		paiStr := "1p 1p 1p 1p 3p 3p 4p 4p 5p 5p 6p 6p 7p 7p"
+		ps := convertStrToPaiSetForTest(paiStr)
+		tests = append(tests, testCase{name: paiStr, args: args{ps: ps}, want: false})
+	}
+
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			if got := isHoraFormChitoitsu(tt.args.ps); got != tt.want {
