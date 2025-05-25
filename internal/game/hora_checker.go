@@ -22,8 +22,7 @@ func IsHoraForm(ps *PaiSet) (bool, error) {
 		return false, fmt.Errorf("invalid hand length %d", sum)
 	}
 
-	numMentsus := min(sum/3, 4)
-	ret := isHoraFormGeneral(ps, numMentsus)
+	ret := isHoraFormGeneral(ps)
 	if sum == 14 {
 		ret = ret || isHoraFormChitoitsu(ps)
 		ret = ret || isHoraFormKokushimuso(ps)
@@ -32,7 +31,87 @@ func IsHoraForm(ps *PaiSet) (bool, error) {
 	return ret, nil
 }
 
-func isHoraFormGeneral(ps *PaiSet, numMentsus int) bool {
+// Reference: https://qiita.com/tomohxx/items/20d886d1991ab89f5522
+func isHoraFormGeneral(ps *PaiSet) bool {
+	colorWithPair := -1
+
+	for i := range 3 {
+		sum := 0
+		for _, c := range ps[9*i : 9*i+9] {
+			sum += c
+		}
+		switch sum % 3 {
+		case 1:
+			return false
+		case 2:
+			if colorWithPair == -1 {
+				colorWithPair = i
+			} else {
+				return false
+			}
+		}
+	}
+
+	for i := 27; i < 34; i++ {
+		switch ps[i] % 3 {
+		case 1:
+			return false
+		case 2:
+			if colorWithPair == -1 {
+				colorWithPair = i
+			} else {
+				return false
+			}
+		}
+	}
+
+	for i := range 3 {
+		if i == colorWithPair {
+			if !isSingleColorHoraFormWithPair(ps[9*i : 9*i+9]) {
+				return false
+			}
+		} else {
+			if !isSingleColorHoraFormWithoutPair(ps[9*i : 9*i+9]) {
+				return false
+			}
+		}
+	}
+
+	return true
+}
+
+func isSingleColorHoraFormWithoutPair(ps []int) bool {
+	var r int
+	a := ps[0]
+	b := ps[1]
+
+	for i := range 7 {
+		r = a % 3
+		c := ps[i+2]
+		if b < r || c < r {
+			return false
+		}
+		a = b - r
+		b = c - r
+	}
+
+	return a%3 == 0 && b%3 == 0
+}
+
+func isSingleColorHoraFormWithPair(ps []int) bool {
+	p := 0
+	for i := range 9 {
+		p += i * ps[i]
+	}
+
+	for i := p * 2 % 3; i < 9; i += 3 {
+		ps[i] -= 2
+		if ps[i] >= 0 && isSingleColorHoraFormWithoutPair(ps) {
+			ps[i] += 2
+			return true
+		}
+		ps[i] += 2
+	}
 	return false
 }
 

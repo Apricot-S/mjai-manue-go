@@ -38,8 +38,7 @@ func TestIsHoraForm(t *testing.T) {
 
 func Test_isHoraFormGeneral(t *testing.T) {
 	type args struct {
-		ps         *PaiSet
-		numMentsus int
+		ps *PaiSet
 	}
 	tests := []struct {
 		name string
@@ -50,8 +49,70 @@ func Test_isHoraFormGeneral(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := isHoraFormGeneral(tt.args.ps, tt.args.numMentsus); got != tt.want {
+			if got := isHoraFormGeneral(tt.args.ps); got != tt.want {
 				t.Errorf("isHoraFormGeneral() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func Test_isSingleColorHoraFormWithoutPair(t *testing.T) {
+	type args struct {
+		ps []int
+	}
+	type testCase struct {
+		name string
+		args args
+		want bool
+	}
+	tests := []testCase{}
+
+	{
+		paiStr := "1m 1m 1m 1m 2m 2m 3m 3m 4m"
+		ps := convertStrToPaiSetForTest(paiStr)
+		tests = append(tests, testCase{name: paiStr, args: args{ps: ps[:]}, want: true})
+	}
+	{
+		paiStr := "1m 1m 1m 1m 2m 2m 3m 3m"
+		ps := convertStrToPaiSetForTest(paiStr)
+		tests = append(tests, testCase{name: paiStr, args: args{ps: ps[:]}, want: false})
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := isSingleColorHoraFormWithoutPair(tt.args.ps); got != tt.want {
+				t.Errorf("isSingleColorHoraFormWithoutPair() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func Test_isSingleColorHoraFormWithPair(t *testing.T) {
+	type args struct {
+		ps []int
+	}
+	type testCase struct {
+		name string
+		args args
+		want bool
+	}
+	tests := []testCase{}
+
+	{
+		paiStr := "1m 1m 1m 1m 2m 2m 3m 3m 4m"
+		ps := convertStrToPaiSetForTest(paiStr)
+		tests = append(tests, testCase{name: paiStr, args: args{ps: ps[:]}, want: false})
+	}
+	{
+		paiStr := "1m 1m 1m 1m 2m 2m 3m 3m"
+		ps := convertStrToPaiSetForTest(paiStr)
+		tests = append(tests, testCase{name: paiStr, args: args{ps: ps[:]}, want: true})
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := isSingleColorHoraFormWithPair(tt.args.ps); got != tt.want {
+				t.Errorf("isSingleColorHoraFormWithPair() = %v, want %v", got, tt.want)
 			}
 		})
 	}
