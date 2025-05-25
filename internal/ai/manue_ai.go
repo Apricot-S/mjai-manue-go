@@ -2,6 +2,7 @@ package ai
 
 import (
 	"fmt"
+	"os"
 
 	"github.com/Apricot-S/mjai-manue-go/configs"
 	"github.com/Apricot-S/mjai-manue-go/internal/ai/estimator"
@@ -16,6 +17,7 @@ type ManueAI struct {
 	dangerEstimator     *estimator.DangerEstimator
 	tenpaiProbEstimator *estimator.TenpaiProbEstimator
 	noChanges           [4]int
+	logStr              string
 }
 
 func NewManueAI() (*ManueAI, error) {
@@ -45,7 +47,17 @@ func NewManueAIWithEstimators(
 		dangerEstimator:     dangerEstimator,
 		tenpaiProbEstimator: tenpaiProbEstimator,
 		noChanges:           [4]int{},
+		logStr:              "",
 	}
+}
+
+func (a *ManueAI) Initialize() {
+	a.logStr = ""
+}
+
+func (a *ManueAI) log(str string) {
+	fmt.Fprint(os.Stderr, str)
+	a.logStr += str
 }
 
 func (a *ManueAI) DecideAction(state game.StateAnalyzer, playerID int) (jsontext.Value, error) {
@@ -55,7 +67,7 @@ func (a *ManueAI) DecideAction(state game.StateAnalyzer, playerID int) (jsontext
 	}
 	if hc != nil {
 		// If it can win, always win
-		hora, err := message.NewHora(playerID, hc.Target(), hc.Pai().ToString(), 0, nil, "")
+		hora, err := message.NewHora(playerID, hc.Target(), hc.Pai().ToString(), 0, nil, a.logStr)
 		if err != nil {
 			return nil, fmt.Errorf("failed to create hora message: %w", err)
 		}
@@ -63,6 +75,7 @@ func (a *ManueAI) DecideAction(state game.StateAnalyzer, playerID int) (jsontext
 		if err != nil {
 			return nil, fmt.Errorf("failed to marshal hora message: %w", err)
 		}
+		a.logStr = ""
 		return res, nil
 	}
 
@@ -104,9 +117,10 @@ func (a *ManueAI) decideDahai(state game.StateAnalyzer, playerID int) (jsontext.
 	}
 
 	// my turn
+
 	if state.Players()[playerID].ReachState() == game.Accepted {
 		// in reach
-		dahai, err := message.NewDahai(playerID, dc[0].ToString(), true, "")
+		dahai, err := message.NewDahai(playerID, dc[0].ToString(), true, a.logStr)
 		if err != nil {
 			return nil, fmt.Errorf("failed to create dahai message: %w", err)
 		}
@@ -114,6 +128,7 @@ func (a *ManueAI) decideDahai(state game.StateAnalyzer, playerID int) (jsontext.
 		if err != nil {
 			return nil, fmt.Errorf("failed to marshal dahai message: %w", err)
 		}
+		a.logStr = ""
 		return res, nil
 	}
 
@@ -124,7 +139,7 @@ func (a *ManueAI) decideDahai(state game.StateAnalyzer, playerID int) (jsontext.
 
 	if isReach {
 		// reach declaration
-		reach, err := message.NewReach(playerID, "")
+		reach, err := message.NewReach(playerID, a.logStr)
 		if err != nil {
 			return nil, fmt.Errorf("failed to create reach message: %w", err)
 		}
@@ -132,12 +147,13 @@ func (a *ManueAI) decideDahai(state game.StateAnalyzer, playerID int) (jsontext.
 		if err != nil {
 			return nil, fmt.Errorf("failed to marshal reach message: %w", err)
 		}
+		a.logStr = ""
 		return res, nil
 	}
 
 	// dahai
 	isTsumogiri := state.IsTsumoPai(pai)
-	dahai, err := message.NewDahai(playerID, pai.ToString(), isTsumogiri, "")
+	dahai, err := message.NewDahai(playerID, pai.ToString(), isTsumogiri, a.logStr)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create dahai message: %w", err)
 	}
@@ -145,6 +161,7 @@ func (a *ManueAI) decideDahai(state game.StateAnalyzer, playerID int) (jsontext.
 	if err != nil {
 		return nil, fmt.Errorf("failed to marshal dahai message: %w", err)
 	}
+	a.logStr = ""
 	return res, nil
 }
 

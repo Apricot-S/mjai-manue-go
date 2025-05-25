@@ -47,6 +47,7 @@ func (a *AIAgent) Respond(msgs []jsontext.Value) (jsontext.Value, error) {
 		if err := a.state.OnStartGame(firstMsg); err != nil {
 			return nil, fmt.Errorf("failed to update state: %w", err)
 		}
+		a.ai.Initialize()
 		return a.makeNoneResponse()
 	case message.TypeEndKyoku:
 		// Message during the game, but does not affect the game, so process it here

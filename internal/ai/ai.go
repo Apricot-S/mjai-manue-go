@@ -6,5 +6,6 @@ import (
 )
 
 type AI interface {
+	Initialize()
 	DecideAction(state game.StateAnalyzer, playerID int) (jsontext.Value, error)
 }
