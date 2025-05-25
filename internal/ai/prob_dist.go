@@ -256,7 +256,7 @@ func (a *ManueAI) getImmediateScoreChangesDists(
 
 		scene, err := estimator.NewScene(state, &me, &horaPlayer)
 		if err != nil {
-			panic("TODO: 適切なメッセージを出す")
+			panic(err)
 		}
 
 		tenpaiProb := a.tenpaiProbEstimator.Estimate(&horaPlayer, state)
@@ -293,7 +293,7 @@ func (a *ManueAI) getImmediateScoreChangesDists(
 			key := pai.ToString()
 			isAnpai, err := scene.Evaluate("anpai", &pai)
 			if err != nil {
-				panic("TODO: 適切なメッセージを出す")
+				panic(err)
 			}
 
 			var hojuProb float64
@@ -302,7 +302,7 @@ func (a *ManueAI) getImmediateScoreChangesDists(
 			} else {
 				probInfo, err := a.dangerEstimator.EstimateProb(scene, &pai)
 				if err != nil {
-					panic("TODO: 適切なメッセージを出す")
+					panic(err)
 				}
 				hojuProb = tenpaiProb * probInfo.Prob
 			}
