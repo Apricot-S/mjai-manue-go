@@ -184,7 +184,7 @@ func (a *ManueAI) getSafeProbs(
 	safeProbs := make(map[string]float64, len(dahaiCandidates))
 	for _, pai := range dahaiCandidates {
 		var key string
-		if pai.IsUnknown() {
+		if !pai.IsUnknown() {
 			key = pai.ToString()
 		} else {
 			key = "none"
@@ -226,6 +226,16 @@ func (a *ManueAI) getSafeProbs(
 	}
 
 	return safeProbs, nil
+}
+
+// Distribution of score changes which happen immediately, for each possible dahai.
+// i.e., If this dahai causes hoju, score changes due to the hoju. Otherwise [0, 0, 0, 0].
+func (a *ManueAI) getImmediateScoreChangesDists(
+	state game.StateViewer,
+	playerID int,
+	dahaiCandidates []game.Pai,
+) {
+
 }
 
 func (a *ManueAI) getRyukyokuProbOnMyNoHora(state game.StateViewer) float64 {
