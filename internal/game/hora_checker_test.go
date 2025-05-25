@@ -14,14 +14,70 @@ func TestIsHoraForm(t *testing.T) {
 	type args struct {
 		ps *PaiSet
 	}
-	tests := []struct {
+	type testCase struct {
 		name    string
 		args    args
 		want    bool
 		wantErr bool
-	}{
-		// TODO: Add test cases.
 	}
+	tests := []testCase{}
+
+	{
+		paiStr := "3m 3m 1p 2p 3p 1s 2s 3s 4s 5s 6s 7s 8s 9s"
+		ps := convertStrToPaiSetForTest(paiStr)
+		tests = append(tests, testCase{name: paiStr, args: args{ps: ps}, want: true, wantErr: false})
+	}
+	{
+		paiStr := "1m 1m E E E"
+		ps := convertStrToPaiSetForTest(paiStr)
+		tests = append(tests, testCase{name: paiStr, args: args{ps: ps}, want: true, wantErr: false})
+	}
+	{
+		paiStr := "1p 2p 3p 4p 5p 1s 2s 3s 4s 5s 6s 7s 8s 9s"
+		ps := convertStrToPaiSetForTest(paiStr)
+		tests = append(tests, testCase{name: paiStr, args: args{ps: ps}, want: false, wantErr: false})
+	}
+	{
+		paiStr := "2p 2p 2p 2s 3s 4s 6s 7s"
+		ps := convertStrToPaiSetForTest(paiStr)
+		tests = append(tests, testCase{name: paiStr, args: args{ps: ps}, want: false, wantErr: false})
+	}
+	{
+		paiStr := "1p 1p 9p 9p 1s 1s 3s 3s 5s 5s 7s 7s 9s 9s"
+		ps := convertStrToPaiSetForTest(paiStr)
+		tests = append(tests, testCase{name: paiStr, args: args{ps: ps}, want: true, wantErr: false})
+	}
+	{
+		paiStr := "1p 1p 1p 1p 3p 3p 4p 4p 5p 5p 6p 6p 7p 7p"
+		ps := convertStrToPaiSetForTest(paiStr)
+		tests = append(tests, testCase{name: paiStr, args: args{ps: ps}, want: false, wantErr: false})
+	}
+	{
+		paiStr := "1m 9m 1p 9p 1s 9s E S W N P F C C"
+		ps := convertStrToPaiSetForTest(paiStr)
+		tests = append(tests, testCase{name: paiStr, args: args{ps: ps}, want: true, wantErr: false})
+	}
+	{
+		paiStr := "1m 2m 9m 1p 9p 1s 9s E S W N P F C"
+		ps := convertStrToPaiSetForTest(paiStr)
+		tests = append(tests, testCase{name: paiStr, args: args{ps: ps}, want: false, wantErr: false})
+	}
+	{
+		paiStr := "3m 3m 3m 1p 2p 3p 1s 2s 3s 4s 5s 6s 7s 8s 9s"
+		ps := convertStrToPaiSetForTest(paiStr)
+		tests = append(tests, testCase{name: paiStr, args: args{ps: ps}, want: false, wantErr: true})
+	}
+	{
+		paiStr := ""
+		ps := convertStrToPaiSetForTest(paiStr)
+		tests = append(tests, testCase{name: paiStr, args: args{ps: ps}, want: false, wantErr: true})
+	}
+	{
+		paiStr := "1p 1p 1p 1p 1p 1s 2s 3s 4s 5s 6s 7s 8s 9s"
+		ps := convertStrToPaiSetForTest(paiStr)
+		tests = append(tests, testCase{name: paiStr, args: args{ps: ps}, want: false, wantErr: true})
+	}
+
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			got, err := IsHoraForm(tt.args.ps)
