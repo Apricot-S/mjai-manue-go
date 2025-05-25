@@ -232,6 +232,37 @@ func (a *ManueAI) getRyukyokuProbOnMyNoHora(state game.StateViewer) float64 {
 	return math.Pow(a.getRyukyokuProb(state), 3.0/4.0)
 }
 
+func (a *ManueAI) getRandomHoraScoreChangesDist(
+	state game.StateViewer,
+	playerID int,
+	actor *game.Player,
+) *core.ProbDist[[]float64] {
+	var horaPointsFreqs map[string]int
+	if actor.ID() == state.Oya().ID() {
+		horaPointsFreqs = a.stats.OyaHoraPointsFreqs
+	} else {
+		horaPointsFreqs = a.stats.KoHoraPointsFreqs
+	}
+
+	hm := core.NewHashMap[float64]()
+	totalFreqs := float64(horaPointsFreqs["total"])
+	for points, freq := range horaPointsFreqs {
+		if points == "total" {
+			continue
+		}
+		p, err := strconv.ParseFloat(points, 64)
+		if err != nil {
+			panic("Invalid stats file: failed to convert key of horaPointsFreqs to float64 (" + points + ").")
+		}
+		f := float64(freq) / totalFreqs
+		hm.Set(p, f)
+	}
+
+	horaPointsDist := core.NewProbDist(hm)
+	horaFactorsDist := a.getHoraFactorsDist(state, playerID, actor)
+	return core.Mult[float64, []float64, []float64](horaPointsDist, horaFactorsDist)
+}
+
 func (a *ManueAI) getHoraFactorsDist(
 	state game.StateViewer,
 	playerID int,
