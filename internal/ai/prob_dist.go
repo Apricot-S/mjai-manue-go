@@ -1,8 +1,10 @@
 package ai
 
 import (
+	"fmt"
 	"math"
 	"strconv"
+	"strings"
 
 	"github.com/Apricot-S/mjai-manue-go/internal/ai/core"
 	"github.com/Apricot-S/mjai-manue-go/internal/ai/estimator"
@@ -290,6 +292,18 @@ func (a *ManueAI) getHoraFactors(state game.StateViewer, actor, target *game.Pla
 		}
 	}
 	return horaFactors
+}
+
+func (a *ManueAI) printTenpaiProbs(state game.StateViewer, playerID int) {
+	var output strings.Builder
+	output.WriteString("tenpaiProbs:  ")
+	for _, p := range state.Players() {
+		if p.ID() != playerID {
+			fmt.Fprintf(&output, "%d: %.3f  ", p.ID(), a.tenpaiProbEstimator.Estimate(&p, state))
+		}
+	}
+	output.WriteString("\n")
+	a.log(output.String())
 }
 
 func (a *ManueAI) getNumExpectedRemainingTurns(state game.StateViewer) int {
