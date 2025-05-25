@@ -452,3 +452,44 @@ func (a *ManueAI) getRyukyokuProb(state game.StateViewer) float64 {
 	}
 	return a.stats.RyukyokuRatio / den
 }
+
+func (a *ManueAI) getAverageRank(
+	state game.StateViewer,
+	playerID int,
+	scoreChangesDist *core.ProbDist[[]float64],
+) float64 {
+	hm1 := core.NewHashMap[[]float64]()
+	hm1.Set([]float64{0.0, 0.0, 0.0, 0.0}, 1.0)
+	winsDist := core.NewProbDist(hm1)
+	for _, other := range state.Players() {
+		if other.ID() == playerID {
+			continue
+		}
+		winProb := a.getWinProb(state, playerID, scoreChangesDist, &other)
+		hm2 := core.NewHashMap[[]float64]()
+		hm2.Set([]float64{0.0, 0.0, 0.0, 0.0}, 1-winProb)
+		w := []float64{0.0, 0.0, 0.0, 0.0}
+		w[other.ID()] = 1.0
+		hm2.Set(w, winProb)
+		d := core.NewProbDist(hm2)
+		winsDist = core.Add[[]float64, []float64, []float64](winsDist, d)
+	}
+
+	rankDist := winsDist.MapValue2(func(wins []float64) float64 {
+		c, _ := core.Count(wins, func(w float64) (bool, error) {
+			// Since w == 1.0 is problematic, a threshold is tentatively set
+			return math.Abs(w-1.0) < 1e-5, nil
+		})
+		return float64(4 - c)
+	})
+	return rankDist.Expected()
+}
+
+func (a *ManueAI) getWinProb(
+	state game.StateViewer,
+	playerID int,
+	scoreChangesDist *core.ProbDist[[]float64],
+	other *game.Player,
+) float64 {
+	panic("unimplemented")
+}

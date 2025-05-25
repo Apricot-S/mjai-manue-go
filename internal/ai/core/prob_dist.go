@@ -61,6 +61,15 @@ func (p *ProbDist[T]) MapValue(mapper func(T) T) *ProbDist[T] {
 	return &ProbDist[T]{dist: dist}
 }
 
+func (p *ProbDist[T]) MapValue2(mapper func(T) float64) *ProbDist[float64] {
+	dist := NewHashMap[float64]()
+	p.dist.ForEach(func(v T, p float64) {
+		newValue := mapper(v)
+		dist.Set(newValue, dist.Get(newValue, 0.0)+p)
+	})
+	return &ProbDist[float64]{dist: dist}
+}
+
 // Returns probability distribution of sum of two random variables assuming these two are independent.
 func Add[T, U, V HashMapKey](lhs *ProbDist[T], rhs *ProbDist[U]) *ProbDist[V] {
 	dist := NewHashMap[V]()
