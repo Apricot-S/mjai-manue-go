@@ -523,12 +523,12 @@ func (a *ManueAI) getWinProbFromRelativeScore(
 	// abs(relativeScore) is so big that statistics are missing,
 	// or the current kyoku is S-4 (orasu).
 	if myPos < otherPos {
-		if relativeScore >= 0 {
+		if relativeScore >= 0.0 {
 			return 1.0
 		}
 		return 0.0
 	}
-	if relativeScore > 0 {
+	if relativeScore > 0.0 {
 		return 1.0
 	}
 	return 0.0
