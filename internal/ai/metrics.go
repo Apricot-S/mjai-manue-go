@@ -239,6 +239,7 @@ func (a *ManueAI) getHoraEstimation(
 							pointsVector[pid] = g.points
 							yakuToFanVector[pid] = nil
 						}
+						// TODO: Implement yakus
 					}
 				}
 			}
