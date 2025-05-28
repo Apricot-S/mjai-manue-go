@@ -17,14 +17,27 @@ type goal struct {
 }
 
 type metric struct {
-	horaProb           float64
-	safeProb           float64
-	hojuProb           float64
-	averageHoraPoints  float64
-	horaPointsDist     *core.ProbDist[float64]
-	expectedHoraPoints float64
-	shanten            int
-	red                bool
+	horaProb                   float64
+	safeProb                   float64
+	hojuProb                   float64
+	ryukyokuProb               float64
+	othersHoraProb             float64
+	averageHoraPoints          float64
+	ryukyokuAveragePoints      float64
+	horaPointsDist             *core.ProbDist[[]float64]
+	immediateScoreChangesDist  *core.ProbDist[[]float64]
+	futureScoreChangesDist     *core.ProbDist[[]float64]
+	scoreChangesDist           *core.ProbDist[[]float64]
+	scoreChangesDistOnHora     *core.ProbDist[[]float64]
+	scoreChangesDistOnRyukyoku *core.ProbDist[[]float64]
+	expectedPoints             float64
+	expectedHoraPoints         float64
+	safeExpectedPoints         float64
+	unsafeExpectedPoints       float64
+	ryukyokuExpectedPoints     float64
+	averageRank                float64
+	shanten                    int
+	red                        bool
 }
 
 type metrics map[string]metric
@@ -42,6 +55,111 @@ func (a *ManueAI) getMetrics(
 ) (pai *game.Pai, isReach bool, err error) {
 	// TODO: Implement logic.
 	return &dahaiCandidates[len(dahaiCandidates)-1], false, nil
+}
+
+// horaProb: P(hora | this dahai doesn't cause hoju)
+// averageHoraPoints: Average hora points assuming I hora
+// horaPointsDist: Distribution of hora points assuming I hora
+// expectedHoraPoints: Expected hora points assuming this dahai doesn't cause hoju
+// shanten: Shanten number
+func (a *ManueAI) getMetricsInternal(
+	state game.StateViewer,
+	playerID int,
+	tehais game.Pais,
+	furos []game.Furo,
+	dahaiCandidates []game.Pai,
+	reach bool,
+) (metrics, error) {
+	ps, err := game.NewPaiSetWithPais(tehais)
+	if err != nil {
+		return nil, err
+	}
+	shanten, goals, err := game.AnalyzeShantenWithOption(ps, 1, 8)
+	if err != nil {
+		return nil, err
+	}
+
+	safeProbs, err := a.getSafeProbs(state, playerID, dahaiCandidates)
+	if err != nil {
+		return nil, err
+	}
+	immediateScoreChangesDists := a.getImmediateScoreChangesDists(state, playerID, dahaiCandidates)
+	ms, err := a.getHoraEstimation(state, playerID, dahaiCandidates, shanten, goals, reach)
+	if err != nil {
+		return nil, err
+	}
+
+	tenpaiRyukyokuAveragePoints := a.getRyukyokuAveragePoints(state, playerID, true)
+	notenRyukyokuAveragePoints := a.getRyukyokuAveragePoints(state, playerID, false)
+	ryukyokuProb := a.getRyukyokuProb(state)
+	ryukyokuProbOnMyNoHora := a.getRyukyokuProbOnMyNoHora(state)
+
+	scoreChangesDistOnRyukyokuIfTenpaiNow := a.getScoreChangesDistOnRyukyoku(state, playerID, true)
+	scoreChangesDistOnRyukyokuIfNotenNow := a.getScoreChangesDistOnRyukyoku(state, playerID, false)
+	scoreChangesDistsOnOtherHora := make([]*core.ProbDist[[]float64], 0, 3)
+	for _, p := range state.Players() {
+		if p.ID() == playerID {
+			continue
+		}
+		d := a.getRandomHoraScoreChangesDist(state, playerID, &p)
+		scoreChangesDistsOnOtherHora = append(scoreChangesDistsOnOtherHora, d)
+	}
+
+	for _, pai := range dahaiCandidates {
+		var key string
+		if pai.IsUnknown() {
+			key = "none"
+		} else {
+			key = pai.ToString()
+		}
+		m := ms[key]
+		m.red = pai.IsRed()
+		m.safeProb = safeProbs[key]
+		m.hojuProb = 1.0 - m.safeProb
+		m.safeExpectedPoints = m.safeProb * m.expectedHoraPoints
+		m.unsafeExpectedPoints = -(1.0 - m.safeProb) * a.stats.AverageHoraPoints
+		m.ryukyokuProb = ryukyokuProb
+		if m.shanten <= 0 {
+			m.ryukyokuAveragePoints = tenpaiRyukyokuAveragePoints
+		} else {
+			m.ryukyokuAveragePoints = notenRyukyokuAveragePoints
+		}
+		m.ryukyokuExpectedPoints = m.safeProb * ryukyokuProb * m.ryukyokuAveragePoints
+
+		m.immediateScoreChangesDist = immediateScoreChangesDists[key]
+		if m.shanten <= 0 {
+			m.scoreChangesDistOnRyukyoku = scoreChangesDistOnRyukyokuIfTenpaiNow
+		} else {
+			m.scoreChangesDistOnRyukyoku = scoreChangesDistOnRyukyokuIfNotenNow
+		}
+		m.scoreChangesDistOnHora = a.getScoreChangesDistOnHora(state, playerID, m.horaPointsDist)
+
+		m.ryukyokuProb = (1.0 - m.horaProb) * ryukyokuProbOnMyNoHora
+		m.othersHoraProb = (1.0 - m.horaProb) * (1.0 - ryukyokuProbOnMyNoHora)
+
+		myHoraItem := core.WeightedProbDist[[]float64]{Pd: m.scoreChangesDistOnHora, Prob: m.horaProb}
+		ryukyokuItem := core.WeightedProbDist[[]float64]{Pd: m.scoreChangesDistOnRyukyoku, Prob: m.ryukyokuProb}
+		var otherHoraItems [3]core.WeightedProbDist[[]float64]
+		for i, d := range scoreChangesDistsOnOtherHora {
+			otherHoraItems[i] = core.WeightedProbDist[[]float64]{Pd: d, Prob: m.othersHoraProb / 3.0}
+		}
+		items := []core.WeightedProbDist[[]float64]{
+			myHoraItem,
+			ryukyokuItem,
+			otherHoraItems[0],
+			otherHoraItems[1],
+			otherHoraItems[2],
+		}
+
+		m.futureScoreChangesDist = core.Merge(items)
+		m.scoreChangesDist = m.immediateScoreChangesDist.Replace(a.noChanges[:], m.futureScoreChangesDist)
+		m.expectedPoints = m.scoreChangesDist.Expected()[playerID]
+		m.averageRank = a.getAverageRank(state, playerID, m.scoreChangesDist)
+
+		ms[key] = m
+	}
+
+	return ms, nil
 }
 
 func (a *ManueAI) getHoraEstimation(
@@ -88,13 +206,13 @@ func (a *ManueAI) getHoraEstimation(
 	numTsumos := a.getNumExpectedRemainingTurns(state)
 	// Uses a fixed seed to get a reproducable result, and to make the result comparable
 	// e.g., with and without reach.
-	rng := createRNG()
+	rng := core.CreateRNG()
 	totalHoraVector := [game.NumIDs + 1]int{}
 	totalPointsVector := [game.NumIDs + 1]int{}
 	totalPointsFreqsVector := [game.NumIDs + 1]map[int]int{}
 	totalYakuToFanVector := [game.NumIDs + 1]map[string]int{}
 	for range numTries {
-		shuffleWall(rng, &invisiblePais)
+		core.ShuffleWall(rng, &invisiblePais)
 		tsumoPais := make(game.Pais, numTsumos)
 		copy(tsumoPais, invisiblePais[:numTsumos])
 		tsumoVector, err := game.NewPaiSetWithPais(tsumoPais)
@@ -166,16 +284,13 @@ func (a *ManueAI) getHoraEstimation(
 			key = pai.ToString()
 		}
 
-		hm := core.NewHashMap[float64]()
+		hm := core.NewHashMap[[]float64]()
 		m := metric{
 			horaProb:           float64(totalHoraVector[pid]) / numTriesFloat,
-			safeProb:           0.0,
-			hojuProb:           0.0,
 			averageHoraPoints:  float64(totalPointsVector[pid]) / float64(totalHoraVector[pid]),
 			horaPointsDist:     core.NewProbDist(hm),
 			expectedHoraPoints: float64(totalPointsVector[pid]) / numTriesFloat,
 			shanten:            shantenVector[pid],
-			red:                false,
 		}
 		ms[key] = m
 	}
