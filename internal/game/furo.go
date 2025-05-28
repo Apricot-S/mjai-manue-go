@@ -10,6 +10,7 @@ type Furo interface {
 	Consumed() []Pai
 	Target() *int
 	Pais() []Pai
+	ToMentsu() Mentsu
 }
 
 type Chi struct {
@@ -51,6 +52,10 @@ func (c *Chi) Pais() []Pai {
 	return c.pais
 }
 
+func (c *Chi) ToMentsu() Mentsu {
+	return NewShuntsu(c.pais[0], c.pais[1], c.pais[2])
+}
+
 type Pon struct {
 	taken    Pai
 	consumed [2]Pai
@@ -88,6 +93,10 @@ func (p *Pon) Target() *int {
 
 func (p *Pon) Pais() []Pai {
 	return p.pais
+}
+
+func (p *Pon) ToMentsu() Mentsu {
+	return NewKotsu(p.pais[0], p.pais[1], p.pais[2])
 }
 
 type Daiminkan struct {
@@ -129,6 +138,10 @@ func (d *Daiminkan) Pais() []Pai {
 	return d.pais
 }
 
+func (d *Daiminkan) ToMentsu() Mentsu {
+	return NewKantsu(d.pais[0], d.pais[1], d.pais[2], d.pais[3])
+}
+
 type Ankan struct {
 	consumed [4]Pai
 	pais     []Pai
@@ -158,6 +171,10 @@ func (a *Ankan) Target() *int {
 
 func (a *Ankan) Pais() []Pai {
 	return a.pais
+}
+
+func (a *Ankan) ToMentsu() Mentsu {
+	return NewKantsu(a.pais[0], a.pais[1], a.pais[2], a.pais[3])
 }
 
 type Kakan struct {
@@ -207,4 +224,8 @@ func (k *Kakan) Target() *int {
 
 func (k *Kakan) Pais() []Pai {
 	return k.pais
+}
+
+func (k *Kakan) ToMentsu() Mentsu {
+	return NewKantsu(k.pais[0], k.pais[1], k.pais[2], k.pais[3])
 }

@@ -353,3 +353,32 @@ func TestNewKakan(t *testing.T) {
 		})
 	}
 }
+
+func TestChi_ToMentsu(t *testing.T) {
+	type fields struct {
+		taken    Pai
+		consumed [2]Pai
+		target   int
+		pais     []Pai
+	}
+	tests := []struct {
+		name   string
+		fields fields
+		want   Mentsu
+	}{
+		// TODO: Add test cases.
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			c := &Chi{
+				taken:    tt.fields.taken,
+				consumed: tt.fields.consumed,
+				target:   tt.fields.target,
+				pais:     tt.fields.pais,
+			}
+			if got := c.ToMentsu(); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("Chi.ToMentsu() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
