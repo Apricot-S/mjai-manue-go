@@ -372,10 +372,8 @@ func (a *ManueAI) getHoraEstimation(
 	totalHoraVector := [game.NumIDs + 1]int{}
 	totalPointsVector := [game.NumIDs + 1]int{}
 	totalPointsFreqsVector := [game.NumIDs + 1]map[int]int{}
-	totalYakuToFanVector := [game.NumIDs + 1]map[string]int{}
 	for pid := range game.NumIDs + 1 {
 		totalPointsFreqsVector[pid] = make(map[int]int)
-		totalYakuToFanVector[pid] = make(map[string]int)
 	}
 
 	for range numTries {
@@ -389,10 +387,6 @@ func (a *ManueAI) getHoraEstimation(
 		tsumoBitVectors := core.CountVectorToBitVectors(tsumoVector)
 		horaVector := [game.NumIDs + 1]int{}
 		pointsVector := [game.NumIDs + 1]int{}
-		yakuToFanVector := [game.NumIDs + 1]map[string]int{}
-		for pid := range game.NumIDs + 1 {
-			yakuToFanVector[pid] = make(map[string]int)
-		}
 
 		for _, g := range gs {
 			achieved := true
@@ -411,8 +405,6 @@ func (a *ManueAI) getHoraEstimation(
 					horaVector[pid] = 1
 					if g.points > pointsVector[pid] {
 						pointsVector[pid] = g.points
-						yakuToFanVector[pid] = nil
-						// TODO: Implement yakus
 					}
 				}
 			}
@@ -429,9 +421,6 @@ func (a *ManueAI) getHoraEstimation(
 				totalPointsFreqsVector[pid][points] = 0
 			}
 			totalPointsFreqsVector[pid][points]++
-			for name, fan := range yakuToFanVector[pid] {
-				totalYakuToFanVector[pid][name] += fan
-			}
 		}
 	}
 
