@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"slices"
+	"strings"
 
 	"github.com/Apricot-S/mjai-manue-go/internal/ai/core"
 	"github.com/Apricot-S/mjai-manue-go/internal/game"
@@ -204,10 +205,123 @@ func (a *ManueAI) getMetricsInternal(
 }
 
 func (a *ManueAI) chooseBestMetric(ms metrics, preferBlack bool) string {
-	return ""
+	bestKey := ""
+	var bestMetric metric
+	for key, m := range ms {
+		if bestKey == "" {
+			bestKey = key
+			bestMetric = m
+		}
+		if a.compareMetric(&m, &bestMetric, preferBlack) < 0 {
+			bestKey = key
+			bestMetric = m
+		}
+	}
+	return bestKey
+}
+
+func (a *ManueAI) compareMetric(lhs, rhs *metric, preferBlack bool) int {
+	if lhs.averageRank < rhs.averageRank {
+		return -1
+	}
+	if lhs.averageRank > rhs.averageRank {
+		return 1
+	}
+	if lhs.expectedPoints > rhs.expectedPoints {
+		return -1
+	}
+	if lhs.expectedPoints < rhs.expectedPoints {
+		return 1
+	}
+	if preferBlack {
+		if !lhs.red && rhs.red {
+			return -1
+		}
+		if lhs.red && !rhs.red {
+			return 1
+		}
+	}
+	return 0
 }
 
 func (a *ManueAI) printMetrics(ms metrics) {
+	if len(ms) == 0 {
+		return
+	}
+
+	type keyValue struct {
+		key string
+		m   metric
+	}
+	sortedMetrics := make([]keyValue, 0, len(ms))
+	for k, m := range ms {
+		sortedMetrics = append(sortedMetrics, keyValue{k, m})
+	}
+	slices.SortFunc(sortedMetrics, func(kv1, kv2 keyValue) int {
+		return a.compareMetric(&kv1.m, &kv2.m, true)
+	})
+
+	columns := []struct {
+		Header string
+		Format string
+	}{
+		{"action", "%s"},
+		{"avgRank", "%.4f"},
+		{"expPt", "%.0f"},
+		{"hojuProb", "%.3f"},
+		{"myHoraProb", "%.3f"},
+		{"ryukyokuProb", "%.3f"},
+		{"otherHoraProb", "%.3f"},
+		{"avgHoraPt", "%.0f"},
+		{"ryukyokuAvgPt", "%.0f"},
+		{"shanten", "%d"},
+	}
+
+	table := make([][]string, 0, len(sortedMetrics)+1)
+	header := make([]string, len(columns))
+	for i, col := range columns {
+		header[i] = col.Header
+	}
+	table = append(table, header)
+
+	for _, kv := range sortedMetrics {
+		row := make([]string, len(columns))
+		row[0] = fmt.Sprintf(columns[0].Format, kv.key)
+		row[1] = fmt.Sprintf(columns[1].Format, kv.m.averageRank)
+		row[2] = fmt.Sprintf(columns[2].Format, kv.m.expectedPoints)
+		row[3] = fmt.Sprintf(columns[3].Format, kv.m.hojuProb)
+		row[4] = fmt.Sprintf(columns[4].Format, kv.m.horaProb)
+		row[5] = fmt.Sprintf(columns[5].Format, kv.m.ryukyokuProb)
+		row[6] = fmt.Sprintf(columns[6].Format, kv.m.othersHoraProb)
+		row[7] = fmt.Sprintf(columns[7].Format, kv.m.averageHoraPoints)
+		row[8] = fmt.Sprintf(columns[8].Format, kv.m.ryukyokuAveragePoints)
+		row[9] = fmt.Sprintf(columns[9].Format, kv.m.shanten)
+		table = append(table, row)
+	}
+
+	a.log(formatArraysAsTable(table) + "\n")
+}
+
+func formatArraysAsTable(arrays [][]string) string {
+	if len(arrays) == 0 || len(arrays[0]) == 0 {
+		return ""
+	}
+	widths := make([]int, len(arrays[0]))
+	for _, array := range arrays {
+		for i, val := range array {
+			widths[i] = max(widths[i], len(val))
+		}
+	}
+	var sb strings.Builder
+	for _, array := range arrays {
+		sb.WriteString("| ")
+		for i, val := range array {
+			w := widths[i]
+			sb.WriteString(fmt.Sprintf("%*s | ", w, val))
+		}
+		sb.WriteString("\n")
+	}
+	return sb.String()
 }
 
 func (a *ManueAI) getHoraEstimation(
