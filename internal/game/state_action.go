@@ -115,10 +115,6 @@ func (s *StateImpl) IsTsumoPai(pai *Pai) bool {
 	return pai.ID() == tehais[len(tehais)-1].ID()
 }
 
-func (s *StateImpl) ForbiddenDahais() []Pai {
-	return s.kuikaePais
-}
-
 func (s *StateImpl) FuroCandidates() ([]Furo, error) {
 	if s.lastActor == noActor || s.lastActor == s.playerID {
 		// Furo is not possible if the last actor is the player itself or no actor.
