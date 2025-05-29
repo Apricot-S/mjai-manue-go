@@ -355,28 +355,35 @@ func TestNewKakan(t *testing.T) {
 }
 
 func TestChi_ToMentsu(t *testing.T) {
-	type fields struct {
-		taken    Pai
-		consumed [2]Pai
-		target   int
-		pais     []Pai
+	type testCase struct {
+		name string
+		chi  *Chi
+		want *Shuntsu
 	}
-	tests := []struct {
-		name   string
-		fields fields
-		want   Mentsu
-	}{
-		// TODO: Add test cases.
+	tests := []testCase{}
+
+	for _, strs := range [][2]string{{"1m", "2m 3m"}, {"1m", "3m 2m"}, {"5mr", "4m 6m"}} {
+		taken, _ := NewPaiWithName(strs[0])
+		consumed, _ := StrToPais(strs[1])
+		target := 0
+		chi, _ := NewChi(*taken, [2]Pai(consumed), target)
+
+		pais := Pais{*taken, consumed[0], consumed[1]}
+		sort.Sort(pais)
+		want := Shuntsu{pais[0], pais[1], pais[2]}
+
+		testCase := testCase{
+			name: fmt.Sprintf("chi %s %s", strs[0], strs[1]),
+			chi:  chi,
+			want: &want,
+		}
+		tests = append(tests, testCase)
 	}
+
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			c := &Chi{
-				taken:    tt.fields.taken,
-				consumed: tt.fields.consumed,
-				target:   tt.fields.target,
-				pais:     tt.fields.pais,
-			}
-			if got := c.ToMentsu(); !reflect.DeepEqual(got, tt.want) {
+			got := tt.chi.ToMentsu()
+			if !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("Chi.ToMentsu() = %v, want %v", got, tt.want)
 			}
 		})
