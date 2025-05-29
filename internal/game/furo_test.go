@@ -389,3 +389,145 @@ func TestChi_ToMentsu(t *testing.T) {
 		})
 	}
 }
+
+func TestPon_ToMentsu(t *testing.T) {
+	type testCase struct {
+		name string
+		pon  *Pon
+		want *Kotsu
+	}
+	tests := []testCase{}
+
+	for _, strs := range [][2]string{{"E", "E E"}, {"5mr", "5m 5m"}, {"5p", "5pr 5p"}, {"5s", "5s 5sr"}} {
+		taken, _ := NewPaiWithName(strs[0])
+		consumed, _ := StrToPais(strs[1])
+		target := 0
+		pon, _ := NewPon(*taken, [2]Pai(consumed), target)
+
+		pais := Pais{*taken, consumed[0], consumed[1]}
+		sort.Sort(pais)
+		want := Kotsu{pais[0], pais[1], pais[2]}
+
+		testCase := testCase{
+			name: fmt.Sprintf("pon %s %s", strs[0], strs[1]),
+			pon:  pon,
+			want: &want,
+		}
+		tests = append(tests, testCase)
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := tt.pon.ToMentsu()
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("Pon.ToMentsu() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestDaiminkan_ToMentsu(t *testing.T) {
+	type testCase struct {
+		name      string
+		daiminkan *Daiminkan
+		want      *Kantsu
+	}
+	tests := []testCase{}
+
+	for _, strs := range [][2]string{{"E", "E E E"}, {"5mr", "5m 5m 5m"}, {"5p", "5pr 5p 5p"}, {"5s", "5s 5sr 5s"}, {"5s", "5s 5s 5sr"}} {
+		taken, _ := NewPaiWithName(strs[0])
+		consumed, _ := StrToPais(strs[1])
+		target := 0
+		daiminkan, _ := NewDaiminkan(*taken, [3]Pai(consumed), target)
+
+		pais := Pais{*taken, consumed[0], consumed[1], consumed[2]}
+		sort.Sort(pais)
+		want := Kantsu{pais[0], pais[1], pais[2], pais[3]}
+
+		testCase := testCase{
+			name:      fmt.Sprintf("daiminkan %s %s", strs[0], strs[1]),
+			daiminkan: daiminkan,
+			want:      &want,
+		}
+		tests = append(tests, testCase)
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := tt.daiminkan.ToMentsu()
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("Daiminkan.ToMentsu() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestAnkan_ToMentsu(t *testing.T) {
+	type testCase struct {
+		name  string
+		ankan *Ankan
+		want  *Kantsu
+	}
+	tests := []testCase{}
+
+	for _, strs := range []string{"E E E E", "5mr 5m 5m 5m", "5p 5pr 5p 5p", "5s 5s 5sr 5s", "5s 5s 5s 5sr"} {
+		consumed, _ := StrToPais(strs)
+		ankan, _ := NewAnkan([4]Pai(consumed))
+
+		pais := Pais{consumed[0], consumed[1], consumed[2], consumed[3]}
+		sort.Sort(pais)
+		want := Kantsu{pais[0], pais[1], pais[2], pais[3]}
+
+		testCase := testCase{
+			name:  fmt.Sprintf("ankan %s", strs),
+			ankan: ankan,
+			want:  &want,
+		}
+		tests = append(tests, testCase)
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := tt.ankan.ToMentsu()
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("Ankan.ToMentsu() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestKakan_ToMentsu(t *testing.T) {
+	type testCase struct {
+		name  string
+		kakan *Kakan
+		want  *Kantsu
+	}
+	tests := []testCase{}
+
+	for _, strs := range [][2]string{{"E", "E E E"}, {"5mr", "5m 5m 5m"}, {"5p", "5pr 5p 5p"}, {"5s", "5s 5sr 5s"}, {"5s", "5s 5s 5sr"}} {
+		taken, _ := NewPaiWithName(strs[0])
+		consumed, _ := StrToPais(strs[1])
+		target := 0
+		kakan, _ := NewKakan(*taken, [3]Pai(consumed), &target)
+
+		pais := Pais{*taken, consumed[0], consumed[1], consumed[2]}
+		sort.Sort(pais)
+		want := Kantsu{pais[0], pais[1], pais[2], pais[3]}
+
+		testCase := testCase{
+			name:  fmt.Sprintf("kakan %s %s", strs[0], strs[1]),
+			kakan: kakan,
+			want:  &want,
+		}
+		tests = append(tests, testCase)
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := tt.kakan.ToMentsu()
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("Kakan.ToMentsu() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
