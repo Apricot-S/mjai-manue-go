@@ -14,7 +14,7 @@ import (
 func (a *ManueAI) getScoreChangesDistOnHora(
 	state game.StateViewer,
 	playerID int,
-	horaPointsDist *core.ProbDist[[]float64],
+	horaPointsDist *core.ProbDist[float64],
 ) *core.ProbDist[[]float64] {
 	tsumoHoraProb := float64(a.stats.NumTsumoHoras) / float64(a.stats.NumHoras)
 	unitDistMap := core.NewHashMap[[]float64]()
@@ -44,7 +44,7 @@ func (a *ManueAI) getScoreChangesDistOnHora(
 	}
 
 	u := core.NewProbDist(unitDistMap)
-	return core.Mult[[]float64, []float64, []float64](horaPointsDist, u)
+	return core.Mult[float64, []float64, []float64](horaPointsDist, u)
 }
 
 func (a *ManueAI) getRyukyokuAveragePoints(

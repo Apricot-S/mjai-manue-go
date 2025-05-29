@@ -107,7 +107,6 @@ func (a *ManueAI) DecideAction(state game.StateAnalyzer, playerID int) (jsontext
 func (a *ManueAI) decideDahai(state game.StateAnalyzer, playerID int) (jsontext.Value, error) {
 	dc := state.DahaiCandidates()
 	rdc, err := state.ReachDahaiCandidates()
-	fd := state.ForbiddenDahais()
 	if err != nil {
 		return nil, err
 	}
@@ -132,7 +131,7 @@ func (a *ManueAI) decideDahai(state game.StateAnalyzer, playerID int) (jsontext.
 		return res, nil
 	}
 
-	pai, isReach, err := a.getMetrics(state, playerID, dc, rdc, fd)
+	pai, isReach, err := a.getMetrics(state, playerID, dc, rdc)
 	if err != nil {
 		return nil, err
 	}

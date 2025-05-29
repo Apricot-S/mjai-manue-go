@@ -24,7 +24,7 @@ type metric struct {
 	othersHoraProb             float64
 	averageHoraPoints          float64
 	ryukyokuAveragePoints      float64
-	horaPointsDist             *core.ProbDist[[]float64]
+	horaPointsDist             *core.ProbDist[float64]
 	immediateScoreChangesDist  *core.ProbDist[[]float64]
 	futureScoreChangesDist     *core.ProbDist[[]float64]
 	scoreChangesDist           *core.ProbDist[[]float64]
@@ -51,10 +51,48 @@ func (a *ManueAI) getMetrics(
 	playerID int,
 	dahaiCandidates []game.Pai,
 	reachDahaiCandidates []game.Pai,
-	forbiddenDahais []game.Pai,
 ) (pai *game.Pai, isReach bool, err error) {
-	// TODO: Implement logic.
+	player := state.Players()[playerID]
+	tehais := player.Tehais()
+	furos := player.Furos()
+	canReach := len(dahaiCandidates) != 0 && len(reachDahaiCandidates) != 0
+	reachDeclared := player.ReachState() == game.Declared
+
+	ms := make(metrics)
+	if canReach {
+		nowMetrics, err := a.getMetricsInternal(state, playerID, tehais, furos, reachDahaiCandidates, true)
+		if err != nil {
+			return nil, false, err
+		}
+		ms = mergeMetrics(ms, 0, nowMetrics)
+
+		neverMetrics, err := a.getMetricsInternal(state, playerID, tehais, furos, dahaiCandidates, false)
+		if err != nil {
+			return nil, false, err
+		}
+		ms = mergeMetrics(ms, -1, neverMetrics)
+	} else if reachDeclared {
+		defaultMetrics, err := a.getMetricsInternal(state, playerID, tehais, furos, reachDahaiCandidates, true)
+		if err != nil {
+			return nil, false, err
+		}
+		ms = mergeMetrics(ms, -1, defaultMetrics)
+	} else {
+		defaultMetrics, err := a.getMetricsInternal(state, playerID, tehais, furos, dahaiCandidates, false)
+		if err != nil {
+			return nil, false, err
+		}
+		ms = mergeMetrics(ms, -1, defaultMetrics)
+	}
+
 	return &dahaiCandidates[len(dahaiCandidates)-1], false, nil
+}
+
+func mergeMetrics(ms metrics, prefix int, otherMetrics metrics) metrics {
+	for key, metric := range otherMetrics {
+		ms[fmt.Sprintf("%d.%s", prefix, key)] = metric
+	}
+	return ms
 }
 
 // horaProb: P(hora | this dahai doesn't cause hoju)
@@ -231,14 +269,16 @@ func (a *ManueAI) getHoraEstimation(
 					break
 				}
 			}
-			if achieved {
-				for pid := range game.NumIDs + 1 {
-					if pid == game.NumIDs || g.ThrowableVector[pid] > 0 {
-						horaVector[pid] = 1
-						if g.points > pointsVector[pid] {
-							pointsVector[pid] = g.points
-							yakuToFanVector[pid] = nil
-						}
+			if !achieved {
+				continue
+			}
+
+			for pid := range game.NumIDs + 1 {
+				if pid == game.NumIDs || g.ThrowableVector[pid] > 0 {
+					horaVector[pid] = 1
+					if g.points > pointsVector[pid] {
+						pointsVector[pid] = g.points
+						yakuToFanVector[pid] = nil
 						// TODO: Implement yakus
 					}
 				}
@@ -285,7 +325,10 @@ func (a *ManueAI) getHoraEstimation(
 			key = pai.ToString()
 		}
 
-		hm := core.NewHashMap[[]float64]()
+		hm := core.NewHashMap[float64]()
+		for points, freq := range totalPointsFreqsVector[pid] {
+			hm.Set(float64(points), float64(freq)/float64(totalHoraVector[pid]))
+		}
 		m := metric{
 			horaProb:           float64(totalHoraVector[pid]) / numTriesFloat,
 			averageHoraPoints:  float64(totalPointsVector[pid]) / float64(totalHoraVector[pid]),
