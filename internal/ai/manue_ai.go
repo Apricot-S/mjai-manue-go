@@ -3,6 +3,7 @@ package ai
 import (
 	"fmt"
 	"os"
+	"strings"
 
 	"github.com/Apricot-S/mjai-manue-go/configs"
 	"github.com/Apricot-S/mjai-manue-go/internal/ai/estimator"
@@ -131,12 +132,20 @@ func (a *ManueAI) decideDahai(state game.StateAnalyzer, playerID int) (jsontext.
 		return res, nil
 	}
 
-	pai, isReach, err := a.getMetrics(state, playerID, dc, rdc)
+	ms, err := a.getMetrics(state, playerID, dc, rdc)
 	if err != nil {
 		return nil, err
 	}
+	a.printMetrics(ms)
+	a.printTenpaiProbs(state, playerID)
+	key := a.chooseBestMetric(ms, true)
+	fmt.Fprintf(os.Stderr, "decidedKey %s\n", key)
+	k := strings.Split(key, ".")
+	actionIdx := k[0]
+	paiStr := k[1]
 
-	if isReach {
+	reach := actionIdx == "0"
+	if reach {
 		// reach declaration
 		reach, err := message.NewReach(playerID, a.logStr)
 		if err != nil {
@@ -151,8 +160,12 @@ func (a *ManueAI) decideDahai(state game.StateAnalyzer, playerID int) (jsontext.
 	}
 
 	// dahai
+	pai, err := game.NewPaiWithName(paiStr)
+	if err != nil {
+		return nil, err
+	}
 	isTsumogiri := state.IsTsumoPai(pai)
-	dahai, err := message.NewDahai(playerID, pai.ToString(), isTsumogiri, a.logStr)
+	dahai, err := message.NewDahai(playerID, paiStr, isTsumogiri, a.logStr)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create dahai message: %w", err)
 	}

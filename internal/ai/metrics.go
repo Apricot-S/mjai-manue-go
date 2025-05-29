@@ -51,41 +51,44 @@ func (a *ManueAI) getMetrics(
 	playerID int,
 	dahaiCandidates []game.Pai,
 	reachDahaiCandidates []game.Pai,
-) (pai *game.Pai, isReach bool, err error) {
+) (metrics, error) {
 	player := state.Players()[playerID]
 	tehais := player.Tehais()
 	furos := player.Furos()
-	canReach := len(dahaiCandidates) != 0 && len(reachDahaiCandidates) != 0
-	reachDeclared := player.ReachState() == game.Declared
-
 	ms := make(metrics)
+
+	canReach := len(dahaiCandidates) != 0 && len(reachDahaiCandidates) != 0
 	if canReach {
 		nowMetrics, err := a.getMetricsInternal(state, playerID, tehais, furos, reachDahaiCandidates, true)
 		if err != nil {
-			return nil, false, err
+			return nil, err
 		}
 		ms = mergeMetrics(ms, 0, nowMetrics)
 
 		neverMetrics, err := a.getMetricsInternal(state, playerID, tehais, furos, dahaiCandidates, false)
 		if err != nil {
-			return nil, false, err
+			return nil, err
 		}
 		ms = mergeMetrics(ms, -1, neverMetrics)
-	} else if reachDeclared {
-		defaultMetrics, err := a.getMetricsInternal(state, playerID, tehais, furos, reachDahaiCandidates, true)
-		if err != nil {
-			return nil, false, err
-		}
-		ms = mergeMetrics(ms, -1, defaultMetrics)
-	} else {
-		defaultMetrics, err := a.getMetricsInternal(state, playerID, tehais, furos, dahaiCandidates, false)
-		if err != nil {
-			return nil, false, err
-		}
-		ms = mergeMetrics(ms, -1, defaultMetrics)
+		return ms, nil
 	}
 
-	return &dahaiCandidates[len(dahaiCandidates)-1], false, nil
+	reachDeclared := player.ReachState() == game.Declared
+	if reachDeclared {
+		defaultMetrics, err := a.getMetricsInternal(state, playerID, tehais, furos, reachDahaiCandidates, true)
+		if err != nil {
+			return nil, err
+		}
+		ms = mergeMetrics(ms, -1, defaultMetrics)
+		return ms, nil
+	}
+
+	defaultMetrics, err := a.getMetricsInternal(state, playerID, tehais, furos, dahaiCandidates, false)
+	if err != nil {
+		return nil, err
+	}
+	ms = mergeMetrics(ms, -1, defaultMetrics)
+	return ms, nil
 }
 
 func mergeMetrics(ms metrics, prefix int, otherMetrics metrics) metrics {
@@ -198,6 +201,13 @@ func (a *ManueAI) getMetricsInternal(
 	}
 
 	return ms, nil
+}
+
+func (a *ManueAI) chooseBestMetric(ms metrics, preferBlack bool) string {
+	return ""
+}
+
+func (a *ManueAI) printMetrics(ms metrics) {
 }
 
 func (a *ManueAI) getHoraEstimation(
