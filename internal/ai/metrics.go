@@ -373,6 +373,11 @@ func (a *ManueAI) getHoraEstimation(
 	totalPointsVector := [game.NumIDs + 1]int{}
 	totalPointsFreqsVector := [game.NumIDs + 1]map[int]int{}
 	totalYakuToFanVector := [game.NumIDs + 1]map[string]int{}
+	for pid := range game.NumIDs + 1 {
+		totalPointsFreqsVector[pid] = make(map[int]int)
+		totalYakuToFanVector[pid] = make(map[string]int)
+	}
+
 	for range numTries {
 		core.ShuffleWall(rng, &invisiblePais)
 		tsumoPais := make(game.Pais, numTsumos)
@@ -385,6 +390,10 @@ func (a *ManueAI) getHoraEstimation(
 		horaVector := [game.NumIDs + 1]int{}
 		pointsVector := [game.NumIDs + 1]int{}
 		yakuToFanVector := [game.NumIDs + 1]map[string]int{}
+		for pid := range game.NumIDs + 1 {
+			yakuToFanVector[pid] = make(map[string]int)
+		}
+
 		for _, g := range gs {
 			achieved := true
 			for i := range len(tsumoBitVectors) {
