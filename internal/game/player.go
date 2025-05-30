@@ -174,6 +174,7 @@ func (p *Player) onStartKyoku(tehais []Pai, score *int) error {
 
 	p.tehais = p.tehais[:initTehaisSize]
 	copy(p.tehais, tehais)
+	sort.Sort(p.tehais)
 	p.furos = make([]Furo, 0, maxNumFuro)
 	p.ho = make([]Pai, 0, maxNumHo)
 	p.sutehais = make([]Pai, 0, maxNumSutehais)
