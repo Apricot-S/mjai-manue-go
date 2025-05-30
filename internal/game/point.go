@@ -44,8 +44,8 @@ func TenpaisToRyukyokuPoints(tenpais [4]bool) [4]int {
 	plusPoints := 3000 / numTenpais
 	minusPoints := -3000 / (4 - numTenpais)
 	var ryukyokuPoints [4]int
-	for i := range tenpais {
-		if tenpais[i] {
+	for i, tenpai := range tenpais {
+		if tenpai {
 			ryukyokuPoints[i] = plusPoints
 		} else {
 			ryukyokuPoints[i] = minusPoints
