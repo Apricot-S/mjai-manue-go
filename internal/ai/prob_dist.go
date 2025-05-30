@@ -118,7 +118,7 @@ func (a *ManueAI) getScoreChangesDistOnRyukyoku(
 	tenpaisDist := core.NewProbDist(hm1)
 
 	for _, player := range state.Players() {
-		var currentTenpaiProb = 0.0
+		var currentTenpaiProb float64
 		if player.ID() == playerID {
 			if selfTenpai {
 				currentTenpaiProb = 1.0
