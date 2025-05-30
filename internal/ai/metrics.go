@@ -208,11 +208,7 @@ func (a *ManueAI) chooseBestMetric(ms metrics, preferBlack bool) string {
 	bestKey := ""
 	var bestMetric metric
 	for key, m := range ms {
-		if bestKey == "" {
-			bestKey = key
-			bestMetric = m
-		}
-		if a.compareMetric(&m, &bestMetric, preferBlack) < 0 {
+		if bestKey == "" || a.compareMetric(&m, &bestMetric, preferBlack) < 0 {
 			bestKey = key
 			bestMetric = m
 		}
