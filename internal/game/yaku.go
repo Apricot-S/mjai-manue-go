@@ -48,6 +48,8 @@ func CalculateFan(
 	addYaku(isChantaiyao(allMentsus), "cty", 2, 1)
 	pinfu := isPinfu(state, playerID, allMentsus)
 	addYaku(pinfu, "pf", 1, 0)
+	yakuhaiFan := sumYakuhaiFan(state, playerID, allMentsus)
+	addYaku(yakuhaiFan > 0, "ykh", yakuhaiFan, yakuhaiFan)
 
 	// TODO Calculate fu more accurately
 	if pinfu || len(furoMentsus) > 0 {
@@ -102,4 +104,17 @@ func isPinfu(state StateViewer, playerID int, allMentsus []Mentsu) bool {
 		}
 	}
 	return true
+}
+
+func sumYakuhaiFan(state StateViewer, playerID int, allMentsus []Mentsu) int {
+	player := &state.Players()[playerID]
+	fan := 0
+	for _, m := range allMentsus {
+		switch m.(type) {
+		case *Kotsu, *Kantsu:
+			pai := &m.Pais()[0]
+			fan += state.YakuhaiFan(pai, player)
+		}
+	}
+	return fan
 }
