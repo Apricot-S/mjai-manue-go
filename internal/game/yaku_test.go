@@ -333,3 +333,64 @@ func Test_isIkkiTsukan(t *testing.T) {
 		})
 	}
 }
+
+func Test_isToitoiho(t *testing.T) {
+	type args struct {
+		allMentsus []Mentsu
+	}
+	type testCase struct {
+		name string
+		args args
+		want bool
+	}
+	tests := []testCase{}
+
+	{
+		name := "is toitoiho"
+		mentsus := make([]Mentsu, 5)
+		pais1, _ := StrToPais("1m 1m 1m")
+		pais2, _ := StrToPais("2p 2p 2p")
+		pais3, _ := StrToPais("6s 6s 6s")
+		pais4, _ := StrToPais("E E E E")
+		pais5, _ := StrToPais("N N")
+		mentsus[0] = NewKotsu(pais1[0], pais1[1], pais1[2])
+		mentsus[1] = NewKotsu(pais2[0], pais2[1], pais2[2])
+		mentsus[2] = NewKotsu(pais3[0], pais3[1], pais3[2])
+		mentsus[3] = NewKantsu(pais4[0], pais4[1], pais4[2], pais4[3])
+		mentsus[4] = NewToitsu(pais5[0], pais5[1])
+
+		tests = append(tests, testCase{
+			name: name,
+			args: args{allMentsus: mentsus},
+			want: true,
+		})
+	}
+	{
+		name := "is not toitoiho"
+		mentsus := make([]Mentsu, 5)
+		pais1, _ := StrToPais("1m 1m 1m")
+		pais2, _ := StrToPais("2p 2p 2p")
+		pais3, _ := StrToPais("7m 8m 9m")
+		pais4, _ := StrToPais("E E E E")
+		pais5, _ := StrToPais("N N")
+		mentsus[0] = NewKotsu(pais1[0], pais1[1], pais1[2])
+		mentsus[1] = NewKotsu(pais2[0], pais2[1], pais2[2])
+		mentsus[2] = NewShuntsu(pais3[0], pais3[1], pais3[2])
+		mentsus[3] = NewKantsu(pais4[0], pais4[1], pais4[2], pais4[3])
+		mentsus[4] = NewToitsu(pais5[0], pais5[1])
+
+		tests = append(tests, testCase{
+			name: name,
+			args: args{allMentsus: mentsus},
+			want: false,
+		})
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := isToitoiho(tt.args.allMentsus); got != tt.want {
+				t.Errorf("isToitoiho() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}

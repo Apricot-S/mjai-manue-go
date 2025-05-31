@@ -55,6 +55,7 @@ func CalculateFan(
 	addYaku(isIpeko(allMentsus), "ipk", 1, 0)
 	addYaku(isSanshokuDojun(allMentsus), "ssj", 2, 1)
 	addYaku(isIkkiTsukan(allMentsus), "ikt", 2, 1)
+	addYaku(isToitoiho(allMentsus), "tth", 2, 2)
 
 	if fan > 0 {
 		doras := state.Doras()
@@ -218,4 +219,13 @@ func isIkkiTsukan(allMentsus []Mentsu) bool {
 		}
 	}
 	return false
+}
+
+func isToitoiho(allMentsus []Mentsu) bool {
+	for _, m := range allMentsus {
+		if _, ok := m.(*Shuntsu); ok {
+			return false
+		}
+	}
+	return true
 }
