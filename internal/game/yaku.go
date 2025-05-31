@@ -46,9 +46,11 @@ func CalculateFan(
 	addYaku(reach, "reach", 1, 0)
 	addYaku(isTanyaochu(allPais), "tyc", 1, 1)
 	addYaku(isChantaiyao(allMentsus), "cty", 2, 1)
+	pinfu := isPinfu(state, playerID, allMentsus)
+	addYaku(pinfu, "pf", 1, 0)
 
-	isPinfu := false
-	if isPinfu || len(furoMentsus) > 0 {
+	// TODO Calculate fu more accurately
+	if pinfu || len(furoMentsus) > 0 {
 		fu = 30
 	} else {
 		fu = 40
@@ -80,6 +82,23 @@ func isChantaiyao(allMentsus []Mentsu) bool {
 		}
 		if !isYaochuMentsu {
 			return false
+		}
+	}
+	return true
+}
+
+// TODO Consider ryanmen criteria
+func isPinfu(state StateViewer, playerID int, allMentsus []Mentsu) bool {
+	player := &state.Players()[playerID]
+	for _, m := range allMentsus {
+		switch m.(type) {
+		case *Kotsu, *Kantsu:
+			return false
+		case *Toitsu:
+			pai := &m.Pais()[0]
+			if state.YakuhaiFan(pai, player) > 0 {
+				return false
+			}
 		}
 	}
 	return true
