@@ -26,6 +26,13 @@ func CalculateFan(
 	fan = 0
 	yakus = make(map[string]int)
 
+	if reach {
+		fan += 1
+		yakus["reach"] = 1
+	}
+
+	// TODO: Implement yaku calculation
+
 	isPinfu := false
 	if isPinfu || len(furoMentsus) > 0 {
 		fu = 30
