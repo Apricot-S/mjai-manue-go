@@ -126,7 +126,7 @@ func (a *ManueAI) getMetricsInternal(
 		return nil, err
 	}
 	immediateScoreChangesDists := a.getImmediateScoreChangesDists(state, playerID, dahaiCandidates)
-	ms, err := a.getHoraEstimation(state, playerID, dahaiCandidates, shanten, goals, reach)
+	ms, err := a.getHoraEstimation(state, playerID, dahaiCandidates, shanten, goals, tehais, furos, reach)
 	if err != nil {
 		return nil, err
 	}
@@ -319,6 +319,8 @@ func (a *ManueAI) getHoraEstimation(
 	dahaiCandidates []game.Pai,
 	shanten int,
 	goals []game.Goal,
+	tehais game.Pais,
+	furos []game.Furo,
 	reach bool,
 ) (metrics, error) {
 	gs := make([]goal, 0, len(goals))
