@@ -44,7 +44,6 @@ func CalculateFan(
 		}
 	}
 
-	// TODO: Implement yaku calculation
 	addYaku(reach, "reach", 1, 0)
 	addYaku(isTanyaochu(allPais), "tyc", 1, 1)
 	addYaku(isChantaiyao(allMentsus), "cty", 2, 1)
@@ -56,6 +55,11 @@ func CalculateFan(
 	addYaku(isSanshokuDojun(allMentsus), "ssj", 2, 1)
 	addYaku(isIkkiTsukan(allMentsus), "ikt", 2, 1)
 	addYaku(isToitoiho(allMentsus), "tth", 2, 2)
+	if isChiniso(allMentsus) {
+		addYaku(true, "cis", 6, 5)
+	} else if isHoniso(allMentsus) {
+		addYaku(true, "his", 3, 2)
+	}
 
 	if fan > 0 {
 		doras := state.Doras()
@@ -224,6 +228,35 @@ func isIkkiTsukan(allMentsus []Mentsu) bool {
 func isToitoiho(allMentsus []Mentsu) bool {
 	for _, m := range allMentsus {
 		if _, ok := m.(*Shuntsu); ok {
+			return false
+		}
+	}
+	return true
+}
+
+func isChiniso(allMentsus []Mentsu) bool {
+	var suit rune
+	for i, m := range allMentsus {
+		t := m.Pais()[0].Type()
+		if t == tsupaiType {
+			return false
+		}
+		if i == 0 {
+			suit = t
+		} else if t != suit {
+			return false
+		}
+	}
+	return true
+}
+
+func isHoniso(allMentsus []Mentsu) bool {
+	var suit rune
+	for i, m := range allMentsus {
+		t := m.Pais()[0].Type()
+		if i == 0 {
+			suit = t
+		} else if t != suit && t != tsupaiType {
 			return false
 		}
 	}
