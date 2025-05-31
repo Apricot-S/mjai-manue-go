@@ -335,7 +335,7 @@ func (a *ManueAI) printMetrics(ms metrics) {
 		})
 	}
 
-	a.log(formatArraysAsTable(arrays) + "\n")
+	a.log(formatArraysAsTable(arrays) + "\n\n")
 }
 
 func formatArraysAsTable(arrays [][]string) string {
