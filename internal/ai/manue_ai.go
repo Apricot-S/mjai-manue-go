@@ -326,16 +326,23 @@ func getUniqueDahais(tehais []game.Pai, del func(game.Pai) bool) []game.Pai {
 }
 
 func isKuikae(furo game.Furo, dahai *game.Pai) bool {
-	if dahai.HasSameSymbol(furo.Taken()) {
+	taken := furo.Taken()
+	if dahai.HasSameSymbol(taken) {
 		return true
 	}
 
 	chi, isChi := furo.(*game.Chi)
 	if !isChi {
+		// There is no suji swap calling for pon or daiminkan
 		return false
 	}
 
 	pais := chi.Pais()
+	if taken.Number() == pais[1].Number() {
+		// There is no suji swap calling for kanchan chi
+		return false
+	}
+
 	number := dahai.Number()
 	if number > 3 && number-3 == pais[0].Number() {
 		return true
