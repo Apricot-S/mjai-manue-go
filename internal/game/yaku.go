@@ -51,6 +51,24 @@ func CalculateFan(
 	yakuhaiFan := sumYakuhaiFan(state, playerID, allMentsus)
 	addYaku(yakuhaiFan > 0, "ykh", yakuhaiFan, yakuhaiFan)
 
+	if fan > 0 {
+		doras := state.Doras()
+		numDoras := 0
+		numAkadoras := 0
+		for _, p := range allPais {
+			for _, d := range doras {
+				if p.HasSameSymbol(&d) {
+					numDoras++
+				}
+			}
+			if p.IsRed() {
+				numAkadoras++
+			}
+		}
+		addYaku(true, "dr", numDoras, numDoras)
+		addYaku(true, "adr", numAkadoras, numAkadoras)
+	}
+
 	// TODO Calculate fu more accurately
 	if pinfu || len(furoMentsus) > 0 {
 		fu = 30
