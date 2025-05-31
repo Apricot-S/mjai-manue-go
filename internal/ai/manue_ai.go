@@ -226,11 +226,11 @@ func (a *ManueAI) decideFuro(state game.StateAnalyzer, playerID int) (jsontext.V
 		for i, pai := range decision.Consumed() {
 			consumed[i] = pai.ToString()
 		}
-		chiMsg, err := message.NewChi(playerID, target, taken, consumed, a.logStr)
+		chi, err := message.NewChi(playerID, target, taken, consumed, a.logStr)
 		if err != nil {
 			return nil, fmt.Errorf("failed to create chi message: %w", err)
 		}
-		res, err := json.Marshal(&chiMsg)
+		res, err := json.Marshal(&chi)
 		if err != nil {
 			return nil, fmt.Errorf("failed to marshal chi message: %w", err)
 		}
@@ -241,11 +241,11 @@ func (a *ManueAI) decideFuro(state game.StateAnalyzer, playerID int) (jsontext.V
 		for i, pai := range decision.Consumed() {
 			consumed[i] = pai.ToString()
 		}
-		ponMsg, err := message.NewPon(playerID, target, taken, consumed, a.logStr)
+		pon, err := message.NewPon(playerID, target, taken, consumed, a.logStr)
 		if err != nil {
 			return nil, fmt.Errorf("failed to create pon message: %w", err)
 		}
-		res, err := json.Marshal(&ponMsg)
+		res, err := json.Marshal(&pon)
 		if err != nil {
 			return nil, fmt.Errorf("failed to marshal pon message: %w", err)
 		}
@@ -256,11 +256,11 @@ func (a *ManueAI) decideFuro(state game.StateAnalyzer, playerID int) (jsontext.V
 		for i, pai := range decision.Consumed() {
 			consumed[i] = pai.ToString()
 		}
-		daiminkanMsg, err := message.NewDaiminkan(playerID, target, taken, consumed, a.logStr)
+		daiminkan, err := message.NewDaiminkan(playerID, target, taken, consumed, a.logStr)
 		if err != nil {
 			return nil, fmt.Errorf("failed to create daiminkan message: %w", err)
 		}
-		res, err := json.Marshal(&daiminkanMsg)
+		res, err := json.Marshal(&daiminkan)
 		if err != nil {
 			return nil, fmt.Errorf("failed to marshal daiminkan message: %w", err)
 		}
