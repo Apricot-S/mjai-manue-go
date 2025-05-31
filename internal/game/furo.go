@@ -243,6 +243,10 @@ func IsKuikae(furo Furo, dahai *Pai) bool {
 	}
 
 	pais := chi.Pais()
+	if dahai.Type() != pais[0].Type() {
+		return false
+	}
+
 	if taken.Number() == pais[1].Number() {
 		// There is no suji swap calling for kanchan chi
 		return false
