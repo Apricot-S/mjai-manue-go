@@ -4,7 +4,7 @@ import "slices"
 
 // Note:
 // This function calculates points based on the original specification,
-// not the exact score.
+// not the exact points.
 func CalculateFan(
 	state StateViewer,
 	playerID int,
