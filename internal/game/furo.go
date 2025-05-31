@@ -229,3 +229,31 @@ func (k *Kakan) Pais() []Pai {
 func (k *Kakan) ToMentsu() Mentsu {
 	return NewKantsu(k.pais[0], k.pais[1], k.pais[2], k.pais[3])
 }
+
+func IsKuikae(furo Furo, dahai *Pai) bool {
+	taken := furo.Taken()
+	if dahai.HasSameSymbol(taken) {
+		return true
+	}
+
+	chi, isChi := furo.(*Chi)
+	if !isChi {
+		// There is no suji swap calling for pon or daiminkan
+		return false
+	}
+
+	pais := chi.Pais()
+	if taken.Number() == pais[1].Number() {
+		// There is no suji swap calling for kanchan chi
+		return false
+	}
+
+	number := dahai.Number()
+	if number > 3 && number-3 == pais[0].Number() {
+		return true
+	}
+	if number < 7 && number+3 == pais[2].Number() {
+		return true
+	}
+	return false
+}

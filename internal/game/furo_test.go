@@ -531,3 +531,24 @@ func TestKakan_ToMentsu(t *testing.T) {
 		})
 	}
 }
+
+func TestIsKuikae(t *testing.T) {
+	type args struct {
+		furo  Furo
+		dahai *Pai
+	}
+	tests := []struct {
+		name string
+		args args
+		want bool
+	}{
+		// TODO: Add test cases.
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := IsKuikae(tt.args.furo, tt.args.dahai); got != tt.want {
+				t.Errorf("IsKuikae() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}

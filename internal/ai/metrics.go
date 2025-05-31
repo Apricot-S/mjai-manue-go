@@ -135,7 +135,7 @@ func (a *ManueAI) getFuroMetrics(
 		furos := slices.Clone(player.Furos())
 		furos = append(furos, action)
 		dahaiCandidates := getUniqueDahais(tehais, func(p game.Pai) bool {
-			return isKuikae(action, &p)
+			return game.IsKuikae(action, &p)
 		})
 		furoMetrics, err := a.getMetricsInternal(state, playerID, tehais, furos, dahaiCandidates, false)
 		if err != nil {
@@ -162,34 +162,6 @@ func getUniqueDahais(tehais []game.Pai, del func(game.Pai) bool) []game.Pai {
 		return del(p)
 	})
 	return unique
-}
-
-func isKuikae(furo game.Furo, dahai *game.Pai) bool {
-	taken := furo.Taken()
-	if dahai.HasSameSymbol(taken) {
-		return true
-	}
-
-	chi, isChi := furo.(*game.Chi)
-	if !isChi {
-		// There is no suji swap calling for pon or daiminkan
-		return false
-	}
-
-	pais := chi.Pais()
-	if taken.Number() == pais[1].Number() {
-		// There is no suji swap calling for kanchan chi
-		return false
-	}
-
-	number := dahai.Number()
-	if number > 3 && number-3 == pais[0].Number() {
-		return true
-	}
-	if number < 7 && number+3 == pais[2].Number() {
-		return true
-	}
-	return false
 }
 
 // horaProb: P(hora | this dahai doesn't cause hoju)
