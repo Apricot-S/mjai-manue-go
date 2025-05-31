@@ -38,8 +38,10 @@ func CalculateFan(
 			yakuFan = kuiFan
 		}
 
-		yakus[name] = yakuFan
-		fan += yakuFan
+		if yakuFan > 0 {
+			yakus[name] = yakuFan
+			fan += yakuFan
+		}
 	}
 
 	// TODO: Implement yaku calculation
