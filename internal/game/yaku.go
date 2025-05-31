@@ -26,12 +26,26 @@ func CalculateFan(
 	fan = 0
 	yakus = make(map[string]int)
 
-	if reach {
-		fan += 1
-		yakus["reach"] = 1
+	addYaku := func(existsYaku bool, name string, menzenFan int, kuiFan int) {
+		if !existsYaku {
+			return
+		}
+
+		var yakuFan int
+		if len(furoMentsus) == 0 {
+			yakuFan = menzenFan
+		} else {
+			yakuFan = kuiFan
+		}
+
+		yakus[name] = yakuFan
+		fan += yakuFan
 	}
 
 	// TODO: Implement yaku calculation
+	addYaku(reach, "reach", 1, 0)
+	addYaku(isTanyaochu(allPais), "tyc", 1, 1)
+	addYaku(isChantaiyao(allMentsus), "cty", 2, 1)
 
 	isPinfu := false
 	if isPinfu || len(furoMentsus) > 0 {
@@ -44,4 +58,29 @@ func CalculateFan(
 	points = GetPoints(fu, fan, isOya)
 
 	return fu, fan, points, yakus
+}
+
+func isTanyaochu(allPais Pais) bool {
+	for _, p := range allPais {
+		if p.IsYaochu() {
+			return false
+		}
+	}
+	return true
+}
+
+func isChantaiyao(allMentsus []Mentsu) bool {
+	for _, m := range allMentsus {
+		isYaochuMentsu := false
+		for _, p := range m.Pais() {
+			if p.IsYaochu() {
+				isYaochuMentsu = true
+				break
+			}
+		}
+		if !isYaochuMentsu {
+			return false
+		}
+	}
+	return true
 }
