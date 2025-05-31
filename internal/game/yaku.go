@@ -54,6 +54,7 @@ func CalculateFan(
 	addYaku(yakuhaiFan > 0, "ykh", yakuhaiFan, yakuhaiFan)
 	addYaku(isIpeko(allMentsus), "ipk", 1, 0)
 	addYaku(isSanshokuDojun(allMentsus), "ssj", 2, 1)
+	addYaku(isIkkiTsukan(allMentsus), "ikt", 2, 1)
 
 	if fan > 0 {
 		doras := state.Doras()
@@ -183,15 +184,36 @@ func isSanshokuDojun(allMentsus []Mentsu) bool {
 			continue
 		}
 		pai := shuntsu.Pais()[0]
-		if pai.IsTsupai() {
-			continue
-		}
 		t := pai.Type()
 		n := pai.Number()
 		typeNumMap[t][n] = true
 	}
 	for n := uint8(1); n <= 7; n++ {
 		if typeNumMap['m'][n] && typeNumMap['p'][n] && typeNumMap['s'][n] {
+			return true
+		}
+	}
+	return false
+}
+
+func isIkkiTsukan(allMentsus []Mentsu) bool {
+	typeNumMap := map[rune]map[uint8]bool{
+		'm': {},
+		'p': {},
+		's': {},
+	}
+	for _, m := range allMentsus {
+		shuntsu, ok := m.(*Shuntsu)
+		if !ok {
+			continue
+		}
+		pai := shuntsu.Pais()[0]
+		t := pai.Type()
+		n := pai.Number()
+		typeNumMap[t][n] = true
+	}
+	for _, t := range []rune{'m', 'p', 's'} {
+		if typeNumMap[t][1] && typeNumMap[t][4] && typeNumMap[t][7] {
 			return true
 		}
 	}
