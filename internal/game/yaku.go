@@ -56,19 +56,32 @@ func CalculateFan(
 	if fan > 0 {
 		doras := state.Doras()
 		numDoras := 0
-		numAkadoras := 0
 		for _, p := range allPais {
 			for _, d := range doras {
 				if p.HasSameSymbol(&d) {
 					numDoras++
 				}
 			}
-			if p.IsRed() {
-				numAkadoras++
+		}
+		addYaku(numDoras > 0, "dr", numDoras, numDoras)
+
+		var currentPais []Pai = slices.Clone(tehais)
+		for _, f := range furos {
+			currentPais = slices.Concat(currentPais, f.Pais())
+		}
+		numAkadoras := 0
+		for _, cp := range currentPais {
+			if !cp.IsRed() {
+				continue
+			}
+			for _, p := range allPais {
+				if p.HasSameSymbol(&cp) {
+					numAkadoras++
+					break
+				}
 			}
 		}
-		addYaku(true, "dr", numDoras, numDoras)
-		addYaku(true, "adr", numAkadoras, numAkadoras)
+		addYaku(numAkadoras > 0, "adr", numAkadoras, numAkadoras)
 	}
 
 	// TODO Calculate fu more accurately
