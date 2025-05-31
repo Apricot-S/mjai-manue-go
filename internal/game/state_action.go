@@ -2,7 +2,6 @@ package game
 
 import (
 	"slices"
-	"sort"
 
 	"github.com/Apricot-S/mjai-manue-go/internal/message"
 )
@@ -22,11 +21,7 @@ func (s *StateImpl) DahaiCandidates() []Pai {
 		return candidates
 	}
 
-	candidates := slices.Clone(player.tehais)
-	sort.Sort(candidates)
-	candidates = slices.CompactFunc(candidates, func(p1, p2 Pai) bool {
-		return p1.ID() == p2.ID()
-	})
+	candidates := GetUniquePais(player.tehais, nil)
 
 	// Remove the kuikae tiles from the candidates.
 	kuikaeSet := make(map[uint8]struct{}, len(s.kuikaePais))
@@ -63,8 +58,7 @@ func (s *StateImpl) ReachDahaiCandidates() ([]Pai, error) {
 		return nil, nil
 	}
 
-	tehaiPais := slices.Clone(player.tehais)
-	tehaiCounts, err := NewPaiSetWithPais(tehaiPais)
+	tehaiCounts, err := NewPaiSetWithPais(player.tehais)
 	if err != nil {
 		return nil, err
 	}
@@ -77,13 +71,8 @@ func (s *StateImpl) ReachDahaiCandidates() ([]Pai, error) {
 		return nil, nil
 	}
 
-	sort.Sort(tehaiPais)
-	tehaiPais = slices.CompactFunc(tehaiPais, func(p1, p2 Pai) bool {
-		return p1.ID() == p2.ID()
-	})
-
-	// The number of candidates will be equal or less than 13.
-	candidates := make([]Pai, 0, 13)
+	tehaiPais := GetUniquePais(player.tehais, nil)
+	candidates := make([]Pai, 0, len(tehaiPais))
 	for _, p := range tehaiPais {
 		i := p.RemoveRed().ID()
 		tehaiCounts[i] -= 1

@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"os"
 	"slices"
-	"sort"
 	"strings"
 
 	"github.com/Apricot-S/mjai-manue-go/internal/ai/core"
@@ -134,7 +133,7 @@ func (a *ManueAI) getFuroMetrics(
 		}
 		furos := slices.Clone(player.Furos())
 		furos = append(furos, action)
-		dahaiCandidates := getUniqueDahais(tehais, func(p game.Pai) bool {
+		dahaiCandidates := game.GetUniquePais(tehais, func(p game.Pai) bool {
 			return game.IsKuikae(action, &p)
 		})
 		furoMetrics, err := a.getMetricsInternal(state, playerID, tehais, furos, dahaiCandidates, false)
@@ -147,21 +146,6 @@ func (a *ManueAI) getFuroMetrics(
 	}
 
 	return ms, nil
-}
-
-func getUniqueDahais(tehais []game.Pai, del func(game.Pai) bool) []game.Pai {
-	unique := game.Pais(slices.Clone(tehais))
-	sort.Sort(unique)
-	unique = slices.CompactFunc(unique, func(a, b game.Pai) bool {
-		return a.ID() == b.ID()
-	})
-	if del == nil {
-		return unique
-	}
-	unique = slices.DeleteFunc(unique, func(p game.Pai) bool {
-		return del(p)
-	})
-	return unique
 }
 
 // horaProb: P(hora | this dahai doesn't cause hoju)

@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"slices"
+	"sort"
 	"strings"
 )
 
@@ -323,4 +324,19 @@ func (ps Pais) Less(i, j int) bool {
 
 func (ps Pais) Swap(i, j int) {
 	ps[i], ps[j] = ps[j], ps[i]
+}
+
+func GetUniquePais(ps Pais, del func(Pai) bool) []Pai {
+	unique := slices.Clone(ps)
+	sort.Sort(unique)
+	unique = slices.CompactFunc(unique, func(a, b Pai) bool {
+		return a.ID() == b.ID()
+	})
+	if del == nil {
+		return unique
+	}
+	unique = slices.DeleteFunc(unique, func(p Pai) bool {
+		return del(p)
+	})
+	return unique
 }
