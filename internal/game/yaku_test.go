@@ -394,3 +394,84 @@ func Test_isToitoiho(t *testing.T) {
 		})
 	}
 }
+
+func Test_isChiniso(t *testing.T) {
+	type args struct {
+		allMentsus []Mentsu
+	}
+	type testCase struct {
+		name string
+		args args
+		want bool
+	}
+	tests := []testCase{}
+
+	{
+		name := "is chiniso"
+		mentsus := make([]Mentsu, 5)
+		pais1, _ := StrToPais("1m 2m 3m")
+		pais2, _ := StrToPais("4m 5m 6m")
+		pais3, _ := StrToPais("7m 8m 9m")
+		pais4, _ := StrToPais("1m 1m 1m")
+		pais5, _ := StrToPais("5m 5mr")
+		mentsus[0] = NewShuntsu(pais1[0], pais1[1], pais1[2])
+		mentsus[1] = NewShuntsu(pais2[0], pais2[1], pais2[2])
+		mentsus[2] = NewShuntsu(pais3[0], pais3[1], pais3[2])
+		mentsus[3] = NewKotsu(pais4[0], pais4[1], pais4[2])
+		mentsus[4] = NewToitsu(pais5[0], pais5[1])
+
+		tests = append(tests, testCase{
+			name: name,
+			args: args{allMentsus: mentsus},
+			want: true,
+		})
+	}
+	{
+		name := "is not chiniso"
+		mentsus := make([]Mentsu, 5)
+		pais1, _ := StrToPais("1m 2m 3m")
+		pais2, _ := StrToPais("4m 5m 6m")
+		pais3, _ := StrToPais("7m 8m 9m")
+		pais4, _ := StrToPais("1m 1m 1m")
+		pais5, _ := StrToPais("E E")
+		mentsus[0] = NewShuntsu(pais1[0], pais1[1], pais1[2])
+		mentsus[1] = NewShuntsu(pais2[0], pais2[1], pais2[2])
+		mentsus[2] = NewShuntsu(pais3[0], pais3[1], pais3[2])
+		mentsus[3] = NewKotsu(pais4[0], pais4[1], pais4[2])
+		mentsus[4] = NewToitsu(pais5[0], pais5[1])
+
+		tests = append(tests, testCase{
+			name: name,
+			args: args{allMentsus: mentsus},
+			want: false,
+		})
+	}
+	{
+		name := "is not chiniso for tsuiso"
+		mentsus := make([]Mentsu, 5)
+		pais1, _ := StrToPais("E E E")
+		pais2, _ := StrToPais("S S S")
+		pais3, _ := StrToPais("W W W")
+		pais4, _ := StrToPais("N N N")
+		pais5, _ := StrToPais("P P")
+		mentsus[0] = NewKotsu(pais1[0], pais1[1], pais1[2])
+		mentsus[1] = NewKotsu(pais2[0], pais2[1], pais2[2])
+		mentsus[2] = NewKotsu(pais3[0], pais3[1], pais3[2])
+		mentsus[3] = NewKotsu(pais4[0], pais4[1], pais4[2])
+		mentsus[4] = NewToitsu(pais5[0], pais5[1])
+
+		tests = append(tests, testCase{
+			name: name,
+			args: args{allMentsus: mentsus},
+			want: false,
+		})
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := isChiniso(tt.args.allMentsus); got != tt.want {
+				t.Errorf("isChiniso() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
