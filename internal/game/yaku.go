@@ -52,6 +52,7 @@ func CalculateFan(
 	addYaku(pinfu, "pf", 1, 0)
 	yakuhaiFan := sumYakuhaiFan(state, playerID, allMentsus)
 	addYaku(yakuhaiFan > 0, "ykh", yakuhaiFan, yakuhaiFan)
+	addYaku(isIpeko(allMentsus), "ipk", 1, 0)
 
 	if fan > 0 {
 		doras := state.Doras()
@@ -150,4 +151,21 @@ func sumYakuhaiFan(state StateViewer, playerID int, allMentsus []Mentsu) int {
 		}
 	}
 	return fan
+}
+
+func isIpeko(allMentsus []Mentsu) bool {
+	for i, m1 := range allMentsus {
+		if _, ok := m1.(*Shuntsu); !ok {
+			continue
+		}
+		for _, m2 := range allMentsus[i+1:] {
+			if _, ok := m2.(*Shuntsu); !ok {
+				continue
+			}
+			if m1.Pais()[0].HasSameSymbol(&m2.Pais()[0]) {
+				return true
+			}
+		}
+	}
+	return false
 }
