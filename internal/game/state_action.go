@@ -96,7 +96,7 @@ func (s *StateImpl) IsTsumoPai(pai *Pai) bool {
 	if s.lastActor != s.playerID {
 		return false
 	}
-	if s.lastActionType != message.TypeTsumo {
+	if s.lastActionType != message.TypeTsumo && s.lastActionType != message.TypeReach {
 		return false
 	}
 
