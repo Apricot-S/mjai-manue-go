@@ -537,13 +537,224 @@ func TestIsKuikae(t *testing.T) {
 		furo  Furo
 		dahai *Pai
 	}
-	tests := []struct {
+	type testCase struct {
 		name string
 		args args
 		want bool
-	}{
-		// TODO: Add test cases.
 	}
+	tests := []testCase{}
+
+	{
+		taken, _ := NewPaiWithName("2m")
+		consumed, _ := StrToPais("1m 3m")
+		chi, _ := NewChi(*taken, [2]Pai(consumed), 0)
+		dahai, _ := NewPaiWithName("2m")
+		tests = append(tests, testCase{
+			name: "chi 2m (1m 3m), dahai 2m (kuikae)",
+			args: args{furo: chi, dahai: dahai},
+			want: true,
+		})
+	}
+	{
+		taken, _ := NewPaiWithName("2m")
+		consumed, _ := StrToPais("1m 3m")
+		chi, _ := NewChi(*taken, [2]Pai(consumed), 0)
+		dahai, _ := NewPaiWithName("2p")
+		tests = append(tests, testCase{
+			name: "chi 2m (1m 3m), dahai 2p (not kuikae)",
+			args: args{furo: chi, dahai: dahai},
+			want: false,
+		})
+	}
+	{
+		taken, _ := NewPaiWithName("4p")
+		consumed, _ := StrToPais("3p 5p")
+		chi, _ := NewChi(*taken, [2]Pai(consumed), 0)
+		dahai, _ := NewPaiWithName("1p")
+		tests = append(tests, testCase{
+			name: "chi 4p (3p 5p), dahai 1p (not kuikae)",
+			args: args{furo: chi, dahai: dahai},
+			want: false,
+		})
+	}
+	{
+		taken, _ := NewPaiWithName("4p")
+		consumed, _ := StrToPais("3p 5p")
+		chi, _ := NewChi(*taken, [2]Pai(consumed), 0)
+		dahai, _ := NewPaiWithName("7p")
+		tests = append(tests, testCase{
+			name: "chi 4p (3p 5p), dahai 7p (not kuikae)",
+			args: args{furo: chi, dahai: dahai},
+			want: false,
+		})
+	}
+	{
+		taken, _ := NewPaiWithName("1s")
+		consumed, _ := StrToPais("2s 3s")
+		chi, _ := NewChi(*taken, [2]Pai(consumed), 0)
+		dahai, _ := NewPaiWithName("1s")
+		tests = append(tests, testCase{
+			name: "chi 1s (2s 3s), dahai 1s (kuikae)",
+			args: args{furo: chi, dahai: dahai},
+			want: true,
+		})
+	}
+	{
+		taken, _ := NewPaiWithName("1s")
+		consumed, _ := StrToPais("2s 3s")
+		chi, _ := NewChi(*taken, [2]Pai(consumed), 0)
+		dahai, _ := NewPaiWithName("4s")
+		tests = append(tests, testCase{
+			name: "chi 1s (2s 3s), dahai 4s (kuikae)",
+			args: args{furo: chi, dahai: dahai},
+			want: true,
+		})
+	}
+	{
+		taken, _ := NewPaiWithName("1s")
+		consumed, _ := StrToPais("2s 3s")
+		chi, _ := NewChi(*taken, [2]Pai(consumed), 0)
+		dahai, _ := NewPaiWithName("7s")
+		tests = append(tests, testCase{
+			name: "chi 1s (2s 3s), dahai 7s (not kuikae)",
+			args: args{furo: chi, dahai: dahai},
+			want: false,
+		})
+	}
+	{
+		taken, _ := NewPaiWithName("1s")
+		consumed, _ := StrToPais("2s 3s")
+		chi, _ := NewChi(*taken, [2]Pai(consumed), 0)
+		dahai, _ := NewPaiWithName("1p")
+		tests = append(tests, testCase{
+			name: "chi 1s (2s 3s), dahai 1p (not kuikae)",
+			args: args{furo: chi, dahai: dahai},
+			want: false,
+		})
+	}
+	{
+		taken, _ := NewPaiWithName("1s")
+		consumed, _ := StrToPais("2s 3s")
+		chi, _ := NewChi(*taken, [2]Pai(consumed), 0)
+		dahai, _ := NewPaiWithName("4p")
+		tests = append(tests, testCase{
+			name: "chi 1s (2s 3s), dahai 4p (not kuikae)",
+			args: args{furo: chi, dahai: dahai},
+			want: false,
+		})
+	}
+	{
+		taken, _ := NewPaiWithName("9m")
+		consumed, _ := StrToPais("7m 8m")
+		chi, _ := NewChi(*taken, [2]Pai(consumed), 0)
+		dahai, _ := NewPaiWithName("9m")
+		tests = append(tests, testCase{
+			name: "chi 9m (7m 8m), dahai 9m (kuikae)",
+			args: args{furo: chi, dahai: dahai},
+			want: true,
+		})
+	}
+	{
+		taken, _ := NewPaiWithName("9m")
+		consumed, _ := StrToPais("7m 8m")
+		chi, _ := NewChi(*taken, [2]Pai(consumed), 0)
+		dahai, _ := NewPaiWithName("6m")
+		tests = append(tests, testCase{
+			name: "chi 9m (7m 8m), dahai 6m (kuikae)",
+			args: args{furo: chi, dahai: dahai},
+			want: true,
+		})
+	}
+	{
+		taken, _ := NewPaiWithName("9m")
+		consumed, _ := StrToPais("7m 8m")
+		chi, _ := NewChi(*taken, [2]Pai(consumed), 0)
+		dahai, _ := NewPaiWithName("3m")
+		tests = append(tests, testCase{
+			name: "chi 9m (7m 8m), dahai 3m (not kuikae)",
+			args: args{furo: chi, dahai: dahai},
+			want: false,
+		})
+	}
+	{
+		taken, _ := NewPaiWithName("9m")
+		consumed, _ := StrToPais("7m 8m")
+		chi, _ := NewChi(*taken, [2]Pai(consumed), 0)
+		dahai, _ := NewPaiWithName("9s")
+		tests = append(tests, testCase{
+			name: "chi 9m (7m 8m), dahai 9s (not kuikae)",
+			args: args{furo: chi, dahai: dahai},
+			want: false,
+		})
+	}
+	{
+		taken, _ := NewPaiWithName("9m")
+		consumed, _ := StrToPais("7m 8m")
+		chi, _ := NewChi(*taken, [2]Pai(consumed), 0)
+		dahai, _ := NewPaiWithName("6s")
+		tests = append(tests, testCase{
+			name: "chi 9m (7m 8m), dahai 6s (not kuikae)",
+			args: args{furo: chi, dahai: dahai},
+			want: false,
+		})
+	}
+	{
+		taken, _ := NewPaiWithName("2m")
+		consumed, _ := StrToPais("3m 4m")
+		chi, _ := NewChi(*taken, [2]Pai(consumed), 0)
+		dahai, _ := NewPaiWithName("5mr")
+		tests = append(tests, testCase{
+			name: "chi 2m (3m 4m), dahai 5mr (kuikae)",
+			args: args{furo: chi, dahai: dahai},
+			want: true,
+		})
+	}
+
+	{
+		taken, _ := NewPaiWithName("5m")
+		consumed, _ := StrToPais("5m 5m")
+		pon, _ := NewPon(*taken, [2]Pai(consumed), 0)
+		dahai, _ := NewPaiWithName("5mr")
+		tests = append(tests, testCase{
+			name: "pon 5m (5m 5m), dahai 5mr (kuikae)",
+			args: args{furo: pon, dahai: dahai},
+			want: true,
+		})
+	}
+	{
+		taken, _ := NewPaiWithName("5pr")
+		consumed, _ := StrToPais("5p 5p")
+		pon, _ := NewPon(*taken, [2]Pai(consumed), 0)
+		dahai, _ := NewPaiWithName("5p")
+		tests = append(tests, testCase{
+			name: "pon 5pr (5p 5p), dahai 5p (kuikae)",
+			args: args{furo: pon, dahai: dahai},
+			want: true,
+		})
+	}
+	{
+		taken, _ := NewPaiWithName("5s")
+		consumed, _ := StrToPais("5s 5sr")
+		pon, _ := NewPon(*taken, [2]Pai(consumed), 0)
+		dahai, _ := NewPaiWithName("5s")
+		tests = append(tests, testCase{
+			name: "pon 5s (5s 5sr), dahai 5s (kuikae)",
+			args: args{furo: pon, dahai: dahai},
+			want: true,
+		})
+	}
+	{
+		taken, _ := NewPaiWithName("5m")
+		consumed, _ := StrToPais("5m 5m")
+		pon, _ := NewPon(*taken, [2]Pai(consumed), 0)
+		dahai, _ := NewPaiWithName("6m")
+		tests = append(tests, testCase{
+			name: "pon 5m (5m 5m), dahai 6m (not kuikae)",
+			args: args{furo: pon, dahai: dahai},
+			want: false,
+		})
+	}
+
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			if got := IsKuikae(tt.args.furo, tt.args.dahai); got != tt.want {
