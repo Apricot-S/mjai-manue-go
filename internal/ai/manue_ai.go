@@ -3,6 +3,9 @@ package ai
 import (
 	"fmt"
 	"os"
+	"slices"
+	"sort"
+	"strconv"
 	"strings"
 
 	"github.com/Apricot-S/mjai-manue-go/configs"
@@ -140,9 +143,7 @@ func (a *ManueAI) decideDahai(state game.StateAnalyzer, playerID int) (jsontext.
 	a.printTenpaiProbs(state, playerID)
 	key := a.chooseBestMetric(ms, true)
 	fmt.Fprintf(os.Stderr, "decidedKey %s\n", key)
-	k := strings.Split(key, ".")
-	actionIdx := k[0]
-	paiStr := k[1]
+	actionIdx, paiStr, _ := strings.Cut(key, ".")
 
 	reach := actionIdx == "0"
 	if reach {
@@ -187,5 +188,160 @@ func (a *ManueAI) decideFuro(state game.StateAnalyzer, playerID int) (jsontext.V
 		return nil, nil
 	}
 
-	panic("unimplemented")
+	// The maximum number of furo candidates is
+	// 5 for chi, 1 for pon, and 1 for daiminkan, totaling 7.
+	ms := make(metrics, 7)
+	player := state.Players()[playerID]
+
+	// Not furo
+	noneTehais := player.Tehais()
+	noneFuros := player.Furos()
+	noneDahai := []game.Pai{*game.Unknown}
+	noneMetrics, err := a.getMetricsInternal(state, playerID, noneTehais, noneFuros, noneDahai, false)
+	if err != nil {
+		return nil, err
+	}
+	ms["none"] = noneMetrics["none"]
+
+	// Metrics for each furo candidate
+	for j, action := range fc {
+		tehais := slices.Clone(player.Tehais())
+		// remove the consumed tiles from the hand
+		for _, pai := range action.Consumed() {
+			for i, t := range tehais {
+				if t.ID() == pai.ID() {
+					tehais = slices.Delete(tehais, i, i+1)
+					break
+				}
+			}
+		}
+		furos := slices.Clone(player.Furos())
+		furos = append(furos, action)
+		dahaiCandidates := getUniqueDahais(tehais, func(p game.Pai) bool {
+			return isKuikae(action, &p)
+		})
+		furoMetrics, err := a.getMetricsInternal(state, playerID, tehais, furos, dahaiCandidates, false)
+		if err != nil {
+			return nil, err
+		}
+		for k, v := range furoMetrics {
+			ms[fmt.Sprintf("%d.%s", j, k)] = v
+		}
+	}
+
+	a.printMetrics(ms)
+	a.printTenpaiProbs(state, playerID)
+	key := a.chooseBestMetric(ms, false)
+	fmt.Fprintf(os.Stderr, "decidedKey %s\n", key)
+
+	if key == "none" {
+		none, err := message.NewSkip(playerID, a.logStr)
+		if err != nil {
+			return nil, err
+		}
+		res, err := json.Marshal(&none)
+		if err != nil {
+			return nil, fmt.Errorf("failed to marshal skip message: %w", err)
+		}
+		a.logStr = ""
+		return res, nil
+	}
+
+	actionIdx, _, _ := strings.Cut(key, ".")
+	idx, err := strconv.Atoi(actionIdx)
+	if err != nil {
+		return nil, err
+	}
+	if idx < 0 || idx >= len(fc) {
+		return nil, fmt.Errorf("invalid furo action index: %s", actionIdx)
+	}
+	decision := fc[idx]
+
+	target := *decision.Target()
+	taken := decision.Taken().ToString()
+	switch decision.(type) {
+	case *game.Chi:
+		var consumed [2]string
+		for i, pai := range decision.Consumed() {
+			consumed[i] = pai.ToString()
+		}
+		chiMsg, err := message.NewChi(playerID, target, taken, consumed, a.logStr)
+		if err != nil {
+			return nil, fmt.Errorf("failed to create chi message: %w", err)
+		}
+		res, err := json.Marshal(&chiMsg)
+		if err != nil {
+			return nil, fmt.Errorf("failed to marshal chi message: %w", err)
+		}
+		a.logStr = ""
+		return res, nil
+	case *game.Pon:
+		var consumed [2]string
+		for i, pai := range decision.Consumed() {
+			consumed[i] = pai.ToString()
+		}
+		ponMsg, err := message.NewPon(playerID, target, taken, consumed, a.logStr)
+		if err != nil {
+			return nil, fmt.Errorf("failed to create pon message: %w", err)
+		}
+		res, err := json.Marshal(&ponMsg)
+		if err != nil {
+			return nil, fmt.Errorf("failed to marshal pon message: %w", err)
+		}
+		a.logStr = ""
+		return res, nil
+	case *game.Daiminkan:
+		var consumed [3]string
+		for i, pai := range decision.Consumed() {
+			consumed[i] = pai.ToString()
+		}
+		daiminkanMsg, err := message.NewDaiminkan(playerID, target, taken, consumed, a.logStr)
+		if err != nil {
+			return nil, fmt.Errorf("failed to create daiminkan message: %w", err)
+		}
+		res, err := json.Marshal(&daiminkanMsg)
+		if err != nil {
+			return nil, fmt.Errorf("failed to marshal daiminkan message: %w", err)
+		}
+		a.logStr = ""
+		return res, nil
+	default:
+		return nil, fmt.Errorf("unknown furo action type: %T", decision)
+	}
+}
+
+func getUniqueDahais(tehais []game.Pai, del func(game.Pai) bool) []game.Pai {
+	unique := game.Pais(slices.Clone(tehais))
+	sort.Sort(unique)
+	unique = slices.CompactFunc(unique, func(a, b game.Pai) bool {
+		return a.ID() == b.ID()
+	})
+	if del == nil {
+		return unique
+	}
+	unique = slices.DeleteFunc(unique, func(p game.Pai) bool {
+		return del(p)
+	})
+	return unique
+}
+
+func isKuikae(furo game.Furo, dahai *game.Pai) bool {
+	if dahai.HasSameSymbol(furo.Taken()) {
+		return true
+	}
+
+	chi, isChi := furo.(*game.Chi)
+	if !isChi {
+		return false
+	}
+
+	pais := chi.Pais()
+	number := dahai.Number()
+	if number > 3 && number-3 == pais[0].Number() {
+		return true
+	}
+	if number < 7 && number+3 == pais[2].Number() {
+		return true
+	}
+	return false
 }
