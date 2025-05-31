@@ -382,7 +382,7 @@ func (a *ManueAI) getHoraEstimation(
 			continue
 		}
 		requiredBitVectors := core.CountVectorToBitVectors(&g.RequiredVector)
-		_, _, points, _ := game.CalculateFan(tehais, g.Mentsus, furos, reach, state.Doras())
+		_, _, points, _ := game.CalculateFan(state, playerID, tehais, g.Mentsus, furos, reach)
 		if points > 0 {
 			gg := goal{
 				Goal:               g,
