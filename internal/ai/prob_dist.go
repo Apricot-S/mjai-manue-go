@@ -433,7 +433,9 @@ func (a *ManueAI) getNumExpectedRemainingTurns(state game.StateViewer) int {
 	currentTurn := math.Round(float64(game.NumInitPipais-state.NumPipais()) / 4.0)
 	num := 0.0
 	den := 0.0
-	for i, prob := range a.stats.NumTurnsDistribution[int(currentTurn):] {
+	ct := int(currentTurn)
+	for i := ct; i < len(a.stats.NumTurnsDistribution); i++ {
+		prob := a.stats.NumTurnsDistribution[i]
 		num += prob * (float64(i) - currentTurn + 0.5)
 		den += prob
 	}
