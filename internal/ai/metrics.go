@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"slices"
+	"sort"
 	"strings"
 
 	"github.com/Apricot-S/mjai-manue-go/internal/ai/core"
@@ -97,6 +98,98 @@ func mergeMetrics(ms metrics, prefix int, otherMetrics metrics) metrics {
 		ms[fmt.Sprintf("%d.%s", prefix, key)] = metric
 	}
 	return ms
+}
+
+func (a *ManueAI) getFuroMetrics(
+	state game.StateAnalyzer,
+	playerID int,
+	furoCandidates []game.Furo,
+) (metrics, error) {
+	// The maximum number of furo candidates is
+	// 5 for chi, 1 for pon, and 1 for daiminkan, totaling 7.
+	ms := make(metrics, 7)
+	player := state.Players()[playerID]
+
+	// Not furo
+	noneTehais := player.Tehais()
+	noneFuros := player.Furos()
+	noneDahai := []game.Pai{*game.Unknown}
+	noneMetrics, err := a.getMetricsInternal(state, playerID, noneTehais, noneFuros, noneDahai, false)
+	if err != nil {
+		return nil, err
+	}
+	ms["none"] = noneMetrics["none"]
+
+	// Metrics for each furo candidate
+	for j, action := range furoCandidates {
+		tehais := slices.Clone(player.Tehais())
+		// remove the consumed tiles from the hand
+		for _, pai := range action.Consumed() {
+			for i, t := range tehais {
+				if t.ID() == pai.ID() {
+					tehais = slices.Delete(tehais, i, i+1)
+					break
+				}
+			}
+		}
+		furos := slices.Clone(player.Furos())
+		furos = append(furos, action)
+		dahaiCandidates := getUniqueDahais(tehais, func(p game.Pai) bool {
+			return isKuikae(action, &p)
+		})
+		furoMetrics, err := a.getMetricsInternal(state, playerID, tehais, furos, dahaiCandidates, false)
+		if err != nil {
+			return nil, err
+		}
+		for k, v := range furoMetrics {
+			ms[fmt.Sprintf("%d.%s", j, k)] = v
+		}
+	}
+
+	return ms, nil
+}
+
+func getUniqueDahais(tehais []game.Pai, del func(game.Pai) bool) []game.Pai {
+	unique := game.Pais(slices.Clone(tehais))
+	sort.Sort(unique)
+	unique = slices.CompactFunc(unique, func(a, b game.Pai) bool {
+		return a.ID() == b.ID()
+	})
+	if del == nil {
+		return unique
+	}
+	unique = slices.DeleteFunc(unique, func(p game.Pai) bool {
+		return del(p)
+	})
+	return unique
+}
+
+func isKuikae(furo game.Furo, dahai *game.Pai) bool {
+	taken := furo.Taken()
+	if dahai.HasSameSymbol(taken) {
+		return true
+	}
+
+	chi, isChi := furo.(*game.Chi)
+	if !isChi {
+		// There is no suji swap calling for pon or daiminkan
+		return false
+	}
+
+	pais := chi.Pais()
+	if taken.Number() == pais[1].Number() {
+		// There is no suji swap calling for kanchan chi
+		return false
+	}
+
+	number := dahai.Number()
+	if number > 3 && number-3 == pais[0].Number() {
+		return true
+	}
+	if number < 7 && number+3 == pais[2].Number() {
+		return true
+	}
+	return false
 }
 
 // horaProb: P(hora | this dahai doesn't cause hoju)
