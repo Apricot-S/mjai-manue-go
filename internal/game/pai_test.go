@@ -770,3 +770,137 @@ func TestSortPais(t *testing.T) {
 		}
 	}
 }
+
+func TestGetUniquePais(t *testing.T) {
+	type args struct {
+		ps  Pais
+		del func(Pai) bool
+	}
+	type testCase struct {
+		name string
+		args args
+		want []Pai
+	}
+	tests := []testCase{
+		{
+			name: "nil",
+			args: args{
+				ps:  nil,
+				del: func(p Pai) bool { return false },
+			},
+			want: nil,
+		},
+		{
+			name: "empty",
+			args: args{
+				ps:  Pais{},
+				del: func(p Pai) bool { return false },
+			},
+			want: []Pai{},
+		},
+		{
+			name: "one element",
+			args: args{
+				ps: func() Pais {
+					p, _ := NewPaiWithName("1m")
+					return Pais{*p}
+				}(),
+				del: func(p Pai) bool { return false },
+			},
+			want: func() []Pai {
+				p, _ := NewPaiWithName("1m")
+				return []Pai{*p}
+			}(),
+		},
+		{
+			name: "two elements, no duplicate",
+			args: args{
+				ps: func() Pais {
+					p1, _ := NewPaiWithName("1m")
+					p2, _ := NewPaiWithName("2m")
+					return Pais{*p1, *p2}
+				}(),
+				del: func(p Pai) bool { return false },
+			},
+			want: func() []Pai {
+				p1, _ := NewPaiWithName("1m")
+				p2, _ := NewPaiWithName("2m")
+				return []Pai{*p1, *p2}
+			}(),
+		},
+		{
+			name: "two elements, duplicate",
+			args: args{
+				ps: func() Pais {
+					p1, _ := NewPaiWithName("1m")
+					p2, _ := NewPaiWithName("1m")
+					return Pais{*p1, *p2}
+				}(),
+				del: func(p Pai) bool { return false },
+			},
+			want: func() []Pai {
+				p1, _ := NewPaiWithName("1m")
+				return []Pai{*p1}
+			}(),
+		},
+		{
+			name: "two elements, red and black 5m",
+			args: args{
+				ps: func() Pais {
+					p1, _ := NewPaiWithName("5m")
+					p2, _ := NewPaiWithName("5mr")
+					return Pais{*p1, *p2}
+				}(),
+				del: func(p Pai) bool { return false },
+			},
+			want: func() []Pai {
+				p1, _ := NewPaiWithName("5m")
+				p2, _ := NewPaiWithName("5mr")
+				return []Pai{*p1, *p2}
+			}(),
+		},
+		{
+			name: "three elements, 1m 2m 1m",
+			args: args{
+				ps: func() Pais {
+					p1, _ := NewPaiWithName("1m")
+					p2, _ := NewPaiWithName("2m")
+					p3, _ := NewPaiWithName("1m")
+					return Pais{*p1, *p2, *p3}
+				}(),
+				del: func(p Pai) bool { return false },
+			},
+			want: func() []Pai {
+				p1, _ := NewPaiWithName("1m")
+				p2, _ := NewPaiWithName("2m")
+				return []Pai{*p1, *p2}
+			}(),
+		},
+		{
+			name: "three elements, all unique",
+			args: args{
+				ps: func() Pais {
+					p1, _ := NewPaiWithName("1m")
+					p2, _ := NewPaiWithName("2m")
+					p3, _ := NewPaiWithName("3m")
+					return Pais{*p1, *p2, *p3}
+				}(),
+				del: func(p Pai) bool { return false },
+			},
+			want: func() []Pai {
+				p1, _ := NewPaiWithName("1m")
+				p2, _ := NewPaiWithName("2m")
+				p3, _ := NewPaiWithName("3m")
+				return []Pai{*p1, *p2, *p3}
+			}(),
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := GetUniquePais(tt.args.ps, tt.args.del); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("GetUniquePais() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
