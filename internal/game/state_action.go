@@ -161,7 +161,7 @@ func (s *StateImpl) chiCandidates() ([]Furo, error) {
 	used := make(map[[2]uint8]struct{})
 	takenNum := int(taken.Number())
 	for d := -2; d <= 0; d++ {
-		// takenが左端・中央・右端になる3パターン
+		// taken can be the lowest, middle, or highest tile in a sequence.
 		n1 := takenNum + d
 		n2 := takenNum + d + 1
 		n3 := takenNum + d + 2
@@ -169,7 +169,7 @@ func (s *StateImpl) chiCandidates() ([]Furo, error) {
 			continue
 		}
 
-		// taken以外の2枚を探す
+		// Find two tiles that can form a sequence with the taken tile.
 		var cands []Pai
 		for _, p := range tehais {
 			if p.Type() != taken.Type() {
@@ -185,10 +185,10 @@ func (s *StateImpl) chiCandidates() ([]Furo, error) {
 
 		for i := range cands {
 			for j := i + 1; j < len(cands); j++ {
-				// taken以外の2枚
+				// Two candidates other than the taken tile
 				p1 := cands[i]
 				p2 := cands[j]
-				// taken, p1, p2 で3連続になるか確認
+				// Check if taken, p1, and p2 form a sequence.
 				nums := []int{takenNum, int(p1.Number()), int(p2.Number())}
 				slices.Sort(nums)
 				if nums[0] != n1 || nums[1] != n2 || nums[2] != n3 {
@@ -215,8 +215,8 @@ func (s *StateImpl) chiCandidates() ([]Furo, error) {
 					return nil, err
 				}
 
-				// 喰い替えチェック
-				// チーで消費する2枚を除いた手牌を作る
+				// Kuikae check
+				// Create a hand without the two tiles consumed by chi.
 				rest := make([]Pai, 0, len(tehais)-2)
 				usedIdx := map[int]bool{}
 				p1used := false
@@ -238,7 +238,7 @@ func (s *StateImpl) chiCandidates() ([]Furo, error) {
 						rest = append(rest, tp)
 					}
 				}
-				// 残り手牌がすべて喰い替え対象ならスキップ
+				// If all remaining tiles are kuikae candidates, skip.
 				allKuikae := true
 				for _, tp := range rest {
 					if !IsKuikae(furo, &tp) {
