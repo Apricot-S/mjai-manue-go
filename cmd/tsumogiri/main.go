@@ -78,6 +78,10 @@ func runTCPClientMode(rawURL string, agent agent.Agent) error {
 func main() {
 	var name string
 	flag.StringVar(&name, "name", defaultName, "Player's name")
+	flag.Usage = func() {
+		fmt.Fprintf(os.Stderr, "Usage: %s [--name NAME] [url]\n", os.Args[0])
+		flag.PrintDefaults()
+	}
 	flag.Parse()
 
 	var rawURL string
@@ -90,8 +94,8 @@ func main() {
 		rawURL = args[0]
 		usePipe = false
 	default:
-		fmt.Fprintf(os.Stderr, "Usage: %s [--name NAME] [url]\n", os.Args[0])
-		os.Exit(1)
+		flag.Usage()
+		os.Exit(2)
 	}
 
 	room, err := getRoom(rawURL)
