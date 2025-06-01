@@ -191,27 +191,66 @@ func (s *StateImpl) chiCandidates() ([]Furo, error) {
 				// taken, p1, p2 で3連続になるか確認
 				nums := []int{takenNum, int(p1.Number()), int(p2.Number())}
 				slices.Sort(nums)
-				if nums[0] == n1 && nums[1] == n2 && nums[2] == n3 {
-					// Preventing duplicate
-					id1 := p1.ID()
-					id2 := p2.ID()
-					if id1 > id2 {
-						id1, id2 = id2, id1
-					}
-					key := [2]uint8{id1, id2}
-					if _, ok := used[key]; ok {
-						// If the pair of tiles has already been used, skip it.
+				if nums[0] != n1 || nums[1] != n2 || nums[2] != n3 {
+					continue
+				}
+
+				// Preventing duplicate
+				id1 := p1.ID()
+				id2 := p2.ID()
+				if id1 > id2 {
+					id1, id2 = id2, id1
+				}
+				key := [2]uint8{id1, id2}
+				if _, ok := used[key]; ok {
+					// If the pair of tiles has already been used, skip it.
+					continue
+				}
+				used[key] = struct{}{}
+
+				// Create a chi
+				consumed := [2]Pai{p1, p2}
+				furo, err := NewChi(*taken, consumed, s.prevDahaiActor)
+				if err != nil {
+					return nil, err
+				}
+
+				// 喰い替えチェック
+				// チーで消費する2枚を除いた手牌を作る
+				rest := make([]Pai, 0, len(tehais)-2)
+				usedIdx := map[int]bool{}
+				p1used := false
+				p2used := false
+				for idx, tp := range tehais {
+					if !p1used && tp.ID() == p1.ID() {
+						usedIdx[idx] = true
+						p1used = true
 						continue
 					}
-					used[key] = struct{}{}
-
-					consumed := [2]Pai{p1, p2}
-					furo, err := NewChi(*taken, consumed, s.prevDahaiActor)
-					if err != nil {
-						return nil, err
+					if !p2used && tp.ID() == p2.ID() && !usedIdx[idx] {
+						usedIdx[idx] = true
+						p2used = true
+						continue
 					}
-					furos = append(furos, furo)
 				}
+				for idx, tp := range tehais {
+					if !usedIdx[idx] {
+						rest = append(rest, tp)
+					}
+				}
+				// 残り手牌がすべて喰い替え対象ならスキップ
+				allKuikae := true
+				for _, tp := range rest {
+					if !IsKuikae(furo, &tp) {
+						allKuikae = false
+						break
+					}
+				}
+				if allKuikae {
+					continue
+				}
+
+				furos = append(furos, furo)
 			}
 		}
 	}
