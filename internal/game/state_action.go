@@ -145,8 +145,77 @@ func (s *StateImpl) chiCandidates() ([]Furo, error) {
 		return nil, nil
 	}
 
-	// TODO: Implement logic.
-	return nil, nil
+	taken := s.prevDahaiPai
+	if taken == nil {
+		return nil, nil
+	}
+	if taken.IsTsupai() {
+		// Chi is not possible for honors.
+		return nil, nil
+	}
+
+	player := &s.players[s.playerID]
+	tehais := player.tehais
+
+	furos := make([]Furo, 0, 5)
+	used := make(map[[2]uint8]struct{})
+	takenNum := int(taken.Number())
+	for d := -2; d <= 0; d++ {
+		// takenが左端・中央・右端になる3パターン
+		n1 := takenNum + d
+		n2 := takenNum + d + 1
+		n3 := takenNum + d + 2
+		if n1 < 1 || n3 > 9 {
+			continue
+		}
+
+		// taken以外の2枚を探す
+		var cands []Pai
+		for _, p := range tehais {
+			if p.Type() != taken.Type() {
+				continue
+			}
+			if p.HasSameSymbol(taken) {
+				continue
+			}
+			if n := int(p.Number()); n == n1 || n == n2 || n == n3 {
+				cands = append(cands, p)
+			}
+		}
+
+		for i := range cands {
+			for j := i + 1; j < len(cands); j++ {
+				// taken以外の2枚
+				p1 := cands[i]
+				p2 := cands[j]
+				// taken, p1, p2 で3連続になるか確認
+				nums := []int{takenNum, int(p1.Number()), int(p2.Number())}
+				slices.Sort(nums)
+				if nums[0] == n1 && nums[1] == n2 && nums[2] == n3 {
+					// Preventing duplicate
+					id1 := p1.ID()
+					id2 := p2.ID()
+					if id1 > id2 {
+						id1, id2 = id2, id1
+					}
+					key := [2]uint8{id1, id2}
+					if _, ok := used[key]; ok {
+						// If the pair of tiles has already been used, skip it.
+						continue
+					}
+					used[key] = struct{}{}
+
+					consumed := [2]Pai{p1, p2}
+					furo, err := NewChi(*taken, consumed, s.prevDahaiActor)
+					if err != nil {
+						return nil, err
+					}
+					furos = append(furos, furo)
+				}
+			}
+		}
+	}
+	return furos, nil
 }
 
 func (s *StateImpl) ponCandidates() ([]Furo, error) {
@@ -171,13 +240,13 @@ func (s *StateImpl) ponCandidates() ([]Furo, error) {
 	used := make(map[[2]uint8]struct{})
 	for i := range numConsumedPais {
 		for j := i + 1; j < numConsumedPais; j++ {
-			// Ensure that we do not use the same pair of tiles more than once.
+			// Preventing duplicate
 			id1 := consumedPais[i].ID()
 			id2 := consumedPais[j].ID()
-			key := [2]uint8{id1, id2}
 			if id1 > id2 {
-				key = [2]uint8{id2, id1}
+				id1, id2 = id2, id1
 			}
+			key := [2]uint8{id1, id2}
 			if _, ok := used[key]; ok {
 				// If the pair of tiles has already been used, skip it.
 				continue
