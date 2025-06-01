@@ -321,6 +321,13 @@ func (a *ManueAI) printMetrics(ms metrics) {
 	})
 
 	for _, kv := range sortedMetrics {
+		var shanten string
+		if kv.m.shanten == game.InfinityShanten {
+			shanten = "Infinity"
+		} else {
+			shanten = fmt.Sprintf("%d", kv.m.shanten)
+		}
+
 		arrays = append(arrays, []string{
 			kv.key,
 			fmt.Sprintf("%.4f", kv.m.averageRank),
@@ -331,7 +338,7 @@ func (a *ManueAI) printMetrics(ms metrics) {
 			fmt.Sprintf("%.3f", kv.m.othersHoraProb),
 			fmt.Sprintf("%.0f", kv.m.averageHoraPoints),
 			fmt.Sprintf("%.0f", kv.m.ryukyokuAveragePoints),
-			fmt.Sprintf("%d", kv.m.shanten),
+			shanten,
 		})
 	}
 
