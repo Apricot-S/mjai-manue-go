@@ -118,6 +118,12 @@ func (s *StateImpl) FuroCandidates() ([]Furo, error) {
 		return nil, nil
 	}
 
+	player := &s.players[s.playerID]
+	if player.ReachState() != None {
+		// If the player has already declared the reach, the player cannot furo.
+		return nil, nil
+	}
+
 	cc, err := s.chiCandidates()
 	if err != nil {
 		return nil, err
@@ -144,13 +150,76 @@ func (s *StateImpl) chiCandidates() ([]Furo, error) {
 }
 
 func (s *StateImpl) ponCandidates() ([]Furo, error) {
-	// TODO: Implement logic.
-	return nil, nil
+	taken := s.prevDahaiPai
+	if taken == nil {
+		return nil, nil
+	}
+
+	consumedPais := make([]Pai, 0, 3)
+	player := &s.players[s.playerID]
+	for _, p := range player.tehais {
+		if p.HasSameSymbol(taken) {
+			consumedPais = append(consumedPais, p)
+		}
+	}
+	numConsumedPais := len(consumedPais)
+	if numConsumedPais < 2 {
+		return nil, nil
+	}
+
+	furos := make([]Furo, 0, 2)
+	used := make(map[[2]uint8]struct{})
+	for i := range numConsumedPais {
+		for j := i + 1; j < numConsumedPais; j++ {
+			// Ensure that we do not use the same pair of tiles more than once.
+			id1 := consumedPais[i].ID()
+			id2 := consumedPais[j].ID()
+			key := [2]uint8{id1, id2}
+			if id1 > id2 {
+				key = [2]uint8{id2, id1}
+			}
+			if _, ok := used[key]; ok {
+				// If the pair of tiles has already been used, skip it.
+				continue
+			}
+			used[key] = struct{}{}
+
+			consumed := [2]Pai{consumedPais[i], consumedPais[j]}
+			furo, err := NewPon(*taken, consumed, s.prevDahaiActor)
+			if err != nil {
+				return nil, err
+			}
+			furos = append(furos, furo)
+		}
+	}
+	return furos, nil
 }
 
 func (s *StateImpl) daiminkanCandidates() ([]Furo, error) {
-	// TODO: Implement logic.
-	return nil, nil
+	taken := s.prevDahaiPai
+	if taken == nil {
+		return nil, nil
+	}
+
+	consumedPais := make([]Pai, 0, 3)
+	player := &s.players[s.playerID]
+	for _, p := range player.tehais {
+		if p.HasSameSymbol(taken) {
+			consumedPais = append(consumedPais, p)
+		}
+	}
+	numConsumedPais := len(consumedPais)
+	if numConsumedPais != 3 {
+		return nil, nil
+	}
+
+	consumed := [3]Pai(consumedPais)
+	furo, err := NewDaiminkan(*taken, consumed, s.prevDahaiActor)
+	if err != nil {
+		return nil, err
+	}
+	furos := []Furo{furo}
+	return furos, nil
 }
 
 func (s *StateImpl) HoraCandidate() (*Hora, error) {
