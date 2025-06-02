@@ -32,6 +32,7 @@ type StateImpl struct {
 
 	// The tiles that cannot be discarded because they would result in swap calling (喰い替え)
 	kuikaePais     []Pai
+	isFuriten      bool
 	isRinshanTsumo bool
 }
 

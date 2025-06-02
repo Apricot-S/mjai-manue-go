@@ -65,6 +65,7 @@ func (s *StateImpl) OnStartGame(event jsontext.Value) error {
 	s.lastActionType = noEvent
 
 	s.kuikaePais = make([]Pai, 0, 3)
+	s.isFuriten = false
 	s.isRinshanTsumo = false
 
 	return nil
@@ -237,6 +238,7 @@ func (s *StateImpl) onStartKyoku(event *message.StartKyoku) error {
 	s.lastActionType = noEvent
 
 	s.kuikaePais = make([]Pai, 0, 3)
+	s.isFuriten = false
 	s.isRinshanTsumo = false
 
 	return nil
@@ -293,6 +295,9 @@ func (s *StateImpl) onDahai(event *message.Dahai) error {
 
 	if actor == s.playerID {
 		s.kuikaePais = make([]Pai, 0, 3)
+		if player.ReachState() != Accepted {
+			s.isFuriten = false
+		}
 		s.isRinshanTsumo = false
 	}
 

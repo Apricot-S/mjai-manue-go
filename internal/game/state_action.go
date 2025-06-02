@@ -331,6 +331,7 @@ func (s *StateImpl) daiminkanCandidates() ([]Furo, error) {
 	return furos, nil
 }
 
+// To be fixed: If called multiple times in the same situation, it will become furiten.
 func (s *StateImpl) HoraCandidate() (*Hora, error) {
 	if s.lastActor == noActor {
 		return nil, nil
@@ -340,6 +341,10 @@ func (s *StateImpl) HoraCandidate() (*Hora, error) {
 	isRonSituation := s.lastActor != s.playerID &&
 		s.lastActionType == message.TypeDahai || s.lastActionType == message.TypeKakan
 	if !isTsumoSituation && !isRonSituation {
+		return nil, nil
+	}
+	if s.isFuriten && !isTsumoSituation {
+		// If the player is in furiten, the player cannot ron.
 		return nil, nil
 	}
 
@@ -367,13 +372,18 @@ func (s *StateImpl) HoraCandidate() (*Hora, error) {
 		return nil, nil
 	}
 
+	s.isFuriten = true
+
 	has1Fan := (isTsumoSituation && player.IsMenzen()) || // menzenchin tsumoho
 		(player.ReachState() == Accepted) || // reach
 		(s.lastActionType == message.TypeKakan) || // chankan
 		s.isRinshanTsumo || // rinshankaiho
 		(s.NumPipais() == 0) // haiteimoyue or hoteiraoyui
 	if !has1Fan {
-		has1Fan = false // TODO: Yaku check
+		has1Fan, err = Has1Fan(s, s.playerID, tehais, player.Furos(), s.prevDahaiPai, isTsumoSituation)
+		if err != nil {
+			return nil, fmt.Errorf("failed to check if has 1 fan: %w", err)
+		}
 	}
 
 	// TODO: Implement logic.

@@ -105,6 +105,18 @@ func CalculateFan(
 	return fu, fan, points, yakus
 }
 
+func Has1Fan(
+	state StateViewer,
+	playerID int,
+	tehais Pais,
+	furos []Furo,
+	horaPai *Pai,
+	isTsumo bool,
+) (bool, error) {
+	// TODO: Implement 1 fan
+	return false, nil
+}
+
 func isTanyaochu(allPais Pais) bool {
 	for _, p := range allPais {
 		if p.IsYaochu() {
