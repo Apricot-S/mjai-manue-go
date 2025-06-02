@@ -779,7 +779,7 @@ func TestGetUniquePais(t *testing.T) {
 	type testCase struct {
 		name string
 		args args
-		want []Pai
+		want Pais
 	}
 	tests := []testCase{
 		{
@@ -796,7 +796,7 @@ func TestGetUniquePais(t *testing.T) {
 				ps:  Pais{},
 				del: func(p Pai) bool { return false },
 			},
-			want: []Pai{},
+			want: Pais{},
 		},
 		{
 			name: "one element",
@@ -807,9 +807,9 @@ func TestGetUniquePais(t *testing.T) {
 				}(),
 				del: func(p Pai) bool { return false },
 			},
-			want: func() []Pai {
+			want: func() Pais {
 				p, _ := NewPaiWithName("1m")
-				return []Pai{*p}
+				return Pais{*p}
 			}(),
 		},
 		{
@@ -822,10 +822,10 @@ func TestGetUniquePais(t *testing.T) {
 				}(),
 				del: func(p Pai) bool { return false },
 			},
-			want: func() []Pai {
+			want: func() Pais {
 				p1, _ := NewPaiWithName("1m")
 				p2, _ := NewPaiWithName("2m")
-				return []Pai{*p1, *p2}
+				return Pais{*p1, *p2}
 			}(),
 		},
 		{
@@ -838,9 +838,9 @@ func TestGetUniquePais(t *testing.T) {
 				}(),
 				del: func(p Pai) bool { return false },
 			},
-			want: func() []Pai {
+			want: func() Pais {
 				p1, _ := NewPaiWithName("1m")
-				return []Pai{*p1}
+				return Pais{*p1}
 			}(),
 		},
 		{
@@ -853,10 +853,10 @@ func TestGetUniquePais(t *testing.T) {
 				}(),
 				del: func(p Pai) bool { return false },
 			},
-			want: func() []Pai {
+			want: func() Pais {
 				p1, _ := NewPaiWithName("5m")
 				p2, _ := NewPaiWithName("5mr")
-				return []Pai{*p1, *p2}
+				return Pais{*p1, *p2}
 			}(),
 		},
 		{
@@ -870,10 +870,10 @@ func TestGetUniquePais(t *testing.T) {
 				}(),
 				del: func(p Pai) bool { return false },
 			},
-			want: func() []Pai {
+			want: func() Pais {
 				p1, _ := NewPaiWithName("1m")
 				p2, _ := NewPaiWithName("2m")
-				return []Pai{*p1, *p2}
+				return Pais{*p1, *p2}
 			}(),
 		},
 		{
@@ -887,11 +887,11 @@ func TestGetUniquePais(t *testing.T) {
 				}(),
 				del: func(p Pai) bool { return false },
 			},
-			want: func() []Pai {
+			want: func() Pais {
 				p1, _ := NewPaiWithName("1m")
 				p2, _ := NewPaiWithName("2m")
 				p3, _ := NewPaiWithName("3m")
-				return []Pai{*p1, *p2, *p3}
+				return Pais{*p1, *p2, *p3}
 			}(),
 		},
 	}

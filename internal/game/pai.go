@@ -326,7 +326,7 @@ func (ps Pais) Swap(i, j int) {
 	ps[i], ps[j] = ps[j], ps[i]
 }
 
-func GetUniquePais(ps Pais, del func(Pai) bool) []Pai {
+func GetUniquePais(ps Pais, del func(Pai) bool) Pais {
 	unique := slices.Clone(ps)
 	sort.Sort(unique)
 	unique = slices.CompactFunc(unique, func(a, b Pai) bool {
