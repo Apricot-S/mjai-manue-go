@@ -6,6 +6,7 @@ import (
 )
 
 // PaiSet represents the number of each tile.
+// Red 5 are not distinguished from normal 5.
 type PaiSet [NumIDs]int
 
 func NewPaiSet(pais []Pai) (*PaiSet, error) {
