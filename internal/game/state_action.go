@@ -387,5 +387,14 @@ func (s *StateImpl) HoraCandidate() (*Hora, error) {
 	}
 
 	// TODO: Implement logic.
+
+	if has1Fan {
+		hora, err := NewHora(*s.prevDahaiPai, s.lastActor)
+		if err != nil {
+			return nil, fmt.Errorf("failed to create hora: %w", err)
+		}
+		return hora, nil
+	}
+
 	return nil, nil
 }
