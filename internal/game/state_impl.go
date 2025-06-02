@@ -31,7 +31,8 @@ type StateImpl struct {
 	lastActionType message.Type
 
 	// The tiles that cannot be discarded because they would result in swap calling (喰い替え)
-	kuikaePais []Pai
+	kuikaePais     []Pai
+	isRinshanTsumo bool
 }
 
 func (s *StateImpl) Players() *[NumPlayers]Player {

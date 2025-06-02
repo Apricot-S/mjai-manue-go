@@ -65,6 +65,7 @@ func (s *StateImpl) OnStartGame(event jsontext.Value) error {
 	s.lastActionType = noEvent
 
 	s.kuikaePais = make([]Pai, 0, 3)
+	s.isRinshanTsumo = false
 
 	return nil
 }
@@ -236,6 +237,7 @@ func (s *StateImpl) onStartKyoku(event *message.StartKyoku) error {
 	s.lastActionType = noEvent
 
 	s.kuikaePais = make([]Pai, 0, 3)
+	s.isRinshanTsumo = false
 
 	return nil
 }
@@ -291,6 +293,7 @@ func (s *StateImpl) onDahai(event *message.Dahai) error {
 
 	if actor == s.playerID {
 		s.kuikaePais = make([]Pai, 0, 3)
+		s.isRinshanTsumo = false
 	}
 
 	return nil
@@ -472,6 +475,10 @@ func (s *StateImpl) onDaiminkan(event *message.Daiminkan) error {
 	s.lastActor = actor
 	s.lastActionType = message.TypeDaiminkan
 
+	if actor == s.playerID {
+		s.isRinshanTsumo = true
+	}
+
 	return nil
 }
 
@@ -505,6 +512,10 @@ func (s *StateImpl) onAnkan(event *message.Ankan) error {
 
 	s.lastActor = actor
 	s.lastActionType = message.TypeAnkan
+
+	if actor == s.playerID {
+		s.isRinshanTsumo = true
+	}
 
 	return nil
 }
@@ -547,6 +558,10 @@ func (s *StateImpl) onKakan(event *message.Kakan) error {
 
 	s.lastActor = actor
 	s.lastActionType = message.TypeKakan
+
+	if actor == s.playerID {
+		s.isRinshanTsumo = true
+	}
 
 	return nil
 }

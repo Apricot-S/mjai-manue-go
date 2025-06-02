@@ -343,7 +343,9 @@ func (s *StateImpl) HoraCandidate() (*Hora, error) {
 		return nil, nil
 	}
 
-	tehais := s.players[s.playerID].tehais
+	player := &s.players[s.playerID]
+	tehais := player.tehais
+
 	tehaiCounts, err := NewPaiSetWithPais(tehais)
 	if err != nil {
 		return nil, err
@@ -357,13 +359,21 @@ func (s *StateImpl) HoraCandidate() (*Hora, error) {
 			return nil, fmt.Errorf("failed to add dahaiPai %v to tehaiCounts: %w", dahaiPai, err)
 		}
 	}
-
 	isHoraFrom, err := IsHoraForm(tehaiCounts)
 	if err != nil {
 		return nil, fmt.Errorf("failed to check if tehaiCounts is hora form: %w", err)
 	}
 	if !isHoraFrom {
 		return nil, nil
+	}
+
+	has1Fan := (isTsumoSituation && player.IsMenzen()) || // menzenchin tsumoho
+		(player.ReachState() == Accepted) || // reach
+		(s.lastActionType == message.TypeKakan) || // chankan
+		s.isRinshanTsumo || // rinshankaiho
+		(s.NumPipais() == 0) // haiteimoyue or hoteiraoyui
+	if !has1Fan {
+		has1Fan = false // TODO: Yaku check
 	}
 
 	// TODO: Implement logic.
