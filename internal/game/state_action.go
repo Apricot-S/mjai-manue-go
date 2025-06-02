@@ -1,6 +1,7 @@
 package game
 
 import (
+	"fmt"
 	"slices"
 
 	"github.com/Apricot-S/mjai-manue-go/internal/message"
@@ -334,13 +335,34 @@ func (s *StateImpl) HoraCandidate() (*Hora, error) {
 	if s.lastActor == noActor {
 		return nil, nil
 	}
-	if s.lastActor == s.playerID && s.lastActionType != message.TypeTsumo {
-		// If the last actor is the player itself, it cannot be a ron hora.
+
+	isTsumoSituation := s.lastActor == s.playerID && s.lastActionType == message.TypeTsumo
+	isRonSituation := s.lastActor != s.playerID &&
+		s.lastActionType == message.TypeDahai || s.lastActionType == message.TypeKakan
+	if !isTsumoSituation && !isRonSituation {
 		return nil, nil
 	}
-	if s.lastActor != s.playerID &&
-		s.lastActionType != message.TypeDahai && s.lastActionType != message.TypeKakan {
-		// If the last actor is not the player itself, it cannot be a tsumo hora.
+
+	tehais := s.players[s.playerID].tehais
+	tehaiCounts, err := NewPaiSetWithPais(tehais)
+	if err != nil {
+		return nil, err
+	}
+	if isRonSituation {
+		dahaiPai := s.prevDahaiPai
+		if dahaiPai == nil {
+			return nil, fmt.Errorf("dahaiPai is nil, but canRon is true")
+		}
+		if err := tehaiCounts.AddPai(dahaiPai, 1); err != nil {
+			return nil, fmt.Errorf("failed to add dahaiPai %v to tehaiCounts: %w", dahaiPai, err)
+		}
+	}
+
+	isHoraFrom, err := IsHoraForm(tehaiCounts)
+	if err != nil {
+		return nil, fmt.Errorf("failed to check if tehaiCounts is hora form: %w", err)
+	}
+	if !isHoraFrom {
 		return nil, nil
 	}
 
