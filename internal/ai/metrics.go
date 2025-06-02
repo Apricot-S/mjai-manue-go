@@ -161,7 +161,7 @@ func (a *ManueAI) getMetricsInternal(
 	dahaiCandidates []game.Pai,
 	reach bool,
 ) (metrics, error) {
-	ps, err := game.NewPaiSetWithPais(tehais)
+	ps, err := game.NewPaiSet(tehais)
 	if err != nil {
 		return nil, err
 	}
@@ -403,7 +403,7 @@ func (a *ManueAI) getHoraEstimation(
 	gs = slices.Clip(gs)
 	fmt.Fprintf(os.Stderr, "goals %d\n", len(gs))
 
-	visiblePaiSet, err := game.NewPaiSetWithPais(state.VisiblePais(&state.Players()[playerID]))
+	visiblePaiSet, err := game.NewPaiSet(state.VisiblePais(&state.Players()[playerID]))
 	if err != nil {
 		return nil, err
 	}
@@ -426,7 +426,7 @@ func (a *ManueAI) getHoraEstimation(
 		core.ShuffleWall(rng, &invisiblePais)
 		tsumoPais := make(game.Pais, numTsumos)
 		copy(tsumoPais, invisiblePais[:numTsumos])
-		tsumoVector, err := game.NewPaiSetWithPais(tsumoPais)
+		tsumoVector, err := game.NewPaiSet(tsumoPais)
 		if err != nil {
 			return nil, err
 		}

@@ -6,7 +6,7 @@ import (
 
 func convertStrToPaiSetForTest(paiStr string) *PaiSet {
 	pais, _ := StrToPais(paiStr)
-	ps, _ := NewPaiSetWithPais(pais)
+	ps, _ := NewPaiSet(pais)
 	return ps
 }
 

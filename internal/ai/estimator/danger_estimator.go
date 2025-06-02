@@ -42,16 +42,16 @@ func NewScene(gameState game.StateViewer, me *game.Player, target *game.Player) 
 	}
 
 	var err error
-	if s.tehaiSet, err = game.NewPaiSetWithPais(me.Tehais()); err != nil {
+	if s.tehaiSet, err = game.NewPaiSet(me.Tehais()); err != nil {
 		return nil, err
 	}
-	if s.anpaiSet, err = game.NewPaiSetWithPais(gameState.Anpais(target)); err != nil {
+	if s.anpaiSet, err = game.NewPaiSet(gameState.Anpais(target)); err != nil {
 		return nil, err
 	}
-	if s.visibleSet, err = game.NewPaiSetWithPais(gameState.VisiblePais(me)); err != nil {
+	if s.visibleSet, err = game.NewPaiSet(gameState.VisiblePais(me)); err != nil {
 		return nil, err
 	}
-	if s.doraSet, err = game.NewPaiSetWithPais(gameState.Doras()); err != nil {
+	if s.doraSet, err = game.NewPaiSet(gameState.Doras()); err != nil {
 		return nil, err
 	}
 
@@ -66,18 +66,18 @@ func NewScene(gameState game.StateViewer, me *game.Player, target *game.Player) 
 		reachPai := sutehais[idx]
 		reachPais = game.Pais{reachPai}
 	}
-	if s.prereachSutehaiSet, err = game.NewPaiSetWithPais(prereachSutehais); err != nil {
+	if s.prereachSutehaiSet, err = game.NewPaiSet(prereachSutehais); err != nil {
 		return nil, err
 	}
-	if s.reachPaiSet, err = game.NewPaiSetWithPais(reachPais); err != nil {
+	if s.reachPaiSet, err = game.NewPaiSet(reachPais); err != nil {
 		return nil, err
 	}
 
 	halfLen := len(prereachSutehais) / 2
-	if s.earlySutehaiSet, err = game.NewPaiSetWithPais(prereachSutehais[:halfLen]); err != nil {
+	if s.earlySutehaiSet, err = game.NewPaiSet(prereachSutehais[:halfLen]); err != nil {
 		return nil, err
 	}
-	if s.lateSutehaiSet, err = game.NewPaiSetWithPais(prereachSutehais[halfLen:]); err != nil {
+	if s.lateSutehaiSet, err = game.NewPaiSet(prereachSutehais[halfLen:]); err != nil {
 		return nil, err
 	}
 

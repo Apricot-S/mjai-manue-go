@@ -6,7 +6,7 @@ import (
 	"testing"
 )
 
-func TestNewPaiSetWithPais(t *testing.T) {
+func TestNewPaiSet(t *testing.T) {
 	type args struct {
 		pais []Pai
 	}
@@ -68,13 +68,13 @@ func TestNewPaiSetWithPais(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := NewPaiSetWithPais(tt.args.pais)
+			got, err := NewPaiSet(tt.args.pais)
 			if (err != nil) != tt.wantErr {
-				t.Errorf("NewPaiSetWithPais() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("NewPaiSet() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
 			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("NewPaiSetWithPais() = %v, want %v", got, tt.want)
+				t.Errorf("NewPaiSet() = %v, want %v", got, tt.want)
 			}
 		})
 	}
@@ -479,7 +479,7 @@ func TestPaiSet_RemovePaiSet(t *testing.T) {
 		array := [NumIDs]int{}
 		array[i] = 1
 		p, _ := NewPaiWithID(i)
-		ps, _ := NewPaiSetWithPais([]Pai{*p})
+		ps, _ := NewPaiSet([]Pai{*p})
 		want := PaiSet{}
 		tests = append(tests, testCase{p.ToString() + "+1-1", fields{array}, args{ps}, want})
 	}
@@ -487,7 +487,7 @@ func TestPaiSet_RemovePaiSet(t *testing.T) {
 		array := [NumIDs]int{}
 		array[4+i*9] = 1
 		r, _ := NewPaiWithName(n)
-		ps, _ := NewPaiSetWithPais([]Pai{*r})
+		ps, _ := NewPaiSet([]Pai{*r})
 		want := PaiSet{}
 		tests = append(tests, testCase{r.ToString() + "+1-1", fields{array}, args{ps}, want})
 	}

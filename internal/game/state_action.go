@@ -59,7 +59,7 @@ func (s *StateImpl) ReachDahaiCandidates() ([]Pai, error) {
 		return nil, nil
 	}
 
-	tehaiCounts, err := NewPaiSetWithPais(player.tehais)
+	tehaiCounts, err := NewPaiSet(player.tehais)
 	if err != nil {
 		return nil, err
 	}
@@ -351,7 +351,7 @@ func (s *StateImpl) HoraCandidate() (*Hora, error) {
 	player := &s.players[s.playerID]
 	tehais := player.tehais
 
-	tehaiCounts, err := NewPaiSetWithPais(tehais)
+	tehaiCounts, err := NewPaiSet(tehais)
 	if err != nil {
 		return nil, err
 	}

@@ -71,7 +71,7 @@ func verifyShantenWithUpperBounds(t *testing.T, paiSet *game.PaiSet, expectedSha
 
 func testAnalyzeShantenInternal(t *testing.T, paiStr string, expectedShanten int, expectedGoalsSize int) {
 	pais, _ := game.StrToPais(paiStr)
-	paiSet, _ := game.NewPaiSetWithPais(pais)
+	paiSet, _ := game.NewPaiSet(pais)
 
 	verifyShantenAndGoals(t, paiSet, expectedShanten, expectedGoalsSize)
 	verifyShantenWithUpperBounds(t, paiSet, expectedShanten, expectedGoalsSize)
@@ -171,7 +171,7 @@ func TestAnalyzeShanten_Invalid(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.args.ps, func(t *testing.T) {
 			pais, _ := game.StrToPais(tt.args.ps)
-			paiSet, _ := game.NewPaiSetWithPais(pais)
+			paiSet, _ := game.NewPaiSet(pais)
 
 			shanten, goals, err := game.AnalyzeShanten(paiSet)
 			if err == nil {
