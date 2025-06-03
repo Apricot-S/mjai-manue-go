@@ -824,15 +824,15 @@ func TestPlayer_onAnkan(t *testing.T) {
 
 		p, _ := NewPlayer(0, "", 25_000)
 		p.onStartKyoku(tehais, nil)
-		p.onChiPonKan(furo1)
+		p.onDaiminkan(furo1)
 		p.onTsumo(*tsumoPai1)
 		p.onDahai(*dahai1)
-		p.onChiPonKan(furo2)
+		p.onDaiminkan(furo2)
 		p.onTsumo(*tsumoPai2)
 		p.onDahai(*dahai2)
-		p.onChiPonKan(furo3)
+		p.onPon(furo3)
 		p.onDahai(*dahai3)
-		p.onChiPonKan(furo4)
+		p.onChi(furo4)
 		p.onDahai(*dahai4)
 
 		err := p.onAnkan(furo5)
@@ -883,7 +883,7 @@ func TestPlayer_onKakan(t *testing.T) {
 
 		p, _ := NewPlayer(0, "", 25_000)
 		p.onStartKyoku(tehais, nil)
-		p.onChiPonKan(furo1)
+		p.onPon(furo1)
 		p.onDahai(*dahai1)
 		p.onTsumo(*tsumoPai)
 
@@ -954,15 +954,15 @@ func TestPlayer_onKakan(t *testing.T) {
 
 		p, _ := NewPlayer(0, "", 25_000)
 		p.onStartKyoku(tehais, nil)
-		p.onChiPonKan(furo1)
+		p.onDaiminkan(furo1)
 		p.onTsumo(*tsumoPai1)
 		p.onDahai(*dahai1)
-		p.onChiPonKan(furo2)
+		p.onDaiminkan(furo2)
 		p.onTsumo(*tsumoPai2)
 		p.onDahai(*dahai2)
-		p.onChiPonKan(furo3)
+		p.onPon(furo3)
 		p.onDahai(*dahai3)
-		p.onChiPonKan(furo4)
+		p.onChi(furo4)
 		p.onDahai(*dahai4)
 		p.onTsumo(*tsumoPai)
 
@@ -1008,7 +1008,7 @@ func TestPlayer_onKakan(t *testing.T) {
 
 		p, _ := NewPlayer(0, "", 25_000)
 		p.onStartKyoku(tehais, nil)
-		p.onChiPonKan(furo1)
+		p.onPon(furo1)
 		p.onDahai(*dahai1)
 
 		err := p.onKakan(furo2)
@@ -1135,7 +1135,7 @@ func TestPlayer_onReach(t *testing.T) {
 
 		p, _ := NewPlayer(0, "", 25_000)
 		p.onStartKyoku(tehais, nil)
-		p.onChiPonKan(furo)
+		p.onPon(furo)
 		p.onDahai(*dahai)
 		p.onTsumo(*tsumoPai1)
 

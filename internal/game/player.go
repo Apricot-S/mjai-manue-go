@@ -224,40 +224,6 @@ func (p *Player) onDahai(pai Pai) error {
 	return nil
 }
 
-func (p *Player) onChiPonKan(furo Furo) error {
-	if p.canDahai {
-		return fmt.Errorf("it is not in a state to be chi/pon/kan")
-	}
-
-	if p.reachState != None {
-		return fmt.Errorf("chi/pon/kan are not possible during reach")
-	}
-
-	numFuro := len(p.furos)
-	if numFuro >= maxNumFuro {
-		return fmt.Errorf("a 5th furo is not possible")
-	}
-
-	switch furo.(type) {
-	case *Chi, *Pon, *Daiminkan:
-	default:
-		return fmt.Errorf("invalid furo for `onChiPonKan`: %v", furo)
-	}
-
-	for _, pai := range furo.Consumed() {
-		err := p.deleteTehai(&pai)
-		if err != nil {
-			return fmt.Errorf("failed to delete tehais on chi/pon/kan: %w", err)
-		}
-	}
-
-	p.furos = append(p.furos, furo)
-	_, isDaiminkan := furo.(*Daiminkan)
-	p.canDahai = !isDaiminkan
-	p.isMenzen = false
-	return nil
-}
-
 func (p *Player) onChi(furo *Chi) error {
 	if p.canDahai {
 		return fmt.Errorf("it is not in a state to be chi")

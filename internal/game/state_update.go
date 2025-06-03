@@ -331,7 +331,7 @@ func (s *StateImpl) onChi(event *message.Chi) error {
 	}
 
 	actor := event.Actor
-	err = s.players[actor].onChiPonKan(furo)
+	err = s.players[actor].onChi(furo)
 	if err != nil {
 		return err
 	}
@@ -415,7 +415,7 @@ func (s *StateImpl) onPon(event *message.Pon) error {
 	}
 
 	actor := event.Actor
-	err = s.players[actor].onChiPonKan(furo)
+	err = s.players[actor].onPon(furo)
 	if err != nil {
 		return err
 	}
@@ -466,7 +466,7 @@ func (s *StateImpl) onDaiminkan(event *message.Daiminkan) error {
 	}
 
 	actor := event.Actor
-	err = s.players[actor].onChiPonKan(furo)
+	err = s.players[actor].onDaiminkan(furo)
 	if err != nil {
 		return err
 	}
