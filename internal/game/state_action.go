@@ -331,7 +331,6 @@ func (s *StateImpl) daiminkanCandidates() ([]Furo, error) {
 	return furos, nil
 }
 
-// To be fixed: If called multiple times in the same situation, it will become furiten.
 func (s *StateImpl) HoraCandidate() (*Hora, error) {
 	if s.lastActor == noActor {
 		return nil, nil
@@ -371,8 +370,6 @@ func (s *StateImpl) HoraCandidate() (*Hora, error) {
 	if !isHoraFrom {
 		return nil, nil
 	}
-
-	s.isFuriten = true
 
 	has1Fan := (isTsumoSituation && player.IsMenzen()) || // menzenchin tsumoho
 		(player.ReachState() == Accepted) || // reach

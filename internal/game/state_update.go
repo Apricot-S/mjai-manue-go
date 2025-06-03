@@ -299,6 +299,31 @@ func (s *StateImpl) onDahai(event *message.Dahai) error {
 			s.isFuriten = false
 		}
 		s.isRinshanTsumo = false
+
+		tehaiCounts, err := NewPaiSet(player.tehais)
+		if err != nil {
+			return err
+		}
+
+		for _, anpai := range s.Anpais(player) {
+			if err := tehaiCounts.AddPai(&anpai, 1); err != nil {
+				return fmt.Errorf("failed to add anpai %v to tehaiCounts: %w", anpai, err)
+			}
+
+			isHoraFrom, err := IsHoraForm(tehaiCounts)
+			if err != nil {
+				return fmt.Errorf("failed to check if tehaiCounts is hora form: %w", err)
+			}
+
+			if err := tehaiCounts.AddPai(&anpai, -1); err != nil {
+				return fmt.Errorf("failed to remove anpai %v to tehaiCounts: %w", anpai, err)
+			}
+
+			if isHoraFrom {
+				s.isFuriten = true
+				break
+			}
+		}
 	}
 
 	return nil
