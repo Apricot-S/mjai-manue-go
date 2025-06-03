@@ -383,8 +383,6 @@ func (s *StateImpl) HoraCandidate() (*Hora, error) {
 		}
 	}
 
-	// TODO: Implement logic.
-
 	if has1Fan {
 		hora, err := NewHora(*s.prevDahaiPai, s.lastActor)
 		if err != nil {
