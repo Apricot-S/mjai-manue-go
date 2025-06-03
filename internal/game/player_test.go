@@ -361,7 +361,7 @@ func TestPlayer_onDahai(t *testing.T) {
 	})
 }
 
-func TestPlayer_onChiPonKan(t *testing.T) {
+func TestPlayer_onChi(t *testing.T) {
 	// on chi
 	t.Run("on chi", func(t *testing.T) {
 		tehais, _ := StrToPais("1m 2m 3m 6m 7m 8m 1p 2p 3p 6p 8p N N")
@@ -374,9 +374,9 @@ func TestPlayer_onChiPonKan(t *testing.T) {
 		p, _ := NewPlayer(0, "", 25_000)
 		p.onStartKyoku(tehais, nil)
 
-		err := p.onChiPonKan(furo)
+		err := p.onChi(furo)
 		if err != nil {
-			t.Errorf("Player.onChiPonKan() error = %v", err)
+			t.Errorf("Player.onChi() error = %v", err)
 		}
 
 		want := &Player{
@@ -400,6 +400,99 @@ func TestPlayer_onChiPonKan(t *testing.T) {
 		}
 	})
 
+	// cannot 5th furo
+	t.Run("cannot 5th furo", func(t *testing.T) {
+		tehais, _ := StrToPais("2m 3m 1p 1p 2p 3p 1s 1s 1s 2s N N N")
+		target := 2
+
+		taken1, _ := NewPaiWithName("N")
+		consumed1, _ := StrToPais("N N N")
+		furo1, _ := NewDaiminkan(*taken1, [3]Pai(consumed1), target)
+		tsumoPai1, _ := NewPaiWithName("4m")
+		dahai1, _ := NewPaiWithName("4m")
+
+		taken2, _ := NewPaiWithName("1s")
+		consumed2, _ := StrToPais("1s 1s 1s")
+		furo2, _ := NewDaiminkan(*taken2, [3]Pai(consumed2), target)
+		tsumoPai2, _ := NewPaiWithName("4m")
+		dahai2, _ := NewPaiWithName("4m")
+
+		taken3, _ := NewPaiWithName("1p")
+		consumed3, _ := StrToPais("1p 1p")
+		furo3, _ := NewPon(*taken3, [2]Pai(consumed3), target)
+		dahai3, _ := NewPaiWithName("2s")
+
+		taken4, _ := NewPaiWithName("1m")
+		consumed4, _ := StrToPais("2m 3m")
+		furo4, _ := NewChi(*taken4, [2]Pai(consumed4), target)
+		dahai4, _ := NewPaiWithName("3p")
+
+		taken5, _ := NewPaiWithName("4p")
+		consumed5, _ := StrToPais("2p 3p")
+		furo5, _ := NewChi(*taken5, [2]Pai(consumed5), target)
+
+		p, _ := NewPlayer(0, "", 25_000)
+		p.onStartKyoku(tehais, nil)
+		p.onDaiminkan(furo1)
+		p.onTsumo(*tsumoPai1)
+		p.onDahai(*dahai1)
+		p.onDaiminkan(furo2)
+		p.onTsumo(*tsumoPai2)
+		p.onDahai(*dahai2)
+		p.onPon(furo3)
+		p.onDahai(*dahai3)
+		p.onChi(furo4)
+		p.onDahai(*dahai4)
+
+		err := p.onChi(furo5)
+		if err == nil {
+			t.Errorf("Player.onChi() error = %v", err)
+		}
+	})
+
+	// after tsumo
+	t.Run("after tsumo", func(t *testing.T) {
+		tehais, _ := StrToPais("2m 3m 1p 1p 2p 3p 1s 1s 1s 2s N N N")
+		tsumoPai, _ := NewPaiWithName("4m")
+		target := 2
+		taken, _ := NewPaiWithName("4p")
+		consumed, _ := StrToPais("2p 3p")
+		furo, _ := NewChi(*taken, [2]Pai(consumed), target)
+
+		p, _ := NewPlayer(0, "", 25_000)
+		p.onStartKyoku(tehais, nil)
+		p.onTsumo(*tsumoPai)
+
+		err := p.onChi(furo)
+		if err == nil {
+			t.Errorf("Player.onChi() error = %v", err)
+		}
+	})
+
+	// after reach
+	t.Run("after reach", func(t *testing.T) {
+		tehais, _ := StrToPais("2m 3m 1p 1p 2p 3p 1s 1s 1s 2s N N N")
+		tsumoPai, _ := NewPaiWithName("4m")
+		target := 2
+		taken, _ := NewPaiWithName("4p")
+		consumed, _ := StrToPais("2p 3p")
+		furo, _ := NewChi(*taken, [2]Pai(consumed), target)
+
+		p, _ := NewPlayer(0, "", 25_000)
+		p.onStartKyoku(tehais, nil)
+		p.onTsumo(*tsumoPai)
+		p.onReach()
+		p.onDahai(*tsumoPai)
+		p.onReachAccepted(nil)
+
+		err := p.onChi(furo)
+		if err == nil {
+			t.Errorf("Player.onChi() error = %v", err)
+		}
+	})
+}
+
+func TestPlayer_onPon(t *testing.T) {
 	// on pon
 	t.Run("on pon", func(t *testing.T) {
 		tehais, _ := StrToPais("1m 2m 3m 6m 7m 8m 1p 2p 3p 6p 8p N N")
@@ -412,9 +505,9 @@ func TestPlayer_onChiPonKan(t *testing.T) {
 		p, _ := NewPlayer(0, "", 25_000)
 		p.onStartKyoku(tehais, nil)
 
-		err := p.onChiPonKan(furo)
+		err := p.onPon(furo)
 		if err != nil {
-			t.Errorf("Player.onChiPonKan() error = %v", err)
+			t.Errorf("Player.onPon() error = %v", err)
 		}
 
 		want := &Player{
@@ -438,6 +531,99 @@ func TestPlayer_onChiPonKan(t *testing.T) {
 		}
 	})
 
+	// cannot 5th furo
+	t.Run("cannot 5th furo", func(t *testing.T) {
+		tehais, _ := StrToPais("2m 3m 1p 1p 2p 3p 1s 1s 1s 2s N N N")
+		target := 2
+
+		taken1, _ := NewPaiWithName("N")
+		consumed1, _ := StrToPais("N N N")
+		furo1, _ := NewDaiminkan(*taken1, [3]Pai(consumed1), target)
+		tsumoPai1, _ := NewPaiWithName("4m")
+		dahai1, _ := NewPaiWithName("4m")
+
+		taken2, _ := NewPaiWithName("1s")
+		consumed2, _ := StrToPais("1s 1s 1s")
+		furo2, _ := NewDaiminkan(*taken2, [3]Pai(consumed2), target)
+		tsumoPai2, _ := NewPaiWithName("4m")
+		dahai2, _ := NewPaiWithName("4m")
+
+		taken3, _ := NewPaiWithName("1p")
+		consumed3, _ := StrToPais("1p 1p")
+		furo3, _ := NewPon(*taken3, [2]Pai(consumed3), target)
+		dahai3, _ := NewPaiWithName("2s")
+
+		taken4, _ := NewPaiWithName("1m")
+		consumed4, _ := StrToPais("2m 3m")
+		furo4, _ := NewChi(*taken4, [2]Pai(consumed4), target)
+		dahai4, _ := NewPaiWithName("3p")
+
+		taken5, _ := NewPaiWithName("2p")
+		consumed5, _ := StrToPais("2p 2p")
+		furo5, _ := NewPon(*taken5, [2]Pai(consumed5), target)
+
+		p, _ := NewPlayer(0, "", 25_000)
+		p.onStartKyoku(tehais, nil)
+		p.onDaiminkan(furo1)
+		p.onTsumo(*tsumoPai1)
+		p.onDahai(*dahai1)
+		p.onDaiminkan(furo2)
+		p.onTsumo(*tsumoPai2)
+		p.onDahai(*dahai2)
+		p.onPon(furo3)
+		p.onDahai(*dahai3)
+		p.onChi(furo4)
+		p.onDahai(*dahai4)
+
+		err := p.onPon(furo5)
+		if err == nil {
+			t.Errorf("Player.onPon() error = %v", err)
+		}
+	})
+
+	// after tsumo
+	t.Run("after tsumo", func(t *testing.T) {
+		tehais, _ := StrToPais("2m 3m 1p 1p 2p 3p 1s 1s 1s 2s N N N")
+		tsumoPai, _ := NewPaiWithName("4m")
+		target := 2
+		taken, _ := NewPaiWithName("1p")
+		consumed, _ := StrToPais("1p 1p")
+		furo, _ := NewPon(*taken, [2]Pai(consumed), target)
+
+		p, _ := NewPlayer(0, "", 25_000)
+		p.onStartKyoku(tehais, nil)
+		p.onTsumo(*tsumoPai)
+
+		err := p.onPon(furo)
+		if err == nil {
+			t.Errorf("Player.onPon() error = %v", err)
+		}
+	})
+
+	// after reach
+	t.Run("after reach", func(t *testing.T) {
+		tehais, _ := StrToPais("2m 3m 1p 1p 2p 3p 1s 1s 1s 2s N N N")
+		tsumoPai, _ := NewPaiWithName("4m")
+		target := 2
+		taken, _ := NewPaiWithName("1p")
+		consumed, _ := StrToPais("1p 1p")
+		furo, _ := NewPon(*taken, [2]Pai(consumed), target)
+
+		p, _ := NewPlayer(0, "", 25_000)
+		p.onStartKyoku(tehais, nil)
+		p.onTsumo(*tsumoPai)
+		p.onReach()
+		p.onDahai(*tsumoPai)
+		p.onReachAccepted(nil)
+
+		err := p.onPon(furo)
+		if err == nil {
+			t.Errorf("Player.onPon() error = %v", err)
+		}
+	})
+}
+
+func TestPlayer_onDaiminkan(t *testing.T) {
 	// on daiminkan
 	t.Run("on daiminkan", func(t *testing.T) {
 		tehais, _ := StrToPais("1m 2m 3m 6m 7m 8m 1p 2p 3p 6p N N N")
@@ -450,9 +636,9 @@ func TestPlayer_onChiPonKan(t *testing.T) {
 		p, _ := NewPlayer(0, "", 25_000)
 		p.onStartKyoku(tehais, nil)
 
-		err := p.onChiPonKan(furo)
+		err := p.onDaiminkan(furo)
 		if err != nil {
-			t.Errorf("Player.onChiPonKan() error = %v", err)
+			t.Errorf("Player.onDaiminkan() error = %v", err)
 		}
 
 		want := &Player{
@@ -503,26 +689,26 @@ func TestPlayer_onChiPonKan(t *testing.T) {
 		furo4, _ := NewChi(*taken4, [2]Pai(consumed4), target)
 		dahai4, _ := NewPaiWithName("3p")
 
-		taken5, _ := NewPaiWithName("4p")
-		consumed5, _ := StrToPais("2p 3p")
-		furo5, _ := NewChi(*taken5, [2]Pai(consumed5), target)
+		taken5, _ := NewPaiWithName("2p")
+		consumed5, _ := StrToPais("2p 2p 2p")
+		furo5, _ := NewDaiminkan(*taken5, [3]Pai(consumed5), target)
 
 		p, _ := NewPlayer(0, "", 25_000)
 		p.onStartKyoku(tehais, nil)
-		p.onChiPonKan(furo1)
+		p.onDaiminkan(furo1)
 		p.onTsumo(*tsumoPai1)
 		p.onDahai(*dahai1)
-		p.onChiPonKan(furo2)
+		p.onDaiminkan(furo2)
 		p.onTsumo(*tsumoPai2)
 		p.onDahai(*dahai2)
-		p.onChiPonKan(furo3)
+		p.onPon(furo3)
 		p.onDahai(*dahai3)
-		p.onChiPonKan(furo4)
+		p.onChi(furo4)
 		p.onDahai(*dahai4)
 
-		err := p.onChiPonKan(furo5)
+		err := p.onDaiminkan(furo5)
 		if err == nil {
-			t.Errorf("Player.onChiPonKan() error = %v", err)
+			t.Errorf("Player.onDaiminkan() error = %v", err)
 		}
 	})
 
@@ -539,9 +725,9 @@ func TestPlayer_onChiPonKan(t *testing.T) {
 		p.onStartKyoku(tehais, nil)
 		p.onTsumo(*tsumoPai)
 
-		err := p.onChiPonKan(furo)
+		err := p.onDaiminkan(furo)
 		if err == nil {
-			t.Errorf("Player.onChiPonKan() error = %v", err)
+			t.Errorf("Player.onDaiminkan() error = %v", err)
 		}
 	})
 
@@ -561,41 +747,9 @@ func TestPlayer_onChiPonKan(t *testing.T) {
 		p.onDahai(*tsumoPai)
 		p.onReachAccepted(nil)
 
-		err := p.onChiPonKan(furo)
+		err := p.onDaiminkan(furo)
 		if err == nil {
-			t.Errorf("Player.onChiPonKan() error = %v", err)
-		}
-	})
-
-	// cannot ankan
-	t.Run("cannot ankan", func(t *testing.T) {
-		tehais, _ := StrToPais("2m 3m 1p 1p 2p 3p 1s 1s 1s N N N N")
-		consumed, _ := StrToPais("N N N N")
-		furo, _ := NewAnkan([4]Pai(consumed))
-
-		p, _ := NewPlayer(0, "", 25_000)
-		p.onStartKyoku(tehais, nil)
-
-		err := p.onChiPonKan(furo)
-		if err == nil {
-			t.Errorf("Player.onChiPonKan() error = %v", err)
-		}
-	})
-
-	// cannot kakan
-	t.Run("cannot kakan", func(t *testing.T) {
-		tehais, _ := StrToPais("2m 3m 1p 1p 2p 3p 1s 1s 1s 2s N N N")
-		taken, _ := NewPaiWithName("N")
-		consumed, _ := StrToPais("N N N")
-		target := 2
-		furo, _ := NewKakan(*taken, [3]Pai(consumed), &target)
-
-		p, _ := NewPlayer(0, "", 25_000)
-		p.onStartKyoku(tehais, nil)
-
-		err := p.onChiPonKan(furo)
-		if err == nil {
-			t.Errorf("Player.onChiPonKan() error = %v", err)
+			t.Errorf("Player.onDaiminkan() error = %v", err)
 		}
 	})
 }

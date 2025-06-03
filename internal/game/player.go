@@ -258,6 +258,87 @@ func (p *Player) onChiPonKan(furo Furo) error {
 	return nil
 }
 
+func (p *Player) onChi(furo *Chi) error {
+	if p.canDahai {
+		return fmt.Errorf("it is not in a state to be chi")
+	}
+
+	if p.reachState != None {
+		return fmt.Errorf("chi is not possible during reach")
+	}
+
+	numFuro := len(p.furos)
+	if numFuro >= maxNumFuro {
+		return fmt.Errorf("a 5th furo is not possible")
+	}
+
+	for _, pai := range furo.Consumed() {
+		err := p.deleteTehai(&pai)
+		if err != nil {
+			return fmt.Errorf("failed to delete tehais on chi: %w", err)
+		}
+	}
+
+	p.furos = append(p.furos, furo)
+	p.canDahai = true
+	p.isMenzen = false
+	return nil
+}
+
+func (p *Player) onPon(furo *Pon) error {
+	if p.canDahai {
+		return fmt.Errorf("it is not in a state to be pon")
+	}
+
+	if p.reachState != None {
+		return fmt.Errorf("pon is not possible during reach")
+	}
+
+	numFuro := len(p.furos)
+	if numFuro >= maxNumFuro {
+		return fmt.Errorf("a 5th furo is not possible")
+	}
+
+	for _, pai := range furo.Consumed() {
+		err := p.deleteTehai(&pai)
+		if err != nil {
+			return fmt.Errorf("failed to delete tehais on pon: %w", err)
+		}
+	}
+
+	p.furos = append(p.furos, furo)
+	p.canDahai = true
+	p.isMenzen = false
+	return nil
+}
+
+func (p *Player) onDaiminkan(furo *Daiminkan) error {
+	if p.canDahai {
+		return fmt.Errorf("it is not in a state to be daiminkan")
+	}
+
+	if p.reachState != None {
+		return fmt.Errorf("daiminkan is not possible during reach")
+	}
+
+	numFuro := len(p.furos)
+	if numFuro >= maxNumFuro {
+		return fmt.Errorf("a 5th furo is not possible")
+	}
+
+	for _, pai := range furo.Consumed() {
+		err := p.deleteTehai(&pai)
+		if err != nil {
+			return fmt.Errorf("failed to delete tehais on daiminkan: %w", err)
+		}
+	}
+
+	p.furos = append(p.furos, furo)
+	p.canDahai = false
+	p.isMenzen = false
+	return nil
+}
+
 func (p *Player) onAnkan(furo *Ankan) error {
 	if furo == nil {
 		return fmt.Errorf("furo is nil")
