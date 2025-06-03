@@ -611,6 +611,28 @@ func (s *StateImpl) onKakan(event *message.Kakan) error {
 
 	if actor == s.playerID {
 		s.isRinshanTsumo = true
+	} else {
+		tehaiCounts, err := NewPaiSet(s.players[s.playerID].tehais)
+		if err != nil {
+			return err
+		}
+
+		if s.missedRon {
+			// The previous ron-able tile was missed
+			s.isFuriten = true
+		}
+
+		if err := tehaiCounts.AddPai(pai, 1); err != nil {
+			return fmt.Errorf("failed to add anpai %v to tehaiCounts: %w", pai, err)
+		}
+
+		isHoraFrom, err := IsHoraForm(tehaiCounts)
+		if err != nil {
+			return fmt.Errorf("failed to check if tehaiCounts is hora form: %w", err)
+		}
+		if isHoraFrom && !s.missedRon && !s.isFuriten {
+			s.missedRon = true
+		}
 	}
 
 	return nil
