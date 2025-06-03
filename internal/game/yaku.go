@@ -158,7 +158,9 @@ func Has1Fan(
 		if isMenzen && isIpeko(allMentsus) {
 			return true, nil
 		}
-		// TODO: Pinfu
+		if isMenzen && isPinfuStrict(state, playerID, allMentsus, horaPai) {
+			return true, nil
+		}
 		if isChantaiyao(allMentsus) {
 			return true, nil
 		}
@@ -226,6 +228,46 @@ func isPinfu(state StateViewer, playerID int, allMentsus []Mentsu) bool {
 		}
 	}
 	return true
+}
+
+func isPinfuStrict(state StateViewer, playerID int, allMentsus []Mentsu, horaPai *Pai) bool {
+	player := &state.Players()[playerID]
+	foundShuntsuWithHoraPai := false
+
+	for _, m := range allMentsus {
+		switch m.(type) {
+		case *Kotsu, *Kantsu:
+			return false
+		case *Toitsu:
+			pai := &m.Pais()[0]
+			if state.YakuhaiFan(pai, player) > 0 {
+				return false
+			}
+		case *Shuntsu:
+			pais := m.Pais()
+			// Check if the shuntsu contains the horaPai
+			if !slices.ContainsFunc(pais, func(p Pai) bool {
+				return p.HasSameSymbol(horaPai)
+			}) {
+				continue
+			}
+			// The middle (kanchan) wait is not allowed
+			if pais[1].HasSameSymbol(horaPai) {
+				continue
+			}
+			// The edge (penchan) wait is not allowed
+			if horaPai.Number() == 3 && pais[2].HasSameSymbol(horaPai) {
+				continue
+			}
+			if horaPai.Number() == 7 && pais[0].HasSameSymbol(horaPai) {
+				continue
+			}
+			// If the shuntsu contains the horaPai, it must be a ryanmen wait
+			foundShuntsuWithHoraPai = true
+		}
+	}
+
+	return foundShuntsuWithHoraPai
 }
 
 func sumYakuhaiFan(state StateViewer, playerID int, allMentsus []Mentsu) int {
