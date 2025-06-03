@@ -334,7 +334,7 @@ func (s *StateImpl) onDahai(event *message.Dahai) error {
 		}
 
 		if err := tehaiCounts.AddPai(pai, 1); err != nil {
-			return fmt.Errorf("failed to add anpai %v to tehaiCounts: %w", pai, err)
+			return fmt.Errorf("failed to add pai %v to tehaiCounts: %w", pai, err)
 		}
 
 		isHoraFrom, err := IsHoraForm(tehaiCounts)
@@ -623,7 +623,7 @@ func (s *StateImpl) onKakan(event *message.Kakan) error {
 		}
 
 		if err := tehaiCounts.AddPai(pai, 1); err != nil {
-			return fmt.Errorf("failed to add anpai %v to tehaiCounts: %w", pai, err)
+			return fmt.Errorf("failed to add pai %v to tehaiCounts: %w", pai, err)
 		}
 
 		isHoraFrom, err := IsHoraForm(tehaiCounts)
