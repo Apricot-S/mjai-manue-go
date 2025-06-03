@@ -65,6 +65,7 @@ func (s *StateImpl) OnStartGame(event jsontext.Value) error {
 	s.lastActionType = noEvent
 
 	s.kuikaePais = make([]Pai, 0, 3)
+	s.missedRon = false
 	s.isFuriten = false
 	s.isRinshanTsumo = false
 
@@ -238,6 +239,7 @@ func (s *StateImpl) onStartKyoku(event *message.StartKyoku) error {
 	s.lastActionType = noEvent
 
 	s.kuikaePais = make([]Pai, 0, 3)
+	s.missedRon = false
 	s.isFuriten = false
 	s.isRinshanTsumo = false
 
@@ -293,17 +295,18 @@ func (s *StateImpl) onDahai(event *message.Dahai) error {
 	s.lastActor = actor
 	s.lastActionType = message.TypeDahai
 
+	tehaiCounts, err := NewPaiSet(s.players[s.playerID].tehais)
+	if err != nil {
+		return err
+	}
+
 	if actor == s.playerID {
 		s.kuikaePais = make([]Pai, 0, 3)
 		if player.ReachState() != Accepted {
+			s.missedRon = false
 			s.isFuriten = false
 		}
 		s.isRinshanTsumo = false
-
-		tehaiCounts, err := NewPaiSet(player.tehais)
-		if err != nil {
-			return err
-		}
 
 		for _, anpai := range s.Anpais(player) {
 			if err := tehaiCounts.AddPai(&anpai, 1); err != nil {
@@ -323,6 +326,23 @@ func (s *StateImpl) onDahai(event *message.Dahai) error {
 				s.isFuriten = true
 				break
 			}
+		}
+	} else {
+		if s.missedRon {
+			// The previous ron-able tile was missed
+			s.isFuriten = true
+		}
+
+		if err := tehaiCounts.AddPai(pai, 1); err != nil {
+			return fmt.Errorf("failed to add anpai %v to tehaiCounts: %w", pai, err)
+		}
+
+		isHoraFrom, err := IsHoraForm(tehaiCounts)
+		if err != nil {
+			return fmt.Errorf("failed to check if tehaiCounts is hora form: %w", err)
+		}
+		if isHoraFrom && !s.missedRon && !s.isFuriten {
+			s.missedRon = true
 		}
 	}
 
