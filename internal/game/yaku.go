@@ -113,7 +113,74 @@ func Has1Fan(
 	horaPai *Pai,
 	isTsumo bool,
 ) (bool, error) {
-	// TODO: Implement 1 fan
+	horaTehais := slices.Clone(tehais)
+	if !isTsumo {
+		horaTehais = append(horaTehais, *horaPai)
+	}
+	horaTehaisCounts, err := NewPaiSet(horaTehais)
+	if err != nil {
+		return false, err
+	}
+
+	isMenzen := state.Players()[playerID].IsMenzen()
+	if isMenzen {
+		if isChitoitsu := isHoraFormChitoitsu(horaTehaisCounts); isChitoitsu {
+			return true, nil
+		}
+		if isKokushimuso := isHoraFormKokushimuso(horaTehaisCounts); isKokushimuso {
+			return true, nil
+		}
+	}
+
+	_, goals, err := AnalyzeShantenWithOption(horaTehaisCounts, 0, -1)
+	if err != nil {
+		return false, err
+	}
+
+	furoMentsus := make([]Mentsu, len(furos))
+	for i, f := range furos {
+		furoMentsus[i] = f.ToMentsu()
+	}
+
+	for _, goal := range goals {
+		allMentsus := slices.Concat(goal.Mentsus, furoMentsus)
+		allPais := make(Pais, 0, 14)
+		for _, m := range allMentsus {
+			allPais = append(allPais, m.Pais()...)
+		}
+
+		if sumYakuhaiFan(state, playerID, allMentsus) > 0 {
+			return true, nil
+		}
+		if isTanyaochu(allPais) {
+			return true, nil
+		}
+		if isMenzen && isIpeko(allMentsus) {
+			return true, nil
+		}
+		// TODO: Pinfu
+		if isChantaiyao(allMentsus) {
+			return true, nil
+		}
+		if isIkkiTsukan(allMentsus) {
+			return true, nil
+		}
+		if isSanshokuDojun(allMentsus) {
+			return true, nil
+		}
+		if isSanshokuDoko(allMentsus) {
+			return true, nil
+		}
+		// TODO: sankantsu
+		if isToitoiho(allMentsus) {
+			return true, nil
+		}
+		// TODO: sananko
+		if isHoniso(allMentsus) {
+			return true, nil
+		}
+	}
+
 	return false, nil
 }
 
@@ -273,4 +340,29 @@ func isHoniso(allMentsus []Mentsu) bool {
 		}
 	}
 	return true
+}
+
+func isSanshokuDoko(allMentsus []Mentsu) bool {
+	typeNumMap := map[rune]map[uint8]bool{
+		'm': {},
+		'p': {},
+		's': {},
+	}
+	for _, m := range allMentsus {
+		_, isKotsu := m.(*Kotsu)
+		_, isKantsu := m.(*Kantsu)
+		if !isKotsu && !isKantsu {
+			continue
+		}
+		pai := m.Pais()[0]
+		t := pai.Type()
+		n := pai.Number()
+		typeNumMap[t][n] = true
+	}
+	for n := uint8(1); n <= 9; n++ {
+		if typeNumMap['m'][n] && typeNumMap['p'][n] && typeNumMap['s'][n] {
+			return true
+		}
+	}
+	return false
 }
