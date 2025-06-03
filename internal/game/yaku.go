@@ -179,7 +179,9 @@ func Has1Fan(
 		if isToitoiho(allMentsus) {
 			return true, nil
 		}
-		// TODO: sananko
+		if isSananko(goal.Mentsus, furos, horaPai, isTsumo) {
+			return true, nil
+		}
 		if isHoniso(allMentsus) {
 			return true, nil
 		}
@@ -419,4 +421,29 @@ func isSankantsu(allMentsus []Mentsu) bool {
 		}
 	}
 	return numKantsu >= 3
+}
+
+func isSananko(tehaiMentsus []Mentsu, furos []Furo, horaPai *Pai, isTsumo bool) bool {
+	numAnko := 0
+
+	// Mentsus in the hand
+	for _, m := range tehaiMentsus {
+		switch kotsu := m.(type) {
+		case *Kotsu:
+			// en: In the case of Ron, exclude the kotsu that contains the horaPai
+			if !isTsumo && kotsu.Pais()[0].HasSameSymbol(horaPai) {
+				continue
+			}
+			numAnko++
+		}
+	}
+
+	// Count only the ankan in the furos
+	for _, f := range furos {
+		if _, ok := f.(*Ankan); ok {
+			numAnko++
+		}
+	}
+
+	return numAnko >= 3
 }
