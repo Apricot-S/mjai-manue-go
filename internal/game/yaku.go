@@ -171,7 +171,9 @@ func Has1Fan(
 		if isSanshokuDoko(allMentsus) {
 			return true, nil
 		}
-		// TODO: sankantsu
+		if isSankantsu(allMentsus) {
+			return true, nil
+		}
 		if isToitoiho(allMentsus) {
 			return true, nil
 		}
@@ -365,4 +367,14 @@ func isSanshokuDoko(allMentsus []Mentsu) bool {
 		}
 	}
 	return false
+}
+
+func isSankantsu(allMentsus []Mentsu) bool {
+	numKantsu := 0
+	for _, m := range allMentsus {
+		if _, ok := m.(*Kantsu); ok {
+			numKantsu++
+		}
+	}
+	return numKantsu >= 3
 }
