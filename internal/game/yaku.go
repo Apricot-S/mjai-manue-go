@@ -393,6 +393,7 @@ func isSanshokuDoko(allMentsus []Mentsu) bool {
 		'm': {},
 		'p': {},
 		's': {},
+		't': {},
 	}
 	for _, m := range allMentsus {
 		_, isKotsu := m.(*Kotsu)
