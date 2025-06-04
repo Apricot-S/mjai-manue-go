@@ -19,19 +19,11 @@ For more information, see [the original README (Japanese)](https://github.com/gi
 
 ## Installation
 
-There are two options to install this application:
-
-### Option 1: Download from releases
-
-Download the executable file for your platform from the [releases page](https://github.com/Apricot-S/mjai-manue-go/releases/latest).
-
-### Option 2: Build from source
+Requires [Go 1.24 or later](https://go.dev/dl/).
 
 ```sh
-go install github.com/Apricot-S/mjai-manue-go/cmd/mjai-manue
+go install github.com/Apricot-S/mjai-manue-go/cmd/mjai-manue@latest
 ```
-
-`mjai-manue` will be built in current directory.
 
 ## Usage
 
