@@ -46,16 +46,18 @@ mjai-manue
 > [!TIP]
 > See [scripts/mjai.app/](scripts/mjai.app/) for how to generate a submission file for `mjai.app`.
 
-## License
+## Credits
 
-Licensed under the [New BSD License](LICENSE) (3-Clause BSD License).
+This project is a Go port of [mjai-manue](https://github.com/gimite/mjai-manue), created by [Hiroshi Ichikawa](https://github.com/gimite).
 
-## Copyright and Attribution
+## Licenses
 
-This project is a Go port of [mjai-manue](https://github.com/gimite/mjai-manue), originally created by [Hiroshi Ichikawa](https://github.com/gimite).
+This project is licensed under the [New BSD License](LICENSE) (3-Clause BSD License).
 
-The following configuration files are copied from the original project and their copyright belongs to Hiroshi Ichikawa. These files are distributed under the New BSD License:
+This project also contains configuration files copied from the original project:
 
 - `configs/danger_tree.all.json`
 - `configs/game_stats.json`
 - `configs/light_game_stats.json`
+
+These files are copyright Hiroshi Ichikawa and distributed under the New BSD License.

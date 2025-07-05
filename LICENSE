@@ -31,12 +31,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 Attribution Notice:
 
-The files listed below are from the original mjai-manue project created by
-Hiroshi Ichikawa.
-These files are licensed under the New BSD License and their copyright belongs
-to the original author.
+This project includes files copied from the original mjai-manue project,
+created by Hiroshi Ichikawa.
+These files are licensed under the New BSD License, and their copyright belongs
+to Hiroshi Ichikawa.
 
-Files:
+Copied files:
 
 - configs/danger_tree.all.json
 - configs/game_stats.json
