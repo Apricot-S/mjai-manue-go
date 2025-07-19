@@ -74,7 +74,7 @@ func (a *ManueAI) getMetrics(
 		return ms, nil
 	}
 
-	reachDeclared := player.ReachState() == game.Declared
+	reachDeclared := player.ReachState() == game.ReachDeclared
 	if reachDeclared {
 		defaultMetrics, err := a.getMetricsInternal(state, playerID, tehais, furos, reachDahaiCandidates, true)
 		if err != nil {

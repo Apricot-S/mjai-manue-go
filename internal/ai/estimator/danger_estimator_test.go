@@ -40,7 +40,7 @@ func NewMockState(
 		bakaze:            bakaze,
 	}
 
-	s.players[0] = *game.NewPlayerForTest(0, s.tehais, nil, nil, nil, game.None, -1)
+	s.players[0] = *game.NewPlayerForTest(0, s.tehais, nil, nil, nil, game.NotReach, -1)
 
 	allSutehais := slices.Concat(s.prereachSutehais, s.postreachSutehais)
 	reachSutehaiIndex := -1
@@ -53,12 +53,12 @@ func NewMockState(
 		nil,
 		allSutehais,
 		allSutehais,
-		game.None,
+		game.NotReach,
 		reachSutehaiIndex,
 	)
 
-	s.players[2] = *game.NewPlayerForTest(2, nil, nil, nil, nil, game.None, -1)
-	s.players[3] = *game.NewPlayerForTest(3, nil, nil, nil, nil, game.None, -1)
+	s.players[2] = *game.NewPlayerForTest(2, nil, nil, nil, nil, game.NotReach, -1)
+	s.players[3] = *game.NewPlayerForTest(3, nil, nil, nil, nil, game.NotReach, -1)
 
 	return s
 }

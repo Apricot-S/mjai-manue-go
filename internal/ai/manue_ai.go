@@ -119,7 +119,7 @@ func (a *ManueAI) decideDahai(state game.StateAnalyzer, playerID int) (jsontext.
 
 	// my turn
 
-	if state.Players()[playerID].ReachState() == game.Accepted {
+	if state.Players()[playerID].ReachState() == game.ReachAccepted {
 		// in reach
 		dahai, err := message.NewDahai(playerID, dc[0].ToString(), true, a.logStr)
 		if err != nil {

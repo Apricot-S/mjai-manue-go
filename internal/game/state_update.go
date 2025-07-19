@@ -302,7 +302,7 @@ func (s *StateImpl) onDahai(event *message.Dahai) error {
 
 	if actor == s.playerID {
 		s.kuikaePais = make([]Pai, 0, 3)
-		if player.ReachState() != Accepted {
+		if player.ReachState() != ReachAccepted {
 			s.missedRon = false
 			s.isFuriten = false
 		}

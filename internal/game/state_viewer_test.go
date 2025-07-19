@@ -24,7 +24,7 @@ func getDefaultStateForTest() *StateImpl {
 			ho:                make([]Pai, 0),
 			sutehais:          make([]Pai, 0),
 			extraAnpais:       make([]Pai, 0),
-			reachState:        None,
+			reachState:        NotReach,
 			reachHoIndex:      -1,
 			reachSutehaiIndex: -1,
 			score:             InitScore,

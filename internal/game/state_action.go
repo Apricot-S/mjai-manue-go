@@ -12,11 +12,11 @@ func (s *StateImpl) DahaiCandidates() []Pai {
 	if !player.CanDahai() {
 		return nil
 	}
-	if player.ReachState() == Declared {
+	if player.ReachState() == ReachDeclared {
 		// If the player has already declared reach, return nil.
 		return nil
 	}
-	if player.ReachState() == Accepted {
+	if player.ReachState() == ReachAccepted {
 		// If the player has already accepted the reach, only the drawn tile is a candidate.
 		candidates := []Pai{player.tehais[len(player.tehais)-1]}
 		return candidates
@@ -46,7 +46,7 @@ func (s *StateImpl) ReachDahaiCandidates() ([]Pai, error) {
 	if !player.IsMenzen() {
 		return nil, nil
 	}
-	if player.ReachState() == Accepted {
+	if player.ReachState() == ReachAccepted {
 		// If the player has already accepted the reach, the player cannot declare reach.
 		return nil, nil
 	}
@@ -120,7 +120,7 @@ func (s *StateImpl) FuroCandidates() ([]Furo, error) {
 	}
 
 	player := &s.players[s.playerID]
-	if player.ReachState() != None {
+	if player.ReachState() != NotReach {
 		// If the player has already declared the reach, the player cannot furo.
 		return nil, nil
 	}
@@ -372,7 +372,7 @@ func (s *StateImpl) HoraCandidate() (*Hora, error) {
 	}
 
 	has1Fan := (isTsumoSituation && player.IsMenzen()) || // menzenchin tsumoho
-		(player.ReachState() == Accepted) || // reach
+		(player.ReachState() == ReachAccepted) || // reach
 		(s.lastActionType == message.TypeKakan) || // chankan
 		s.isRinshanTsumo || // rinshankaiho
 		(s.NumPipais() == 0) // haiteimoyue or hoteiraoyui

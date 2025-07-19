@@ -9,9 +9,9 @@ import (
 type ReachState int
 
 const (
-	None ReachState = iota + 1
-	Declared
-	Accepted
+	NotReach ReachState = iota + 1
+	ReachDeclared
+	ReachAccepted
 )
 
 const (
@@ -77,7 +77,7 @@ func NewPlayer(id int, name string, initScore int) (*Player, error) {
 		ho:                make([]Pai, 0, maxNumHo),
 		sutehais:          make([]Pai, 0, maxNumSutehais),
 		extraAnpais:       nil,
-		reachState:        None,
+		reachState:        NotReach,
 		reachHoIndex:      -1,
 		reachSutehaiIndex: -1,
 		score:             initScore,
@@ -179,7 +179,7 @@ func (p *Player) onStartKyoku(tehais []Pai, score *int) error {
 	p.ho = make([]Pai, 0, maxNumHo)
 	p.sutehais = make([]Pai, 0, maxNumSutehais)
 	p.extraAnpais = nil
-	p.reachState = None
+	p.reachState = NotReach
 	p.reachHoIndex = -1
 	p.reachSutehaiIndex = -1
 	p.canDahai = false
@@ -216,7 +216,7 @@ func (p *Player) onDahai(pai Pai) error {
 	p.ho = append(p.ho, pai)
 	p.sutehais = append(p.sutehais, pai)
 
-	if p.reachState != Accepted {
+	if p.reachState != ReachAccepted {
 		p.extraAnpais = nil
 	}
 
@@ -229,7 +229,7 @@ func (p *Player) onChi(furo *Chi) error {
 		return fmt.Errorf("it is not in a state to be chi")
 	}
 
-	if p.reachState != None {
+	if p.reachState != NotReach {
 		return fmt.Errorf("chi is not possible during reach")
 	}
 
@@ -256,7 +256,7 @@ func (p *Player) onPon(furo *Pon) error {
 		return fmt.Errorf("it is not in a state to be pon")
 	}
 
-	if p.reachState != None {
+	if p.reachState != NotReach {
 		return fmt.Errorf("pon is not possible during reach")
 	}
 
@@ -283,7 +283,7 @@ func (p *Player) onDaiminkan(furo *Daiminkan) error {
 		return fmt.Errorf("it is not in a state to be daiminkan")
 	}
 
-	if p.reachState != None {
+	if p.reachState != NotReach {
 		return fmt.Errorf("daiminkan is not possible during reach")
 	}
 
@@ -340,7 +340,7 @@ func (p *Player) onKakan(furo *Kakan) error {
 		return fmt.Errorf("it is not in a state to be kakan")
 	}
 
-	if p.reachState != None {
+	if p.reachState != NotReach {
 		return fmt.Errorf("kakan is not possible during reach")
 	}
 
@@ -377,7 +377,7 @@ func (p *Player) onReach() error {
 		return fmt.Errorf("it is not in a state to be reach declaration")
 	}
 
-	if p.reachState != None {
+	if p.reachState != NotReach {
 		return fmt.Errorf("reach again is not possible during a reach")
 	}
 
@@ -385,7 +385,7 @@ func (p *Player) onReach() error {
 		return fmt.Errorf("reach is not possible after furo")
 	}
 
-	p.reachState = Declared
+	p.reachState = ReachDeclared
 	return nil
 }
 
@@ -394,7 +394,7 @@ func (p *Player) onReachAccepted(score *int) error {
 		return fmt.Errorf("it is not in a state to be reach acception")
 	}
 
-	if p.reachState != Declared {
+	if p.reachState != ReachDeclared {
 		return fmt.Errorf("reach acception cannot be made except after reach declaration")
 	}
 
@@ -402,7 +402,7 @@ func (p *Player) onReachAccepted(score *int) error {
 		return fmt.Errorf("reach acception is not possible after furo")
 	}
 
-	p.reachState = Accepted
+	p.reachState = ReachAccepted
 	p.reachHoIndex = len(p.ho) - 1
 	p.reachSutehaiIndex = len(p.sutehais) - 1
 
