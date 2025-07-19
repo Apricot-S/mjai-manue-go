@@ -133,7 +133,7 @@ func analyzeShantenInternal(
 ) int {
 	if numMeldsLeft == 0 {
 		// Add a pair
-		for i := uint8(0); i < NumIDs; i++ {
+		for i := range uint8(NumIDs) {
 			if targetVector[i] > 2 {
 				// Can't add a pair
 				continue
