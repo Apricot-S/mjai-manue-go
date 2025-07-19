@@ -265,38 +265,99 @@ func isJikaze(pai *game.Pai, targetKaze *game.Pai) bool {
 	return pai.HasSameSymbol(targetKaze)
 }
 
-// n can be negative.
-func isNOuterPrereachSutehai(pai *game.Pai, n int, prereachSutehaiSet *game.PaiSet) (bool, error) {
+func isNChanceOrLess(pai *game.Pai, n int, visibleSet *game.PaiSet) (bool, error) {
 	if pai.IsTsupai() {
 		return false, nil
 	}
 
-	paiNumber := int(pai.Number())
-	if paiNumber == 5 {
+	paiNumber := pai.Number()
+	if 4 <= paiNumber && paiNumber <= 6 {
 		return false, nil
 	}
 
-	nInnerNumber := 0
-	if paiNumber < 5 {
-		nInnerNumber = paiNumber + n
-	} else {
-		nInnerNumber = paiNumber - n
+	candidates := make([]uint8, 2)
+	for i := uint8(1); i < 3; i++ {
+		if paiNumber < 5 {
+			candidates[i-1] = paiNumber + i
+		} else {
+			candidates[i-1] = paiNumber - i
+		}
 	}
 
-	if nInnerNumber < 1 || 9 < nInnerNumber {
+	return core.AnyMatch(candidates, func(num uint8) (bool, error) {
+		kabePai, err := game.NewPaiWithDetail(pai.Type(), num, false)
+		if err != nil {
+			return false, err
+		}
+
+		count, err := visibleSet.Count(kabePai)
+		if err != nil {
+			return false, err
+		}
+
+		return count >= 4-n, nil
+	})
+}
+
+func isVisibleNOrMore(pai *game.Pai, n int, visibleSet *game.PaiSet) (bool, error) {
+	c, err := visibleSet.Count(pai)
+	if err != nil {
+		return false, err
+	}
+	return c >= n, nil
+}
+
+func isSujiVisible(pai *game.Pai, n int, visibleSet *game.PaiSet) (bool, error) {
+	if pai.IsTsupai() {
 		return false, nil
 	}
 
-	if (paiNumber >= 5 || nInnerNumber > 5) && (paiNumber <= 5 || nInnerNumber < 5) {
-		return false, nil
-	}
-
-	innerPai, err := game.NewPaiWithDetail(pai.Type(), uint8(nInnerNumber), false)
+	suji, err := getSuji(pai)
 	if err != nil {
 		return false, err
 	}
 
-	return prereachSutehaiSet.Has(innerPai)
+	return core.AnyMatch(suji, func(sujiPai game.Pai) (bool, error) {
+		visible, err := isVisibleNOrMore(&sujiPai, n+1, visibleSet)
+		if err != nil {
+			return false, err
+		}
+		return !visible, nil
+	})
+}
+
+func isNumNOrInner(pai *game.Pai, n uint8) bool {
+	if pai.IsTsupai() {
+		return false
+	}
+
+	paiNumber := pai.Number()
+	if n <= paiNumber && paiNumber <= 10-n {
+		return true
+	}
+
+	return false
+}
+
+func isInTehais(pai *game.Pai, n int, tehaiSet *game.PaiSet) (bool, error) {
+	c, err := tehaiSet.Count(pai)
+	return c >= n, err
+}
+
+func isSujiInTehais(pai *game.Pai, n int, tehaiSet *game.PaiSet) (bool, error) {
+	if pai.IsTsupai() {
+		return false, nil
+	}
+
+	suji, err := getSuji(pai)
+	if err != nil {
+		return false, err
+	}
+
+	return core.AnyMatch(suji, func(sujiPai game.Pai) (bool, error) {
+		c, err := tehaiSet.Count(&sujiPai)
+		return c >= n, err
+	})
 }
 
 func isNOrMoreOfNeighborsInPrereachSutehais(
@@ -337,6 +398,60 @@ func isNOrMoreOfNeighborsInPrereachSutehais(
 	}
 
 	return numNeighbors >= n, nil
+}
+
+// n can be negative.
+func isNOuterPrereachSutehai(pai *game.Pai, n int, prereachSutehaiSet *game.PaiSet) (bool, error) {
+	if pai.IsTsupai() {
+		return false, nil
+	}
+
+	paiNumber := int(pai.Number())
+	if paiNumber == 5 {
+		return false, nil
+	}
+
+	nInnerNumber := 0
+	if paiNumber < 5 {
+		nInnerNumber = paiNumber + n
+	} else {
+		nInnerNumber = paiNumber - n
+	}
+
+	if nInnerNumber < 1 || 9 < nInnerNumber {
+		return false, nil
+	}
+
+	if (paiNumber >= 5 || nInnerNumber > 5) && (paiNumber <= 5 || nInnerNumber < 5) {
+		return false, nil
+	}
+
+	innerPai, err := game.NewPaiWithDetail(pai.Type(), uint8(nInnerNumber), false)
+	if err != nil {
+		return false, err
+	}
+
+	return prereachSutehaiSet.Has(innerPai)
+}
+
+func isSameTypeInPrereach(pai *game.Pai, n int, prereachSutehaiSet *game.PaiSet) (bool, error) {
+	if pai.IsTsupai() {
+		return false, nil
+	}
+
+	numbers := []uint8{1, 2, 3, 4, 5, 6, 7, 8, 9}
+	numSameType, err := core.Count(numbers, func(num uint8) (bool, error) {
+		target, err := game.NewPaiWithDetail(pai.Type(), num, false)
+		if err != nil {
+			return false, err
+		}
+		return prereachSutehaiSet.Has(target)
+	})
+	if err != nil {
+		return false, err
+	}
+
+	return numSameType+1 >= n, nil
 }
 
 func isSujiOf(pai *game.Pai, targetPaiSet *game.PaiSet) (bool, error) {
@@ -388,105 +503,6 @@ func getSuji(pai *game.Pai) ([]game.Pai, error) {
 	}
 
 	return result, nil
-}
-
-// Returns sujis which contain the given pai and is alive i.e. none of pais in the suji are anpai.
-// Uses the first pai to represent the suji. e.g. 1p for 14p suji
-func getPossibleSujis(pai *game.Pai, anpaiSet *game.PaiSet) ([]game.Pai, error) {
-	if pai.IsTsupai() {
-		return []game.Pai{}, nil
-	}
-
-	sujis := make([]game.Pai, 0, 2)
-	paiNumber := pai.Number()
-	candidates := []uint8{paiNumber - 3, paiNumber}
-
-	for _, n := range candidates {
-		isAlive, err := core.AllMatch([]uint8{n, n + 3}, func(m uint8) (bool, error) {
-			if m < 1 || m > 9 {
-				return false, nil
-			}
-
-			sujiPai, err := game.NewPaiWithDetail(pai.Type(), m, false)
-			if err != nil {
-				return false, err
-			}
-
-			isAnpai, err := anpaiSet.Has(sujiPai)
-			if err != nil {
-				return false, err
-			}
-			return !isAnpai, nil
-		})
-		if err != nil {
-			return nil, err
-		}
-
-		if isAlive {
-			sujiPai, err := game.NewPaiWithDetail(pai.Type(), n, false)
-			if err != nil {
-				return nil, err
-			}
-			sujis = append(sujis, *sujiPai)
-		}
-	}
-
-	return sujis, nil
-}
-
-func isNChanceOrLess(pai *game.Pai, n int, visibleSet *game.PaiSet) (bool, error) {
-	if pai.IsTsupai() {
-		return false, nil
-	}
-
-	paiNumber := pai.Number()
-	if 4 <= paiNumber && paiNumber <= 6 {
-		return false, nil
-	}
-
-	candidates := make([]uint8, 2)
-	for i := uint8(1); i < 3; i++ {
-		if paiNumber < 5 {
-			candidates[i-1] = paiNumber + i
-		} else {
-			candidates[i-1] = paiNumber - i
-		}
-	}
-
-	return core.AnyMatch(candidates, func(num uint8) (bool, error) {
-		kabePai, err := game.NewPaiWithDetail(pai.Type(), num, false)
-		if err != nil {
-			return false, err
-		}
-
-		count, err := visibleSet.Count(kabePai)
-		if err != nil {
-			return false, err
-		}
-
-		return count >= 4-n, nil
-	})
-}
-
-func isNumNOrInner(pai *game.Pai, n uint8) bool {
-	if pai.IsTsupai() {
-		return false
-	}
-
-	paiNumber := pai.Number()
-	if n <= paiNumber && paiNumber <= 10-n {
-		return true
-	}
-
-	return false
-}
-
-func isVisibleNOrMore(pai *game.Pai, n int, visibleSet *game.PaiSet) (bool, error) {
-	c, err := visibleSet.Count(pai)
-	if err != nil {
-		return false, err
-	}
-	return c >= n, nil
 }
 
 func isUrasujiOf(pai *game.Pai, targetPaiSet *game.PaiSet, anpaiSet *game.PaiSet) (bool, error) {
@@ -581,6 +597,50 @@ func isMatagisujiOf(pai *game.Pai, targetPaiSet *game.PaiSet, anpaiSet *game.Pai
 
 		return false, nil
 	})
+}
+
+// Returns sujis which contain the given pai and is alive i.e. none of pais in the suji are anpai.
+// Uses the first pai to represent the suji. e.g. 1p for 14p suji
+func getPossibleSujis(pai *game.Pai, anpaiSet *game.PaiSet) ([]game.Pai, error) {
+	if pai.IsTsupai() {
+		return []game.Pai{}, nil
+	}
+
+	sujis := make([]game.Pai, 0, 2)
+	paiNumber := pai.Number()
+	candidates := []uint8{paiNumber - 3, paiNumber}
+
+	for _, n := range candidates {
+		isAlive, err := core.AllMatch([]uint8{n, n + 3}, func(m uint8) (bool, error) {
+			if m < 1 || m > 9 {
+				return false, nil
+			}
+
+			sujiPai, err := game.NewPaiWithDetail(pai.Type(), m, false)
+			if err != nil {
+				return false, err
+			}
+
+			isAnpai, err := anpaiSet.Has(sujiPai)
+			if err != nil {
+				return false, err
+			}
+			return !isAnpai, nil
+		})
+		if err != nil {
+			return nil, err
+		}
+
+		if isAlive {
+			sujiPai, err := game.NewPaiWithDetail(pai.Type(), n, false)
+			if err != nil {
+				return nil, err
+			}
+			sujis = append(sujis, *sujiPai)
+		}
+	}
+
+	return sujis, nil
 }
 
 func isOuter(pai *game.Pai, targetPaiSet *game.PaiSet) (bool, error) {
@@ -728,22 +788,7 @@ func registerEvaluators() *evaluators {
 		featureName := fmt.Sprintf("suji_visible<=%d", i)
 		n := i
 		ev[featureName] = func(scene *Scene, pai *game.Pai) (bool, error) {
-			if pai.IsTsupai() {
-				return false, nil
-			}
-
-			suji, err := getSuji(pai)
-			if err != nil {
-				return false, err
-			}
-
-			return core.AnyMatch(suji, func(sujiPai game.Pai) (bool, error) {
-				visible, err := isVisibleNOrMore(&sujiPai, n+1, scene.visibleSet)
-				if err != nil {
-					return false, err
-				}
-				return !visible, nil
-			})
+			return isSujiVisible(pai, n, scene.visibleSet)
 		}
 	}
 
@@ -759,8 +804,7 @@ func registerEvaluators() *evaluators {
 		featureName := fmt.Sprintf("in_tehais>=%d", i)
 		n := i
 		ev[featureName] = func(scene *Scene, pai *game.Pai) (bool, error) {
-			c, err := scene.tehaiSet.Count(pai)
-			return c >= n, err
+			return isInTehais(pai, n, scene.tehaiSet)
 		}
 	}
 
@@ -772,19 +816,7 @@ func registerEvaluators() *evaluators {
 		featureName := fmt.Sprintf("suji_in_tehais>=%d", i)
 		n := i
 		ev[featureName] = func(scene *Scene, pai *game.Pai) (bool, error) {
-			if pai.IsTsupai() {
-				return false, nil
-			}
-
-			suji, err := getSuji(pai)
-			if err != nil {
-				return false, err
-			}
-
-			return core.AnyMatch(suji, func(sujiPai game.Pai) (bool, error) {
-				c, err := scene.tehaiSet.Count(&sujiPai)
-				return c >= n, err
-			})
+			return isSujiInTehais(pai, n, scene.tehaiSet)
 		}
 	}
 
@@ -824,23 +856,7 @@ func registerEvaluators() *evaluators {
 		featureName := fmt.Sprintf("same_type_in_prereach>=%d", i)
 		n := i
 		ev[featureName] = func(scene *Scene, pai *game.Pai) (bool, error) {
-			if pai.IsTsupai() {
-				return false, nil
-			}
-
-			numbers := []uint8{1, 2, 3, 4, 5, 6, 7, 8, 9}
-			numSameType, err := core.Count(numbers, func(num uint8) (bool, error) {
-				target, err := game.NewPaiWithDetail(pai.Type(), num, false)
-				if err != nil {
-					return false, err
-				}
-				return scene.prereachSutehaiSet.Has(target)
-			})
-			if err != nil {
-				return false, err
-			}
-
-			return numSameType+1 >= n, nil
+			return isSameTypeInPrereach(pai, n, scene.prereachSutehaiSet)
 		}
 	}
 
