@@ -29,7 +29,7 @@ func TestNewPaiSet(t *testing.T) {
 	tests = append(tests, testCase{"empty", args{pais0}, &ps0, false})
 
 	pais1 := []Pai{}
-	for i := uint8(0); i < NumIDs; i++ {
+	for i := range uint8(NumIDs) {
 		p, _ := NewPaiWithID(i)
 		pais1 = append(pais1, *p)
 	}
@@ -41,7 +41,7 @@ func TestNewPaiSet(t *testing.T) {
 	tests = append(tests, testCase{"all1", args{pais1}, &ps1, false})
 
 	pais2 := []Pai{}
-	for i := uint8(0); i < NumIDs; i++ {
+	for i := range uint8(NumIDs) {
 		p, _ := NewPaiWithID(i)
 		pais2 = append(pais2, *p, *p)
 	}
@@ -127,7 +127,7 @@ func TestPaiSet_ToPais(t *testing.T) {
 		array1[i] = 1
 	}
 	pais1 := []Pai{}
-	for i := uint8(0); i < NumIDs; i++ {
+	for i := range uint8(NumIDs) {
 		p, _ := NewPaiWithID(i)
 		pais1 = append(pais1, *p)
 	}
@@ -138,7 +138,7 @@ func TestPaiSet_ToPais(t *testing.T) {
 		array2[i] = 2
 	}
 	pais2 := []Pai{}
-	for i := uint8(0); i < NumIDs; i++ {
+	for i := range uint8(NumIDs) {
 		p, _ := NewPaiWithID(i)
 		pais2 = append(pais2, *p, *p)
 	}
@@ -177,7 +177,7 @@ func TestPaiSet_Count(t *testing.T) {
 	tests := []testCase{}
 
 	array0 := [NumIDs]int{}
-	for i := uint8(0); i < NumIDs; i++ {
+	for i := range uint8(NumIDs) {
 		p, _ := NewPaiWithID(i)
 		tests = append(tests, testCase{p.ToString() + " 0", fields{array0}, args{p}, 0, false})
 	}
@@ -190,7 +190,7 @@ func TestPaiSet_Count(t *testing.T) {
 	for i := range array1 {
 		array1[i] = 1
 	}
-	for i := uint8(0); i < NumIDs; i++ {
+	for i := range uint8(NumIDs) {
 		p, _ := NewPaiWithID(i)
 		tests = append(tests, testCase{p.ToString() + " 1", fields{array1}, args{p}, 1, false})
 	}
@@ -203,7 +203,7 @@ func TestPaiSet_Count(t *testing.T) {
 	for i := range arrayMinus1 {
 		arrayMinus1[i] = -1
 	}
-	for i := uint8(0); i < NumIDs; i++ {
+	for i := range uint8(NumIDs) {
 		p, _ := NewPaiWithID(i)
 		tests = append(tests, testCase{p.ToString() + " -1", fields{arrayMinus1}, args{p}, -1, false})
 	}
@@ -247,7 +247,7 @@ func TestPaiSet_Has(t *testing.T) {
 	tests := []testCase{}
 
 	array0 := [NumIDs]int{}
-	for i := uint8(0); i < NumIDs; i++ {
+	for i := range uint8(NumIDs) {
 		p, _ := NewPaiWithID(i)
 		tests = append(tests, testCase{p.ToString() + " 0", fields{array0}, args{p}, false, false})
 	}
@@ -260,7 +260,7 @@ func TestPaiSet_Has(t *testing.T) {
 	for i := range array1 {
 		array1[i] = 1
 	}
-	for i := uint8(0); i < NumIDs; i++ {
+	for i := range uint8(NumIDs) {
 		p, _ := NewPaiWithID(i)
 		tests = append(tests, testCase{p.ToString() + " 1", fields{array1}, args{p}, true, false})
 	}
@@ -273,7 +273,7 @@ func TestPaiSet_Has(t *testing.T) {
 	for i := range arrayMinus1 {
 		arrayMinus1[i] = -1
 	}
-	for i := uint8(0); i < NumIDs; i++ {
+	for i := range uint8(NumIDs) {
 		p, _ := NewPaiWithID(i)
 		tests = append(tests, testCase{p.ToString() + " -1", fields{arrayMinus1}, args{p}, false, false})
 	}
@@ -317,7 +317,7 @@ func TestPaiSet_AddPai(t *testing.T) {
 	}
 	tests := []testCase{}
 
-	for i := uint8(0); i < NumIDs; i++ {
+	for i := range uint8(NumIDs) {
 		array := [NumIDs]int{}
 		p, _ := NewPaiWithID(i)
 		tests = append(tests, testCase{p.ToString() + "+0", fields{array}, args{p, 0}, false, 0})
@@ -328,7 +328,7 @@ func TestPaiSet_AddPai(t *testing.T) {
 		tests = append(tests, testCase{r.ToString() + "+0", fields{array}, args{r, 0}, false, 0})
 	}
 
-	for i := uint8(0); i < NumIDs; i++ {
+	for i := range uint8(NumIDs) {
 		array := [NumIDs]int{}
 		p, _ := NewPaiWithID(i)
 		tests = append(tests, testCase{p.ToString() + "+1", fields{array}, args{p, 1}, false, 1})
@@ -339,7 +339,7 @@ func TestPaiSet_AddPai(t *testing.T) {
 		tests = append(tests, testCase{r.ToString() + "+1", fields{array}, args{r, 1}, false, 1})
 	}
 
-	for i := uint8(0); i < NumIDs; i++ {
+	for i := range uint8(NumIDs) {
 		array := [NumIDs]int{}
 		p, _ := NewPaiWithID(i)
 		tests = append(tests, testCase{p.ToString() + "-1", fields{array}, args{p, -1}, false, -1})
@@ -351,7 +351,7 @@ func TestPaiSet_AddPai(t *testing.T) {
 	}
 
 	// 1 - 1 = 0
-	for i := uint8(0); i < NumIDs; i++ {
+	for i := range uint8(NumIDs) {
 		array := [NumIDs]int{}
 		array[i] = 1
 		p, _ := NewPaiWithID(i)
@@ -400,7 +400,7 @@ func TestPaiSet_AddPais(t *testing.T) {
 	}
 	tests := []testCase{}
 
-	for i := uint8(0); i < NumIDs; i++ {
+	for i := range uint8(NumIDs) {
 		array := [NumIDs]int{}
 		p, _ := NewPaiWithID(i)
 		ps := []Pai{}
@@ -413,7 +413,7 @@ func TestPaiSet_AddPais(t *testing.T) {
 		tests = append(tests, testCase{r.ToString() + "+0", fields{array}, args{ps}, false, r, 0})
 	}
 
-	for i := uint8(0); i < NumIDs; i++ {
+	for i := range uint8(NumIDs) {
 		array := [NumIDs]int{}
 		p, _ := NewPaiWithID(i)
 		ps := []Pai{*p}
@@ -426,7 +426,7 @@ func TestPaiSet_AddPais(t *testing.T) {
 		tests = append(tests, testCase{r.ToString() + "+1", fields{array}, args{ps}, false, r, 1})
 	}
 
-	for i := uint8(0); i < NumIDs; i++ {
+	for i := range uint8(NumIDs) {
 		array := [NumIDs]int{}
 		p, _ := NewPaiWithID(i)
 		ps := []Pai{*p, *p}
@@ -475,7 +475,7 @@ func TestPaiSet_RemovePaiSet(t *testing.T) {
 	tests := []testCase{}
 
 	// 1 - 1 = 0
-	for i := uint8(0); i < NumIDs; i++ {
+	for i := range uint8(NumIDs) {
 		array := [NumIDs]int{}
 		array[i] = 1
 		p, _ := NewPaiWithID(i)
@@ -517,7 +517,7 @@ func TestPaiSet_ToString(t *testing.T) {
 
 	tests = append(tests, testCase{"empty", fields{[NumIDs]int{}}, ""})
 
-	for i := uint8(0); i < NumIDs; i++ {
+	for i := range uint8(NumIDs) {
 		array := [NumIDs]int{}
 		array[i] = 1
 		p, _ := NewPaiWithID(i)
@@ -525,7 +525,7 @@ func TestPaiSet_ToString(t *testing.T) {
 		tests = append(tests, testCase{want, fields{array}, want})
 	}
 
-	for i := uint8(0); i < NumIDs; i++ {
+	for i := range uint8(NumIDs) {
 		array := [NumIDs]int{}
 		array[i] = 2
 		p, _ := NewPaiWithID(i)
