@@ -261,7 +261,7 @@ func PaisToStr(pais []Pai) string {
 
 func StrToPais(str string) ([]Pai, error) {
 	pais := []Pai{}
-	for _, f := range strings.Fields(str) {
+	for f := range strings.FieldsSeq(str) {
 		pai, err := NewPaiWithName(f)
 		if err != nil {
 			return nil, err
