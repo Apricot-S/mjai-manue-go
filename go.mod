@@ -1,6 +1,6 @@
 module github.com/Apricot-S/mjai-manue-go
 
-go 1.24.1
+go 1.24.5
 
 require (
 	github.com/go-json-experiment/json v0.0.0-20250626171732-1a886bd29d1b
