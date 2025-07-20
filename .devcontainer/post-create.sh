@@ -12,5 +12,5 @@ if [[ -t 1 ]] && type -t tput >/dev/null; then
   fi
 fi
 
-uv venv
+uv venv --clear
 uv pip install mjai
