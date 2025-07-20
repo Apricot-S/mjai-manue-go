@@ -124,10 +124,10 @@ func Has1Fan(
 
 	isMenzen := state.Players()[playerID].IsMenzen()
 	if isMenzen {
-		if isChitoitsu := isHoraFormChitoitsu(horaTehaisCounts); isChitoitsu {
+		if isHoraFormChitoitsu(horaTehaisCounts) {
 			return true, nil
 		}
-		if isKokushimuso := isHoraFormKokushimuso(horaTehaisCounts); isKokushimuso {
+		if isHoraFormKokushimuso(horaTehaisCounts) {
 			return true, nil
 		}
 	}
