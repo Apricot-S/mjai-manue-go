@@ -2,6 +2,7 @@ package archive
 
 import (
 	"compress/gzip"
+	"errors"
 	"os"
 	"path/filepath"
 	"reflect"
@@ -85,8 +86,9 @@ func TestArchive_PlayLight_SingleFile(t *testing.T) {
 
 	archive := NewArchive([]string{path})
 	var got []jsontext.Value
-	err := archive.PlayLight(func(act jsontext.Value) {
+	err := archive.PlayLight(func(act jsontext.Value) error {
 		got = append(got, act)
+		return nil
 	})
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
@@ -108,8 +110,9 @@ func TestArchive_PlayLight_GzipFile(t *testing.T) {
 
 	archive := NewArchive([]string{path})
 	var got []jsontext.Value
-	err := archive.PlayLight(func(act jsontext.Value) {
+	err := archive.PlayLight(func(act jsontext.Value) error {
 		got = append(got, act)
+		return nil
 	})
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
@@ -128,7 +131,7 @@ func TestArchive_PlayLight_InvalidJSON(t *testing.T) {
 	path := writeTestFile(t, "broken.json", data)
 
 	archive := NewArchive([]string{path})
-	err := archive.PlayLight(func(act jsontext.Value) {})
+	err := archive.PlayLight(func(act jsontext.Value) error { return nil })
 
 	if err == nil || !strings.Contains(err.Error(), "json decode error") {
 		t.Errorf("expected JSON error, got: %v", err)
@@ -137,10 +140,24 @@ func TestArchive_PlayLight_InvalidJSON(t *testing.T) {
 
 func TestArchive_PlayLight_FileNotFound(t *testing.T) {
 	archive := NewArchive([]string{"/nonexistent/path.json"})
-	err := archive.PlayLight(func(act jsontext.Value) {})
+	err := archive.PlayLight(func(act jsontext.Value) error { return nil })
 
 	if err == nil || !strings.Contains(err.Error(), "failed to open") {
 		t.Errorf("expected file open error, got: %v", err)
+	}
+}
+
+func TestArchive_PlayLight_ErrorInCallback(t *testing.T) {
+	data := []string{`{"key":"value1"}`, `{"key":"value2"}`}
+	path := writeTestFile(t, "actions.json", data)
+
+	archive := NewArchive([]string{path})
+	err := archive.PlayLight(func(act jsontext.Value) error {
+		return errors.New("")
+	})
+
+	if err == nil || !strings.Contains(err.Error(), "failed to callback") {
+		t.Errorf("expected callback error, got: %v", err)
 	}
 }
 

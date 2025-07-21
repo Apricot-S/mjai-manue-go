@@ -21,7 +21,7 @@ func NewArchive(paths []string) *Archive {
 	return &Archive{paths: paths}
 }
 
-func (a *Archive) PlayLight(onAction func(jsontext.Value)) error {
+func (a *Archive) PlayLight(onAction func(jsontext.Value) error) error {
 	numFiles := len(a.paths)
 	for i, p := range a.paths {
 		if numFiles > 1 {
@@ -35,7 +35,7 @@ func (a *Archive) PlayLight(onAction func(jsontext.Value)) error {
 	return nil
 }
 
-func playLightInner(singlePath string, onAction func(jsontext.Value)) error {
+func playLightInner(singlePath string, onAction func(jsontext.Value) error) error {
 	reader, err := openMaybeGzip(singlePath)
 	if err != nil {
 		return err
@@ -54,7 +54,9 @@ func playLightInner(singlePath string, onAction func(jsontext.Value)) error {
 			return fmt.Errorf("json decode error: %w", err)
 		}
 
-		onAction(action)
+		if err := onAction(action); err != nil {
+			return fmt.Errorf("failed to callback: %w", err)
+		}
 	}
 	if err := scanner.Err(); err != nil {
 		return fmt.Errorf("scanner error: %w", err)
@@ -98,8 +100,9 @@ func (g *gzipReadCloser) Close() error {
 // GetLightActions collects all actions from files into a slice.
 func (a *Archive) GetLightActions() ([]jsontext.Value, error) {
 	var actions []jsontext.Value
-	err := a.PlayLight(func(action jsontext.Value) {
+	err := a.PlayLight(func(action jsontext.Value) error {
 		actions = append(actions, action)
+		return nil
 	})
 	return actions, err
 }
