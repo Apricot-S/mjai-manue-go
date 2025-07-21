@@ -105,6 +105,11 @@ func GlobAll(patterns []string) ([]string, error) {
 }
 
 func main() {
+	if len(os.Args) < 2 {
+		fmt.Fprintf(os.Stderr, "Usage: %s <log_glob_patterns...>\n", os.Args[0])
+		os.Exit(2)
+	}
+
 	args := os.Args[1:]
 	paths, err := GlobAll(args)
 	if err != nil {
