@@ -25,7 +25,7 @@ func (a *Archive) PlayLight(onAction func(jsontext.Value) error) error {
 	numFiles := len(a.paths)
 	for i, p := range a.paths {
 		if numFiles > 1 {
-			fmt.Fprintf(os.Stderr, "%d/%d\n", i, numFiles) // tentative
+			fmt.Fprintf(os.Stderr, "%d/%d\n", i+1, numFiles) // tentative
 		}
 
 		if err := playLightInner(p, onAction); err != nil {
