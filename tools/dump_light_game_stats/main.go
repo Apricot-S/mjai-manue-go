@@ -8,7 +8,7 @@ import (
 	"slices"
 
 	"github.com/Apricot-S/mjai-manue-go/internal/message"
-	"github.com/Apricot-S/mjai-manue-go/tools/archive"
+	"github.com/Apricot-S/mjai-manue-go/tools/shared"
 	"github.com/go-json-experiment/json"
 	"github.com/go-json-experiment/json/jsontext"
 )
@@ -115,7 +115,7 @@ func main() {
 	if err != nil {
 		log.Fatalf("error in glob: %v", err)
 	}
-	a := archive.NewArchive(paths)
+	a := shared.NewArchive(paths)
 	counter := NewScoreCounter()
 
 	onAction := func(action jsontext.Value) error {

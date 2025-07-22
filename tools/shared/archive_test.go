@@ -1,4 +1,4 @@
-package archive
+package shared
 
 import (
 	"compress/gzip"
