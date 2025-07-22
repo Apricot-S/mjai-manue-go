@@ -45,7 +45,8 @@ go run ./tools/dump_light_game_stats <log_glob_patterns...> > <light_game_stats.
     },
     "E1,1": {
       ...
-    }
+    },
+    ...
   }
 }
 ```
