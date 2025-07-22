@@ -16,6 +16,10 @@ This tool analyzes game logs in mjai format, including gzip-compressed files, an
 The tool writes the resulting statistics as JSON to standard output.
 You can redirect or pipe it as needed for downstream processing.
 
+> [!IMPORTANT]
+> The output from this tool **cannot** be used directly as `configs/light_game_stats.json`.
+> You must run it through `postprocess_light_game_stats` to convert it into the proper format.
+
 ### Usage
 
 With the top-level directory of working tree of this repository as the current directory, run the following command:
@@ -45,3 +49,5 @@ go run ./tools/dump_light_game_stats <log_glob_patterns...> > <light_game_stats.
   }
 }
 ```
+
+## postprocess_light_game_stats
