@@ -134,7 +134,7 @@ func main() {
 	}
 
 	output := Output{ScoreStats: counter.stats}
-	if err := json.MarshalWrite(os.Stdout, output); err != nil {
+	if err := json.MarshalWrite(os.Stdout, output, json.Deterministic(true)); err != nil {
 		log.Fatalf("failed to output result: %v", err)
 	}
 	fmt.Print("\n")

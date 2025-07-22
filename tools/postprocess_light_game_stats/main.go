@@ -125,7 +125,7 @@ func main() {
 	winProbsMap := computeWinProbabilities(kyokus, ratiosMap)
 
 	output := configs.LightGameStats{WinProbsMap: winProbsMap}
-	if err := json.MarshalWrite(os.Stdout, output); err != nil {
+	if err := json.MarshalWrite(os.Stdout, output, json.Deterministic(true)); err != nil {
 		log.Fatalf("failed to output result: %v", err)
 	}
 	fmt.Print("\n")
