@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"log"
 	"os"
-	"path/filepath"
 	"slices"
 
 	"github.com/Apricot-S/mjai-manue-go/internal/message"
@@ -92,18 +91,6 @@ func getDistance(playerId1, playerId2 int) int {
 	return (4 + playerId1 - playerId2) % 4
 }
 
-func GlobAll(patterns []string) ([]string, error) {
-	var result []string
-	for _, pattern := range patterns {
-		matches, err := filepath.Glob(pattern)
-		if err != nil {
-			return nil, fmt.Errorf("invalid glob pattern %q: %w", pattern, err)
-		}
-		result = slices.Concat(result, matches)
-	}
-	return result, nil
-}
-
 func main() {
 	if len(os.Args) < 2 {
 		fmt.Fprintf(os.Stderr, "Usage: %s <log_glob_patterns...>\n", os.Args[0])
@@ -111,7 +98,7 @@ func main() {
 	}
 
 	args := os.Args[1:]
-	paths, err := GlobAll(args)
+	paths, err := shared.GlobAll(args)
 	if err != nil {
 		log.Fatalf("error in glob: %v", err)
 	}
