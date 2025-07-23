@@ -52,3 +52,11 @@ go run ./tools/dump_light_game_stats <log_glob_patterns...> > <score_stats.json>
 ```
 
 ## postprocess_light_game_stats
+
+### Usage
+
+With the top-level directory of working tree of this repository as the current directory, run the following command:
+
+```sh
+go run ./tools/postprocess_light_game_stats <score_stats.json> > <light_game_stats.json>
+```
