@@ -60,3 +60,22 @@ With the top-level directory of working tree of this repository as the current d
 ```sh
 go run ./tools/postprocess_light_game_stats <score_stats.json> > <light_game_stats.json>
 ```
+
+#### Sample Output (formatted)
+
+```json
+{
+  "winProbsMap": {
+    "E1,0,1": {
+      ...
+      "-100": 0.4201448961937716,
+      "-1000": 0.40051903114186843,
+      ...
+    },
+    "E1,0,2": {
+      ...
+    },
+    ...
+  }
+}
+```
