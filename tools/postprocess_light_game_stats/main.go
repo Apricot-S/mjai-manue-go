@@ -11,11 +11,13 @@ import (
 	"github.com/go-json-experiment/json"
 )
 
-type Input struct {
-	ScoreStats map[string]map[string]float64 `json:"scoreStats"`
-}
+type Stats = map[string]map[string]float64
+type RatiosMap = map[string]map[int]float64
+type WinProbsMap = map[string]map[string]float64
 
-var kyokus = []string{"E1", "E2", "E3", "E4", "S1", "S2", "S3", "S4"}
+type Input struct {
+	ScoreStats Stats `json:"scoreStats"`
+}
 
 func loadStatsFromFile(path string) (*Input, error) {
 	data, err := os.ReadFile(path)
@@ -29,8 +31,8 @@ func loadStatsFromFile(path string) (*Input, error) {
 	return &in, nil
 }
 
-func computeRatios(scoreStats map[string]map[string]float64) map[string]map[int]float64 {
-	ratiosMap := make(map[string]map[int]float64)
+func computeRatios(scoreStats Stats) RatiosMap {
+	ratiosMap := make(RatiosMap)
 
 	for key, freqs := range scoreStats {
 		intFreqs := make(map[int]float64)
@@ -57,9 +59,10 @@ func computeRatios(scoreStats map[string]map[string]float64) map[string]map[int]
 	return ratiosMap
 }
 
-func computeWinProbabilities(kyokus []string, ratiosMap map[string]map[int]float64) map[string]map[string]float64 {
-	winProbsMap := make(map[string]map[string]float64)
+func computeWinProbabilities(ratiosMap RatiosMap) WinProbsMap {
+	winProbsMap := make(WinProbsMap)
 
+	var kyokus = []string{"E1", "E2", "E3", "E4", "S1", "S2", "S3", "S4"}
 	for _, kyoku := range kyokus {
 		for i := range 4 {
 			for j := range 4 {
@@ -116,13 +119,13 @@ func main() {
 		os.Exit(2)
 	}
 
-	stats, err := loadStatsFromFile(os.Args[1])
+	input, err := loadStatsFromFile(os.Args[1])
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	ratiosMap := computeRatios(stats.ScoreStats)
-	winProbsMap := computeWinProbabilities(kyokus, ratiosMap)
+	ratiosMap := computeRatios(input.ScoreStats)
+	winProbsMap := computeWinProbabilities(ratiosMap)
 
 	output := configs.LightGameStats{WinProbsMap: winProbsMap}
 	if err := json.MarshalWrite(os.Stdout, output, json.Deterministic(true)); err != nil {
