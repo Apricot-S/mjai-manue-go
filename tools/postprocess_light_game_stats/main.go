@@ -1,10 +1,12 @@
 package main
 
 import (
+	"cmp"
 	"fmt"
 	"log"
+	"maps"
 	"os"
-	"sort"
+	"slices"
 	"strconv"
 
 	"github.com/Apricot-S/mjai-manue-go/configs"
@@ -57,7 +59,7 @@ func computeRatios(scoreStats Stats) (RatiosMap, error) {
 	return ratiosMap, nil
 }
 
-func computeWinProbabilities(ratiosMap RatiosMap) WinProbsMap {
+func computeWinProbs(ratiosMap RatiosMap) WinProbsMap {
 	winProbsMap := make(WinProbsMap)
 
 	var kyokus = []string{"E1", "E2", "E3", "E4", "S1", "S2", "S3", "S4"}
@@ -82,7 +84,7 @@ func computeWinProbabilities(ratiosMap RatiosMap) WinProbsMap {
 				if i <= j {
 					delta = 100
 				}
-				winProbs := buildWinProbabilities(relativeScoreRatios, delta)
+				winProbs := buildEntry(relativeScoreRatios, delta)
 				key := fmt.Sprintf("%s,%d,%d", kyoku, i, j)
 				winProbsMap[key] = winProbs
 			}
@@ -92,14 +94,12 @@ func computeWinProbabilities(ratiosMap RatiosMap) WinProbsMap {
 	return winProbsMap
 }
 
-func buildWinProbabilities(relativeRatios map[int]float64, delta int) WinProbsMapEntry {
+func buildEntry(relativeRatios map[int]float64, delta int) WinProbsMapEntry {
 	winProbs := make(WinProbsMapEntry)
 
-	relativeScores := make([]int, 0, len(relativeRatios))
-	for score := range relativeRatios {
-		relativeScores = append(relativeScores, score)
-	}
-	sort.Sort(sort.Reverse(sort.IntSlice(relativeScores)))
+	relativeScores := slices.SortedFunc(maps.Keys(relativeRatios), func(a, b int) int {
+		return cmp.Compare(b, a)
+	})
 
 	accumProb := 0.0
 	for _, relative := range relativeScores {
@@ -126,7 +126,7 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	winProbsMap := computeWinProbabilities(ratiosMap)
+	winProbsMap := computeWinProbs(ratiosMap)
 
 	output := configs.LightGameStats{WinProbsMap: winProbsMap}
 	if err := json.MarshalWrite(os.Stdout, output, json.Deterministic(true)); err != nil {
