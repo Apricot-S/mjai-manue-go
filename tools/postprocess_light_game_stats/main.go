@@ -35,32 +35,26 @@ func loadStatsFromFile(path string) (*Input, error) {
 	return &in, nil
 }
 
-func computeRatios(scoreStats Stats) RatiosMap {
+func computeRatios(scoreStats Stats) (RatiosMap, error) {
 	ratiosMap := make(RatiosMap)
 
 	for key, freqs := range scoreStats {
-		intFreqs := make(RatiosMapEntry)
 		total := 0.0
-
-		for scoreStr, freq := range freqs {
-			scoreDiff, err := strconv.Atoi(scoreStr)
-			if err != nil {
-				log.Printf("invalid score key %q: %v", scoreStr, err)
-				continue
-			}
-			intFreqs[scoreDiff] = freq
+		for _, freq := range freqs {
 			total += freq
 		}
 
-		ratios := make(RatiosMapEntry)
-		for scoreDiff, freq := range intFreqs {
-			ratios[scoreDiff] = freq / total
+		ratiosMap[key] = make(RatiosMapEntry)
+		for scoreDiffStr, freq := range freqs {
+			scoreDiff, err := strconv.Atoi(scoreDiffStr)
+			if err != nil {
+				return nil, fmt.Errorf("invalid score key %q: %w", scoreDiffStr, err)
+			}
+			ratiosMap[key][scoreDiff] = freq / total
 		}
-
-		ratiosMap[key] = ratios
 	}
 
-	return ratiosMap
+	return ratiosMap, nil
 }
 
 func computeWinProbabilities(ratiosMap RatiosMap) WinProbsMap {
@@ -128,7 +122,10 @@ func main() {
 		log.Fatal(err)
 	}
 
-	ratiosMap := computeRatios(input.ScoreStats)
+	ratiosMap, err := computeRatios(input.ScoreStats)
+	if err != nil {
+		log.Fatal(err)
+	}
 	winProbsMap := computeWinProbabilities(ratiosMap)
 
 	output := configs.LightGameStats{WinProbsMap: winProbsMap}
