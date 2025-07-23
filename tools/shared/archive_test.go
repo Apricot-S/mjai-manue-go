@@ -160,23 +160,3 @@ func TestArchive_PlayLight_ErrorInCallback(t *testing.T) {
 		t.Errorf("expected callback error, got: %v", err)
 	}
 }
-
-func TestArchive_GetLightActions_SingleFile(t *testing.T) {
-	data := []string{`{"key":"value1"}`, `{"key":"value2"}`}
-	path := writeTestFile(t, "actions.json", data)
-
-	want := []jsontext.Value{}
-	for _, d := range data {
-		want = append(want, jsontext.Value(d))
-	}
-
-	archive := NewArchive([]string{path})
-	got, err := archive.GetLightActions()
-	if err != nil {
-		t.Fatalf("unexpected error: %v", err)
-	}
-
-	if !reflect.DeepEqual(got, want) {
-		t.Errorf("unexpected actions: got %v, want %v", got, want)
-	}
-}

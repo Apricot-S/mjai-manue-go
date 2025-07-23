@@ -96,13 +96,3 @@ func (g *gzipReadCloser) Close() error {
 	}
 	return err2
 }
-
-// GetLightActions collects all actions from files into a slice.
-func (a *Archive) GetLightActions() ([]jsontext.Value, error) {
-	var actions []jsontext.Value
-	err := a.PlayLight(func(action jsontext.Value) error {
-		actions = append(actions, action)
-		return nil
-	})
-	return actions, err
-}
