@@ -12,12 +12,16 @@ import (
 )
 
 type Stats = map[string]map[string]float64
-type RatiosMap = map[string]map[int]float64
-type WinProbsMap = map[string]map[string]float64
 
 type Input struct {
 	ScoreStats Stats `json:"scoreStats"`
 }
+
+type RatiosMapEntry = map[int]float64
+type RatiosMap = map[string]RatiosMapEntry
+
+type WinProbsMapEntry = map[string]float64
+type WinProbsMap = map[string]WinProbsMapEntry
 
 func loadStatsFromFile(path string) (*Input, error) {
 	data, err := os.ReadFile(path)
@@ -35,7 +39,7 @@ func computeRatios(scoreStats Stats) RatiosMap {
 	ratiosMap := make(RatiosMap)
 
 	for key, freqs := range scoreStats {
-		intFreqs := make(map[int]float64)
+		intFreqs := make(RatiosMapEntry)
 		total := 0.0
 
 		for scoreStr, freq := range freqs {
@@ -48,7 +52,7 @@ func computeRatios(scoreStats Stats) RatiosMap {
 			total += freq
 		}
 
-		ratios := make(map[int]float64)
+		ratios := make(RatiosMapEntry)
 		for scoreDiff, freq := range intFreqs {
 			ratios[scoreDiff] = freq / total
 		}
@@ -94,8 +98,8 @@ func computeWinProbabilities(ratiosMap RatiosMap) WinProbsMap {
 	return winProbsMap
 }
 
-func buildWinProbabilities(relativeRatios map[int]float64, delta int) map[string]float64 {
-	winProbs := make(map[string]float64)
+func buildWinProbabilities(relativeRatios map[int]float64, delta int) WinProbsMapEntry {
+	winProbs := make(WinProbsMapEntry)
 
 	relativeScores := make([]int, 0, len(relativeRatios))
 	for score := range relativeRatios {
