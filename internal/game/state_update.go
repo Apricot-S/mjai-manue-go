@@ -9,24 +9,19 @@ import (
 	"github.com/go-json-experiment/json/jsontext"
 )
 
-func (s *StateImpl) OnStartGame(event jsontext.Value) error {
+func (s *StateImpl) onStartGame(event *message.StartGame) error {
 	if event == nil {
 		return fmt.Errorf("start_game message is nil")
 	}
 
-	var e message.StartGame
-	if err := json.Unmarshal(event, &e); err != nil {
-		return fmt.Errorf("failed to unmarshal start_game: %w", err)
-	}
-
-	id := e.ID
+	id := event.ID
 	if id < 0 || id >= NumPlayers {
 		return fmt.Errorf("invalid player ID: %d", id)
 	}
 
 	names := []string{"", "", "", ""}
-	if e.Names != nil {
-		names = slices.Clone(e.Names)
+	if event.Names != nil {
+		names = slices.Clone(event.Names)
 	}
 	if len(names) != NumPlayers {
 		return fmt.Errorf("number of players must be 4, but got %d", len(names))
@@ -73,12 +68,22 @@ func (s *StateImpl) OnStartGame(event jsontext.Value) error {
 }
 
 func (s *StateImpl) Update(event jsontext.Value) error {
-	s.prevEventType = s.currentEventType
-
 	var msg message.Message
 	if err := json.Unmarshal(event, &msg); err != nil {
 		return fmt.Errorf("failed to unmarshal message: %w", err)
 	}
+
+	if msg.Type == message.TypeStartGame {
+		var e message.StartGame
+		if err := json.Unmarshal(event, &e); err != nil {
+			return fmt.Errorf("failed to unmarshal start_game: %w", err)
+		}
+		s.currentEventType = message.TypeStartGame
+		s.onStartGame(&e)
+		return nil
+	}
+
+	s.prevEventType = s.currentEventType
 
 	// This is specially handled here because it's not an anpai if the dahai is followed by a hora.
 	if msg.Type != message.TypeHora &&

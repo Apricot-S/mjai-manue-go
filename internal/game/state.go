@@ -53,7 +53,6 @@ type StateViewer interface {
 
 // StateUpdater is an interface for updating the game state.
 type StateUpdater interface {
-	OnStartGame(event jsontext.Value) error
 	Update(event jsontext.Value) error
 }
 
