@@ -9,16 +9,25 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/Apricot-S/mjai-manue-go/internal/game"
 	"github.com/go-json-experiment/json"
 	"github.com/go-json-experiment/json/jsontext"
 )
 
 type Archive struct {
 	paths []string
+	state game.State
 }
 
 func NewArchive(paths []string) *Archive {
-	return &Archive{paths: paths}
+	return &Archive{
+		paths: paths,
+		state: &game.StateImpl{},
+	}
+}
+
+func (a *Archive) StateViewer() game.StateViewer {
+	return a.state
 }
 
 func (a *Archive) PlayLight(onAction func(jsontext.Value) error) error {
@@ -95,4 +104,14 @@ func (g *gzipReadCloser) Close() error {
 		return err1
 	}
 	return err2
+}
+
+func (a *Archive) Play(onAction func(jsontext.Value) error) error {
+	onLightAction := func(action jsontext.Value) error {
+		if err := a.state.Update(action); err != nil {
+			return err
+		}
+		return onAction(action)
+	}
+	return a.PlayLight(onLightAction)
 }
