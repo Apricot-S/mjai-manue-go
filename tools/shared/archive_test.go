@@ -9,6 +9,7 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/Apricot-S/mjai-manue-go/internal/game"
 	"github.com/go-json-experiment/json/jsontext"
 )
 
@@ -24,17 +25,26 @@ func TestNewArchive(t *testing.T) {
 		{
 			name: "multiple paths",
 			args: args{paths: []string{"test1.json", "test1.json.gz"}},
-			want: &Archive{paths: []string{"test1.json", "test1.json.gz"}},
+			want: &Archive{
+				paths: []string{"test1.json", "test1.json.gz"},
+				state: &game.StateImpl{},
+			},
 		},
 		{
 			name: "empty",
 			args: args{paths: []string{}},
-			want: &Archive{paths: []string{}},
+			want: &Archive{
+				paths: []string{},
+				state: &game.StateImpl{},
+			},
 		},
 		{
 			name: "nil",
 			args: args{paths: nil},
-			want: &Archive{paths: nil},
+			want: &Archive{
+				paths: nil,
+				state: &game.StateImpl{},
+			},
 		},
 	}
 	for _, tt := range tests {
