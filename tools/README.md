@@ -12,7 +12,10 @@
 
 ### Output
 
-(TODO)
+The tool writes the resulting statistics as JSON to standard output.
+You can redirect or pipe it as needed for downstream processing.
+
+The output is directly usable as `configs/game_stats.json`.
 
 ### Usage
 
