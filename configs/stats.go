@@ -19,7 +19,7 @@ type RyukyokuTenpaiStat struct {
 }
 
 type LightGameStats struct {
-	WinProbsMap map[string]map[string]float64 `json:"winProbsMap"`
+	WinProbsMap map[string]map[string]float64 `json:"winProbsMap,omitempty"`
 }
 
 type GameStats struct {
