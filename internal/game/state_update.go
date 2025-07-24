@@ -21,8 +21,7 @@ func (s *StateImpl) Update(event jsontext.Value) error {
 			return fmt.Errorf("failed to unmarshal start_game: %w", err)
 		}
 		s.currentEventType = message.TypeStartGame
-		s.onStartGame(&e)
-		return nil
+		return s.onStartGame(&e)
 	}
 
 	s.prevEventType = s.currentEventType
@@ -44,96 +43,94 @@ func (s *StateImpl) Update(event jsontext.Value) error {
 			return fmt.Errorf("failed to unmarshal start_kyoku: %w", err)
 		}
 		s.currentEventType = message.TypeStartKyoku
-		s.onStartKyoku(&e)
+		return s.onStartKyoku(&e)
 	case message.TypeTsumo:
 		var e message.Tsumo
 		if err := json.Unmarshal(event, &e); err != nil {
 			return fmt.Errorf("failed to unmarshal tsumo: %w", err)
 		}
 		s.currentEventType = message.TypeTsumo
-		s.onTsumo(&e)
+		return s.onTsumo(&e)
 	case message.TypeDahai:
 		var e message.Dahai
 		if err := json.Unmarshal(event, &e); err != nil {
 			return fmt.Errorf("failed to unmarshal dahai: %w", err)
 		}
 		s.currentEventType = message.TypeDahai
-		s.onDahai(&e)
+		return s.onDahai(&e)
 	case message.TypeChi:
 		var e message.Chi
 		if err := json.Unmarshal(event, &e); err != nil {
 			return fmt.Errorf("failed to unmarshal chi: %w", err)
 		}
 		s.currentEventType = message.TypeChi
-		s.onChi(&e)
+		return s.onChi(&e)
 	case message.TypePon:
 		var e message.Pon
 		if err := json.Unmarshal(event, &e); err != nil {
 			return fmt.Errorf("failed to unmarshal pon: %w", err)
 		}
 		s.currentEventType = message.TypePon
-		s.onPon(&e)
+		return s.onPon(&e)
 	case message.TypeDaiminkan:
 		var e message.Daiminkan
 		if err := json.Unmarshal(event, &e); err != nil {
 			return fmt.Errorf("failed to unmarshal daiminkan: %w", err)
 		}
 		s.currentEventType = message.TypeDaiminkan
-		s.onDaiminkan(&e)
+		return s.onDaiminkan(&e)
 	case message.TypeAnkan:
 		var e message.Ankan
 		if err := json.Unmarshal(event, &e); err != nil {
 			return fmt.Errorf("failed to unmarshal ankan: %w", err)
 		}
 		s.currentEventType = message.TypeAnkan
-		s.onAnkan(&e)
+		return s.onAnkan(&e)
 	case message.TypeKakan:
 		var e message.Kakan
 		if err := json.Unmarshal(event, &e); err != nil {
 			return fmt.Errorf("failed to unmarshal kakan: %w", err)
 		}
 		s.currentEventType = message.TypeKakan
-		s.onKakan(&e)
+		return s.onKakan(&e)
 	case message.TypeDora:
 		var e message.Dora
 		if err := json.Unmarshal(event, &e); err != nil {
 			return fmt.Errorf("failed to unmarshal dora: %w", err)
 		}
 		s.currentEventType = message.TypeDora
-		s.onDora(&e)
+		return s.onDora(&e)
 	case message.TypeReach:
 		var e message.Reach
 		if err := json.Unmarshal(event, &e); err != nil {
 			return fmt.Errorf("failed to unmarshal reach: %w", err)
 		}
 		s.currentEventType = message.TypeReach
-		s.onReach(&e)
+		return s.onReach(&e)
 	case message.TypeReachAccepted:
 		var e message.ReachAccepted
 		if err := json.Unmarshal(event, &e); err != nil {
 			return fmt.Errorf("failed to unmarshal reach_accepted: %w", err)
 		}
 		s.currentEventType = message.TypeReachAccepted
-		s.onReachAccepted(&e)
+		return s.onReachAccepted(&e)
 	case message.TypeHora:
 		var e message.Hora
 		if err := json.Unmarshal(event, &e); err != nil {
 			return fmt.Errorf("failed to unmarshal hora: %w", err)
 		}
 		s.currentEventType = message.TypeHora
-		s.onHora(&e)
+		return s.onHora(&e)
 	case message.TypeRyukyoku:
 		var e message.Ryukyoku
 		if err := json.Unmarshal(event, &e); err != nil {
 			return fmt.Errorf("failed to unmarshal ryukyoku: %w", err)
 		}
 		s.currentEventType = message.TypeRyukyoku
-		s.onRyukyoku(&e)
+		return s.onRyukyoku(&e)
 	default:
 		return fmt.Errorf("unknown event type: %v", event)
 	}
-
-	return nil
 }
 
 func (s *StateImpl) onStartGame(event *message.StartGame) error {
