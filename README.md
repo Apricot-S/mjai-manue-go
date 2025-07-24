@@ -52,7 +52,7 @@ mjai-manue
 > - `configs/game_stats.json`
 > - `configs/light_game_stats.json`
 >
-> See `tools/` for instructions on how to generate these files.
+> See [tools/](tools/) for instructions on how to generate these files.
 
 ## Credits
 
