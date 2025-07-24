@@ -1,5 +1,34 @@
 # Tools to generate stats and decision trees from game records
 
+(TODO)
+
+## dump_game_stats
+
+(TODO)
+
+### What It Does
+
+(TODO)
+
+### Output
+
+(TODO)
+
+### Usage
+
+With the top-level directory of working tree of this repository as the current directory, run the following command:
+
+```sh
+go run ./tools/dump_game_stats <log_glob_patterns...> > <game_stats.json>
+```
+
+- Replace `<log_glob_patterns...>` with one or more file path patterns matching your target logs, such as `"logs/*/*.mjson"` and `"logs/*/*.mjson.gz"`. You can specify multiple patterns, separated by spaces.
+- Output is written to `<game_stats.json>` in JSON format.
+
+#### Sample Output (formatted)
+
+(TODO)
+
 ## dump_light_game_stats
 
 This tool analyzes game logs in mjai format, including gzip-compressed files, and generates per-round statistics on score differentials.
