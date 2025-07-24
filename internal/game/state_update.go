@@ -9,64 +9,6 @@ import (
 	"github.com/go-json-experiment/json/jsontext"
 )
 
-func (s *StateImpl) onStartGame(event *message.StartGame) error {
-	if event == nil {
-		return fmt.Errorf("start_game message is nil")
-	}
-
-	id := event.ID
-	if id < 0 || id >= NumPlayers {
-		return fmt.Errorf("invalid player ID: %d", id)
-	}
-
-	names := []string{"", "", "", ""}
-	if event.Names != nil {
-		names = slices.Clone(event.Names)
-	}
-	if len(names) != NumPlayers {
-		return fmt.Errorf("number of players must be 4, but got %d", len(names))
-	}
-
-	east, err := NewPaiWithName("E")
-	if err != nil {
-		return err
-	}
-
-	var players [NumPlayers]Player
-	for i, name := range names {
-		p, err := NewPlayer(i, name, InitScore)
-		if err != nil {
-			return err
-		}
-		players[i] = *p
-	}
-
-	s.players = players
-	s.bakaze = *east
-	s.kyokuNum = 1
-	s.honba = 0
-	s.oya = &s.players[0]
-	s.chicha = &s.players[0]
-	s.doraMarkers = make([]Pai, 0, MaxNumDoraMarkers)
-	s.numPipais = NumInitPipais
-
-	s.prevEventType = noEvent
-	s.prevDahaiActor = noActor
-	s.prevDahaiPai = nil
-	s.currentEventType = noEvent
-
-	s.playerID = id
-	s.lastActor = noActor
-	s.lastActionType = noEvent
-
-	s.kuikaePais = make([]Pai, 0, 3)
-	s.missedRon = false
-	s.isFuriten = false
-	s.isRinshanTsumo = false
-
-	return nil
-}
-
 func (s *StateImpl) Update(event jsontext.Value) error {
 	var msg message.Message
 	if err := json.Unmarshal(event, &msg); err != nil {
@@ -190,6 +132,64 @@ func (s *StateImpl) Update(event jsontext.Value) error {
 	default:
 		return fmt.Errorf("unknown event type: %v", event)
 	}
+
+	return nil
+}
+
+func (s *StateImpl) onStartGame(event *message.StartGame) error {
+	if event == nil {
+		return fmt.Errorf("start_game message is nil")
+	}
+
+	id := event.ID
+	if id < 0 || id >= NumPlayers {
+		return fmt.Errorf("invalid player ID: %d", id)
+	}
+
+	names := []string{"", "", "", ""}
+	if event.Names != nil {
+		names = slices.Clone(event.Names)
+	}
+	if len(names) != NumPlayers {
+		return fmt.Errorf("number of players must be 4, but got %d", len(names))
+	}
+
+	east, err := NewPaiWithName("E")
+	if err != nil {
+		return err
+	}
+
+	var players [NumPlayers]Player
+	for i, name := range names {
+		p, err := NewPlayer(i, name, InitScore)
+		if err != nil {
+			return err
+		}
+		players[i] = *p
+	}
+
+	s.players = players
+	s.bakaze = *east
+	s.kyokuNum = 1
+	s.honba = 0
+	s.oya = &s.players[0]
+	s.chicha = &s.players[0]
+	s.doraMarkers = make([]Pai, 0, MaxNumDoraMarkers)
+	s.numPipais = NumInitPipais
+
+	s.prevEventType = noEvent
+	s.prevDahaiActor = noActor
+	s.prevDahaiPai = nil
+	s.currentEventType = noEvent
+
+	s.playerID = id
+	s.lastActor = noActor
+	s.lastActionType = noEvent
+
+	s.kuikaePais = make([]Pai, 0, 3)
+	s.missedRon = false
+	s.isFuriten = false
+	s.isRinshanTsumo = false
 
 	return nil
 }
