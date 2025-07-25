@@ -349,7 +349,7 @@ func (p *Player) onKakan(furo *Kakan) error {
 		if !isPon {
 			return false
 		}
-		return slices.Contains(p.Pais(), *furo.Taken())
+		return slices.Contains(p.Pais(), *furo.Taken().RemoveRed())
 	})
 	if ponIndex == -1 {
 		return fmt.Errorf("failed to find pon mentsu for kakan: %v", furo)
