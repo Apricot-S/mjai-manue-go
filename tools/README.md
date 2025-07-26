@@ -30,7 +30,53 @@ go run ./tools/dump_game_stats <log_glob_patterns...> > <game_stats.json>
 
 #### Sample Output (formatted)
 
-(TODO)
+```json
+{
+  "numHoras": 17793,
+  "numTsumoHoras": 7195,
+  "numTurnsDistribution": [
+    0.008629732049203776,
+    ...
+  ],
+  "ryukyokuRatio": 0.15700390960236482,
+  "averageHoraPoints": 5533.648063845332,
+  "koHoraPointsFreqs": {
+    "1000": 1087,
+    "1100": 445,
+    ...
+    "32000": 1,
+    "total": 12834
+  },
+  "oyaHoraPointsFreqs": {
+    "1500": 555,
+    "2000": 154,
+    ...
+    "36000": 1,
+    "total": 4959
+  },
+  "yamitenStats": {
+    "17,0": {
+      "total": 41903,
+      "tenpai": 2
+    },
+    ...
+    "12,4": {
+      "total": 4,
+      "tenpai": 4
+    }
+  },
+  "ryukyokuTenpaiStat": {
+    "total": 13172,
+    "tenpai": 5468,
+    "noten": 7704,
+    "tenpaiTurnDistribution": {
+      "0": 0,
+      ...
+      "17.5": 46,
+    }
+  }
+}
+```
 
 ## dump_light_game_stats
 
