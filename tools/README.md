@@ -4,7 +4,7 @@
 
 ## dump_game_stats
 
-(TODO)
+This tool analyzes game logs in mjai format, including gzip-compressed files, and generates overall game statistics such as number of wins, tsumo rate, draw ratio, average winning points, and tenpai timing distributions.
 
 ### What It Does
 
