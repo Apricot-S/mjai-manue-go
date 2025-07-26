@@ -2,7 +2,7 @@
 
 Tools that analyze game records and generate structured data for use in mjai-manue's decision-making.
 
-These tools output JSON suitable for use as configuration files under `configs/`.
+These tools output JSON suitable for use as configuration files under [configs/](configs/).
 
 ## Deal-in risk decision tree (TODO)
 
