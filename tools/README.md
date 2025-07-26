@@ -6,9 +6,9 @@ These tools output JSON suitable for use as configuration files under `configs/`
 
 ## Deal-in risk decision tree (TODO)
 
-| Tool              | Output                 | Purpose                                                              |
-| ----------------- | ---------------------- | -------------------------------------------------------------------- |
-| `estimate_danger` | `danger_tree.all.json` | Generates a decision tree to assess deal-in risk based on game state |
+| Tool                                | Output                 | Purpose                                                              |
+| ----------------------------------- | ---------------------- | -------------------------------------------------------------------- |
+| [estimate_danger](estimate_danger/) | `danger_tree.all.json` | Generates a decision tree to assess deal-in risk based on game state |
 
 ## Game-level statistics
 
