@@ -4,6 +4,12 @@ Tools that analyze game records and generate structured data for use in mjai-man
 
 These tools output JSON suitable for use as configuration files under `configs/`.
 
+## Deal-in risk decision tree (TODO)
+
+| Tool              | Output                 | Purpose                                                              |
+| ----------------- | ---------------------- | -------------------------------------------------------------------- |
+| `estimate_danger` | `danger_tree.all.json` | Generates a decision tree to assess deal-in risk based on game state |
+
 ## Game-level statistics
 
 | Tool                                  | Output            | Purpose                                             |
@@ -17,11 +23,5 @@ These tools output JSON suitable for use as configuration files under `configs/`
 | ------------------------------------------------------------- | ----------------------- | ----------------------------------------------------- |
 | [dump_light_game_stats](dump_light_game_stats/)               | (intermediate JSON)     | Extracts round-level score differentials from records |
 | [postprocess_light_game_stats](postprocess_light_game_stats/) | `light_game_stats.json` | Converts score differentials into win rates           |
-
-## Deal-in risk decision tree (TODO)
-
-| Tool              | Output                 | Purpose                                                              |
-| ----------------- | ---------------------- | -------------------------------------------------------------------- |
-| `estimate_danger` | `danger_tree.all.json` | Generates a decision tree to assess deal-in risk based on game state |
 
 See each tool's `README.md` for details.
