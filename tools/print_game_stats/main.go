@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"log"
+	"math"
 	"os"
 
 	"github.com/Apricot-S/mjai-manue-go/configs"
@@ -37,11 +38,14 @@ func printYamitenStats(stats configs.GameStats) {
 				stat = &configs.YamitenStat{}
 			}
 
-			ratio := 0.0
-			if stat.Total > 0 {
-				ratio = float64(stat.Tenpai) / float64(stat.Total)
+			ratio := float64(stat.Tenpai) / float64(stat.Total)
+			var ratioStr string
+			if math.IsNaN(ratio) {
+				ratioStr = "  NaN"
+			} else {
+				ratioStr = fmt.Sprintf("%.3f", ratio)
 			}
-			line += fmt.Sprintf("%.3f(%5d/%5d)  ", ratio, stat.Tenpai, stat.Total)
+			line += fmt.Sprintf("%s(%5d/%5d)  ", ratioStr, stat.Tenpai, stat.Total)
 		}
 		fmt.Println(line)
 	}
