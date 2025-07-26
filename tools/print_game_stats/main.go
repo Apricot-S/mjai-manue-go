@@ -20,7 +20,7 @@ func printNumTurnsDistribution(stats configs.GameStats) {
 
 func main() {
 	if len(os.Args) != 2 {
-		fmt.Fprintf(os.Stderr, "Usage: %s <game_stats.json>\n", os.Args[0])
+		fmt.Fprintf(os.Stderr, "Usage: %s <PATH TO game_stats.json>\n", os.Args[0])
 		os.Exit(2)
 	}
 
