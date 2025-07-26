@@ -10,35 +10,40 @@ import (
 )
 
 func printNumTurnsDistribution(stats configs.GameStats) {
-	if stats.NumTurnsDistribution != nil {
-		fmt.Println("numTurnsDistribution:")
-		for i, n := range stats.NumTurnsDistribution {
-			fmt.Printf("  %2d: %.3f\n", i, n)
-		}
+	if stats.NumTurnsDistribution == nil {
+		return
+	}
+
+	fmt.Println("numTurnsDistribution:")
+	for i, n := range stats.NumTurnsDistribution {
+		fmt.Printf("  %2d: %.3f\n", i, n)
 	}
 }
 
 func printYamitenStats(stats configs.GameStats) {
-	const maxTurn = 18
-	if stats.YamitenStats != nil {
-		fmt.Println("yamitenStats:")
-		for i := range maxTurn {
-			line := fmt.Sprintf("  %2d: ", i)
-			for j := range 5 {
-				key := fmt.Sprintf("%d,%d", i, j)
-				stat, ok := stats.YamitenStats[key]
-				if !ok || stat.Total == 0 {
-					stat = &configs.YamitenStat{}
-				}
+	if stats.YamitenStats == nil {
+		return
+	}
 
-				ratio := 0.0
-				if stat.Total > 0 {
-					ratio = float64(stat.Tenpai) / float64(stat.Total)
-				}
-				line += fmt.Sprintf("%.3f(%5d/%5d)  ", ratio, stat.Tenpai, stat.Total)
+	const maxTurn = 18
+	const maxNumFuro = 4
+	fmt.Println("yamitenStats:")
+	for i := range maxTurn {
+		line := fmt.Sprintf("  %2d: ", i)
+		for j := range maxNumFuro + 1 {
+			key := fmt.Sprintf("%d,%d", i, j)
+			stat, ok := stats.YamitenStats[key]
+			if !ok || stat.Total == 0 {
+				stat = &configs.YamitenStat{}
 			}
-			fmt.Println(line)
+
+			ratio := 0.0
+			if stat.Total > 0 {
+				ratio = float64(stat.Tenpai) / float64(stat.Total)
+			}
+			line += fmt.Sprintf("%.3f(%5d/%5d)  ", ratio, stat.Tenpai, stat.Total)
 		}
+		fmt.Println(line)
 	}
 }
 
