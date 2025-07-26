@@ -23,15 +23,15 @@ type LightGameStats struct {
 }
 
 type GameStats struct {
-	NumHoras             int                    `json:"numHoras"`
-	NumTsumoHoras        int                    `json:"numTsumoHoras"`
-	NumTurnsDistribution []float64              `json:"numTurnsDistribution"`
-	RyukyokuRatio        float64                `json:"ryukyokuRatio"`
-	AverageHoraPoints    float64                `json:"averageHoraPoints"`
-	KoHoraPointsFreqs    map[string]int         `json:"koHoraPointsFreqs"`
-	OyaHoraPointsFreqs   map[string]int         `json:"oyaHoraPointsFreqs"`
-	YamitenStats         map[string]YamitenStat `json:"yamitenStats"`
-	RyukyokuTenpaiStat   RyukyokuTenpaiStat     `json:"ryukyokuTenpaiStat"`
+	NumHoras             int                     `json:"numHoras"`
+	NumTsumoHoras        int                     `json:"numTsumoHoras"`
+	NumTurnsDistribution []float64               `json:"numTurnsDistribution"`
+	RyukyokuRatio        float64                 `json:"ryukyokuRatio"`
+	AverageHoraPoints    float64                 `json:"averageHoraPoints"`
+	KoHoraPointsFreqs    map[string]int          `json:"koHoraPointsFreqs"`
+	OyaHoraPointsFreqs   map[string]int          `json:"oyaHoraPointsFreqs"`
+	YamitenStats         map[string]*YamitenStat `json:"yamitenStats"`
+	RyukyokuTenpaiStat   *RyukyokuTenpaiStat     `json:"ryukyokuTenpaiStat"`
 	LightGameStats
 }
 
