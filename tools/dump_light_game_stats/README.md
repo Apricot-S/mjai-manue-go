@@ -23,11 +23,10 @@ You can redirect or pipe it as needed for downstream processing.
 With the top-level directory of working tree of this repository as the current directory, run the following command:
 
 ```sh
-go run ./tools/dump_light_game_stats <log_glob_patterns...> > <score_stats.json>
+go run ./tools/dump_light_game_stats <log_glob_patterns...> > PATH/TO/score_stats.json
 ```
 
 - Replace `<log_glob_patterns...>` with one or more file path patterns matching your target logs, such as `"logs/*/*.mjson"` and `"logs/*/*.mjson.gz"`. You can specify multiple patterns, separated by spaces.
-- Output is written to `<score_stats.json>` in JSON format.
 
 ### Sample Output (formatted)
 
