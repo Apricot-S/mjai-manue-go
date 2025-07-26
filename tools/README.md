@@ -4,13 +4,13 @@ Tools that analyze game records and generate structured data for use in mjai-man
 
 These tools output JSON suitable for use as configuration files under [/configs/](/configs/).
 
-## Deal-in risk decision tree (TODO)
+## Deal-in risk decision tree (WIP)
 
 | Tool                                | Output                 | Purpose                                                                |
 | ----------------------------------- | ---------------------- | ---------------------------------------------------------------------- |
 | [estimate_danger](estimate_danger/) | `danger_tree.all.json` | Generates a decision tree to estimate deal-in risk based on game state |
 
-## Game-level statistics
+## Game-level statistics (WIP)
 
 | Tool                                  | Output            | Purpose                                             |
 | ------------------------------------- | ----------------- | --------------------------------------------------- |
