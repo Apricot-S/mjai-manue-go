@@ -14,6 +14,18 @@ import (
 	"github.com/go-json-experiment/json/jsontext"
 )
 
+func isTenpai(actor *game.Player) (bool, error) {
+	tehaiSet, err := game.NewPaiSet(actor.Tehais())
+	if err != nil {
+		return false, fmt.Errorf("failed to get the hand: %w", err)
+	}
+	shantenNumber, _, err := game.AnalyzeShantenWithOption(tehaiSet, 0, 0)
+	if err != nil {
+		return false, fmt.Errorf("failed to calculate shanten number: %w", err)
+	}
+	return shantenNumber <= 0, nil
+}
+
 type Counter interface {
 	OnAction(action jsontext.Value, g game.StateViewer) error
 }
@@ -104,6 +116,56 @@ func (hpc *HoraPointsCounter) OnAction(action jsontext.Value, g game.StateViewer
 	return nil
 }
 
+type YamitenCounter struct {
+	Stats map[string]*configs.YamitenStat
+}
+
+func NewYamitenCounter() *YamitenCounter {
+	return &YamitenCounter{
+		Stats: make(map[string]*configs.YamitenStat),
+	}
+}
+
+func (yc *YamitenCounter) OnAction(action jsontext.Value, g game.StateViewer) error {
+	var msg message.Message
+	if err := json.Unmarshal(action, &msg); err != nil {
+		return err
+	}
+
+	if msg.Type != message.TypeDahai {
+		return nil
+	}
+
+	var dahai message.Dahai
+	if err := json.Unmarshal(action, &dahai); err != nil {
+		return fmt.Errorf("failed to unmarshal dahai: %w", err)
+	}
+
+	actor := g.Players()[dahai.Actor]
+	if actor.ReachState() != game.NotReach {
+		return nil
+	}
+
+	numTurns := g.NumPipais() / 4
+	numFuros := len(actor.Furos())
+	key := fmt.Sprintf("%d,%d", numTurns, numFuros)
+
+	if _, ok := yc.Stats[key]; !ok {
+		yc.Stats[key] = new(configs.YamitenStat)
+	}
+	yc.Stats[key].Total++
+
+	isTenpai, err := isTenpai(&actor)
+	if err != nil {
+		return err
+	}
+	if isTenpai {
+		yc.Stats[key].Tenpai++
+	}
+
+	return nil
+}
+
 func main() {
 	if len(os.Args) < 2 {
 		fmt.Fprintf(os.Stderr, "Usage: %s <log_glob_patterns...>\n", os.Args[0])
@@ -119,7 +181,8 @@ func main() {
 
 	basic := NewBasicCounter()
 	horaPoints := NewHoraPointsCounter()
-	counters := []Counter{basic, horaPoints}
+	yamiten := NewYamitenCounter()
+	counters := []Counter{basic, horaPoints, yamiten}
 
 	onAction := func(action jsontext.Value) error {
 		var msg message.Message
@@ -154,6 +217,7 @@ func main() {
 		AverageHoraPoints:    float64(basic.TotalHoraPoints) / float64(basic.NumHoras),
 		KoHoraPointsFreqs:    horaPoints.KoFreqs,
 		OyaHoraPointsFreqs:   horaPoints.OyaFreqs,
+		YamitenStats:         yamiten.Stats,
 	}
 	if err := json.MarshalWrite(os.Stdout, output, json.Deterministic(true)); err != nil {
 		log.Fatalf("failed to output result: %v", err)
