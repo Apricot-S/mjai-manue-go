@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"strconv"
 
 	"github.com/Apricot-S/mjai-manue-go/configs"
 	"github.com/Apricot-S/mjai-manue-go/internal/game"
@@ -62,6 +63,47 @@ func (bc *BasicCounter) OnAction(action jsontext.Value, g game.StateViewer) erro
 	return nil
 }
 
+type HoraPointsCounter struct {
+	KoFreqs  map[string]int
+	OyaFreqs map[string]int
+}
+
+func NewHoraPointsCounter() *HoraPointsCounter {
+	return &HoraPointsCounter{
+		KoFreqs:  map[string]int{"total": 0},
+		OyaFreqs: map[string]int{"total": 0},
+	}
+}
+
+func (hpc *HoraPointsCounter) OnAction(action jsontext.Value, g game.StateViewer) error {
+	var msg message.Message
+	if err := json.Unmarshal(action, &msg); err != nil {
+		return err
+	}
+
+	if msg.Type != message.TypeHora {
+		return nil
+	}
+
+	var hora message.Hora
+	if err := json.Unmarshal(action, &hora); err != nil {
+		return fmt.Errorf("failed to unmarshal hora: %w", err)
+	}
+
+	var freqs map[string]int
+	if hora.Actor == g.Oya().ID() {
+		freqs = hpc.OyaFreqs
+	} else {
+		freqs = hpc.KoFreqs
+	}
+
+	freqs["total"]++
+	key := strconv.Itoa(hora.HoraPoints)
+	freqs[key]++
+
+	return nil
+}
+
 func main() {
 	if len(os.Args) < 2 {
 		fmt.Fprintf(os.Stderr, "Usage: %s <log_glob_patterns...>\n", os.Args[0])
@@ -76,9 +118,8 @@ func main() {
 	a := shared.NewArchive(paths)
 
 	basic := NewBasicCounter()
-	counters := []Counter{
-		basic,
-	}
+	horaPoints := NewHoraPointsCounter()
+	counters := []Counter{basic, horaPoints}
 
 	onAction := func(action jsontext.Value) error {
 		var msg message.Message
@@ -111,6 +152,8 @@ func main() {
 		NumTurnsDistribution: numTurnsDistribution,
 		RyukyokuRatio:        float64(basic.NumRyukyokus) / float64(basic.NumKyokus),
 		AverageHoraPoints:    float64(basic.TotalHoraPoints) / float64(basic.NumHoras),
+		KoHoraPointsFreqs:    horaPoints.KoFreqs,
+		OyaHoraPointsFreqs:   horaPoints.OyaFreqs,
 	}
 	if err := json.MarshalWrite(os.Stdout, output, json.Deterministic(true)); err != nil {
 		log.Fatalf("failed to output result: %v", err)
