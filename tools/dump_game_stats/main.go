@@ -174,8 +174,7 @@ type RyukyokuTenpaiCounter struct {
 
 func NewRyukyokuTenpaiCounter() *RyukyokuTenpaiCounter {
 	tenpaiTurnDistribution := make(map[string]int)
-	const finalTurn = float64(game.FinalTurn)
-	for i := 0.0; i <= finalTurn; i += 1.0 / 4.0 {
+	for i := 0.0; i <= game.FinalTurn; i += 1.0 / 4.0 {
 		key := strconv.FormatFloat(i, 'f', -1, 64)
 		tenpaiTurnDistribution[key] = 0
 	}

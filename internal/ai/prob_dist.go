@@ -168,7 +168,7 @@ func (a *ManueAI) getNotenRyukyokuTenpaiProb(state game.StateViewer) float64 {
 	notenFreq := float64(a.stats.RyukyokuTenpaiStat.Noten)
 	tenpaiFreq := 0.0
 	t := state.Turn() + 1.0/4.0
-	for t <= float64(game.FinalTurn) {
+	for t <= game.FinalTurn {
 		n := strconv.FormatFloat(t, 'f', -1, 64)
 		tenpaiFreq += float64(a.stats.RyukyokuTenpaiStat.TenpaiTurnDistribution[n])
 		t += 1.0 / 4.0
