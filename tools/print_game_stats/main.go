@@ -5,8 +5,10 @@ import (
 	"log"
 	"math"
 	"os"
+	"strconv"
 
 	"github.com/Apricot-S/mjai-manue-go/configs"
+	"github.com/Apricot-S/mjai-manue-go/internal/game"
 	"github.com/go-json-experiment/json"
 )
 
@@ -51,6 +53,21 @@ func printYamitenStats(stats configs.GameStats) {
 	}
 }
 
+func printRyukyokuTenpaiStats(stats configs.GameStats) {
+	if stats.RyukyokuTenpaiStat == nil {
+		return
+	}
+
+	fmt.Println("ryukyokuTenpaiStat:")
+	for i := 0.0; i <= game.FinalTurn; i += 1.0 / 4.0 {
+		key := strconv.FormatFloat(i, 'f', -1, 64)
+		ratio := float64(stats.RyukyokuTenpaiStat.TenpaiTurnDistribution[key]) / float64(stats.RyukyokuTenpaiStat.Total)
+		fmt.Printf("  %5.2f: %.3f (%d)\n", i, ratio, stats.RyukyokuTenpaiStat.TenpaiTurnDistribution[key])
+	}
+	ratio := float64(stats.RyukyokuTenpaiStat.Noten) / float64(stats.RyukyokuTenpaiStat.Total)
+	fmt.Printf("  noten: %.3f (%d)\n", ratio, stats.RyukyokuTenpaiStat.Noten)
+}
+
 func main() {
 	if len(os.Args) != 2 {
 		fmt.Fprintf(os.Stderr, "Usage: %s <PATH TO game_stats.json>\n", os.Args[0])
@@ -70,5 +87,7 @@ func main() {
 	printNumTurnsDistribution(stats)
 	fmt.Println()
 	printYamitenStats(stats)
+	fmt.Println()
+	printRyukyokuTenpaiStats(stats)
 	fmt.Println()
 }
