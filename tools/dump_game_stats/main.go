@@ -14,6 +14,7 @@ import (
 	"github.com/go-json-experiment/json/jsontext"
 )
 
+// TODO Support kokushimuso and chitoitsu
 func isTenpai(actor *game.Player) (bool, error) {
 	tehaiSet, err := game.NewPaiSet(actor.Tehais())
 	if err != nil {
@@ -166,6 +167,84 @@ func (yc *YamitenCounter) OnAction(action jsontext.Value, g game.StateViewer) er
 	return nil
 }
 
+type RyukyokuTenpaiCounter struct {
+	Stats       *configs.RyukyokuTenpaiStat
+	tenpaiTurns [4]*float64
+}
+
+func NewRyukyokuTenpaiCounter() *RyukyokuTenpaiCounter {
+	tenpaiTurnDistribution := make(map[string]int)
+	const finalTurn = float64(game.FinalTurn)
+	for i := 0.0; i <= finalTurn; i += 1.0 / 4.0 {
+		key := strconv.FormatFloat(i, 'f', -1, 64)
+		tenpaiTurnDistribution[key] = 0
+	}
+
+	return &RyukyokuTenpaiCounter{
+		Stats: &configs.RyukyokuTenpaiStat{
+			Total:                  0,
+			Tenpai:                 0,
+			Noten:                  0,
+			TenpaiTurnDistribution: tenpaiTurnDistribution,
+		},
+		tenpaiTurns: [4]*float64{nil, nil, nil, nil},
+	}
+}
+
+func (rtc *RyukyokuTenpaiCounter) OnAction(action jsontext.Value, g game.StateViewer) error {
+	var msg message.Message
+	if err := json.Unmarshal(action, &msg); err != nil {
+		return err
+	}
+
+	switch msg.Type {
+	case message.TypeStartKyoku:
+		rtc.tenpaiTurns = [4]*float64{nil, nil, nil, nil}
+	case message.TypeDahai:
+		var dahai message.Dahai
+		if err := json.Unmarshal(action, &dahai); err != nil {
+			return fmt.Errorf("failed to unmarshal dahai: %w", err)
+		}
+
+		actor := g.Players()[dahai.Actor]
+		isTenpai, err := isTenpai(&actor)
+		if err != nil {
+			return err
+		}
+		if rtc.tenpaiTurns[dahai.Actor] == nil && isTenpai {
+			// Note:
+			// This branch isn't reached if the player entered Tenpai once,
+			// then broke Tenpai before the end of the round,
+			// but it's unclear if this is intentional.
+			turn := g.Turn()
+			rtc.tenpaiTurns[dahai.Actor] = &turn
+		}
+	case message.TypeRyukyoku:
+		for _, player := range g.Players() {
+			isTenpai, err := isTenpai(&player)
+			if err != nil {
+				return err
+			}
+
+			rtc.Stats.Total++
+			// Temporary handling:
+			// In the case of Nine Different Terminals and Honors,
+			// the round may end in a draw before any discard, so it's possible for
+			// isTenpai && rtc.tenpaiTurns[player.ID()] == nil.
+			// However, since there's no point exchange, all players are treated as Noten.
+			if isTenpai && rtc.tenpaiTurns[player.ID()] != nil {
+				rtc.Stats.Tenpai++
+				key := strconv.FormatFloat(*rtc.tenpaiTurns[player.ID()], 'f', -1, 64)
+				rtc.Stats.TenpaiTurnDistribution[key]++
+			} else {
+				rtc.Stats.Noten++
+			}
+		}
+	}
+
+	return nil
+}
+
 func main() {
 	if len(os.Args) < 2 {
 		fmt.Fprintf(os.Stderr, "Usage: %s <log_glob_patterns...>\n", os.Args[0])
@@ -182,7 +261,8 @@ func main() {
 	basic := NewBasicCounter()
 	horaPoints := NewHoraPointsCounter()
 	yamiten := NewYamitenCounter()
-	counters := []Counter{basic, horaPoints, yamiten}
+	ryukyokuTenpai := NewRyukyokuTenpaiCounter()
+	counters := []Counter{basic, horaPoints, yamiten, ryukyokuTenpai}
 
 	onAction := func(action jsontext.Value) error {
 		var msg message.Message
@@ -218,6 +298,7 @@ func main() {
 		KoHoraPointsFreqs:    horaPoints.KoFreqs,
 		OyaHoraPointsFreqs:   horaPoints.OyaFreqs,
 		YamitenStats:         yamiten.Stats,
+		RyukyokuTenpaiStat:   ryukyokuTenpai.Stats,
 	}
 	if err := json.MarshalWrite(os.Stdout, output, json.Deterministic(true)); err != nil {
 		log.Fatalf("failed to output result: %v", err)
