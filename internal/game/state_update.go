@@ -15,13 +15,17 @@ func (s *StateImpl) Update(event jsontext.Value) error {
 		return fmt.Errorf("failed to unmarshal message: %w", err)
 	}
 
-	if msg.Type == message.TypeStartGame {
+	switch msg.Type {
+	case message.TypeStartGame:
 		var e message.StartGame
 		if err := json.Unmarshal(event, &e); err != nil {
 			return fmt.Errorf("failed to unmarshal start_game: %w", err)
 		}
 		s.currentEventType = message.TypeStartGame
 		return s.onStartGame(&e)
+	case message.TypeEndKyoku, message.TypeEndGame:
+		// For game records only
+		return nil
 	}
 
 	s.prevEventType = s.currentEventType

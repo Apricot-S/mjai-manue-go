@@ -167,8 +167,8 @@ func tenpaisToRyukyokuPointsFloat(tenpais []float64) []float64 {
 func (a *ManueAI) getNotenRyukyokuTenpaiProb(state game.StateViewer) float64 {
 	notenFreq := float64(a.stats.RyukyokuTenpaiStat.Noten)
 	tenpaiFreq := 0.0
-	t := float64(state.Turn()) + 1.0/4.0
-	for t <= float64(game.FinalTurn) {
+	t := state.Turn() + 1.0/4.0
+	for t <= game.FinalTurn {
 		n := strconv.FormatFloat(t, 'f', -1, 64)
 		tenpaiFreq += float64(a.stats.RyukyokuTenpaiStat.TenpaiTurnDistribution[n])
 		t += 1.0 / 4.0
@@ -430,7 +430,7 @@ func (a *ManueAI) printTenpaiProbs(state game.StateViewer, playerID int) {
 }
 
 func (a *ManueAI) getNumExpectedRemainingTurns(state game.StateViewer) int {
-	currentTurn := math.Round(float64(game.NumInitPipais-state.NumPipais()) / 4.0)
+	currentTurn := math.Round(state.Turn())
 	num := 0.0
 	den := 0.0
 	ct := int(currentTurn)
@@ -447,7 +447,7 @@ func (a *ManueAI) getNumExpectedRemainingTurns(state game.StateViewer) int {
 }
 
 func (a *ManueAI) getRyukyokuProb(state game.StateViewer) float64 {
-	currentTurn := state.Turn()
+	currentTurn := int(state.Turn())
 	den := 0.0
 	for _, prob := range a.stats.NumTurnsDistribution[currentTurn:] {
 		den += prob

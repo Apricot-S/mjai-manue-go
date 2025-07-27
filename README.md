@@ -10,7 +10,6 @@ Differences from the original:
 - Fixed the miscalculation of the shanten number when the hand contains four identical tiles.
 - Improved error handling to more reliably reject invalid or anomalous input.
 - Refactored the code to improve readability and maintainability.
-- Does not include tools to generate stats and decision trees from game records, as there is no motivation to modify the pre-generated files provided in the original project.
 
 > [!NOTE]
 > The original project includes an older version written in Ruby and a newer version written in CoffeeScript. This project ports only the new version.
@@ -45,6 +44,15 @@ mjai-manue
 
 > [!TIP]
 > See [scripts/mjai.app/](scripts/mjai.app/) for how to generate a submission file for `mjai.app`.
+
+> [!TIP]
+> To customize the AI's strategic behavior, replace the following configuration files before building `mjai-manue`:
+>
+> - `configs/danger_tree.all.json`
+> - `configs/game_stats.json`
+> - `configs/light_game_stats.json`
+>
+> See [tools/](tools/) for instructions on how to generate these files.
 
 ## Credits
 

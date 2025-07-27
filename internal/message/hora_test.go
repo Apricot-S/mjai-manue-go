@@ -173,8 +173,18 @@ func TestNewHora(t *testing.T) {
 				scores: []int{27500, 22300, 24300, 25900},
 				log:    "",
 			},
-			want:    nil,
-			wantErr: true,
+			want: &Hora{
+				Action: Action{
+					Message: Message{TypeHora},
+					Actor:   0,
+					Log:     "",
+				},
+				Target:     0,
+				Pai:        "",
+				HoraPoints: 0,
+				Scores:     []int{27500, 22300, 24300, 25900},
+			},
+			wantErr: false,
 		},
 		{
 			name: "invalid pai",
@@ -432,8 +442,8 @@ func TestHora_Marshal(t *testing.T) {
 				HoraPoints: 2600,
 				Scores:     []int{27500, 22300, 24300, 25900},
 			},
-			want:    ``,
-			wantErr: true,
+			want:    `{"type":"hora","actor":1,"target":0,"hora_points":2600,"scores":[27500,22300,24300,25900]}`,
+			wantErr: false,
 		},
 		{
 			name: "invalid pai",
@@ -742,7 +752,7 @@ func TestHora_Unmarshal(t *testing.T) {
 				HoraPoints: 0,
 				Scores:     []int{27500, 22300, 24300, 25900},
 			},
-			wantErr: true,
+			wantErr: false,
 		},
 		{
 			name: "invalid pai",

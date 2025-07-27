@@ -9,7 +9,7 @@ const (
 	InitScore         = 25_000
 	MaxNumDoraMarkers = 5
 	NumInitPipais     = NumIDs*4 - 13*NumPlayers - 14
-	FinalTurn         = NumInitPipais / NumPlayers
+	FinalTurn         = float64(NumInitPipais) / float64(NumPlayers)
 
 	// Indicates that no event has been triggered.
 	noEvent = ""
@@ -45,7 +45,7 @@ type StateViewer interface {
 	Jikaze(player *Player) *Pai
 	YakuhaiFan(pai *Pai, player *Player) int
 	NextKyoku() (*Pai, int)
-	Turn() int
+	Turn() float64
 	RankedPlayers() [NumPlayers]Player
 
 	Print()

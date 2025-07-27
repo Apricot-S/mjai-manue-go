@@ -118,7 +118,7 @@ func (s *MockState) Chicha() *game.Player          { panic("not implemented") }
 func (s *MockState) DoraMarkers() []game.Pai       { panic("not implemented") }
 func (s *MockState) NumPipais() int                { panic("not implemented") }
 func (s *MockState) NextKyoku() (*game.Pai, int)   { panic("not implemented") }
-func (s *MockState) Turn() int                     { panic("not implemented") }
+func (s *MockState) Turn() float64                 { panic("not implemented") }
 func (s *MockState) RankedPlayers() [4]game.Player { panic("not implemented") }
 func (s *MockState) Print()                        { panic("not implemented") }
 
