@@ -98,8 +98,8 @@ func (s *StateImpl) NextKyoku() (*Pai, int) {
 	return getNextKyoku(&s.bakaze, s.kyokuNum)
 }
 
-func (s *StateImpl) Turn() int {
-	return (NumInitPipais - s.numPipais) / NumPlayers
+func (s *StateImpl) Turn() float64 {
+	return float64(NumInitPipais-s.numPipais) / float64(NumPlayers)
 }
 
 func (s *StateImpl) RankedPlayers() [NumPlayers]Player {

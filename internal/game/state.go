@@ -45,7 +45,7 @@ type StateViewer interface {
 	Jikaze(player *Player) *Pai
 	YakuhaiFan(pai *Pai, player *Player) int
 	NextKyoku() (*Pai, int)
-	Turn() int
+	Turn() float64
 	RankedPlayers() [NumPlayers]Player
 
 	Print()
