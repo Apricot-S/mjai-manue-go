@@ -1,6 +1,6 @@
 # dump_light_game_stats
 
-This tool analyzes game logs in mjai format, including gzip-compressed files, and generates per-round statistics on score differentials.
+This tool analyzes game logs in Mjai format, including gzip-compressed files, and generates per-round statistics on score differentials.
 
 ## What It Does
 
