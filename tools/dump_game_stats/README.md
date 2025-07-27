@@ -1,15 +1,15 @@
 # dump_game_stats
 
-This tool analyzes game logs in mjai format, including gzip-compressed files, and generates overall game statistics such as number of wins, tsumo rate, draw ratio, average winning points, and tenpai timing distributions.
+This tool analyzes game logs in mjai format, including gzip-compressed files, and generates overall game statistics such as number of wins, Tsumo rate, draw ratio, average winning points, and Tenpai timing distributions.
 
 ## What It Does
 
 - Parses each game log and replays all actions in order
-- Tracks overall stats like number of rounds, Ryukyokus, and Hora-related totals
+- Tracks overall stats like number of rounds, Ryukyokus, and win-related totals
 - Computes distribution of round lengths
-- Measures Hora point distributions by dealer (Oya) and non-dealer (Ko) status
-- Calculates tenpai rates in yamiten situations, grouped by turn number and number of melds
-- Checks for each player whether they were in tenpai at the time of Ryukyoku, and records the turn they first entered tenpai
+- Measures winning point distributions by dealer and non-dealer status
+- Aggregates counts of Yamiten cases (i.e. situations where a player in Tenpai does not declare Riichi and quietly remains in Tenpai) grouped by turn number and number of melds, limited to the player has not declared Riichi
+- Checks for each player whether they were in Tenpai at the time of Ryukyoku, and records the turn they first entered Tenpai
 
 ## Output
 

@@ -6,7 +6,7 @@ This tool analyzes game logs in mjai format, including gzip-compressed files, an
 
 - Processes each game log and examines every round
 - For each player, calculates the score difference between their starting and ending points
-- Groups results by the player's seating position relative to the starting dealer (chicha)
+- Groups results by the player's seating position relative to the starting dealer (Chicha)
 - Aggregates and outputs the frequency of each differential
 
 ## Output
