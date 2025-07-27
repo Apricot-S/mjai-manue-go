@@ -211,10 +211,6 @@ func (rtc *RyukyokuTenpaiCounter) OnAction(action jsontext.Value, g game.StateVi
 			return err
 		}
 		if rtc.tenpaiTurns[dahai.Actor] == nil && isTenpai {
-			// Note:
-			// This branch isn't reached if the player entered Tenpai once,
-			// then broke Tenpai before the end of the round,
-			// but it's unclear if this is intentional.
 			turn := g.Turn()
 			rtc.tenpaiTurns[dahai.Actor] = &turn
 		}

@@ -10,7 +10,7 @@ These tools output JSON suitable for use as configuration files under [/configs/
 | ----------------------------------- | ---------------------- | ---------------------------------------------------------------------- |
 | [estimate_danger](estimate_danger/) | `danger_tree.all.json` | Generates a decision tree to estimate deal-in risk based on game state |
 
-## Game-level statistics (WIP)
+## Game-level statistics
 
 | Tool                                  | Output            | Purpose                                             |
 | ------------------------------------- | ----------------- | --------------------------------------------------- |

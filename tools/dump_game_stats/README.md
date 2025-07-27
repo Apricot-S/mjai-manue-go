@@ -4,7 +4,12 @@ This tool analyzes game logs in mjai format, including gzip-compressed files, an
 
 ## What It Does
 
-(TODO)
+- Parses each game log and replays all actions in order
+- Tracks overall stats like number of rounds, Ryukyokus, and Hora-related totals
+- Computes distribution of round lengths
+- Measures Hora point distributions by dealer (Oya) and non-dealer (Ko) status
+- Calculates tenpai rates in yamiten situations, grouped by turn number and number of melds
+- Checks for each player whether they were in tenpai at the time of Ryukyoku, and records the turn they first entered tenpai
 
 ## Output
 
