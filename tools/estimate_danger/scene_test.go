@@ -167,3 +167,42 @@ func TestScene_Evaluate_Suji(t *testing.T) {
 		})
 	}
 }
+
+func TestScene_Evaluate_Nakasuji(t *testing.T) {
+	tests := []testCase{}
+
+	scene := getSceneForTest()
+	scene.anpaiSet = mustPaiSet([]game.Pai{*mustPai("1p"), *mustPai("7p")})
+
+	{
+		tests = append(tests, testCase{
+			name:    "4p is suji of 17p",
+			scene:   scene,
+			args:    args{name: "suji", pai: mustPai("4p")},
+			want:    true,
+			wantErr: false,
+		})
+	}
+	{
+		tests = append(tests, testCase{
+			name:    "4p is weak suji of 17p",
+			scene:   scene,
+			args:    args{name: "weak_suji", pai: mustPai("4p")},
+			want:    true,
+			wantErr: false,
+		})
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := tt.scene.Evaluate(tt.args.name, tt.args.pai)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("Scene.Evaluate() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if got != tt.want {
+				t.Errorf("Scene.Evaluate() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
