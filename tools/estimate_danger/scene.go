@@ -24,10 +24,10 @@ type Scene struct {
 	// bakaze     *game.Pai
 	// targetKaze *game.Pai
 
-	// prereachSutehaiSet *game.PaiSet
+	prereachSutehaiSet *game.PaiSet
 	// earlySutehaiSet    *game.PaiSet
 	// lateSutehaiSet     *game.PaiSet
-	// reachPaiSet        *game.PaiSet
+	reachPaiSet *game.PaiSet
 
 	evaluators *evaluators
 }
@@ -57,20 +57,20 @@ func NewScene(gameState game.StateViewer, me *game.Player, target *game.Player) 
 	// s.bakaze = gameState.Bakaze()
 	// s.targetKaze = gameState.Jikaze(target)
 
-	// var prereachSutehais game.Pais = nil
-	// var reachPais game.Pais = nil
-	// if idx := target.ReachSutehaiIndex(); idx != -1 {
-	// 	sutehais := target.Sutehais()
-	// 	prereachSutehais = sutehais[:idx+1]
-	// 	reachPai := sutehais[idx]
-	// 	reachPais = game.Pais{reachPai}
-	// }
-	// if s.prereachSutehaiSet, err = game.NewPaiSet(prereachSutehais); err != nil {
-	// 	return nil, err
-	// }
-	// if s.reachPaiSet, err = game.NewPaiSet(reachPais); err != nil {
-	// 	return nil, err
-	// }
+	var prereachSutehais game.Pais = nil
+	var reachPais game.Pais = nil
+	if idx := target.ReachSutehaiIndex(); idx != -1 {
+		sutehais := target.Sutehais()
+		prereachSutehais = sutehais[:idx+1]
+		reachPai := sutehais[idx]
+		reachPais = game.Pais{reachPai}
+	}
+	if s.prereachSutehaiSet, err = game.NewPaiSet(prereachSutehais); err != nil {
+		return nil, err
+	}
+	if s.reachPaiSet, err = game.NewPaiSet(reachPais); err != nil {
+		return nil, err
+	}
 
 	// halfLen := len(prereachSutehais) / 2
 	// if s.earlySutehaiSet, err = game.NewPaiSet(prereachSutehais[:halfLen]); err != nil {
@@ -108,10 +108,10 @@ func isWeakSuji(pai *game.Pai, anpaiSet *game.PaiSet) (bool, error) {
 	return isWeakSujiOf(pai, anpaiSet)
 }
 
-// // Suji for Riichi declaration tile. Including tiles like 4p against 1p Riichi.
-// func isReachSuji(pai *game.Pai, reachPaiSet *game.PaiSet) (bool, error) {
-// 	return isWeakSujiOf(pai, reachPaiSet)
-// }
+// Suji for Riichi declaration tile. Including tiles like 4p against 1p Riichi.
+func isReachSuji(pai *game.Pai, reachPaiSet *game.PaiSet) (bool, error) {
+	return isWeakSujiOf(pai, reachPaiSet)
+}
 
 // func isPrereachSuji(pai *game.Pai, prereachSutehaiSet *game.PaiSet) (bool, error) {
 // 	return isSujiOf(pai, prereachSutehaiSet)
@@ -691,9 +691,9 @@ func registerEvaluators() *evaluators {
 	ev["weak_suji"] = func(scene *Scene, pai *game.Pai) (bool, error) {
 		return isWeakSuji(pai, scene.anpaiSet)
 	}
-	// ev["reach_suji"] = func(scene *Scene, pai *game.Pai) (bool, error) {
-	// 	return isReachSuji(pai, scene.reachPaiSet)
-	// }
+	ev["reach_suji"] = func(scene *Scene, pai *game.Pai) (bool, error) {
+		return isReachSuji(pai, scene.reachPaiSet)
+	}
 	// ev["prereach_suji"] = func(scene *Scene, pai *game.Pai) (bool, error) {
 	// 	return isPrereachSuji(pai, scene.prereachSutehaiSet)
 	// }
