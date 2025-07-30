@@ -286,3 +286,35 @@ func TestScene_Evaluate_ReachSuji(t *testing.T) {
 		})
 	}
 }
+
+func TestScene_Evaluate_ReachKataSuji(t *testing.T) {
+	tests := []testCase{}
+
+	scene := getSceneForTest()
+	scene.anpaiSet = mustPaiSet([]game.Pai{*mustPai("1p")})
+	scene.prereachSutehaiSet = mustPaiSet([]game.Pai{*mustPai("1p")})
+	scene.reachPaiSet = mustPaiSet([]game.Pai{*mustPai("1p")})
+
+	{
+		tests = append(tests, testCase{
+			name:    "4p is reach suji of 1p",
+			scene:   scene,
+			args:    args{name: "reach_suji", pai: mustPai("4p")},
+			want:    true,
+			wantErr: false,
+		})
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := tt.scene.Evaluate(tt.args.name, tt.args.pai)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("Scene.Evaluate() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if got != tt.want {
+				t.Errorf("Scene.Evaluate() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
