@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 
+	"github.com/Apricot-S/mjai-manue-go/internal/ai/core"
 	"github.com/Apricot-S/mjai-manue-go/internal/game"
 )
 
@@ -17,7 +18,7 @@ type Scene struct {
 	// target    *game.Player
 
 	// tehaiSet   *game.PaiSet
-	// anpaiSet   *game.PaiSet
+	anpaiSet *game.PaiSet
 	// visibleSet *game.PaiSet
 	// doraSet    *game.PaiSet
 	// bakaze     *game.Pai
@@ -39,13 +40,13 @@ func NewScene(gameState game.StateViewer, me *game.Player, target *game.Player) 
 		evaluators: defaultEvaluators,
 	}
 
-	// var err error
+	var err error
 	// if s.tehaiSet, err = game.NewPaiSet(me.Tehais()); err != nil {
 	// 	return nil, err
 	// }
-	// if s.anpaiSet, err = game.NewPaiSet(gameState.Anpais(target)); err != nil {
-	// 	return nil, err
-	// }
+	if s.anpaiSet, err = game.NewPaiSet(gameState.Anpais(target)); err != nil {
+		return nil, err
+	}
 	// if s.visibleSet, err = game.NewPaiSet(gameState.VisiblePais(me)); err != nil {
 	// 	return nil, err
 	// }
@@ -98,14 +99,14 @@ func isTsupai(pai *game.Pai) bool {
 }
 
 // Omotesuji (表筋) or Nakasuji (中筋)
-// func isSuji(pai *game.Pai, anpaiSet *game.PaiSet) (bool, error) {
-// 	return isSujiOf(pai, anpaiSet)
-// }
+func isSuji(pai *game.Pai, anpaiSet *game.PaiSet) (bool, error) {
+	return isSujiOf(pai, anpaiSet)
+}
 
-// // Katasuji (片筋) or Suji (筋)
-// func isWeakSuji(pai *game.Pai, anpaiSet *game.PaiSet) (bool, error) {
-// 	return isWeakSujiOf(pai, anpaiSet)
-// }
+// Katasuji (片筋) or Suji (筋)
+func isWeakSuji(pai *game.Pai, anpaiSet *game.PaiSet) (bool, error) {
+	return isWeakSujiOf(pai, anpaiSet)
+}
 
 // // Suji for Riichi declaration tile. Including tiles like 4p against 1p Riichi.
 // func isReachSuji(pai *game.Pai, reachPaiSet *game.PaiSet) (bool, error) {
@@ -452,56 +453,56 @@ func isTsupai(pai *game.Pai) bool {
 // 	return numSameType+1 >= n, nil
 // }
 
-// func isSujiOf(pai *game.Pai, targetPaiSet *game.PaiSet) (bool, error) {
-// 	if pai.IsTsupai() {
-// 		return false, nil
-// 	}
+func isSujiOf(pai *game.Pai, targetPaiSet *game.PaiSet) (bool, error) {
+	if pai.IsTsupai() {
+		return false, nil
+	}
 
-// 	suji, err := getSuji(pai)
-// 	if err != nil {
-// 		return false, err
-// 	}
+	suji, err := getSuji(pai)
+	if err != nil {
+		return false, err
+	}
 
-// 	return core.AllMatch(suji, func(s game.Pai) (bool, error) {
-// 		return targetPaiSet.Has(&s)
-// 	})
-// }
+	return core.AllMatch(suji, func(s game.Pai) (bool, error) {
+		return targetPaiSet.Has(&s)
+	})
+}
 
-// func isWeakSujiOf(pai *game.Pai, targetPaiSet *game.PaiSet) (bool, error) {
-// 	if pai.IsTsupai() {
-// 		return false, nil
-// 	}
+func isWeakSujiOf(pai *game.Pai, targetPaiSet *game.PaiSet) (bool, error) {
+	if pai.IsTsupai() {
+		return false, nil
+	}
 
-// 	suji, err := getSuji(pai)
-// 	if err != nil {
-// 		return false, err
-// 	}
+	suji, err := getSuji(pai)
+	if err != nil {
+		return false, err
+	}
 
-// 	return core.AnyMatch(suji, func(s game.Pai) (bool, error) {
-// 		return targetPaiSet.Has(&s)
-// 	})
-// }
+	return core.AnyMatch(suji, func(s game.Pai) (bool, error) {
+		return targetPaiSet.Has(&s)
+	})
+}
 
-// func getSuji(pai *game.Pai) ([]game.Pai, error) {
-// 	if pai.IsTsupai() {
-// 		return []game.Pai{}, nil
-// 	}
+func getSuji(pai *game.Pai) ([]game.Pai, error) {
+	if pai.IsTsupai() {
+		return []game.Pai{}, nil
+	}
 
-// 	result := make([]game.Pai, 0, 2)
-// 	paiNumber := pai.Number()
-// 	candidates := []uint8{paiNumber - 3, paiNumber + 3}
-// 	for _, n := range candidates {
-// 		if 1 <= n && n <= 9 {
-// 			sujiPai, err := game.NewPaiWithDetail(pai.Type(), n, false)
-// 			if err != nil {
-// 				return nil, err
-// 			}
-// 			result = append(result, *sujiPai)
-// 		}
-// 	}
+	result := make([]game.Pai, 0, 2)
+	paiNumber := pai.Number()
+	candidates := []uint8{paiNumber - 3, paiNumber + 3}
+	for _, n := range candidates {
+		if 1 <= n && n <= 9 {
+			sujiPai, err := game.NewPaiWithDetail(pai.Type(), n, false)
+			if err != nil {
+				return nil, err
+			}
+			result = append(result, *sujiPai)
+		}
+	}
 
-// 	return result, nil
-// }
+	return result, nil
+}
 
 // func isUrasujiOf(pai *game.Pai, targetPaiSet *game.PaiSet, anpaiSet *game.PaiSet) (bool, error) {
 // 	sujis, err := getPossibleSujis(pai, anpaiSet)
@@ -684,12 +685,12 @@ func registerEvaluators() *evaluators {
 	ev["tsupai"] = func(scene *Scene, pai *game.Pai) (bool, error) {
 		return isTsupai(pai), nil
 	}
-	// ev["suji"] = func(scene *Scene, pai *game.Pai) (bool, error) {
-	// 	return isSuji(pai, scene.anpaiSet)
-	// }
-	// ev["weak_suji"] = func(scene *Scene, pai *game.Pai) (bool, error) {
-	// 	return isWeakSuji(pai, scene.anpaiSet)
-	// }
+	ev["suji"] = func(scene *Scene, pai *game.Pai) (bool, error) {
+		return isSuji(pai, scene.anpaiSet)
+	}
+	ev["weak_suji"] = func(scene *Scene, pai *game.Pai) (bool, error) {
+		return isWeakSuji(pai, scene.anpaiSet)
+	}
 	// ev["reach_suji"] = func(scene *Scene, pai *game.Pai) (bool, error) {
 	// 	return isReachSuji(pai, scene.reachPaiSet)
 	// }
