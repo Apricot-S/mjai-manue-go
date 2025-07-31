@@ -3,23 +3,23 @@ package main
 import (
 	"testing"
 
-	"github.com/Apricot-S/mjai-manue-go/internal/game"
+	"github.com/Apricot-S/mjai-manue-go/internal/base"
 )
 
 func getSceneForTest() *Scene {
 	return &Scene{evaluators: defaultEvaluators}
 }
 
-func mustPai(name string) *game.Pai {
-	p, err := game.NewPaiWithName(name)
+func mustPai(name string) *base.Pai {
+	p, err := base.NewPaiWithName(name)
 	if err != nil {
 		panic(err)
 	}
 	return p
 }
 
-func mustPaiSet(pais []game.Pai) *game.PaiSet {
-	ps, err := game.NewPaiSet(pais)
+func mustPaiSet(pais []base.Pai) *base.PaiSet {
+	ps, err := base.NewPaiSet(pais)
 	if err != nil {
 		panic(err)
 	}
@@ -28,7 +28,7 @@ func mustPaiSet(pais []game.Pai) *game.PaiSet {
 
 type args struct {
 	name string
-	pai  *game.Pai
+	pai  *base.Pai
 }
 
 type testCase struct {
@@ -79,7 +79,7 @@ func TestScene_Evaluate_Suji(t *testing.T) {
 	tests := []testCase{}
 
 	scene := getSceneForTest()
-	scene.anpaiSet = mustPaiSet([]game.Pai{*mustPai("4p")})
+	scene.anpaiSet = mustPaiSet([]base.Pai{*mustPai("4p")})
 
 	{
 		tests = append(tests, testCase{
@@ -172,7 +172,7 @@ func TestScene_Evaluate_NakaSuji(t *testing.T) {
 	tests := []testCase{}
 
 	scene := getSceneForTest()
-	scene.anpaiSet = mustPaiSet([]game.Pai{*mustPai("1p"), *mustPai("7p")})
+	scene.anpaiSet = mustPaiSet([]base.Pai{*mustPai("1p"), *mustPai("7p")})
 
 	{
 		tests = append(tests, testCase{
@@ -211,7 +211,7 @@ func TestScene_Evaluate_KataSuji(t *testing.T) {
 	tests := []testCase{}
 
 	scene := getSceneForTest()
-	scene.anpaiSet = mustPaiSet([]game.Pai{*mustPai("1p")})
+	scene.anpaiSet = mustPaiSet([]base.Pai{*mustPai("1p")})
 
 	{
 		tests = append(tests, testCase{
@@ -250,9 +250,9 @@ func TestScene_Evaluate_ReachSuji(t *testing.T) {
 	tests := []testCase{}
 
 	scene := getSceneForTest()
-	scene.anpaiSet = mustPaiSet([]game.Pai{*mustPai("5p"), *mustPai("4p")})
-	scene.prereachSutehaiSet = mustPaiSet([]game.Pai{*mustPai("5p"), *mustPai("4p")})
-	scene.reachPaiSet = mustPaiSet([]game.Pai{*mustPai("4p")})
+	scene.anpaiSet = mustPaiSet([]base.Pai{*mustPai("5p"), *mustPai("4p")})
+	scene.prereachSutehaiSet = mustPaiSet([]base.Pai{*mustPai("5p"), *mustPai("4p")})
+	scene.reachPaiSet = mustPaiSet([]base.Pai{*mustPai("4p")})
 
 	{
 		tests = append(tests, testCase{
@@ -291,9 +291,9 @@ func TestScene_Evaluate_ReachKataSuji(t *testing.T) {
 	tests := []testCase{}
 
 	scene := getSceneForTest()
-	scene.anpaiSet = mustPaiSet([]game.Pai{*mustPai("1p")})
-	scene.prereachSutehaiSet = mustPaiSet([]game.Pai{*mustPai("1p")})
-	scene.reachPaiSet = mustPaiSet([]game.Pai{*mustPai("1p")})
+	scene.anpaiSet = mustPaiSet([]base.Pai{*mustPai("1p")})
+	scene.prereachSutehaiSet = mustPaiSet([]base.Pai{*mustPai("1p")})
+	scene.reachPaiSet = mustPaiSet([]base.Pai{*mustPai("1p")})
 
 	{
 		tests = append(tests, testCase{
