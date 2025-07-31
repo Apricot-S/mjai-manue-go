@@ -2,17 +2,19 @@ package game
 
 import (
 	"testing"
+
+	"github.com/Apricot-S/mjai-manue-go/internal/base"
 )
 
-func convertStrToPaiSetForTest(paiStr string) *PaiSet {
-	pais, _ := StrToPais(paiStr)
-	ps, _ := NewPaiSet(pais)
+func convertStrToPaiSetForTest(paiStr string) *base.PaiSet {
+	pais, _ := base.StrToPais(paiStr)
+	ps, _ := base.NewPaiSet(pais)
 	return ps
 }
 
 func TestIsHoraForm(t *testing.T) {
 	type args struct {
-		ps *PaiSet
+		ps *base.PaiSet
 	}
 	type testCase struct {
 		name    string
@@ -94,7 +96,7 @@ func TestIsHoraForm(t *testing.T) {
 
 func Test_isHoraFormGeneral(t *testing.T) {
 	type args struct {
-		ps *PaiSet
+		ps *base.PaiSet
 	}
 	type testCase struct {
 		name string
@@ -243,7 +245,7 @@ func Test_isSingleColorHoraFormWithPair(t *testing.T) {
 
 func Test_isHoraFormChitoitsu(t *testing.T) {
 	type args struct {
-		ps *PaiSet
+		ps *base.PaiSet
 	}
 	type testCase struct {
 		name string
@@ -284,7 +286,7 @@ func Test_isHoraFormChitoitsu(t *testing.T) {
 
 func Test_isHoraFormKokushimuso(t *testing.T) {
 	type args struct {
-		ps *PaiSet
+		ps *base.PaiSet
 	}
 	type testCase struct {
 		name string

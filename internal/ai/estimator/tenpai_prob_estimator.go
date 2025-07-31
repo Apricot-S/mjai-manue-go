@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/Apricot-S/mjai-manue-go/configs"
+	"github.com/Apricot-S/mjai-manue-go/internal/base"
 	"github.com/Apricot-S/mjai-manue-go/internal/game"
 )
 
@@ -17,8 +18,8 @@ func NewTenpaiProbEstimator(stats *configs.GameStats) *TenpaiProbEstimator {
 	}
 }
 
-func (e *TenpaiProbEstimator) Estimate(player *game.Player, state game.StateViewer) float64 {
-	if player.ReachState() != game.NotReach {
+func (e *TenpaiProbEstimator) Estimate(player *base.Player, state game.StateViewer) float64 {
+	if player.ReachState() != base.NotReach {
 		// If the player is in the riichi state, it is certain that the player is in tenpai.
 		return 1.0
 	}

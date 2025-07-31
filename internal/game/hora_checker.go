@@ -2,9 +2,11 @@ package game
 
 import (
 	"fmt"
+
+	"github.com/Apricot-S/mjai-manue-go/internal/base"
 )
 
-func IsHoraForm(ps *PaiSet) (bool, error) {
+func IsHoraForm(ps *base.PaiSet) (bool, error) {
 	sum := 0
 	for _, c := range ps {
 		if c < 0 {
@@ -32,7 +34,7 @@ func IsHoraForm(ps *PaiSet) (bool, error) {
 }
 
 // Reference: https://qiita.com/tomohxx/items/20d886d1991ab89f5522
-func isHoraFormGeneral(ps *PaiSet) bool {
+func isHoraFormGeneral(ps *base.PaiSet) bool {
 	colorWithPair := -1
 
 	for i := range 3 {
@@ -115,7 +117,7 @@ func isSingleColorHoraFormWithPair(ps []int) bool {
 	return false
 }
 
-func isHoraFormChitoitsu(ps *PaiSet) bool {
+func isHoraFormChitoitsu(ps *base.PaiSet) bool {
 	numPairs := 0
 	for _, c := range ps {
 		if c == 2 {
@@ -127,7 +129,7 @@ func isHoraFormChitoitsu(ps *PaiSet) bool {
 
 var yaochuhaiIndices = [13]int{0, 8, 9, 17, 18, 26, 27, 28, 29, 30, 31, 32, 33}
 
-func isHoraFormKokushimuso(ps *PaiSet) bool {
+func isHoraFormKokushimuso(ps *base.PaiSet) bool {
 	ret := 1
 	for _, i := range yaochuhaiIndices {
 		ret *= ps[i]

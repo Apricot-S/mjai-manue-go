@@ -5,35 +5,36 @@ import (
 
 	"github.com/Apricot-S/mjai-manue-go/configs"
 	"github.com/Apricot-S/mjai-manue-go/internal/ai/core"
+	"github.com/Apricot-S/mjai-manue-go/internal/base"
 	"github.com/Apricot-S/mjai-manue-go/internal/game"
 )
 
-type evaluator func(*Scene, *game.Pai) (bool, error)
+type evaluator func(*Scene, *base.Pai) (bool, error)
 type evaluators map[string]evaluator
 
 var defaultEvaluators = registerEvaluators()
 
 type Scene struct {
 	gameState game.StateViewer
-	me        *game.Player
-	target    *game.Player
+	me        *base.Player
+	target    *base.Player
 
-	tehaiSet   *game.PaiSet
-	anpaiSet   *game.PaiSet
-	visibleSet *game.PaiSet
-	doraSet    *game.PaiSet
-	bakaze     *game.Pai
-	targetKaze *game.Pai
+	tehaiSet   *base.PaiSet
+	anpaiSet   *base.PaiSet
+	visibleSet *base.PaiSet
+	doraSet    *base.PaiSet
+	bakaze     *base.Pai
+	targetKaze *base.Pai
 
-	prereachSutehaiSet *game.PaiSet
-	earlySutehaiSet    *game.PaiSet
-	lateSutehaiSet     *game.PaiSet
-	reachPaiSet        *game.PaiSet
+	prereachSutehaiSet *base.PaiSet
+	earlySutehaiSet    *base.PaiSet
+	lateSutehaiSet     *base.PaiSet
+	reachPaiSet        *base.PaiSet
 
 	evaluators *evaluators
 }
 
-func NewScene(gameState game.StateViewer, me *game.Player, target *game.Player) (*Scene, error) {
+func NewScene(gameState game.StateViewer, me *base.Player, target *base.Player) (*Scene, error) {
 	s := &Scene{
 		gameState:  gameState,
 		me:         me,
@@ -42,99 +43,99 @@ func NewScene(gameState game.StateViewer, me *game.Player, target *game.Player) 
 	}
 
 	var err error
-	if s.tehaiSet, err = game.NewPaiSet(me.Tehais()); err != nil {
+	if s.tehaiSet, err = base.NewPaiSet(me.Tehais()); err != nil {
 		return nil, err
 	}
-	if s.anpaiSet, err = game.NewPaiSet(gameState.Anpais(target)); err != nil {
+	if s.anpaiSet, err = base.NewPaiSet(gameState.Anpais(target)); err != nil {
 		return nil, err
 	}
-	if s.visibleSet, err = game.NewPaiSet(gameState.VisiblePais(me)); err != nil {
+	if s.visibleSet, err = base.NewPaiSet(gameState.VisiblePais(me)); err != nil {
 		return nil, err
 	}
-	if s.doraSet, err = game.NewPaiSet(gameState.Doras()); err != nil {
+	if s.doraSet, err = base.NewPaiSet(gameState.Doras()); err != nil {
 		return nil, err
 	}
 
 	s.bakaze = gameState.Bakaze()
 	s.targetKaze = gameState.Jikaze(target)
 
-	var prereachSutehais game.Pais = nil
-	var reachPais game.Pais = nil
+	var prereachSutehais base.Pais = nil
+	var reachPais base.Pais = nil
 	if idx := target.ReachSutehaiIndex(); idx != -1 {
 		sutehais := target.Sutehais()
 		prereachSutehais = sutehais[:idx+1]
 		reachPai := sutehais[idx]
-		reachPais = game.Pais{reachPai}
+		reachPais = base.Pais{reachPai}
 	}
-	if s.prereachSutehaiSet, err = game.NewPaiSet(prereachSutehais); err != nil {
+	if s.prereachSutehaiSet, err = base.NewPaiSet(prereachSutehais); err != nil {
 		return nil, err
 	}
-	if s.reachPaiSet, err = game.NewPaiSet(reachPais); err != nil {
+	if s.reachPaiSet, err = base.NewPaiSet(reachPais); err != nil {
 		return nil, err
 	}
 
 	halfLen := len(prereachSutehais) / 2
-	if s.earlySutehaiSet, err = game.NewPaiSet(prereachSutehais[:halfLen]); err != nil {
+	if s.earlySutehaiSet, err = base.NewPaiSet(prereachSutehais[:halfLen]); err != nil {
 		return nil, err
 	}
-	if s.lateSutehaiSet, err = game.NewPaiSet(prereachSutehais[halfLen:]); err != nil {
+	if s.lateSutehaiSet, err = base.NewPaiSet(prereachSutehais[halfLen:]); err != nil {
 		return nil, err
 	}
 
 	return s, nil
 }
 
-func (s *Scene) Evaluate(name string, pai *game.Pai) (bool, error) {
+func (s *Scene) Evaluate(name string, pai *base.Pai) (bool, error) {
 	if evaluator, ok := (*s.evaluators)[name]; ok {
 		return evaluator(s, pai)
 	}
 	return false, fmt.Errorf("an unknown feature name was specified: %v", name)
 }
 
-func isAnpai(pai *game.Pai, anpaiSet *game.PaiSet) (bool, error) {
+func isAnpai(pai *base.Pai, anpaiSet *base.PaiSet) (bool, error) {
 	return anpaiSet.Has(pai)
 }
 
-func isTsupai(pai *game.Pai) bool {
+func isTsupai(pai *base.Pai) bool {
 	return pai.IsTsupai()
 }
 
 // Omotesuji (表筋) or Nakasuji (中筋)
-func isSuji(pai *game.Pai, anpaiSet *game.PaiSet) (bool, error) {
+func isSuji(pai *base.Pai, anpaiSet *base.PaiSet) (bool, error) {
 	return isSujiOf(pai, anpaiSet)
 }
 
 // Katasuji (片筋) or Suji (筋)
-func isWeakSuji(pai *game.Pai, anpaiSet *game.PaiSet) (bool, error) {
+func isWeakSuji(pai *base.Pai, anpaiSet *base.PaiSet) (bool, error) {
 	return isWeakSujiOf(pai, anpaiSet)
 }
 
 // Suji for Riichi declaration tile. Including tiles like 4p against 1p Riichi.
-func isReachSuji(pai *game.Pai, reachPaiSet *game.PaiSet) (bool, error) {
+func isReachSuji(pai *base.Pai, reachPaiSet *base.PaiSet) (bool, error) {
 	return isWeakSujiOf(pai, reachPaiSet)
 }
 
-func isPrereachSuji(pai *game.Pai, prereachSutehaiSet *game.PaiSet) (bool, error) {
+func isPrereachSuji(pai *base.Pai, prereachSutehaiSet *base.PaiSet) (bool, error) {
 	return isSujiOf(pai, prereachSutehaiSet)
 }
 
 // Urasuji (裏筋)
 // http://ja.wikipedia.org/wiki/%E7%AD%8B_(%E9%BA%BB%E9%9B%80)#.E8.A3.8F.E3.82.B9.E3.82.B8
-func isUrasuji(pai *game.Pai, prereachSutehaiSet *game.PaiSet, anpaiSet *game.PaiSet) (bool, error) {
+func isUrasuji(pai *base.Pai, prereachSutehaiSet *base.PaiSet, anpaiSet *base.PaiSet) (bool, error) {
 	return isUrasujiOf(pai, prereachSutehaiSet, anpaiSet)
 }
 
-func isEarlyUrasuji(pai *game.Pai, earlySutehaiSet *game.PaiSet, anpaiSet *game.PaiSet) (bool, error) {
+func isEarlyUrasuji(pai *base.Pai, earlySutehaiSet *base.PaiSet, anpaiSet *base.PaiSet) (bool, error) {
 	return isUrasujiOf(pai, earlySutehaiSet, anpaiSet)
 }
 
-func isReachUrasuji(pai *game.Pai, reachPaiSet *game.PaiSet, anpaiSet *game.PaiSet) (bool, error) {
+func isReachUrasuji(pai *base.Pai, reachPaiSet *base.PaiSet, anpaiSet *base.PaiSet) (bool, error) {
 	return isUrasujiOf(pai, reachPaiSet, anpaiSet)
 }
 
 // Aidayonken (間四間)
 // http://ja.wikipedia.org/wiki/%E7%AD%8B_(%E9%BA%BB%E9%9B%80)#.E9.96.93.E5.9B.9B.E9.96.93
-func isAida4ken(pai *game.Pai, prereachSutehaiSet *game.PaiSet) (bool, error) {
+func isAida4ken(pai *base.Pai, prereachSutehaiSet *base.PaiSet) (bool, error) {
 	if pai.IsTsupai() {
 		return false, nil
 	}
@@ -143,7 +144,7 @@ func isAida4ken(pai *game.Pai, prereachSutehaiSet *game.PaiSet) (bool, error) {
 	typ := pai.Type()
 
 	if 2 <= num && num <= 5 {
-		low, err := game.NewPaiWithDetail(typ, num-1, false)
+		low, err := base.NewPaiWithDetail(typ, num-1, false)
 		if err != nil {
 			return false, err
 		}
@@ -152,7 +153,7 @@ func isAida4ken(pai *game.Pai, prereachSutehaiSet *game.PaiSet) (bool, error) {
 			return false, err
 		}
 
-		high, err := game.NewPaiWithDetail(typ, num+4, false)
+		high, err := base.NewPaiWithDetail(typ, num+4, false)
 		if err != nil {
 			return false, err
 		}
@@ -167,7 +168,7 @@ func isAida4ken(pai *game.Pai, prereachSutehaiSet *game.PaiSet) (bool, error) {
 	}
 
 	if 5 <= num && num <= 8 {
-		low, err := game.NewPaiWithDetail(typ, num-4, false)
+		low, err := base.NewPaiWithDetail(typ, num-4, false)
 		if err != nil {
 			return false, err
 		}
@@ -176,7 +177,7 @@ func isAida4ken(pai *game.Pai, prereachSutehaiSet *game.PaiSet) (bool, error) {
 			return false, err
 		}
 
-		high, err := game.NewPaiWithDetail(typ, num+1, false)
+		high, err := base.NewPaiWithDetail(typ, num+1, false)
 		if err != nil {
 			return false, err
 		}
@@ -195,77 +196,77 @@ func isAida4ken(pai *game.Pai, prereachSutehaiSet *game.PaiSet) (bool, error) {
 
 // Matagisuji (跨ぎ筋)
 // http://ja.wikipedia.org/wiki/%E7%AD%8B_(%E9%BA%BB%E9%9B%80)#.E3.81.BE.E3.81.9F.E3.81.8E.E3.82.B9.E3.82.B8
-func isMatagisuji(pai *game.Pai, prereachSutehaiSet *game.PaiSet, anpaiSet *game.PaiSet) (bool, error) {
+func isMatagisuji(pai *base.Pai, prereachSutehaiSet *base.PaiSet, anpaiSet *base.PaiSet) (bool, error) {
 	return isMatagisujiOf(pai, prereachSutehaiSet, anpaiSet)
 }
 
-func isEarlyMatagisuji(pai *game.Pai, earlySutehaiSet *game.PaiSet, anpaiSet *game.PaiSet) (bool, error) {
+func isEarlyMatagisuji(pai *base.Pai, earlySutehaiSet *base.PaiSet, anpaiSet *base.PaiSet) (bool, error) {
 	return isMatagisujiOf(pai, earlySutehaiSet, anpaiSet)
 }
 
-func isLateMatagisuji(pai *game.Pai, lateSutehaiSet *game.PaiSet, anpaiSet *game.PaiSet) (bool, error) {
+func isLateMatagisuji(pai *base.Pai, lateSutehaiSet *base.PaiSet, anpaiSet *base.PaiSet) (bool, error) {
 	return isMatagisujiOf(pai, lateSutehaiSet, anpaiSet)
 }
 
-func isReachMatagisuji(pai *game.Pai, reachPaiSet *game.PaiSet, anpaiSet *game.PaiSet) (bool, error) {
+func isReachMatagisuji(pai *base.Pai, reachPaiSet *base.PaiSet, anpaiSet *base.PaiSet) (bool, error) {
 	return isMatagisujiOf(pai, reachPaiSet, anpaiSet)
 }
 
 // Senkisuji (疝気筋)
 // # http://ja.wikipedia.org/wiki/%E7%AD%8B_(%E9%BA%BB%E9%9B%80)#.E7.96.9D.E6.B0.97.E3.82.B9.E3.82.B8
-func isSenkisuji(pai *game.Pai, prereachSutehaiSet *game.PaiSet, anpaiSet *game.PaiSet) (bool, error) {
+func isSenkisuji(pai *base.Pai, prereachSutehaiSet *base.PaiSet, anpaiSet *base.PaiSet) (bool, error) {
 	return isSenkisujiOf(pai, prereachSutehaiSet, anpaiSet)
 }
 
-func isEarlySenkisuji(pai *game.Pai, earlySutehaiSet *game.PaiSet, anpaiSet *game.PaiSet) (bool, error) {
+func isEarlySenkisuji(pai *base.Pai, earlySutehaiSet *base.PaiSet, anpaiSet *base.PaiSet) (bool, error) {
 	return isSenkisujiOf(pai, earlySutehaiSet, anpaiSet)
 }
 
-func isOuterPrereachSutehai(pai *game.Pai, prereachSutehaiSet *game.PaiSet) (bool, error) {
+func isOuterPrereachSutehai(pai *base.Pai, prereachSutehaiSet *base.PaiSet) (bool, error) {
 	return isOuter(pai, prereachSutehaiSet)
 }
 
-func isOuterEarlySutehai(pai *game.Pai, earlySutehaiSet *game.PaiSet) (bool, error) {
+func isOuterEarlySutehai(pai *base.Pai, earlySutehaiSet *base.PaiSet) (bool, error) {
 	return isOuter(pai, earlySutehaiSet)
 }
 
-func isDora(pai *game.Pai, doraSet *game.PaiSet) (bool, error) {
+func isDora(pai *base.Pai, doraSet *base.PaiSet) (bool, error) {
 	return doraSet.Has(pai)
 }
 
-func isDoraSuji(pai *game.Pai, doraSet *game.PaiSet) (bool, error) {
+func isDoraSuji(pai *base.Pai, doraSet *base.PaiSet) (bool, error) {
 	return isWeakSujiOf(pai, doraSet)
 }
 
-func isDoraMatagi(pai *game.Pai, doraSet *game.PaiSet, anpaiSet *game.PaiSet) (bool, error) {
+func isDoraMatagi(pai *base.Pai, doraSet *base.PaiSet, anpaiSet *base.PaiSet) (bool, error) {
 	return isMatagisujiOf(pai, doraSet, anpaiSet)
 }
 
-func isFanpai(pai *game.Pai, gameState game.StateViewer, target *game.Player) bool {
+func isFanpai(pai *base.Pai, gameState game.StateViewer, target *base.Player) bool {
 	return gameState.YakuhaiFan(pai, target) >= 1
 }
 
-func isRyenfonpai(pai *game.Pai, gameState game.StateViewer, target *game.Player) bool {
+func isRyenfonpai(pai *base.Pai, gameState game.StateViewer, target *base.Player) bool {
 	return gameState.YakuhaiFan(pai, target) >= 2
 }
 
-func isSangenpai(pai *game.Pai) bool {
+func isSangenpai(pai *base.Pai) bool {
 	return pai.IsTsupai() && pai.Number() >= 5
 }
 
-func isFonpai(pai *game.Pai) bool {
+func isFonpai(pai *base.Pai) bool {
 	return pai.IsTsupai() && pai.Number() < 5
 }
 
-func isBakaze(pai *game.Pai, bakaze *game.Pai) bool {
+func isBakaze(pai *base.Pai, bakaze *base.Pai) bool {
 	return pai.HasSameSymbol(bakaze)
 }
 
-func isJikaze(pai *game.Pai, targetKaze *game.Pai) bool {
+func isJikaze(pai *base.Pai, targetKaze *base.Pai) bool {
 	return pai.HasSameSymbol(targetKaze)
 }
 
-func isNChanceOrLess(pai *game.Pai, n int, visibleSet *game.PaiSet) (bool, error) {
+func isNChanceOrLess(pai *base.Pai, n int, visibleSet *base.PaiSet) (bool, error) {
 	if pai.IsTsupai() {
 		return false, nil
 	}
@@ -285,7 +286,7 @@ func isNChanceOrLess(pai *game.Pai, n int, visibleSet *game.PaiSet) (bool, error
 	}
 
 	return core.AnyMatch(candidates, func(num uint8) (bool, error) {
-		kabePai, err := game.NewPaiWithDetail(pai.Type(), num, false)
+		kabePai, err := base.NewPaiWithDetail(pai.Type(), num, false)
 		if err != nil {
 			return false, err
 		}
@@ -299,7 +300,7 @@ func isNChanceOrLess(pai *game.Pai, n int, visibleSet *game.PaiSet) (bool, error
 	})
 }
 
-func isVisibleNOrMore(pai *game.Pai, n int, visibleSet *game.PaiSet) (bool, error) {
+func isVisibleNOrMore(pai *base.Pai, n int, visibleSet *base.PaiSet) (bool, error) {
 	c, err := visibleSet.Count(pai)
 	if err != nil {
 		return false, err
@@ -307,7 +308,7 @@ func isVisibleNOrMore(pai *game.Pai, n int, visibleSet *game.PaiSet) (bool, erro
 	return c >= n, nil
 }
 
-func isSujiVisible(pai *game.Pai, n int, visibleSet *game.PaiSet) (bool, error) {
+func isSujiVisible(pai *base.Pai, n int, visibleSet *base.PaiSet) (bool, error) {
 	if pai.IsTsupai() {
 		return false, nil
 	}
@@ -317,7 +318,7 @@ func isSujiVisible(pai *game.Pai, n int, visibleSet *game.PaiSet) (bool, error) 
 		return false, err
 	}
 
-	return core.AnyMatch(suji, func(sujiPai game.Pai) (bool, error) {
+	return core.AnyMatch(suji, func(sujiPai base.Pai) (bool, error) {
 		visible, err := isVisibleNOrMore(&sujiPai, n+1, visibleSet)
 		if err != nil {
 			return false, err
@@ -326,7 +327,7 @@ func isSujiVisible(pai *game.Pai, n int, visibleSet *game.PaiSet) (bool, error) 
 	})
 }
 
-func isNumNOrInner(pai *game.Pai, n uint8) bool {
+func isNumNOrInner(pai *base.Pai, n uint8) bool {
 	if pai.IsTsupai() {
 		return false
 	}
@@ -339,12 +340,12 @@ func isNumNOrInner(pai *game.Pai, n uint8) bool {
 	return false
 }
 
-func isInTehais(pai *game.Pai, n int, tehaiSet *game.PaiSet) (bool, error) {
+func isInTehais(pai *base.Pai, n int, tehaiSet *base.PaiSet) (bool, error) {
 	c, err := tehaiSet.Count(pai)
 	return c >= n, err
 }
 
-func isSujiInTehais(pai *game.Pai, n int, tehaiSet *game.PaiSet) (bool, error) {
+func isSujiInTehais(pai *base.Pai, n int, tehaiSet *base.PaiSet) (bool, error) {
 	if pai.IsTsupai() {
 		return false, nil
 	}
@@ -354,17 +355,17 @@ func isSujiInTehais(pai *game.Pai, n int, tehaiSet *game.PaiSet) (bool, error) {
 		return false, err
 	}
 
-	return core.AnyMatch(suji, func(sujiPai game.Pai) (bool, error) {
+	return core.AnyMatch(suji, func(sujiPai base.Pai) (bool, error) {
 		c, err := tehaiSet.Count(&sujiPai)
 		return c >= n, err
 	})
 }
 
 func isNOrMoreOfNeighborsInPrereachSutehais(
-	pai *game.Pai,
+	pai *base.Pai,
 	n int,
 	neighborDistance int,
-	prereachSutehaiSet *game.PaiSet,
+	prereachSutehaiSet *base.PaiSet,
 ) (bool, error) {
 	if pai.IsTsupai() {
 		return false, nil
@@ -381,7 +382,7 @@ func isNOrMoreOfNeighborsInPrereachSutehais(
 			return false, nil
 		}
 
-		neighborPai, err := game.NewPaiWithDetail(pai.Type(), uint8(num), false)
+		neighborPai, err := base.NewPaiWithDetail(pai.Type(), uint8(num), false)
 		if err != nil {
 			return false, err
 		}
@@ -401,7 +402,7 @@ func isNOrMoreOfNeighborsInPrereachSutehais(
 }
 
 // n can be negative.
-func isNOuterPrereachSutehai(pai *game.Pai, n int, prereachSutehaiSet *game.PaiSet) (bool, error) {
+func isNOuterPrereachSutehai(pai *base.Pai, n int, prereachSutehaiSet *base.PaiSet) (bool, error) {
 	if pai.IsTsupai() {
 		return false, nil
 	}
@@ -426,7 +427,7 @@ func isNOuterPrereachSutehai(pai *game.Pai, n int, prereachSutehaiSet *game.PaiS
 		return false, nil
 	}
 
-	innerPai, err := game.NewPaiWithDetail(pai.Type(), uint8(nInnerNumber), false)
+	innerPai, err := base.NewPaiWithDetail(pai.Type(), uint8(nInnerNumber), false)
 	if err != nil {
 		return false, err
 	}
@@ -434,14 +435,14 @@ func isNOuterPrereachSutehai(pai *game.Pai, n int, prereachSutehaiSet *game.PaiS
 	return prereachSutehaiSet.Has(innerPai)
 }
 
-func isSameTypeInPrereach(pai *game.Pai, n int, prereachSutehaiSet *game.PaiSet) (bool, error) {
+func isSameTypeInPrereach(pai *base.Pai, n int, prereachSutehaiSet *base.PaiSet) (bool, error) {
 	if pai.IsTsupai() {
 		return false, nil
 	}
 
 	numbers := []uint8{1, 2, 3, 4, 5, 6, 7, 8, 9}
 	numSameType, err := core.Count(numbers, func(num uint8) (bool, error) {
-		target, err := game.NewPaiWithDetail(pai.Type(), num, false)
+		target, err := base.NewPaiWithDetail(pai.Type(), num, false)
 		if err != nil {
 			return false, err
 		}
@@ -454,7 +455,7 @@ func isSameTypeInPrereach(pai *game.Pai, n int, prereachSutehaiSet *game.PaiSet)
 	return numSameType+1 >= n, nil
 }
 
-func isSujiOf(pai *game.Pai, targetPaiSet *game.PaiSet) (bool, error) {
+func isSujiOf(pai *base.Pai, targetPaiSet *base.PaiSet) (bool, error) {
 	if pai.IsTsupai() {
 		return false, nil
 	}
@@ -464,12 +465,12 @@ func isSujiOf(pai *game.Pai, targetPaiSet *game.PaiSet) (bool, error) {
 		return false, err
 	}
 
-	return core.AllMatch(suji, func(s game.Pai) (bool, error) {
+	return core.AllMatch(suji, func(s base.Pai) (bool, error) {
 		return targetPaiSet.Has(&s)
 	})
 }
 
-func isWeakSujiOf(pai *game.Pai, targetPaiSet *game.PaiSet) (bool, error) {
+func isWeakSujiOf(pai *base.Pai, targetPaiSet *base.PaiSet) (bool, error) {
 	if pai.IsTsupai() {
 		return false, nil
 	}
@@ -479,22 +480,22 @@ func isWeakSujiOf(pai *game.Pai, targetPaiSet *game.PaiSet) (bool, error) {
 		return false, err
 	}
 
-	return core.AnyMatch(suji, func(s game.Pai) (bool, error) {
+	return core.AnyMatch(suji, func(s base.Pai) (bool, error) {
 		return targetPaiSet.Has(&s)
 	})
 }
 
-func getSuji(pai *game.Pai) ([]game.Pai, error) {
+func getSuji(pai *base.Pai) ([]base.Pai, error) {
 	if pai.IsTsupai() {
-		return []game.Pai{}, nil
+		return []base.Pai{}, nil
 	}
 
-	result := make([]game.Pai, 0, 2)
+	result := make([]base.Pai, 0, 2)
 	paiNumber := pai.Number()
 	candidates := []uint8{paiNumber - 3, paiNumber + 3}
 	for _, n := range candidates {
 		if 1 <= n && n <= 9 {
-			sujiPai, err := game.NewPaiWithDetail(pai.Type(), n, false)
+			sujiPai, err := base.NewPaiWithDetail(pai.Type(), n, false)
 			if err != nil {
 				return nil, err
 			}
@@ -505,13 +506,13 @@ func getSuji(pai *game.Pai) ([]game.Pai, error) {
 	return result, nil
 }
 
-func isUrasujiOf(pai *game.Pai, targetPaiSet *game.PaiSet, anpaiSet *game.PaiSet) (bool, error) {
+func isUrasujiOf(pai *base.Pai, targetPaiSet *base.PaiSet, anpaiSet *base.PaiSet) (bool, error) {
 	sujis, err := getPossibleSujis(pai, anpaiSet)
 	if err != nil {
 		return false, err
 	}
 
-	return core.AnyMatch(sujis, func(s game.Pai) (bool, error) {
+	return core.AnyMatch(sujis, func(s base.Pai) (bool, error) {
 		if low := s.Next(-1); low != nil {
 			hasLow, err := targetPaiSet.Has(low)
 			if err != nil {
@@ -537,13 +538,13 @@ func isUrasujiOf(pai *game.Pai, targetPaiSet *game.PaiSet, anpaiSet *game.PaiSet
 }
 
 // Senkisuji (疝気筋) : Urasuji (裏筋) of urasuji
-func isSenkisujiOf(pai *game.Pai, targetPaiSet *game.PaiSet, anpaiSet *game.PaiSet) (bool, error) {
+func isSenkisujiOf(pai *base.Pai, targetPaiSet *base.PaiSet, anpaiSet *base.PaiSet) (bool, error) {
 	sujis, err := getPossibleSujis(pai, anpaiSet)
 	if err != nil {
 		return false, err
 	}
 
-	return core.AnyMatch(sujis, func(s game.Pai) (bool, error) {
+	return core.AnyMatch(sujis, func(s base.Pai) (bool, error) {
 		if low := s.Next(-2); low != nil {
 			hasLow, err := targetPaiSet.Has(low)
 			if err != nil {
@@ -568,13 +569,13 @@ func isSenkisujiOf(pai *game.Pai, targetPaiSet *game.PaiSet, anpaiSet *game.PaiS
 	})
 }
 
-func isMatagisujiOf(pai *game.Pai, targetPaiSet *game.PaiSet, anpaiSet *game.PaiSet) (bool, error) {
+func isMatagisujiOf(pai *base.Pai, targetPaiSet *base.PaiSet, anpaiSet *base.PaiSet) (bool, error) {
 	sujis, err := getPossibleSujis(pai, anpaiSet)
 	if err != nil {
 		return false, err
 	}
 
-	return core.AnyMatch(sujis, func(s game.Pai) (bool, error) {
+	return core.AnyMatch(sujis, func(s base.Pai) (bool, error) {
 		if low := s.Next(1); low != nil {
 			hasLow, err := targetPaiSet.Has(low)
 			if err != nil {
@@ -601,12 +602,12 @@ func isMatagisujiOf(pai *game.Pai, targetPaiSet *game.PaiSet, anpaiSet *game.Pai
 
 // Returns sujis which contain the given pai and is alive i.e. none of pais in the suji are anpai.
 // Uses the first pai to represent the suji. e.g. 1p for 14p suji
-func getPossibleSujis(pai *game.Pai, anpaiSet *game.PaiSet) ([]game.Pai, error) {
+func getPossibleSujis(pai *base.Pai, anpaiSet *base.PaiSet) ([]base.Pai, error) {
 	if pai.IsTsupai() {
-		return []game.Pai{}, nil
+		return []base.Pai{}, nil
 	}
 
-	sujis := make([]game.Pai, 0, 2)
+	sujis := make([]base.Pai, 0, 2)
 	paiNumber := pai.Number()
 	candidates := []uint8{paiNumber - 3, paiNumber}
 
@@ -616,7 +617,7 @@ func getPossibleSujis(pai *game.Pai, anpaiSet *game.PaiSet) ([]game.Pai, error) 
 				return false, nil
 			}
 
-			sujiPai, err := game.NewPaiWithDetail(pai.Type(), m, false)
+			sujiPai, err := base.NewPaiWithDetail(pai.Type(), m, false)
 			if err != nil {
 				return false, err
 			}
@@ -632,7 +633,7 @@ func getPossibleSujis(pai *game.Pai, anpaiSet *game.PaiSet) ([]game.Pai, error) 
 		}
 
 		if isAlive {
-			sujiPai, err := game.NewPaiWithDetail(pai.Type(), n, false)
+			sujiPai, err := base.NewPaiWithDetail(pai.Type(), n, false)
 			if err != nil {
 				return nil, err
 			}
@@ -643,7 +644,7 @@ func getPossibleSujis(pai *game.Pai, anpaiSet *game.PaiSet) ([]game.Pai, error) 
 	return sujis, nil
 }
 
-func isOuter(pai *game.Pai, targetPaiSet *game.PaiSet) (bool, error) {
+func isOuter(pai *base.Pai, targetPaiSet *base.PaiSet) (bool, error) {
 	if pai.IsTsupai() {
 		return false, nil
 	}
@@ -665,7 +666,7 @@ func isOuter(pai *game.Pai, targetPaiSet *game.PaiSet) (bool, error) {
 	}
 
 	return core.AnyMatch(innerNumbers, func(n uint8) (bool, error) {
-		innerPai, err := game.NewPaiWithDetail(pai.Type(), n, false)
+		innerPai, err := base.NewPaiWithDetail(pai.Type(), n, false)
 		if err != nil {
 			return false, err
 		}
@@ -680,92 +681,92 @@ func isOuter(pai *game.Pai, targetPaiSet *game.PaiSet) (bool, error) {
 func registerEvaluators() *evaluators {
 	ev := evaluators{}
 
-	ev["anpai"] = func(scene *Scene, pai *game.Pai) (bool, error) {
+	ev["anpai"] = func(scene *Scene, pai *base.Pai) (bool, error) {
 		return isAnpai(pai, scene.anpaiSet)
 	}
-	ev["tsupai"] = func(scene *Scene, pai *game.Pai) (bool, error) {
+	ev["tsupai"] = func(scene *Scene, pai *base.Pai) (bool, error) {
 		return isTsupai(pai), nil
 	}
-	ev["suji"] = func(scene *Scene, pai *game.Pai) (bool, error) {
+	ev["suji"] = func(scene *Scene, pai *base.Pai) (bool, error) {
 		return isSuji(pai, scene.anpaiSet)
 	}
-	ev["weak_suji"] = func(scene *Scene, pai *game.Pai) (bool, error) {
+	ev["weak_suji"] = func(scene *Scene, pai *base.Pai) (bool, error) {
 		return isWeakSuji(pai, scene.anpaiSet)
 	}
-	ev["reach_suji"] = func(scene *Scene, pai *game.Pai) (bool, error) {
+	ev["reach_suji"] = func(scene *Scene, pai *base.Pai) (bool, error) {
 		return isReachSuji(pai, scene.reachPaiSet)
 	}
-	ev["prereach_suji"] = func(scene *Scene, pai *game.Pai) (bool, error) {
+	ev["prereach_suji"] = func(scene *Scene, pai *base.Pai) (bool, error) {
 		return isPrereachSuji(pai, scene.prereachSutehaiSet)
 	}
-	ev["urasuji"] = func(scene *Scene, pai *game.Pai) (bool, error) {
+	ev["urasuji"] = func(scene *Scene, pai *base.Pai) (bool, error) {
 		return isUrasuji(pai, scene.prereachSutehaiSet, scene.anpaiSet)
 	}
-	ev["early_urasuji"] = func(scene *Scene, pai *game.Pai) (bool, error) {
+	ev["early_urasuji"] = func(scene *Scene, pai *base.Pai) (bool, error) {
 		return isEarlyUrasuji(pai, scene.earlySutehaiSet, scene.anpaiSet)
 	}
-	ev["reach_urasuji"] = func(scene *Scene, pai *game.Pai) (bool, error) {
+	ev["reach_urasuji"] = func(scene *Scene, pai *base.Pai) (bool, error) {
 		return isReachUrasuji(pai, scene.reachPaiSet, scene.anpaiSet)
 	}
-	ev["aida4ken"] = func(scene *Scene, pai *game.Pai) (bool, error) {
+	ev["aida4ken"] = func(scene *Scene, pai *base.Pai) (bool, error) {
 		return isAida4ken(pai, scene.prereachSutehaiSet)
 	}
-	ev["matagisuji"] = func(scene *Scene, pai *game.Pai) (bool, error) {
+	ev["matagisuji"] = func(scene *Scene, pai *base.Pai) (bool, error) {
 		return isMatagisuji(pai, scene.prereachSutehaiSet, scene.anpaiSet)
 	}
-	ev["early_matagisuji"] = func(scene *Scene, pai *game.Pai) (bool, error) {
+	ev["early_matagisuji"] = func(scene *Scene, pai *base.Pai) (bool, error) {
 		return isEarlyMatagisuji(pai, scene.earlySutehaiSet, scene.anpaiSet)
 	}
-	ev["late_matagisuji"] = func(scene *Scene, pai *game.Pai) (bool, error) {
+	ev["late_matagisuji"] = func(scene *Scene, pai *base.Pai) (bool, error) {
 		return isLateMatagisuji(pai, scene.lateSutehaiSet, scene.anpaiSet)
 	}
-	ev["reach_matagisuji"] = func(scene *Scene, pai *game.Pai) (bool, error) {
+	ev["reach_matagisuji"] = func(scene *Scene, pai *base.Pai) (bool, error) {
 		return isReachMatagisuji(pai, scene.reachPaiSet, scene.anpaiSet)
 	}
-	ev["senkisuji"] = func(scene *Scene, pai *game.Pai) (bool, error) {
+	ev["senkisuji"] = func(scene *Scene, pai *base.Pai) (bool, error) {
 		return isSenkisuji(pai, scene.prereachSutehaiSet, scene.anpaiSet)
 	}
-	ev["early_senkisuji"] = func(scene *Scene, pai *game.Pai) (bool, error) {
+	ev["early_senkisuji"] = func(scene *Scene, pai *base.Pai) (bool, error) {
 		return isEarlySenkisuji(pai, scene.earlySutehaiSet, scene.anpaiSet)
 	}
-	ev["outer_prereach_sutehai"] = func(scene *Scene, pai *game.Pai) (bool, error) {
+	ev["outer_prereach_sutehai"] = func(scene *Scene, pai *base.Pai) (bool, error) {
 		return isOuterPrereachSutehai(pai, scene.prereachSutehaiSet)
 	}
-	ev["outer_early_sutehai"] = func(scene *Scene, pai *game.Pai) (bool, error) {
+	ev["outer_early_sutehai"] = func(scene *Scene, pai *base.Pai) (bool, error) {
 		return isOuterEarlySutehai(pai, scene.earlySutehaiSet)
 	}
-	ev["dora"] = func(scene *Scene, pai *game.Pai) (bool, error) {
+	ev["dora"] = func(scene *Scene, pai *base.Pai) (bool, error) {
 		return isDora(pai, scene.doraSet)
 	}
-	ev["dora_suji"] = func(scene *Scene, pai *game.Pai) (bool, error) {
+	ev["dora_suji"] = func(scene *Scene, pai *base.Pai) (bool, error) {
 		return isDoraSuji(pai, scene.doraSet)
 	}
-	ev["dora_matagi"] = func(scene *Scene, pai *game.Pai) (bool, error) {
+	ev["dora_matagi"] = func(scene *Scene, pai *base.Pai) (bool, error) {
 		return isDoraMatagi(pai, scene.doraSet, scene.anpaiSet)
 	}
-	ev["fanpai"] = func(scene *Scene, pai *game.Pai) (bool, error) {
+	ev["fanpai"] = func(scene *Scene, pai *base.Pai) (bool, error) {
 		return isFanpai(pai, scene.gameState, scene.target), nil
 	}
-	ev["ryenfonpai"] = func(scene *Scene, pai *game.Pai) (bool, error) {
+	ev["ryenfonpai"] = func(scene *Scene, pai *base.Pai) (bool, error) {
 		return isRyenfonpai(pai, scene.gameState, scene.target), nil
 	}
-	ev["sangenpai"] = func(scene *Scene, pai *game.Pai) (bool, error) {
+	ev["sangenpai"] = func(scene *Scene, pai *base.Pai) (bool, error) {
 		return isSangenpai(pai), nil
 	}
-	ev["fonpai"] = func(scene *Scene, pai *game.Pai) (bool, error) {
+	ev["fonpai"] = func(scene *Scene, pai *base.Pai) (bool, error) {
 		return isFonpai(pai), nil
 	}
-	ev["bakaze"] = func(scene *Scene, pai *game.Pai) (bool, error) {
+	ev["bakaze"] = func(scene *Scene, pai *base.Pai) (bool, error) {
 		return isBakaze(pai, scene.bakaze), nil
 	}
-	ev["jikaze"] = func(scene *Scene, pai *game.Pai) (bool, error) {
+	ev["jikaze"] = func(scene *Scene, pai *base.Pai) (bool, error) {
 		return isJikaze(pai, scene.targetKaze), nil
 	}
 
 	for i := range 4 {
 		featureName := fmt.Sprintf("chances<=%d", i)
 		n := i
-		ev[featureName] = func(scene *Scene, pai *game.Pai) (bool, error) {
+		ev[featureName] = func(scene *Scene, pai *base.Pai) (bool, error) {
 			return isNChanceOrLess(pai, n, scene.visibleSet)
 		}
 	}
@@ -775,7 +776,7 @@ func registerEvaluators() *evaluators {
 	for i := 1; i < 4; i++ {
 		featureName := fmt.Sprintf("visible>=%d", i)
 		n := i
-		ev[featureName] = func(scene *Scene, pai *game.Pai) (bool, error) {
+		ev[featureName] = func(scene *Scene, pai *base.Pai) (bool, error) {
 			return isVisibleNOrMore(pai, n+1, scene.visibleSet)
 		}
 	}
@@ -787,7 +788,7 @@ func registerEvaluators() *evaluators {
 	for i := range 4 {
 		featureName := fmt.Sprintf("suji_visible<=%d", i)
 		n := i
-		ev[featureName] = func(scene *Scene, pai *game.Pai) (bool, error) {
+		ev[featureName] = func(scene *Scene, pai *base.Pai) (bool, error) {
 			return isSujiVisible(pai, n, scene.visibleSet)
 		}
 	}
@@ -795,7 +796,7 @@ func registerEvaluators() *evaluators {
 	for i := uint8(2); i < 6; i++ {
 		featureName := fmt.Sprintf("%d<=n<=%d", i, 10-i)
 		n := i
-		ev[featureName] = func(scene *Scene, pai *game.Pai) (bool, error) {
+		ev[featureName] = func(scene *Scene, pai *base.Pai) (bool, error) {
 			return isNumNOrInner(pai, n), nil
 		}
 	}
@@ -803,7 +804,7 @@ func registerEvaluators() *evaluators {
 	for i := 2; i < 5; i++ {
 		featureName := fmt.Sprintf("in_tehais>=%d", i)
 		n := i
-		ev[featureName] = func(scene *Scene, pai *game.Pai) (bool, error) {
+		ev[featureName] = func(scene *Scene, pai *base.Pai) (bool, error) {
 			return isInTehais(pai, n, scene.tehaiSet)
 		}
 	}
@@ -815,7 +816,7 @@ func registerEvaluators() *evaluators {
 	for i := 1; i < 5; i++ {
 		featureName := fmt.Sprintf("suji_in_tehais>=%d", i)
 		n := i
-		ev[featureName] = func(scene *Scene, pai *game.Pai) (bool, error) {
+		ev[featureName] = func(scene *Scene, pai *base.Pai) (bool, error) {
 			return isSujiInTehais(pai, n, scene.tehaiSet)
 		}
 	}
@@ -825,7 +826,7 @@ func registerEvaluators() *evaluators {
 			featureName := fmt.Sprintf("+-%d_in_prereach_sutehais>=%d", i, j)
 			distance := i
 			threshold := j
-			ev[featureName] = func(scene *Scene, pai *game.Pai) (bool, error) {
+			ev[featureName] = func(scene *Scene, pai *base.Pai) (bool, error) {
 				return isNOrMoreOfNeighborsInPrereachSutehais(
 					pai,
 					threshold,
@@ -839,7 +840,7 @@ func registerEvaluators() *evaluators {
 	for i := 1; i < 3; i++ {
 		featureName := fmt.Sprintf("%d_outer_prereach_sutehai", i)
 		n := i
-		ev[featureName] = func(scene *Scene, pai *game.Pai) (bool, error) {
+		ev[featureName] = func(scene *Scene, pai *base.Pai) (bool, error) {
 			return isNOuterPrereachSutehai(pai, n, scene.prereachSutehaiSet)
 		}
 	}
@@ -847,7 +848,7 @@ func registerEvaluators() *evaluators {
 	for i := 1; i < 3; i++ {
 		featureName := fmt.Sprintf("%d_inner_prereach_sutehai", i)
 		n := i
-		ev[featureName] = func(scene *Scene, pai *game.Pai) (bool, error) {
+		ev[featureName] = func(scene *Scene, pai *base.Pai) (bool, error) {
 			return isNOuterPrereachSutehai(pai, -n, scene.prereachSutehaiSet)
 		}
 	}
@@ -855,7 +856,7 @@ func registerEvaluators() *evaluators {
 	for i := 1; i < 9; i++ {
 		featureName := fmt.Sprintf("same_type_in_prereach>=%d", i)
 		n := i
-		ev[featureName] = func(scene *Scene, pai *game.Pai) (bool, error) {
+		ev[featureName] = func(scene *Scene, pai *base.Pai) (bool, error) {
 			return isSameTypeInPrereach(pai, n, scene.prereachSutehaiSet)
 		}
 	}
@@ -883,7 +884,7 @@ func NewDangerEstimator(root *configs.DecisionNode) *DangerEstimator {
 	}
 }
 
-func (e *DangerEstimator) EstimateProb(scene *Scene, pai *game.Pai) (*ProbInfo, error) {
+func (e *DangerEstimator) EstimateProb(scene *Scene, pai *base.Pai) (*ProbInfo, error) {
 	pai = pai.RemoveRed()
 	node := e.root
 	features := make([]Feature, 0)

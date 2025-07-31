@@ -8,6 +8,7 @@ import (
 
 	"github.com/Apricot-S/mjai-manue-go/internal/ai/core"
 	"github.com/Apricot-S/mjai-manue-go/internal/ai/estimator"
+	"github.com/Apricot-S/mjai-manue-go/internal/base"
 	"github.com/Apricot-S/mjai-manue-go/internal/game"
 )
 
@@ -179,7 +180,7 @@ func (a *ManueAI) getNotenRyukyokuTenpaiProb(state game.StateViewer) float64 {
 func (a *ManueAI) getSafeProbs(
 	state game.StateViewer,
 	playerID int,
-	dahaiCandidates []game.Pai,
+	dahaiCandidates []base.Pai,
 ) (map[string]float64, error) {
 	safeProbs := make(map[string]float64, len(dahaiCandidates))
 	for _, pai := range dahaiCandidates {
@@ -233,7 +234,7 @@ func (a *ManueAI) getSafeProbs(
 func (a *ManueAI) getImmediateScoreChangesDists(
 	state game.StateViewer,
 	playerID int,
-	dahaiCandidates []game.Pai,
+	dahaiCandidates []base.Pai,
 ) map[string]*core.ProbDist[[]float64] {
 	scoreChangesDists := make(map[string]*core.ProbDist[[]float64], len(dahaiCandidates))
 	for _, pai := range dahaiCandidates {
@@ -327,7 +328,7 @@ func (a *ManueAI) getRyukyokuProbOnMyNoHora(state game.StateViewer) float64 {
 func (a *ManueAI) getRandomHoraScoreChangesDist(
 	state game.StateViewer,
 	playerID int,
-	actor *game.Player,
+	actor *base.Player,
 ) *core.ProbDist[[]float64] {
 	var horaPointsFreqs map[string]int
 	if actor.ID() == state.Oya().ID() {
@@ -358,7 +359,7 @@ func (a *ManueAI) getRandomHoraScoreChangesDist(
 func (a *ManueAI) getHoraFactorsDist(
 	state game.StateViewer,
 	playerID int,
-	actor *game.Player,
+	actor *base.Player,
 ) *core.ProbDist[[]float64] {
 	tsumoHoraProb := float64(a.stats.NumTsumoHoras) / float64(a.stats.NumHoras)
 	m := core.NewHashMap[[]float64]()
@@ -374,7 +375,7 @@ func (a *ManueAI) getHoraFactorsDist(
 	return core.NewProbDist(m)
 }
 
-func (a *ManueAI) getHoraFactors(state game.StateViewer, actor, target *game.Player) []float64 {
+func (a *ManueAI) getHoraFactors(state game.StateViewer, actor, target *base.Player) []float64 {
 	actorID := actor.ID()
 	targetID := target.ID()
 	if actorID != targetID {
@@ -491,7 +492,7 @@ func (a *ManueAI) getWinProb(
 	state game.StateViewer,
 	playerID int,
 	scoreChangesDist *core.ProbDist[[]float64],
-	other *game.Player,
+	other *base.Player,
 ) float64 {
 	me := &state.Players()[playerID]
 	// TODO Change this considering renchan.

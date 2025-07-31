@@ -1,4 +1,4 @@
-package game
+package base
 
 import (
 	"fmt"
@@ -15,14 +15,14 @@ const (
 )
 
 const (
-	minPlayerID    = 0
-	maxPlayerID    = 3
-	initTehaisSize = 13
-	maxNumFuro     = 4
+	MinPlayerID    = 0
+	MaxPlayerID    = 3
+	InitTehaisSize = 13
+	MaxNumFuro     = 4
 	// Reference: <https://note.com/daku_longyi/n/n51fe08566f1b>
 	maxNumHo       = 24
 	maxNumSutehais = 27
-	kyotakuPoint   = 1_000
+	KyotakuPoint   = 1_000
 )
 
 type Player struct {
@@ -65,15 +65,15 @@ type Player struct {
 }
 
 func NewPlayer(id int, name string, initScore int) (*Player, error) {
-	if id < minPlayerID || maxPlayerID < id {
+	if id < MinPlayerID || MaxPlayerID < id {
 		return nil, fmt.Errorf("player ID is invalid: %d", id)
 	}
 
 	return &Player{
 		id:                id,
 		name:              name,
-		tehais:            make(Pais, 0, initTehaisSize+1), // +1 for tsumo
-		furos:             make([]Furo, 0, maxNumFuro),
+		tehais:            make(Pais, 0, InitTehaisSize+1), // +1 for tsumo
+		furos:             make([]Furo, 0, MaxNumFuro),
 		ho:                make([]Pai, 0, maxNumHo),
 		sutehais:          make([]Pai, 0, maxNumSutehais),
 		extraAnpais:       nil,
@@ -89,21 +89,33 @@ func NewPlayer(id int, name string, initScore int) (*Player, error) {
 // For test only.
 func NewPlayerForTest(
 	id int,
+	name string,
 	tehais []Pai,
 	furos []Furo,
 	ho []Pai,
 	sutehais []Pai,
+	extraAnpais []Pai,
 	reachState ReachState,
+	reachHoIndex int,
 	reachSutehaiIndex int,
+	score int,
+	canDahai bool,
+	isMenzen bool,
 ) *Player {
 	return &Player{
 		id:                id,
+		name:              name,
 		tehais:            tehais,
 		furos:             furos,
 		ho:                ho,
 		sutehais:          sutehais,
+		extraAnpais:       extraAnpais,
 		reachState:        reachState,
+		reachHoIndex:      reachHoIndex,
 		reachSutehaiIndex: reachSutehaiIndex,
+		score:             score,
+		canDahai:          canDahai,
+		isMenzen:          isMenzen,
 	}
 }
 
@@ -167,15 +179,15 @@ func (p *Player) AddExtraAnpais(pai Pai) {
 	p.extraAnpais = append(p.extraAnpais, pai)
 }
 
-func (p *Player) onStartKyoku(tehais []Pai, score *int) error {
-	if len(tehais) != initTehaisSize {
+func (p *Player) OnStartKyoku(tehais []Pai, score *int) error {
+	if len(tehais) != InitTehaisSize {
 		return fmt.Errorf("the length of haipai is not 13: %d", len(tehais))
 	}
 
-	p.tehais = p.tehais[:initTehaisSize]
+	p.tehais = p.tehais[:InitTehaisSize]
 	copy(p.tehais, tehais)
 	sort.Sort(p.tehais)
-	p.furos = make([]Furo, 0, maxNumFuro)
+	p.furos = make([]Furo, 0, MaxNumFuro)
 	p.ho = make([]Pai, 0, maxNumHo)
 	p.sutehais = make([]Pai, 0, maxNumSutehais)
 	p.extraAnpais = nil
@@ -192,7 +204,7 @@ func (p *Player) onStartKyoku(tehais []Pai, score *int) error {
 	return nil
 }
 
-func (p *Player) onTsumo(pai Pai) error {
+func (p *Player) OnTsumo(pai Pai) error {
 	if p.canDahai {
 		return fmt.Errorf("it is not in a state to be tsumo")
 	}
@@ -202,7 +214,7 @@ func (p *Player) onTsumo(pai Pai) error {
 	return nil
 }
 
-func (p *Player) onDahai(pai Pai) error {
+func (p *Player) OnDahai(pai Pai) error {
 	if !p.canDahai {
 		return fmt.Errorf("it is not in a state to be dahai")
 	}
@@ -224,7 +236,7 @@ func (p *Player) onDahai(pai Pai) error {
 	return nil
 }
 
-func (p *Player) onChi(furo *Chi) error {
+func (p *Player) OnChi(furo *Chi) error {
 	if p.canDahai {
 		return fmt.Errorf("it is not in a state to be chi")
 	}
@@ -234,7 +246,7 @@ func (p *Player) onChi(furo *Chi) error {
 	}
 
 	numFuro := len(p.furos)
-	if numFuro >= maxNumFuro {
+	if numFuro >= MaxNumFuro {
 		return fmt.Errorf("a 5th furo is not possible")
 	}
 
@@ -251,7 +263,7 @@ func (p *Player) onChi(furo *Chi) error {
 	return nil
 }
 
-func (p *Player) onPon(furo *Pon) error {
+func (p *Player) OnPon(furo *Pon) error {
 	if p.canDahai {
 		return fmt.Errorf("it is not in a state to be pon")
 	}
@@ -261,7 +273,7 @@ func (p *Player) onPon(furo *Pon) error {
 	}
 
 	numFuro := len(p.furos)
-	if numFuro >= maxNumFuro {
+	if numFuro >= MaxNumFuro {
 		return fmt.Errorf("a 5th furo is not possible")
 	}
 
@@ -278,7 +290,7 @@ func (p *Player) onPon(furo *Pon) error {
 	return nil
 }
 
-func (p *Player) onDaiminkan(furo *Daiminkan) error {
+func (p *Player) OnDaiminkan(furo *Daiminkan) error {
 	if p.canDahai {
 		return fmt.Errorf("it is not in a state to be daiminkan")
 	}
@@ -288,7 +300,7 @@ func (p *Player) onDaiminkan(furo *Daiminkan) error {
 	}
 
 	numFuro := len(p.furos)
-	if numFuro >= maxNumFuro {
+	if numFuro >= MaxNumFuro {
 		return fmt.Errorf("a 5th furo is not possible")
 	}
 
@@ -305,7 +317,7 @@ func (p *Player) onDaiminkan(furo *Daiminkan) error {
 	return nil
 }
 
-func (p *Player) onAnkan(furo *Ankan) error {
+func (p *Player) OnAnkan(furo *Ankan) error {
 	if furo == nil {
 		return fmt.Errorf("furo is nil")
 	}
@@ -315,7 +327,7 @@ func (p *Player) onAnkan(furo *Ankan) error {
 	}
 
 	numFuro := len(p.furos)
-	if numFuro >= maxNumFuro {
+	if numFuro >= MaxNumFuro {
 		return fmt.Errorf("a 5th furo is not possible")
 	}
 
@@ -331,7 +343,7 @@ func (p *Player) onAnkan(furo *Ankan) error {
 	return nil
 }
 
-func (p *Player) onKakan(furo *Kakan) error {
+func (p *Player) OnKakan(furo *Kakan) error {
 	if furo == nil {
 		return fmt.Errorf("furo is nil")
 	}
@@ -372,7 +384,7 @@ func (p *Player) onKakan(furo *Kakan) error {
 	return nil
 }
 
-func (p *Player) onReach() error {
+func (p *Player) OnReach() error {
 	if !p.canDahai {
 		return fmt.Errorf("it is not in a state to be reach declaration")
 	}
@@ -389,7 +401,7 @@ func (p *Player) onReach() error {
 	return nil
 }
 
-func (p *Player) onReachAccepted(score *int) error {
+func (p *Player) OnReachAccepted(score *int) error {
 	if p.canDahai {
 		return fmt.Errorf("it is not in a state to be reach acception")
 	}
@@ -409,13 +421,13 @@ func (p *Player) onReachAccepted(score *int) error {
 	if score != nil {
 		p.score = *score
 	} else {
-		p.score -= kyotakuPoint
+		p.score -= KyotakuPoint
 	}
 
 	return nil
 }
 
-func (p *Player) onTargeted(furo Furo) error {
+func (p *Player) OnTargeted(furo Furo) error {
 	switch furo.(type) {
 	case *Ankan, *Kakan:
 		return fmt.Errorf("invalid furo for `onTargeted`: %v", furo)

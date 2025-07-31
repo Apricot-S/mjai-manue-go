@@ -1,10 +1,10 @@
 package core
 
-import "github.com/Apricot-S/mjai-manue-go/internal/game"
+import "github.com/Apricot-S/mjai-manue-go/internal/base"
 
 type BitVector uint64
 
-func NewBitVector(countVector *game.PaiSet, threshold int) BitVector {
+func NewBitVector(countVector *base.PaiSet, threshold int) BitVector {
 	var bv BitVector
 	for i, c := range countVector {
 		if c >= threshold {
@@ -22,7 +22,7 @@ func (bv BitVector) HasIntersectionWith(other BitVector) bool {
 	return (bv & other) != 0
 }
 
-func CountVectorToBitVectors(countVector *game.PaiSet) [4]BitVector {
+func CountVectorToBitVectors(countVector *base.PaiSet) [4]BitVector {
 	var bitVectors [4]BitVector
 	for i := 1; i < 5; i++ {
 		bitVectors[i-1] = NewBitVector(countVector, i)

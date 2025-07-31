@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"math"
 	"slices"
+
+	"github.com/Apricot-S/mjai-manue-go/internal/base"
 )
 
 // Goal represents a winning hand that can be transitioned from the current hand.
@@ -14,13 +16,13 @@ type Goal struct {
 	// If the current hand and the winning hand are the same, it will be -1.
 	Shanten int
 	// Mentsus is a list of sets in the winning hand.
-	Mentsus []Mentsu
+	Mentsus []base.Mentsu
 	// CountVector is the number of each tile included in the winning hand.
-	CountVector PaiSet
+	CountVector base.PaiSet
 	// RequiredVector is the number of each tile required for the winning hand.
-	RequiredVector PaiSet
+	RequiredVector base.PaiSet
 	// ThrowableVector is the number of each tile not required for the winning hand.
-	ThrowableVector PaiSet
+	ThrowableVector base.PaiSet
 }
 
 const (
@@ -38,25 +40,25 @@ var (
 		18, 19, 20, 21, 22, 23, 24,
 	}
 
-	allPairs [NumIDs]Mentsu = func() [NumIDs]Mentsu {
-		p := [NumIDs]Mentsu{}
-		for i := range uint8(NumIDs) {
-			pai, _ := NewPaiWithID(i)
-			p[i] = NewToitsu(*pai, *pai)
+	allPairs [base.NumIDs]base.Mentsu = func() [base.NumIDs]base.Mentsu {
+		p := [base.NumIDs]base.Mentsu{}
+		for i := range uint8(base.NumIDs) {
+			pai, _ := base.NewPaiWithID(i)
+			p[i] = base.NewToitsu(*pai, *pai)
 		}
 		return p
 	}()
 
-	allMelds [NumIDs + numChows]Mentsu = func() [NumIDs + numChows]Mentsu {
-		m := [NumIDs + numChows]Mentsu{}
-		for i := range uint8(NumIDs) {
-			pai, _ := NewPaiWithID(i)
-			m[i] = NewKotsu(*pai, *pai, *pai)
+	allMelds [base.NumIDs + numChows]base.Mentsu = func() [base.NumIDs + numChows]base.Mentsu {
+		m := [base.NumIDs + numChows]base.Mentsu{}
+		for i := range uint8(base.NumIDs) {
+			pai, _ := base.NewPaiWithID(i)
+			m[i] = base.NewKotsu(*pai, *pai, *pai)
 		}
 		for chowId := range uint8(numChows) {
 			i := chowStartIDs[chowId]
-			pai, _ := NewPaiWithID(i)
-			m[chowId+NumIDs] = NewShuntsu(*pai, *pai.Next(1), *pai.Next(2))
+			pai, _ := base.NewPaiWithID(i)
+			m[chowId+base.NumIDs] = base.NewShuntsu(*pai, *pai.Next(1), *pai.Next(2))
 		}
 		return m
 	}()
@@ -65,11 +67,11 @@ var (
 // AnalyzeShanten calculates the shanten number and the list of Goal for the given PaiSet.
 // When the list of Goal is empty, [InfinityShanten] is returned as the shanten number.
 // It does not consider Seven Pairs or Thirteen Orphans.
-func AnalyzeShanten(ps *PaiSet) (int, []Goal, error) {
+func AnalyzeShanten(ps *base.PaiSet) (int, []Goal, error) {
 	return AnalyzeShantenWithOption(ps, 0, maxShantenNumber)
 }
 
-func AnalyzeShantenWithOption(ps *PaiSet, allowedExtraPais int, upperbound int) (int, []Goal, error) {
+func AnalyzeShantenWithOption(ps *base.PaiSet, allowedExtraPais int, upperbound int) (int, []Goal, error) {
 	sum := 0
 	for _, c := range ps {
 		if c < 0 {
@@ -81,9 +83,9 @@ func AnalyzeShantenWithOption(ps *PaiSet, allowedExtraPais int, upperbound int) 
 		sum += c
 	}
 
-	targetVector := PaiSet{}
+	targetVector := base.PaiSet{}
 	numMentsus := min(sum/3, 4)
-	mentsus := make([]Mentsu, 0, numMentsus+1) // +1 for the pair
+	mentsus := make([]base.Mentsu, 0, numMentsus+1) // +1 for the pair
 	allGoals := []Goal{}
 
 	shanten := analyzeShantenInternal(
@@ -103,7 +105,7 @@ func AnalyzeShantenWithOption(ps *PaiSet, allowedExtraPais int, upperbound int) 
 	goals := make([]Goal, 0, len(allGoals))
 	for _, goal := range allGoals {
 		if goal.Shanten <= newUpperbound {
-			for pid := range NumIDs {
+			for pid := range base.NumIDs {
 				goal.RequiredVector[pid] = max(goal.CountVector[pid]-ps[pid], 0)
 				goal.ThrowableVector[pid] = max(ps[pid]-goal.CountVector[pid], 0)
 			}
@@ -121,19 +123,19 @@ func AnalyzeShantenWithOption(ps *PaiSet, allowedExtraPais int, upperbound int) 
 // analyzeShantenInternal calculates the shanten number and
 // the set of nearest winning hands using pruning DFS.
 func analyzeShantenInternal(
-	currentVector *PaiSet,
-	targetVector *PaiSet,
+	currentVector *base.PaiSet,
+	targetVector *base.PaiSet,
 	currentShanten int,
 	numMeldsLeft int,
 	minMeldId int,
 	upperbound int,
-	mentsus []Mentsu,
+	mentsus []base.Mentsu,
 	goals *[]Goal,
 	allowedExtraPais int,
 ) int {
 	if numMeldsLeft == 0 {
 		// Add a pair
-		for i := range uint8(NumIDs) {
+		for i := range uint8(base.NumIDs) {
 			if targetVector[i] > 2 {
 				// Can't add a pair
 				continue
@@ -162,7 +164,7 @@ func analyzeShantenInternal(
 	}
 
 	// Add Pungs
-	for i := minMeldId; i < NumIDs; i++ {
+	for i := minMeldId; i < base.NumIDs; i++ {
 		if targetVector[i] >= 2 {
 			// Can't add a Pung
 			continue
@@ -197,7 +199,7 @@ func analyzeShantenInternal(
 	}
 
 	// Add Chows
-	startChowId := max(minMeldId-NumIDs, 0)
+	startChowId := max(minMeldId-base.NumIDs, 0)
 	for chowId := startChowId; chowId < numChows; chowId++ {
 		i := chowStartIDs[chowId]
 		if targetVector[i] >= 4 || targetVector[i+1] >= 4 || targetVector[i+2] >= 4 {
@@ -231,9 +233,9 @@ func analyzeShantenInternal(
 				targetVector,
 				newShanten,
 				numMeldsLeft-1,
-				chowId+NumIDs,
+				chowId+base.NumIDs,
 				upperbound,
-				makeNewMentsus(mentsus, allMelds[chowId+NumIDs]),
+				makeNewMentsus(mentsus, allMelds[chowId+base.NumIDs]),
 				goals,
 				allowedExtraPais,
 			)
@@ -246,8 +248,8 @@ func analyzeShantenInternal(
 	return upperbound
 }
 
-func makeNewMentsus(mentsus []Mentsu, newMentsu Mentsu) []Mentsu {
-	newMentsus := make([]Mentsu, len(mentsus), cap(mentsus))
+func makeNewMentsus(mentsus []base.Mentsu, newMentsu base.Mentsu) []base.Mentsu {
+	newMentsus := make([]base.Mentsu, len(mentsus), cap(mentsus))
 	copy(newMentsus, mentsus)
 	return append(newMentsus, newMentsu)
 }

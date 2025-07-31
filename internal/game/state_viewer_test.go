@@ -4,33 +4,35 @@ import (
 	"reflect"
 	"slices"
 	"testing"
+
+	"github.com/Apricot-S/mjai-manue-go/internal/base"
 )
 
 func getDefaultStateForTest() *StateImpl {
-	east, _ := NewPaiWithName("E")
-	players := [NumPlayers]Player{}
+	east, _ := base.NewPaiWithName("E")
+	players := [NumPlayers]base.Player{}
 
 	for i := range NumPlayers {
-		tehais := make([]Pai, 13)
+		tehais := make([]base.Pai, 13)
 		for j := range 13 {
-			tehais[j] = *Unknown
+			tehais[j] = *base.Unknown
 		}
 
-		players[i] = Player{
-			id:                i,
-			name:              "",
-			tehais:            tehais,
-			furos:             make([]Furo, 0, maxNumFuro),
-			ho:                make([]Pai, 0),
-			sutehais:          make([]Pai, 0),
-			extraAnpais:       make([]Pai, 0),
-			reachState:        NotReach,
-			reachHoIndex:      -1,
-			reachSutehaiIndex: -1,
-			score:             InitScore,
-			canDahai:          false,
-			isMenzen:          true,
-		}
+		players[i] = *base.NewPlayerForTest(
+			i,
+			"",
+			tehais,
+			make([]base.Furo, 0, base.MaxNumFuro),
+			make([]base.Pai, 0),
+			make([]base.Pai, 0),
+			make([]base.Pai, 0),
+			base.NotReach,
+			-1,
+			-1,
+			InitScore,
+			false,
+			true,
+		)
 	}
 
 	return &StateImpl{
@@ -40,7 +42,7 @@ func getDefaultStateForTest() *StateImpl {
 		honba:       0,
 		oya:         &players[0],
 		chicha:      &players[0],
-		doraMarkers: make([]Pai, 0, MaxNumDoraMarkers),
+		doraMarkers: make([]base.Pai, 0, MaxNumDoraMarkers),
 		numPipais:   NumInitPipais,
 
 		prevEventType:    "",
@@ -52,13 +54,13 @@ func getDefaultStateForTest() *StateImpl {
 
 func TestState_Anpais(t *testing.T) {
 	type args struct {
-		player *Player
+		player *base.Player
 	}
 	type testCase struct {
 		name  string
 		state State
 		args  args
-		want  []Pai
+		want  []base.Pai
 	}
 	tests := []testCase{}
 
@@ -75,8 +77,22 @@ func TestState_Anpais(t *testing.T) {
 	}
 	{
 		state := getDefaultStateForTest()
-		pais, _ := StrToPais("1m 7z")
-		state.players[3].ho = slices.Concat(state.players[3].ho, pais)
+		pais, _ := base.StrToPais("1m 7z")
+		state.players[3] = *base.NewPlayerForTest(
+			state.players[3].ID(),
+			state.players[3].Name(),
+			state.players[3].Tehais(),
+			state.players[3].Furos(),
+			slices.Concat(state.players[3].Ho(), pais),
+			state.players[3].Sutehais(),
+			state.players[3].ExtraAnpais(),
+			state.players[3].ReachState(),
+			state.players[3].ReachHoIndex(),
+			state.players[3].ReachSutehaiIndex(),
+			state.players[3].Score(),
+			state.players[3].CanDahai(),
+			state.players[3].IsMenzen(),
+		)
 		player := state.players[3]
 
 		tests = append(tests, testCase{

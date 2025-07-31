@@ -7,6 +7,7 @@ import (
 	"strconv"
 
 	"github.com/Apricot-S/mjai-manue-go/configs"
+	"github.com/Apricot-S/mjai-manue-go/internal/base"
 	"github.com/Apricot-S/mjai-manue-go/internal/game"
 	"github.com/Apricot-S/mjai-manue-go/internal/message"
 	"github.com/Apricot-S/mjai-manue-go/tools/shared"
@@ -15,8 +16,8 @@ import (
 )
 
 // TODO Support kokushimuso and chitoitsu
-func isTenpai(actor *game.Player) (bool, error) {
-	tehaiSet, err := game.NewPaiSet(actor.Tehais())
+func isTenpai(actor *base.Player) (bool, error) {
+	tehaiSet, err := base.NewPaiSet(actor.Tehais())
 	if err != nil {
 		return false, fmt.Errorf("failed to get the hand: %w", err)
 	}
@@ -143,7 +144,7 @@ func (yc *YamitenCounter) OnAction(action jsontext.Value, g game.StateViewer) er
 	}
 
 	actor := g.Players()[dahai.Actor]
-	if actor.ReachState() != game.NotReach {
+	if actor.ReachState() != base.NotReach {
 		return nil
 	}
 

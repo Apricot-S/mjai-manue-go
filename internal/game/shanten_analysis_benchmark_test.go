@@ -4,6 +4,7 @@ import (
 	"math/rand/v2"
 	"testing"
 
+	"github.com/Apricot-S/mjai-manue-go/internal/base"
 	"github.com/Apricot-S/mjai-manue-go/internal/game"
 )
 
@@ -122,7 +123,7 @@ func BenchmarkShantenAnalysis_Normal(b *testing.B) {
 	for b.Loop() {
 		b.StopTimer()
 		hand := generateRandomPureHand(rng)
-		var ps game.PaiSet = *hand
+		var ps base.PaiSet = *hand
 		b.StartTimer()
 		_, _, _ = game.AnalyzeShanten(&ps)
 	}
@@ -133,7 +134,7 @@ func BenchmarkShantenAnalysis_HalfFlush(b *testing.B) {
 	for b.Loop() {
 		b.StopTimer()
 		hand := generateRandomHalfFlushPureHand(rng)
-		var ps game.PaiSet = *hand
+		var ps base.PaiSet = *hand
 		b.StartTimer()
 		_, _, _ = game.AnalyzeShanten(&ps)
 	}
@@ -144,7 +145,7 @@ func BenchmarkShantenAnalysis_FullFlush(b *testing.B) {
 	for b.Loop() {
 		b.StopTimer()
 		hand := generateRandomFullFlushPureHand(rng)
-		var ps game.PaiSet = *hand
+		var ps base.PaiSet = *hand
 		b.StartTimer()
 		_, _, _ = game.AnalyzeShanten(&ps)
 	}
@@ -155,7 +156,7 @@ func BenchmarkShantenAnalysis_NonSimple(b *testing.B) {
 	for b.Loop() {
 		b.StopTimer()
 		hand := generateRandomNonSimplePureHand(rng)
-		var ps game.PaiSet = *hand
+		var ps base.PaiSet = *hand
 		b.StartTimer()
 		_, _, _ = game.AnalyzeShanten(&ps)
 	}
@@ -166,7 +167,7 @@ func BenchmarkShantenAnalysis_14_Normal(b *testing.B) {
 	for b.Loop() {
 		b.StopTimer()
 		hand := generateRandomPureHand14(rng)
-		var ps game.PaiSet = *hand
+		var ps base.PaiSet = *hand
 		b.StartTimer()
 		_, _, _ = game.AnalyzeShanten(&ps)
 	}
@@ -177,7 +178,7 @@ func BenchmarkShantenAnalysis_14_HalfFlush(b *testing.B) {
 	for b.Loop() {
 		b.StopTimer()
 		hand := generateRandomHalfFlushPureHand14(rng)
-		var ps game.PaiSet = *hand
+		var ps base.PaiSet = *hand
 		b.StartTimer()
 		_, _, _ = game.AnalyzeShanten(&ps)
 	}
@@ -188,7 +189,7 @@ func BenchmarkShantenAnalysis_14_FullFlush(b *testing.B) {
 	for b.Loop() {
 		b.StopTimer()
 		hand := generateRandomFullFlushPureHand14(rng)
-		var ps game.PaiSet = *hand
+		var ps base.PaiSet = *hand
 		b.StartTimer()
 		_, _, _ = game.AnalyzeShanten(&ps)
 	}
@@ -199,7 +200,7 @@ func BenchmarkShantenAnalysis_14_NonSimple(b *testing.B) {
 	for b.Loop() {
 		b.StopTimer()
 		hand := generateRandomNonSimplePureHand14(rng)
-		var ps game.PaiSet = *hand
+		var ps base.PaiSet = *hand
 		b.StartTimer()
 		_, _, _ = game.AnalyzeShanten(&ps)
 	}

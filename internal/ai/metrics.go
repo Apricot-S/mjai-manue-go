@@ -7,13 +7,14 @@ import (
 	"strings"
 
 	"github.com/Apricot-S/mjai-manue-go/internal/ai/core"
+	"github.com/Apricot-S/mjai-manue-go/internal/base"
 	"github.com/Apricot-S/mjai-manue-go/internal/game"
 )
 
 type goal struct {
 	game.Goal
 	requiredBitVectors [4]core.BitVector
-	furos              []game.Furo
+	furos              []base.Furo
 	points             int
 }
 
@@ -50,8 +51,8 @@ const numTriesFloat = float64(numTries)
 func (a *ManueAI) getMetrics(
 	state game.StateViewer,
 	playerID int,
-	dahaiCandidates []game.Pai,
-	reachDahaiCandidates []game.Pai,
+	dahaiCandidates []base.Pai,
+	reachDahaiCandidates []base.Pai,
 ) (metrics, error) {
 	player := state.Players()[playerID]
 	tehais := player.Tehais()
@@ -74,7 +75,7 @@ func (a *ManueAI) getMetrics(
 		return ms, nil
 	}
 
-	reachDeclared := player.ReachState() == game.ReachDeclared
+	reachDeclared := player.ReachState() == base.ReachDeclared
 	if reachDeclared {
 		defaultMetrics, err := a.getMetricsInternal(state, playerID, tehais, furos, reachDahaiCandidates, true)
 		if err != nil {
@@ -102,7 +103,7 @@ func mergeMetrics(ms metrics, prefix int, otherMetrics metrics) metrics {
 func (a *ManueAI) getFuroMetrics(
 	state game.StateAnalyzer,
 	playerID int,
-	furoCandidates []game.Furo,
+	furoCandidates []base.Furo,
 ) (metrics, error) {
 	// The maximum number of furo candidates is
 	// 5 for chi, 1 for pon, and 1 for daiminkan, totaling 7.
@@ -112,7 +113,7 @@ func (a *ManueAI) getFuroMetrics(
 	// Not furo
 	noneTehais := player.Tehais()
 	noneFuros := player.Furos()
-	noneDahai := []game.Pai{*game.Unknown}
+	noneDahai := []base.Pai{*base.Unknown}
 	noneMetrics, err := a.getMetricsInternal(state, playerID, noneTehais, noneFuros, noneDahai, false)
 	if err != nil {
 		return nil, err
@@ -133,8 +134,8 @@ func (a *ManueAI) getFuroMetrics(
 		}
 		furos := slices.Clone(player.Furos())
 		furos = append(furos, action)
-		dahaiCandidates := game.GetUniquePais(tehais, func(p game.Pai) bool {
-			return game.IsKuikae(action, &p)
+		dahaiCandidates := base.GetUniquePais(tehais, func(p base.Pai) bool {
+			return base.IsKuikae(action, &p)
 		})
 		furoMetrics, err := a.getMetricsInternal(state, playerID, tehais, furos, dahaiCandidates, false)
 		if err != nil {
@@ -156,12 +157,12 @@ func (a *ManueAI) getFuroMetrics(
 func (a *ManueAI) getMetricsInternal(
 	state game.StateViewer,
 	playerID int,
-	tehais game.Pais,
-	furos []game.Furo,
-	dahaiCandidates []game.Pai,
+	tehais base.Pais,
+	furos []base.Furo,
+	dahaiCandidates []base.Pai,
 	reach bool,
 ) (metrics, error) {
-	ps, err := game.NewPaiSet(tehais)
+	ps, err := base.NewPaiSet(tehais)
 	if err != nil {
 		return nil, err
 	}
@@ -372,11 +373,11 @@ func formatArraysAsTable(arrays [][]string) string {
 func (a *ManueAI) getHoraEstimation(
 	state game.StateViewer,
 	playerID int,
-	dahaiCandidates []game.Pai,
+	dahaiCandidates []base.Pai,
 	shanten int,
 	goals []game.Goal,
-	tehais game.Pais,
-	furos []game.Furo,
+	tehais base.Pais,
+	furos []base.Furo,
 	reach bool,
 ) (metrics, error) {
 	gs := make([]goal, 0, len(goals))
@@ -403,11 +404,11 @@ func (a *ManueAI) getHoraEstimation(
 	gs = slices.Clip(gs)
 	fmt.Fprintf(os.Stderr, "goals %d\n", len(gs))
 
-	visiblePaiSet, err := game.NewPaiSet(state.VisiblePais(&state.Players()[playerID]))
+	visiblePaiSet, err := base.NewPaiSet(state.VisiblePais(&state.Players()[playerID]))
 	if err != nil {
 		return nil, err
 	}
-	invisiblePaiSet := game.GetAll()
+	invisiblePaiSet := base.GetAll()
 	invisiblePaiSet.RemovePaiSet(visiblePaiSet)
 	invisiblePais := invisiblePaiSet.ToPais()
 
@@ -415,24 +416,24 @@ func (a *ManueAI) getHoraEstimation(
 	// Uses a fixed seed to get a reproducable result, and to make the result comparable
 	// e.g., with and without reach.
 	rng := core.CreateRNG()
-	totalHoraVector := [game.NumIDs + 1]int{}
-	totalPointsVector := [game.NumIDs + 1]int{}
-	totalPointsFreqsVector := [game.NumIDs + 1]map[int]int{}
-	for pid := range game.NumIDs + 1 {
+	totalHoraVector := [base.NumIDs + 1]int{}
+	totalPointsVector := [base.NumIDs + 1]int{}
+	totalPointsFreqsVector := [base.NumIDs + 1]map[int]int{}
+	for pid := range base.NumIDs + 1 {
 		totalPointsFreqsVector[pid] = make(map[int]int)
 	}
 
 	for range numTries {
 		core.ShuffleWall(rng, &invisiblePais)
-		tsumoPais := make(game.Pais, numTsumos)
+		tsumoPais := make(base.Pais, numTsumos)
 		copy(tsumoPais, invisiblePais[:numTsumos])
-		tsumoVector, err := game.NewPaiSet(tsumoPais)
+		tsumoVector, err := base.NewPaiSet(tsumoPais)
 		if err != nil {
 			return nil, err
 		}
 		tsumoBitVectors := core.CountVectorToBitVectors(tsumoVector)
-		horaVector := [game.NumIDs + 1]int{}
-		pointsVector := [game.NumIDs + 1]int{}
+		horaVector := [base.NumIDs + 1]int{}
+		pointsVector := [base.NumIDs + 1]int{}
 
 		for _, g := range gs {
 			achieved := true
@@ -446,8 +447,8 @@ func (a *ManueAI) getHoraEstimation(
 				continue
 			}
 
-			for pid := range game.NumIDs + 1 {
-				if pid == game.NumIDs || g.ThrowableVector[pid] > 0 {
+			for pid := range base.NumIDs + 1 {
+				if pid == base.NumIDs || g.ThrowableVector[pid] > 0 {
 					horaVector[pid] = 1
 					if g.points > pointsVector[pid] {
 						pointsVector[pid] = g.points
@@ -456,7 +457,7 @@ func (a *ManueAI) getHoraEstimation(
 			}
 		}
 
-		for pid := range game.NumIDs + 1 {
+		for pid := range base.NumIDs + 1 {
 			if horaVector[pid] != 1 {
 				continue
 			}
@@ -470,13 +471,13 @@ func (a *ManueAI) getHoraEstimation(
 		}
 	}
 
-	shantenVector := [game.NumIDs + 1]int{}
+	shantenVector := [base.NumIDs + 1]int{}
 	for i := range len(shantenVector) {
 		shantenVector[i] = game.InfinityShanten
 	}
-	shantenVector[game.NumIDs] = shanten
+	shantenVector[base.NumIDs] = shanten
 	for _, g := range goals {
-		for pid := range game.NumIDs {
+		for pid := range base.NumIDs {
 			if g.ThrowableVector[pid] > 0 && g.Shanten < shantenVector[pid] {
 				shantenVector[pid] = g.Shanten
 			}
@@ -485,7 +486,7 @@ func (a *ManueAI) getHoraEstimation(
 
 	ms := make(metrics, len(dahaiCandidates))
 	for _, pai := range dahaiCandidates {
-		pid := min(pai.RemoveRed().ID(), game.NumIDs)
+		pid := min(pai.RemoveRed().ID(), base.NumIDs)
 		var key string
 		if pai.IsUnknown() {
 			key = "none"

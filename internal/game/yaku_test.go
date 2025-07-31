@@ -1,10 +1,14 @@
 package game
 
-import "testing"
+import (
+	"testing"
+
+	"github.com/Apricot-S/mjai-manue-go/internal/base"
+)
 
 func Test_isTanyaochu(t *testing.T) {
 	type args struct {
-		allPais Pais
+		allPais base.Pais
 	}
 	type testCase struct {
 		name string
@@ -15,7 +19,7 @@ func Test_isTanyaochu(t *testing.T) {
 
 	{
 		name := "is tanyaochu"
-		pais, _ := StrToPais("2m 2m 6m 7m 8m 2p 3p 4p 3s 3s 3s 5s 6s 7s")
+		pais, _ := base.StrToPais("2m 2m 6m 7m 8m 2p 3p 4p 3s 3s 3s 5s 6s 7s")
 		tests = append(tests, testCase{
 			name: name,
 			args: args{allPais: pais},
@@ -24,7 +28,7 @@ func Test_isTanyaochu(t *testing.T) {
 	}
 	{
 		name := "contains 19"
-		pais, _ := StrToPais("2m 2m 6m 7m 8m 1p 2p 3p 3s 3s 3s 5s 6s 7s")
+		pais, _ := base.StrToPais("2m 2m 6m 7m 8m 1p 2p 3p 3s 3s 3s 5s 6s 7s")
 		tests = append(tests, testCase{
 			name: name,
 			args: args{allPais: pais},
@@ -33,7 +37,7 @@ func Test_isTanyaochu(t *testing.T) {
 	}
 	{
 		name := "contains honors"
-		pais, _ := StrToPais("E E 6m 7m 8m 2p 3p 4p 3s 3s 3s 5s 6s 7s")
+		pais, _ := base.StrToPais("E E 6m 7m 8m 2p 3p 4p 3s 3s 3s 5s 6s 7s")
 		tests = append(tests, testCase{
 			name: name,
 			args: args{allPais: pais},
@@ -52,7 +56,7 @@ func Test_isTanyaochu(t *testing.T) {
 
 func Test_isChantaiyao(t *testing.T) {
 	type args struct {
-		allMentsus []Mentsu
+		allMentsus []base.Mentsu
 	}
 	type testCase struct {
 		name string
@@ -63,17 +67,17 @@ func Test_isChantaiyao(t *testing.T) {
 
 	{
 		name := "is chantaiyao"
-		mentsus := make([]Mentsu, 5)
-		pais1, _ := StrToPais("1m 2m 3m")
-		pais2, _ := StrToPais("7p 8p 9p")
-		pais3, _ := StrToPais("1s 1s 1s")
-		pais4, _ := StrToPais("E E E E")
-		pais5, _ := StrToPais("N N")
-		mentsus[0] = NewShuntsu(pais1[0], pais1[1], pais1[2])
-		mentsus[1] = NewShuntsu(pais2[0], pais2[1], pais2[2])
-		mentsus[2] = NewKotsu(pais3[0], pais3[1], pais3[2])
-		mentsus[3] = NewKantsu(pais4[0], pais4[1], pais4[2], pais4[3])
-		mentsus[4] = NewToitsu(pais5[0], pais5[1])
+		mentsus := make([]base.Mentsu, 5)
+		pais1, _ := base.StrToPais("1m 2m 3m")
+		pais2, _ := base.StrToPais("7p 8p 9p")
+		pais3, _ := base.StrToPais("1s 1s 1s")
+		pais4, _ := base.StrToPais("E E E E")
+		pais5, _ := base.StrToPais("N N")
+		mentsus[0] = base.NewShuntsu(pais1[0], pais1[1], pais1[2])
+		mentsus[1] = base.NewShuntsu(pais2[0], pais2[1], pais2[2])
+		mentsus[2] = base.NewKotsu(pais3[0], pais3[1], pais3[2])
+		mentsus[3] = base.NewKantsu(pais4[0], pais4[1], pais4[2], pais4[3])
+		mentsus[4] = base.NewToitsu(pais5[0], pais5[1])
 
 		tests = append(tests, testCase{
 			name: name,
@@ -83,17 +87,17 @@ func Test_isChantaiyao(t *testing.T) {
 	}
 	{
 		name := "is not chantaiyao"
-		mentsus := make([]Mentsu, 5)
-		pais1, _ := StrToPais("2m 3m 4m")
-		pais2, _ := StrToPais("7p 8p 9p")
-		pais3, _ := StrToPais("1s 1s 1s")
-		pais4, _ := StrToPais("E E E E")
-		pais5, _ := StrToPais("N N")
-		mentsus[0] = NewShuntsu(pais1[0], pais1[1], pais1[2])
-		mentsus[1] = NewShuntsu(pais2[0], pais2[1], pais2[2])
-		mentsus[2] = NewKotsu(pais3[0], pais3[1], pais3[2])
-		mentsus[3] = NewKantsu(pais4[0], pais4[1], pais4[2], pais4[3])
-		mentsus[4] = NewToitsu(pais5[0], pais5[1])
+		mentsus := make([]base.Mentsu, 5)
+		pais1, _ := base.StrToPais("2m 3m 4m")
+		pais2, _ := base.StrToPais("7p 8p 9p")
+		pais3, _ := base.StrToPais("1s 1s 1s")
+		pais4, _ := base.StrToPais("E E E E")
+		pais5, _ := base.StrToPais("N N")
+		mentsus[0] = base.NewShuntsu(pais1[0], pais1[1], pais1[2])
+		mentsus[1] = base.NewShuntsu(pais2[0], pais2[1], pais2[2])
+		mentsus[2] = base.NewKotsu(pais3[0], pais3[1], pais3[2])
+		mentsus[3] = base.NewKantsu(pais4[0], pais4[1], pais4[2], pais4[3])
+		mentsus[4] = base.NewToitsu(pais5[0], pais5[1])
 
 		tests = append(tests, testCase{
 			name: name,
@@ -113,7 +117,7 @@ func Test_isChantaiyao(t *testing.T) {
 
 func Test_isIpeko(t *testing.T) {
 	type args struct {
-		allMentsus []Mentsu
+		allMentsus []base.Mentsu
 	}
 	type testCase struct {
 		name string
@@ -124,17 +128,17 @@ func Test_isIpeko(t *testing.T) {
 
 	{
 		name := "is ipeko"
-		mentsus := make([]Mentsu, 5)
-		pais1, _ := StrToPais("1m 2m 3m")
-		pais2, _ := StrToPais("1m 2m 3m")
-		pais3, _ := StrToPais("1s 1s 1s")
-		pais4, _ := StrToPais("E E E E")
-		pais5, _ := StrToPais("N N")
-		mentsus[0] = NewShuntsu(pais1[0], pais1[1], pais1[2])
-		mentsus[1] = NewShuntsu(pais2[0], pais2[1], pais2[2])
-		mentsus[2] = NewKotsu(pais3[0], pais3[1], pais3[2])
-		mentsus[3] = NewKantsu(pais4[0], pais4[1], pais4[2], pais4[3])
-		mentsus[4] = NewToitsu(pais5[0], pais5[1])
+		mentsus := make([]base.Mentsu, 5)
+		pais1, _ := base.StrToPais("1m 2m 3m")
+		pais2, _ := base.StrToPais("1m 2m 3m")
+		pais3, _ := base.StrToPais("1s 1s 1s")
+		pais4, _ := base.StrToPais("E E E E")
+		pais5, _ := base.StrToPais("N N")
+		mentsus[0] = base.NewShuntsu(pais1[0], pais1[1], pais1[2])
+		mentsus[1] = base.NewShuntsu(pais2[0], pais2[1], pais2[2])
+		mentsus[2] = base.NewKotsu(pais3[0], pais3[1], pais3[2])
+		mentsus[3] = base.NewKantsu(pais4[0], pais4[1], pais4[2], pais4[3])
+		mentsus[4] = base.NewToitsu(pais5[0], pais5[1])
 
 		tests = append(tests, testCase{
 			name: name,
@@ -144,17 +148,17 @@ func Test_isIpeko(t *testing.T) {
 	}
 	{
 		name := "is not ipeko"
-		mentsus := make([]Mentsu, 5)
-		pais1, _ := StrToPais("2m 3m 4m")
-		pais2, _ := StrToPais("1m 2m 3m")
-		pais3, _ := StrToPais("1s 1s 1s")
-		pais4, _ := StrToPais("E E E E")
-		pais5, _ := StrToPais("N N")
-		mentsus[0] = NewShuntsu(pais1[0], pais1[1], pais1[2])
-		mentsus[1] = NewShuntsu(pais2[0], pais2[1], pais2[2])
-		mentsus[2] = NewKotsu(pais3[0], pais3[1], pais3[2])
-		mentsus[3] = NewKantsu(pais4[0], pais4[1], pais4[2], pais4[3])
-		mentsus[4] = NewToitsu(pais5[0], pais5[1])
+		mentsus := make([]base.Mentsu, 5)
+		pais1, _ := base.StrToPais("2m 3m 4m")
+		pais2, _ := base.StrToPais("1m 2m 3m")
+		pais3, _ := base.StrToPais("1s 1s 1s")
+		pais4, _ := base.StrToPais("E E E E")
+		pais5, _ := base.StrToPais("N N")
+		mentsus[0] = base.NewShuntsu(pais1[0], pais1[1], pais1[2])
+		mentsus[1] = base.NewShuntsu(pais2[0], pais2[1], pais2[2])
+		mentsus[2] = base.NewKotsu(pais3[0], pais3[1], pais3[2])
+		mentsus[3] = base.NewKantsu(pais4[0], pais4[1], pais4[2], pais4[3])
+		mentsus[4] = base.NewToitsu(pais5[0], pais5[1])
 
 		tests = append(tests, testCase{
 			name: name,
@@ -174,7 +178,7 @@ func Test_isIpeko(t *testing.T) {
 
 func Test_isSanshokuDojun(t *testing.T) {
 	type args struct {
-		allMentsus []Mentsu
+		allMentsus []base.Mentsu
 	}
 	type testCase struct {
 		name string
@@ -185,17 +189,17 @@ func Test_isSanshokuDojun(t *testing.T) {
 
 	{
 		name := "is sanshoku dojun"
-		mentsus := make([]Mentsu, 5)
-		pais1, _ := StrToPais("1m 2m 3m")
-		pais2, _ := StrToPais("1p 2p 3p")
-		pais3, _ := StrToPais("1s 2s 3s")
-		pais4, _ := StrToPais("E E E E")
-		pais5, _ := StrToPais("N N")
-		mentsus[0] = NewShuntsu(pais1[0], pais1[1], pais1[2])
-		mentsus[1] = NewShuntsu(pais2[0], pais2[1], pais2[2])
-		mentsus[2] = NewShuntsu(pais3[0], pais3[1], pais3[2])
-		mentsus[3] = NewKantsu(pais4[0], pais4[1], pais4[2], pais4[3])
-		mentsus[4] = NewToitsu(pais5[0], pais5[1])
+		mentsus := make([]base.Mentsu, 5)
+		pais1, _ := base.StrToPais("1m 2m 3m")
+		pais2, _ := base.StrToPais("1p 2p 3p")
+		pais3, _ := base.StrToPais("1s 2s 3s")
+		pais4, _ := base.StrToPais("E E E E")
+		pais5, _ := base.StrToPais("N N")
+		mentsus[0] = base.NewShuntsu(pais1[0], pais1[1], pais1[2])
+		mentsus[1] = base.NewShuntsu(pais2[0], pais2[1], pais2[2])
+		mentsus[2] = base.NewShuntsu(pais3[0], pais3[1], pais3[2])
+		mentsus[3] = base.NewKantsu(pais4[0], pais4[1], pais4[2], pais4[3])
+		mentsus[4] = base.NewToitsu(pais5[0], pais5[1])
 
 		tests = append(tests, testCase{
 			name: name,
@@ -205,17 +209,17 @@ func Test_isSanshokuDojun(t *testing.T) {
 	}
 	{
 		name := "is not sanshoku dojun"
-		mentsus := make([]Mentsu, 5)
-		pais1, _ := StrToPais("1m 2m 3m")
-		pais2, _ := StrToPais("1s 2s 3s")
-		pais3, _ := StrToPais("1s 2s 3s")
-		pais4, _ := StrToPais("E E E E")
-		pais5, _ := StrToPais("N N")
-		mentsus[0] = NewShuntsu(pais1[0], pais1[1], pais1[2])
-		mentsus[1] = NewShuntsu(pais2[0], pais2[1], pais2[2])
-		mentsus[2] = NewShuntsu(pais3[0], pais3[1], pais3[2])
-		mentsus[3] = NewKantsu(pais4[0], pais4[1], pais4[2], pais4[3])
-		mentsus[4] = NewToitsu(pais5[0], pais5[1])
+		mentsus := make([]base.Mentsu, 5)
+		pais1, _ := base.StrToPais("1m 2m 3m")
+		pais2, _ := base.StrToPais("1s 2s 3s")
+		pais3, _ := base.StrToPais("1s 2s 3s")
+		pais4, _ := base.StrToPais("E E E E")
+		pais5, _ := base.StrToPais("N N")
+		mentsus[0] = base.NewShuntsu(pais1[0], pais1[1], pais1[2])
+		mentsus[1] = base.NewShuntsu(pais2[0], pais2[1], pais2[2])
+		mentsus[2] = base.NewShuntsu(pais3[0], pais3[1], pais3[2])
+		mentsus[3] = base.NewKantsu(pais4[0], pais4[1], pais4[2], pais4[3])
+		mentsus[4] = base.NewToitsu(pais5[0], pais5[1])
 
 		tests = append(tests, testCase{
 			name: name,
@@ -225,17 +229,17 @@ func Test_isSanshokuDojun(t *testing.T) {
 	}
 	{
 		name := "is not sanshoku dojun for same kotsu"
-		mentsus := make([]Mentsu, 5)
-		pais1, _ := StrToPais("1m 1m 1m")
-		pais2, _ := StrToPais("1p 1p 1p")
-		pais3, _ := StrToPais("1s 1s 1s")
-		pais4, _ := StrToPais("W W W")
-		pais5, _ := StrToPais("N N")
-		mentsus[0] = NewKotsu(pais1[0], pais1[1], pais1[2])
-		mentsus[1] = NewKotsu(pais2[0], pais2[1], pais2[2])
-		mentsus[2] = NewKotsu(pais3[0], pais3[1], pais3[2])
-		mentsus[3] = NewKotsu(pais4[0], pais4[1], pais4[2])
-		mentsus[4] = NewToitsu(pais5[0], pais5[1])
+		mentsus := make([]base.Mentsu, 5)
+		pais1, _ := base.StrToPais("1m 1m 1m")
+		pais2, _ := base.StrToPais("1p 1p 1p")
+		pais3, _ := base.StrToPais("1s 1s 1s")
+		pais4, _ := base.StrToPais("W W W")
+		pais5, _ := base.StrToPais("N N")
+		mentsus[0] = base.NewKotsu(pais1[0], pais1[1], pais1[2])
+		mentsus[1] = base.NewKotsu(pais2[0], pais2[1], pais2[2])
+		mentsus[2] = base.NewKotsu(pais3[0], pais3[1], pais3[2])
+		mentsus[3] = base.NewKotsu(pais4[0], pais4[1], pais4[2])
+		mentsus[4] = base.NewToitsu(pais5[0], pais5[1])
 
 		tests = append(tests, testCase{
 			name: name,
@@ -255,7 +259,7 @@ func Test_isSanshokuDojun(t *testing.T) {
 
 func Test_isIkkiTsukan(t *testing.T) {
 	type args struct {
-		allMentsus []Mentsu
+		allMentsus []base.Mentsu
 	}
 	type testCase struct {
 		name string
@@ -266,17 +270,17 @@ func Test_isIkkiTsukan(t *testing.T) {
 
 	{
 		name := "is ikki tsukan"
-		mentsus := make([]Mentsu, 5)
-		pais1, _ := StrToPais("1m 2m 3m")
-		pais2, _ := StrToPais("4m 5m 6m")
-		pais3, _ := StrToPais("7m 8m 9m")
-		pais4, _ := StrToPais("E E E E")
-		pais5, _ := StrToPais("N N")
-		mentsus[0] = NewShuntsu(pais1[0], pais1[1], pais1[2])
-		mentsus[1] = NewShuntsu(pais2[0], pais2[1], pais2[2])
-		mentsus[2] = NewShuntsu(pais3[0], pais3[1], pais3[2])
-		mentsus[3] = NewKantsu(pais4[0], pais4[1], pais4[2], pais4[3])
-		mentsus[4] = NewToitsu(pais5[0], pais5[1])
+		mentsus := make([]base.Mentsu, 5)
+		pais1, _ := base.StrToPais("1m 2m 3m")
+		pais2, _ := base.StrToPais("4m 5m 6m")
+		pais3, _ := base.StrToPais("7m 8m 9m")
+		pais4, _ := base.StrToPais("E E E E")
+		pais5, _ := base.StrToPais("N N")
+		mentsus[0] = base.NewShuntsu(pais1[0], pais1[1], pais1[2])
+		mentsus[1] = base.NewShuntsu(pais2[0], pais2[1], pais2[2])
+		mentsus[2] = base.NewShuntsu(pais3[0], pais3[1], pais3[2])
+		mentsus[3] = base.NewKantsu(pais4[0], pais4[1], pais4[2], pais4[3])
+		mentsus[4] = base.NewToitsu(pais5[0], pais5[1])
 
 		tests = append(tests, testCase{
 			name: name,
@@ -286,17 +290,17 @@ func Test_isIkkiTsukan(t *testing.T) {
 	}
 	{
 		name := "is not ikki tsukan"
-		mentsus := make([]Mentsu, 5)
-		pais1, _ := StrToPais("1m 2m 3m")
-		pais2, _ := StrToPais("4p 5p 6p")
-		pais3, _ := StrToPais("7m 8m 9m")
-		pais4, _ := StrToPais("E E E E")
-		pais5, _ := StrToPais("N N")
-		mentsus[0] = NewShuntsu(pais1[0], pais1[1], pais1[2])
-		mentsus[1] = NewShuntsu(pais2[0], pais2[1], pais2[2])
-		mentsus[2] = NewShuntsu(pais3[0], pais3[1], pais3[2])
-		mentsus[3] = NewKantsu(pais4[0], pais4[1], pais4[2], pais4[3])
-		mentsus[4] = NewToitsu(pais5[0], pais5[1])
+		mentsus := make([]base.Mentsu, 5)
+		pais1, _ := base.StrToPais("1m 2m 3m")
+		pais2, _ := base.StrToPais("4p 5p 6p")
+		pais3, _ := base.StrToPais("7m 8m 9m")
+		pais4, _ := base.StrToPais("E E E E")
+		pais5, _ := base.StrToPais("N N")
+		mentsus[0] = base.NewShuntsu(pais1[0], pais1[1], pais1[2])
+		mentsus[1] = base.NewShuntsu(pais2[0], pais2[1], pais2[2])
+		mentsus[2] = base.NewShuntsu(pais3[0], pais3[1], pais3[2])
+		mentsus[3] = base.NewKantsu(pais4[0], pais4[1], pais4[2], pais4[3])
+		mentsus[4] = base.NewToitsu(pais5[0], pais5[1])
 
 		tests = append(tests, testCase{
 			name: name,
@@ -306,17 +310,17 @@ func Test_isIkkiTsukan(t *testing.T) {
 	}
 	{
 		name := "is not ikki tsukan for kotsu"
-		mentsus := make([]Mentsu, 5)
-		pais1, _ := StrToPais("1m 1m 1m")
-		pais2, _ := StrToPais("4m 4m 4m")
-		pais3, _ := StrToPais("7m 7m 7m")
-		pais4, _ := StrToPais("W W W")
-		pais5, _ := StrToPais("N N")
-		mentsus[0] = NewKotsu(pais1[0], pais1[1], pais1[2])
-		mentsus[1] = NewKotsu(pais2[0], pais2[1], pais2[2])
-		mentsus[2] = NewKotsu(pais3[0], pais3[1], pais3[2])
-		mentsus[3] = NewKotsu(pais4[0], pais4[1], pais4[2])
-		mentsus[4] = NewToitsu(pais5[0], pais5[1])
+		mentsus := make([]base.Mentsu, 5)
+		pais1, _ := base.StrToPais("1m 1m 1m")
+		pais2, _ := base.StrToPais("4m 4m 4m")
+		pais3, _ := base.StrToPais("7m 7m 7m")
+		pais4, _ := base.StrToPais("W W W")
+		pais5, _ := base.StrToPais("N N")
+		mentsus[0] = base.NewKotsu(pais1[0], pais1[1], pais1[2])
+		mentsus[1] = base.NewKotsu(pais2[0], pais2[1], pais2[2])
+		mentsus[2] = base.NewKotsu(pais3[0], pais3[1], pais3[2])
+		mentsus[3] = base.NewKotsu(pais4[0], pais4[1], pais4[2])
+		mentsus[4] = base.NewToitsu(pais5[0], pais5[1])
 
 		tests = append(tests, testCase{
 			name: name,
@@ -336,7 +340,7 @@ func Test_isIkkiTsukan(t *testing.T) {
 
 func Test_isToitoiho(t *testing.T) {
 	type args struct {
-		allMentsus []Mentsu
+		allMentsus []base.Mentsu
 	}
 	type testCase struct {
 		name string
@@ -347,17 +351,17 @@ func Test_isToitoiho(t *testing.T) {
 
 	{
 		name := "is toitoiho"
-		mentsus := make([]Mentsu, 5)
-		pais1, _ := StrToPais("1m 1m 1m")
-		pais2, _ := StrToPais("2p 2p 2p")
-		pais3, _ := StrToPais("6s 6s 6s")
-		pais4, _ := StrToPais("E E E E")
-		pais5, _ := StrToPais("N N")
-		mentsus[0] = NewKotsu(pais1[0], pais1[1], pais1[2])
-		mentsus[1] = NewKotsu(pais2[0], pais2[1], pais2[2])
-		mentsus[2] = NewKotsu(pais3[0], pais3[1], pais3[2])
-		mentsus[3] = NewKantsu(pais4[0], pais4[1], pais4[2], pais4[3])
-		mentsus[4] = NewToitsu(pais5[0], pais5[1])
+		mentsus := make([]base.Mentsu, 5)
+		pais1, _ := base.StrToPais("1m 1m 1m")
+		pais2, _ := base.StrToPais("2p 2p 2p")
+		pais3, _ := base.StrToPais("6s 6s 6s")
+		pais4, _ := base.StrToPais("E E E E")
+		pais5, _ := base.StrToPais("N N")
+		mentsus[0] = base.NewKotsu(pais1[0], pais1[1], pais1[2])
+		mentsus[1] = base.NewKotsu(pais2[0], pais2[1], pais2[2])
+		mentsus[2] = base.NewKotsu(pais3[0], pais3[1], pais3[2])
+		mentsus[3] = base.NewKantsu(pais4[0], pais4[1], pais4[2], pais4[3])
+		mentsus[4] = base.NewToitsu(pais5[0], pais5[1])
 
 		tests = append(tests, testCase{
 			name: name,
@@ -367,17 +371,17 @@ func Test_isToitoiho(t *testing.T) {
 	}
 	{
 		name := "is not toitoiho"
-		mentsus := make([]Mentsu, 5)
-		pais1, _ := StrToPais("1m 1m 1m")
-		pais2, _ := StrToPais("2p 2p 2p")
-		pais3, _ := StrToPais("7m 8m 9m")
-		pais4, _ := StrToPais("E E E E")
-		pais5, _ := StrToPais("N N")
-		mentsus[0] = NewKotsu(pais1[0], pais1[1], pais1[2])
-		mentsus[1] = NewKotsu(pais2[0], pais2[1], pais2[2])
-		mentsus[2] = NewShuntsu(pais3[0], pais3[1], pais3[2])
-		mentsus[3] = NewKantsu(pais4[0], pais4[1], pais4[2], pais4[3])
-		mentsus[4] = NewToitsu(pais5[0], pais5[1])
+		mentsus := make([]base.Mentsu, 5)
+		pais1, _ := base.StrToPais("1m 1m 1m")
+		pais2, _ := base.StrToPais("2p 2p 2p")
+		pais3, _ := base.StrToPais("7m 8m 9m")
+		pais4, _ := base.StrToPais("E E E E")
+		pais5, _ := base.StrToPais("N N")
+		mentsus[0] = base.NewKotsu(pais1[0], pais1[1], pais1[2])
+		mentsus[1] = base.NewKotsu(pais2[0], pais2[1], pais2[2])
+		mentsus[2] = base.NewShuntsu(pais3[0], pais3[1], pais3[2])
+		mentsus[3] = base.NewKantsu(pais4[0], pais4[1], pais4[2], pais4[3])
+		mentsus[4] = base.NewToitsu(pais5[0], pais5[1])
 
 		tests = append(tests, testCase{
 			name: name,
@@ -397,7 +401,7 @@ func Test_isToitoiho(t *testing.T) {
 
 func Test_isChiniso(t *testing.T) {
 	type args struct {
-		allMentsus []Mentsu
+		allMentsus []base.Mentsu
 	}
 	type testCase struct {
 		name string
@@ -408,17 +412,17 @@ func Test_isChiniso(t *testing.T) {
 
 	{
 		name := "is chiniso"
-		mentsus := make([]Mentsu, 5)
-		pais1, _ := StrToPais("1m 2m 3m")
-		pais2, _ := StrToPais("4m 5m 6m")
-		pais3, _ := StrToPais("7m 8m 9m")
-		pais4, _ := StrToPais("1m 1m 1m")
-		pais5, _ := StrToPais("5m 5mr")
-		mentsus[0] = NewShuntsu(pais1[0], pais1[1], pais1[2])
-		mentsus[1] = NewShuntsu(pais2[0], pais2[1], pais2[2])
-		mentsus[2] = NewShuntsu(pais3[0], pais3[1], pais3[2])
-		mentsus[3] = NewKotsu(pais4[0], pais4[1], pais4[2])
-		mentsus[4] = NewToitsu(pais5[0], pais5[1])
+		mentsus := make([]base.Mentsu, 5)
+		pais1, _ := base.StrToPais("1m 2m 3m")
+		pais2, _ := base.StrToPais("4m 5m 6m")
+		pais3, _ := base.StrToPais("7m 8m 9m")
+		pais4, _ := base.StrToPais("1m 1m 1m")
+		pais5, _ := base.StrToPais("5m 5mr")
+		mentsus[0] = base.NewShuntsu(pais1[0], pais1[1], pais1[2])
+		mentsus[1] = base.NewShuntsu(pais2[0], pais2[1], pais2[2])
+		mentsus[2] = base.NewShuntsu(pais3[0], pais3[1], pais3[2])
+		mentsus[3] = base.NewKotsu(pais4[0], pais4[1], pais4[2])
+		mentsus[4] = base.NewToitsu(pais5[0], pais5[1])
 
 		tests = append(tests, testCase{
 			name: name,
@@ -428,17 +432,17 @@ func Test_isChiniso(t *testing.T) {
 	}
 	{
 		name := "is not chiniso"
-		mentsus := make([]Mentsu, 5)
-		pais1, _ := StrToPais("1m 2m 3m")
-		pais2, _ := StrToPais("4m 5m 6m")
-		pais3, _ := StrToPais("7m 8m 9m")
-		pais4, _ := StrToPais("1m 1m 1m")
-		pais5, _ := StrToPais("E E")
-		mentsus[0] = NewShuntsu(pais1[0], pais1[1], pais1[2])
-		mentsus[1] = NewShuntsu(pais2[0], pais2[1], pais2[2])
-		mentsus[2] = NewShuntsu(pais3[0], pais3[1], pais3[2])
-		mentsus[3] = NewKotsu(pais4[0], pais4[1], pais4[2])
-		mentsus[4] = NewToitsu(pais5[0], pais5[1])
+		mentsus := make([]base.Mentsu, 5)
+		pais1, _ := base.StrToPais("1m 2m 3m")
+		pais2, _ := base.StrToPais("4m 5m 6m")
+		pais3, _ := base.StrToPais("7m 8m 9m")
+		pais4, _ := base.StrToPais("1m 1m 1m")
+		pais5, _ := base.StrToPais("E E")
+		mentsus[0] = base.NewShuntsu(pais1[0], pais1[1], pais1[2])
+		mentsus[1] = base.NewShuntsu(pais2[0], pais2[1], pais2[2])
+		mentsus[2] = base.NewShuntsu(pais3[0], pais3[1], pais3[2])
+		mentsus[3] = base.NewKotsu(pais4[0], pais4[1], pais4[2])
+		mentsus[4] = base.NewToitsu(pais5[0], pais5[1])
 
 		tests = append(tests, testCase{
 			name: name,
@@ -448,17 +452,17 @@ func Test_isChiniso(t *testing.T) {
 	}
 	{
 		name := "is not chiniso for tsuiso"
-		mentsus := make([]Mentsu, 5)
-		pais1, _ := StrToPais("E E E")
-		pais2, _ := StrToPais("S S S")
-		pais3, _ := StrToPais("W W W")
-		pais4, _ := StrToPais("N N N")
-		pais5, _ := StrToPais("P P")
-		mentsus[0] = NewKotsu(pais1[0], pais1[1], pais1[2])
-		mentsus[1] = NewKotsu(pais2[0], pais2[1], pais2[2])
-		mentsus[2] = NewKotsu(pais3[0], pais3[1], pais3[2])
-		mentsus[3] = NewKotsu(pais4[0], pais4[1], pais4[2])
-		mentsus[4] = NewToitsu(pais5[0], pais5[1])
+		mentsus := make([]base.Mentsu, 5)
+		pais1, _ := base.StrToPais("E E E")
+		pais2, _ := base.StrToPais("S S S")
+		pais3, _ := base.StrToPais("W W W")
+		pais4, _ := base.StrToPais("N N N")
+		pais5, _ := base.StrToPais("P P")
+		mentsus[0] = base.NewKotsu(pais1[0], pais1[1], pais1[2])
+		mentsus[1] = base.NewKotsu(pais2[0], pais2[1], pais2[2])
+		mentsus[2] = base.NewKotsu(pais3[0], pais3[1], pais3[2])
+		mentsus[3] = base.NewKotsu(pais4[0], pais4[1], pais4[2])
+		mentsus[4] = base.NewToitsu(pais5[0], pais5[1])
 
 		tests = append(tests, testCase{
 			name: name,
@@ -478,7 +482,7 @@ func Test_isChiniso(t *testing.T) {
 
 func Test_isHoniso(t *testing.T) {
 	type args struct {
-		allMentsus []Mentsu
+		allMentsus []base.Mentsu
 	}
 	type testCase struct {
 		name string
@@ -489,17 +493,17 @@ func Test_isHoniso(t *testing.T) {
 
 	{
 		name := "is honiso"
-		mentsus := make([]Mentsu, 5)
-		pais1, _ := StrToPais("1m 2m 3m")
-		pais2, _ := StrToPais("4m 5m 6m")
-		pais3, _ := StrToPais("7m 8m 9m")
-		pais4, _ := StrToPais("1m 1m 1m")
-		pais5, _ := StrToPais("E E")
-		mentsus[0] = NewShuntsu(pais1[0], pais1[1], pais1[2])
-		mentsus[1] = NewShuntsu(pais2[0], pais2[1], pais2[2])
-		mentsus[2] = NewShuntsu(pais3[0], pais3[1], pais3[2])
-		mentsus[3] = NewKotsu(pais4[0], pais4[1], pais4[2])
-		mentsus[4] = NewToitsu(pais5[0], pais5[1])
+		mentsus := make([]base.Mentsu, 5)
+		pais1, _ := base.StrToPais("1m 2m 3m")
+		pais2, _ := base.StrToPais("4m 5m 6m")
+		pais3, _ := base.StrToPais("7m 8m 9m")
+		pais4, _ := base.StrToPais("1m 1m 1m")
+		pais5, _ := base.StrToPais("E E")
+		mentsus[0] = base.NewShuntsu(pais1[0], pais1[1], pais1[2])
+		mentsus[1] = base.NewShuntsu(pais2[0], pais2[1], pais2[2])
+		mentsus[2] = base.NewShuntsu(pais3[0], pais3[1], pais3[2])
+		mentsus[3] = base.NewKotsu(pais4[0], pais4[1], pais4[2])
+		mentsus[4] = base.NewToitsu(pais5[0], pais5[1])
 
 		tests = append(tests, testCase{
 			name: name,
@@ -509,17 +513,17 @@ func Test_isHoniso(t *testing.T) {
 	}
 	{
 		name := "is honiso for chiniso"
-		mentsus := make([]Mentsu, 5)
-		pais1, _ := StrToPais("1m 2m 3m")
-		pais2, _ := StrToPais("4m 5m 6m")
-		pais3, _ := StrToPais("7m 8m 9m")
-		pais4, _ := StrToPais("1m 1m 1m")
-		pais5, _ := StrToPais("5m 5mr")
-		mentsus[0] = NewShuntsu(pais1[0], pais1[1], pais1[2])
-		mentsus[1] = NewShuntsu(pais2[0], pais2[1], pais2[2])
-		mentsus[2] = NewShuntsu(pais3[0], pais3[1], pais3[2])
-		mentsus[3] = NewKotsu(pais4[0], pais4[1], pais4[2])
-		mentsus[4] = NewToitsu(pais5[0], pais5[1])
+		mentsus := make([]base.Mentsu, 5)
+		pais1, _ := base.StrToPais("1m 2m 3m")
+		pais2, _ := base.StrToPais("4m 5m 6m")
+		pais3, _ := base.StrToPais("7m 8m 9m")
+		pais4, _ := base.StrToPais("1m 1m 1m")
+		pais5, _ := base.StrToPais("5m 5mr")
+		mentsus[0] = base.NewShuntsu(pais1[0], pais1[1], pais1[2])
+		mentsus[1] = base.NewShuntsu(pais2[0], pais2[1], pais2[2])
+		mentsus[2] = base.NewShuntsu(pais3[0], pais3[1], pais3[2])
+		mentsus[3] = base.NewKotsu(pais4[0], pais4[1], pais4[2])
+		mentsus[4] = base.NewToitsu(pais5[0], pais5[1])
 
 		tests = append(tests, testCase{
 			name: name,
@@ -529,17 +533,17 @@ func Test_isHoniso(t *testing.T) {
 	}
 	{
 		name := "is honiso for tsuiso"
-		mentsus := make([]Mentsu, 5)
-		pais1, _ := StrToPais("E E E")
-		pais2, _ := StrToPais("S S S")
-		pais3, _ := StrToPais("W W W")
-		pais4, _ := StrToPais("N N N")
-		pais5, _ := StrToPais("P P")
-		mentsus[0] = NewKotsu(pais1[0], pais1[1], pais1[2])
-		mentsus[1] = NewKotsu(pais2[0], pais2[1], pais2[2])
-		mentsus[2] = NewKotsu(pais3[0], pais3[1], pais3[2])
-		mentsus[3] = NewKotsu(pais4[0], pais4[1], pais4[2])
-		mentsus[4] = NewToitsu(pais5[0], pais5[1])
+		mentsus := make([]base.Mentsu, 5)
+		pais1, _ := base.StrToPais("E E E")
+		pais2, _ := base.StrToPais("S S S")
+		pais3, _ := base.StrToPais("W W W")
+		pais4, _ := base.StrToPais("N N N")
+		pais5, _ := base.StrToPais("P P")
+		mentsus[0] = base.NewKotsu(pais1[0], pais1[1], pais1[2])
+		mentsus[1] = base.NewKotsu(pais2[0], pais2[1], pais2[2])
+		mentsus[2] = base.NewKotsu(pais3[0], pais3[1], pais3[2])
+		mentsus[3] = base.NewKotsu(pais4[0], pais4[1], pais4[2])
+		mentsus[4] = base.NewToitsu(pais5[0], pais5[1])
 
 		tests = append(tests, testCase{
 			name: name,
@@ -549,17 +553,17 @@ func Test_isHoniso(t *testing.T) {
 	}
 	{
 		name := "is not honiso"
-		mentsus := make([]Mentsu, 5)
-		pais1, _ := StrToPais("1m 2m 3m")
-		pais2, _ := StrToPais("4m 5m 6m")
-		pais3, _ := StrToPais("7m 8m 9m")
-		pais4, _ := StrToPais("1m 1m 1m")
-		pais5, _ := StrToPais("2s 2s")
-		mentsus[0] = NewShuntsu(pais1[0], pais1[1], pais1[2])
-		mentsus[1] = NewShuntsu(pais2[0], pais2[1], pais2[2])
-		mentsus[2] = NewShuntsu(pais3[0], pais3[1], pais3[2])
-		mentsus[3] = NewKotsu(pais4[0], pais4[1], pais4[2])
-		mentsus[4] = NewToitsu(pais5[0], pais5[1])
+		mentsus := make([]base.Mentsu, 5)
+		pais1, _ := base.StrToPais("1m 2m 3m")
+		pais2, _ := base.StrToPais("4m 5m 6m")
+		pais3, _ := base.StrToPais("7m 8m 9m")
+		pais4, _ := base.StrToPais("1m 1m 1m")
+		pais5, _ := base.StrToPais("2s 2s")
+		mentsus[0] = base.NewShuntsu(pais1[0], pais1[1], pais1[2])
+		mentsus[1] = base.NewShuntsu(pais2[0], pais2[1], pais2[2])
+		mentsus[2] = base.NewShuntsu(pais3[0], pais3[1], pais3[2])
+		mentsus[3] = base.NewKotsu(pais4[0], pais4[1], pais4[2])
+		mentsus[4] = base.NewToitsu(pais5[0], pais5[1])
 
 		tests = append(tests, testCase{
 			name: name,

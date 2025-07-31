@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"slices"
 
+	"github.com/Apricot-S/mjai-manue-go/internal/base"
 	"github.com/Apricot-S/mjai-manue-go/internal/message"
 	"github.com/go-json-experiment/json"
 	"github.com/go-json-experiment/json/jsontext"
@@ -155,14 +156,14 @@ func (s *StateImpl) onStartGame(event *message.StartGame) error {
 		return fmt.Errorf("number of players must be 4, but got %d", len(names))
 	}
 
-	east, err := NewPaiWithName("E")
+	east, err := base.NewPaiWithName("E")
 	if err != nil {
 		return err
 	}
 
-	var players [NumPlayers]Player
+	var players [NumPlayers]base.Player
 	for i, name := range names {
-		p, err := NewPlayer(i, name, InitScore)
+		p, err := base.NewPlayer(i, name, InitScore)
 		if err != nil {
 			return err
 		}
@@ -175,7 +176,7 @@ func (s *StateImpl) onStartGame(event *message.StartGame) error {
 	s.honba = 0
 	s.oya = &s.players[0]
 	s.chicha = &s.players[0]
-	s.doraMarkers = make([]Pai, 0, MaxNumDoraMarkers)
+	s.doraMarkers = make([]base.Pai, 0, MaxNumDoraMarkers)
 	s.numPipais = NumInitPipais
 
 	s.prevEventType = noEvent
@@ -187,7 +188,7 @@ func (s *StateImpl) onStartGame(event *message.StartGame) error {
 	s.lastActor = noActor
 	s.lastActionType = noEvent
 
-	s.kuikaePais = make([]Pai, 0, 3)
+	s.kuikaePais = make([]base.Pai, 0, 3)
 	s.missedRon = false
 	s.isFuriten = false
 	s.isRinshanTsumo = false
@@ -200,7 +201,7 @@ func (s *StateImpl) onStartKyoku(event *message.StartKyoku) error {
 		return fmt.Errorf("start_kyoku message is nil")
 	}
 
-	bakaze, err := NewPaiWithName(event.Bakaze)
+	bakaze, err := base.NewPaiWithName(event.Bakaze)
 	if err != nil {
 		return err
 	}
@@ -208,8 +209,8 @@ func (s *StateImpl) onStartKyoku(event *message.StartKyoku) error {
 	s.kyokuNum = event.Kyoku
 	s.honba = event.Honba
 	s.oya = &s.players[event.Oya]
-	s.doraMarkers = make([]Pai, 0, MaxNumDoraMarkers)
-	doraMarker, err := NewPaiWithName(event.DoraMarker)
+	s.doraMarkers = make([]base.Pai, 0, MaxNumDoraMarkers)
+	doraMarker, err := base.NewPaiWithName(event.DoraMarker)
 	if err != nil {
 		return err
 	}
@@ -217,9 +218,9 @@ func (s *StateImpl) onStartKyoku(event *message.StartKyoku) error {
 	s.numPipais = NumInitPipais
 
 	for i := range NumPlayers {
-		tehais := make([]Pai, initTehaisSize)
+		tehais := make([]base.Pai, base.InitTehaisSize)
 		for j := range tehais {
-			tehai, err := NewPaiWithName(event.Tehais[i][j])
+			tehai, err := base.NewPaiWithName(event.Tehais[i][j])
 			if err != nil {
 				return err
 			}
@@ -228,9 +229,9 @@ func (s *StateImpl) onStartKyoku(event *message.StartKyoku) error {
 
 		var err error
 		if event.Scores != nil {
-			err = s.players[i].onStartKyoku(tehais, &event.Scores[i])
+			err = s.players[i].OnStartKyoku(tehais, &event.Scores[i])
 		} else {
-			err = s.players[i].onStartKyoku(tehais, nil)
+			err = s.players[i].OnStartKyoku(tehais, nil)
 		}
 		if err != nil {
 			return err
@@ -244,7 +245,7 @@ func (s *StateImpl) onStartKyoku(event *message.StartKyoku) error {
 	s.lastActor = noActor
 	s.lastActionType = noEvent
 
-	s.kuikaePais = make([]Pai, 0, 3)
+	s.kuikaePais = make([]base.Pai, 0, 3)
 	s.missedRon = false
 	s.isFuriten = false
 	s.isRinshanTsumo = false
@@ -262,13 +263,13 @@ func (s *StateImpl) onTsumo(event *message.Tsumo) error {
 	}
 	s.numPipais--
 
-	pai, err := NewPaiWithName(event.Pai)
+	pai, err := base.NewPaiWithName(event.Pai)
 	if err != nil {
 		return err
 	}
 	actor := event.Actor
 	player := &s.players[actor]
-	err = player.onTsumo(*pai)
+	err = player.OnTsumo(*pai)
 	if err != nil {
 		return err
 	}
@@ -284,13 +285,13 @@ func (s *StateImpl) onDahai(event *message.Dahai) error {
 		return fmt.Errorf("dahai message is nil")
 	}
 
-	pai, err := NewPaiWithName(event.Pai)
+	pai, err := base.NewPaiWithName(event.Pai)
 	if err != nil {
 		return err
 	}
 	actor := event.Actor
 	player := &s.players[actor]
-	err = player.onDahai(*pai)
+	err = player.OnDahai(*pai)
 	if err != nil {
 		return err
 	}
@@ -301,14 +302,14 @@ func (s *StateImpl) onDahai(event *message.Dahai) error {
 	s.lastActor = actor
 	s.lastActionType = message.TypeDahai
 
-	tehaiCounts, err := NewPaiSet(s.players[s.playerID].tehais)
+	tehaiCounts, err := base.NewPaiSet(s.players[s.playerID].Tehais())
 	if err != nil {
 		return err
 	}
 
 	if actor == s.playerID {
-		s.kuikaePais = make([]Pai, 0, 3)
-		if player.ReachState() != ReachAccepted {
+		s.kuikaePais = make([]base.Pai, 0, 3)
+		if player.ReachState() != base.ReachAccepted {
 			s.missedRon = false
 			s.isFuriten = false
 		}
@@ -364,31 +365,31 @@ func (s *StateImpl) onChi(event *message.Chi) error {
 		return fmt.Errorf("chi is not possible if numPipais is 0 or negative: %d", s.numPipais)
 	}
 
-	pai, err := NewPaiWithName(event.Pai)
+	pai, err := base.NewPaiWithName(event.Pai)
 	if err != nil {
 		return err
 	}
-	var consumed [2]Pai
+	var consumed [2]base.Pai
 	for i, c := range event.Consumed {
-		p, err := NewPaiWithName(c)
+		p, err := base.NewPaiWithName(c)
 		if err != nil {
 			return err
 		}
 		consumed[i] = *p
 	}
-	furo, err := NewChi(*pai, consumed, event.Target)
+	furo, err := base.NewChi(*pai, consumed, event.Target)
 	if err != nil {
 		return err
 	}
 
 	actor := event.Actor
-	err = s.players[actor].onChi(furo)
+	err = s.players[actor].OnChi(furo)
 	if err != nil {
 		return err
 	}
 
 	target := event.Target
-	err = s.players[target].onTargeted(furo)
+	err = s.players[target].OnTargeted(furo)
 	if err != nil {
 		return err
 	}
@@ -448,31 +449,31 @@ func (s *StateImpl) onPon(event *message.Pon) error {
 		return fmt.Errorf("pon is not possible if numPipais is 0 or negative: %d", s.numPipais)
 	}
 
-	pai, err := NewPaiWithName(event.Pai)
+	pai, err := base.NewPaiWithName(event.Pai)
 	if err != nil {
 		return err
 	}
-	var consumed [2]Pai
+	var consumed [2]base.Pai
 	for i, c := range event.Consumed {
-		p, err := NewPaiWithName(c)
+		p, err := base.NewPaiWithName(c)
 		if err != nil {
 			return err
 		}
 		consumed[i] = *p
 	}
-	furo, err := NewPon(*pai, consumed, event.Target)
+	furo, err := base.NewPon(*pai, consumed, event.Target)
 	if err != nil {
 		return err
 	}
 
 	actor := event.Actor
-	err = s.players[actor].onPon(furo)
+	err = s.players[actor].OnPon(furo)
 	if err != nil {
 		return err
 	}
 
 	target := event.Target
-	err = s.players[target].onTargeted(furo)
+	err = s.players[target].OnTargeted(furo)
 	if err != nil {
 		return err
 	}
@@ -499,31 +500,31 @@ func (s *StateImpl) onDaiminkan(event *message.Daiminkan) error {
 		return fmt.Errorf("daiminkan is not possible if numPipais is 0 or negative: %d", s.numPipais)
 	}
 
-	pai, err := NewPaiWithName(event.Pai)
+	pai, err := base.NewPaiWithName(event.Pai)
 	if err != nil {
 		return err
 	}
-	var consumed [3]Pai
+	var consumed [3]base.Pai
 	for i, c := range event.Consumed {
-		p, err := NewPaiWithName(c)
+		p, err := base.NewPaiWithName(c)
 		if err != nil {
 			return err
 		}
 		consumed[i] = *p
 	}
-	furo, err := NewDaiminkan(*pai, consumed, event.Target)
+	furo, err := base.NewDaiminkan(*pai, consumed, event.Target)
 	if err != nil {
 		return err
 	}
 
 	actor := event.Actor
-	err = s.players[actor].onDaiminkan(furo)
+	err = s.players[actor].OnDaiminkan(furo)
 	if err != nil {
 		return err
 	}
 
 	target := event.Target
-	err = s.players[target].onTargeted(furo)
+	err = s.players[target].OnTargeted(furo)
 	if err != nil {
 		return err
 	}
@@ -547,21 +548,21 @@ func (s *StateImpl) onAnkan(event *message.Ankan) error {
 		return fmt.Errorf("ankan is not possible if numPipais is 0 or negative: %d", s.numPipais)
 	}
 
-	var consumed [4]Pai
+	var consumed [4]base.Pai
 	for i, c := range event.Consumed {
-		p, err := NewPaiWithName(c)
+		p, err := base.NewPaiWithName(c)
 		if err != nil {
 			return err
 		}
 		consumed[i] = *p
 	}
-	furo, err := NewAnkan(consumed)
+	furo, err := base.NewAnkan(consumed)
 	if err != nil {
 		return err
 	}
 
 	actor := event.Actor
-	err = s.players[actor].onAnkan(furo)
+	err = s.players[actor].OnAnkan(furo)
 	if err != nil {
 		return err
 	}
@@ -585,25 +586,25 @@ func (s *StateImpl) onKakan(event *message.Kakan) error {
 		return fmt.Errorf("kakan is not possible if numPipais is 0 or negative: %d", s.numPipais)
 	}
 
-	pai, err := NewPaiWithName(event.Pai)
+	pai, err := base.NewPaiWithName(event.Pai)
 	if err != nil {
 		return err
 	}
-	var consumed [3]Pai
+	var consumed [3]base.Pai
 	for i, c := range event.Consumed {
-		p, err := NewPaiWithName(c)
+		p, err := base.NewPaiWithName(c)
 		if err != nil {
 			return err
 		}
 		consumed[i] = *p
 	}
-	furo, err := NewKakan(*pai, consumed, nil)
+	furo, err := base.NewKakan(*pai, consumed, nil)
 	if err != nil {
 		return err
 	}
 
 	actor := event.Actor
-	err = s.players[actor].onKakan(furo)
+	err = s.players[actor].OnKakan(furo)
 	if err != nil {
 		return err
 	}
@@ -618,7 +619,7 @@ func (s *StateImpl) onKakan(event *message.Kakan) error {
 	if actor == s.playerID {
 		s.isRinshanTsumo = true
 	} else {
-		tehaiCounts, err := NewPaiSet(s.players[s.playerID].tehais)
+		tehaiCounts, err := base.NewPaiSet(s.players[s.playerID].Tehais())
 		if err != nil {
 			return err
 		}
@@ -653,7 +654,7 @@ func (s *StateImpl) onDora(event *message.Dora) error {
 		return fmt.Errorf("a 6th dora cannot be added")
 	}
 
-	pai, err := NewPaiWithName(event.DoraMarker)
+	pai, err := base.NewPaiWithName(event.DoraMarker)
 	if err != nil {
 		return err
 	}
@@ -673,7 +674,7 @@ func (s *StateImpl) onReach(event *message.Reach) error {
 
 	actor := event.Actor
 	player := &s.players[actor]
-	err := player.onReach()
+	err := player.OnReach()
 	if err != nil {
 		return err
 	}
@@ -693,9 +694,9 @@ func (s *StateImpl) onReachAccepted(event *message.ReachAccepted) error {
 	player := &s.players[actor]
 	var err error
 	if event.Scores != nil {
-		err = player.onReachAccepted(&event.Scores[actor])
+		err = player.OnReachAccepted(&event.Scores[actor])
 	} else {
-		err = player.onReachAccepted(nil)
+		err = player.OnReachAccepted(nil)
 	}
 	if err != nil {
 		return err

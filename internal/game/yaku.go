@@ -1,6 +1,10 @@
 package game
 
-import "slices"
+import (
+	"slices"
+
+	"github.com/Apricot-S/mjai-manue-go/internal/base"
+)
 
 // Note:
 // This function calculates points based on the original specification,
@@ -8,17 +12,17 @@ import "slices"
 func CalculateFan(
 	state StateViewer,
 	playerID int,
-	tehais Pais,
-	mentsus []Mentsu,
-	furos []Furo,
+	tehais base.Pais,
+	mentsus []base.Mentsu,
+	furos []base.Furo,
 	reach bool,
 ) (fu int, fan int, points int, yakus map[string]int) {
-	furoMentsus := make([]Mentsu, len(furos))
+	furoMentsus := make([]base.Mentsu, len(furos))
 	for i, f := range furos {
 		furoMentsus[i] = f.ToMentsu()
 	}
 	allMentsus := slices.Concat(mentsus, furoMentsus)
-	allPais := make(Pais, 0, 14)
+	allPais := make(base.Pais, 0, 14)
 	for _, m := range allMentsus {
 		allPais = append(allPais, m.Pais()...)
 	}
@@ -73,7 +77,7 @@ func CalculateFan(
 		}
 		addYaku(numDoras > 0, "dr", numDoras, numDoras)
 
-		var currentPais []Pai = slices.Clone(tehais)
+		var currentPais []base.Pai = slices.Clone(tehais)
 		for _, f := range furos {
 			currentPais = slices.Concat(currentPais, f.Pais())
 		}
@@ -108,16 +112,16 @@ func CalculateFan(
 func Has1Fan(
 	state StateViewer,
 	playerID int,
-	tehais Pais,
-	furos []Furo,
-	horaPai *Pai,
+	tehais base.Pais,
+	furos []base.Furo,
+	horaPai *base.Pai,
 	isTsumo bool,
 ) (bool, error) {
 	horaTehais := slices.Clone(tehais)
 	if !isTsumo {
 		horaTehais = append(horaTehais, *horaPai)
 	}
-	horaTehaisCounts, err := NewPaiSet(horaTehais)
+	horaTehaisCounts, err := base.NewPaiSet(horaTehais)
 	if err != nil {
 		return false, err
 	}
@@ -137,14 +141,14 @@ func Has1Fan(
 		return false, err
 	}
 
-	furoMentsus := make([]Mentsu, len(furos))
+	furoMentsus := make([]base.Mentsu, len(furos))
 	for i, f := range furos {
 		furoMentsus[i] = f.ToMentsu()
 	}
 
 	for _, goal := range goals {
 		allMentsus := slices.Concat(goal.Mentsus, furoMentsus)
-		allPais := make(Pais, 0, 14)
+		allPais := make(base.Pais, 0, 14)
 		for _, m := range allMentsus {
 			allPais = append(allPais, m.Pais()...)
 		}
@@ -190,7 +194,7 @@ func Has1Fan(
 	return false, nil
 }
 
-func isTanyaochu(allPais Pais) bool {
+func isTanyaochu(allPais base.Pais) bool {
 	for _, p := range allPais {
 		if p.IsYaochu() {
 			return false
@@ -199,7 +203,7 @@ func isTanyaochu(allPais Pais) bool {
 	return true
 }
 
-func isChantaiyao(allMentsus []Mentsu) bool {
+func isChantaiyao(allMentsus []base.Mentsu) bool {
 	for _, m := range allMentsus {
 		isYaochuMentsu := false
 		for _, p := range m.Pais() {
@@ -216,13 +220,13 @@ func isChantaiyao(allMentsus []Mentsu) bool {
 }
 
 // TODO Consider ryanmen criteria
-func isPinfu(state StateViewer, playerID int, allMentsus []Mentsu) bool {
+func isPinfu(state StateViewer, playerID int, allMentsus []base.Mentsu) bool {
 	player := &state.Players()[playerID]
 	for _, m := range allMentsus {
 		switch m.(type) {
-		case *Kotsu, *Kantsu:
+		case *base.Kotsu, *base.Kantsu:
 			return false
-		case *Toitsu:
+		case *base.Toitsu:
 			pai := &m.Pais()[0]
 			if state.YakuhaiFan(pai, player) > 0 {
 				return false
@@ -232,23 +236,23 @@ func isPinfu(state StateViewer, playerID int, allMentsus []Mentsu) bool {
 	return true
 }
 
-func isPinfuStrict(state StateViewer, playerID int, allMentsus []Mentsu, horaPai *Pai) bool {
+func isPinfuStrict(state StateViewer, playerID int, allMentsus []base.Mentsu, horaPai *base.Pai) bool {
 	player := &state.Players()[playerID]
 	foundShuntsuWithHoraPai := false
 
 	for _, m := range allMentsus {
 		switch m.(type) {
-		case *Kotsu, *Kantsu:
+		case *base.Kotsu, *base.Kantsu:
 			return false
-		case *Toitsu:
+		case *base.Toitsu:
 			pai := &m.Pais()[0]
 			if state.YakuhaiFan(pai, player) > 0 {
 				return false
 			}
-		case *Shuntsu:
+		case *base.Shuntsu:
 			pais := m.Pais()
 			// Check if the shuntsu contains the horaPai
-			if !slices.ContainsFunc(pais, func(p Pai) bool {
+			if !slices.ContainsFunc(pais, func(p base.Pai) bool {
 				return p.HasSameSymbol(horaPai)
 			}) {
 				continue
@@ -272,12 +276,12 @@ func isPinfuStrict(state StateViewer, playerID int, allMentsus []Mentsu, horaPai
 	return foundShuntsuWithHoraPai
 }
 
-func sumYakuhaiFan(state StateViewer, playerID int, allMentsus []Mentsu) int {
+func sumYakuhaiFan(state StateViewer, playerID int, allMentsus []base.Mentsu) int {
 	player := &state.Players()[playerID]
 	fan := 0
 	for _, m := range allMentsus {
 		switch m.(type) {
-		case *Kotsu, *Kantsu:
+		case *base.Kotsu, *base.Kantsu:
 			pai := &m.Pais()[0]
 			fan += state.YakuhaiFan(pai, player)
 		}
@@ -285,13 +289,13 @@ func sumYakuhaiFan(state StateViewer, playerID int, allMentsus []Mentsu) int {
 	return fan
 }
 
-func isIpeko(allMentsus []Mentsu) bool {
+func isIpeko(allMentsus []base.Mentsu) bool {
 	for i, m1 := range allMentsus {
-		if _, ok := m1.(*Shuntsu); !ok {
+		if _, ok := m1.(*base.Shuntsu); !ok {
 			continue
 		}
 		for _, m2 := range allMentsus[i+1:] {
-			if _, ok := m2.(*Shuntsu); !ok {
+			if _, ok := m2.(*base.Shuntsu); !ok {
 				continue
 			}
 			if m1.Pais()[0].HasSameSymbol(&m2.Pais()[0]) {
@@ -302,14 +306,14 @@ func isIpeko(allMentsus []Mentsu) bool {
 	return false
 }
 
-func isSanshokuDojun(allMentsus []Mentsu) bool {
+func isSanshokuDojun(allMentsus []base.Mentsu) bool {
 	typeNumMap := map[rune]map[uint8]bool{
 		'm': {},
 		'p': {},
 		's': {},
 	}
 	for _, m := range allMentsus {
-		shuntsu, ok := m.(*Shuntsu)
+		shuntsu, ok := m.(*base.Shuntsu)
 		if !ok {
 			continue
 		}
@@ -326,14 +330,14 @@ func isSanshokuDojun(allMentsus []Mentsu) bool {
 	return false
 }
 
-func isIkkiTsukan(allMentsus []Mentsu) bool {
+func isIkkiTsukan(allMentsus []base.Mentsu) bool {
 	typeNumMap := map[rune]map[uint8]bool{
 		'm': {},
 		'p': {},
 		's': {},
 	}
 	for _, m := range allMentsus {
-		shuntsu, ok := m.(*Shuntsu)
+		shuntsu, ok := m.(*base.Shuntsu)
 		if !ok {
 			continue
 		}
@@ -350,20 +354,20 @@ func isIkkiTsukan(allMentsus []Mentsu) bool {
 	return false
 }
 
-func isToitoiho(allMentsus []Mentsu) bool {
+func isToitoiho(allMentsus []base.Mentsu) bool {
 	for _, m := range allMentsus {
-		if _, ok := m.(*Shuntsu); ok {
+		if _, ok := m.(*base.Shuntsu); ok {
 			return false
 		}
 	}
 	return true
 }
 
-func isChiniso(allMentsus []Mentsu) bool {
+func isChiniso(allMentsus []base.Mentsu) bool {
 	var suit rune
 	for i, m := range allMentsus {
 		t := m.Pais()[0].Type()
-		if t == tsupaiType {
+		if t == base.TsupaiType {
 			return false
 		}
 		if i == 0 {
@@ -375,20 +379,20 @@ func isChiniso(allMentsus []Mentsu) bool {
 	return true
 }
 
-func isHoniso(allMentsus []Mentsu) bool {
+func isHoniso(allMentsus []base.Mentsu) bool {
 	var suit rune
 	for i, m := range allMentsus {
 		t := m.Pais()[0].Type()
 		if i == 0 {
 			suit = t
-		} else if t != suit && t != tsupaiType {
+		} else if t != suit && t != base.TsupaiType {
 			return false
 		}
 	}
 	return true
 }
 
-func isSanshokuDoko(allMentsus []Mentsu) bool {
+func isSanshokuDoko(allMentsus []base.Mentsu) bool {
 	typeNumMap := map[rune]map[uint8]bool{
 		'm': {},
 		'p': {},
@@ -396,8 +400,8 @@ func isSanshokuDoko(allMentsus []Mentsu) bool {
 		't': {},
 	}
 	for _, m := range allMentsus {
-		_, isKotsu := m.(*Kotsu)
-		_, isKantsu := m.(*Kantsu)
+		_, isKotsu := m.(*base.Kotsu)
+		_, isKantsu := m.(*base.Kantsu)
 		if !isKotsu && !isKantsu {
 			continue
 		}
@@ -414,23 +418,23 @@ func isSanshokuDoko(allMentsus []Mentsu) bool {
 	return false
 }
 
-func isSankantsu(allMentsus []Mentsu) bool {
+func isSankantsu(allMentsus []base.Mentsu) bool {
 	numKantsu := 0
 	for _, m := range allMentsus {
-		if _, ok := m.(*Kantsu); ok {
+		if _, ok := m.(*base.Kantsu); ok {
 			numKantsu++
 		}
 	}
 	return numKantsu >= 3
 }
 
-func isSananko(tehaiMentsus []Mentsu, furos []Furo, horaPai *Pai, isTsumo bool) bool {
+func isSananko(tehaiMentsus []base.Mentsu, furos []base.Furo, horaPai *base.Pai, isTsumo bool) bool {
 	numAnko := 0
 
 	// Mentsus in the hand
 	for _, m := range tehaiMentsus {
 		switch kotsu := m.(type) {
-		case *Kotsu:
+		case *base.Kotsu:
 			// en: In the case of Ron, exclude the kotsu that contains the horaPai
 			if !isTsumo && kotsu.Pais()[0].HasSameSymbol(horaPai) {
 				continue
@@ -441,7 +445,7 @@ func isSananko(tehaiMentsus []Mentsu, furos []Furo, horaPai *Pai, isTsumo bool) 
 
 	// Count only the ankan in the furos
 	for _, f := range furos {
-		if _, ok := f.(*Ankan); ok {
+		if _, ok := f.(*base.Ankan); ok {
 			numAnko++
 		}
 	}

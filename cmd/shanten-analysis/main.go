@@ -5,10 +5,11 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/Apricot-S/mjai-manue-go/internal/base"
 	"github.com/Apricot-S/mjai-manue-go/internal/game"
 )
 
-func printAnalysisResults(paiSet *game.PaiSet, shantenNumber int, goals []game.Goal) {
+func printAnalysisResults(paiSet *base.PaiSet, shantenNumber int, goals []game.Goal) {
 	writer := bufio.NewWriter(os.Stdout)
 	defer writer.Flush()
 
@@ -43,13 +44,13 @@ func main() {
 		return
 	}
 
-	pais, err := game.StrToPais(paiStr)
+	pais, err := base.StrToPais(paiStr)
 	if err != nil {
 		fmt.Println(err)
 		return
 	}
 
-	paiSet, err := game.NewPaiSet(pais)
+	paiSet, err := base.NewPaiSet(pais)
 	if err != nil {
 		fmt.Println(err)
 		return

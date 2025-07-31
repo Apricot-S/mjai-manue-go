@@ -5,13 +5,15 @@ import (
 	"fmt"
 	"os"
 	"slices"
+
+	"github.com/Apricot-S/mjai-manue-go/internal/base"
 )
 
-func (s *StateImpl) Players() *[NumPlayers]Player {
+func (s *StateImpl) Players() *[NumPlayers]base.Player {
 	return &s.players
 }
 
-func (s *StateImpl) Bakaze() *Pai {
+func (s *StateImpl) Bakaze() *base.Pai {
 	return &s.bakaze
 }
 
@@ -23,15 +25,15 @@ func (s *StateImpl) Honba() int {
 	return s.honba
 }
 
-func (s *StateImpl) Oya() *Player {
+func (s *StateImpl) Oya() *base.Player {
 	return s.oya
 }
 
-func (s *StateImpl) Chicha() *Player {
+func (s *StateImpl) Chicha() *base.Player {
 	return s.chicha
 }
 
-func (s *StateImpl) DoraMarkers() []Pai {
+func (s *StateImpl) DoraMarkers() []base.Pai {
 	return s.doraMarkers
 }
 
@@ -39,38 +41,38 @@ func (s *StateImpl) NumPipais() int {
 	return s.numPipais
 }
 
-func (s *StateImpl) Anpais(player *Player) []Pai {
-	return slices.Concat(player.sutehais, player.extraAnpais)
+func (s *StateImpl) Anpais(player *base.Player) []base.Pai {
+	return slices.Concat(player.Sutehais(), player.ExtraAnpais())
 }
 
-func (s *StateImpl) VisiblePais(player *Player) []Pai {
-	visiblePais := []Pai{}
+func (s *StateImpl) VisiblePais(player *base.Player) []base.Pai {
+	visiblePais := []base.Pai{}
 
 	for _, p := range s.players {
-		visiblePais = slices.Concat(visiblePais, p.ho)
-		for _, furo := range p.furos {
+		visiblePais = slices.Concat(visiblePais, p.Ho())
+		for _, furo := range p.Furos() {
 			visiblePais = slices.Concat(visiblePais, furo.Pais())
 		}
 	}
 
-	return slices.Concat(visiblePais, s.doraMarkers, player.tehais)
+	return slices.Concat(visiblePais, s.doraMarkers, player.Tehais())
 }
 
-func (s *StateImpl) Doras() []Pai {
-	doras := make([]Pai, len(s.doraMarkers))
+func (s *StateImpl) Doras() []base.Pai {
+	doras := make([]base.Pai, len(s.doraMarkers))
 	for i, d := range s.doraMarkers {
 		doras[i] = *d.NextForDora()
 	}
 	return doras
 }
 
-func (s *StateImpl) Jikaze(player *Player) *Pai {
-	j := 1 + (4+player.id-s.oya.id)%4
-	p, _ := NewPaiWithDetail(tsupaiType, uint8(j), false)
+func (s *StateImpl) Jikaze(player *base.Player) *base.Pai {
+	j := 1 + (4+player.ID()-s.oya.ID())%4
+	p, _ := base.NewPaiWithDetail(base.TsupaiType, uint8(j), false)
 	return p
 }
 
-func (s *StateImpl) YakuhaiFan(pai *Pai, player *Player) int {
+func (s *StateImpl) YakuhaiFan(pai *base.Pai, player *base.Player) int {
 	if !pai.IsTsupai() {
 		// Suhai
 		return 0
@@ -94,7 +96,7 @@ func (s *StateImpl) YakuhaiFan(pai *Pai, player *Player) int {
 	return fan
 }
 
-func (s *StateImpl) NextKyoku() (*Pai, int) {
+func (s *StateImpl) NextKyoku() (*base.Pai, int) {
 	return getNextKyoku(&s.bakaze, s.kyokuNum)
 }
 
@@ -102,10 +104,10 @@ func (s *StateImpl) Turn() float64 {
 	return float64(NumInitPipais-s.numPipais) / float64(NumPlayers)
 }
 
-func (s *StateImpl) RankedPlayers() [NumPlayers]Player {
+func (s *StateImpl) RankedPlayers() [NumPlayers]base.Player {
 	players := s.players
-	slices.SortStableFunc(players[:], func(p1, p2 Player) int {
-		if c := cmp.Compare(p1.score, p2.score); c != 0 {
+	slices.SortStableFunc(players[:], func(p1, p2 base.Player) int {
+		if c := cmp.Compare(p1.Score(), p2.Score()); c != 0 {
 			// Sort descending.
 			return -c
 		}
@@ -124,8 +126,8 @@ func (s *StateImpl) Print() {
        ho: %s
 
 `,
-			p.id,
-			PaisToStr(p.tehais),
-			PaisToStr(p.ho))
+			p.ID(),
+			base.PaisToStr(p.Tehais()),
+			base.PaisToStr(p.Ho()))
 	}
 }

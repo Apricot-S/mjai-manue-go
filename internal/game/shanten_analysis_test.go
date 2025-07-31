@@ -5,10 +5,11 @@ import (
 	"reflect"
 	"testing"
 
+	"github.com/Apricot-S/mjai-manue-go/internal/base"
 	"github.com/Apricot-S/mjai-manue-go/internal/game"
 )
 
-func sum(arr [game.NumIDs]int) int {
+func sum(arr [base.NumIDs]int) int {
 	sum := 0
 	for _, c := range arr {
 		sum += c
@@ -16,7 +17,7 @@ func sum(arr [game.NumIDs]int) int {
 	return sum
 }
 
-func verifyShantenAndGoals(t *testing.T, paiSet *game.PaiSet, expectedShanten int, expectedGoalsSize int) {
+func verifyShantenAndGoals(t *testing.T, paiSet *base.PaiSet, expectedShanten int, expectedGoalsSize int) {
 	shanten, goals, err := game.AnalyzeShanten(paiSet)
 	if err != nil {
 		t.Errorf("AnalyzeShanten() error = %v", err)
@@ -37,7 +38,7 @@ func verifyShantenAndGoals(t *testing.T, paiSet *game.PaiSet, expectedShanten in
 	}
 }
 
-func verifyShantenWithUpperBounds(t *testing.T, paiSet *game.PaiSet, expectedShanten int, expectedGoalsSize int) {
+func verifyShantenWithUpperBounds(t *testing.T, paiSet *base.PaiSet, expectedShanten int, expectedGoalsSize int) {
 	for i := -1; i <= 8; i++ {
 		shanten, goals, err := game.AnalyzeShantenWithOption(paiSet, 0, i)
 		if err != nil {
@@ -70,8 +71,8 @@ func verifyShantenWithUpperBounds(t *testing.T, paiSet *game.PaiSet, expectedSha
 }
 
 func testAnalyzeShantenInternal(t *testing.T, paiStr string, expectedShanten int, expectedGoalsSize int) {
-	pais, _ := game.StrToPais(paiStr)
-	paiSet, _ := game.NewPaiSet(pais)
+	pais, _ := base.StrToPais(paiStr)
+	paiSet, _ := base.NewPaiSet(pais)
 
 	verifyShantenAndGoals(t, paiSet, expectedShanten, expectedGoalsSize)
 	verifyShantenWithUpperBounds(t, paiSet, expectedShanten, expectedGoalsSize)
@@ -170,8 +171,8 @@ func TestAnalyzeShanten_Invalid(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.args.ps, func(t *testing.T) {
-			pais, _ := game.StrToPais(tt.args.ps)
-			paiSet, _ := game.NewPaiSet(pais)
+			pais, _ := base.StrToPais(tt.args.ps)
+			paiSet, _ := base.NewPaiSet(pais)
 
 			shanten, goals, err := game.AnalyzeShanten(paiSet)
 			if err == nil {

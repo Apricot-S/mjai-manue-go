@@ -1,4 +1,4 @@
-package game
+package base
 
 import (
 	"fmt"
@@ -27,7 +27,7 @@ const (
 	unknownID  = maxRedID + 1
 	maxPaiID   = unknownID
 
-	tsupaiType = 't'
+	TsupaiType = 't'
 
 	unknownStr    = "?"
 	unknownType   = '?'
@@ -119,10 +119,10 @@ func NewPaiWithDetail(typ rune, number uint8, isRed bool) (*Pai, error) {
 	if number < 1 || 9 < number {
 		return nil, fmt.Errorf("number out of range: %d", number)
 	}
-	if typ == tsupaiType && number > 7 {
+	if typ == TsupaiType && number > 7 {
 		return nil, fmt.Errorf("number out of range for tsupai: %d", number)
 	}
-	if isRed && (number != 5 || typ == tsupaiType) {
+	if isRed && (number != 5 || typ == TsupaiType) {
 		return nil, fmt.Errorf("no reds other than 5: %d", number)
 	}
 
@@ -182,7 +182,7 @@ func (p *Pai) NextForDora() *Pai {
 	number := p.number
 	var nextNumber uint8 = 0
 
-	if p.typ == tsupaiType {
+	if p.typ == TsupaiType {
 		// honors
 		switch number {
 		case 4:
@@ -209,12 +209,12 @@ func (p *Pai) NextForDora() *Pai {
 
 func (p *Pai) IsTsupai() bool {
 	p.assertInitialized()
-	return p.typ == tsupaiType
+	return p.typ == TsupaiType
 }
 
 func (p *Pai) IsYaochu() bool {
 	p.assertInitialized()
-	return p.typ == tsupaiType || p.number == 1 || p.number == 9
+	return p.typ == TsupaiType || p.number == 1 || p.number == 9
 }
 
 func (p *Pai) AddRed() *Pai {
@@ -235,7 +235,7 @@ func (p *Pai) RemoveRed() *Pai {
 }
 
 func (p *Pai) Next(n int8) *Pai {
-	if p.IsUnknown() || p.typ == tsupaiType {
+	if p.IsUnknown() || p.typ == TsupaiType {
 		return nil
 	}
 

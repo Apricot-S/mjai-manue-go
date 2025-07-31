@@ -4,32 +4,33 @@ import (
 	"fmt"
 	"slices"
 
+	"github.com/Apricot-S/mjai-manue-go/internal/base"
 	"github.com/Apricot-S/mjai-manue-go/internal/message"
 )
 
-func (s *StateImpl) DahaiCandidates() []Pai {
+func (s *StateImpl) DahaiCandidates() []base.Pai {
 	player := &s.players[s.playerID]
 	if !player.CanDahai() {
 		return nil
 	}
-	if player.ReachState() == ReachDeclared {
+	if player.ReachState() == base.ReachDeclared {
 		// If the player has already declared reach, return nil.
 		return nil
 	}
-	if player.ReachState() == ReachAccepted {
+	if player.ReachState() == base.ReachAccepted {
 		// If the player has already accepted the reach, only the drawn tile is a candidate.
-		candidates := []Pai{player.tehais[len(player.tehais)-1]}
+		candidates := []base.Pai{player.Tehais()[len(player.Tehais())-1]}
 		return candidates
 	}
 
-	candidates := GetUniquePais(player.tehais, nil)
+	candidates := base.GetUniquePais(player.Tehais(), nil)
 
 	// Remove the kuikae tiles from the candidates.
 	kuikaeSet := make(map[uint8]struct{}, len(s.kuikaePais))
 	for _, k := range s.kuikaePais {
 		kuikaeSet[k.ID()] = struct{}{}
 	}
-	candidates = slices.DeleteFunc(candidates, func(p Pai) bool {
+	candidates = slices.DeleteFunc(candidates, func(p base.Pai) bool {
 		_, found := kuikaeSet[p.ID()]
 		return found
 	})
@@ -38,7 +39,7 @@ func (s *StateImpl) DahaiCandidates() []Pai {
 }
 
 // ReachDahaiCandidates returns the candidates for the reach declaration tile.
-func (s *StateImpl) ReachDahaiCandidates() ([]Pai, error) {
+func (s *StateImpl) ReachDahaiCandidates() ([]base.Pai, error) {
 	player := &s.players[s.playerID]
 	if !player.CanDahai() {
 		return nil, nil
@@ -46,7 +47,7 @@ func (s *StateImpl) ReachDahaiCandidates() ([]Pai, error) {
 	if !player.IsMenzen() {
 		return nil, nil
 	}
-	if player.ReachState() == ReachAccepted {
+	if player.ReachState() == base.ReachAccepted {
 		// If the player has already accepted the reach, the player cannot declare reach.
 		return nil, nil
 	}
@@ -54,12 +55,12 @@ func (s *StateImpl) ReachDahaiCandidates() ([]Pai, error) {
 		// If there are no remaining tiles to draw, the player cannot declare reach.
 		return nil, nil
 	}
-	if player.Score() < kyotakuPoint {
+	if player.Score() < base.KyotakuPoint {
 		// If the player does not have enough points to declare reach, return nil.
 		return nil, nil
 	}
 
-	tehaiCounts, err := NewPaiSet(player.tehais)
+	tehaiCounts, err := base.NewPaiSet(player.Tehais())
 	if err != nil {
 		return nil, err
 	}
@@ -72,8 +73,8 @@ func (s *StateImpl) ReachDahaiCandidates() ([]Pai, error) {
 		return nil, nil
 	}
 
-	tehaiPais := GetUniquePais(player.tehais, nil)
-	candidates := make([]Pai, 0, len(tehaiPais))
+	tehaiPais := base.GetUniquePais(player.Tehais(), nil)
+	candidates := make([]base.Pai, 0, len(tehaiPais))
 	for _, p := range tehaiPais {
 		i := p.RemoveRed().ID()
 		tehaiCounts[i] -= 1
@@ -90,7 +91,7 @@ func (s *StateImpl) ReachDahaiCandidates() ([]Pai, error) {
 	return candidates, nil
 }
 
-func (s *StateImpl) IsTsumoPai(pai *Pai) bool {
+func (s *StateImpl) IsTsumoPai(pai *base.Pai) bool {
 	if s.lastActor == noActor {
 		return false
 	}
@@ -101,11 +102,11 @@ func (s *StateImpl) IsTsumoPai(pai *Pai) bool {
 		return false
 	}
 
-	tehais := s.players[s.playerID].tehais
+	tehais := s.players[s.playerID].Tehais()
 	return pai.ID() == tehais[len(tehais)-1].ID()
 }
 
-func (s *StateImpl) FuroCandidates() ([]Furo, error) {
+func (s *StateImpl) FuroCandidates() ([]base.Furo, error) {
 	if s.lastActor == noActor || s.lastActor == s.playerID {
 		// Furo is not possible if the last actor is the player itself or no actor.
 		return nil, nil
@@ -120,7 +121,7 @@ func (s *StateImpl) FuroCandidates() ([]Furo, error) {
 	}
 
 	player := &s.players[s.playerID]
-	if player.ReachState() != NotReach {
+	if player.ReachState() != base.NotReach {
 		// If the player has already declared the reach, the player cannot furo.
 		return nil, nil
 	}
@@ -140,7 +141,7 @@ func (s *StateImpl) FuroCandidates() ([]Furo, error) {
 	return slices.Concat(cc, pc, dc), nil
 }
 
-func (s *StateImpl) chiCandidates() ([]Furo, error) {
+func (s *StateImpl) chiCandidates() ([]base.Furo, error) {
 	if GetPlayerDistance(&s.players[s.playerID], &s.players[s.lastActor]) != 1 {
 		// Chi is only possible for kamicha's discarded tile.
 		return nil, nil
@@ -156,9 +157,9 @@ func (s *StateImpl) chiCandidates() ([]Furo, error) {
 	}
 
 	player := &s.players[s.playerID]
-	tehais := player.tehais
+	tehais := player.Tehais()
 
-	furos := make([]Furo, 0, 5)
+	furos := make([]base.Furo, 0, 5)
 	used := make(map[[2]uint8]struct{})
 	takenNum := int(taken.Number())
 	for d := -2; d <= 0; d++ {
@@ -171,7 +172,7 @@ func (s *StateImpl) chiCandidates() ([]Furo, error) {
 		}
 
 		// Find two tiles that can form a sequence with the taken tile.
-		var cands []Pai
+		var cands []base.Pai
 		for _, p := range tehais {
 			if p.Type() != taken.Type() {
 				continue
@@ -210,15 +211,15 @@ func (s *StateImpl) chiCandidates() ([]Furo, error) {
 				used[key] = struct{}{}
 
 				// Create a chi
-				consumed := [2]Pai{p1, p2}
-				furo, err := NewChi(*taken, consumed, s.prevDahaiActor)
+				consumed := [2]base.Pai{p1, p2}
+				furo, err := base.NewChi(*taken, consumed, s.prevDahaiActor)
 				if err != nil {
 					return nil, err
 				}
 
 				// Kuikae check
 				// Create a hand without the two tiles consumed by chi.
-				rest := make([]Pai, 0, len(tehais)-2)
+				rest := make([]base.Pai, 0, len(tehais)-2)
 				usedIdx := map[int]bool{}
 				p1used := false
 				p2used := false
@@ -242,7 +243,7 @@ func (s *StateImpl) chiCandidates() ([]Furo, error) {
 				// If all remaining tiles are kuikae candidates, skip.
 				allKuikae := true
 				for _, tp := range rest {
-					if !IsKuikae(furo, &tp) {
+					if !base.IsKuikae(furo, &tp) {
 						allKuikae = false
 						break
 					}
@@ -258,15 +259,15 @@ func (s *StateImpl) chiCandidates() ([]Furo, error) {
 	return furos, nil
 }
 
-func (s *StateImpl) ponCandidates() ([]Furo, error) {
+func (s *StateImpl) ponCandidates() ([]base.Furo, error) {
 	taken := s.prevDahaiPai
 	if taken == nil {
 		return nil, nil
 	}
 
-	consumedPais := make([]Pai, 0, 3)
+	consumedPais := make([]base.Pai, 0, 3)
 	player := &s.players[s.playerID]
-	for _, p := range player.tehais {
+	for _, p := range player.Tehais() {
 		if p.HasSameSymbol(taken) {
 			consumedPais = append(consumedPais, p)
 		}
@@ -276,7 +277,7 @@ func (s *StateImpl) ponCandidates() ([]Furo, error) {
 		return nil, nil
 	}
 
-	furos := make([]Furo, 0, 2)
+	furos := make([]base.Furo, 0, 2)
 	used := make(map[[2]uint8]struct{})
 	for i := range numConsumedPais {
 		for j := i + 1; j < numConsumedPais; j++ {
@@ -293,8 +294,8 @@ func (s *StateImpl) ponCandidates() ([]Furo, error) {
 			}
 			used[key] = struct{}{}
 
-			consumed := [2]Pai{consumedPais[i], consumedPais[j]}
-			furo, err := NewPon(*taken, consumed, s.prevDahaiActor)
+			consumed := [2]base.Pai{consumedPais[i], consumedPais[j]}
+			furo, err := base.NewPon(*taken, consumed, s.prevDahaiActor)
 			if err != nil {
 				return nil, err
 			}
@@ -304,15 +305,15 @@ func (s *StateImpl) ponCandidates() ([]Furo, error) {
 	return furos, nil
 }
 
-func (s *StateImpl) daiminkanCandidates() ([]Furo, error) {
+func (s *StateImpl) daiminkanCandidates() ([]base.Furo, error) {
 	taken := s.prevDahaiPai
 	if taken == nil {
 		return nil, nil
 	}
 
-	consumedPais := make([]Pai, 0, 3)
+	consumedPais := make([]base.Pai, 0, 3)
 	player := &s.players[s.playerID]
-	for _, p := range player.tehais {
+	for _, p := range player.Tehais() {
 		if p.HasSameSymbol(taken) {
 			consumedPais = append(consumedPais, p)
 		}
@@ -322,16 +323,16 @@ func (s *StateImpl) daiminkanCandidates() ([]Furo, error) {
 		return nil, nil
 	}
 
-	consumed := [3]Pai(consumedPais)
-	furo, err := NewDaiminkan(*taken, consumed, s.prevDahaiActor)
+	consumed := [3]base.Pai(consumedPais)
+	furo, err := base.NewDaiminkan(*taken, consumed, s.prevDahaiActor)
 	if err != nil {
 		return nil, err
 	}
-	furos := []Furo{furo}
+	furos := []base.Furo{furo}
 	return furos, nil
 }
 
-func (s *StateImpl) HoraCandidate() (*Hora, error) {
+func (s *StateImpl) HoraCandidate() (*base.Hora, error) {
 	if s.lastActor == noActor {
 		return nil, nil
 	}
@@ -348,9 +349,9 @@ func (s *StateImpl) HoraCandidate() (*Hora, error) {
 	}
 
 	player := &s.players[s.playerID]
-	tehais := player.tehais
+	tehais := player.Tehais()
 
-	tehaiCounts, err := NewPaiSet(tehais)
+	tehaiCounts, err := base.NewPaiSet(tehais)
 	if err != nil {
 		return nil, err
 	}
@@ -372,7 +373,7 @@ func (s *StateImpl) HoraCandidate() (*Hora, error) {
 	}
 
 	has1Fan := (isTsumoSituation && player.IsMenzen()) || // menzenchin tsumoho
-		(player.ReachState() == ReachAccepted) || // reach
+		(player.ReachState() == base.ReachAccepted) || // reach
 		(s.lastActionType == message.TypeKakan) || // chankan
 		s.isRinshanTsumo || // rinshankaiho
 		(s.NumPipais() == 0) // haiteimoyue or hoteiraoyui
@@ -384,7 +385,7 @@ func (s *StateImpl) HoraCandidate() (*Hora, error) {
 	}
 
 	if has1Fan {
-		hora, err := NewHora(*s.prevDahaiPai, s.lastActor)
+		hora, err := base.NewHora(*s.prevDahaiPai, s.lastActor)
 		if err != nil {
 			return nil, fmt.Errorf("failed to create hora: %w", err)
 		}

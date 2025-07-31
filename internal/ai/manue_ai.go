@@ -8,6 +8,7 @@ import (
 
 	"github.com/Apricot-S/mjai-manue-go/configs"
 	"github.com/Apricot-S/mjai-manue-go/internal/ai/estimator"
+	"github.com/Apricot-S/mjai-manue-go/internal/base"
 	"github.com/Apricot-S/mjai-manue-go/internal/game"
 	"github.com/Apricot-S/mjai-manue-go/internal/message"
 	"github.com/go-json-experiment/json"
@@ -119,7 +120,7 @@ func (a *ManueAI) decideDahai(state game.StateAnalyzer, playerID int) (jsontext.
 
 	// my turn
 
-	if state.Players()[playerID].ReachState() == game.ReachAccepted {
+	if state.Players()[playerID].ReachState() == base.ReachAccepted {
 		// in reach
 		dahai, err := message.NewDahai(playerID, dc[0].ToString(), true, a.logStr)
 		if err != nil {
@@ -159,7 +160,7 @@ func (a *ManueAI) decideDahai(state game.StateAnalyzer, playerID int) (jsontext.
 	}
 
 	// dahai
-	pai, err := game.NewPaiWithName(paiStr)
+	pai, err := base.NewPaiWithName(paiStr)
 	if err != nil {
 		return nil, err
 	}
@@ -221,7 +222,7 @@ func (a *ManueAI) decideFuro(state game.StateAnalyzer, playerID int) (jsontext.V
 	target := *decision.Target()
 	taken := decision.Taken().ToString()
 	switch decision.(type) {
-	case *game.Chi:
+	case *base.Chi:
 		var consumed [2]string
 		for i, pai := range decision.Consumed() {
 			consumed[i] = pai.ToString()
@@ -236,7 +237,7 @@ func (a *ManueAI) decideFuro(state game.StateAnalyzer, playerID int) (jsontext.V
 		}
 		a.logStr = ""
 		return res, nil
-	case *game.Pon:
+	case *base.Pon:
 		var consumed [2]string
 		for i, pai := range decision.Consumed() {
 			consumed[i] = pai.ToString()
@@ -251,7 +252,7 @@ func (a *ManueAI) decideFuro(state game.StateAnalyzer, playerID int) (jsontext.V
 		}
 		a.logStr = ""
 		return res, nil
-	case *game.Daiminkan:
+	case *base.Daiminkan:
 		var consumed [3]string
 		for i, pai := range decision.Consumed() {
 			consumed[i] = pai.ToString()

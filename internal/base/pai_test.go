@@ -1,4 +1,4 @@
-package game
+package base
 
 import (
 	"fmt"
@@ -499,7 +499,7 @@ func TestPai_AddRed(t *testing.T) {
 
 	for _, n := range allNames {
 		p, _ := NewPaiWithName(n)
-		if p.Type() != tsupaiType && p.Number() == 5 && !p.IsRed() {
+		if p.Type() != TsupaiType && p.Number() == 5 && !p.IsRed() {
 			red, _ := NewPaiWithName(n + "r")
 			tests = append(tests, testCase{n, red})
 		} else {

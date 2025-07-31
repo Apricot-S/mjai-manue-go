@@ -5,12 +5,12 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/Apricot-S/mjai-manue-go/internal/game"
+	"github.com/Apricot-S/mjai-manue-go/internal/base"
 )
 
 func TestNewBitVector(t *testing.T) {
 	type args struct {
-		countVector *game.PaiSet
+		countVector *base.PaiSet
 		threshold   int
 	}
 	type testCase struct {
@@ -21,7 +21,7 @@ func TestNewBitVector(t *testing.T) {
 	tests := []testCase{}
 
 	{
-		ps := game.PaiSet{}
+		ps := base.PaiSet{}
 		tests = append(tests, testCase{
 			name: "empty",
 			args: args{countVector: &ps, threshold: 0},
@@ -37,7 +37,7 @@ func TestNewBitVector(t *testing.T) {
 	}
 
 	{
-		ps := game.PaiSet{0, 1, 2, 3, 4}
+		ps := base.PaiSet{0, 1, 2, 3, 4}
 		tests = append(tests, testCase{
 			name: "threshold 0",
 			args: args{countVector: &ps, threshold: 0},
@@ -66,7 +66,7 @@ func TestNewBitVector(t *testing.T) {
 	}
 
 	{
-		ps := game.PaiSet{33: 4}
+		ps := base.PaiSet{33: 4}
 		tests = append(tests, testCase{
 			name: "threshold 0",
 			args: args{countVector: &ps, threshold: 0},
@@ -233,7 +233,7 @@ func TestBitVector_HasIntersectionWith(t *testing.T) {
 
 func TestCountVectorToBitVectors(t *testing.T) {
 	type args struct {
-		countVector *game.PaiSet
+		countVector *base.PaiSet
 	}
 	type testCase struct {
 		name string
@@ -243,7 +243,7 @@ func TestCountVectorToBitVectors(t *testing.T) {
 	tests := []testCase{}
 
 	{
-		ps := game.PaiSet{0, 1, 2, 3, 4}
+		ps := base.PaiSet{0, 1, 2, 3, 4}
 		want := [4]BitVector{
 			BitVector(0x1E), // 11110 in binary
 			BitVector(0x1C), // 11100 in binary
@@ -258,7 +258,7 @@ func TestCountVectorToBitVectors(t *testing.T) {
 	}
 
 	{
-		ps := game.PaiSet{33: 4}
+		ps := base.PaiSet{33: 4}
 		want := [4]BitVector{
 			BitVector(0x2_0000_0000),
 			BitVector(0x2_0000_0000),
