@@ -871,10 +871,10 @@ func TestPlayer_onKakan(t *testing.T) {
 
 		taken2, _ := NewPaiWithName("N")
 		consumed2, _ := StrToPais("N N N")
-		furo2, _ := NewKakan(*taken2, [3]Pai(consumed2), nil)
+		furo2, _ := NewKakanFromEvent(*taken2, [3]Pai(consumed2))
 		tehaisAfterFuro, _ := StrToPais("1m 2m 3m 6m 7m 8m 1p 2p 3p 6p")
 
-		kantsu, _ := NewKakan(*taken2, [3]Pai(consumed2), &target)
+		kantsu, _ := NewKakan(*taken2, [2]Pai(consumed1), consumed2[2], target)
 
 		p, _ := NewPlayer(0, "", 25_000)
 		p.OnStartKyoku(tehais, nil)
@@ -937,10 +937,10 @@ func TestPlayer_onKakan(t *testing.T) {
 		tsumoPai, _ := NewPaiWithName("1p")
 		taken5, _ := NewPaiWithName("1p")
 		consumed5, _ := StrToPais("1p 1p 1p")
-		furo5, _ := NewKakan(*taken5, [3]Pai(consumed5), nil)
+		furo5, _ := NewKakanFromEvent(*taken5, [3]Pai(consumed5))
 		tehaisAfterFuro, _ := StrToPais("2p")
 
-		kantsu, _ := NewKakan(*taken5, [3]Pai(consumed5), &target)
+		kantsu, _ := NewKakan(*taken5, [2]Pai(consumed3), consumed5[2], target)
 
 		p, _ := NewPlayer(0, "", 25_000)
 		p.OnStartKyoku(tehais, nil)
@@ -994,7 +994,7 @@ func TestPlayer_onKakan(t *testing.T) {
 
 		taken2, _ := NewPaiWithName("N")
 		consumed2, _ := StrToPais("N N N")
-		furo2, _ := NewKakan(*taken2, [3]Pai(consumed2), nil)
+		furo2, _ := NewKakanFromEvent(*taken2, [3]Pai(consumed2))
 
 		p, _ := NewPlayer(0, "", 25_000)
 		p.OnStartKyoku(tehais, nil)
@@ -1013,7 +1013,7 @@ func TestPlayer_onKakan(t *testing.T) {
 		tsumoPai, _ := NewPaiWithName("7p")
 		taken, _ := NewPaiWithName("N")
 		consumed, _ := StrToPais("N N N")
-		furo, _ := NewKakan(*taken, [3]Pai(consumed), nil)
+		furo, _ := NewKakanFromEvent(*taken, [3]Pai(consumed))
 
 		p, _ := NewPlayer(0, "", 25_000)
 		p.OnStartKyoku(tehais, nil)
@@ -1391,7 +1391,7 @@ func TestPlayer_onTargeted(t *testing.T) {
 
 		taken, _ := NewPaiWithName("E")
 		consumed, _ := StrToPais("E E E")
-		furo, _ := NewKakan(*taken, [3]Pai(consumed), nil)
+		furo, _ := NewKakanFromEvent(*taken, [3]Pai(consumed))
 
 		p, _ := NewPlayer(0, "", 25_000)
 		p.OnStartKyoku(tehais, nil)

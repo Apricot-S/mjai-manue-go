@@ -262,7 +262,7 @@ func TestNewAnkan(t *testing.T) {
 	}
 }
 
-func TestNewKakan(t *testing.T) {
+func TestNewKakanFromEvent(t *testing.T) {
 	type args struct {
 		taken    Pai
 		consumed [3]Pai
@@ -276,79 +276,38 @@ func TestNewKakan(t *testing.T) {
 	}
 	tests := []testCase{}
 
-	// valid cases target: present
+	// valid cases target
 	for _, strs := range [][2]string{{"E", "E E E"}, {"5mr", "5m 5m 5m"}, {"5p", "5pr 5p 5p"}, {"5s", "5s 5sr 5s"}, {"5s", "5s 5s 5sr"}} {
-		for i := range 4 {
-			taken, _ := NewPaiWithName(strs[0])
-			consumed, _ := StrToPais(strs[1])
-			target := i
-			pais := Pais{*taken, consumed[0], consumed[1], consumed[2]}
-			sort.Sort(pais)
-			want := &Kakan{
-				taken:    *taken,
-				consumed: [3]Pai(consumed),
-				target:   &target,
-				pais:     pais,
-			}
-
-			testCase := testCase{
-				fmt.Sprintf("kakan valid: target %d", target),
-				args{*taken, [3]Pai(consumed), &target},
-				want,
-				false,
-			}
-			tests = append(tests, testCase)
-		}
-	}
-
-	// valid cases target: nil
-	for _, strs := range [][2]string{{"E", "E E E"}, {"5mr", "5m 5m 5m"}, {"5p", "5pr 5p 5p"}, {"5s", "5s 5sr 5s"}, {"5s", "5s 5s 5sr"}} {
-		taken, _ := NewPaiWithName(strs[0])
+		added, _ := NewPaiWithName(strs[0])
 		consumed, _ := StrToPais(strs[1])
-		pais := Pais{*taken, consumed[0], consumed[1], consumed[2]}
+		pais := Pais{*added, consumed[0], consumed[1], consumed[2]}
 		sort.Sort(pais)
 		want := &Kakan{
-			taken:    *taken,
-			consumed: [3]Pai(consumed),
+			taken:    &consumed[2],
+			consumed: [2]Pai(consumed[0:2]),
+			added:    *added,
 			target:   nil,
 			pais:     pais,
 		}
 
 		testCase := testCase{
 			"kakan valid: target nil",
-			args{*taken, [3]Pai(consumed), nil},
+			args{*added, [3]Pai(consumed), nil},
 			want,
 			false,
 		}
 		tests = append(tests, testCase)
 	}
 
-	// invalid cases
-	for _, strs := range [][2]string{{"E", "E E E"}, {"5mr", "5m 5m 5m"}, {"5p", "5pr 5p 5p"}, {"5s", "5s 5sr 5s"}, {"5s", "5s 5s 5sr"}} {
-		for _, i := range [2]int{-1, 4} {
-			taken, _ := NewPaiWithName(strs[0])
-			consumed, _ := StrToPais(strs[1])
-			target := i
-
-			testCase := testCase{
-				fmt.Sprintf("kakan invalid: target %d", target),
-				args{*taken, [3]Pai(consumed), &target},
-				nil,
-				true,
-			}
-			tests = append(tests, testCase)
-		}
-	}
-
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := NewKakan(tt.args.taken, tt.args.consumed, tt.args.target)
+			got, err := NewKakanFromEvent(tt.args.taken, tt.args.consumed)
 			if (err != nil) != tt.wantErr {
-				t.Errorf("NewKakan() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("NewKakanFromEvent() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
 			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("NewKakan() = %v, want %v", got, tt.want)
+				t.Errorf("NewKakanFromEvent() = %v, want %v", got, tt.want)
 			}
 		})
 	}
@@ -507,8 +466,7 @@ func TestKakan_ToMentsu(t *testing.T) {
 	for _, strs := range [][2]string{{"E", "E E E"}, {"5mr", "5m 5m 5m"}, {"5p", "5pr 5p 5p"}, {"5s", "5s 5sr 5s"}, {"5s", "5s 5s 5sr"}} {
 		taken, _ := NewPaiWithName(strs[0])
 		consumed, _ := StrToPais(strs[1])
-		target := 0
-		kakan, _ := NewKakan(*taken, [3]Pai(consumed), &target)
+		kakan, _ := NewKakanFromEvent(*taken, [3]Pai(consumed))
 
 		pais := Pais{*taken, consumed[0], consumed[1], consumed[2]}
 		sort.Sort(pais)

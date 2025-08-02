@@ -598,7 +598,7 @@ func (s *StateImpl) onKakan(event *message.Kakan) error {
 		}
 		consumed[i] = *p
 	}
-	furo, err := base.NewKakan(*pai, consumed, nil)
+	furo, err := base.NewKakanFromEvent(*pai, consumed)
 	if err != nil {
 		return err
 	}

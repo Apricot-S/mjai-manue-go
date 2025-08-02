@@ -178,44 +178,65 @@ func (a *Ankan) ToMentsu() Mentsu {
 }
 
 type Kakan struct {
-	taken    Pai
-	consumed [3]Pai
-	target   *int
-	pais     []Pai
+	// Taken tile for the original Pon (nil in event data)
+	taken *Pai
+	// 2 tiles from the player's hand used for the original Pon
+	consumed [2]Pai
+	// Tile added from hand to form Kakan
+	added Pai
+	// Source player index for original Pon (nil in event data)
+	target *int
+	pais   []Pai
 }
 
-// NewKakan creates a new Kakan instance.
-// The target parameter is optional (can be nil).
-// If target is provided, it must be between 0 and 3.
-// The target value is deep copied to prevent modifications from the caller.
-func NewKakan(taken Pai, consumed [3]Pai, target *int) (*Kakan, error) {
-	if (target != nil) && (*target < 0 || *target > 3) {
+func NewKakan(taken Pai, consumed [2]Pai, added Pai, target int) (*Kakan, error) {
+	if target < 0 || target > 3 {
 		return nil, fmt.Errorf("kakan: invalid target player index (must be 0-3, got: %d)", target)
 	}
 
-	var pais Pais = []Pai{taken, consumed[0], consumed[1], consumed[2]}
+	var pais Pais = []Pai{taken, consumed[0], consumed[1], added}
 	sort.Sort(pais)
 
-	var tg *int = nil
-	if target != nil {
-		tg = new(int)
-		*tg = *target
-	}
+	return &Kakan{
+		taken:    &taken,
+		consumed: consumed,
+		added:    added,
+		target:   &target,
+		pais:     pais,
+	}, nil
+}
+
+// NewKakanFromEvent constructs a Kakan from event data.
+// The event provides `added` and `consumed` (3 tiles from the Pon meld, including `taken`).
+// Internally, one tile from consumed is heuristically assigned as `taken`.
+// Note: The exact identity of `taken` is not guaranteed.
+func NewKakanFromEvent(added Pai, consumed [3]Pai) (*Kakan, error) {
+	var pais Pais = []Pai{added, consumed[0], consumed[1], consumed[2]}
+	sort.Sort(pais)
+
+	// Heuristic: The last tile in the consumed is considered `taken`.
+	// This is a simplification and may not reflect the actual game state.
+	taken := &consumed[2]
 
 	return &Kakan{
 		taken:    taken,
-		consumed: consumed,
-		target:   tg,
+		consumed: [2]Pai{consumed[0], consumed[1]},
+		added:    added,
+		target:   nil, // Target is not provided in event data
 		pais:     pais,
 	}, nil
 }
 
 func (k *Kakan) Taken() *Pai {
-	return &k.taken
+	return k.taken
 }
 
 func (k *Kakan) Consumed() []Pai {
 	return k.consumed[:]
+}
+
+func (k *Kakan) Added() *Pai {
+	return &k.added
 }
 
 func (k *Kakan) Target() *int {

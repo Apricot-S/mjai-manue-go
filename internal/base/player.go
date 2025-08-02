@@ -373,8 +373,12 @@ func (p *Player) OnKakan(furo *Kakan) error {
 	}
 
 	ponMentsu := p.furos[ponIndex]
-	consumed := append(ponMentsu.Consumed(), *furo.Taken())
-	kanMentsu, err := NewKakan(*ponMentsu.Taken(), [3]Pai(consumed), ponMentsu.Target())
+	kanMentsu, err := NewKakan(
+		*ponMentsu.Taken(),
+		[2]Pai(ponMentsu.Consumed()),
+		*furo.Added(),
+		*ponMentsu.Target(),
+	)
 	if err != nil {
 		return fmt.Errorf("failed to create kakan mentsu: %w", err)
 	}
