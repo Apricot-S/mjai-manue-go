@@ -1,4 +1,4 @@
-package event
+package outbound
 
 type None struct{}
 
