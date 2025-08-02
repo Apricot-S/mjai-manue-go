@@ -470,7 +470,7 @@ func (a *ManueAI) getAverageRank(
 		}
 		winProb := a.getWinProb(state, playerID, scoreChangesDist, &other)
 		hm2 := core.NewHashMap[[]float64]()
-		hm2.Set([]float64{0.0, 0.0, 0.0, 0.0}, 1-winProb)
+		hm2.Set([]float64{0.0, 0.0, 0.0, 0.0}, 1.0-winProb)
 		w := []float64{0.0, 0.0, 0.0, 0.0}
 		w[other.ID()] = 1.0
 		hm2.Set(w, winProb)
