@@ -1,5 +1,6 @@
 package event
 
 type OutboundEvent interface {
-	Type() OutboundEventType
+	// isOutboundEvent is a marker method to distinguish outbound events.
+	isOutboundEvent()
 }
