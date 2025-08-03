@@ -36,6 +36,10 @@ func NewPon(actor int, target int, taken base.Pai, consumed [2]base.Pai, log str
 		return nil, fmt.Errorf("taken tile must be the same as the consumed tile: %v", event)
 	}
 
+	if event.Taken.IsUnknown() {
+		return nil, fmt.Errorf("pon tiles must not be unknown: %v", event)
+	}
+
 	if err := eventValidator.Struct(event); err != nil {
 		return nil, err
 	}
