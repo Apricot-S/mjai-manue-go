@@ -1,6 +1,10 @@
 package outbound
 
-import "github.com/Apricot-S/mjai-manue-go/internal/base"
+import (
+	"fmt"
+
+	"github.com/Apricot-S/mjai-manue-go/internal/base"
+)
 
 type Hora struct {
 	action
@@ -16,6 +20,10 @@ func NewHora(actor int, target int, pai base.Pai, log string) (*Hora, error) {
 		},
 		Target: target,
 		Pai:    pai,
+	}
+
+	if event.Pai.IsUnknown() {
+		return nil, fmt.Errorf("hora tile must not be unknown: %v", event)
 	}
 
 	if err := eventValidator.Struct(event); err != nil {

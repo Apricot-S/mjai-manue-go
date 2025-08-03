@@ -100,6 +100,17 @@ func TestNewHora(t *testing.T) {
 			want:    nil,
 			wantErr: true,
 		},
+		{
+			name: "unknown pai",
+			args: args{
+				actor:  0,
+				target: 3,
+				pai:    *mustPai("?"),
+				log:    "",
+			},
+			want:    nil,
+			wantErr: true,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
