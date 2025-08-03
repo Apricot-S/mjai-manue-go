@@ -1,6 +1,10 @@
 package inbound
 
-import "github.com/Apricot-S/mjai-manue-go/internal/base"
+import (
+	"fmt"
+
+	"github.com/Apricot-S/mjai-manue-go/internal/base"
+)
 
 type Dahai struct {
 	Actor     int `validate:"min=0,max=3"`
@@ -13,6 +17,10 @@ func NewDahai(actor int, pai base.Pai, tsumogiri bool) (*Dahai, error) {
 		Actor:     actor,
 		Pai:       pai,
 		Tsumogiri: tsumogiri,
+	}
+
+	if event.Pai.IsUnknown() {
+		return nil, fmt.Errorf("dahai must not be unknown: %v", event)
 	}
 
 	if err := eventValidator.Struct(event); err != nil {
