@@ -24,7 +24,7 @@ func TestNewDahai(t *testing.T) {
 			name: "without log",
 			args: args{
 				actor:     0,
-				pai:       *mustPai("?"),
+				pai:       *mustPai("1m"),
 				tsumogiri: false,
 				log:       "",
 			},
@@ -33,7 +33,7 @@ func TestNewDahai(t *testing.T) {
 					Actor: 0,
 					Log:   "",
 				},
-				Pai:       *mustPai("?"),
+				Pai:       *mustPai("1m"),
 				Tsumogiri: false,
 			},
 			wantErr: false,
@@ -57,7 +57,7 @@ func TestNewDahai(t *testing.T) {
 			wantErr: false,
 		},
 		{
-			name: "invalid actor min",
+			name: "invalid pai unknown",
 			args: args{
 				actor:     -1,
 				pai:       *mustPai("?"),
@@ -67,10 +67,20 @@ func TestNewDahai(t *testing.T) {
 			wantErr: true,
 		},
 		{
+			name: "invalid actor min",
+			args: args{
+				actor:     -1,
+				pai:       *mustPai("1m"),
+				tsumogiri: false,
+			},
+			want:    nil,
+			wantErr: true,
+		},
+		{
 			name: "invalid actor max",
 			args: args{
 				actor:     4,
-				pai:       *mustPai("?"),
+				pai:       *mustPai("1m"),
 				tsumogiri: true,
 			},
 			want:    nil,
