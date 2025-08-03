@@ -21,7 +21,7 @@ func NewAnkan(actor int, consumed [4]base.Pai, log string) (*Ankan, error) {
 		Consumed: consumed,
 	}
 
-	isValidPais := !slices.ContainsFunc(event.Consumed[:], func(p base.Pai) bool {
+	isValidPais := !slices.ContainsFunc(event.Consumed[1:], func(p base.Pai) bool {
 		return !event.Consumed[0].HasSameSymbol(&p)
 	})
 	if !isValidPais {
