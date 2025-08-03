@@ -12,23 +12,36 @@ func TestNewDora(t *testing.T) {
 		doraMarker base.Pai
 	}
 	tests := []struct {
-		name string
-		args args
-		want *Dora
+		name    string
+		args    args
+		want    *Dora
+		wantErr bool
 	}{
 		{
-			name: "dora",
+			name: "valid dora marker",
 			args: args{
 				doraMarker: *mustPai("6s"),
 			},
 			want: &Dora{
 				DoraMarker: *mustPai("6s"),
 			},
+			wantErr: false,
+		},
+		{
+			name: "unknown dora marker",
+			args: args{
+				doraMarker: *mustPai("?"),
+			},
+			want:    nil,
+			wantErr: true,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got := NewDora(tt.args.doraMarker)
+			got, err := NewDora(tt.args.doraMarker)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("NewDora() error = %v, want %v", err, tt.wantErr)
+			}
 
 			if !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("NewDora() = %v, want %v", got, tt.want)
