@@ -145,6 +145,26 @@ func TestNewPon(t *testing.T) {
 			wantErr: true,
 		},
 		{
+			name: "red tile in taken",
+			args: args{
+				actor:    2,
+				target:   3,
+				taken:    *mustPai("5sr"),
+				consumed: [2]base.Pai{*mustPai("5s"), *mustPai("5s")},
+				log:      "",
+			},
+			want: &Pon{
+				action: action{
+					Actor: 2,
+					Log:   "",
+				},
+				Target:   3,
+				Taken:    *mustPai("5sr"),
+				Consumed: [2]base.Pai{*mustPai("5s"), *mustPai("5s")},
+			},
+			wantErr: false,
+		},
+		{
 			name: "red tile in consumed",
 			args: args{
 				actor:    2,
