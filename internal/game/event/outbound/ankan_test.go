@@ -65,6 +65,17 @@ func TestNewAnkan(t *testing.T) {
 			wantErr: true,
 		},
 		{
+			name: "unknown consumed tiles",
+			args: args{
+				actor:    2,
+				target:   3,
+				consumed: [4]base.Pai{*mustPai("?"), *mustPai("?"), *mustPai("?"), *mustPai("?")},
+				log:      "",
+			},
+			want:    nil,
+			wantErr: true,
+		},
+		{
 			name: "red tile in consumed",
 			args: args{
 				actor:    2,
