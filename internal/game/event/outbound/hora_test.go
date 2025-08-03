@@ -75,6 +75,7 @@ func TestNewHora(t *testing.T) {
 				pai:    *mustPai("6s"),
 				log:    "",
 			},
+			want:    nil,
 			wantErr: true,
 		},
 		{
@@ -96,6 +97,7 @@ func TestNewHora(t *testing.T) {
 				pai:    *mustPai("6s"),
 				log:    "",
 			},
+			want:    nil,
 			wantErr: true,
 		},
 	}
