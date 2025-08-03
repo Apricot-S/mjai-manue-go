@@ -122,6 +122,18 @@ func TestNewDaiminkan(t *testing.T) {
 			wantErr: true,
 		},
 		{
+			name: "unknown tile",
+			args: args{
+				actor:    0,
+				target:   1,
+				taken:    *mustPai("?"),
+				consumed: [3]base.Pai{*mustPai("?"), *mustPai("?"), *mustPai("?")},
+				log:      "",
+			},
+			want:    nil,
+			wantErr: true,
+		},
+		{
 			name: "invalid taken tile",
 			args: args{
 				actor:    0,
