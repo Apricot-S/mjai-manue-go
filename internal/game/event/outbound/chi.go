@@ -30,13 +30,6 @@ func NewChi(actor int, target int, taken base.Pai, consumed [2]base.Pai, log str
 		return nil, fmt.Errorf("target must be the kamicha of actor: actor=%d, target=%d", actor, target)
 	}
 
-	isSuhai := !slices.ContainsFunc(event.Consumed[:], func(p base.Pai) bool {
-		return p.IsTsupai()
-	})
-	if !isSuhai {
-		return nil, fmt.Errorf("consumed tiles must not be tsupai: %v", event)
-	}
-
 	isSameColor := !slices.ContainsFunc(event.Consumed[:], func(p base.Pai) bool {
 		return event.Taken.Type() != p.Type()
 	})
@@ -46,6 +39,14 @@ func NewChi(actor int, target int, taken base.Pai, consumed [2]base.Pai, log str
 
 	pais := slices.Concat(base.Pais{event.Taken}, event.Consumed[:])
 	sort.Sort(pais)
+
+	isSuhai := !slices.ContainsFunc(pais, func(p base.Pai) bool {
+		return p.IsTsupai() || p.IsUnknown()
+	})
+	if !isSuhai {
+		return nil, fmt.Errorf("chi tiles must be suhai: %v", event)
+	}
+
 	isSequence := pais[0].Number()+1 == pais[1].Number() && pais[1].Number()+1 == pais[2].Number()
 	if !isSequence {
 		return nil, fmt.Errorf("consumed tiles must be a sequence with the taken tile: %v", event)

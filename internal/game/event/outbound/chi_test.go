@@ -122,6 +122,18 @@ func TestNewChi(t *testing.T) {
 			wantErr: true,
 		},
 		{
+			name: "unknown is not allowed",
+			args: args{
+				actor:    0,
+				target:   3,
+				taken:    *mustPai("?"),
+				consumed: [2]base.Pai{*mustPai("?"), *mustPai("?")},
+				log:      "",
+			},
+			want:    nil,
+			wantErr: true,
+		},
+		{
 			name: "tsupai is not allowed",
 			args: args{
 				actor:    0,
