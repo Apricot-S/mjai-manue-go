@@ -82,6 +82,7 @@ func TestNewChi(t *testing.T) {
 				consumed: [2]base.Pai{*mustPai("5sr"), *mustPai("7s")},
 				log:      "",
 			},
+			want:    nil,
 			wantErr: true,
 		},
 		{
@@ -105,6 +106,7 @@ func TestNewChi(t *testing.T) {
 				consumed: [2]base.Pai{*mustPai("5sr"), *mustPai("7s")},
 				log:      "",
 			},
+			want:    nil,
 			wantErr: true,
 		},
 		{
@@ -116,6 +118,7 @@ func TestNewChi(t *testing.T) {
 				consumed: [2]base.Pai{*mustPai("5sr"), *mustPai("7s")},
 				log:      "",
 			},
+			want:    nil,
 			wantErr: true,
 		},
 		{

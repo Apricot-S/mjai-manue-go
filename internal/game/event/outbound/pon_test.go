@@ -82,6 +82,7 @@ func TestNewPon(t *testing.T) {
 				consumed: [2]base.Pai{*mustPai("6s"), *mustPai("6s")},
 				log:      "",
 			},
+			want:    nil,
 			wantErr: true,
 		},
 		{

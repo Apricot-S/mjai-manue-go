@@ -89,6 +89,7 @@ func TestNewKakan(t *testing.T) {
 				added:    *mustPai("6s"),
 				log:      "",
 			},
+			want:    nil,
 			wantErr: true,
 		},
 		{

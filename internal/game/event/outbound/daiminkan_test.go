@@ -82,6 +82,7 @@ func TestNewDaiminkan(t *testing.T) {
 				consumed: [3]base.Pai{*mustPai("6s"), *mustPai("6s"), *mustPai("6s")},
 				log:      "",
 			},
+			want:    nil,
 			wantErr: true,
 		},
 		{
