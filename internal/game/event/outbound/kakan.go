@@ -42,6 +42,10 @@ func NewKakan(actor int, target int, taken base.Pai, consumed [2]base.Pai, added
 		return nil, fmt.Errorf("all tiles must be the same tile: %v", event)
 	}
 
+	if event.Added.IsUnknown() {
+		return nil, fmt.Errorf("kakan tiles must not be unknown: %v", event)
+	}
+
 	if err := eventValidator.Struct(event); err != nil {
 		return nil, err
 	}

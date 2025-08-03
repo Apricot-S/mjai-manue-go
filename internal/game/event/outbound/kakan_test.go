@@ -132,6 +132,19 @@ func TestNewKakan(t *testing.T) {
 			wantErr: true,
 		},
 		{
+			name: "unknown tile",
+			args: args{
+				actor:    0,
+				target:   1,
+				taken:    *mustPai("?"),
+				consumed: [2]base.Pai{*mustPai("?"), *mustPai("?")},
+				added:    *mustPai("?"),
+				log:      "",
+			},
+			want:    nil,
+			wantErr: true,
+		},
+		{
 			name: "invalid taken tile",
 			args: args{
 				actor:    0,
