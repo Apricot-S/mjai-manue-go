@@ -116,6 +116,12 @@ func (s *StateImpl) FuroCandidates() ([]base.Furo, error) {
 		// Furo is only possible after dahai.
 		return nil, nil
 	}
+	if s.currentEventType == message.TypeReachAccepted {
+		// If a call is accepted to the riichi declaration tile,
+		// the client sends a call message ("chi", "pon" or "kan") for the "dahai" first.
+		// Afterwards, the server responds with "reach_accepted".
+		return nil, nil
+	}
 	if s.NumPipais() == 0 {
 		// Furo is not possible if discarded tile is a last tile.
 		return nil, nil
