@@ -137,6 +137,7 @@ func TestNewHora(t *testing.T) {
 				scores:     []int{27500, 22300, 24300, 25900},
 				log:        "",
 			},
+			want:    nil,
 			wantErr: true,
 		},
 		{
@@ -162,6 +163,7 @@ func TestNewHora(t *testing.T) {
 				scores:     []int{27500, 22300, 24300, 25900},
 				log:        "",
 			},
+			want:    nil,
 			wantErr: true,
 		},
 		{
