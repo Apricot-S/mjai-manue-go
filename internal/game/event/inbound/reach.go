@@ -15,4 +15,4 @@ func NewReach(actor int) (*Reach, error) {
 	return event, nil
 }
 
-func (s *Reach) isInboundEvent() {}
+func (r *Reach) isInboundEvent() {}

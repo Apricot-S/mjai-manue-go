@@ -6,4 +6,4 @@ func NewEndGame() *EndGame {
 	return &EndGame{}
 }
 
-func (n *EndGame) isInboundEvent() {}
+func (e *EndGame) isInboundEvent() {}

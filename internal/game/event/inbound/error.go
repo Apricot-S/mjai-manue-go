@@ -6,4 +6,4 @@ func NewError() *Error {
 	return &Error{}
 }
 
-func (n *Error) isInboundEvent() {}
+func (e *Error) isInboundEvent() {}

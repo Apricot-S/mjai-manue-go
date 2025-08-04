@@ -42,3 +42,5 @@ func NewPon(actor int, target int, taken base.Pai, consumed [2]base.Pai) (*Pon, 
 	}
 	return event, nil
 }
+
+func (p *Pon) isInboundEvent() {}

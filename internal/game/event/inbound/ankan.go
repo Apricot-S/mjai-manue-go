@@ -34,3 +34,5 @@ func NewAnkan(actor int, consumed [4]base.Pai) (*Ankan, error) {
 	}
 	return event, nil
 }
+
+func (a *Ankan) isInboundEvent() {}

@@ -42,3 +42,5 @@ func NewDaiminkan(actor int, target int, taken base.Pai, consumed [3]base.Pai) (
 	}
 	return event, nil
 }
+
+func (d *Daiminkan) isInboundEvent() {}

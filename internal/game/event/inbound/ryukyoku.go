@@ -12,4 +12,4 @@ func NewRyukyoku(scores *[4]int) *Ryukyoku {
 	return event
 }
 
-func (s *Ryukyoku) isInboundEvent() {}
+func (r *Ryukyoku) isInboundEvent() {}

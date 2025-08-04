@@ -19,4 +19,4 @@ func NewTsumo(actor int, pai base.Pai) (*Tsumo, error) {
 	return event, nil
 }
 
-func (s *Tsumo) isInboundEvent() {}
+func (t *Tsumo) isInboundEvent() {}

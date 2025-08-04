@@ -6,4 +6,4 @@ func NewHello() *Hello {
 	return &Hello{}
 }
 
-func (n *Hello) isInboundEvent() {}
+func (h *Hello) isInboundEvent() {}

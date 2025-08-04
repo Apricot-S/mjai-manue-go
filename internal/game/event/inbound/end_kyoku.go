@@ -6,4 +6,4 @@ func NewEndKyoku() *EndKyoku {
 	return &EndKyoku{}
 }
 
-func (n *EndKyoku) isInboundEvent() {}
+func (e *EndKyoku) isInboundEvent() {}

@@ -22,4 +22,4 @@ func NewDora(doraMarker base.Pai) (*Dora, error) {
 	return event, nil
 }
 
-func (n *Dora) isInboundEvent() {}
+func (d *Dora) isInboundEvent() {}

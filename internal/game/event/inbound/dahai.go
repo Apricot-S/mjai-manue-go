@@ -29,4 +29,4 @@ func NewDahai(actor int, pai base.Pai, tsumogiri bool) (*Dahai, error) {
 	return event, nil
 }
 
-func (s *Dahai) isInboundEvent() {}
+func (d *Dahai) isInboundEvent() {}

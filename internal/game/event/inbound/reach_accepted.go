@@ -17,4 +17,4 @@ func NewReachAccepted(actor int, scores *[4]int) (*ReachAccepted, error) {
 	return event, nil
 }
 
-func (s *ReachAccepted) isInboundEvent() {}
+func (r *ReachAccepted) isInboundEvent() {}

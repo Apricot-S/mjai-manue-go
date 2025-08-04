@@ -60,4 +60,4 @@ func getPlayerDistance(p1 int, p2 int) int {
 	return (NumPlayers + p1 - p2) % NumPlayers
 }
 
-func (s *Chi) isInboundEvent() {}
+func (c *Chi) isInboundEvent() {}
