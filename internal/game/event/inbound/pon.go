@@ -14,7 +14,7 @@ type Pon struct {
 	Consumed [2]base.Pai
 }
 
-func NewPon(actor int, target int, taken base.Pai, consumed [2]base.Pai, log string) (*Pon, error) {
+func NewPon(actor int, target int, taken base.Pai, consumed [2]base.Pai) (*Pon, error) {
 	event := &Pon{
 		Actor:    actor,
 		Target:   target,

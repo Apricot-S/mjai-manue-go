@@ -13,7 +13,6 @@ func TestNewPon(t *testing.T) {
 		target   int
 		taken    base.Pai
 		consumed [2]base.Pai
-		log      string
 	}
 	tests := []struct {
 		name    string
@@ -28,7 +27,6 @@ func TestNewPon(t *testing.T) {
 				target:   0,
 				taken:    *mustPai("6s"),
 				consumed: [2]base.Pai{*mustPai("6s"), *mustPai("6s")},
-				log:      "test",
 			},
 			want: &Pon{
 				Actor:    1,
@@ -45,7 +43,6 @@ func TestNewPon(t *testing.T) {
 				target:   0,
 				taken:    *mustPai("6s"),
 				consumed: [2]base.Pai{*mustPai("6s"), *mustPai("6s")},
-				log:      "",
 			},
 			want:    nil,
 			wantErr: true,
@@ -57,7 +54,6 @@ func TestNewPon(t *testing.T) {
 				target:   3,
 				taken:    *mustPai("6s"),
 				consumed: [2]base.Pai{*mustPai("6s"), *mustPai("6s")},
-				log:      "",
 			},
 			want:    nil,
 			wantErr: true,
@@ -69,7 +65,6 @@ func TestNewPon(t *testing.T) {
 				target:   -1,
 				taken:    *mustPai("6s"),
 				consumed: [2]base.Pai{*mustPai("6s"), *mustPai("6s")},
-				log:      "",
 			},
 			want:    nil,
 			wantErr: true,
@@ -81,7 +76,6 @@ func TestNewPon(t *testing.T) {
 				target:   4,
 				taken:    *mustPai("6s"),
 				consumed: [2]base.Pai{*mustPai("6s"), *mustPai("6s")},
-				log:      "",
 			},
 			want:    nil,
 			wantErr: true,
@@ -93,7 +87,6 @@ func TestNewPon(t *testing.T) {
 				target:   0,
 				taken:    *mustPai("6s"),
 				consumed: [2]base.Pai{*mustPai("6s"), *mustPai("6s")},
-				log:      "",
 			},
 			want:    nil,
 			wantErr: true,
@@ -105,7 +98,6 @@ func TestNewPon(t *testing.T) {
 				target:   1,
 				taken:    *mustPai("?"),
 				consumed: [2]base.Pai{*mustPai("?"), *mustPai("?")},
-				log:      "",
 			},
 			want:    nil,
 			wantErr: true,
@@ -117,7 +109,6 @@ func TestNewPon(t *testing.T) {
 				target:   1,
 				taken:    *mustPai("6s"),
 				consumed: [2]base.Pai{*mustPai("7s"), *mustPai("7s")},
-				log:      "",
 			},
 			want:    nil,
 			wantErr: true,
@@ -129,7 +120,6 @@ func TestNewPon(t *testing.T) {
 				target:   3,
 				taken:    *mustPai("6s"),
 				consumed: [2]base.Pai{*mustPai("6s"), *mustPai("7s")},
-				log:      "",
 			},
 			want:    nil,
 			wantErr: true,
@@ -141,7 +131,6 @@ func TestNewPon(t *testing.T) {
 				target:   3,
 				taken:    *mustPai("5sr"),
 				consumed: [2]base.Pai{*mustPai("5s"), *mustPai("5s")},
-				log:      "",
 			},
 			want: &Pon{
 				Actor:    2,
@@ -158,7 +147,6 @@ func TestNewPon(t *testing.T) {
 				target:   3,
 				taken:    *mustPai("5s"),
 				consumed: [2]base.Pai{*mustPai("5s"), *mustPai("5sr")},
-				log:      "",
 			},
 			want: &Pon{
 				Actor:    2,
@@ -171,7 +159,7 @@ func TestNewPon(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := NewPon(tt.args.actor, tt.args.target, tt.args.taken, tt.args.consumed, tt.args.log)
+			got, err := NewPon(tt.args.actor, tt.args.target, tt.args.taken, tt.args.consumed)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("NewPon() error = %v, want %v", err, tt.wantErr)
 			}
