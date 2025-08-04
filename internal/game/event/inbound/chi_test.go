@@ -21,7 +21,7 @@ func TestNewChi(t *testing.T) {
 		wantErr bool
 	}{
 		{
-			name: "without log",
+			name: "valid",
 			args: args{
 				actor:    1,
 				target:   0,
@@ -33,22 +33,6 @@ func TestNewChi(t *testing.T) {
 				Target:   0,
 				Taken:    *mustPai("6s"),
 				Consumed: [2]base.Pai{*mustPai("5sr"), *mustPai("7s")},
-			},
-			wantErr: false,
-		},
-		{
-			name: "with log",
-			args: args{
-				actor:    3,
-				target:   2,
-				taken:    *mustPai("5sr"),
-				consumed: [2]base.Pai{*mustPai("4s"), *mustPai("6s")},
-			},
-			want: &Chi{
-				Actor:    3,
-				Target:   2,
-				Taken:    *mustPai("5sr"),
-				Consumed: [2]base.Pai{*mustPai("4s"), *mustPai("6s")},
 			},
 			wantErr: false,
 		},
