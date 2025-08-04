@@ -10,7 +10,6 @@ import (
 func TestNewAnkan(t *testing.T) {
 	type args struct {
 		actor    int
-		target   int
 		consumed [4]base.Pai
 		log      string
 	}
@@ -24,7 +23,6 @@ func TestNewAnkan(t *testing.T) {
 			name: "without log",
 			args: args{
 				actor:    1,
-				target:   0,
 				consumed: [4]base.Pai{*mustPai("6s"), *mustPai("6s"), *mustPai("6s"), *mustPai("6s")},
 				log:      "",
 			},
@@ -57,7 +55,6 @@ func TestNewAnkan(t *testing.T) {
 			name: "invalid consumed tiles",
 			args: args{
 				actor:    2,
-				target:   3,
 				consumed: [4]base.Pai{*mustPai("6s"), *mustPai("6s"), *mustPai("6s"), *mustPai("7s")},
 				log:      "",
 			},
@@ -68,7 +65,6 @@ func TestNewAnkan(t *testing.T) {
 			name: "unknown consumed tiles",
 			args: args{
 				actor:    2,
-				target:   3,
 				consumed: [4]base.Pai{*mustPai("?"), *mustPai("?"), *mustPai("?"), *mustPai("?")},
 				log:      "",
 			},
@@ -79,7 +75,6 @@ func TestNewAnkan(t *testing.T) {
 			name: "red tile in consumed",
 			args: args{
 				actor:    2,
-				target:   3,
 				consumed: [4]base.Pai{*mustPai("5s"), *mustPai("5s"), *mustPai("5s"), *mustPai("5sr")},
 				log:      "",
 			},
