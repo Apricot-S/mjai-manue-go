@@ -12,4 +12,4 @@ func NewJoin(name string, room string) *Join {
 	}
 }
 
-func (n *Join) isOutboundEvent() {}
+func (j *Join) isOutboundEvent() {}
