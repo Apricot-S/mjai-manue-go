@@ -5,7 +5,7 @@ import (
 	"slices"
 
 	"github.com/Apricot-S/mjai-manue-go/internal/base"
-	"github.com/Apricot-S/mjai-manue-go/internal/message"
+	"github.com/Apricot-S/mjai-manue-go/internal/game/event/inbound"
 )
 
 func (s *StateImpl) DahaiCandidates() []base.Pai {
@@ -99,7 +99,9 @@ func (s *StateImpl) IsTsumoPai(pai *base.Pai) bool {
 	if s.lastActor != s.playerID {
 		return false
 	}
-	if s.lastActionType != message.TypeTsumo && s.lastActionType != message.TypeReach {
+	_, isTsumo := s.lastAction.(*inbound.Tsumo)
+	_, isReach := s.lastAction.(*inbound.Reach)
+	if !isTsumo && !isReach {
 		return false
 	}
 
@@ -112,11 +114,11 @@ func (s *StateImpl) FuroCandidates() ([]base.Furo, error) {
 		// Furo is not possible if the last actor is the player itself or no actor.
 		return nil, nil
 	}
-	if s.lastActionType != message.TypeDahai {
+	if _, ok := s.lastAction.(*inbound.Dahai); !ok {
 		// Furo is only possible after dahai.
 		return nil, nil
 	}
-	if s.currentEventType == message.TypeReachAccepted {
+	if _, ok := s.currentEvent.(*inbound.ReachAccepted); ok {
 		// If a call is accepted to the riichi declaration tile,
 		// the client sends a call message ("chi", "pon" or "kan") for the "dahai" first.
 		// Afterwards, the server responds with "reach_accepted".
@@ -344,10 +346,13 @@ func (s *StateImpl) HoraCandidate() (*base.Hora, error) {
 		return nil, nil
 	}
 
-	isTsumoSituation := s.lastActor == s.playerID && s.lastActionType == message.TypeTsumo
-	isRonSituation := s.lastActor != s.playerID &&
-		s.lastActionType == message.TypeDahai || s.lastActionType == message.TypeKakan
+	_, isTsumo := s.lastAction.(*inbound.Tsumo)
+	_, isDahai := s.lastAction.(*inbound.Dahai)
+	_, isKakan := s.lastAction.(*inbound.Kakan)
+	isTsumoSituation := s.lastActor == s.playerID && isTsumo
+	isRonSituation := s.lastActor != s.playerID && (isDahai || isKakan)
 	if !isTsumoSituation && !isRonSituation {
+		// The last action is not a valid situation for hora.
 		return nil, nil
 	}
 	if s.isFuriten && !isTsumoSituation {
@@ -379,11 +384,14 @@ func (s *StateImpl) HoraCandidate() (*base.Hora, error) {
 		return nil, nil
 	}
 
-	has1Fan := (isTsumoSituation && player.IsMenzen()) || // menzenchin tsumoho
-		(player.ReachState() == base.ReachAccepted) || // reach
-		(s.lastActionType == message.TypeKakan) || // chankan
-		s.isRinshanTsumo || // rinshankaiho
-		(s.NumPipais() == 0) // haiteimoyue or hoteiraoyui
+	// Situation Yaku
+	hasMenzenchinTsumoho := isTsumoSituation && player.IsMenzen()
+	hasReach := player.ReachState() == base.ReachAccepted
+	hasChankan := isKakan
+	hasRinshankaiho := s.isRinshanTsumo
+	hasHaiteimoyueOrHoteiraoyui := s.NumPipais() == 0
+
+	has1Fan := hasMenzenchinTsumoho || hasReach || hasChankan || hasRinshankaiho || hasHaiteimoyueOrHoteiraoyui
 	if !has1Fan {
 		has1Fan, err = Has1Fan(s, s.playerID, tehais, player.Furos(), s.prevDahaiPai, isTsumoSituation)
 		if err != nil {

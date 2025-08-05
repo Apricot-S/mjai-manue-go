@@ -1,15 +1,12 @@
 package agent
 
 import (
-	"fmt"
-
-	"github.com/Apricot-S/mjai-manue-go/internal/message"
-	"github.com/go-json-experiment/json"
-	"github.com/go-json-experiment/json/jsontext"
+	"github.com/Apricot-S/mjai-manue-go/internal/game/event/inbound"
+	"github.com/Apricot-S/mjai-manue-go/internal/game/event/outbound"
 )
 
 type Agent interface {
-	Respond(msgs []jsontext.Value) (jsontext.Value, error)
+	Respond(events []inbound.Event) (outbound.Event, error)
 }
 
 type baseAgent struct {
@@ -28,31 +25,16 @@ func newBaseAgent(name string, room string) baseAgent {
 	}
 }
 
-func (a *baseAgent) makeNoneResponse() (jsontext.Value, error) {
-	none := message.NewNone()
-	res, err := json.Marshal(&none)
-	if err != nil {
-		return nil, fmt.Errorf("failed to marshal none message: %w", err)
-	}
-	return res, nil
+func (a *baseAgent) makeNoneResponse() (outbound.Event, error) {
+	return outbound.NewNone(), nil
 }
 
-func (a *baseAgent) makeJoinResponse() (jsontext.Value, error) {
-	join := message.NewJoin(a.name, a.room)
-	res, err := json.Marshal(&join)
-	if err != nil {
-		return nil, fmt.Errorf("failed to marshal join message: %w", err)
-	}
-	return res, nil
+func (a *baseAgent) makeJoinResponse() (outbound.Event, error) {
+	return outbound.NewJoin(a.name, a.room), nil
 }
 
-func (a *baseAgent) onStartGame(rawMsg jsontext.Value) error {
-	var startGame message.StartGame
-	if err := json.Unmarshal(rawMsg, &startGame); err != nil {
-		return fmt.Errorf("failed to unmarshal start_game message: %w", err)
-	}
-
-	a.playerID = startGame.ID
+func (a *baseAgent) onStartGame(event inbound.StartGame) error {
+	a.playerID = event.ID
 	a.inGame = true
 
 	return nil

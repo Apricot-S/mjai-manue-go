@@ -7,14 +7,15 @@ import (
 	"testing"
 
 	"github.com/Apricot-S/mjai-manue-go/internal/agent"
-	"github.com/go-json-experiment/json/jsontext"
+	"github.com/Apricot-S/mjai-manue-go/internal/game/event/inbound"
+	"github.com/Apricot-S/mjai-manue-go/internal/game/event/outbound"
 )
 
 // For test.
-type EchoAgent struct{}
+type NoneAgent struct{}
 
-func (a *EchoAgent) Respond(msg []jsontext.Value) (jsontext.Value, error) {
-	return msg[len(msg)-1], nil
+func (a *NoneAgent) Respond(events []inbound.Event) (outbound.Event, error) {
+	return outbound.NewNone(), nil
 }
 
 func TestClient_Run_OutputValidation(t *testing.T) {
@@ -27,17 +28,17 @@ func TestClient_Run_OutputValidation(t *testing.T) {
 	}{
 		{
 			name:  "single message with new line",
-			input: `{"type":"none"}`,
-			agent: &EchoAgent{},
+			input: `{"type":"hello"}`,
+			agent: &NoneAgent{},
 			wantOutput: `{"type":"none"}
 `,
 			wantErr: false,
 		},
 		{
 			name:  "array messages should write last response with new line",
-			input: `[{"type":"none"},{"type":"end_game"}]`,
-			agent: &EchoAgent{},
-			wantOutput: `{"type":"end_game"}
+			input: `[{"type":"start_game","id":1},{"type":"error"}]`,
+			agent: &NoneAgent{},
+			wantOutput: `{"type":"none"}
 `,
 			wantErr: false,
 		},
@@ -45,14 +46,14 @@ func TestClient_Run_OutputValidation(t *testing.T) {
 			name:       "empty reader",
 			input:      ``,
 			wantOutput: ``,
-			agent:      &EchoAgent{},
+			agent:      &NoneAgent{},
 			wantErr:    false,
 		},
 		{
 			name:       "invalid JSON input should return error",
 			input:      `invalid json`,
 			wantOutput: ``,
-			agent:      &EchoAgent{},
+			agent:      &NoneAgent{},
 			wantErr:    true,
 		},
 	}
@@ -83,7 +84,7 @@ type ErrorAgent struct {
 	err error
 }
 
-func (a *ErrorAgent) Respond(msg []jsontext.Value) (jsontext.Value, error) {
+func (a *ErrorAgent) Respond(events []inbound.Event) (outbound.Event, error) {
 	return nil, a.err
 }
 

@@ -2,7 +2,7 @@ package game
 
 import (
 	"github.com/Apricot-S/mjai-manue-go/internal/base"
-	"github.com/go-json-experiment/json/jsontext"
+	"github.com/Apricot-S/mjai-manue-go/internal/game/event/inbound"
 )
 
 const (
@@ -12,8 +12,6 @@ const (
 	NumInitPipais     = base.NumIDs*4 - 13*NumPlayers - 14
 	FinalTurn         = float64(NumInitPipais) / float64(NumPlayers)
 
-	// Indicates that no event has been triggered.
-	noEvent = ""
 	// Indicates that no action has been taken by anyone.
 	noActor = -1
 )
@@ -54,7 +52,7 @@ type StateViewer interface {
 
 // StateUpdater is an interface for updating the game state.
 type StateUpdater interface {
-	Update(event jsontext.Value) error
+	Update(event inbound.Event) error
 }
 
 // ActionCandidatesProvider is an interface for providing action candidates.

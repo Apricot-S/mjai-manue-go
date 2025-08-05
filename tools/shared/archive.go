@@ -10,6 +10,7 @@ import (
 	"path/filepath"
 
 	"github.com/Apricot-S/mjai-manue-go/internal/game"
+	"github.com/Apricot-S/mjai-manue-go/internal/message"
 	"github.com/go-json-experiment/json"
 	"github.com/go-json-experiment/json/jsontext"
 )
@@ -107,8 +108,11 @@ func (g *gzipReadCloser) Close() error {
 }
 
 func (a *Archive) Play(onAction func(jsontext.Value) error) error {
+	// TODO: temporary
+	adapter := message.MjaiAdapter{}
 	onLightAction := func(action jsontext.Value) error {
-		if err := a.state.Update(action); err != nil {
+		event, _ := adapter.MessageToEvent(action)
+		if err := a.state.Update(event); err != nil {
 			return err
 		}
 		return onAction(action)

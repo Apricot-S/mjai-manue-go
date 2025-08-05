@@ -2,10 +2,10 @@ package ai
 
 import (
 	"github.com/Apricot-S/mjai-manue-go/internal/game"
-	"github.com/go-json-experiment/json/jsontext"
+	"github.com/Apricot-S/mjai-manue-go/internal/game/event/outbound"
 )
 
 type AI interface {
 	Initialize()
-	DecideAction(state game.StateAnalyzer, playerID int) (jsontext.Value, error)
+	DecideAction(state game.StateAnalyzer, playerID int) (outbound.Event, error)
 }

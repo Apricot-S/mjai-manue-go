@@ -45,10 +45,10 @@ func getDefaultStateForTest() *StateImpl {
 		doraMarkers: make([]base.Pai, 0, MaxNumDoraMarkers),
 		numPipais:   NumInitPipais,
 
-		prevEventType:    "",
-		prevDahaiActor:   -1,
-		prevDahaiPai:     nil,
-		currentEventType: "",
+		prevEvent:      nil,
+		prevDahaiActor: -1,
+		prevDahaiPai:   nil,
+		currentEvent:   nil,
 	}
 }
 
