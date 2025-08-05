@@ -21,18 +21,16 @@ func (a *TsumogiriAgent) Respond(events []inbound.Event) (outbound.Event, error)
 	// Process messages before and after the game
 	switch firstEvent := events[0].(type) {
 	case *inbound.Hello:
-		return a.makeJoinResponse()
+		return a.makeJoinResponse(), nil
 	case *inbound.StartGame:
-		if err := a.onStartGame(*firstEvent); err != nil {
-			return nil, err
-		}
-		return a.makeNoneResponse()
+		a.onStartGame(*firstEvent)
+		return a.makeNoneResponse(), nil
 	case *inbound.EndKyoku:
 		// Message during the game, but does not affect the game, so process it here
-		return a.makeNoneResponse()
+		return a.makeNoneResponse(), nil
 	case *inbound.EndGame, *inbound.Error:
 		a.onEndGame()
-		return a.makeNoneResponse()
+		return a.makeNoneResponse(), nil
 	}
 
 	if !a.inGame {
@@ -42,7 +40,7 @@ func (a *TsumogiriAgent) Respond(events []inbound.Event) (outbound.Event, error)
 	if lastEvent, ok := events[len(events)-1].(*inbound.Tsumo); ok {
 		if lastEvent.Actor != a.playerID {
 			// Not self tsumo
-			return a.makeNoneResponse()
+			return a.makeNoneResponse(), nil
 		}
 
 		// Self tsumo
@@ -55,5 +53,5 @@ func (a *TsumogiriAgent) Respond(events []inbound.Event) (outbound.Event, error)
 	}
 
 	// Not tsumo
-	return a.makeNoneResponse()
+	return a.makeNoneResponse(), nil
 }

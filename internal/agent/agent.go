@@ -25,19 +25,17 @@ func newBaseAgent(name string, room string) baseAgent {
 	}
 }
 
-func (a *baseAgent) makeNoneResponse() (outbound.Event, error) {
-	return outbound.NewNone(), nil
+func (a *baseAgent) makeNoneResponse() outbound.Event {
+	return outbound.NewNone()
 }
 
-func (a *baseAgent) makeJoinResponse() (outbound.Event, error) {
-	return outbound.NewJoin(a.name, a.room), nil
+func (a *baseAgent) makeJoinResponse() outbound.Event {
+	return outbound.NewJoin(a.name, a.room)
 }
 
-func (a *baseAgent) onStartGame(event inbound.StartGame) error {
+func (a *baseAgent) onStartGame(event inbound.StartGame) {
 	a.playerID = event.ID
 	a.inGame = true
-
-	return nil
 }
 
 func (a *baseAgent) onEndGame() {
