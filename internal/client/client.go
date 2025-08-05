@@ -7,7 +7,7 @@ import (
 
 	"github.com/Apricot-S/mjai-manue-go/internal/agent"
 	"github.com/Apricot-S/mjai-manue-go/internal/game/event/inbound"
-	"github.com/Apricot-S/mjai-manue-go/internal/message"
+	"github.com/Apricot-S/mjai-manue-go/internal/protocol/mjai"
 	"github.com/go-json-experiment/json"
 	"github.com/go-json-experiment/json/jsontext"
 )
@@ -27,7 +27,7 @@ func (c *Client) Run() error {
 	var raw jsontext.Value
 	var msgs []jsontext.Value
 
-	adapter := message.MjaiAdapter{}
+	adapter := mjai.MjaiAdapter{}
 
 	for {
 		if err := json.UnmarshalDecode(decoder, &raw); err != nil {
