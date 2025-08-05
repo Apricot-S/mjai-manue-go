@@ -275,14 +275,12 @@ func (s *StateImpl) onChi(event *inbound.Chi) error {
 	}
 
 	actor := event.Actor
-	err = s.players[actor].OnChi(furo)
-	if err != nil {
+	if err := s.players[actor].OnChi(furo); err != nil {
 		return err
 	}
 
 	target := event.Target
-	err = s.players[target].OnTargeted(furo)
-	if err != nil {
+	if err := s.players[target].OnTargeted(furo); err != nil {
 		return err
 	}
 
@@ -348,14 +346,12 @@ func (s *StateImpl) onPon(event *inbound.Pon) error {
 	}
 
 	actor := event.Actor
-	err = s.players[actor].OnPon(furo)
-	if err != nil {
+	if err := s.players[actor].OnPon(furo); err != nil {
 		return err
 	}
 
 	target := event.Target
-	err = s.players[target].OnTargeted(furo)
-	if err != nil {
+	if err := s.players[target].OnTargeted(furo); err != nil {
 		return err
 	}
 
@@ -388,14 +384,12 @@ func (s *StateImpl) onDaiminkan(event *inbound.Daiminkan) error {
 	}
 
 	actor := event.Actor
-	err = s.players[actor].OnDaiminkan(furo)
-	if err != nil {
+	if err := s.players[actor].OnDaiminkan(furo); err != nil {
 		return err
 	}
 
 	target := event.Target
-	err = s.players[target].OnTargeted(furo)
-	if err != nil {
+	if err := s.players[target].OnTargeted(furo); err != nil {
 		return err
 	}
 
@@ -424,8 +418,7 @@ func (s *StateImpl) onAnkan(event *inbound.Ankan) error {
 	}
 
 	actor := event.Actor
-	err = s.players[actor].OnAnkan(furo)
-	if err != nil {
+	if err := s.players[actor].OnAnkan(furo); err != nil {
 		return err
 	}
 
@@ -455,8 +448,7 @@ func (s *StateImpl) onKakan(event *inbound.Kakan) error {
 	}
 
 	actor := event.Actor
-	err = s.players[actor].OnKakan(furo)
-	if err != nil {
+	if err := s.players[actor].OnKakan(furo); err != nil {
 		return err
 	}
 
@@ -521,8 +513,7 @@ func (s *StateImpl) onReach(event *inbound.Reach) error {
 
 	actor := event.Actor
 	player := &s.players[actor]
-	err := player.OnReach()
-	if err != nil {
+	if err := player.OnReach(); err != nil {
 		return err
 	}
 
