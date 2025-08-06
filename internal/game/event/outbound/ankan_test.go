@@ -23,7 +23,7 @@ func TestNewAnkan(t *testing.T) {
 			name: "without log",
 			args: args{
 				actor:    1,
-				consumed: [4]base.Pai{*mustPai("6s"), *mustPai("6s"), *mustPai("6s"), *mustPai("6s")},
+				consumed: [4]base.Pai(mustPais("6s", "6s", "6s", "6s")),
 				log:      "",
 			},
 			want: &Ankan{
@@ -31,7 +31,7 @@ func TestNewAnkan(t *testing.T) {
 					Actor: 1,
 					Log:   "",
 				},
-				Consumed: [4]base.Pai{*mustPai("6s"), *mustPai("6s"), *mustPai("6s"), *mustPai("6s")},
+				Consumed: [4]base.Pai(mustPais("6s", "6s", "6s", "6s")),
 			},
 			wantErr: false,
 		},
@@ -39,7 +39,7 @@ func TestNewAnkan(t *testing.T) {
 			name: "with log",
 			args: args{
 				actor:    1,
-				consumed: [4]base.Pai{*mustPai("6s"), *mustPai("6s"), *mustPai("6s"), *mustPai("6s")},
+				consumed: [4]base.Pai(mustPais("6s", "6s", "6s", "6s")),
 				log:      "test",
 			},
 			want: &Ankan{
@@ -47,7 +47,7 @@ func TestNewAnkan(t *testing.T) {
 					Actor: 1,
 					Log:   "test",
 				},
-				Consumed: [4]base.Pai{*mustPai("6s"), *mustPai("6s"), *mustPai("6s"), *mustPai("6s")},
+				Consumed: [4]base.Pai(mustPais("6s", "6s", "6s", "6s")),
 			},
 			wantErr: false,
 		},
@@ -55,7 +55,7 @@ func TestNewAnkan(t *testing.T) {
 			name: "invalid consumed tiles",
 			args: args{
 				actor:    2,
-				consumed: [4]base.Pai{*mustPai("6s"), *mustPai("6s"), *mustPai("6s"), *mustPai("7s")},
+				consumed: [4]base.Pai(mustPais("6s", "6s", "6s", "7s")),
 				log:      "",
 			},
 			want:    nil,
@@ -65,7 +65,7 @@ func TestNewAnkan(t *testing.T) {
 			name: "unknown consumed tiles",
 			args: args{
 				actor:    2,
-				consumed: [4]base.Pai{*mustPai("?"), *mustPai("?"), *mustPai("?"), *mustPai("?")},
+				consumed: [4]base.Pai(mustPais("?", "?", "?", "?")),
 				log:      "",
 			},
 			want:    nil,
@@ -75,7 +75,7 @@ func TestNewAnkan(t *testing.T) {
 			name: "red tile in consumed",
 			args: args{
 				actor:    2,
-				consumed: [4]base.Pai{*mustPai("5s"), *mustPai("5s"), *mustPai("5s"), *mustPai("5sr")},
+				consumed: [4]base.Pai(mustPais("5s", "5s", "5s", "5sr")),
 				log:      "",
 			},
 			want: &Ankan{
@@ -83,7 +83,7 @@ func TestNewAnkan(t *testing.T) {
 					Actor: 2,
 					Log:   "",
 				},
-				Consumed: [4]base.Pai{*mustPai("5s"), *mustPai("5s"), *mustPai("5s"), *mustPai("5sr")},
+				Consumed: [4]base.Pai(mustPais("5s", "5s", "5s", "5sr")),
 			},
 			wantErr: false,
 		},
