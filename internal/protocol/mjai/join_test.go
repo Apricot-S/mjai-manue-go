@@ -4,6 +4,7 @@ import (
 	"reflect"
 	"testing"
 
+	"github.com/Apricot-S/mjai-manue-go/internal/game/event/outbound"
 	"github.com/go-json-experiment/json"
 )
 
@@ -166,6 +167,37 @@ func TestJoin_Unmarshal(t *testing.T) {
 			}
 			if !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("Unmarshal() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestNewJoinFromEvent(t *testing.T) {
+	type args struct {
+		ev *outbound.Join
+	}
+	tests := []struct {
+		name string
+		args args
+		want *Join
+	}{
+		{
+			name: "valid",
+			args: args{&outbound.Join{
+				Name: "manue020",
+				Room: "default",
+			}},
+			want: &Join{
+				Message: Message{Type: TypeJoin},
+				Name:    "manue020",
+				Room:    "default",
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := NewJoinFromEvent(tt.args.ev); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("NewJoinFromEvent() = %v, want %v", got, tt.want)
 			}
 		})
 	}

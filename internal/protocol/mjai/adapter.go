@@ -206,7 +206,7 @@ func (a *MjaiAdapter) EventToMessage(ev outbound.Event) ([]byte, error) {
 		msg := NewNoneFromEvent(e)
 		return json.Marshal(msg)
 	case *outbound.Join:
-		msg := NewJoin(e.Name, e.Room)
+		msg := NewJoinFromEvent(e)
 		return json.Marshal(msg)
 	case *outbound.Dahai:
 		msg, err := NewDahai(e.Actor, e.Pai.ToString(), e.Tsumogiri, e.Log)
