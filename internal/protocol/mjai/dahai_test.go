@@ -4,6 +4,7 @@ import (
 	"reflect"
 	"testing"
 
+	"github.com/Apricot-S/mjai-manue-go/internal/game/event/outbound"
 	"github.com/go-json-experiment/json"
 )
 
@@ -397,6 +398,55 @@ func TestDahai_Unmarshal(t *testing.T) {
 			}
 			if !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("Unmarshal() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestNewDahaiFromEvent(t *testing.T) {
+	valid, _ := outbound.NewDahai(1, *mustPai("E"), true, "test")
+	invalid := *valid
+	invalid.Actor = 4
+
+	type args struct {
+		ev *outbound.Dahai
+	}
+	tests := []struct {
+		name    string
+		args    args
+		want    *Dahai
+		wantErr bool
+	}{
+		{
+			name: "valid",
+			args: args{valid},
+			want: &Dahai{
+				Action: Action{
+					Message: Message{Type: TypeDahai},
+					Actor:   1,
+					Log:     "test",
+				},
+				Pai:       "E",
+				Tsumogiri: true,
+			},
+			wantErr: false,
+		},
+		{
+			name:    "invalid",
+			args:    args{&invalid},
+			want:    nil,
+			wantErr: true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := NewDahaiFromEvent(tt.args.ev)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("NewDahaiFromEvent() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("NewDahaiFromEvent() = %v, want %v", got, tt.want)
 			}
 		})
 	}

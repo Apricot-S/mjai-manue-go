@@ -3,6 +3,7 @@ package mjai
 import (
 	"fmt"
 
+	"github.com/Apricot-S/mjai-manue-go/internal/game/event/outbound"
 	"github.com/go-json-experiment/json"
 	"github.com/go-json-experiment/json/jsontext"
 )
@@ -56,4 +57,8 @@ func (m *Dahai) UnmarshalJSONFrom(d *jsontext.Decoder) error {
 	}
 
 	return messageValidator.Struct(m)
+}
+
+func NewDahaiFromEvent(ev *outbound.Dahai) (*Dahai, error) {
+	return NewDahai(ev.Actor, ev.Pai.ToString(), ev.Tsumogiri, ev.Log)
 }

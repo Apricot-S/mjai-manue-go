@@ -209,7 +209,7 @@ func (a *MjaiAdapter) EventToMessage(ev outbound.Event) ([]byte, error) {
 		msg := NewJoinFromEvent(e)
 		return json.Marshal(msg)
 	case *outbound.Dahai:
-		msg, err := NewDahai(e.Actor, e.Pai.ToString(), e.Tsumogiri, e.Log)
+		msg, err := NewDahaiFromEvent(e)
 		if err != nil {
 			return nil, fmt.Errorf("failed to create dahai message: %w", err)
 		}
