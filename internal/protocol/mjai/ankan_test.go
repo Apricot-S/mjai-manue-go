@@ -404,7 +404,7 @@ func TestAnkan_ToEvent(t *testing.T) {
 			},
 			want: &inbound.Ankan{
 				Actor:    1,
-				Consumed: [4]base.Pai(mustPais([]string{"C", "C", "C", "C"})),
+				Consumed: [4]base.Pai(mustPais("C", "C", "C", "C")),
 			},
 			wantErr: false,
 		},
