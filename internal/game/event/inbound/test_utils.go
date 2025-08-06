@@ -11,3 +11,11 @@ func mustPai(name string) *base.Pai {
 	}
 	return p
 }
+
+func mustPais(names ...string) []base.Pai {
+	pais := make([]base.Pai, len(names))
+	for i, n := range names {
+		pais[i] = *mustPai(n)
+	}
+	return pais
+}
