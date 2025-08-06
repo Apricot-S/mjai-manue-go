@@ -68,7 +68,7 @@ func TestNewPlayer(t *testing.T) {
 	}
 }
 
-func TestPlayer_onStartKyoku(t *testing.T) {
+func TestPlayer_OnStartKyoku(t *testing.T) {
 	type fields struct {
 		id        int
 		name      string
@@ -154,13 +154,13 @@ func TestPlayer_onStartKyoku(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			p, _ := NewPlayer(tt.fields.id, tt.fields.name, tt.fields.initScore)
 			if err := p.OnStartKyoku(tt.args.tehais, tt.args.score); (err != nil) != tt.wantErr {
-				t.Errorf("Player.onStartKyoku() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("Player.OnStartKyoku() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
 	}
 }
 
-func TestPlayer_onTsumo(t *testing.T) {
+func TestPlayer_OnTsumo(t *testing.T) {
 	// valid cases
 	t.Run("valid", func(t *testing.T) {
 		tehais, _ := StrToPais("1m 2m 3m 6m 7m 8m 1p 2p 3p 6p 8p N N")
@@ -171,7 +171,7 @@ func TestPlayer_onTsumo(t *testing.T) {
 
 		err := p.OnTsumo(*tsumoPai)
 		if err != nil {
-			t.Errorf("Player.onTsumo() error = %v", err)
+			t.Errorf("Player.OnTsumo() error = %v", err)
 		}
 
 		want := &Player{
@@ -207,12 +207,12 @@ func TestPlayer_onTsumo(t *testing.T) {
 
 		err := p.OnTsumo(*tsumoPai2)
 		if err == nil {
-			t.Errorf("Player.onTsumo() error = %v", err)
+			t.Errorf("Player.OnTsumo() error = %v", err)
 		}
 	})
 }
 
-func TestPlayer_onDahai(t *testing.T) {
+func TestPlayer_OnDahai(t *testing.T) {
 	// before reach
 	t.Run("before reach", func(t *testing.T) {
 		tehais, _ := StrToPais("1m 2m 3m 6m 7m 8m 1p 2p 3p 6p 8p N N")
@@ -226,7 +226,7 @@ func TestPlayer_onDahai(t *testing.T) {
 		err := p.OnDahai(*dahai)
 
 		if err != nil {
-			t.Errorf("Player.onDahai() error = %v", err)
+			t.Errorf("Player.OnDahai() error = %v", err)
 		}
 
 		want := &Player{
@@ -271,7 +271,7 @@ func TestPlayer_onDahai(t *testing.T) {
 
 		err := p.OnDahai(*dahai2)
 		if err != nil {
-			t.Errorf("Player.onDahai() error = %v", err)
+			t.Errorf("Player.OnDahai() error = %v", err)
 		}
 
 		want := &Player{
@@ -307,7 +307,7 @@ func TestPlayer_onDahai(t *testing.T) {
 
 		err := p.OnDahai(*dahai)
 		if err != nil {
-			t.Errorf("Player.onDahai() error = %v", err)
+			t.Errorf("Player.OnDahai() error = %v", err)
 		}
 
 		want := &Player{
@@ -340,7 +340,7 @@ func TestPlayer_onDahai(t *testing.T) {
 
 		err := p.OnDahai(*dahai)
 		if err == nil {
-			t.Errorf("Player.onDahai() error = %v", err)
+			t.Errorf("Player.OnDahai() error = %v", err)
 		}
 	})
 
@@ -356,12 +356,12 @@ func TestPlayer_onDahai(t *testing.T) {
 
 		err := p.OnDahai(*dahai)
 		if err == nil {
-			t.Errorf("Player.onDahai() error = %v", err)
+			t.Errorf("Player.OnDahai() error = %v", err)
 		}
 	})
 }
 
-func TestPlayer_onChi(t *testing.T) {
+func TestPlayer_OnChi(t *testing.T) {
 	// on chi
 	t.Run("on chi", func(t *testing.T) {
 		tehais, _ := StrToPais("1m 2m 3m 6m 7m 8m 1p 2p 3p 6p 8p N N")
@@ -376,7 +376,7 @@ func TestPlayer_onChi(t *testing.T) {
 
 		err := p.OnChi(furo)
 		if err != nil {
-			t.Errorf("Player.onChi() error = %v", err)
+			t.Errorf("Player.OnChi() error = %v", err)
 		}
 
 		want := &Player{
@@ -446,7 +446,7 @@ func TestPlayer_onChi(t *testing.T) {
 
 		err := p.OnChi(furo5)
 		if err == nil {
-			t.Errorf("Player.onChi() error = %v", err)
+			t.Errorf("Player.OnChi() error = %v", err)
 		}
 	})
 
@@ -465,7 +465,7 @@ func TestPlayer_onChi(t *testing.T) {
 
 		err := p.OnChi(furo)
 		if err == nil {
-			t.Errorf("Player.onChi() error = %v", err)
+			t.Errorf("Player.OnChi() error = %v", err)
 		}
 	})
 
@@ -487,12 +487,12 @@ func TestPlayer_onChi(t *testing.T) {
 
 		err := p.OnChi(furo)
 		if err == nil {
-			t.Errorf("Player.onChi() error = %v", err)
+			t.Errorf("Player.OnChi() error = %v", err)
 		}
 	})
 }
 
-func TestPlayer_onPon(t *testing.T) {
+func TestPlayer_OnPon(t *testing.T) {
 	// on pon
 	t.Run("on pon", func(t *testing.T) {
 		tehais, _ := StrToPais("1m 2m 3m 6m 7m 8m 1p 2p 3p 6p 8p N N")
@@ -507,7 +507,7 @@ func TestPlayer_onPon(t *testing.T) {
 
 		err := p.OnPon(furo)
 		if err != nil {
-			t.Errorf("Player.onPon() error = %v", err)
+			t.Errorf("Player.OnPon() error = %v", err)
 		}
 
 		want := &Player{
@@ -577,7 +577,7 @@ func TestPlayer_onPon(t *testing.T) {
 
 		err := p.OnPon(furo5)
 		if err == nil {
-			t.Errorf("Player.onPon() error = %v", err)
+			t.Errorf("Player.OnPon() error = %v", err)
 		}
 	})
 
@@ -596,7 +596,7 @@ func TestPlayer_onPon(t *testing.T) {
 
 		err := p.OnPon(furo)
 		if err == nil {
-			t.Errorf("Player.onPon() error = %v", err)
+			t.Errorf("Player.OnPon() error = %v", err)
 		}
 	})
 
@@ -618,12 +618,12 @@ func TestPlayer_onPon(t *testing.T) {
 
 		err := p.OnPon(furo)
 		if err == nil {
-			t.Errorf("Player.onPon() error = %v", err)
+			t.Errorf("Player.OnPon() error = %v", err)
 		}
 	})
 }
 
-func TestPlayer_onDaiminkan(t *testing.T) {
+func TestPlayer_OnDaiminkan(t *testing.T) {
 	// on daiminkan
 	t.Run("on daiminkan", func(t *testing.T) {
 		tehais, _ := StrToPais("1m 2m 3m 6m 7m 8m 1p 2p 3p 6p N N N")
@@ -638,7 +638,7 @@ func TestPlayer_onDaiminkan(t *testing.T) {
 
 		err := p.OnDaiminkan(furo)
 		if err != nil {
-			t.Errorf("Player.onDaiminkan() error = %v", err)
+			t.Errorf("Player.OnDaiminkan() error = %v", err)
 		}
 
 		want := &Player{
@@ -708,7 +708,7 @@ func TestPlayer_onDaiminkan(t *testing.T) {
 
 		err := p.OnDaiminkan(furo5)
 		if err == nil {
-			t.Errorf("Player.onDaiminkan() error = %v", err)
+			t.Errorf("Player.OnDaiminkan() error = %v", err)
 		}
 	})
 
@@ -727,7 +727,7 @@ func TestPlayer_onDaiminkan(t *testing.T) {
 
 		err := p.OnDaiminkan(furo)
 		if err == nil {
-			t.Errorf("Player.onDaiminkan() error = %v", err)
+			t.Errorf("Player.OnDaiminkan() error = %v", err)
 		}
 	})
 
@@ -749,12 +749,12 @@ func TestPlayer_onDaiminkan(t *testing.T) {
 
 		err := p.OnDaiminkan(furo)
 		if err == nil {
-			t.Errorf("Player.onDaiminkan() error = %v", err)
+			t.Errorf("Player.OnDaiminkan() error = %v", err)
 		}
 	})
 }
 
-func TestPlayer_onAnkan(t *testing.T) {
+func TestPlayer_OnAnkan(t *testing.T) {
 	// on ankan
 	t.Run("on ankan", func(t *testing.T) {
 		tehais, _ := StrToPais("1m 2m 3m 6m 7m 8m 1p 2p 3p 6p N N N")
@@ -769,7 +769,7 @@ func TestPlayer_onAnkan(t *testing.T) {
 
 		err := p.OnAnkan(furo)
 		if err != nil {
-			t.Errorf("Player.onAnkan() error = %v", err)
+			t.Errorf("Player.OnAnkan() error = %v", err)
 		}
 
 		want := &Player{
@@ -837,7 +837,7 @@ func TestPlayer_onAnkan(t *testing.T) {
 
 		err := p.OnAnkan(furo5)
 		if err == nil {
-			t.Errorf("Player.onAnkan() error = %v", err)
+			t.Errorf("Player.OnAnkan() error = %v", err)
 		}
 	})
 
@@ -852,12 +852,12 @@ func TestPlayer_onAnkan(t *testing.T) {
 
 		err := p.OnAnkan(furo)
 		if err == nil {
-			t.Errorf("Player.onAnkan() error = %v", err)
+			t.Errorf("Player.OnAnkan() error = %v", err)
 		}
 	})
 }
 
-func TestPlayer_onKakan(t *testing.T) {
+func TestPlayer_OnKakan(t *testing.T) {
 	// on kakan
 	t.Run("on kakan", func(t *testing.T) {
 		tehais, _ := StrToPais("1m 2m 3m 6m 7m 8m 1p 2p 3p 6p N N N")
@@ -884,7 +884,7 @@ func TestPlayer_onKakan(t *testing.T) {
 
 		err := p.OnKakan(furo2)
 		if err != nil {
-			t.Errorf("Player.onKakan() error = %v", err)
+			t.Errorf("Player.OnKakan() error = %v", err)
 		}
 
 		want := &Player{
@@ -958,7 +958,7 @@ func TestPlayer_onKakan(t *testing.T) {
 
 		err := p.OnKakan(furo5)
 		if err != nil {
-			t.Errorf("Player.onKakan() error = %v", err)
+			t.Errorf("Player.OnKakan() error = %v", err)
 		}
 
 		want := &Player{
@@ -1003,7 +1003,7 @@ func TestPlayer_onKakan(t *testing.T) {
 
 		err := p.OnKakan(furo2)
 		if err == nil {
-			t.Errorf("Player.onKakan() error = %v", err)
+			t.Errorf("Player.OnKakan() error = %v", err)
 		}
 	})
 
@@ -1021,12 +1021,12 @@ func TestPlayer_onKakan(t *testing.T) {
 
 		err := p.OnKakan(furo)
 		if err == nil {
-			t.Errorf("Player.onKakan() error = %v", err)
+			t.Errorf("Player.OnKakan() error = %v", err)
 		}
 	})
 }
 
-func TestPlayer_onReach(t *testing.T) {
+func TestPlayer_OnReach(t *testing.T) {
 	// valid case
 	t.Run("on reach", func(t *testing.T) {
 		tehais, _ := StrToPais("1m 2m 3m 6m 7m 8m 1p 2p 3p 6p 8p N N")
@@ -1039,7 +1039,7 @@ func TestPlayer_onReach(t *testing.T) {
 
 		err := p.OnReach()
 		if err != nil {
-			t.Errorf("Player.onReach() error = %v", err)
+			t.Errorf("Player.OnReach() error = %v", err)
 		}
 
 		want := &Player{
@@ -1075,7 +1075,7 @@ func TestPlayer_onReach(t *testing.T) {
 
 		err := p.OnReach()
 		if err == nil {
-			t.Errorf("Player.onReach() error = %v", err)
+			t.Errorf("Player.OnReach() error = %v", err)
 		}
 	})
 
@@ -1095,7 +1095,7 @@ func TestPlayer_onReach(t *testing.T) {
 
 		err := p.OnReach()
 		if err == nil {
-			t.Errorf("Player.onReach() error = %v", err)
+			t.Errorf("Player.OnReach() error = %v", err)
 		}
 	})
 
@@ -1108,7 +1108,7 @@ func TestPlayer_onReach(t *testing.T) {
 
 		err := p.OnReach()
 		if err == nil {
-			t.Errorf("Player.onReach() error = %v", err)
+			t.Errorf("Player.OnReach() error = %v", err)
 		}
 	})
 
@@ -1131,12 +1131,12 @@ func TestPlayer_onReach(t *testing.T) {
 
 		err := p.OnReach()
 		if err == nil {
-			t.Errorf("Player.onReach() error = %v", err)
+			t.Errorf("Player.OnReach() error = %v", err)
 		}
 	})
 }
 
-func TestPlayer_onReachAccepted(t *testing.T) {
+func TestPlayer_OnReachAccepted(t *testing.T) {
 	// on reach accepted
 	t.Run("on reach accepted", func(t *testing.T) {
 		tehais, _ := StrToPais("1m 2m 3m 6m 7m 8m 1p 2p 3p 6p 8p N N")
@@ -1151,7 +1151,7 @@ func TestPlayer_onReachAccepted(t *testing.T) {
 
 		err := p.OnReachAccepted(nil)
 		if err != nil {
-			t.Errorf("Player.onReachAccepted() error = %v", err)
+			t.Errorf("Player.OnReachAccepted() error = %v", err)
 		}
 
 		want := &Player{
@@ -1189,7 +1189,7 @@ func TestPlayer_onReachAccepted(t *testing.T) {
 
 		err := p.OnReachAccepted(&scoreAfterReach)
 		if err != nil {
-			t.Errorf("Player.onReachAccepted() error = %v", err)
+			t.Errorf("Player.OnReachAccepted() error = %v", err)
 		}
 
 		want := &Player{
@@ -1226,7 +1226,7 @@ func TestPlayer_onReachAccepted(t *testing.T) {
 
 		err := p.OnReachAccepted(nil)
 		if err == nil {
-			t.Errorf("Player.onReachAccepted() error = %v", err)
+			t.Errorf("Player.OnReachAccepted() error = %v", err)
 		}
 	})
 
@@ -1239,12 +1239,12 @@ func TestPlayer_onReachAccepted(t *testing.T) {
 
 		err := p.OnReachAccepted(nil)
 		if err == nil {
-			t.Errorf("Player.onReachAccepted() error = %v", err)
+			t.Errorf("Player.OnReachAccepted() error = %v", err)
 		}
 	})
 }
 
-func TestPlayer_onTargeted(t *testing.T) {
+func TestPlayer_OnTargeted(t *testing.T) {
 	// on chi
 	t.Run("on chi", func(t *testing.T) {
 		tehais, _ := StrToPais("1m 2m 3m 6m 7m 8m 1p 2p 3p 6p 8p N N")
@@ -1262,7 +1262,7 @@ func TestPlayer_onTargeted(t *testing.T) {
 
 		err := p.OnTargeted(furo)
 		if err != nil {
-			t.Errorf("Player.onTargeted() error = %v", err)
+			t.Errorf("Player.OnTargeted() error = %v", err)
 		}
 
 		want := &Player{
@@ -1302,7 +1302,7 @@ func TestPlayer_onTargeted(t *testing.T) {
 
 		err := p.OnTargeted(furo)
 		if err != nil {
-			t.Errorf("Player.onTargeted() error = %v", err)
+			t.Errorf("Player.OnTargeted() error = %v", err)
 		}
 
 		want := &Player{
@@ -1342,7 +1342,7 @@ func TestPlayer_onTargeted(t *testing.T) {
 
 		err := p.OnTargeted(furo)
 		if err != nil {
-			t.Errorf("Player.onTargeted() error = %v", err)
+			t.Errorf("Player.OnTargeted() error = %v", err)
 		}
 
 		want := &Player{
@@ -1380,7 +1380,7 @@ func TestPlayer_onTargeted(t *testing.T) {
 
 		err := p.OnTargeted(furo)
 		if err == nil {
-			t.Errorf("Player.onTargeted() error = %v", err)
+			t.Errorf("Player.OnTargeted() error = %v", err)
 		}
 	})
 
@@ -1400,7 +1400,7 @@ func TestPlayer_onTargeted(t *testing.T) {
 
 		err := p.OnTargeted(furo)
 		if err == nil {
-			t.Errorf("Player.onTargeted() error = %v", err)
+			t.Errorf("Player.OnTargeted() error = %v", err)
 		}
 	})
 }
