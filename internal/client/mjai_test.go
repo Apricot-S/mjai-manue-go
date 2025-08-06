@@ -18,7 +18,7 @@ func (a *NoneAgent) Respond(events []inbound.Event) (outbound.Event, error) {
 	return outbound.NewNone(), nil
 }
 
-func TestClient_Run_OutputValidation(t *testing.T) {
+func TestMjaiClient_Run_OutputValidation(t *testing.T) {
 	tests := []struct {
 		name       string
 		input      string
@@ -61,7 +61,7 @@ func TestClient_Run_OutputValidation(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			buf := &bytes.Buffer{}
-			c := &Client{
+			c := &MjaiClient{
 				reader: strings.NewReader(tt.input),
 				writer: buf,
 				agent:  tt.agent,
@@ -69,12 +69,12 @@ func TestClient_Run_OutputValidation(t *testing.T) {
 
 			err := c.Run()
 			if (err != nil) != tt.wantErr {
-				t.Errorf("Client.Run() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("MjaiClient.Run() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
 
 			if got := buf.String(); got != tt.wantOutput {
-				t.Errorf("Client.Run() output = %q, want %q", got, tt.wantOutput)
+				t.Errorf("MjaiClient.Run() output = %q, want %q", got, tt.wantOutput)
 			}
 		})
 	}
@@ -88,19 +88,19 @@ func (a *ErrorAgent) Respond(events []inbound.Event) (outbound.Event, error) {
 	return nil, a.err
 }
 
-func TestClient_Run_AgentError(t *testing.T) {
-	expectedErr := fmt.Errorf("agent error")
-	c := &Client{
-		reader: strings.NewReader(`{"type":"none"}`),
+func TestMjaiClient_Run_AgentError(t *testing.T) {
+	expectedErr := fmt.Errorf("error")
+	c := &MjaiClient{
+		reader: strings.NewReader(`{"type":"error"}`),
 		writer: &bytes.Buffer{},
 		agent:  &ErrorAgent{err: expectedErr},
 	}
 
 	err := c.Run()
 	if err == nil {
-		t.Error("Client.Run() expected error but got nil")
+		t.Error("MjaiClient.Run() expected error but got nil")
 	}
 	if !strings.Contains(err.Error(), expectedErr.Error()) {
-		t.Errorf("Client.Run() error = %v, should contain %v", err, expectedErr)
+		t.Errorf("MjaiClient.Run() error = %v, should contain %v", err, expectedErr)
 	}
 }
