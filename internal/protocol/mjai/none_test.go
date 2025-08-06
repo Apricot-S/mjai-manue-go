@@ -4,6 +4,7 @@ import (
 	"reflect"
 	"testing"
 
+	"github.com/Apricot-S/mjai-manue-go/internal/game/event/outbound"
 	"github.com/go-json-experiment/json"
 )
 
@@ -131,6 +132,32 @@ func TestNone_Unmarshal(t *testing.T) {
 			}
 			if !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("Unmarshal() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestNewNoneFromEvent(t *testing.T) {
+	type args struct {
+		ev outbound.None
+	}
+	tests := []struct {
+		name string
+		args args
+		want *None
+	}{
+		{
+			name: "valid",
+			args: args{outbound.None{}},
+			want: &None{
+				Message: Message{Type: TypeNone},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := NewNoneFromEvent(&tt.args.ev); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("NewNoneFromEvent() = %v, want %v", got, tt.want)
 			}
 		})
 	}

@@ -203,7 +203,7 @@ func (a *MjaiAdapter) MessageToEvent(rawMsg []byte) (inbound.Event, error) {
 func (a *MjaiAdapter) EventToMessage(ev outbound.Event) ([]byte, error) {
 	switch e := ev.(type) {
 	case *outbound.None:
-		msg := NewNone()
+		msg := NewNoneFromEvent(e)
 		return json.Marshal(msg)
 	case *outbound.Join:
 		msg := NewJoin(e.Name, e.Room)
