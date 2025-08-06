@@ -168,17 +168,7 @@ func (a *MjaiAdapter) MessageToEvent(rawMsg []byte) (inbound.Event, error) {
 		if err := json.Unmarshal(rawMsg, &ankan); err != nil {
 			return nil, fmt.Errorf("failed to unmarshal ankan message: %w", err)
 		}
-
-		consumed := [4]base.Pai{}
-		for i, c := range ankan.Consumed {
-			p, err := base.NewPaiWithName(c)
-			if err != nil {
-				return nil, err
-			}
-			consumed[i] = *p
-		}
-
-		return inbound.NewAnkan(ankan.Actor, consumed)
+		return ankan.ToEvent()
 	case TypeKakan:
 		var kakan Kakan
 		if err := json.Unmarshal(rawMsg, &kakan); err != nil {

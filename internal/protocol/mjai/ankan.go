@@ -3,6 +3,8 @@ package mjai
 import (
 	"fmt"
 
+	"github.com/Apricot-S/mjai-manue-go/internal/base"
+	"github.com/Apricot-S/mjai-manue-go/internal/game/event/inbound"
 	"github.com/go-json-experiment/json"
 	"github.com/go-json-experiment/json/jsontext"
 )
@@ -54,4 +56,16 @@ func (m *Ankan) UnmarshalJSONFrom(d *jsontext.Decoder) error {
 	}
 
 	return messageValidator.Struct(m)
+}
+
+func (m *Ankan) ToEvent() (*inbound.Ankan, error) {
+	consumed := [4]base.Pai{}
+	for i, c := range m.Consumed {
+		p, err := base.NewPaiWithName(c)
+		if err != nil {
+			return nil, err
+		}
+		consumed[i] = *p
+	}
+	return inbound.NewAnkan(m.Actor, consumed)
 }
