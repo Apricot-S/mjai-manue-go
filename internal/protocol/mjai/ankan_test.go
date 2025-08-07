@@ -6,6 +6,7 @@ import (
 
 	"github.com/Apricot-S/mjai-manue-go/internal/base"
 	"github.com/Apricot-S/mjai-manue-go/internal/game/event/inbound"
+	"github.com/Apricot-S/mjai-manue-go/internal/game/event/outbound"
 	"github.com/go-json-experiment/json"
 )
 
@@ -431,6 +432,54 @@ func TestAnkan_ToEvent(t *testing.T) {
 			}
 			if !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("Ankan.ToEvent() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestNewAnkanFromEvent(t *testing.T) {
+	valid, _ := outbound.NewAnkan(1, [4]base.Pai(mustPais("5p", "5p", "5p", "5pr")), "test")
+	invalid := *valid
+	invalid.Actor = -1
+
+	type args struct {
+		ev *outbound.Ankan
+	}
+	tests := []struct {
+		name    string
+		args    args
+		want    *Ankan
+		wantErr bool
+	}{
+		{
+			name: "valid",
+			args: args{valid},
+			want: &Ankan{
+				Action: Action{
+					Message: Message{TypeAnkan},
+					Actor:   1,
+					Log:     "test",
+				},
+				Consumed: [4]string{"5p", "5p", "5p", "5pr"},
+			},
+			wantErr: false,
+		},
+		{
+			name:    "invalid",
+			args:    args{&invalid},
+			want:    nil,
+			wantErr: true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := NewAnkanFromEvent(tt.args.ev)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("NewAnkanFromEvent() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("NewAnkanFromEvent() = %v, want %v", got, tt.want)
 			}
 		})
 	}

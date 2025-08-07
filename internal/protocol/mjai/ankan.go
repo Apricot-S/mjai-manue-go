@@ -5,6 +5,7 @@ import (
 
 	"github.com/Apricot-S/mjai-manue-go/internal/base"
 	"github.com/Apricot-S/mjai-manue-go/internal/game/event/inbound"
+	"github.com/Apricot-S/mjai-manue-go/internal/game/event/outbound"
 	"github.com/go-json-experiment/json"
 	"github.com/go-json-experiment/json/jsontext"
 )
@@ -68,4 +69,14 @@ func (m *Ankan) ToEvent() (*inbound.Ankan, error) {
 		consumed[i] = *p
 	}
 	return inbound.NewAnkan(m.Actor, consumed)
+}
+
+func NewAnkanFromEvent(ev *outbound.Ankan) (*Ankan, error) {
+	consumed := [4]string{
+		ev.Consumed[0].ToString(),
+		ev.Consumed[1].ToString(),
+		ev.Consumed[2].ToString(),
+		ev.Consumed[3].ToString(),
+	}
+	return NewAnkan(ev.Actor, consumed, ev.Log)
 }

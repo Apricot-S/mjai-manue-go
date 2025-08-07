@@ -239,12 +239,7 @@ func (a *MjaiAdapter) EventToMessage(ev outbound.Event) ([]byte, error) {
 		}
 		return json.Marshal(msg)
 	case *outbound.Ankan:
-		consumed := [4]string{}
-		for i, p := range e.Consumed {
-			consumed[i] = p.ToString()
-		}
-
-		msg, err := NewAnkan(e.Actor, consumed, e.Log)
+		msg, err := NewAnkanFromEvent(e)
 		if err != nil {
 			return nil, fmt.Errorf("failed to create ankan message: %w", err)
 		}
