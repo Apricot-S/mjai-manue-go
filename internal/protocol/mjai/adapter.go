@@ -215,7 +215,7 @@ func (a *MjaiAdapter) EventToMessage(ev outbound.Event) ([]byte, error) {
 		}
 		return json.Marshal(msg)
 	case *outbound.Skip:
-		msg, err := NewSkip(e.Actor, e.Log)
+		msg, err := NewSkipFromEvent(e)
 		if err != nil {
 			return nil, fmt.Errorf("failed to create skip message: %w", err)
 		}
