@@ -10,20 +10,21 @@ import (
 	"path/filepath"
 
 	"github.com/Apricot-S/mjai-manue-go/internal/game"
-	"github.com/Apricot-S/mjai-manue-go/internal/message"
-	"github.com/go-json-experiment/json"
-	"github.com/go-json-experiment/json/jsontext"
+	"github.com/Apricot-S/mjai-manue-go/internal/game/event/inbound"
+	"github.com/Apricot-S/mjai-manue-go/internal/protocol"
 )
 
 type Archive struct {
-	paths []string
-	state game.State
+	paths   []string
+	adapter protocol.Adapter
+	state   game.State
 }
 
-func NewArchive(paths []string) *Archive {
+func NewArchive(paths []string, adapter protocol.Adapter) *Archive {
 	return &Archive{
-		paths: paths,
-		state: &game.StateImpl{},
+		paths:   paths,
+		adapter: adapter,
+		state:   &game.StateImpl{},
 	}
 }
 
@@ -31,21 +32,21 @@ func (a *Archive) StateViewer() game.StateViewer {
 	return a.state
 }
 
-func (a *Archive) PlayLight(onAction func(jsontext.Value) error) error {
+func (a *Archive) PlayLight(onAction func(inbound.Event) error) error {
 	numFiles := len(a.paths)
 	for i, p := range a.paths {
 		if numFiles > 1 {
 			fmt.Fprintf(os.Stderr, "%d/%d\n", i+1, numFiles) // tentative
 		}
 
-		if err := playLightInner(p, onAction); err != nil {
+		if err := a.playLightInner(p, onAction); err != nil {
 			return err
 		}
 	}
 	return nil
 }
 
-func playLightInner(singlePath string, onAction func(jsontext.Value) error) error {
+func (a *Archive) playLightInner(singlePath string, onAction func(inbound.Event) error) error {
 	reader, err := openMaybeGzip(singlePath)
 	if err != nil {
 		return err
@@ -59,13 +60,15 @@ func playLightInner(singlePath string, onAction func(jsontext.Value) error) erro
 			continue
 		}
 
-		var action jsontext.Value
-		if err := json.Unmarshal(line, &action); err != nil {
-			return fmt.Errorf("json decode error: %w", err)
+		actions, err := a.adapter.DecodeMessages(line)
+		if err != nil {
+			return fmt.Errorf("failed to decode: %w", err)
 		}
 
-		if err := onAction(action); err != nil {
-			return fmt.Errorf("failed to callback: %w", err)
+		for _, action := range actions {
+			if err := onAction(action); err != nil {
+				return fmt.Errorf("failed to callback: %w", err)
+			}
 		}
 	}
 	if err := scanner.Err(); err != nil {
@@ -107,12 +110,9 @@ func (g *gzipReadCloser) Close() error {
 	return err2
 }
 
-func (a *Archive) Play(onAction func(jsontext.Value) error) error {
-	// TODO: temporary
-	adapter := message.MjaiAdapter{}
-	onLightAction := func(action jsontext.Value) error {
-		event, _ := adapter.MessageToEvent(action)
-		if err := a.state.Update(event); err != nil {
+func (a *Archive) Play(onAction func(inbound.Event) error) error {
+	onLightAction := func(action inbound.Event) error {
+		if err := a.state.Update(action); err != nil {
 			return err
 		}
 		return onAction(action)
