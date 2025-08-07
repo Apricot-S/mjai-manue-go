@@ -4,6 +4,7 @@ import (
 	"reflect"
 	"testing"
 
+	"github.com/Apricot-S/mjai-manue-go/internal/game/event/outbound"
 	"github.com/go-json-experiment/json"
 )
 
@@ -273,6 +274,53 @@ func TestReach_Unmarshal(t *testing.T) {
 			}
 			if !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("Unmarshal() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestNewReachFromEvent(t *testing.T) {
+	valid, _ := outbound.NewReach(1, "test")
+	invalid := *valid
+	invalid.Actor = 4
+
+	type args struct {
+		ev *outbound.Reach
+	}
+	tests := []struct {
+		name    string
+		args    args
+		want    *Reach
+		wantErr bool
+	}{
+		{
+			name: "valid",
+			args: args{valid},
+			want: &Reach{
+				Action: Action{
+					Message: Message{Type: TypeReach},
+					Actor:   1,
+					Log:     "test",
+				},
+			},
+			wantErr: false,
+		},
+		{
+			name:    "invalid",
+			args:    args{&invalid},
+			want:    nil,
+			wantErr: true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := NewReachFromEvent(tt.args.ev)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("NewReachFromEvent() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("NewReachFromEvent() = %v, want %v", got, tt.want)
 			}
 		})
 	}

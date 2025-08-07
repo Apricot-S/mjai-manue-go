@@ -251,7 +251,7 @@ func (a *MjaiAdapter) EventToMessage(ev outbound.Event) ([]byte, error) {
 		}
 		return json.Marshal(msg)
 	case *outbound.Reach:
-		msg, err := NewReach(e.Actor, e.Log)
+		msg, err := NewReachFromEvent(e)
 		if err != nil {
 			return nil, fmt.Errorf("failed to create reach message: %w", err)
 		}
