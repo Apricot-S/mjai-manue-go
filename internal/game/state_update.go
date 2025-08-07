@@ -136,13 +136,11 @@ func (s *StateImpl) onStartKyoku(event *inbound.StartKyoku) error {
 	s.numPipais = NumInitPipais
 
 	for i := range NumPlayers {
-		tehais := event.Tehais[i][:]
-
 		var err error
 		if event.Scores != nil {
-			err = s.players[i].OnStartKyoku(tehais, &event.Scores[i])
+			err = s.players[i].OnStartKyoku(event.Tehais[i], &event.Scores[i])
 		} else {
-			err = s.players[i].OnStartKyoku(tehais, nil)
+			err = s.players[i].OnStartKyoku(event.Tehais[i], nil)
 		}
 		if err != nil {
 			return err
