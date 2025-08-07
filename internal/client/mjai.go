@@ -6,7 +6,6 @@ import (
 	"os"
 
 	"github.com/Apricot-S/mjai-manue-go/internal/agent"
-	"github.com/Apricot-S/mjai-manue-go/internal/game/event/inbound"
 	"github.com/Apricot-S/mjai-manue-go/internal/protocol/mjai"
 	"github.com/go-json-experiment/json"
 	"github.com/go-json-experiment/json/jsontext"
@@ -26,7 +25,6 @@ func (c *MjaiClient) Run() error {
 	adapter := mjai.MjaiAdapter{}
 	decoder := jsontext.NewDecoder(c.reader)
 	var raw jsontext.Value
-	var msgs []jsontext.Value
 
 	for {
 		if err := json.UnmarshalDecode(decoder, &raw); err != nil {
@@ -37,33 +35,17 @@ func (c *MjaiClient) Run() error {
 		}
 		fmt.Fprintf(os.Stderr, "<-\t%s\n", raw)
 
-		switch raw.Kind() {
-		case '{':
-			// single object
-			msgs = []jsontext.Value{raw}
-		case '[':
-			// array
-			if err := json.Unmarshal(raw, &msgs); err != nil {
-				return fmt.Errorf("failed to unmarshal messages: %w", err)
-			}
-		default:
-			return fmt.Errorf("invalid message: %v", raw)
-		}
-
-		events := make([]inbound.Event, len(msgs))
-		for i, msg := range msgs {
-			ev, err := adapter.MessageToEvent(msg)
-			if err != nil {
-				return err
-			}
-			events[i] = ev
+		events, err := adapter.DecodeMessages(raw)
+		if err != nil {
+			return err
 		}
 
 		resEv, err := c.agent.Respond(events)
 		if err != nil {
 			return fmt.Errorf("failed to respond from agent: %w", err)
 		}
-		res, err := adapter.EventToMessage(resEv)
+
+		res, err := adapter.EncodeResponse(resEv)
 		if err != nil {
 			return fmt.Errorf("failed to convert event to message: %w", err)
 		}

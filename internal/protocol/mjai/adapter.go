@@ -7,11 +7,12 @@ import (
 	"github.com/Apricot-S/mjai-manue-go/internal/game/event/inbound"
 	"github.com/Apricot-S/mjai-manue-go/internal/game/event/outbound"
 	"github.com/go-json-experiment/json"
+	"github.com/go-json-experiment/json/jsontext"
 )
 
 type MjaiAdapter struct{}
 
-func (a *MjaiAdapter) MessageToEvent(rawMsg []byte) (inbound.Event, error) {
+func (a *MjaiAdapter) messageToEvent(rawMsg []byte) (inbound.Event, error) {
 	var msg Message
 	if err := json.Unmarshal(rawMsg, &msg); err != nil {
 		return nil, fmt.Errorf("failed to unmarshal message: %w", err)
@@ -200,7 +201,35 @@ func (a *MjaiAdapter) MessageToEvent(rawMsg []byte) (inbound.Event, error) {
 	}
 }
 
-func (a *MjaiAdapter) EventToMessage(ev outbound.Event) ([]byte, error) {
+func (a *MjaiAdapter) DecodeMessages(msg []byte) ([]inbound.Event, error) {
+	var msgs []jsontext.Value
+
+	switch jsontext.Value(msg).Kind() {
+	case '{':
+		// single object
+		msgs = []jsontext.Value{msg}
+	case '[':
+		// array
+		if err := json.Unmarshal(msg, &msgs); err != nil {
+			return nil, fmt.Errorf("failed to unmarshal messages: %w", err)
+		}
+	default:
+		return nil, fmt.Errorf("invalid message: %v", msg)
+	}
+
+	events := make([]inbound.Event, len(msgs))
+	for i, msg := range msgs {
+		ev, err := a.messageToEvent(msg)
+		if err != nil {
+			return nil, err
+		}
+		events[i] = ev
+	}
+
+	return events, nil
+}
+
+func (a *MjaiAdapter) EncodeResponse(ev outbound.Event) ([]byte, error) {
 	switch e := ev.(type) {
 	case *outbound.None:
 		msg := NewNoneFromEvent(e)

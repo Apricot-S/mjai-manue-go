@@ -5,10 +5,7 @@ import (
 	"github.com/Apricot-S/mjai-manue-go/internal/game/event/outbound"
 )
 
-type MessageEventAdapter interface {
-	MessageToEvent(msg []byte) (inbound.Event, error)
-}
-
-type EventMessageAdapter interface {
-	EventToMessage(ev outbound.Event) ([]byte, error)
+type Adapter interface {
+	DecodeMessages(msg []byte) ([]inbound.Event, error)
+	EncodeResponse(ev outbound.Event) ([]byte, error)
 }
