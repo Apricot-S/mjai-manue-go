@@ -4,6 +4,8 @@ import (
 	"reflect"
 	"testing"
 
+	"github.com/Apricot-S/mjai-manue-go/internal/base"
+	"github.com/Apricot-S/mjai-manue-go/internal/game/event/outbound"
 	"github.com/go-json-experiment/json"
 )
 
@@ -482,6 +484,55 @@ func TestKakan_Unmarshal(t *testing.T) {
 			}
 			if !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("Unmarshal() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestNewKakanFromEvent(t *testing.T) {
+	valid, _ := outbound.NewKakan(1, 0, *mustPai("5mr"), [2]base.Pai(mustPais("5m", "5m")), *mustPai("5m"), "test")
+	invalid := *valid
+	invalid.Actor = -1
+
+	type args struct {
+		ev *outbound.Kakan
+	}
+	tests := []struct {
+		name    string
+		args    args
+		want    *Kakan
+		wantErr bool
+	}{
+		{
+			name: "valid",
+			args: args{valid},
+			want: &Kakan{
+				Action: Action{
+					Message: Message{TypeKakan},
+					Actor:   1,
+					Log:     "test",
+				},
+				Pai:      "5m",
+				Consumed: [3]string{"5m", "5m", "5mr"},
+			},
+			wantErr: false,
+		},
+		{
+			name:    "invalid",
+			args:    args{&invalid},
+			want:    nil,
+			wantErr: true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := NewKakanFromEvent(tt.args.ev)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("NewKakanFromEvent() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("NewKakanFromEvent() = %v, want %v", got, tt.want)
 			}
 		})
 	}

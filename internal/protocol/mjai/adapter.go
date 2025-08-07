@@ -245,11 +245,7 @@ func (a *MjaiAdapter) EventToMessage(ev outbound.Event) ([]byte, error) {
 		}
 		return json.Marshal(msg)
 	case *outbound.Kakan:
-		consumed := [3]string{}
-		consumed[0] = e.Consumed[0].ToString()
-		consumed[1] = e.Consumed[1].ToString()
-		consumed[2] = e.Taken.ToString()
-		msg, err := NewKakan(e.Actor, e.Added.ToString(), consumed, e.Log)
+		msg, err := NewKakanFromEvent(e)
 		if err != nil {
 			return nil, fmt.Errorf("failed to create kakan message: %w", err)
 		}

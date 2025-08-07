@@ -3,6 +3,7 @@ package mjai
 import (
 	"fmt"
 
+	"github.com/Apricot-S/mjai-manue-go/internal/game/event/outbound"
 	"github.com/go-json-experiment/json"
 	"github.com/go-json-experiment/json/jsontext"
 )
@@ -56,4 +57,13 @@ func (m *Kakan) UnmarshalJSONFrom(d *jsontext.Decoder) error {
 	}
 
 	return messageValidator.Struct(m)
+}
+
+func NewKakanFromEvent(ev *outbound.Kakan) (*Kakan, error) {
+	consumed := [3]string{
+		ev.Consumed[0].ToString(),
+		ev.Consumed[1].ToString(),
+		ev.Taken.ToString(),
+	}
+	return NewKakan(ev.Actor, ev.Added.ToString(), consumed, ev.Log)
 }
