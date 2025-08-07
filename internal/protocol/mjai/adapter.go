@@ -227,12 +227,7 @@ func (a *MjaiAdapter) EventToMessage(ev outbound.Event) ([]byte, error) {
 		}
 		return json.Marshal(msg)
 	case *outbound.Pon:
-		consumed := [2]string{}
-		for i, p := range e.Consumed {
-			consumed[i] = p.ToString()
-		}
-
-		msg, err := NewPon(e.Actor, e.Target, e.Taken.ToString(), consumed, e.Log)
+		msg, err := NewPonFromEvent(e)
 		if err != nil {
 			return nil, fmt.Errorf("failed to create pon message: %w", err)
 		}

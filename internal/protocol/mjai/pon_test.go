@@ -4,6 +4,8 @@ import (
 	"reflect"
 	"testing"
 
+	"github.com/Apricot-S/mjai-manue-go/internal/base"
+	"github.com/Apricot-S/mjai-manue-go/internal/game/event/outbound"
 	"github.com/go-json-experiment/json"
 )
 
@@ -612,6 +614,56 @@ func TestPon_Unmarshal(t *testing.T) {
 			}
 			if !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("Unmarshal() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestNewPonFromEvent(t *testing.T) {
+	valid, _ := outbound.NewPon(1, 0, *mustPai("1m"), [2]base.Pai(mustPais("1m", "1m")), "test")
+	invalid := *valid
+	invalid.Actor = -1
+
+	type args struct {
+		ev *outbound.Pon
+	}
+	tests := []struct {
+		name    string
+		args    args
+		want    *Pon
+		wantErr bool
+	}{
+		{
+			name: "valid",
+			args: args{valid},
+			want: &Pon{
+				Action: Action{
+					Message: Message{TypePon},
+					Actor:   1,
+					Log:     "test",
+				},
+				Target:   0,
+				Pai:      "1m",
+				Consumed: [2]string{"1m", "1m"},
+			},
+			wantErr: false,
+		},
+		{
+			name:    "invalid",
+			args:    args{&invalid},
+			want:    nil,
+			wantErr: true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := NewPonFromEvent(tt.args.ev)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("NewPonFromEvent() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("NewPonFromEvent() = %v, want %v", got, tt.want)
 			}
 		})
 	}
