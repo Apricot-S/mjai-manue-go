@@ -4,6 +4,8 @@ import (
 	"reflect"
 	"testing"
 
+	"github.com/Apricot-S/mjai-manue-go/internal/base"
+	"github.com/Apricot-S/mjai-manue-go/internal/game/event/outbound"
 	"github.com/go-json-experiment/json"
 )
 
@@ -612,6 +614,56 @@ func TestChi_Unmarshal(t *testing.T) {
 			}
 			if !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("Unmarshal() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestNewChiFromEvent(t *testing.T) {
+	valid, _ := outbound.NewChi(1, 0, *mustPai("1m"), [2]base.Pai(mustPais("2m", "3m")), "test")
+	invalid := *valid
+	invalid.Actor = 4
+
+	type args struct {
+		ev *outbound.Chi
+	}
+	tests := []struct {
+		name    string
+		args    args
+		want    *Chi
+		wantErr bool
+	}{
+		{
+			name: "valid",
+			args: args{valid},
+			want: &Chi{
+				Action: Action{
+					Message: Message{TypeChi},
+					Actor:   1,
+					Log:     "test",
+				},
+				Target:   0,
+				Pai:      "1m",
+				Consumed: [2]string{"2m", "3m"},
+			},
+			wantErr: false,
+		},
+		{
+			name:    "invalid",
+			args:    args{&invalid},
+			want:    nil,
+			wantErr: true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := NewChiFromEvent(tt.args.ev)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("NewChiFromEvent() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("NewChiFromEvent() = %v, want %v", got, tt.want)
 			}
 		})
 	}

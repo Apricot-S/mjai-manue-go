@@ -3,6 +3,7 @@ package mjai
 import (
 	"fmt"
 
+	"github.com/Apricot-S/mjai-manue-go/internal/game/event/outbound"
 	"github.com/go-json-experiment/json"
 	"github.com/go-json-experiment/json/jsontext"
 )
@@ -58,4 +59,9 @@ func (m *Chi) UnmarshalJSONFrom(d *jsontext.Decoder) error {
 	}
 
 	return messageValidator.Struct(m)
+}
+
+func NewChiFromEvent(ev *outbound.Chi) (*Chi, error) {
+	consumed := [2]string{ev.Consumed[0].ToString(), ev.Consumed[1].ToString()}
+	return NewChi(ev.Actor, ev.Target, ev.Taken.ToString(), consumed, ev.Log)
 }
