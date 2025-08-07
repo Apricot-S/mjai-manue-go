@@ -4,6 +4,8 @@ import (
 	"reflect"
 	"testing"
 
+	"github.com/Apricot-S/mjai-manue-go/internal/base"
+	"github.com/Apricot-S/mjai-manue-go/internal/game/event/outbound"
 	"github.com/go-json-experiment/json"
 )
 
@@ -612,6 +614,56 @@ func TestDaiminkan_Unmarshal(t *testing.T) {
 			}
 			if !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("Unmarshal() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestNewDaiminkanFromEvent(t *testing.T) {
+	valid, _ := outbound.NewDaiminkan(1, 0, *mustPai("5p"), [3]base.Pai(mustPais("5p", "5p", "5pr")), "test")
+	invalid := *valid
+	invalid.Actor = -1
+
+	type args struct {
+		ev *outbound.Daiminkan
+	}
+	tests := []struct {
+		name    string
+		args    args
+		want    *Daiminkan
+		wantErr bool
+	}{
+		{
+			name: "valid",
+			args: args{valid},
+			want: &Daiminkan{
+				Action: Action{
+					Message: Message{TypeDaiminkan},
+					Actor:   1,
+					Log:     "test",
+				},
+				Target:   0,
+				Pai:      "5p",
+				Consumed: [3]string{"5p", "5p", "5pr"},
+			},
+			wantErr: false,
+		},
+		{
+			name:    "invalid",
+			args:    args{&invalid},
+			want:    nil,
+			wantErr: true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := NewDaiminkanFromEvent(tt.args.ev)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("NewDaiminkanFromEvent() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("NewDaiminkanFromEvent() = %v, want %v", got, tt.want)
 			}
 		})
 	}
