@@ -24,7 +24,7 @@ func (a *MjaiAdapter) messageToEvent(rawMsg []byte) (inbound.Event, error) {
 		if err := json.Unmarshal(rawMsg, &hello); err != nil {
 			return nil, fmt.Errorf("failed to unmarshal hello message: %w", err)
 		}
-		return inbound.NewHello(), nil
+		return hello.ToEvent(), nil
 	case TypeStartGame:
 		var startGame StartGame
 		if err := json.Unmarshal(rawMsg, &startGame); err != nil {

@@ -4,6 +4,7 @@ import (
 	"reflect"
 	"testing"
 
+	"github.com/Apricot-S/mjai-manue-go/internal/game/event/inbound"
 	"github.com/go-json-experiment/json"
 )
 
@@ -202,6 +203,50 @@ func TestHello_Unmarshal(t *testing.T) {
 			}
 			if !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("Unmarshal() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestHello_ToEvent(t *testing.T) {
+	type fields struct {
+		Message         Message
+		Protocol        string
+		ProtocolVersion int
+	}
+	tests := []struct {
+		name   string
+		fields fields
+		want   *inbound.Hello
+	}{
+		{
+			name: "valid",
+			fields: fields{
+				Message:         Message{TypeHello},
+				Protocol:        "mjsonp",
+				ProtocolVersion: 3,
+			},
+			want: inbound.NewHello(),
+		},
+		{
+			name: "fields are not checked",
+			fields: fields{
+				Message:         Message{TypeHello},
+				Protocol:        "",
+				ProtocolVersion: -1,
+			},
+			want: inbound.NewHello(),
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			m := &Hello{
+				Message:         tt.fields.Message,
+				Protocol:        tt.fields.Protocol,
+				ProtocolVersion: tt.fields.ProtocolVersion,
+			}
+			if got := m.ToEvent(); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("Hello.ToEvent() = %v, want %v", got, tt.want)
 			}
 		})
 	}
