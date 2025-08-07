@@ -196,6 +196,22 @@ func (a *MjaiAdapter) messageToEvent(rawMsg []byte) (inbound.Event, error) {
 		}
 
 		return inbound.NewKakan(kakan.Actor, kakan.Actor, *taken, consumed, *added)
+	case TypeDora:
+		panic("not implemented")
+	case TypeReach:
+		panic("not implemented")
+	case TypeReachAccepted:
+		panic("not implemented")
+	case TypeHora:
+		panic("not implemented")
+	case TypeRyukyoku:
+		panic("not implemented")
+	case TypeEndKyoku:
+		panic("not implemented")
+	case TypeEndGame:
+		panic("not implemented")
+	case TypeError:
+		panic("not implemented")
 	default:
 		return nil, fmt.Errorf("unknown message type: %s", msg.Type)
 	}
