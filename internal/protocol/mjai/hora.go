@@ -3,6 +3,7 @@ package mjai
 import (
 	"fmt"
 
+	"github.com/Apricot-S/mjai-manue-go/internal/game/event/outbound"
 	"github.com/go-json-experiment/json"
 	"github.com/go-json-experiment/json/jsontext"
 )
@@ -70,4 +71,8 @@ func (m *Hora) UnmarshalJSONFrom(d *jsontext.Decoder) error {
 	}
 
 	return messageValidator.Struct(m)
+}
+
+func NewHoraFromEvent(ev *outbound.Hora) (*Hora, error) {
+	return NewHora(ev.Actor, ev.Target, ev.Pai.ToString(), 0, nil, ev.Log)
 }

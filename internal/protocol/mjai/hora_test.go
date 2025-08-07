@@ -4,6 +4,7 @@ import (
 	"reflect"
 	"testing"
 
+	"github.com/Apricot-S/mjai-manue-go/internal/game/event/outbound"
 	"github.com/go-json-experiment/json"
 )
 
@@ -846,6 +847,55 @@ func TestHora_Unmarshal(t *testing.T) {
 			}
 			if !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("Unmarshal() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestNewHoraFromEvent(t *testing.T) {
+	valid, _ := outbound.NewHora(1, 0, *mustPai("1m"), "test")
+	invalid := *valid
+	invalid.Actor = 4
+
+	type args struct {
+		ev *outbound.Hora
+	}
+	tests := []struct {
+		name    string
+		args    args
+		want    *Hora
+		wantErr bool
+	}{
+		{
+			name: "valid",
+			args: args{valid},
+			want: &Hora{
+				Action: Action{
+					Message: Message{TypeHora},
+					Actor:   1,
+					Log:     "test",
+				},
+				Target: 0,
+				Pai:    "1m",
+			},
+			wantErr: false,
+		},
+		{
+			name:    "invalid",
+			args:    args{&invalid},
+			want:    nil,
+			wantErr: true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := NewHoraFromEvent(tt.args.ev)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("NewHoraFromEvent() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("NewHoraFromEvent() = %v, want %v", got, tt.want)
 			}
 		})
 	}
