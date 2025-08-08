@@ -384,11 +384,11 @@ func TestTsumo_ToEvent(t *testing.T) {
 					Actor:   1,
 					Log:     "",
 				},
-				Pai: "6s",
+				Pai: "?",
 			},
 			want: &inbound.Tsumo{
 				Actor: 1,
-				Pai:   *mustPai("6s"),
+				Pai:   *mustPai("?"),
 			},
 			wantErr: false,
 		},
