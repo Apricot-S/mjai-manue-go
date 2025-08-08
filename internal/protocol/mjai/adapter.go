@@ -85,7 +85,11 @@ func (a *MjaiAdapter) messageToEvent(rawMsg []byte) (inbound.Event, error) {
 		}
 		return dora.ToEvent()
 	case TypeReach:
-		panic("not implemented")
+		var reach Reach
+		if err := json.Unmarshal(rawMsg, &reach); err != nil {
+			return nil, fmt.Errorf("failed to unmarshal reach message: %w", err)
+		}
+		return reach.ToEvent()
 	case TypeReachAccepted:
 		panic("not implemented")
 	case TypeHora:

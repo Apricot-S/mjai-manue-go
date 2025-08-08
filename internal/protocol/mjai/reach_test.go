@@ -4,6 +4,7 @@ import (
 	"reflect"
 	"testing"
 
+	"github.com/Apricot-S/mjai-manue-go/internal/game/event/inbound"
 	"github.com/Apricot-S/mjai-manue-go/internal/game/event/outbound"
 	"github.com/go-json-experiment/json"
 )
@@ -274,6 +275,54 @@ func TestReach_Unmarshal(t *testing.T) {
 			}
 			if !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("Unmarshal() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestReach_ToEvent(t *testing.T) {
+	tests := []struct {
+		name    string
+		args    *Reach
+		want    *inbound.Reach
+		wantErr bool
+	}{
+		{
+			name: "valid",
+			args: &Reach{
+				Action: Action{
+					Message: Message{TypeReach},
+					Actor:   1,
+					Log:     "",
+				},
+			},
+			want: &inbound.Reach{
+				Actor: 1,
+			},
+			wantErr: false,
+		},
+		{
+			name: "invalid",
+			args: &Reach{
+				Action: Action{
+					Message: Message{TypeReach},
+					Actor:   -1,
+					Log:     "",
+				},
+			},
+			want:    nil,
+			wantErr: true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := tt.args.ToEvent()
+			if (err != nil) != tt.wantErr {
+				t.Errorf("Reach.ToEvent() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("Reach.ToEvent() = %v, want %v", got, tt.want)
 			}
 		})
 	}
