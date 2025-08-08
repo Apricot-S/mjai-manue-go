@@ -2,7 +2,7 @@ package game
 
 import (
 	"github.com/Apricot-S/mjai-manue-go/internal/base"
-	"github.com/Apricot-S/mjai-manue-go/internal/message"
+	"github.com/Apricot-S/mjai-manue-go/internal/game/event/inbound"
 )
 
 type StateImpl struct {
@@ -15,16 +15,16 @@ type StateImpl struct {
 	doraMarkers []base.Pai
 	numPipais   int
 
-	prevEventType message.Type
+	prevEvent inbound.Event
 	// -1 if prev action is not dahai
-	prevDahaiActor   int
-	prevDahaiPai     *base.Pai
-	currentEventType message.Type
+	prevDahaiActor int
+	prevDahaiPai   *base.Pai
+	currentEvent   inbound.Event
 
 	playerID int
 	// -1 if there is no action
-	lastActor      int
-	lastActionType message.Type
+	lastActor  int
+	lastAction inbound.Event
 
 	// The tiles that cannot be discarded because they would result in swap calling (喰い替え)
 	kuikaePais     []base.Pai

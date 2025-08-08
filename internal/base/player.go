@@ -179,13 +179,9 @@ func (p *Player) AddExtraAnpais(pai Pai) {
 	p.extraAnpais = append(p.extraAnpais, pai)
 }
 
-func (p *Player) OnStartKyoku(tehais []Pai, score *int) error {
-	if len(tehais) != InitTehaisSize {
-		return fmt.Errorf("the length of haipai is not 13: %d", len(tehais))
-	}
-
+func (p *Player) OnStartKyoku(tehais [InitTehaisSize]Pai, score *int) error {
 	p.tehais = p.tehais[:InitTehaisSize]
-	copy(p.tehais, tehais)
+	copy(p.tehais, tehais[:])
 	sort.Sort(p.tehais)
 	p.furos = make([]Furo, 0, MaxNumFuro)
 	p.ho = make([]Pai, 0, maxNumHo)

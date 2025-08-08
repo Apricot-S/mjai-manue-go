@@ -9,13 +9,17 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/Apricot-S/mjai-manue-go/internal/base"
 	"github.com/Apricot-S/mjai-manue-go/internal/game"
-	"github.com/go-json-experiment/json/jsontext"
+	"github.com/Apricot-S/mjai-manue-go/internal/game/event/inbound"
+	"github.com/Apricot-S/mjai-manue-go/internal/protocol"
+	"github.com/Apricot-S/mjai-manue-go/internal/protocol/mjai"
 )
 
 func TestNewArchive(t *testing.T) {
 	type args struct {
-		paths []string
+		paths   []string
+		adapter protocol.Adapter
 	}
 	tests := []struct {
 		name string
@@ -24,32 +28,44 @@ func TestNewArchive(t *testing.T) {
 	}{
 		{
 			name: "multiple paths",
-			args: args{paths: []string{"test1.json", "test1.json.gz"}},
+			args: args{
+				paths:   []string{"test1.json", "test1.json.gz"},
+				adapter: &mjai.MjaiAdapter{},
+			},
 			want: &Archive{
-				paths: []string{"test1.json", "test1.json.gz"},
-				state: &game.StateImpl{},
+				paths:   []string{"test1.json", "test1.json.gz"},
+				adapter: &mjai.MjaiAdapter{},
+				state:   &game.StateImpl{},
 			},
 		},
 		{
 			name: "empty",
-			args: args{paths: []string{}},
+			args: args{
+				paths:   []string{},
+				adapter: &mjai.MjaiAdapter{},
+			},
 			want: &Archive{
-				paths: []string{},
-				state: &game.StateImpl{},
+				paths:   []string{},
+				adapter: &mjai.MjaiAdapter{},
+				state:   &game.StateImpl{},
 			},
 		},
 		{
 			name: "nil",
-			args: args{paths: nil},
+			args: args{
+				paths:   nil,
+				adapter: &mjai.MjaiAdapter{},
+			},
 			want: &Archive{
-				paths: nil,
-				state: &game.StateImpl{},
+				paths:   nil,
+				adapter: &mjai.MjaiAdapter{},
+				state:   &game.StateImpl{},
 			},
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := NewArchive(tt.args.paths); !reflect.DeepEqual(got, tt.want) {
+			if got := NewArchive(tt.args.paths, tt.args.adapter); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("NewArchive() = %v, want %v", got, tt.want)
 			}
 		})
@@ -86,17 +102,20 @@ func writeTestGZFile(t *testing.T, name string, plain []byte) string {
 }
 
 func TestArchive_PlayLight_SingleFile(t *testing.T) {
-	data := []string{`{"key":"value1"}`, `{"key":"value2"}`}
+	data := []string{
+		`{"type":"tsumo","actor":0,"pai":"F"}`,
+		`{"type":"dahai","actor":0,"pai":"F","tsumogiri":true}`,
+	}
 	path := writeTestFile(t, "actions.json", data)
 
-	want := []jsontext.Value{}
-	for _, d := range data {
-		want = append(want, jsontext.Value(d))
-	}
+	pai, _ := base.NewPaiWithName("F")
+	tsumo, _ := inbound.NewTsumo(0, *pai)
+	dahai, _ := inbound.NewDahai(0, *pai, true)
+	want := []inbound.Event{tsumo, dahai}
 
-	archive := NewArchive([]string{path})
-	var got []jsontext.Value
-	err := archive.PlayLight(func(act jsontext.Value) error {
+	archive := NewArchive([]string{path}, &mjai.MjaiAdapter{})
+	var got []inbound.Event
+	err := archive.PlayLight(func(act inbound.Event) error {
 		got = append(got, act)
 		return nil
 	})
@@ -110,17 +129,17 @@ func TestArchive_PlayLight_SingleFile(t *testing.T) {
 }
 
 func TestArchive_PlayLight_GzipFile(t *testing.T) {
-	plain := []byte(`{"x":1}` + "\n" + `{"x":2}`)
+	plain := []byte(`{"type":"tsumo","actor":0,"pai":"F"}` + "\n" + `{"type":"dahai","actor":0,"pai":"F","tsumogiri":true}`)
 	path := writeTestGZFile(t, "data.json.gz", plain)
 
-	want := []jsontext.Value{
-		jsontext.Value(`{"x":1}`),
-		jsontext.Value(`{"x":2}`),
-	}
+	pai, _ := base.NewPaiWithName("F")
+	tsumo, _ := inbound.NewTsumo(0, *pai)
+	dahai, _ := inbound.NewDahai(0, *pai, true)
+	want := []inbound.Event{tsumo, dahai}
 
-	archive := NewArchive([]string{path})
-	var got []jsontext.Value
-	err := archive.PlayLight(func(act jsontext.Value) error {
+	archive := NewArchive([]string{path}, &mjai.MjaiAdapter{})
+	var got []inbound.Event
+	err := archive.PlayLight(func(act inbound.Event) error {
 		got = append(got, act)
 		return nil
 	})
@@ -135,22 +154,22 @@ func TestArchive_PlayLight_GzipFile(t *testing.T) {
 
 func TestArchive_PlayLight_InvalidJSON(t *testing.T) {
 	data := []string{
-		`{"valid":true}`,
-		`{invalid`, // malformed JSON
+		`{"type":"tsumo","actor":0,"pai":"F"}`,
+		`{"type":"dahai","actor":0`, // malformed JSON
 	}
 	path := writeTestFile(t, "broken.json", data)
 
-	archive := NewArchive([]string{path})
-	err := archive.PlayLight(func(act jsontext.Value) error { return nil })
+	archive := NewArchive([]string{path}, &mjai.MjaiAdapter{})
+	err := archive.PlayLight(func(act inbound.Event) error { return nil })
 
-	if err == nil || !strings.Contains(err.Error(), "json decode error") {
+	if err == nil {
 		t.Errorf("expected JSON error, got: %v", err)
 	}
 }
 
 func TestArchive_PlayLight_FileNotFound(t *testing.T) {
-	archive := NewArchive([]string{"/nonexistent/path.json"})
-	err := archive.PlayLight(func(act jsontext.Value) error { return nil })
+	archive := NewArchive([]string{"/nonexistent/path.json"}, &mjai.MjaiAdapter{})
+	err := archive.PlayLight(func(act inbound.Event) error { return nil })
 
 	if err == nil || !strings.Contains(err.Error(), "failed to open") {
 		t.Errorf("expected file open error, got: %v", err)
@@ -158,11 +177,14 @@ func TestArchive_PlayLight_FileNotFound(t *testing.T) {
 }
 
 func TestArchive_PlayLight_ErrorInCallback(t *testing.T) {
-	data := []string{`{"key":"value1"}`, `{"key":"value2"}`}
+	data := []string{
+		`{"type":"tsumo","actor":0,"pai":"F"}`,
+		`{"type":"dahai","actor":0,"pai":"F","tsumogiri":true}`,
+	}
 	path := writeTestFile(t, "actions.json", data)
 
-	archive := NewArchive([]string{path})
-	err := archive.PlayLight(func(act jsontext.Value) error {
+	archive := NewArchive([]string{path}, &mjai.MjaiAdapter{})
+	err := archive.PlayLight(func(act inbound.Event) error {
 		return errors.New("")
 	})
 

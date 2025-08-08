@@ -9,10 +9,10 @@ import (
 	"github.com/Apricot-S/mjai-manue-go/configs"
 	"github.com/Apricot-S/mjai-manue-go/internal/base"
 	"github.com/Apricot-S/mjai-manue-go/internal/game"
-	"github.com/Apricot-S/mjai-manue-go/internal/message"
+	"github.com/Apricot-S/mjai-manue-go/internal/game/event/inbound"
+	"github.com/Apricot-S/mjai-manue-go/internal/protocol/mjai"
 	"github.com/Apricot-S/mjai-manue-go/tools/shared"
 	"github.com/go-json-experiment/json"
-	"github.com/go-json-experiment/json/jsontext"
 )
 
 // TODO Support kokushimuso and chitoitsu
@@ -29,7 +29,7 @@ func isTenpai(actor *base.Player) (bool, error) {
 }
 
 type Counter interface {
-	OnAction(action jsontext.Value, g game.StateViewer) error
+	OnAction(action inbound.Event, g game.StateViewer) error
 }
 
 const maxTurn = 18
@@ -47,28 +47,19 @@ func NewBasicCounter() *BasicCounter {
 	return &BasicCounter{}
 }
 
-func (bc *BasicCounter) OnAction(action jsontext.Value, g game.StateViewer) error {
-	var msg message.Message
-	if err := json.Unmarshal(action, &msg); err != nil {
-		return err
-	}
-
-	switch msg.Type {
-	case message.TypeHora:
+func (bc *BasicCounter) OnAction(action inbound.Event, g game.StateViewer) error {
+	switch a := action.(type) {
+	case *inbound.Hora:
 		bc.NumHoras++
-
-		var h message.Hora
-		if err := json.Unmarshal(action, &h); err != nil {
-			return fmt.Errorf("failed to unmarshal hora: %w", err)
-		}
-
-		if h.Actor == h.Target {
+		if a.Actor == a.Target {
 			bc.NumTsumoHoras++
 		}
-		bc.TotalHoraPoints += h.HoraPoints
-	case message.TypeRyukyoku:
+		if a.HoraPoints != nil {
+			bc.TotalHoraPoints += *a.HoraPoints
+		}
+	case *inbound.Ryukyoku:
 		bc.NumRyukyokus++
-	case message.TypeEndKyoku:
+	case *inbound.EndKyoku:
 		bc.NumKyokus++
 		idx := (game.NumInitPipais - g.NumPipais()) / 4
 		bc.NumTurnsFreqs[idx]++
@@ -89,19 +80,10 @@ func NewHoraPointsCounter() *HoraPointsCounter {
 	}
 }
 
-func (hpc *HoraPointsCounter) OnAction(action jsontext.Value, g game.StateViewer) error {
-	var msg message.Message
-	if err := json.Unmarshal(action, &msg); err != nil {
-		return err
-	}
-
-	if msg.Type != message.TypeHora {
+func (hpc *HoraPointsCounter) OnAction(action inbound.Event, g game.StateViewer) error {
+	hora, ok := action.(*inbound.Hora)
+	if !ok {
 		return nil
-	}
-
-	var hora message.Hora
-	if err := json.Unmarshal(action, &hora); err != nil {
-		return fmt.Errorf("failed to unmarshal hora: %w", err)
 	}
 
 	var freqs map[string]int
@@ -112,8 +94,10 @@ func (hpc *HoraPointsCounter) OnAction(action jsontext.Value, g game.StateViewer
 	}
 
 	freqs["total"]++
-	key := strconv.Itoa(hora.HoraPoints)
-	freqs[key]++
+	if hora.HoraPoints != nil {
+		key := strconv.Itoa(*hora.HoraPoints)
+		freqs[key]++
+	}
 
 	return nil
 }
@@ -128,19 +112,10 @@ func NewYamitenCounter() *YamitenCounter {
 	}
 }
 
-func (yc *YamitenCounter) OnAction(action jsontext.Value, g game.StateViewer) error {
-	var msg message.Message
-	if err := json.Unmarshal(action, &msg); err != nil {
-		return err
-	}
-
-	if msg.Type != message.TypeDahai {
+func (yc *YamitenCounter) OnAction(action inbound.Event, g game.StateViewer) error {
+	dahai, ok := action.(*inbound.Dahai)
+	if !ok {
 		return nil
-	}
-
-	var dahai message.Dahai
-	if err := json.Unmarshal(action, &dahai); err != nil {
-		return fmt.Errorf("failed to unmarshal dahai: %w", err)
 	}
 
 	actor := g.Players()[dahai.Actor]
@@ -191,31 +166,21 @@ func NewRyukyokuTenpaiCounter() *RyukyokuTenpaiCounter {
 	}
 }
 
-func (rtc *RyukyokuTenpaiCounter) OnAction(action jsontext.Value, g game.StateViewer) error {
-	var msg message.Message
-	if err := json.Unmarshal(action, &msg); err != nil {
-		return err
-	}
-
-	switch msg.Type {
-	case message.TypeStartKyoku:
+func (rtc *RyukyokuTenpaiCounter) OnAction(action inbound.Event, g game.StateViewer) error {
+	switch a := action.(type) {
+	case *inbound.StartKyoku:
 		rtc.tenpaiTurns = [4]*float64{nil, nil, nil, nil}
-	case message.TypeDahai:
-		var dahai message.Dahai
-		if err := json.Unmarshal(action, &dahai); err != nil {
-			return fmt.Errorf("failed to unmarshal dahai: %w", err)
-		}
-
-		actor := g.Players()[dahai.Actor]
+	case *inbound.Dahai:
+		actor := g.Players()[a.Actor]
 		isTenpai, err := isTenpai(&actor)
 		if err != nil {
 			return err
 		}
-		if rtc.tenpaiTurns[dahai.Actor] == nil && isTenpai {
+		if rtc.tenpaiTurns[a.Actor] == nil && isTenpai {
 			turn := g.Turn()
-			rtc.tenpaiTurns[dahai.Actor] = &turn
+			rtc.tenpaiTurns[a.Actor] = &turn
 		}
-	case message.TypeRyukyoku:
+	case *inbound.Ryukyoku:
 		for _, player := range g.Players() {
 			isTenpai, err := isTenpai(&player)
 			if err != nil {
@@ -252,7 +217,7 @@ func main() {
 	if err != nil {
 		log.Fatalf("error in glob: %v", err)
 	}
-	a := shared.NewArchive(paths)
+	a := shared.NewArchive(paths, &mjai.MjaiAdapter{})
 
 	basic := NewBasicCounter()
 	horaPoints := NewHoraPointsCounter()
@@ -260,12 +225,8 @@ func main() {
 	ryukyokuTenpai := NewRyukyokuTenpaiCounter()
 	counters := []Counter{basic, horaPoints, yamiten, ryukyokuTenpai}
 
-	onAction := func(action jsontext.Value) error {
-		var msg message.Message
-		if err := json.Unmarshal(action, &msg); err != nil {
-			return err
-		}
-		if msg.Type == message.TypeError {
+	onAction := func(action inbound.Event) error {
+		if _, ok := action.(*inbound.Error); ok {
 			return fmt.Errorf("error in the log")
 		}
 		for _, counter := range counters {

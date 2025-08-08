@@ -5,9 +5,8 @@ import (
 
 	"github.com/Apricot-S/mjai-manue-go/internal/ai"
 	"github.com/Apricot-S/mjai-manue-go/internal/game"
-	"github.com/Apricot-S/mjai-manue-go/internal/message"
-	"github.com/go-json-experiment/json"
-	"github.com/go-json-experiment/json/jsontext"
+	"github.com/Apricot-S/mjai-manue-go/internal/game/event/inbound"
+	"github.com/Apricot-S/mjai-manue-go/internal/game/event/outbound"
 )
 
 type AIAgent struct {
@@ -28,42 +27,33 @@ func NewAIAgentWithState(name string, room string, ai ai.AI, state game.State) *
 	}
 }
 
-func (a *AIAgent) Respond(msgs []jsontext.Value) (jsontext.Value, error) {
-	var msg message.Message
-
-	firstMsg := msgs[0]
-	if err := json.Unmarshal(firstMsg, &msg); err != nil {
-		return nil, err
-	}
-
+func (a *AIAgent) Respond(events []inbound.Event) (outbound.Event, error) {
 	// Process messages before and after the game
-	switch msg.Type {
-	case message.TypeHello:
-		return a.makeJoinResponse()
-	case message.TypeStartGame:
-		if err := a.onStartGame(firstMsg); err != nil {
-			return nil, err
-		}
-		if err := a.state.Update(firstMsg); err != nil {
+	switch firstEvent := events[0].(type) {
+	case *inbound.Hello:
+		return a.makeJoinResponse(), nil
+	case *inbound.StartGame:
+		a.onStartGame(*firstEvent)
+		if err := a.state.Update(firstEvent); err != nil {
 			return nil, fmt.Errorf("failed to update state: %w", err)
 		}
 		a.ai.Initialize()
-		return a.makeNoneResponse()
-	case message.TypeEndKyoku:
+		return a.makeNoneResponse(), nil
+	case *inbound.EndKyoku:
 		// Message during the game, but does not affect the game, so process it here
-		return a.makeNoneResponse()
-	case message.TypeEndGame, message.TypeError:
+		return a.makeNoneResponse(), nil
+	case *inbound.EndGame, *inbound.Error:
 		a.onEndGame()
-		return a.makeNoneResponse()
+		return a.makeNoneResponse(), nil
 	}
 
 	if !a.inGame {
-		return nil, fmt.Errorf("received message while not in game: %v", msgs)
+		return nil, fmt.Errorf("received message while not in game: %v", events)
 	}
 
 	// Update state for all messages
-	for _, m := range msgs {
-		if err := a.state.Update(m); err != nil {
+	for _, ev := range events {
+		if err := a.state.Update(ev); err != nil {
 			return nil, fmt.Errorf("failed to update state: %w", err)
 		}
 	}

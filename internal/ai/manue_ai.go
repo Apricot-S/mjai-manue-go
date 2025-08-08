@@ -10,9 +10,7 @@ import (
 	"github.com/Apricot-S/mjai-manue-go/internal/ai/estimator"
 	"github.com/Apricot-S/mjai-manue-go/internal/base"
 	"github.com/Apricot-S/mjai-manue-go/internal/game"
-	"github.com/Apricot-S/mjai-manue-go/internal/message"
-	"github.com/go-json-experiment/json"
-	"github.com/go-json-experiment/json/jsontext"
+	"github.com/Apricot-S/mjai-manue-go/internal/game/event/outbound"
 )
 
 type ManueAI struct {
@@ -63,20 +61,16 @@ func (a *ManueAI) log(str string) {
 	a.logStr += str
 }
 
-func (a *ManueAI) DecideAction(state game.StateAnalyzer, playerID int) (jsontext.Value, error) {
+func (a *ManueAI) DecideAction(state game.StateAnalyzer, playerID int) (outbound.Event, error) {
 	hc, err := state.HoraCandidate()
 	if err != nil {
 		return nil, err
 	}
 	if hc != nil {
 		// If it can win, always win
-		hora, err := message.NewHora(playerID, hc.Target(), hc.Pai().ToString(), 0, nil, a.logStr)
+		res, err := outbound.NewHora(playerID, hc.Target(), *hc.Pai(), a.logStr)
 		if err != nil {
-			return nil, fmt.Errorf("failed to create hora message: %w", err)
-		}
-		res, err := json.Marshal(&hora)
-		if err != nil {
-			return nil, fmt.Errorf("failed to marshal hora message: %w", err)
+			return nil, fmt.Errorf("failed to create hora event: %w", err)
 		}
 		a.logStr = ""
 		return res, nil
@@ -99,15 +93,10 @@ func (a *ManueAI) DecideAction(state game.StateAnalyzer, playerID int) (jsontext
 	}
 
 	// no action is possible
-	none := message.NewNone()
-	res, err := json.Marshal(&none)
-	if err != nil {
-		return nil, fmt.Errorf("failed to marshal none message: %w", err)
-	}
-	return res, nil
+	return outbound.NewNone(), nil
 }
 
-func (a *ManueAI) decideDahai(state game.StateAnalyzer, playerID int) (jsontext.Value, error) {
+func (a *ManueAI) decideDahai(state game.StateAnalyzer, playerID int) (outbound.Event, error) {
 	dc := state.DahaiCandidates()
 	rdc, err := state.ReachDahaiCandidates()
 	if err != nil {
@@ -122,13 +111,9 @@ func (a *ManueAI) decideDahai(state game.StateAnalyzer, playerID int) (jsontext.
 
 	if state.Players()[playerID].ReachState() == base.ReachAccepted {
 		// in reach
-		dahai, err := message.NewDahai(playerID, dc[0].ToString(), true, a.logStr)
+		res, err := outbound.NewDahai(playerID, dc[0], true, a.logStr)
 		if err != nil {
-			return nil, fmt.Errorf("failed to create dahai message: %w", err)
-		}
-		res, err := json.Marshal(&dahai)
-		if err != nil {
-			return nil, fmt.Errorf("failed to marshal dahai message: %w", err)
+			return nil, fmt.Errorf("failed to create dahai event: %w", err)
 		}
 		a.logStr = ""
 		return res, nil
@@ -147,13 +132,9 @@ func (a *ManueAI) decideDahai(state game.StateAnalyzer, playerID int) (jsontext.
 	reach := actionIdx == "0"
 	if reach {
 		// reach declaration
-		reach, err := message.NewReach(playerID, a.logStr)
+		res, err := outbound.NewReach(playerID, a.logStr)
 		if err != nil {
-			return nil, fmt.Errorf("failed to create reach message: %w", err)
-		}
-		res, err := json.Marshal(&reach)
-		if err != nil {
-			return nil, fmt.Errorf("failed to marshal reach message: %w", err)
+			return nil, fmt.Errorf("failed to create reach event: %w", err)
 		}
 		a.logStr = ""
 		return res, nil
@@ -165,19 +146,15 @@ func (a *ManueAI) decideDahai(state game.StateAnalyzer, playerID int) (jsontext.
 		return nil, err
 	}
 	isTsumogiri := state.IsTsumoPai(pai)
-	dahai, err := message.NewDahai(playerID, paiStr, isTsumogiri, a.logStr)
+	res, err := outbound.NewDahai(playerID, *pai, isTsumogiri, a.logStr)
 	if err != nil {
-		return nil, fmt.Errorf("failed to create dahai message: %w", err)
-	}
-	res, err := json.Marshal(&dahai)
-	if err != nil {
-		return nil, fmt.Errorf("failed to marshal dahai message: %w", err)
+		return nil, fmt.Errorf("failed to create dahai event: %w", err)
 	}
 	a.logStr = ""
 	return res, nil
 }
 
-func (a *ManueAI) decideFuro(state game.StateAnalyzer, playerID int) (jsontext.Value, error) {
+func (a *ManueAI) decideFuro(state game.StateAnalyzer, playerID int) (outbound.Event, error) {
 	fc, err := state.FuroCandidates()
 	if err != nil {
 		return nil, err
@@ -197,13 +174,9 @@ func (a *ManueAI) decideFuro(state game.StateAnalyzer, playerID int) (jsontext.V
 	fmt.Fprintf(os.Stderr, "decidedKey %s\n", key)
 
 	if key == "none" {
-		none, err := message.NewSkip(playerID, a.logStr)
+		res, err := outbound.NewSkip(playerID, a.logStr)
 		if err != nil {
 			return nil, err
-		}
-		res, err := json.Marshal(&none)
-		if err != nil {
-			return nil, fmt.Errorf("failed to marshal skip message: %w", err)
 		}
 		a.logStr = ""
 		return res, nil
@@ -220,50 +193,29 @@ func (a *ManueAI) decideFuro(state game.StateAnalyzer, playerID int) (jsontext.V
 	decision := fc[idx]
 
 	target := *decision.Target()
-	taken := decision.Taken().ToString()
+	taken := *decision.Taken()
 	switch decision.(type) {
 	case *base.Chi:
-		var consumed [2]string
-		for i, pai := range decision.Consumed() {
-			consumed[i] = pai.ToString()
-		}
-		chi, err := message.NewChi(playerID, target, taken, consumed, a.logStr)
+		consumed := [2]base.Pai(decision.Consumed())
+		res, err := outbound.NewChi(playerID, target, taken, consumed, a.logStr)
 		if err != nil {
-			return nil, fmt.Errorf("failed to create chi message: %w", err)
-		}
-		res, err := json.Marshal(&chi)
-		if err != nil {
-			return nil, fmt.Errorf("failed to marshal chi message: %w", err)
+			return nil, fmt.Errorf("failed to create chi event: %w", err)
 		}
 		a.logStr = ""
 		return res, nil
 	case *base.Pon:
-		var consumed [2]string
-		for i, pai := range decision.Consumed() {
-			consumed[i] = pai.ToString()
-		}
-		pon, err := message.NewPon(playerID, target, taken, consumed, a.logStr)
+		consumed := [2]base.Pai(decision.Consumed())
+		res, err := outbound.NewPon(playerID, target, taken, consumed, a.logStr)
 		if err != nil {
-			return nil, fmt.Errorf("failed to create pon message: %w", err)
-		}
-		res, err := json.Marshal(&pon)
-		if err != nil {
-			return nil, fmt.Errorf("failed to marshal pon message: %w", err)
+			return nil, fmt.Errorf("failed to create pon event: %w", err)
 		}
 		a.logStr = ""
 		return res, nil
 	case *base.Daiminkan:
-		var consumed [3]string
-		for i, pai := range decision.Consumed() {
-			consumed[i] = pai.ToString()
-		}
-		daiminkan, err := message.NewDaiminkan(playerID, target, taken, consumed, a.logStr)
+		consumed := [3]base.Pai(decision.Consumed())
+		res, err := outbound.NewDaiminkan(playerID, target, taken, consumed, a.logStr)
 		if err != nil {
-			return nil, fmt.Errorf("failed to create daiminkan message: %w", err)
-		}
-		res, err := json.Marshal(&daiminkan)
-		if err != nil {
-			return nil, fmt.Errorf("failed to marshal daiminkan message: %w", err)
+			return nil, fmt.Errorf("failed to create daiminkan event: %w", err)
 		}
 		a.logStr = ""
 		return res, nil
