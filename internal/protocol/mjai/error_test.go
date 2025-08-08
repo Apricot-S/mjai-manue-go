@@ -4,6 +4,7 @@ import (
 	"reflect"
 	"testing"
 
+	"github.com/Apricot-S/mjai-manue-go/internal/game/event/inbound"
 	"github.com/go-json-experiment/json"
 )
 
@@ -131,6 +132,35 @@ func TestError_Unmarshal(t *testing.T) {
 			}
 			if !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("Unmarshal() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestError_ToEvent(t *testing.T) {
+	type fields struct {
+		Message Message
+	}
+	tests := []struct {
+		name   string
+		fields fields
+		want   *inbound.Error
+	}{
+		{
+			name: "valid",
+			fields: fields{
+				Message: Message{TypeError},
+			},
+			want: inbound.NewError(),
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			m := &Error{
+				Message: tt.fields.Message,
+			}
+			if got := m.ToEvent(); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("Error.ToEvent() = %v, want %v", got, tt.want)
 			}
 		})
 	}

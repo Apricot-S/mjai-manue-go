@@ -101,7 +101,11 @@ func (a *MjaiAdapter) messageToEvent(rawMsg []byte) (inbound.Event, error) {
 		}
 		return endGame.ToEvent(), nil
 	case TypeError:
-		panic("not implemented")
+		var errorMsg Error
+		if err := json.Unmarshal(rawMsg, &errorMsg); err != nil {
+			return nil, fmt.Errorf("failed to unmarshal error message: %w", err)
+		}
+		return errorMsg.ToEvent(), nil
 	default:
 		return nil, fmt.Errorf("unknown message type: %s", msg.Type)
 	}
