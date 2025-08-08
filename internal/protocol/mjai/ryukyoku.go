@@ -3,6 +3,7 @@ package mjai
 import (
 	"fmt"
 
+	"github.com/Apricot-S/mjai-manue-go/internal/game/event/inbound"
 	"github.com/go-json-experiment/json"
 	"github.com/go-json-experiment/json/jsontext"
 )
@@ -62,4 +63,13 @@ func (m *Ryukyoku) UnmarshalJSONFrom(d *jsontext.Decoder) error {
 	}
 
 	return messageValidator.Struct(m)
+}
+
+func (m *Ryukyoku) ToEvent() *inbound.Ryukyoku {
+	var scores *[4]int = nil
+	if m.Scores != nil {
+		scores = (*[4]int)(m.Scores)
+	}
+
+	return inbound.NewRyukyoku(scores)
 }

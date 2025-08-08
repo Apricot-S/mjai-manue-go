@@ -4,6 +4,7 @@ import (
 	"reflect"
 	"testing"
 
+	"github.com/Apricot-S/mjai-manue-go/internal/game/event/inbound"
 	"github.com/go-json-experiment/json"
 )
 
@@ -238,6 +239,46 @@ func TestRyukyoku_Unmarshal(t *testing.T) {
 			}
 			if !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("Unmarshal() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestRyukyoku_ToEvent(t *testing.T) {
+	tests := []struct {
+		name    string
+		args    *Ryukyoku
+		want    *inbound.Ryukyoku
+		wantErr bool
+	}{
+		{
+			name: "without scores",
+			args: &Ryukyoku{
+				Message: Message{Type: TypeRyukyoku},
+				Scores:  nil,
+			},
+			want: &inbound.Ryukyoku{
+				Scores: nil,
+			},
+			wantErr: false,
+		},
+		{
+			name: "with scores",
+			args: &Ryukyoku{
+				Message: Message{Type: TypeRyukyoku},
+				Scores:  []int{26000, 24000, 23000, 24000},
+			},
+			want: &inbound.Ryukyoku{
+				Scores: &[4]int{26000, 24000, 23000, 24000},
+			},
+			wantErr: false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := tt.args.ToEvent()
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("Ryukyoku.ToEvent() = %v, want %v", got, tt.want)
 			}
 		})
 	}
