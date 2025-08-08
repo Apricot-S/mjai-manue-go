@@ -3,6 +3,8 @@ package mjai
 import (
 	"fmt"
 
+	"github.com/Apricot-S/mjai-manue-go/internal/base"
+	"github.com/Apricot-S/mjai-manue-go/internal/game/event/inbound"
 	"github.com/go-json-experiment/json"
 	"github.com/go-json-experiment/json/jsontext"
 )
@@ -83,4 +85,33 @@ func (m *StartKyoku) UnmarshalJSONFrom(d *jsontext.Decoder) error {
 	}
 
 	return messageValidator.Struct(m)
+}
+
+func (m *StartKyoku) ToEvent() (*inbound.StartKyoku, error) {
+	bakaze, err := base.NewPaiWithName(m.Bakaze)
+	if err != nil {
+		return nil, err
+	}
+	doraMarker, err := base.NewPaiWithName(m.DoraMarker)
+	if err != nil {
+		return nil, err
+	}
+
+	var scores *[4]int = nil
+	if m.Scores != nil {
+		scores = (*[4]int)(m.Scores)
+	}
+
+	tehais := [4][13]base.Pai{}
+	for i, tehai := range m.Tehais {
+		for n, ts := range tehai {
+			tp, err := base.NewPaiWithName(ts)
+			if err != nil {
+				return nil, err
+			}
+			tehais[i][n] = *tp
+		}
+	}
+
+	return inbound.NewStartKyoku(*bakaze, m.Kyoku, m.Honba, m.Kyotaku, m.Oya, *doraMarker, scores, tehais)
 }

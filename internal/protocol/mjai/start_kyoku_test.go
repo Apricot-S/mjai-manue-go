@@ -4,6 +4,8 @@ import (
 	"reflect"
 	"testing"
 
+	"github.com/Apricot-S/mjai-manue-go/internal/base"
+	"github.com/Apricot-S/mjai-manue-go/internal/game/event/inbound"
 	"github.com/go-json-experiment/json"
 )
 
@@ -1065,6 +1067,119 @@ func TestStartKyoku_Unmarshal(t *testing.T) {
 			}
 			if !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("Unmarshal() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestStartKyoku_ToEvent(t *testing.T) {
+	tests := []struct {
+		name    string
+		args    *StartKyoku
+		want    *inbound.StartKyoku
+		wantErr bool
+	}{
+		{
+			name: "without scores",
+			args: &StartKyoku{
+				Message:    Message{Type: TypeStartKyoku},
+				Bakaze:     "E",
+				Kyoku:      1,
+				Honba:      0,
+				Kyotaku:    0,
+				Oya:        0,
+				DoraMarker: "7s",
+				Scores:     nil,
+				Tehais: [4][13]string{
+					{"?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?"},
+					{"3m", "4m", "3p", "5pr", "7p", "9p", "4s", "4s", "5sr", "7s", "7s", "W", "N"},
+					{"?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?"},
+					{"?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?"},
+				},
+			},
+			want: &inbound.StartKyoku{
+				Bakaze:     *mustPai("E"),
+				Kyoku:      1,
+				Honba:      0,
+				Kyotaku:    0,
+				Oya:        0,
+				DoraMarker: *mustPai("7s"),
+				Scores:     nil,
+				Tehais: [4][13]base.Pai{
+					[13]base.Pai(mustPais("?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?")),
+					[13]base.Pai(mustPais("3m", "4m", "3p", "5pr", "7p", "9p", "4s", "4s", "5sr", "7s", "7s", "W", "N")),
+					[13]base.Pai(mustPais("?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?")),
+					[13]base.Pai(mustPais("?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?")),
+				},
+			},
+			wantErr: false,
+		},
+		{
+			name: "with scores",
+			args: &StartKyoku{
+				Message:    Message{Type: TypeStartKyoku},
+				Bakaze:     "S",
+				Kyoku:      1,
+				Honba:      0,
+				Kyotaku:    0,
+				Oya:        0,
+				DoraMarker: "7s",
+				Scores:     []int{25000, 25000, 25000, 25000},
+				Tehais: [4][13]string{
+					{"?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?"},
+					{"3m", "4m", "3p", "5pr", "7p", "9p", "4s", "4s", "5sr", "7s", "7s", "W", "N"},
+					{"?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?"},
+					{"?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?"},
+				},
+			},
+			want: &inbound.StartKyoku{
+				Bakaze:     *mustPai("S"),
+				Kyoku:      1,
+				Honba:      0,
+				Kyotaku:    0,
+				Oya:        0,
+				DoraMarker: *mustPai("7s"),
+				Scores:     &[4]int{25000, 25000, 25000, 25000},
+				Tehais: [4][13]base.Pai{
+					[13]base.Pai(mustPais("?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?")),
+					[13]base.Pai(mustPais("3m", "4m", "3p", "5pr", "7p", "9p", "4s", "4s", "5sr", "7s", "7s", "W", "N")),
+					[13]base.Pai(mustPais("?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?")),
+					[13]base.Pai(mustPais("?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?")),
+				},
+			},
+			wantErr: false,
+		},
+		{
+			name: "invalid",
+			args: &StartKyoku{
+				Message:    Message{Type: TypeStartKyoku},
+				Bakaze:     "W",
+				Kyoku:      0,
+				Honba:      0,
+				Kyotaku:    0,
+				Oya:        0,
+				DoraMarker: "7s",
+				Scores:     []int{25000, 25000, 25000, 25000},
+				Tehais: [4][13]string{
+					{"?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?"},
+					{"3m", "4m", "3p", "5pr", "7p", "9p", "4s", "4s", "5sr", "7s", "7s", "W", "N"},
+					{"?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?"},
+					{"?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?"},
+				},
+			},
+			want:    nil,
+			wantErr: true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := tt.args.ToEvent()
+			if (err != nil) != tt.wantErr {
+				t.Errorf("StartKyoku.ToEvent() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("StartKyoku.ToEvent() = %v, want %v", got, tt.want)
 			}
 		})
 	}

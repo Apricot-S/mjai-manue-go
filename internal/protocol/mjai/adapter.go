@@ -3,7 +3,6 @@ package mjai
 import (
 	"fmt"
 
-	"github.com/Apricot-S/mjai-manue-go/internal/base"
 	"github.com/Apricot-S/mjai-manue-go/internal/game/event/inbound"
 	"github.com/Apricot-S/mjai-manue-go/internal/game/event/outbound"
 	"github.com/go-json-experiment/json"
@@ -36,42 +35,7 @@ func (a *MjaiAdapter) messageToEvent(rawMsg []byte) (inbound.Event, error) {
 		if err := json.Unmarshal(rawMsg, &startKyoku); err != nil {
 			return nil, fmt.Errorf("failed to unmarshal start_kyoku message: %w", err)
 		}
-
-		bakaze, err := base.NewPaiWithName(startKyoku.Bakaze)
-		if err != nil {
-			return nil, err
-		}
-		doraMarker, err := base.NewPaiWithName(startKyoku.DoraMarker)
-		if err != nil {
-			return nil, err
-		}
-
-		var scores *[4]int = nil
-		if startKyoku.Scores != nil {
-			scores = (*[4]int)(startKyoku.Scores)
-		}
-
-		tehais := [4][13]base.Pai{}
-		for i, tehai := range startKyoku.Tehais {
-			for n, ts := range tehai {
-				tp, err := base.NewPaiWithName(ts)
-				if err != nil {
-					return nil, err
-				}
-				tehais[i][n] = *tp
-			}
-		}
-
-		return inbound.NewStartKyoku(
-			*bakaze,
-			startKyoku.Kyoku,
-			startKyoku.Honba,
-			startKyoku.Kyotaku,
-			startKyoku.Oya,
-			*doraMarker,
-			scores,
-			tehais,
-		)
+		return startKyoku.ToEvent()
 	case TypeTsumo:
 		var tsumo Tsumo
 		if err := json.Unmarshal(rawMsg, &tsumo); err != nil {
