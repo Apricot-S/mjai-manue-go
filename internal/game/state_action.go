@@ -8,7 +8,17 @@ import (
 	"github.com/Apricot-S/mjai-manue-go/internal/game/event/inbound"
 )
 
+func isEndOfRound(currentEvent inbound.Event) bool {
+	_, isHora := currentEvent.(*inbound.Hora)
+	_, isRyukyoku := currentEvent.(*inbound.Ryukyoku)
+	return isHora || isRyukyoku
+}
+
 func (s *StateImpl) DahaiCandidates() []base.Pai {
+	if isEndOfRound(s.currentEvent) {
+		return nil
+	}
+
 	player := &s.players[s.playerID]
 	if !player.CanDahai() {
 		return nil
@@ -41,6 +51,10 @@ func (s *StateImpl) DahaiCandidates() []base.Pai {
 
 // ReachDahaiCandidates returns the candidates for the reach declaration tile.
 func (s *StateImpl) ReachDahaiCandidates() ([]base.Pai, error) {
+	if isEndOfRound(s.currentEvent) {
+		return nil, nil
+	}
+
 	player := &s.players[s.playerID]
 	if !player.CanDahai() {
 		return nil, nil
@@ -110,6 +124,10 @@ func (s *StateImpl) IsTsumoPai(pai *base.Pai) bool {
 }
 
 func (s *StateImpl) FuroCandidates() ([]base.Furo, error) {
+	if isEndOfRound(s.currentEvent) {
+		return nil, nil
+	}
+
 	if s.lastActor == noActor || s.lastActor == s.playerID {
 		// Furo is not possible if the last actor is the player itself or no actor.
 		return nil, nil
@@ -342,6 +360,10 @@ func (s *StateImpl) daiminkanCandidates() ([]base.Furo, error) {
 }
 
 func (s *StateImpl) HoraCandidate() (*base.Hora, error) {
+	if isEndOfRound(s.currentEvent) {
+		return nil, nil
+	}
+
 	if s.lastActor == noActor {
 		return nil, nil
 	}
@@ -384,6 +406,13 @@ func (s *StateImpl) HoraCandidate() (*base.Hora, error) {
 		return nil, nil
 	}
 
+	var horaPai base.Pai
+	if isTsumoSituation {
+		horaPai = tehais[len(tehais)-1]
+	} else {
+		horaPai = *s.prevDahaiPai
+	}
+
 	// Situation Yaku
 	hasMenzenchinTsumoho := isTsumoSituation && player.IsMenzen()
 	hasReach := player.ReachState() == base.ReachAccepted
@@ -393,14 +422,14 @@ func (s *StateImpl) HoraCandidate() (*base.Hora, error) {
 
 	has1Fan := hasMenzenchinTsumoho || hasReach || hasChankan || hasRinshankaiho || hasHaiteimoyueOrHoteiraoyui
 	if !has1Fan {
-		has1Fan, err = Has1Fan(s, s.playerID, tehais, player.Furos(), s.prevDahaiPai, isTsumoSituation)
+		has1Fan, err = Has1Fan(s, s.playerID, tehais, player.Furos(), &horaPai, isTsumoSituation)
 		if err != nil {
 			return nil, fmt.Errorf("failed to check if has 1 fan: %w", err)
 		}
 	}
 
 	if has1Fan {
-		hora, err := base.NewHora(*s.prevDahaiPai, s.lastActor)
+		hora, err := base.NewHora(horaPai, s.lastActor)
 		if err != nil {
 			return nil, fmt.Errorf("failed to create hora: %w", err)
 		}
