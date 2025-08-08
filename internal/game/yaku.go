@@ -433,8 +433,7 @@ func isSananko(tehaiMentsus []base.Mentsu, furos []base.Furo, horaPai *base.Pai,
 
 	// Mentsus in the hand
 	for _, m := range tehaiMentsus {
-		switch kotsu := m.(type) {
-		case *base.Kotsu:
+		if kotsu, ok := m.(*base.Kotsu); ok {
 			// In the case of Ron, exclude the kotsu that contains the horaPai
 			if !isTsumo && kotsu.Pais()[0].HasSameSymbol(horaPai) {
 				continue
