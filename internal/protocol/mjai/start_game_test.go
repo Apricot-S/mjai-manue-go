@@ -4,6 +4,7 @@ import (
 	"reflect"
 	"testing"
 
+	"github.com/Apricot-S/mjai-manue-go/internal/game/event/inbound"
 	"github.com/go-json-experiment/json"
 )
 
@@ -345,6 +346,64 @@ func TestStartGame_Unmarshal(t *testing.T) {
 			}
 			if !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("Unmarshal() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestStartGame_ToEvent(t *testing.T) {
+	tests := []struct {
+		name    string
+		args    *StartGame
+		want    *inbound.StartGame
+		wantErr bool
+	}{
+		{
+			name: "without names",
+			args: &StartGame{
+				Message: Message{TypeStartGame},
+				ID:      3,
+				Names:   nil,
+			},
+			want: &inbound.StartGame{
+				ID:    3,
+				Names: [4]string{"", "", "", ""},
+			},
+			wantErr: false,
+		},
+		{
+			name: "with names",
+			args: &StartGame{
+				Message: Message{TypeStartGame},
+				ID:      3,
+				Names:   []string{"a", "b", "c", "d"},
+			},
+			want: &inbound.StartGame{
+				ID:    3,
+				Names: [4]string{"a", "b", "c", "d"},
+			},
+			wantErr: false,
+		},
+		{
+			name: "invalid",
+			args: &StartGame{
+				Message: Message{TypeStartGame},
+				ID:      4,
+				Names:   nil,
+			},
+			want:    nil,
+			wantErr: true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := tt.args.ToEvent()
+			if (err != nil) != tt.wantErr {
+				t.Errorf("StartGame.ToEvent() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("StartGame.ToEvent() = %v, want %v", got, tt.want)
 			}
 		})
 	}

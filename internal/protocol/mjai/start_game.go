@@ -3,6 +3,7 @@ package mjai
 import (
 	"fmt"
 
+	"github.com/Apricot-S/mjai-manue-go/internal/game/event/inbound"
 	"github.com/go-json-experiment/json"
 	"github.com/go-json-experiment/json/jsontext"
 )
@@ -62,4 +63,12 @@ func (m *StartGame) UnmarshalJSONFrom(d *jsontext.Decoder) error {
 	}
 
 	return messageValidator.Struct(m)
+}
+
+func (m *StartGame) ToEvent() (*inbound.StartGame, error) {
+	names := [4]string{"", "", "", ""}
+	if m.Names != nil {
+		names = [4]string(m.Names)
+	}
+	return inbound.NewStartGame(m.ID, names)
 }

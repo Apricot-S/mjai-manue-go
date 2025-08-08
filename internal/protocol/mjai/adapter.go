@@ -30,12 +30,7 @@ func (a *MjaiAdapter) messageToEvent(rawMsg []byte) (inbound.Event, error) {
 		if err := json.Unmarshal(rawMsg, &startGame); err != nil {
 			return nil, fmt.Errorf("failed to unmarshal start_game message: %w", err)
 		}
-
-		names := [4]string{"", "", "", ""}
-		if startGame.Names != nil {
-			names = [4]string(startGame.Names)
-		}
-		return inbound.NewStartGame(startGame.ID, names)
+		return startGame.ToEvent()
 	case TypeStartKyoku:
 		var startKyoku StartKyoku
 		if err := json.Unmarshal(rawMsg, &startKyoku); err != nil {
