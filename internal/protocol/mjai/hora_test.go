@@ -4,6 +4,7 @@ import (
 	"reflect"
 	"testing"
 
+	"github.com/Apricot-S/mjai-manue-go/internal/game/event/inbound"
 	"github.com/Apricot-S/mjai-manue-go/internal/game/event/outbound"
 	"github.com/go-json-experiment/json"
 )
@@ -847,6 +848,113 @@ func TestHora_Unmarshal(t *testing.T) {
 			}
 			if !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("Unmarshal() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestHora_ToEvent(t *testing.T) {
+	horaPoints := new(int)
+	*horaPoints = 2600
+
+	tests := []struct {
+		name    string
+		args    *Hora
+		want    *inbound.Hora
+		wantErr bool
+	}{
+		{
+			name: "without hora_points and scores",
+			args: &Hora{
+				Action: Action{
+					Message: Message{TypeHora},
+					Actor:   1,
+					Log:     "",
+				},
+				Target:     1,
+				Pai:        "2p",
+				HoraPoints: 0,
+				Scores:     nil,
+			},
+			want: &inbound.Hora{
+				Actor:      1,
+				Target:     1,
+				Pai:        mustPai("2p"),
+				HoraPoints: nil,
+				Scores:     nil,
+			},
+			wantErr: false,
+		},
+		{
+			name: "with hora_points",
+			args: &Hora{
+				Action: Action{
+					Message: Message{TypeHora},
+					Actor:   1,
+					Log:     "",
+				},
+				Target:     1,
+				Pai:        "2p",
+				HoraPoints: 2600,
+				Scores:     nil,
+			},
+			want: &inbound.Hora{
+				Actor:      1,
+				Target:     1,
+				Pai:        mustPai("2p"),
+				HoraPoints: horaPoints,
+				Scores:     nil,
+			},
+			wantErr: false,
+		},
+		{
+			name: "with scores",
+			args: &Hora{
+				Action: Action{
+					Message: Message{TypeHora},
+					Actor:   1,
+					Log:     "",
+				},
+				Target:     1,
+				Pai:        "2p",
+				HoraPoints: 0,
+				Scores:     []int{26000, 24000, 23000, 24000},
+			},
+			want: &inbound.Hora{
+				Actor:      1,
+				Target:     1,
+				Pai:        mustPai("2p"),
+				HoraPoints: nil,
+				Scores:     &[4]int{26000, 24000, 23000, 24000},
+			},
+			wantErr: false,
+		},
+		{
+			name: "invalid",
+			args: &Hora{
+				Action: Action{
+					Message: Message{TypeHora},
+					Actor:   1,
+					Log:     "",
+				},
+				Target:     1,
+				Pai:        "2p",
+				HoraPoints: -1,
+				Scores:     nil,
+			},
+			want:    nil,
+			wantErr: true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := tt.args.ToEvent()
+			if (err != nil) != tt.wantErr {
+				t.Errorf("Hora.ToEvent() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("Hora.ToEvent() = %v, want %v", got, tt.want)
 			}
 		})
 	}
