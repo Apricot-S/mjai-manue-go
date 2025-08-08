@@ -77,13 +77,7 @@ func (a *MjaiAdapter) messageToEvent(rawMsg []byte) (inbound.Event, error) {
 		if err := json.Unmarshal(rawMsg, &tsumo); err != nil {
 			return nil, fmt.Errorf("failed to unmarshal tsumo message: %w", err)
 		}
-
-		pai, err := base.NewPaiWithName(tsumo.Pai)
-		if err != nil {
-			return nil, err
-		}
-
-		return inbound.NewTsumo(tsumo.Actor, *pai)
+		return tsumo.ToEvent()
 	case TypeDahai:
 		var dahai Dahai
 		if err := json.Unmarshal(rawMsg, &dahai); err != nil {

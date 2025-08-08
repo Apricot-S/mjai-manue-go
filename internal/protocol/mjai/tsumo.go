@@ -3,6 +3,8 @@ package mjai
 import (
 	"fmt"
 
+	"github.com/Apricot-S/mjai-manue-go/internal/base"
+	"github.com/Apricot-S/mjai-manue-go/internal/game/event/inbound"
 	"github.com/go-json-experiment/json"
 	"github.com/go-json-experiment/json/jsontext"
 )
@@ -54,4 +56,13 @@ func (m *Tsumo) UnmarshalJSONFrom(d *jsontext.Decoder) error {
 	}
 
 	return messageValidator.Struct(m)
+}
+
+func (m *Tsumo) ToEvent() (*inbound.Tsumo, error) {
+	pai, err := base.NewPaiWithName(m.Pai)
+	if err != nil {
+		return nil, err
+	}
+
+	return inbound.NewTsumo(m.Actor, *pai)
 }

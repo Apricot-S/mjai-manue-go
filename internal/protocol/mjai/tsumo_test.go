@@ -4,6 +4,7 @@ import (
 	"reflect"
 	"testing"
 
+	"github.com/Apricot-S/mjai-manue-go/internal/game/event/inbound"
 	"github.com/go-json-experiment/json"
 )
 
@@ -363,6 +364,57 @@ func TestTsumo_Unmarshal(t *testing.T) {
 			}
 			if !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("Unmarshal() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestTsumo_ToEvent(t *testing.T) {
+	tests := []struct {
+		name    string
+		args    *Tsumo
+		want    *inbound.Tsumo
+		wantErr bool
+	}{
+		{
+			name: "valid",
+			args: &Tsumo{
+				Action: Action{
+					Message: Message{TypeTsumo},
+					Actor:   1,
+					Log:     "",
+				},
+				Pai: "6s",
+			},
+			want: &inbound.Tsumo{
+				Actor: 1,
+				Pai:   *mustPai("6s"),
+			},
+			wantErr: false,
+		},
+		{
+			name: "invalid",
+			args: &Tsumo{
+				Action: Action{
+					Message: Message{TypeTsumo},
+					Actor:   -1,
+					Log:     "",
+				},
+				Pai: "4s",
+			},
+			want:    nil,
+			wantErr: true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := tt.args.ToEvent()
+			if (err != nil) != tt.wantErr {
+				t.Errorf("Tsumo.ToEvent() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("Tsumo.ToEvent() = %v, want %v", got, tt.want)
 			}
 		})
 	}
