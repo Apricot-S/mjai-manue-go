@@ -107,22 +107,7 @@ func (a *MjaiAdapter) messageToEvent(rawMsg []byte) (inbound.Event, error) {
 		if err := json.Unmarshal(rawMsg, &pon); err != nil {
 			return nil, fmt.Errorf("failed to unmarshal pon message: %w", err)
 		}
-
-		taken, err := base.NewPaiWithName(pon.Pai)
-		if err != nil {
-			return nil, err
-		}
-
-		consumed := [2]base.Pai{}
-		for i, c := range pon.Consumed {
-			p, err := base.NewPaiWithName(c)
-			if err != nil {
-				return nil, err
-			}
-			consumed[i] = *p
-		}
-
-		return inbound.NewPon(pon.Actor, pon.Target, *taken, consumed)
+		return pon.ToEvent()
 	case TypeDaiminkan:
 		var daiminkan Daiminkan
 		if err := json.Unmarshal(rawMsg, &daiminkan); err != nil {
