@@ -113,22 +113,7 @@ func (a *MjaiAdapter) messageToEvent(rawMsg []byte) (inbound.Event, error) {
 		if err := json.Unmarshal(rawMsg, &daiminkan); err != nil {
 			return nil, fmt.Errorf("failed to unmarshal daiminkan message: %w", err)
 		}
-
-		taken, err := base.NewPaiWithName(daiminkan.Pai)
-		if err != nil {
-			return nil, err
-		}
-
-		consumed := [3]base.Pai{}
-		for i, c := range daiminkan.Consumed {
-			p, err := base.NewPaiWithName(c)
-			if err != nil {
-				return nil, err
-			}
-			consumed[i] = *p
-		}
-
-		return inbound.NewDaiminkan(daiminkan.Actor, daiminkan.Target, *taken, consumed)
+		return daiminkan.ToEvent()
 	case TypeAnkan:
 		var ankan Ankan
 		if err := json.Unmarshal(rawMsg, &ankan); err != nil {

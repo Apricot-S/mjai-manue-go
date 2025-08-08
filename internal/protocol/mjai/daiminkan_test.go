@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/Apricot-S/mjai-manue-go/internal/base"
+	"github.com/Apricot-S/mjai-manue-go/internal/game/event/inbound"
 	"github.com/Apricot-S/mjai-manue-go/internal/game/event/outbound"
 	"github.com/go-json-experiment/json"
 )
@@ -614,6 +615,63 @@ func TestDaiminkan_Unmarshal(t *testing.T) {
 			}
 			if !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("Unmarshal() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestDaiminkan_ToEvent(t *testing.T) {
+	tests := []struct {
+		name    string
+		args    *Daiminkan
+		want    *inbound.Daiminkan
+		wantErr bool
+	}{
+		{
+			name: "valid",
+			args: &Daiminkan{
+				Action: Action{
+					Message: Message{TypeDaiminkan},
+					Actor:   1,
+					Log:     "",
+				},
+				Target:   0,
+				Pai:      "6s",
+				Consumed: [3]string{"6s", "6s", "6s"},
+			},
+			want: &inbound.Daiminkan{
+				Actor:    1,
+				Target:   0,
+				Taken:    *mustPai("6s"),
+				Consumed: [3]base.Pai(mustPais("6s", "6s", "6s")),
+			},
+			wantErr: false,
+		},
+		{
+			name: "invalid",
+			args: &Daiminkan{
+				Action: Action{
+					Message: Message{TypeDaiminkan},
+					Actor:   1,
+					Log:     "",
+				},
+				Target:   1,
+				Pai:      "6s",
+				Consumed: [3]string{"6s", "6s", "6s"},
+			},
+			want:    nil,
+			wantErr: true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := tt.args.ToEvent()
+			if (err != nil) != tt.wantErr {
+				t.Errorf("Daiminkan.ToEvent() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("Daiminkan.ToEvent() = %v, want %v", got, tt.want)
 			}
 		})
 	}
