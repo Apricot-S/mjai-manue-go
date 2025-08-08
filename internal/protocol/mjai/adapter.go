@@ -119,27 +119,7 @@ func (a *MjaiAdapter) messageToEvent(rawMsg []byte) (inbound.Event, error) {
 		if err := json.Unmarshal(rawMsg, &kakan); err != nil {
 			return nil, fmt.Errorf("failed to unmarshal kakan message: %w", err)
 		}
-
-		added, err := base.NewPaiWithName(kakan.Pai)
-		if err != nil {
-			return nil, err
-		}
-
-		consumed := [2]base.Pai{}
-		for i, c := range kakan.Consumed[:2] {
-			p, err := base.NewPaiWithName(c)
-			if err != nil {
-				return nil, err
-			}
-			consumed[i] = *p
-		}
-
-		taken, err := base.NewPaiWithName(kakan.Consumed[2])
-		if err != nil {
-			return nil, err
-		}
-
-		return inbound.NewKakan(kakan.Actor, kakan.Actor, *taken, consumed, *added)
+		return kakan.ToEvent()
 	case TypeDora:
 		panic("not implemented")
 	case TypeReach:

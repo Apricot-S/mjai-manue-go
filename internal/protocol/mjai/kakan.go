@@ -3,6 +3,8 @@ package mjai
 import (
 	"fmt"
 
+	"github.com/Apricot-S/mjai-manue-go/internal/base"
+	"github.com/Apricot-S/mjai-manue-go/internal/game/event/inbound"
 	"github.com/Apricot-S/mjai-manue-go/internal/game/event/outbound"
 	"github.com/go-json-experiment/json"
 	"github.com/go-json-experiment/json/jsontext"
@@ -57,6 +59,36 @@ func (m *Kakan) UnmarshalJSONFrom(d *jsontext.Decoder) error {
 	}
 
 	return messageValidator.Struct(m)
+}
+
+func (m *Kakan) ToEvent() (*inbound.Kakan, error) {
+	added, err := base.NewPaiWithName(m.Pai)
+	if err != nil {
+		return nil, err
+	}
+
+	consumed := [2]base.Pai{}
+	for i, c := range m.Consumed[:2] {
+		p, err := base.NewPaiWithName(c)
+		if err != nil {
+			return nil, err
+		}
+		consumed[i] = *p
+	}
+
+	// Heuristic: The last tile in the consumed is considered `taken`.
+	// This is a simplification and may not reflect the actual game state.
+	taken, err := base.NewPaiWithName(m.Consumed[2])
+	if err != nil {
+		return nil, err
+	}
+
+	// Target is temporarily set to a value that does not overlap with Actor.
+	// There is no problem when updating the Player because the Target is obtained from the Pon.
+	target := (3 + m.Actor) % 4
+
+	// Target is not provided in event data
+	return inbound.NewKakan(m.Actor, target, *taken, consumed, *added)
 }
 
 func NewKakanFromEvent(ev *outbound.Kakan) (*Kakan, error) {
