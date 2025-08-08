@@ -101,22 +101,7 @@ func (a *MjaiAdapter) messageToEvent(rawMsg []byte) (inbound.Event, error) {
 		if err := json.Unmarshal(rawMsg, &chi); err != nil {
 			return nil, fmt.Errorf("failed to unmarshal chi message: %w", err)
 		}
-
-		taken, err := base.NewPaiWithName(chi.Pai)
-		if err != nil {
-			return nil, err
-		}
-
-		consumed := [2]base.Pai{}
-		for i, c := range chi.Consumed {
-			p, err := base.NewPaiWithName(c)
-			if err != nil {
-				return nil, err
-			}
-			consumed[i] = *p
-		}
-
-		return inbound.NewChi(chi.Actor, chi.Target, *taken, consumed)
+		return chi.ToEvent()
 	case TypePon:
 		var pon Pon
 		if err := json.Unmarshal(rawMsg, &pon); err != nil {
