@@ -89,7 +89,11 @@ func (a *MjaiAdapter) messageToEvent(rawMsg []byte) (inbound.Event, error) {
 	case TypeRyukyoku:
 		panic("not implemented")
 	case TypeEndKyoku:
-		panic("not implemented")
+		var endKyoku EndKyoku
+		if err := json.Unmarshal(rawMsg, &endKyoku); err != nil {
+			return nil, fmt.Errorf("failed to unmarshal end_kyoku message: %w", err)
+		}
+		return endKyoku.ToEvent(), nil
 	case TypeEndGame:
 		var endGame EndGame
 		if err := json.Unmarshal(rawMsg, &endGame); err != nil {
