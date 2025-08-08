@@ -384,6 +384,13 @@ func (s *StateImpl) HoraCandidate() (*base.Hora, error) {
 		return nil, nil
 	}
 
+	var horaPai base.Pai
+	if isTsumoSituation {
+		horaPai = tehais[len(tehais)-1]
+	} else {
+		horaPai = *s.prevDahaiPai
+	}
+
 	// Situation Yaku
 	hasMenzenchinTsumoho := isTsumoSituation && player.IsMenzen()
 	hasReach := player.ReachState() == base.ReachAccepted
@@ -393,14 +400,14 @@ func (s *StateImpl) HoraCandidate() (*base.Hora, error) {
 
 	has1Fan := hasMenzenchinTsumoho || hasReach || hasChankan || hasRinshankaiho || hasHaiteimoyueOrHoteiraoyui
 	if !has1Fan {
-		has1Fan, err = Has1Fan(s, s.playerID, tehais, player.Furos(), s.prevDahaiPai, isTsumoSituation)
+		has1Fan, err = Has1Fan(s, s.playerID, tehais, player.Furos(), &horaPai, isTsumoSituation)
 		if err != nil {
 			return nil, fmt.Errorf("failed to check if has 1 fan: %w", err)
 		}
 	}
 
 	if has1Fan {
-		hora, err := base.NewHora(*s.prevDahaiPai, s.lastActor)
+		hora, err := base.NewHora(horaPai, s.lastActor)
 		if err != nil {
 			return nil, fmt.Errorf("failed to create hora: %w", err)
 		}
