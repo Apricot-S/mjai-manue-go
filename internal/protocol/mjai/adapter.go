@@ -83,13 +83,7 @@ func (a *MjaiAdapter) messageToEvent(rawMsg []byte) (inbound.Event, error) {
 		if err := json.Unmarshal(rawMsg, &dahai); err != nil {
 			return nil, fmt.Errorf("failed to unmarshal dahai message: %w", err)
 		}
-
-		pai, err := base.NewPaiWithName(dahai.Pai)
-		if err != nil {
-			return nil, err
-		}
-
-		return inbound.NewDahai(dahai.Actor, *pai, dahai.Tsumogiri)
+		return dahai.ToEvent()
 	case TypeChi:
 		var chi Chi
 		if err := json.Unmarshal(rawMsg, &chi); err != nil {

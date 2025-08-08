@@ -4,6 +4,7 @@ import (
 	"reflect"
 	"testing"
 
+	"github.com/Apricot-S/mjai-manue-go/internal/game/event/inbound"
 	"github.com/Apricot-S/mjai-manue-go/internal/game/event/outbound"
 	"github.com/go-json-experiment/json"
 )
@@ -398,6 +399,60 @@ func TestDahai_Unmarshal(t *testing.T) {
 			}
 			if !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("Unmarshal() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestDahai_ToEvent(t *testing.T) {
+	tests := []struct {
+		name    string
+		args    *Dahai
+		want    *inbound.Dahai
+		wantErr bool
+	}{
+		{
+			name: "valid",
+			args: &Dahai{
+				Action: Action{
+					Message: Message{TypeDahai},
+					Actor:   1,
+					Log:     "",
+				},
+				Pai:       "P",
+				Tsumogiri: true,
+			},
+			want: &inbound.Dahai{
+				Actor:     1,
+				Pai:       *mustPai("P"),
+				Tsumogiri: true,
+			},
+			wantErr: false,
+		},
+		{
+			name: "invalid",
+			args: &Dahai{
+				Action: Action{
+					Message: Message{TypeDahai},
+					Actor:   0,
+					Log:     "",
+				},
+				Pai:       "?",
+				Tsumogiri: false,
+			},
+			want:    nil,
+			wantErr: true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := tt.args.ToEvent()
+			if (err != nil) != tt.wantErr {
+				t.Errorf("Dahai.ToEvent() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("Dahai.ToEvent() = %v, want %v", got, tt.want)
 			}
 		})
 	}
