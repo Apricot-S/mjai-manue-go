@@ -4,6 +4,7 @@ import (
 	"reflect"
 	"testing"
 
+	"github.com/Apricot-S/mjai-manue-go/internal/game/event/inbound"
 	"github.com/go-json-experiment/json"
 )
 
@@ -216,6 +217,46 @@ func TestDora_Unmarshal(t *testing.T) {
 			}
 			if !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("Unmarshal() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestDora_ToEvent(t *testing.T) {
+	tests := []struct {
+		name    string
+		args    *Dora
+		want    *inbound.Dora
+		wantErr bool
+	}{
+		{
+			name: "valid",
+			args: &Dora{
+				DoraMarker: "6s",
+			},
+			want: &inbound.Dora{
+				DoraMarker: *mustPai("6s"),
+			},
+			wantErr: false,
+		},
+		{
+			name: "invalid",
+			args: &Dora{
+				DoraMarker: "?",
+			},
+			want:    nil,
+			wantErr: true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := tt.args.ToEvent()
+			if (err != nil) != tt.wantErr {
+				t.Errorf("Dora.ToEvent() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("Dora.ToEvent() = %v, want %v", got, tt.want)
 			}
 		})
 	}

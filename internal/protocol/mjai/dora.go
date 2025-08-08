@@ -3,6 +3,8 @@ package mjai
 import (
 	"fmt"
 
+	"github.com/Apricot-S/mjai-manue-go/internal/base"
+	"github.com/Apricot-S/mjai-manue-go/internal/game/event/inbound"
 	"github.com/go-json-experiment/json"
 	"github.com/go-json-experiment/json/jsontext"
 )
@@ -50,4 +52,13 @@ func (m *Dora) UnmarshalJSONFrom(d *jsontext.Decoder) error {
 	}
 
 	return messageValidator.Struct(m)
+}
+
+func (m *Dora) ToEvent() (*inbound.Dora, error) {
+	doraMarker, err := base.NewPaiWithName(m.DoraMarker)
+	if err != nil {
+		return nil, err
+	}
+
+	return inbound.NewDora(*doraMarker)
 }

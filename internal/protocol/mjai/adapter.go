@@ -79,7 +79,11 @@ func (a *MjaiAdapter) messageToEvent(rawMsg []byte) (inbound.Event, error) {
 		}
 		return kakan.ToEvent()
 	case TypeDora:
-		panic("not implemented")
+		var dora Dora
+		if err := json.Unmarshal(rawMsg, &dora); err != nil {
+			return nil, fmt.Errorf("failed to unmarshal dora message: %w", err)
+		}
+		return dora.ToEvent()
 	case TypeReach:
 		panic("not implemented")
 	case TypeReachAccepted:
