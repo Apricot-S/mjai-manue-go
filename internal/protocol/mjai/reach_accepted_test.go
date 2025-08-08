@@ -4,6 +4,7 @@ import (
 	"reflect"
 	"testing"
 
+	"github.com/Apricot-S/mjai-manue-go/internal/game/event/inbound"
 	"github.com/go-json-experiment/json"
 )
 
@@ -322,6 +323,64 @@ func TestReachAccepted_Unmarshal(t *testing.T) {
 			}
 			if !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("Unmarshal() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestReachAccepted_ToEvent(t *testing.T) {
+	tests := []struct {
+		name    string
+		args    *ReachAccepted
+		want    *inbound.ReachAccepted
+		wantErr bool
+	}{
+		{
+			name: "without scores",
+			args: &ReachAccepted{
+				Message: Message{Type: TypeReachAccepted},
+				Actor:   1,
+				Scores:  nil,
+			},
+			want: &inbound.ReachAccepted{
+				Actor:  1,
+				Scores: nil,
+			},
+			wantErr: false,
+		},
+		{
+			name: "with scores",
+			args: &ReachAccepted{
+				Message: Message{Type: TypeReachAccepted},
+				Actor:   2,
+				Scores:  []int{26000, 24000, 23000, 24000},
+			},
+			want: &inbound.ReachAccepted{
+				Actor:  2,
+				Scores: &[4]int{26000, 24000, 23000, 24000},
+			},
+			wantErr: false,
+		},
+		{
+			name: "invalid",
+			args: &ReachAccepted{
+				Message: Message{Type: TypeReachAccepted},
+				Actor:   4,
+				Scores:  []int{26000, 24000, 23000, 24000},
+			},
+			want:    nil,
+			wantErr: true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := tt.args.ToEvent()
+			if (err != nil) != tt.wantErr {
+				t.Errorf("ReachAccepted.ToEvent() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("ReachAccepted.ToEvent() = %v, want %v", got, tt.want)
 			}
 		})
 	}

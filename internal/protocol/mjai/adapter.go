@@ -91,7 +91,11 @@ func (a *MjaiAdapter) messageToEvent(rawMsg []byte) (inbound.Event, error) {
 		}
 		return reach.ToEvent()
 	case TypeReachAccepted:
-		panic("not implemented")
+		var reachAccepted ReachAccepted
+		if err := json.Unmarshal(rawMsg, &reachAccepted); err != nil {
+			return nil, fmt.Errorf("failed to unmarshal reach accepted message: %w", err)
+		}
+		return reachAccepted.ToEvent()
 	case TypeHora:
 		panic("not implemented")
 	case TypeRyukyoku:
