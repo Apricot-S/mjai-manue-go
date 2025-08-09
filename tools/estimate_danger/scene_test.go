@@ -631,12 +631,12 @@ func TestScene_Evaluate_Aida4ken(t *testing.T) {
 func TestScene_Evaluate_MatagiSuji(t *testing.T) {
 	tests := []testCase{}
 
-	scene, _ := NewScene(nil, mustPais("3p"), nil, nil, mustPais("3p"), nil, nil)
+	scene1, _ := NewScene(nil, mustPais("3p"), nil, nil, mustPais("3p"), nil, nil)
 
 	{
 		tests = append(tests, testCase{
 			name:    "1p is matagisuji of 3p",
-			scene:   scene,
+			scene:   scene1,
 			args:    args{name: "matagisuji", pai: mustPai("1p")},
 			want:    true,
 			wantErr: false,
@@ -645,7 +645,7 @@ func TestScene_Evaluate_MatagiSuji(t *testing.T) {
 	{
 		tests = append(tests, testCase{
 			name:    "2p is matagisuji of 3p",
-			scene:   scene,
+			scene:   scene1,
 			args:    args{name: "matagisuji", pai: mustPai("2p")},
 			want:    true,
 			wantErr: false,
@@ -654,7 +654,7 @@ func TestScene_Evaluate_MatagiSuji(t *testing.T) {
 	{
 		tests = append(tests, testCase{
 			name:    "4p is matagisuji of 3p",
-			scene:   scene,
+			scene:   scene1,
 			args:    args{name: "matagisuji", pai: mustPai("4p")},
 			want:    true,
 			wantErr: false,
@@ -663,7 +663,7 @@ func TestScene_Evaluate_MatagiSuji(t *testing.T) {
 	{
 		tests = append(tests, testCase{
 			name:    "5p is matagisuji of 3p",
-			scene:   scene,
+			scene:   scene1,
 			args:    args{name: "matagisuji", pai: mustPai("5p")},
 			want:    true,
 			wantErr: false,
@@ -672,8 +672,50 @@ func TestScene_Evaluate_MatagiSuji(t *testing.T) {
 	{
 		tests = append(tests, testCase{
 			name:    "6p is not matagisuji of 3p",
-			scene:   scene,
+			scene:   scene1,
 			args:    args{name: "matagisuji", pai: mustPai("6p")},
+			want:    false,
+			wantErr: false,
+		})
+	}
+
+	scene2, _ := NewScene(nil, mustPais("2p"), nil, nil, mustPais("2p"), nil, nil)
+
+	{
+		tests = append(tests, testCase{
+			name:    "1p is matagisuji of 2p",
+			scene:   scene2,
+			args:    args{name: "matagisuji", pai: mustPai("1p")},
+			want:    true,
+			wantErr: false,
+		})
+	}
+	{
+		tests = append(tests, testCase{
+			name:    "4p is matagisuji of 2p",
+			scene:   scene2,
+			args:    args{name: "matagisuji", pai: mustPai("4p")},
+			want:    true,
+			wantErr: false,
+		})
+	}
+	{
+		tests = append(tests, testCase{
+			name:    "3p is not matagisuji of 2p",
+			scene:   scene2,
+			args:    args{name: "matagisuji", pai: mustPai("3p")},
+			want:    false,
+			wantErr: false,
+		})
+	}
+
+	scene3, _ := NewScene(nil, mustPais("3p", "4p"), nil, nil, mustPais("3p"), nil, nil)
+
+	{
+		tests = append(tests, testCase{
+			name:    "1p is not matagisuji of 3p4p",
+			scene:   scene3,
+			args:    args{name: "matagisuji", pai: mustPai("1p")},
 			want:    false,
 			wantErr: false,
 		})
