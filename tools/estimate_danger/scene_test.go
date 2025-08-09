@@ -627,3 +627,68 @@ func TestScene_Evaluate_Aida4ken(t *testing.T) {
 		})
 	}
 }
+
+func TestScene_Evaluate_MatagiSuji(t *testing.T) {
+	tests := []testCase{}
+
+	scene, _ := NewScene(nil, mustPais("3p"), nil, nil, mustPais("3p"), nil, nil)
+
+	{
+		tests = append(tests, testCase{
+			name:    "1p is matagisuji of 3p",
+			scene:   scene,
+			args:    args{name: "matagisuji", pai: mustPai("1p")},
+			want:    true,
+			wantErr: false,
+		})
+	}
+	{
+		tests = append(tests, testCase{
+			name:    "2p is matagisuji of 3p",
+			scene:   scene,
+			args:    args{name: "matagisuji", pai: mustPai("2p")},
+			want:    true,
+			wantErr: false,
+		})
+	}
+	{
+		tests = append(tests, testCase{
+			name:    "4p is matagisuji of 3p",
+			scene:   scene,
+			args:    args{name: "matagisuji", pai: mustPai("4p")},
+			want:    true,
+			wantErr: false,
+		})
+	}
+	{
+		tests = append(tests, testCase{
+			name:    "5p is matagisuji of 3p",
+			scene:   scene,
+			args:    args{name: "matagisuji", pai: mustPai("5p")},
+			want:    true,
+			wantErr: false,
+		})
+	}
+	{
+		tests = append(tests, testCase{
+			name:    "6p is not matagisuji of 3p",
+			scene:   scene,
+			args:    args{name: "matagisuji", pai: mustPai("6p")},
+			want:    false,
+			wantErr: false,
+		})
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := tt.scene.Evaluate(tt.args.name, tt.args.pai)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("Scene.Evaluate() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if got != tt.want {
+				t.Errorf("Scene.Evaluate() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}

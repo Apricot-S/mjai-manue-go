@@ -236,11 +236,11 @@ func hasBoth(paiType rune, n1, n2 uint8, set *base.PaiSet) (bool, error) {
 	return has1 && has2, nil
 }
 
-// // Matagisuji (跨ぎ筋)
-// // http://ja.wikipedia.org/wiki/%E7%AD%8B_(%E9%BA%BB%E9%9B%80)#.E3.81.BE.E3.81.9F.E3.81.8E.E3.82.B9.E3.82.B8
-// func isMatagisuji(pai *base.Pai, prereachSutehaiSet *base.PaiSet, anpaiSet *base.PaiSet) (bool, error) {
-// 	return isMatagisujiOf(pai, prereachSutehaiSet, anpaiSet)
-// }
+// Matagisuji (跨ぎ筋)
+// http://ja.wikipedia.org/wiki/%E7%AD%8B_(%E9%BA%BB%E9%9B%80)#.E3.81.BE.E3.81.9F.E3.81.8E.E3.82.B9.E3.82.B8
+func isMatagisuji(pai *base.Pai, prereachSutehaiSet *base.PaiSet, anpaiSet *base.PaiSet) (bool, error) {
+	return isMatagisujiOf(pai, prereachSutehaiSet, anpaiSet)
+}
 
 // func isEarlyMatagisuji(pai *base.Pai, earlySutehaiSet *base.PaiSet, anpaiSet *base.PaiSet) (bool, error) {
 // 	return isMatagisujiOf(pai, earlySutehaiSet, anpaiSet)
@@ -611,36 +611,36 @@ func isUrasujiOf(pai *base.Pai, targetPaiSet *base.PaiSet, anpaiSet *base.PaiSet
 // 	})
 // }
 
-// func isMatagisujiOf(pai *base.Pai, targetPaiSet *base.PaiSet, anpaiSet *base.PaiSet) (bool, error) {
-// 	sujis, err := getPossibleSujis(pai, anpaiSet)
-// 	if err != nil {
-// 		return false, err
-// 	}
+func isMatagisujiOf(pai *base.Pai, targetPaiSet *base.PaiSet, anpaiSet *base.PaiSet) (bool, error) {
+	sujis, err := getPossibleSujis(pai, anpaiSet)
+	if err != nil {
+		return false, err
+	}
 
-// 	return core.AnyMatch(sujis, func(s game.Pai) (bool, error) {
-// 		if low := s.Next(1); low != nil {
-// 			hasLow, err := targetPaiSet.Has(low)
-// 			if err != nil {
-// 				return false, err
-// 			}
-// 			if hasLow {
-// 				return true, nil
-// 			}
-// 		}
+	return core.AnyMatch(sujis, func(s base.Pai) (bool, error) {
+		if low := s.Next(1); low != nil {
+			hasLow, err := targetPaiSet.Has(low)
+			if err != nil {
+				return false, err
+			}
+			if hasLow {
+				return true, nil
+			}
+		}
 
-// 		if high := s.Next(2); high != nil {
-// 			hasHigh, err := targetPaiSet.Has(high)
-// 			if err != nil {
-// 				return false, err
-// 			}
-// 			if hasHigh {
-// 				return true, nil
-// 			}
-// 		}
+		if high := s.Next(2); high != nil {
+			hasHigh, err := targetPaiSet.Has(high)
+			if err != nil {
+				return false, err
+			}
+			if hasHigh {
+				return true, nil
+			}
+		}
 
-// 		return false, nil
-// 	})
-// }
+		return false, nil
+	})
+}
 
 // Returns sujis which contain the given pai and is alive i.e. none of pais in the suji are anpai.
 // Uses the first pai to represent the suji. e.g. 1p for 14p suji
@@ -756,9 +756,9 @@ func registerEvaluators() *evaluators {
 	ev["aida4ken"] = func(scene *Scene, pai *base.Pai) (bool, error) {
 		return isAida4ken(pai, scene.prereachSutehaiSet)
 	}
-	// ev["matagisuji"] = func(scene *Scene, pai *base.Pai) (bool, error) {
-	// 	return isMatagisuji(pai, scene.prereachSutehaiSet, scene.anpaiSet)
-	// }
+	ev["matagisuji"] = func(scene *Scene, pai *base.Pai) (bool, error) {
+		return isMatagisuji(pai, scene.prereachSutehaiSet, scene.anpaiSet)
+	}
 	// ev["early_matagisuji"] = func(scene *Scene, pai *base.Pai) (bool, error) {
 	// 	return isEarlyMatagisuji(pai, scene.earlySutehaiSet, scene.anpaiSet)
 	// }
