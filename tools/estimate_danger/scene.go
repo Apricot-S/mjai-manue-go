@@ -118,11 +118,11 @@ func isPrereachSuji(pai *base.Pai, prereachSutehaiSet *base.PaiSet) (bool, error
 	return isSujiOf(pai, prereachSutehaiSet)
 }
 
-// // Urasuji (裏筋)
-// // http://ja.wikipedia.org/wiki/%E7%AD%8B_(%E9%BA%BB%E9%9B%80)#.E8.A3.8F.E3.82.B9.E3.82.B8
-// func isUrasuji(pai *base.Pai, prereachSutehaiSet *base.PaiSet, anpaiSet *base.PaiSet) (bool, error) {
-// 	return isUrasujiOf(pai, prereachSutehaiSet, anpaiSet)
-// }
+// Urasuji (裏筋)
+// http://ja.wikipedia.org/wiki/%E7%AD%8B_(%E9%BA%BB%E9%9B%80)#.E8.A3.8F.E3.82.B9.E3.82.B8
+func isUrasuji(pai *base.Pai, prereachSutehaiSet *base.PaiSet, anpaiSet *base.PaiSet) (bool, error) {
+	return isUrasujiOf(pai, prereachSutehaiSet, anpaiSet)
+}
 
 // func isEarlyUrasuji(pai *base.Pai, earlySutehaiSet *base.PaiSet, anpaiSet *base.PaiSet) (bool, error) {
 // 	return isUrasujiOf(pai, earlySutehaiSet, anpaiSet)
@@ -505,36 +505,36 @@ func getSuji(pai *base.Pai) ([]base.Pai, error) {
 	return result, nil
 }
 
-// func isUrasujiOf(pai *base.Pai, targetPaiSet *base.PaiSet, anpaiSet *base.PaiSet) (bool, error) {
-// 	sujis, err := getPossibleSujis(pai, anpaiSet)
-// 	if err != nil {
-// 		return false, err
-// 	}
+func isUrasujiOf(pai *base.Pai, targetPaiSet *base.PaiSet, anpaiSet *base.PaiSet) (bool, error) {
+	sujis, err := getPossibleSujis(pai, anpaiSet)
+	if err != nil {
+		return false, err
+	}
 
-// 	return core.AnyMatch(sujis, func(s game.Pai) (bool, error) {
-// 		if low := s.Next(-1); low != nil {
-// 			hasLow, err := targetPaiSet.Has(low)
-// 			if err != nil {
-// 				return false, err
-// 			}
-// 			if hasLow {
-// 				return true, nil
-// 			}
-// 		}
+	return core.AnyMatch(sujis, func(s base.Pai) (bool, error) {
+		if low := s.Next(-1); low != nil {
+			hasLow, err := targetPaiSet.Has(low)
+			if err != nil {
+				return false, err
+			}
+			if hasLow {
+				return true, nil
+			}
+		}
 
-// 		if high := s.Next(4); high != nil {
-// 			hasHigh, err := targetPaiSet.Has(high)
-// 			if err != nil {
-// 				return false, err
-// 			}
-// 			if hasHigh {
-// 				return true, nil
-// 			}
-// 		}
+		if high := s.Next(4); high != nil {
+			hasHigh, err := targetPaiSet.Has(high)
+			if err != nil {
+				return false, err
+			}
+			if hasHigh {
+				return true, nil
+			}
+		}
 
-// 		return false, nil
-// 	})
-// }
+		return false, nil
+	})
+}
 
 // // Senkisuji (疝気筋) : Urasuji (裏筋) of urasuji
 // func isSenkisujiOf(pai *base.Pai, targetPaiSet *base.PaiSet, anpaiSet *base.PaiSet) (bool, error) {
@@ -599,49 +599,49 @@ func getSuji(pai *base.Pai) ([]base.Pai, error) {
 // 	})
 // }
 
-// // Returns sujis which contain the given pai and is alive i.e. none of pais in the suji are anpai.
-// // Uses the first pai to represent the suji. e.g. 1p for 14p suji
-// func getPossibleSujis(pai *base.Pai, anpaiSet *base.PaiSet) ([]game.Pai, error) {
-// 	if pai.IsTsupai() {
-// 		return []game.Pai{}, nil
-// 	}
+// Returns sujis which contain the given pai and is alive i.e. none of pais in the suji are anpai.
+// Uses the first pai to represent the suji. e.g. 1p for 14p suji
+func getPossibleSujis(pai *base.Pai, anpaiSet *base.PaiSet) ([]base.Pai, error) {
+	if pai.IsTsupai() {
+		return []base.Pai{}, nil
+	}
 
-// 	sujis := make([]game.Pai, 0, 2)
-// 	paiNumber := pai.Number()
-// 	candidates := []uint8{paiNumber - 3, paiNumber}
+	sujis := make([]base.Pai, 0, 2)
+	paiNumber := pai.Number()
+	candidates := []uint8{paiNumber - 3, paiNumber}
 
-// 	for _, n := range candidates {
-// 		isAlive, err := core.AllMatch([]uint8{n, n + 3}, func(m uint8) (bool, error) {
-// 			if m < 1 || m > 9 {
-// 				return false, nil
-// 			}
+	for _, n := range candidates {
+		isAlive, err := core.AllMatch([]uint8{n, n + 3}, func(m uint8) (bool, error) {
+			if m < 1 || m > 9 {
+				return false, nil
+			}
 
-// 			sujiPai, err := base.NewPaiWithDetail(pai.Type(), m, false)
-// 			if err != nil {
-// 				return false, err
-// 			}
+			sujiPai, err := base.NewPaiWithDetail(pai.Type(), m, false)
+			if err != nil {
+				return false, err
+			}
 
-// 			isAnpai, err := anpaiSet.Has(sujiPai)
-// 			if err != nil {
-// 				return false, err
-// 			}
-// 			return !isAnpai, nil
-// 		})
-// 		if err != nil {
-// 			return nil, err
-// 		}
+			isAnpai, err := anpaiSet.Has(sujiPai)
+			if err != nil {
+				return false, err
+			}
+			return !isAnpai, nil
+		})
+		if err != nil {
+			return nil, err
+		}
 
-// 		if isAlive {
-// 			sujiPai, err := base.NewPaiWithDetail(pai.Type(), n, false)
-// 			if err != nil {
-// 				return nil, err
-// 			}
-// 			sujis = append(sujis, *sujiPai)
-// 		}
-// 	}
+		if isAlive {
+			sujiPai, err := base.NewPaiWithDetail(pai.Type(), n, false)
+			if err != nil {
+				return nil, err
+			}
+			sujis = append(sujis, *sujiPai)
+		}
+	}
 
-// 	return sujis, nil
-// }
+	return sujis, nil
+}
 
 // func isOuter(pai *base.Pai, targetPaiSet *base.PaiSet) (bool, error) {
 // 	if pai.IsTsupai() {
@@ -698,9 +698,9 @@ func registerEvaluators() *evaluators {
 	ev["prereach_suji"] = func(scene *Scene, pai *base.Pai) (bool, error) {
 		return isPrereachSuji(pai, scene.prereachSutehaiSet)
 	}
-	// ev["urasuji"] = func(scene *Scene, pai *base.Pai) (bool, error) {
-	// 	return isUrasuji(pai, scene.prereachSutehaiSet, scene.anpaiSet)
-	// }
+	ev["urasuji"] = func(scene *Scene, pai *base.Pai) (bool, error) {
+		return isUrasuji(pai, scene.prereachSutehaiSet, scene.anpaiSet)
+	}
 	// ev["early_urasuji"] = func(scene *Scene, pai *base.Pai) (bool, error) {
 	// 	return isEarlyUrasuji(pai, scene.earlySutehaiSet, scene.anpaiSet)
 	// }
