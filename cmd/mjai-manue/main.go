@@ -104,11 +104,11 @@ func main() {
 		log.Fatal(err)
 	}
 
-	ai, err := ai.NewManueAI()
+	ai, err := ai.NewManueAIDefault()
 	if err != nil {
 		log.Fatalf("failed to create AI: %v", err)
 	}
-	agent := agent.NewAIAgent(name, room, ai)
+	agent := agent.NewAIAgentDefault(name, room, ai)
 
 	if usePipe {
 		err = runPipeMode(agent)

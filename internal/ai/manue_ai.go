@@ -21,24 +21,7 @@ type ManueAI struct {
 	logStr              string
 }
 
-func NewManueAI() (*ManueAI, error) {
-	stats, err := configs.GetStats()
-	if err != nil {
-		return nil, fmt.Errorf("failed to get the stats: %w", err)
-	}
-	root, err := configs.GetDangerTree()
-	if err != nil {
-		return nil, fmt.Errorf("failed to get the danger tree: %w", err)
-	}
-
-	return NewManueAIWithEstimators(
-		stats,
-		estimator.NewDangerEstimator(root),
-		estimator.NewTenpaiProbEstimator(stats),
-	), nil
-}
-
-func NewManueAIWithEstimators(
+func NewManueAI(
 	stats *configs.GameStats,
 	dangerEstimator *estimator.DangerEstimator,
 	tenpaiProbEstimator *estimator.TenpaiProbEstimator,
@@ -50,6 +33,23 @@ func NewManueAIWithEstimators(
 		noChanges:           [4]float64{},
 		logStr:              "",
 	}
+}
+
+func NewManueAIDefault() (*ManueAI, error) {
+	stats, err := configs.GetStats()
+	if err != nil {
+		return nil, fmt.Errorf("failed to get the stats: %w", err)
+	}
+	root, err := configs.GetDangerTree()
+	if err != nil {
+		return nil, fmt.Errorf("failed to get the danger tree: %w", err)
+	}
+
+	return NewManueAI(
+		stats,
+		estimator.NewDangerEstimator(root),
+		estimator.NewTenpaiProbEstimator(stats),
+	), nil
 }
 
 func (a *ManueAI) Initialize() {

@@ -15,16 +15,16 @@ type AIAgent struct {
 	state game.State
 }
 
-func NewAIAgent(name string, room string, ai ai.AI) *AIAgent {
-	return NewAIAgentWithState(name, room, ai, &game.StateImpl{})
-}
-
-func NewAIAgentWithState(name string, room string, ai ai.AI, state game.State) *AIAgent {
+func NewAIAgent(name string, room string, ai ai.AI, state game.State) *AIAgent {
 	return &AIAgent{
 		baseAgent: newBaseAgent(name, room),
 		ai:        ai,
 		state:     state,
 	}
+}
+
+func NewAIAgentDefault(name string, room string, ai ai.AI) *AIAgent {
+	return NewAIAgent(name, room, ai, &game.StateImpl{})
 }
 
 func (a *AIAgent) Respond(events []inbound.Event) (outbound.Event, error) {
