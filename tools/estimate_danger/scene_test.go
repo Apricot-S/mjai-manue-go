@@ -734,3 +734,41 @@ func TestScene_Evaluate_MatagiSuji(t *testing.T) {
 		})
 	}
 }
+
+func TestScene_Evaluate_EarlyMatagiSuji(t *testing.T) {
+	tests := []testCase{}
+
+	scene, _ := NewScene(nil, mustPais("3p", "E", "S", "7p", "W"), nil, nil, mustPais("3p", "E", "S", "7p", "W"), nil, nil)
+
+	{
+		tests = append(tests, testCase{
+			name:    "1p is early matagisuji of 3pES7pW",
+			scene:   scene,
+			args:    args{name: "early_matagisuji", pai: mustPai("1p")},
+			want:    true,
+			wantErr: false,
+		})
+	}
+	{
+		tests = append(tests, testCase{
+			name:    "9p is not early matagisuji of 3pES7pW",
+			scene:   scene,
+			args:    args{name: "early_matagisuji", pai: mustPai("9p")},
+			want:    false,
+			wantErr: false,
+		})
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := tt.scene.Evaluate(tt.args.name, tt.args.pai)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("Scene.Evaluate() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if got != tt.want {
+				t.Errorf("Scene.Evaluate() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
