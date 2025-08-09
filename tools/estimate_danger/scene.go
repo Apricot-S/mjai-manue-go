@@ -114,9 +114,9 @@ func isReachSuji(pai *base.Pai, reachPaiSet *base.PaiSet) (bool, error) {
 	return isWeakSujiOf(pai, reachPaiSet)
 }
 
-// func isPrereachSuji(pai *base.Pai, prereachSutehaiSet *base.PaiSet) (bool, error) {
-// 	return isSujiOf(pai, prereachSutehaiSet)
-// }
+func isPrereachSuji(pai *base.Pai, prereachSutehaiSet *base.PaiSet) (bool, error) {
+	return isSujiOf(pai, prereachSutehaiSet)
+}
 
 // // Urasuji (裏筋)
 // // http://ja.wikipedia.org/wiki/%E7%AD%8B_(%E9%BA%BB%E9%9B%80)#.E8.A3.8F.E3.82.B9.E3.82.B8
@@ -695,9 +695,9 @@ func registerEvaluators() *evaluators {
 	ev["reach_suji"] = func(scene *Scene, pai *base.Pai) (bool, error) {
 		return isReachSuji(pai, scene.reachPaiSet)
 	}
-	// ev["prereach_suji"] = func(scene *Scene, pai *base.Pai) (bool, error) {
-	// 	return isPrereachSuji(pai, scene.prereachSutehaiSet)
-	// }
+	ev["prereach_suji"] = func(scene *Scene, pai *base.Pai) (bool, error) {
+		return isPrereachSuji(pai, scene.prereachSutehaiSet)
+	}
 	// ev["urasuji"] = func(scene *Scene, pai *base.Pai) (bool, error) {
 	// 	return isUrasuji(pai, scene.prereachSutehaiSet, scene.anpaiSet)
 	// }
