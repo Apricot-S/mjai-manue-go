@@ -580,3 +580,50 @@ func TestScene_Evaluate_Only_UraSujiOf5(t *testing.T) {
 		})
 	}
 }
+
+func TestScene_Evaluate_Aida4ken(t *testing.T) {
+	tests := []testCase{}
+
+	scene, _ := NewScene(nil, mustPais("1p", "6p"), nil, nil, mustPais("1p", "6p"), nil, nil)
+
+	{
+		tests = append(tests, testCase{
+			name:    "2p is aida4ken of 1p6p",
+			scene:   scene,
+			args:    args{name: "aida4ken", pai: mustPai("2p")},
+			want:    true,
+			wantErr: false,
+		})
+	}
+	{
+		tests = append(tests, testCase{
+			name:    "5p is aida4ken of 1p6p",
+			scene:   scene,
+			args:    args{name: "aida4ken", pai: mustPai("5p")},
+			want:    true,
+			wantErr: false,
+		})
+	}
+	{
+		tests = append(tests, testCase{
+			name:    "3p is not aida4ken of 1p6p",
+			scene:   scene,
+			args:    args{name: "aida4ken", pai: mustPai("3p")},
+			want:    false,
+			wantErr: false,
+		})
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := tt.scene.Evaluate(tt.args.name, tt.args.pai)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("Scene.Evaluate() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if got != tt.want {
+				t.Errorf("Scene.Evaluate() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}

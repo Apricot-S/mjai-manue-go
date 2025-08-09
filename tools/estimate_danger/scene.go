@@ -186,66 +186,66 @@ func isUrasujiOf5(pai *base.Pai, prereachSutehaiSet *base.PaiSet, anpaiSet *base
 	return isUrasujiOf(pai, &fiveSet, anpaiSet)
 }
 
-// // Aidayonken (間四間)
-// // http://ja.wikipedia.org/wiki/%E7%AD%8B_(%E9%BA%BB%E9%9B%80)#.E9.96.93.E5.9B.9B.E9.96.93
-// func isAida4ken(pai *base.Pai, prereachSutehaiSet *base.PaiSet) (bool, error) {
-// 	if pai.IsTsupai() {
-// 		return false, nil
-// 	}
+// Aidayonken (間四間)
+// http://ja.wikipedia.org/wiki/%E7%AD%8B_(%E9%BA%BB%E9%9B%80)#.E9.96.93.E5.9B.9B.E9.96.93
+func isAida4ken(pai *base.Pai, prereachSutehaiSet *base.PaiSet) (bool, error) {
+	if pai.IsTsupai() {
+		return false, nil
+	}
 
-// 	num := pai.Number()
-// 	typ := pai.Type()
+	num := pai.Number()
+	typ := pai.Type()
 
-// 	if 2 <= num && num <= 5 {
-// 		low, err := base.NewPaiWithDetail(typ, num-1, false)
-// 		if err != nil {
-// 			return false, err
-// 		}
-// 		hasLow, err := prereachSutehaiSet.Has(low)
-// 		if err != nil {
-// 			return false, err
-// 		}
+	if 2 <= num && num <= 5 {
+		low, err := base.NewPaiWithDetail(typ, num-1, false)
+		if err != nil {
+			return false, err
+		}
+		hasLow, err := prereachSutehaiSet.Has(low)
+		if err != nil {
+			return false, err
+		}
 
-// 		high, err := base.NewPaiWithDetail(typ, num+4, false)
-// 		if err != nil {
-// 			return false, err
-// 		}
-// 		hasHigh, err := prereachSutehaiSet.Has(high)
-// 		if err != nil {
-// 			return false, err
-// 		}
+		high, err := base.NewPaiWithDetail(typ, num+4, false)
+		if err != nil {
+			return false, err
+		}
+		hasHigh, err := prereachSutehaiSet.Has(high)
+		if err != nil {
+			return false, err
+		}
 
-// 		if hasLow && hasHigh {
-// 			return true, nil
-// 		}
-// 	}
+		if hasLow && hasHigh {
+			return true, nil
+		}
+	}
 
-// 	if 5 <= num && num <= 8 {
-// 		low, err := base.NewPaiWithDetail(typ, num-4, false)
-// 		if err != nil {
-// 			return false, err
-// 		}
-// 		hasLow, err := prereachSutehaiSet.Has(low)
-// 		if err != nil {
-// 			return false, err
-// 		}
+	if 5 <= num && num <= 8 {
+		low, err := base.NewPaiWithDetail(typ, num-4, false)
+		if err != nil {
+			return false, err
+		}
+		hasLow, err := prereachSutehaiSet.Has(low)
+		if err != nil {
+			return false, err
+		}
 
-// 		high, err := base.NewPaiWithDetail(typ, num+1, false)
-// 		if err != nil {
-// 			return false, err
-// 		}
-// 		hasHigh, err := prereachSutehaiSet.Has(high)
-// 		if err != nil {
-// 			return false, err
-// 		}
+		high, err := base.NewPaiWithDetail(typ, num+1, false)
+		if err != nil {
+			return false, err
+		}
+		hasHigh, err := prereachSutehaiSet.Has(high)
+		if err != nil {
+			return false, err
+		}
 
-// 		if hasLow && hasHigh {
-// 			return true, nil
-// 		}
-// 	}
+		if hasLow && hasHigh {
+			return true, nil
+		}
+	}
 
-// 	return false, nil
-// }
+	return false, nil
+}
 
 // // Matagisuji (跨ぎ筋)
 // // http://ja.wikipedia.org/wiki/%E7%AD%8B_(%E9%BA%BB%E9%9B%80)#.E3.81.BE.E3.81.9F.E3.81.8E.E3.82.B9.E3.82.B8
@@ -764,9 +764,9 @@ func registerEvaluators() *evaluators {
 	ev["urasuji_of_5"] = func(scene *Scene, pai *base.Pai) (bool, error) {
 		return isUrasujiOf5(pai, scene.prereachSutehaiSet, scene.anpaiSet)
 	}
-	// ev["aida4ken"] = func(scene *Scene, pai *base.Pai) (bool, error) {
-	// 	return isAida4ken(pai, scene.prereachSutehaiSet)
-	// }
+	ev["aida4ken"] = func(scene *Scene, pai *base.Pai) (bool, error) {
+		return isAida4ken(pai, scene.prereachSutehaiSet)
+	}
 	// ev["matagisuji"] = func(scene *Scene, pai *base.Pai) (bool, error) {
 	// 	return isMatagisuji(pai, scene.prereachSutehaiSet, scene.anpaiSet)
 	// }
