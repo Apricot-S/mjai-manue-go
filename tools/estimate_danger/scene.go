@@ -14,49 +14,91 @@ type evaluators map[string]evaluator
 var defaultEvaluators = registerEvaluators()
 
 type Scene struct {
-	// gameState game.StateViewer
-	// me        *base.Player
-	// target    *base.Player
-
-	// tehaiSet   *base.PaiSet
-	anpaiSet *base.PaiSet
-	// visibleSet *base.PaiSet
-	// doraSet    *base.PaiSet
-	// bakaze     *base.Pai
-	// targetKaze *base.Pai
+	tehaiSet   *base.PaiSet
+	anpaiSet   *base.PaiSet
+	visibleSet *base.PaiSet
+	doraSet    *base.PaiSet
+	bakaze     *base.Pai
+	targetKaze *base.Pai
 
 	prereachSutehaiSet *base.PaiSet
-	// earlySutehaiSet    *base.PaiSet
-	// lateSutehaiSet     *base.PaiSet
-	reachPaiSet *base.PaiSet
+	earlySutehaiSet    *base.PaiSet
+	lateSutehaiSet     *base.PaiSet
+	reachPaiSet        *base.PaiSet
 
 	evaluators *evaluators
 }
 
-func NewScene(gameState game.StateViewer, me *base.Player, target *base.Player) (*Scene, error) {
+func NewScene(
+	tehais, anpais, visibles, doras, prereachSutehais base.Pais,
+	bakaze, targetKaze *base.Pai,
+) (*Scene, error) {
 	s := &Scene{
-		// gameState:  gameState,
-		// me:         me,
-		// target:     target,
+		bakaze:     bakaze,
+		targetKaze: targetKaze,
 		evaluators: defaultEvaluators,
 	}
 
 	var err error
-	// if s.tehaiSet, err = base.NewPaiSet(me.Tehais()); err != nil {
-	// 	return nil, err
-	// }
+	if s.tehaiSet, err = base.NewPaiSet(tehais); err != nil {
+		return nil, err
+	}
+	if s.anpaiSet, err = base.NewPaiSet(anpais); err != nil {
+		return nil, err
+	}
+	if s.visibleSet, err = base.NewPaiSet(visibles); err != nil {
+		return nil, err
+	}
+	if s.doraSet, err = base.NewPaiSet(doras); err != nil {
+		return nil, err
+	}
+
+	if s.prereachSutehaiSet, err = base.NewPaiSet(prereachSutehais); err != nil {
+		return nil, err
+	}
+
+	halfLen := len(prereachSutehais) / 2
+	if s.earlySutehaiSet, err = base.NewPaiSet(prereachSutehais[:halfLen]); err != nil {
+		return nil, err
+	}
+	if s.lateSutehaiSet, err = base.NewPaiSet(prereachSutehais[halfLen:]); err != nil {
+		return nil, err
+	}
+
+	var reachPais base.Pais = nil
+	if len(prereachSutehais) != 0 {
+		// prereach_sutehais can be empty in unit tests.
+		reachPai := prereachSutehais[len(prereachSutehais)-1].RemoveRed()
+		reachPais = base.Pais{*reachPai}
+	}
+	if s.reachPaiSet, err = base.NewPaiSet(reachPais); err != nil {
+		return nil, err
+	}
+
+	return s, nil
+}
+
+func NewSceneWithState(gameState game.StateViewer, me *base.Player, target *base.Player) (*Scene, error) {
+	s := &Scene{
+		evaluators: defaultEvaluators,
+	}
+
+	var err error
+	if s.tehaiSet, err = base.NewPaiSet(me.Tehais()); err != nil {
+		return nil, err
+	}
 	if s.anpaiSet, err = base.NewPaiSet(gameState.Anpais(target)); err != nil {
 		return nil, err
 	}
-	// if s.visibleSet, err = base.NewPaiSet(gameState.VisiblePais(me)); err != nil {
-	// 	return nil, err
-	// }
-	// if s.doraSet, err = base.NewPaiSet(gameState.Doras()); err != nil {
-	// 	return nil, err
-	// }
+	if s.visibleSet, err = base.NewPaiSet(gameState.VisiblePais(me)); err != nil {
+		return nil, err
+	}
+	if s.doraSet, err = base.NewPaiSet(gameState.Doras()); err != nil {
+		return nil, err
+	}
 
-	// s.bakaze = gameState.Bakaze()
-	// s.targetKaze = gameState.Jikaze(target)
+	s.bakaze = gameState.Bakaze()
+	s.targetKaze = gameState.Jikaze(target)
 
 	var prereachSutehais base.Pais = nil
 	var reachPais base.Pais = nil
@@ -73,13 +115,13 @@ func NewScene(gameState game.StateViewer, me *base.Player, target *base.Player) 
 		return nil, err
 	}
 
-	// halfLen := len(prereachSutehais) / 2
-	// if s.earlySutehaiSet, err = base.NewPaiSet(prereachSutehais[:halfLen]); err != nil {
-	// 	return nil, err
-	// }
-	// if s.lateSutehaiSet, err = base.NewPaiSet(prereachSutehais[halfLen:]); err != nil {
-	// 	return nil, err
-	// }
+	halfLen := len(prereachSutehais) / 2
+	if s.earlySutehaiSet, err = base.NewPaiSet(prereachSutehais[:halfLen]); err != nil {
+		return nil, err
+	}
+	if s.lateSutehaiSet, err = base.NewPaiSet(prereachSutehais[halfLen:]); err != nil {
+		return nil, err
+	}
 
 	return s, nil
 }
@@ -124,13 +166,13 @@ func isUrasuji(pai *base.Pai, prereachSutehaiSet *base.PaiSet, anpaiSet *base.Pa
 	return isUrasujiOf(pai, prereachSutehaiSet, anpaiSet)
 }
 
-// func isEarlyUrasuji(pai *base.Pai, earlySutehaiSet *base.PaiSet, anpaiSet *base.PaiSet) (bool, error) {
-// 	return isUrasujiOf(pai, earlySutehaiSet, anpaiSet)
-// }
+func isEarlyUrasuji(pai *base.Pai, earlySutehaiSet *base.PaiSet, anpaiSet *base.PaiSet) (bool, error) {
+	return isUrasujiOf(pai, earlySutehaiSet, anpaiSet)
+}
 
-// func isReachUrasuji(pai *base.Pai, reachPaiSet *base.PaiSet, anpaiSet *base.PaiSet) (bool, error) {
-// 	return isUrasujiOf(pai, reachPaiSet, anpaiSet)
-// }
+func isReachUrasuji(pai *base.Pai, reachPaiSet *base.PaiSet, anpaiSet *base.PaiSet) (bool, error) {
+	return isUrasujiOf(pai, reachPaiSet, anpaiSet)
+}
 
 // // Aidayonken (間四間)
 // // http://ja.wikipedia.org/wiki/%E7%AD%8B_(%E9%BA%BB%E9%9B%80)#.E9.96.93.E5.9B.9B.E9.96.93
@@ -701,12 +743,12 @@ func registerEvaluators() *evaluators {
 	ev["urasuji"] = func(scene *Scene, pai *base.Pai) (bool, error) {
 		return isUrasuji(pai, scene.prereachSutehaiSet, scene.anpaiSet)
 	}
-	// ev["early_urasuji"] = func(scene *Scene, pai *base.Pai) (bool, error) {
-	// 	return isEarlyUrasuji(pai, scene.earlySutehaiSet, scene.anpaiSet)
-	// }
-	// ev["reach_urasuji"] = func(scene *Scene, pai *base.Pai) (bool, error) {
-	// 	return isReachUrasuji(pai, scene.reachPaiSet, scene.anpaiSet)
-	// }
+	ev["early_urasuji"] = func(scene *Scene, pai *base.Pai) (bool, error) {
+		return isEarlyUrasuji(pai, scene.earlySutehaiSet, scene.anpaiSet)
+	}
+	ev["reach_urasuji"] = func(scene *Scene, pai *base.Pai) (bool, error) {
+		return isReachUrasuji(pai, scene.reachPaiSet, scene.anpaiSet)
+	}
 	// ev["aida4ken"] = func(scene *Scene, pai *base.Pai) (bool, error) {
 	// 	return isAida4ken(pai, scene.prereachSutehaiSet)
 	// }
