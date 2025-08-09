@@ -357,13 +357,13 @@ func (p *Player) OnKakan(furo *Kakan) error {
 		if !isPon {
 			return false
 		}
-		return slices.Contains(p.Pais(), *furo.Taken().RemoveRed())
+		return slices.Contains(p.Pais(), *furo.Added().RemoveRed())
 	})
 	if ponIndex == -1 {
 		return fmt.Errorf("failed to find pon mentsu for kakan: %v", furo)
 	}
 
-	err := p.deleteTehai(furo.Taken())
+	err := p.deleteTehai(furo.Added())
 	if err != nil {
 		return fmt.Errorf("failed to delete tehais on kakan: %w", err)
 	}
