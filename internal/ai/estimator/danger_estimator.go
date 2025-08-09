@@ -143,55 +143,44 @@ func isAida4ken(pai *base.Pai, prereachSutehaiSet *base.PaiSet) (bool, error) {
 	num := pai.Number()
 	typ := pai.Type()
 
+	var matchA, matchB bool
+	var err error
+
 	if 2 <= num && num <= 5 {
-		low, err := base.NewPaiWithDetail(typ, num-1, false)
-		if err != nil {
+		if matchA, err = hasBoth(typ, num-1, num+4, prereachSutehaiSet); err != nil {
 			return false, err
-		}
-		hasLow, err := prereachSutehaiSet.Has(low)
-		if err != nil {
-			return false, err
-		}
-
-		high, err := base.NewPaiWithDetail(typ, num+4, false)
-		if err != nil {
-			return false, err
-		}
-		hasHigh, err := prereachSutehaiSet.Has(high)
-		if err != nil {
-			return false, err
-		}
-
-		if hasLow && hasHigh {
-			return true, nil
 		}
 	}
 
 	if 5 <= num && num <= 8 {
-		low, err := base.NewPaiWithDetail(typ, num-4, false)
-		if err != nil {
+		if matchB, err = hasBoth(typ, num-4, num+1, prereachSutehaiSet); err != nil {
 			return false, err
-		}
-		hasLow, err := prereachSutehaiSet.Has(low)
-		if err != nil {
-			return false, err
-		}
-
-		high, err := base.NewPaiWithDetail(typ, num+1, false)
-		if err != nil {
-			return false, err
-		}
-		hasHigh, err := prereachSutehaiSet.Has(high)
-		if err != nil {
-			return false, err
-		}
-
-		if hasLow && hasHigh {
-			return true, nil
 		}
 	}
 
-	return false, nil
+	return matchA || matchB, nil
+}
+
+func hasBoth(paiType rune, n1, n2 uint8, set *base.PaiSet) (bool, error) {
+	p1, err := base.NewPaiWithDetail(paiType, n1, false)
+	if err != nil {
+		return false, err
+	}
+	has1, err := set.Has(p1)
+	if err != nil {
+		return false, err
+	}
+
+	p2, err := base.NewPaiWithDetail(paiType, n2, false)
+	if err != nil {
+		return false, err
+	}
+	has2, err := set.Has(p2)
+	if err != nil {
+		return false, err
+	}
+
+	return has1 && has2, nil
 }
 
 // Matagisuji (跨ぎ筋)
