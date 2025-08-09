@@ -479,3 +479,34 @@ func TestScene_Evaluate_UraSujiOf5(t *testing.T) {
 		})
 	}
 }
+
+func TestScene_Evaluate_UraSuji_ReachPai(t *testing.T) {
+	tests := []testCase{}
+
+	scene := getSceneForTest()
+	scene.anpaiSet = mustPaiSet("1p", "5p")
+	scene.prereachSutehaiSet = mustPaiSet("1p")
+
+	{
+		tests = append(tests, testCase{
+			name:    "2p is not urasuji of reach declaration pai 5p",
+			scene:   scene,
+			args:    args{name: "urasuji", pai: mustPai("2p")},
+			want:    false,
+			wantErr: false,
+		})
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := tt.scene.Evaluate(tt.args.name, tt.args.pai)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("Scene.Evaluate() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if got != tt.want {
+				t.Errorf("Scene.Evaluate() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
