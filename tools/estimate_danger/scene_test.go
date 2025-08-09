@@ -542,3 +542,41 @@ func TestScene_Evaluate_EarlyUraSuji_ReachUraSuji(t *testing.T) {
 		})
 	}
 }
+
+func TestScene_Evaluate_Only_UraSujiOf5(t *testing.T) {
+	tests := []testCase{}
+
+	scene, _ := NewScene(nil, mustPais("1p", "5s"), nil, nil, mustPais("1p", "5s"), nil, nil)
+
+	{
+		tests = append(tests, testCase{
+			name:    "1s is urasuji of 5 of 1p5s",
+			scene:   scene,
+			args:    args{name: "urasuji_of_5", pai: mustPai("1s")},
+			want:    true,
+			wantErr: false,
+		})
+	}
+	{
+		tests = append(tests, testCase{
+			name:    "2p is not urasuji of 5 of 1p5s",
+			scene:   scene,
+			args:    args{name: "urasuji_of_5", pai: mustPai("2p")},
+			want:    false,
+			wantErr: false,
+		})
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := tt.scene.Evaluate(tt.args.name, tt.args.pai)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("Scene.Evaluate() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if got != tt.want {
+				t.Errorf("Scene.Evaluate() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
