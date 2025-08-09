@@ -18,7 +18,12 @@ func mustPai(name string) *base.Pai {
 	return p
 }
 
-func mustPaiSet(pais []base.Pai) *base.PaiSet {
+func mustPaiSet(names ...string) *base.PaiSet {
+	pais := make([]base.Pai, len(names))
+	for i, name := range names {
+		pais[i] = *mustPai(name)
+	}
+
 	ps, err := base.NewPaiSet(pais)
 	if err != nil {
 		panic(err)
@@ -79,7 +84,7 @@ func TestScene_Evaluate_Suji(t *testing.T) {
 	tests := []testCase{}
 
 	scene := getSceneForTest()
-	scene.anpaiSet = mustPaiSet([]base.Pai{*mustPai("4p")})
+	scene.anpaiSet = mustPaiSet("4p")
 
 	{
 		tests = append(tests, testCase{
@@ -172,7 +177,7 @@ func TestScene_Evaluate_NakaSuji(t *testing.T) {
 	tests := []testCase{}
 
 	scene := getSceneForTest()
-	scene.anpaiSet = mustPaiSet([]base.Pai{*mustPai("1p"), *mustPai("7p")})
+	scene.anpaiSet = mustPaiSet("1p", "7p")
 
 	{
 		tests = append(tests, testCase{
@@ -211,7 +216,7 @@ func TestScene_Evaluate_KataSuji(t *testing.T) {
 	tests := []testCase{}
 
 	scene := getSceneForTest()
-	scene.anpaiSet = mustPaiSet([]base.Pai{*mustPai("1p")})
+	scene.anpaiSet = mustPaiSet("1p")
 
 	{
 		tests = append(tests, testCase{
@@ -250,9 +255,9 @@ func TestScene_Evaluate_ReachSuji(t *testing.T) {
 	tests := []testCase{}
 
 	scene := getSceneForTest()
-	scene.anpaiSet = mustPaiSet([]base.Pai{*mustPai("5p"), *mustPai("4p")})
-	scene.prereachSutehaiSet = mustPaiSet([]base.Pai{*mustPai("5p"), *mustPai("4p")})
-	scene.reachPaiSet = mustPaiSet([]base.Pai{*mustPai("4p")})
+	scene.anpaiSet = mustPaiSet("5p", "4p")
+	scene.prereachSutehaiSet = mustPaiSet("5p", "4p")
+	scene.reachPaiSet = mustPaiSet("4p")
 
 	{
 		tests = append(tests, testCase{
@@ -291,9 +296,9 @@ func TestScene_Evaluate_ReachKataSuji(t *testing.T) {
 	tests := []testCase{}
 
 	scene := getSceneForTest()
-	scene.anpaiSet = mustPaiSet([]base.Pai{*mustPai("1p")})
-	scene.prereachSutehaiSet = mustPaiSet([]base.Pai{*mustPai("1p")})
-	scene.reachPaiSet = mustPaiSet([]base.Pai{*mustPai("1p")})
+	scene.anpaiSet = mustPaiSet("1p")
+	scene.prereachSutehaiSet = mustPaiSet("1p")
+	scene.reachPaiSet = mustPaiSet("1p")
 
 	{
 		tests = append(tests, testCase{
