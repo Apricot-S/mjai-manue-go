@@ -246,9 +246,9 @@ func isEarlyMatagisuji(pai *base.Pai, earlySutehaiSet *base.PaiSet, anpaiSet *ba
 	return isMatagisujiOf(pai, earlySutehaiSet, anpaiSet)
 }
 
-// func isLateMatagisuji(pai *base.Pai, lateSutehaiSet *base.PaiSet, anpaiSet *base.PaiSet) (bool, error) {
-// 	return isMatagisujiOf(pai, lateSutehaiSet, anpaiSet)
-// }
+func isLateMatagisuji(pai *base.Pai, lateSutehaiSet *base.PaiSet, anpaiSet *base.PaiSet) (bool, error) {
+	return isMatagisujiOf(pai, lateSutehaiSet, anpaiSet)
+}
 
 // func isReachMatagisuji(pai *base.Pai, reachPaiSet *base.PaiSet, anpaiSet *base.PaiSet) (bool, error) {
 // 	return isMatagisujiOf(pai, reachPaiSet, anpaiSet)
@@ -762,9 +762,9 @@ func registerEvaluators() *evaluators {
 	ev["early_matagisuji"] = func(scene *Scene, pai *base.Pai) (bool, error) {
 		return isEarlyMatagisuji(pai, scene.earlySutehaiSet, scene.anpaiSet)
 	}
-	// ev["late_matagisuji"] = func(scene *Scene, pai *base.Pai) (bool, error) {
-	// 	return isLateMatagisuji(pai, scene.lateSutehaiSet, scene.anpaiSet)
-	// }
+	ev["late_matagisuji"] = func(scene *Scene, pai *base.Pai) (bool, error) {
+		return isLateMatagisuji(pai, scene.lateSutehaiSet, scene.anpaiSet)
+	}
 	// ev["reach_matagisuji"] = func(scene *Scene, pai *base.Pai) (bool, error) {
 	// 	return isReachMatagisuji(pai, scene.reachPaiSet, scene.anpaiSet)
 	// }
