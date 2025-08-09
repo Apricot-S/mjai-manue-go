@@ -76,9 +76,13 @@ func (m *Hora) UnmarshalJSONFrom(d *jsontext.Decoder) error {
 }
 
 func (m *Hora) ToEvent() (*inbound.Hora, error) {
-	pai, err := base.NewPaiWithName(m.Pai)
-	if err != nil {
-		return nil, err
+	var pai *base.Pai = nil
+	if m.Pai != "" {
+		p, err := base.NewPaiWithName(m.Pai)
+		if err != nil {
+			return nil, err
+		}
+		pai = p
 	}
 
 	var horaPoints *int = nil
