@@ -174,6 +174,18 @@ func isReachUrasuji(pai *base.Pai, reachPaiSet *base.PaiSet, anpaiSet *base.PaiS
 	return isUrasujiOf(pai, reachPaiSet, anpaiSet)
 }
 
+func isUrasujiOf5(pai *base.Pai, prereachSutehaiSet *base.PaiSet, anpaiSet *base.PaiSet) (bool, error) {
+	fiveSet := *prereachSutehaiSet
+	for i := range base.NumIDs {
+		isSuhai := (i / 9) < 3
+		isFive := (i % 9) == 4
+		if !(isSuhai && isFive) {
+			fiveSet[i] = 0
+		}
+	}
+	return isUrasujiOf(pai, &fiveSet, anpaiSet)
+}
+
 // // Aidayonken (間四間)
 // // http://ja.wikipedia.org/wiki/%E7%AD%8B_(%E9%BA%BB%E9%9B%80)#.E9.96.93.E5.9B.9B.E9.96.93
 // func isAida4ken(pai *base.Pai, prereachSutehaiSet *base.PaiSet) (bool, error) {
@@ -748,6 +760,9 @@ func registerEvaluators() *evaluators {
 	}
 	ev["reach_urasuji"] = func(scene *Scene, pai *base.Pai) (bool, error) {
 		return isReachUrasuji(pai, scene.reachPaiSet, scene.anpaiSet)
+	}
+	ev["urasuji_of_5"] = func(scene *Scene, pai *base.Pai) (bool, error) {
+		return isUrasujiOf5(pai, scene.prereachSutehaiSet, scene.anpaiSet)
 	}
 	// ev["aida4ken"] = func(scene *Scene, pai *base.Pai) (bool, error) {
 	// 	return isAida4ken(pai, scene.prereachSutehaiSet)
