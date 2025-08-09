@@ -810,3 +810,41 @@ func TestScene_Evaluate_LateMatagiSuji(t *testing.T) {
 		})
 	}
 }
+
+func TestScene_Evaluate_ReachMatagiSuji(t *testing.T) {
+	tests := []testCase{}
+
+	scene, _ := NewScene(nil, mustPais("3p", "E", "S", "7p"), nil, nil, mustPais("3p", "E", "S", "7p"), nil, nil)
+
+	{
+		tests = append(tests, testCase{
+			name:    "9p is reach matagisuji of 3pES7p",
+			scene:   scene,
+			args:    args{name: "reach_matagisuji", pai: mustPai("9p")},
+			want:    true,
+			wantErr: false,
+		})
+	}
+	{
+		tests = append(tests, testCase{
+			name:    "1p is not reach matagisuji of 3pES7p",
+			scene:   scene,
+			args:    args{name: "reach_matagisuji", pai: mustPai("1p")},
+			want:    false,
+			wantErr: false,
+		})
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := tt.scene.Evaluate(tt.args.name, tt.args.pai)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("Scene.Evaluate() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if got != tt.want {
+				t.Errorf("Scene.Evaluate() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}

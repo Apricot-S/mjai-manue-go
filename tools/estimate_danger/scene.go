@@ -250,9 +250,9 @@ func isLateMatagisuji(pai *base.Pai, lateSutehaiSet *base.PaiSet, anpaiSet *base
 	return isMatagisujiOf(pai, lateSutehaiSet, anpaiSet)
 }
 
-// func isReachMatagisuji(pai *base.Pai, reachPaiSet *base.PaiSet, anpaiSet *base.PaiSet) (bool, error) {
-// 	return isMatagisujiOf(pai, reachPaiSet, anpaiSet)
-// }
+func isReachMatagisuji(pai *base.Pai, reachPaiSet *base.PaiSet, anpaiSet *base.PaiSet) (bool, error) {
+	return isMatagisujiOf(pai, reachPaiSet, anpaiSet)
+}
 
 // // Senkisuji (疝気筋)
 // // # http://ja.wikipedia.org/wiki/%E7%AD%8B_(%E9%BA%BB%E9%9B%80)#.E7.96.9D.E6.B0.97.E3.82.B9.E3.82.B8
@@ -765,9 +765,9 @@ func registerEvaluators() *evaluators {
 	ev["late_matagisuji"] = func(scene *Scene, pai *base.Pai) (bool, error) {
 		return isLateMatagisuji(pai, scene.lateSutehaiSet, scene.anpaiSet)
 	}
-	// ev["reach_matagisuji"] = func(scene *Scene, pai *base.Pai) (bool, error) {
-	// 	return isReachMatagisuji(pai, scene.reachPaiSet, scene.anpaiSet)
-	// }
+	ev["reach_matagisuji"] = func(scene *Scene, pai *base.Pai) (bool, error) {
+		return isReachMatagisuji(pai, scene.reachPaiSet, scene.anpaiSet)
+	}
 	// ev["senkisuji"] = func(scene *Scene, pai *base.Pai) (bool, error) {
 	// 	return isSenkisuji(pai, scene.prereachSutehaiSet, scene.anpaiSet)
 	// }
