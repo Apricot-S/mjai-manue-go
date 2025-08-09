@@ -6,10 +6,6 @@ import (
 	"github.com/Apricot-S/mjai-manue-go/internal/base"
 )
 
-func getSceneForTest() *Scene {
-	return &Scene{evaluators: defaultEvaluators}
-}
-
 func mustPai(name string) *base.Pai {
 	p, err := base.NewPaiWithName(name)
 	if err != nil {
@@ -18,17 +14,12 @@ func mustPai(name string) *base.Pai {
 	return p
 }
 
-func mustPaiSet(names ...string) *base.PaiSet {
+func mustPais(names ...string) []base.Pai {
 	pais := make([]base.Pai, len(names))
-	for i, name := range names {
-		pais[i] = *mustPai(name)
+	for i, n := range names {
+		pais[i] = *mustPai(n)
 	}
-
-	ps, err := base.NewPaiSet(pais)
-	if err != nil {
-		panic(err)
-	}
-	return ps
+	return pais
 }
 
 type args struct {
@@ -47,10 +38,12 @@ type testCase struct {
 func TestScene_Evaluate_Tsupai(t *testing.T) {
 	tests := []testCase{}
 
+	scene, _ := NewScene(nil, nil, nil, nil, nil, nil, nil)
+
 	{
 		tests = append(tests, testCase{
 			name:    "E is tsupai",
-			scene:   getSceneForTest(),
+			scene:   scene,
 			args:    args{name: "tsupai", pai: mustPai("E")},
 			want:    true,
 			wantErr: false,
@@ -59,7 +52,7 @@ func TestScene_Evaluate_Tsupai(t *testing.T) {
 	{
 		tests = append(tests, testCase{
 			name:    "1p is not tsupai",
-			scene:   getSceneForTest(),
+			scene:   scene,
 			args:    args{name: "tsupai", pai: mustPai("1p")},
 			want:    false,
 			wantErr: false,
@@ -83,8 +76,7 @@ func TestScene_Evaluate_Tsupai(t *testing.T) {
 func TestScene_Evaluate_Suji(t *testing.T) {
 	tests := []testCase{}
 
-	scene := getSceneForTest()
-	scene.anpaiSet = mustPaiSet("4p")
+	scene, _ := NewScene(nil, mustPais("4p"), nil, nil, nil, nil, nil)
 
 	{
 		tests = append(tests, testCase{
@@ -176,8 +168,7 @@ func TestScene_Evaluate_Suji(t *testing.T) {
 func TestScene_Evaluate_NakaSuji(t *testing.T) {
 	tests := []testCase{}
 
-	scene := getSceneForTest()
-	scene.anpaiSet = mustPaiSet("1p", "7p")
+	scene, _ := NewScene(nil, mustPais("1p", "7p"), nil, nil, nil, nil, nil)
 
 	{
 		tests = append(tests, testCase{
@@ -215,8 +206,7 @@ func TestScene_Evaluate_NakaSuji(t *testing.T) {
 func TestScene_Evaluate_KataSuji(t *testing.T) {
 	tests := []testCase{}
 
-	scene := getSceneForTest()
-	scene.anpaiSet = mustPaiSet("1p")
+	scene, _ := NewScene(nil, mustPais("1p"), nil, nil, nil, nil, nil)
 
 	{
 		tests = append(tests, testCase{
@@ -254,10 +244,7 @@ func TestScene_Evaluate_KataSuji(t *testing.T) {
 func TestScene_Evaluate_ReachSuji(t *testing.T) {
 	tests := []testCase{}
 
-	scene := getSceneForTest()
-	scene.anpaiSet = mustPaiSet("5p", "4p")
-	scene.prereachSutehaiSet = mustPaiSet("5p", "4p")
-	scene.reachPaiSet = mustPaiSet("4p")
+	scene, _ := NewScene(nil, mustPais("5p", "4p"), nil, nil, mustPais("5p", "4p"), nil, nil)
 
 	{
 		tests = append(tests, testCase{
@@ -295,10 +282,7 @@ func TestScene_Evaluate_ReachSuji(t *testing.T) {
 func TestScene_Evaluate_ReachKataSuji(t *testing.T) {
 	tests := []testCase{}
 
-	scene := getSceneForTest()
-	scene.anpaiSet = mustPaiSet("1p")
-	scene.prereachSutehaiSet = mustPaiSet("1p")
-	scene.reachPaiSet = mustPaiSet("1p")
+	scene, _ := NewScene(nil, mustPais("1p"), nil, nil, mustPais("1p"), nil, nil)
 
 	{
 		tests = append(tests, testCase{
@@ -327,9 +311,7 @@ func TestScene_Evaluate_ReachKataSuji(t *testing.T) {
 func TestScene_Evaluate_PrereachSuji(t *testing.T) {
 	tests := []testCase{}
 
-	scene := getSceneForTest()
-	scene.anpaiSet = mustPaiSet("4p", "E", "4s")
-	scene.prereachSutehaiSet = mustPaiSet("4p", "E")
+	scene, _ := NewScene(nil, mustPais("4p", "E", "4s"), nil, nil, mustPais("4p", "E"), nil, nil)
 
 	{
 		tests = append(tests, testCase{
@@ -367,9 +349,7 @@ func TestScene_Evaluate_PrereachSuji(t *testing.T) {
 func TestScene_Evaluate_UraSuji(t *testing.T) {
 	tests := []testCase{}
 
-	scene := getSceneForTest()
-	scene.anpaiSet = mustPaiSet("1p")
-	scene.prereachSutehaiSet = mustPaiSet("1p")
+	scene, _ := NewScene(nil, mustPais("1p"), nil, nil, mustPais("1p"), nil, nil)
 
 	{
 		tests = append(tests, testCase{
@@ -416,9 +396,7 @@ func TestScene_Evaluate_UraSuji(t *testing.T) {
 func TestScene_Evaluate_UraSujiOf5(t *testing.T) {
 	tests := []testCase{}
 
-	scene := getSceneForTest()
-	scene.anpaiSet = mustPaiSet("5p")
-	scene.prereachSutehaiSet = mustPaiSet("5p")
+	scene, _ := NewScene(nil, mustPais("5p"), nil, nil, mustPais("5p"), nil, nil)
 
 	{
 		tests = append(tests, testCase{
@@ -483,15 +461,69 @@ func TestScene_Evaluate_UraSujiOf5(t *testing.T) {
 func TestScene_Evaluate_UraSuji_ReachPai(t *testing.T) {
 	tests := []testCase{}
 
-	scene := getSceneForTest()
-	scene.anpaiSet = mustPaiSet("1p", "5p")
-	scene.prereachSutehaiSet = mustPaiSet("1p")
+	scene, _ := NewScene(nil, mustPais("1p", "5p"), nil, nil, mustPais("1p"), nil, nil)
 
 	{
 		tests = append(tests, testCase{
 			name:    "2p is not urasuji of reach declaration pai 5p",
 			scene:   scene,
 			args:    args{name: "urasuji", pai: mustPai("2p")},
+			want:    false,
+			wantErr: false,
+		})
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := tt.scene.Evaluate(tt.args.name, tt.args.pai)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("Scene.Evaluate() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if got != tt.want {
+				t.Errorf("Scene.Evaluate() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestScene_Evaluate_EarlyUraSuji_ReachUraSuji(t *testing.T) {
+	tests := []testCase{}
+
+	scene, _ := NewScene(nil, mustPais("1p", "E", "S", "W", "1s"), nil, nil, mustPais("1p", "E", "S", "W", "1s"), nil, nil)
+
+	{
+		tests = append(tests, testCase{
+			name:    "5p is early urasuji of 1pESW1s",
+			scene:   scene,
+			args:    args{name: "early_urasuji", pai: mustPai("5p")},
+			want:    true,
+			wantErr: false,
+		})
+	}
+	{
+		tests = append(tests, testCase{
+			name:    "5s is not early urasuji of 1pESW1s",
+			scene:   scene,
+			args:    args{name: "early_urasuji", pai: mustPai("5s")},
+			want:    false,
+			wantErr: false,
+		})
+	}
+	{
+		tests = append(tests, testCase{
+			name:    "5s is reach urasuji of 1pESW1s",
+			scene:   scene,
+			args:    args{name: "reach_urasuji", pai: mustPai("5s")},
+			want:    true,
+			wantErr: false,
+		})
+	}
+	{
+		tests = append(tests, testCase{
+			name:    "5p is not reach urasuji of 1pESW1s",
+			scene:   scene,
+			args:    args{name: "reach_urasuji", pai: mustPai("5p")},
 			want:    false,
 			wantErr: false,
 		})
