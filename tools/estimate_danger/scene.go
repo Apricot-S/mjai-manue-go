@@ -79,51 +79,21 @@ func NewScene(
 }
 
 func NewSceneWithState(gameState game.StateViewer, me *base.Player, target *base.Player) (*Scene, error) {
-	s := &Scene{
-		evaluators: defaultEvaluators,
-	}
-
-	var err error
-	if s.tehaiSet, err = base.NewPaiSet(me.Tehais()); err != nil {
-		return nil, err
-	}
-	if s.anpaiSet, err = base.NewPaiSet(gameState.Anpais(target)); err != nil {
-		return nil, err
-	}
-	if s.visibleSet, err = base.NewPaiSet(gameState.VisiblePais(me)); err != nil {
-		return nil, err
-	}
-	if s.doraSet, err = base.NewPaiSet(gameState.Doras()); err != nil {
-		return nil, err
-	}
-
-	s.bakaze = gameState.Bakaze()
-	s.targetKaze = gameState.Jikaze(target)
-
 	var prereachSutehais base.Pais = nil
-	var reachPais base.Pais = nil
 	if idx := target.ReachSutehaiIndex(); idx != -1 {
 		sutehais := target.Sutehais()
 		prereachSutehais = sutehais[:idx+1]
-		reachPai := sutehais[idx]
-		reachPais = base.Pais{reachPai}
-	}
-	if s.prereachSutehaiSet, err = base.NewPaiSet(prereachSutehais); err != nil {
-		return nil, err
-	}
-	if s.reachPaiSet, err = base.NewPaiSet(reachPais); err != nil {
-		return nil, err
 	}
 
-	halfLen := len(prereachSutehais) / 2
-	if s.earlySutehaiSet, err = base.NewPaiSet(prereachSutehais[:halfLen]); err != nil {
-		return nil, err
-	}
-	if s.lateSutehaiSet, err = base.NewPaiSet(prereachSutehais[halfLen:]); err != nil {
-		return nil, err
-	}
-
-	return s, nil
+	return NewScene(
+		me.Tehais(),
+		gameState.Anpais(target),
+		gameState.VisiblePais(me),
+		gameState.Doras(),
+		prereachSutehais,
+		gameState.Bakaze(),
+		gameState.Jikaze(target),
+	)
 }
 
 func (s *Scene) Evaluate(name string, pai *base.Pai) (bool, error) {
