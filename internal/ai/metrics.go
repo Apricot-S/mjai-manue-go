@@ -425,8 +425,7 @@ func (a *ManueAI) getHoraEstimation(
 
 	for range numTries {
 		core.ShuffleWall(rng, &invisiblePais)
-		tsumoPais := make(base.Pais, numTsumos)
-		copy(tsumoPais, invisiblePais[:numTsumos])
+		tsumoPais := slices.Clone(invisiblePais[:numTsumos])
 		tsumoVector, err := base.NewPaiSet(tsumoPais)
 		if err != nil {
 			return nil, err
