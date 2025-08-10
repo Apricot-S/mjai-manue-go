@@ -99,7 +99,22 @@ func NewSceneWithState(gameState game.StateViewer, me *base.Player, target *base
 	)
 }
 
-func (s *Scene) Evaluate(name string, pai *base.Pai) (bool, error) {
+func (s *Scene) FeatureNames() []string {
+	return s.featureNames
+}
+
+func (s *Scene) FeatureVector(pai *base.Pai) (*BitVector, error) {
+	boolArray := make([]bool, len(s.featureNames))
+	var err error
+	for i, featureName := range s.featureNames {
+		if boolArray[i], err = s.evaluate(featureName, pai); err != nil {
+			return nil, err
+		}
+	}
+	return boolArrayToBitVector(boolArray), nil
+}
+
+func (s *Scene) evaluate(name string, pai *base.Pai) (bool, error) {
 	if evaluator, ok := (*s.evaluators)[name]; ok {
 		return evaluator(s, pai)
 	}

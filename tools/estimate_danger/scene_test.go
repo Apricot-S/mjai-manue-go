@@ -61,13 +61,13 @@ func TestScene_Evaluate_Tsupai(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := tt.scene.Evaluate(tt.args.name, tt.args.pai)
+			got, err := tt.scene.evaluate(tt.args.name, tt.args.pai)
 			if (err != nil) != tt.wantErr {
-				t.Errorf("Scene.Evaluate() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("Scene.evaluate() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
 			if got != tt.want {
-				t.Errorf("Scene.Evaluate() = %v, want %v", got, tt.want)
+				t.Errorf("Scene.evaluate() = %v, want %v", got, tt.want)
 			}
 		})
 	}
@@ -153,13 +153,13 @@ func TestScene_Evaluate_Suji(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := tt.scene.Evaluate(tt.args.name, tt.args.pai)
+			got, err := tt.scene.evaluate(tt.args.name, tt.args.pai)
 			if (err != nil) != tt.wantErr {
-				t.Errorf("Scene.Evaluate() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("Scene.evaluate() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
 			if got != tt.want {
-				t.Errorf("Scene.Evaluate() = %v, want %v", got, tt.want)
+				t.Errorf("Scene.evaluate() = %v, want %v", got, tt.want)
 			}
 		})
 	}
@@ -191,13 +191,13 @@ func TestScene_Evaluate_NakaSuji(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := tt.scene.Evaluate(tt.args.name, tt.args.pai)
+			got, err := tt.scene.evaluate(tt.args.name, tt.args.pai)
 			if (err != nil) != tt.wantErr {
-				t.Errorf("Scene.Evaluate() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("Scene.evaluate() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
 			if got != tt.want {
-				t.Errorf("Scene.Evaluate() = %v, want %v", got, tt.want)
+				t.Errorf("Scene.evaluate() = %v, want %v", got, tt.want)
 			}
 		})
 	}
@@ -229,13 +229,13 @@ func TestScene_Evaluate_KataSuji(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := tt.scene.Evaluate(tt.args.name, tt.args.pai)
+			got, err := tt.scene.evaluate(tt.args.name, tt.args.pai)
 			if (err != nil) != tt.wantErr {
-				t.Errorf("Scene.Evaluate() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("Scene.evaluate() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
 			if got != tt.want {
-				t.Errorf("Scene.Evaluate() = %v, want %v", got, tt.want)
+				t.Errorf("Scene.evaluate() = %v, want %v", got, tt.want)
 			}
 		})
 	}
@@ -267,13 +267,13 @@ func TestScene_Evaluate_ReachSuji(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := tt.scene.Evaluate(tt.args.name, tt.args.pai)
+			got, err := tt.scene.evaluate(tt.args.name, tt.args.pai)
 			if (err != nil) != tt.wantErr {
-				t.Errorf("Scene.Evaluate() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("Scene.evaluate() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
 			if got != tt.want {
-				t.Errorf("Scene.Evaluate() = %v, want %v", got, tt.want)
+				t.Errorf("Scene.evaluate() = %v, want %v", got, tt.want)
 			}
 		})
 	}
@@ -296,13 +296,13 @@ func TestScene_Evaluate_ReachKataSuji(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := tt.scene.Evaluate(tt.args.name, tt.args.pai)
+			got, err := tt.scene.evaluate(tt.args.name, tt.args.pai)
 			if (err != nil) != tt.wantErr {
-				t.Errorf("Scene.Evaluate() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("Scene.evaluate() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
 			if got != tt.want {
-				t.Errorf("Scene.Evaluate() = %v, want %v", got, tt.want)
+				t.Errorf("Scene.evaluate() = %v, want %v", got, tt.want)
 			}
 		})
 	}
@@ -334,13 +334,13 @@ func TestScene_Evaluate_PrereachSuji(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := tt.scene.Evaluate(tt.args.name, tt.args.pai)
+			got, err := tt.scene.evaluate(tt.args.name, tt.args.pai)
 			if (err != nil) != tt.wantErr {
-				t.Errorf("Scene.Evaluate() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("Scene.evaluate() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
 			if got != tt.want {
-				t.Errorf("Scene.Evaluate() = %v, want %v", got, tt.want)
+				t.Errorf("Scene.evaluate() = %v, want %v", got, tt.want)
 			}
 		})
 	}
@@ -381,13 +381,13 @@ func TestScene_Evaluate_UraSuji(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := tt.scene.Evaluate(tt.args.name, tt.args.pai)
+			got, err := tt.scene.evaluate(tt.args.name, tt.args.pai)
 			if (err != nil) != tt.wantErr {
-				t.Errorf("Scene.Evaluate() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("Scene.evaluate() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
 			if got != tt.want {
-				t.Errorf("Scene.Evaluate() = %v, want %v", got, tt.want)
+				t.Errorf("Scene.evaluate() = %v, want %v", got, tt.want)
 			}
 		})
 	}
@@ -446,13 +446,13 @@ func TestScene_Evaluate_UraSujiOf5(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := tt.scene.Evaluate(tt.args.name, tt.args.pai)
+			got, err := tt.scene.evaluate(tt.args.name, tt.args.pai)
 			if (err != nil) != tt.wantErr {
-				t.Errorf("Scene.Evaluate() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("Scene.evaluate() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
 			if got != tt.want {
-				t.Errorf("Scene.Evaluate() = %v, want %v", got, tt.want)
+				t.Errorf("Scene.evaluate() = %v, want %v", got, tt.want)
 			}
 		})
 	}
@@ -475,13 +475,13 @@ func TestScene_Evaluate_UraSuji_ReachPai(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := tt.scene.Evaluate(tt.args.name, tt.args.pai)
+			got, err := tt.scene.evaluate(tt.args.name, tt.args.pai)
 			if (err != nil) != tt.wantErr {
-				t.Errorf("Scene.Evaluate() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("Scene.evaluate() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
 			if got != tt.want {
-				t.Errorf("Scene.Evaluate() = %v, want %v", got, tt.want)
+				t.Errorf("Scene.evaluate() = %v, want %v", got, tt.want)
 			}
 		})
 	}
@@ -531,13 +531,13 @@ func TestScene_Evaluate_EarlyUraSuji_ReachUraSuji(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := tt.scene.Evaluate(tt.args.name, tt.args.pai)
+			got, err := tt.scene.evaluate(tt.args.name, tt.args.pai)
 			if (err != nil) != tt.wantErr {
-				t.Errorf("Scene.Evaluate() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("Scene.evaluate() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
 			if got != tt.want {
-				t.Errorf("Scene.Evaluate() = %v, want %v", got, tt.want)
+				t.Errorf("Scene.evaluate() = %v, want %v", got, tt.want)
 			}
 		})
 	}
@@ -569,13 +569,13 @@ func TestScene_Evaluate_Only_UraSujiOf5(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := tt.scene.Evaluate(tt.args.name, tt.args.pai)
+			got, err := tt.scene.evaluate(tt.args.name, tt.args.pai)
 			if (err != nil) != tt.wantErr {
-				t.Errorf("Scene.Evaluate() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("Scene.evaluate() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
 			if got != tt.want {
-				t.Errorf("Scene.Evaluate() = %v, want %v", got, tt.want)
+				t.Errorf("Scene.evaluate() = %v, want %v", got, tt.want)
 			}
 		})
 	}
@@ -616,13 +616,13 @@ func TestScene_Evaluate_Aida4ken(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := tt.scene.Evaluate(tt.args.name, tt.args.pai)
+			got, err := tt.scene.evaluate(tt.args.name, tt.args.pai)
 			if (err != nil) != tt.wantErr {
-				t.Errorf("Scene.Evaluate() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("Scene.evaluate() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
 			if got != tt.want {
-				t.Errorf("Scene.Evaluate() = %v, want %v", got, tt.want)
+				t.Errorf("Scene.evaluate() = %v, want %v", got, tt.want)
 			}
 		})
 	}
@@ -723,13 +723,13 @@ func TestScene_Evaluate_MatagiSuji(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := tt.scene.Evaluate(tt.args.name, tt.args.pai)
+			got, err := tt.scene.evaluate(tt.args.name, tt.args.pai)
 			if (err != nil) != tt.wantErr {
-				t.Errorf("Scene.Evaluate() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("Scene.evaluate() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
 			if got != tt.want {
-				t.Errorf("Scene.Evaluate() = %v, want %v", got, tt.want)
+				t.Errorf("Scene.evaluate() = %v, want %v", got, tt.want)
 			}
 		})
 	}
@@ -761,13 +761,13 @@ func TestScene_Evaluate_EarlyMatagiSuji(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := tt.scene.Evaluate(tt.args.name, tt.args.pai)
+			got, err := tt.scene.evaluate(tt.args.name, tt.args.pai)
 			if (err != nil) != tt.wantErr {
-				t.Errorf("Scene.Evaluate() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("Scene.evaluate() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
 			if got != tt.want {
-				t.Errorf("Scene.Evaluate() = %v, want %v", got, tt.want)
+				t.Errorf("Scene.evaluate() = %v, want %v", got, tt.want)
 			}
 		})
 	}
@@ -799,13 +799,13 @@ func TestScene_Evaluate_LateMatagiSuji(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := tt.scene.Evaluate(tt.args.name, tt.args.pai)
+			got, err := tt.scene.evaluate(tt.args.name, tt.args.pai)
 			if (err != nil) != tt.wantErr {
-				t.Errorf("Scene.Evaluate() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("Scene.evaluate() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
 			if got != tt.want {
-				t.Errorf("Scene.Evaluate() = %v, want %v", got, tt.want)
+				t.Errorf("Scene.evaluate() = %v, want %v", got, tt.want)
 			}
 		})
 	}
@@ -837,13 +837,13 @@ func TestScene_Evaluate_ReachMatagiSuji(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := tt.scene.Evaluate(tt.args.name, tt.args.pai)
+			got, err := tt.scene.evaluate(tt.args.name, tt.args.pai)
 			if (err != nil) != tt.wantErr {
-				t.Errorf("Scene.Evaluate() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("Scene.evaluate() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
 			if got != tt.want {
-				t.Errorf("Scene.Evaluate() = %v, want %v", got, tt.want)
+				t.Errorf("Scene.evaluate() = %v, want %v", got, tt.want)
 			}
 		})
 	}
@@ -884,13 +884,13 @@ func TestScene_Evaluate_SenkiSuji(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := tt.scene.Evaluate(tt.args.name, tt.args.pai)
+			got, err := tt.scene.evaluate(tt.args.name, tt.args.pai)
 			if (err != nil) != tt.wantErr {
-				t.Errorf("Scene.Evaluate() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("Scene.evaluate() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
 			if got != tt.want {
-				t.Errorf("Scene.Evaluate() = %v, want %v", got, tt.want)
+				t.Errorf("Scene.evaluate() = %v, want %v", got, tt.want)
 			}
 		})
 	}
@@ -944,13 +944,13 @@ func TestScene_Evaluate_VisibleNOrMore(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := tt.scene.Evaluate(tt.args.name, tt.args.pai)
+			got, err := tt.scene.evaluate(tt.args.name, tt.args.pai)
 			if (err != nil) != tt.wantErr {
-				t.Errorf("Scene.Evaluate() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("Scene.evaluate() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
 			if got != tt.want {
-				t.Errorf("Scene.Evaluate() = %v, want %v", got, tt.want)
+				t.Errorf("Scene.evaluate() = %v, want %v", got, tt.want)
 			}
 		})
 	}
@@ -1003,13 +1003,13 @@ func TestScene_Evaluate_SujiVisible(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := tt.scene.Evaluate(tt.args.name, tt.args.pai)
+			got, err := tt.scene.evaluate(tt.args.name, tt.args.pai)
 			if (err != nil) != tt.wantErr {
-				t.Errorf("Scene.Evaluate() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("Scene.evaluate() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
 			if got != tt.want {
-				t.Errorf("Scene.Evaluate() = %v, want %v", got, tt.want)
+				t.Errorf("Scene.evaluate() = %v, want %v", got, tt.want)
 			}
 		})
 	}
