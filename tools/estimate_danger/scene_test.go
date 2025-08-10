@@ -848,3 +848,50 @@ func TestScene_Evaluate_ReachMatagiSuji(t *testing.T) {
 		})
 	}
 }
+
+func TestScene_Evaluate_SenkiSuji(t *testing.T) {
+	tests := []testCase{}
+
+	scene, _ := NewScene(nil, mustPais("1p"), nil, nil, mustPais("1p"), nil, nil)
+
+	{
+		tests = append(tests, testCase{
+			name:    "3p is senkisuji of 1p",
+			scene:   scene,
+			args:    args{name: "senkisuji", pai: mustPai("3p")},
+			want:    true,
+			wantErr: false,
+		})
+	}
+	{
+		tests = append(tests, testCase{
+			name:    "6p is senkisuji of 1p",
+			scene:   scene,
+			args:    args{name: "senkisuji", pai: mustPai("6p")},
+			want:    true,
+			wantErr: false,
+		})
+	}
+	{
+		tests = append(tests, testCase{
+			name:    "2p is not senkisuji of 1p",
+			scene:   scene,
+			args:    args{name: "senkisuji", pai: mustPai("2p")},
+			want:    false,
+			wantErr: false,
+		})
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := tt.scene.Evaluate(tt.args.name, tt.args.pai)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("Scene.Evaluate() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if got != tt.want {
+				t.Errorf("Scene.Evaluate() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
