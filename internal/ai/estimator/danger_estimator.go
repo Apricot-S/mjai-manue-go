@@ -322,11 +322,7 @@ func isNumNOrInner(pai *base.Pai, n uint8) bool {
 	}
 
 	paiNumber := pai.Number()
-	if n <= paiNumber && paiNumber <= 10-n {
-		return true
-	}
-
-	return false
+	return n <= paiNumber && paiNumber <= 10-n
 }
 
 func isInTehais(pai *base.Pai, n int, tehaiSet *base.PaiSet) (bool, error) {
