@@ -231,12 +231,12 @@ func isDoraMatagi(pai *base.Pai, doraSet *base.PaiSet, anpaiSet *base.PaiSet) (b
 	return isMatagisujiOf(pai, doraSet, anpaiSet)
 }
 
-func isFanpai(pai *base.Pai, gameState game.StateViewer, target *base.Player) bool {
-	return gameState.YakuhaiFan(pai, target) >= 1
+func isFanpai(pai, bakaze, targetKaze *base.Pai) bool {
+	return fanpaiFansu(pai, bakaze, targetKaze) >= 1
 }
 
-func isRyenfonpai(pai *base.Pai, gameState game.StateViewer, target *base.Player) bool {
-	return gameState.YakuhaiFan(pai, target) >= 2
+func isRyenfonpai(pai, bakaze, targetKaze *base.Pai) bool {
+	return fanpaiFansu(pai, bakaze, targetKaze) >= 2
 }
 
 func isSangenpai(pai *base.Pai) bool {
@@ -663,6 +663,30 @@ func isOuter(pai *base.Pai, targetPaiSet *base.PaiSet) (bool, error) {
 	})
 }
 
+func fanpaiFansu(pai, bakaze, targetKaze *base.Pai) int {
+	if !pai.IsTsupai() {
+		// Suhai
+		return 0
+	}
+
+	// Jihai
+	n := pai.Number()
+	if n >= 5 {
+		// Sangenpai
+		return 1
+	}
+
+	// Kazehai
+	fan := 0
+	if pai.HasSameSymbol(bakaze) {
+		fan++
+	}
+	if pai.HasSameSymbol(targetKaze) {
+		fan++
+	}
+	return fan
+}
+
 func registerEvaluators() *evaluators {
 	ev := evaluators{}
 
@@ -730,10 +754,10 @@ func registerEvaluators() *evaluators {
 		return isDoraMatagi(pai, scene.doraSet, scene.anpaiSet)
 	}
 	ev["fanpai"] = func(scene *Scene, pai *base.Pai) (bool, error) {
-		return isFanpai(pai, scene.gameState, scene.target), nil
+		return isFanpai(pai, scene.bakaze, scene.targetKaze), nil
 	}
 	ev["ryenfonpai"] = func(scene *Scene, pai *base.Pai) (bool, error) {
-		return isRyenfonpai(pai, scene.gameState, scene.target), nil
+		return isRyenfonpai(pai, scene.bakaze, scene.targetKaze), nil
 	}
 	ev["sangenpai"] = func(scene *Scene, pai *base.Pai) (bool, error) {
 		return isSangenpai(pai), nil
