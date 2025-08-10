@@ -15,6 +15,20 @@ type evaluators map[string]evaluator
 
 var defaultFeatureNames, defaultEvaluators = registerEvaluators()
 
+func FeatureNames() []string {
+	return defaultFeatureNames
+}
+
+func FeatureVectorToStr(featureVector *BitVector) string {
+	var features []string
+	for i, name := range defaultFeatureNames {
+		if featureVector.Bit(i) == 1 {
+			features = append(features, name)
+		}
+	}
+	return strings.Join(features, " ")
+}
+
 type Scene struct {
 	tehaiSet   *base.PaiSet
 	anpaiSet   *base.PaiSet
@@ -100,10 +114,6 @@ func NewSceneWithState(gameState game.StateViewer, me *base.Player, target *base
 	)
 }
 
-func (s *Scene) FeatureNames() []string {
-	return s.featureNames
-}
-
 func (s *Scene) FeatureVector(pai *base.Pai) (*BitVector, error) {
 	boolArray := make([]bool, len(s.featureNames))
 	var err error
@@ -113,16 +123,6 @@ func (s *Scene) FeatureVector(pai *base.Pai) (*BitVector, error) {
 		}
 	}
 	return boolArrayToBitVector(boolArray), nil
-}
-
-func (s *Scene) FeatureVectorToStr(featureVector *BitVector) string {
-	var features []string
-	for i, name := range s.featureNames {
-		if featureVector.Bit(i) == 1 {
-			features = append(features, name)
-		}
-	}
-	return strings.Join(features, " ")
 }
 
 func (s *Scene) evaluate(name string, pai *base.Pai) (bool, error) {
