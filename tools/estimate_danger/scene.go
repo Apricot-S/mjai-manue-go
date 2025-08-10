@@ -350,24 +350,24 @@ func isVisibleNOrMore(pai *base.Pai, n int, visibleSet *base.PaiSet) (bool, erro
 	return c >= n, nil
 }
 
-// func isSujiVisible(pai *base.Pai, n int, visibleSet *base.PaiSet) (bool, error) {
-// 	if pai.IsTsupai() {
-// 		return false, nil
-// 	}
+func isSujiVisible(pai *base.Pai, n int, visibleSet *base.PaiSet) (bool, error) {
+	if pai.IsTsupai() {
+		return false, nil
+	}
 
-// 	suji, err := getSuji(pai)
-// 	if err != nil {
-// 		return false, err
-// 	}
+	suji, err := getSuji(pai)
+	if err != nil {
+		return false, err
+	}
 
-// 	return core.AnyMatch(suji, func(sujiPai game.Pai) (bool, error) {
-// 		visible, err := isVisibleNOrMore(&sujiPai, n+1, visibleSet)
-// 		if err != nil {
-// 			return false, err
-// 		}
-// 		return !visible, nil
-// 	})
-// }
+	return core.AnyMatch(suji, func(sujiPai base.Pai) (bool, error) {
+		visible, err := isVisibleNOrMore(&sujiPai, n+1, visibleSet)
+		if err != nil {
+			return false, err
+		}
+		return !visible, nil
+	})
+}
 
 // func isNumNOrInner(pai *base.Pai, n uint8) bool {
 // 	if pai.IsTsupai() {
@@ -826,17 +826,17 @@ func registerEvaluators() *evaluators {
 		}
 	}
 
-	// // Among the Suji of that tile, whether one is visible no more than i copies.
-	// // The tile itself should not be counted.
-	// // In the case of 5p, this means "either 2p or 8p is visible no more than i copies,"
-	// // not "the combined visibility of 2p and 8p is no more than i copies."
-	// for i := range 4 {
-	// 	featureName := fmt.Sprintf("suji_visible<=%d", i)
-	// 	n := i
-	// 	ev[featureName] = func(scene *Scene, pai *base.Pai) (bool, error) {
-	// 		return isSujiVisible(pai, n, scene.visibleSet)
-	// 	}
-	// }
+	// Among the Suji of that tile, whether one is visible no more than i copies.
+	// The tile itself should not be counted.
+	// In the case of 5p, this means "either 2p or 8p is visible no more than i copies,"
+	// not "the combined visibility of 2p and 8p is no more than i copies."
+	for i := range 4 {
+		featureName := fmt.Sprintf("suji_visible<=%d", i)
+		n := i
+		ev[featureName] = func(scene *Scene, pai *base.Pai) (bool, error) {
+			return isSujiVisible(pai, n, scene.visibleSet)
+		}
+	}
 
 	// for i := uint8(2); i < 6; i++ {
 	// 	featureName := fmt.Sprintf("%d<=n<=%d", i, 10-i)

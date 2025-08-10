@@ -955,3 +955,64 @@ func TestScene_Evaluate_VisibleNOrMore(t *testing.T) {
 		})
 	}
 }
+
+func TestScene_Evaluate_SujiVisible(t *testing.T) {
+	tests := []testCase{}
+
+	scene1, _ := NewScene(nil, nil, mustPais("4p"), nil, nil, nil, nil)
+
+	{
+		tests = append(tests, testCase{
+			name:    "1 or less suji of 1p are visible",
+			scene:   scene1,
+			args:    args{name: "suji_visible<=1", pai: mustPai("1p")},
+			want:    true,
+			wantErr: false,
+		})
+	}
+	{
+		tests = append(tests, testCase{
+			name:    "0 or less suji of 1p are not visible",
+			scene:   scene1,
+			args:    args{name: "suji_visible<=0", pai: mustPai("1p")},
+			want:    false,
+			wantErr: false,
+		})
+	}
+
+	scene2, _ := NewScene(nil, nil, mustPais("4p", "4p"), nil, nil, nil, nil)
+
+	{
+		tests = append(tests, testCase{
+			name:    "2 or less suji of 1p are visible",
+			scene:   scene2,
+			args:    args{name: "suji_visible<=2", pai: mustPai("1p")},
+			want:    true,
+			wantErr: false,
+		})
+	}
+	{
+		tests = append(tests, testCase{
+			name:    "1 or less suji of 1p are not visible",
+			scene:   scene2,
+			args:    args{name: "suji_visible<=1", pai: mustPai("1p")},
+			want:    false,
+			wantErr: false,
+		})
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := tt.scene.Evaluate(tt.args.name, tt.args.pai)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("Scene.Evaluate() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if got != tt.want {
+				t.Errorf("Scene.Evaluate() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+// TODO Add test for rest of features.
