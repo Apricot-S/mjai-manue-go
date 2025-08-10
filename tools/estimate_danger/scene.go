@@ -778,33 +778,6 @@ func registerEvaluators() *evaluators {
 	ev["outer_early_sutehai"] = func(scene *Scene, pai *base.Pai) (bool, error) {
 		return isOuterEarlySutehai(pai, scene.earlySutehaiSet)
 	}
-	ev["dora"] = func(scene *Scene, pai *base.Pai) (bool, error) {
-		return isDora(pai, scene.doraSet)
-	}
-	ev["dora_suji"] = func(scene *Scene, pai *base.Pai) (bool, error) {
-		return isDoraSuji(pai, scene.doraSet)
-	}
-	ev["dora_matagi"] = func(scene *Scene, pai *base.Pai) (bool, error) {
-		return isDoraMatagi(pai, scene.doraSet, scene.anpaiSet)
-	}
-	ev["fanpai"] = func(scene *Scene, pai *base.Pai) (bool, error) {
-		return isFanpai(pai, scene.bakaze, scene.targetKaze), nil
-	}
-	ev["ryenfonpai"] = func(scene *Scene, pai *base.Pai) (bool, error) {
-		return isRyenfonpai(pai, scene.bakaze, scene.targetKaze), nil
-	}
-	ev["sangenpai"] = func(scene *Scene, pai *base.Pai) (bool, error) {
-		return isSangenpai(pai), nil
-	}
-	ev["fonpai"] = func(scene *Scene, pai *base.Pai) (bool, error) {
-		return isFonpai(pai), nil
-	}
-	ev["bakaze"] = func(scene *Scene, pai *base.Pai) (bool, error) {
-		return isBakaze(pai, scene.bakaze), nil
-	}
-	ev["jikaze"] = func(scene *Scene, pai *base.Pai) (bool, error) {
-		return isJikaze(pai, scene.targetKaze), nil
-	}
 
 	for i := range 4 {
 		featureName := fmt.Sprintf("chances<=%d", i)
@@ -842,6 +815,16 @@ func registerEvaluators() *evaluators {
 		ev[featureName] = func(scene *Scene, pai *base.Pai) (bool, error) {
 			return isNumNOrInner(pai, n), nil
 		}
+	}
+
+	ev["dora"] = func(scene *Scene, pai *base.Pai) (bool, error) {
+		return isDora(pai, scene.doraSet)
+	}
+	ev["dora_suji"] = func(scene *Scene, pai *base.Pai) (bool, error) {
+		return isDoraSuji(pai, scene.doraSet)
+	}
+	ev["dora_matagi"] = func(scene *Scene, pai *base.Pai) (bool, error) {
+		return isDoraMatagi(pai, scene.doraSet, scene.anpaiSet)
 	}
 
 	for i := 2; i < 5; i++ {
@@ -902,6 +885,25 @@ func registerEvaluators() *evaluators {
 		ev[featureName] = func(scene *Scene, pai *base.Pai) (bool, error) {
 			return isSameTypeInPrereach(pai, n, scene.prereachSutehaiSet)
 		}
+	}
+
+	ev["fanpai"] = func(scene *Scene, pai *base.Pai) (bool, error) {
+		return isFanpai(pai, scene.bakaze, scene.targetKaze), nil
+	}
+	ev["ryenfonpai"] = func(scene *Scene, pai *base.Pai) (bool, error) {
+		return isRyenfonpai(pai, scene.bakaze, scene.targetKaze), nil
+	}
+	ev["sangenpai"] = func(scene *Scene, pai *base.Pai) (bool, error) {
+		return isSangenpai(pai), nil
+	}
+	ev["fonpai"] = func(scene *Scene, pai *base.Pai) (bool, error) {
+		return isFonpai(pai), nil
+	}
+	ev["bakaze"] = func(scene *Scene, pai *base.Pai) (bool, error) {
+		return isBakaze(pai, scene.bakaze), nil
+	}
+	ev["jikaze"] = func(scene *Scene, pai *base.Pai) (bool, error) {
+		return isJikaze(pai, scene.targetKaze), nil
 	}
 
 	return &ev
