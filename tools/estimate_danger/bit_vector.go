@@ -2,7 +2,9 @@ package main
 
 import "math/big"
 
-type BitVector = big.Int
+type BitVector struct {
+	*big.Int
+}
 
 var one = big.NewInt(1)
 
@@ -14,5 +16,5 @@ func boolArrayToBitVector(boolArray []bool) *BitVector {
 			bitVector.Or(bitVector, one)
 		}
 	}
-	return bitVector
+	return &BitVector{bitVector}
 }

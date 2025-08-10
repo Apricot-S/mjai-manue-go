@@ -22,7 +22,7 @@ func FeatureNames() []string {
 func FeatureVectorToStr(featureVector *BitVector) string {
 	var features []string
 	for i, name := range defaultFeatureNames {
-		if featureVector.Bit(i) == 1 {
+		if featureVector.Bit(i) != 0 {
 			features = append(features, name)
 		}
 	}
