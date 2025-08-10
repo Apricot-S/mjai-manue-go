@@ -29,6 +29,11 @@ func FeatureVectorToStr(featureVector *BitVector) string {
 	return strings.Join(features, " ")
 }
 
+func GetFeatureValue(featureVector *BitVector, featureName string) bool {
+	index := slices.Index(defaultFeatureNames, featureName)
+	return featureVector.Bit(index) != 0
+}
+
 type Scene struct {
 	tehaiSet   *base.PaiSet
 	anpaiSet   *base.PaiSet
@@ -122,7 +127,7 @@ func (s *Scene) FeatureVector(pai *base.Pai) (*BitVector, error) {
 			return nil, err
 		}
 	}
-	return boolArrayToBitVector(boolArray), nil
+	return BoolArrayToBitVector(boolArray), nil
 }
 
 func (s *Scene) evaluate(name string, pai *base.Pai) (bool, error) {
