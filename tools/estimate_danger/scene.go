@@ -342,13 +342,13 @@ func isSenkisuji(pai *base.Pai, prereachSutehaiSet *base.PaiSet, anpaiSet *base.
 // 	})
 // }
 
-// func isVisibleNOrMore(pai *base.Pai, n int, visibleSet *base.PaiSet) (bool, error) {
-// 	c, err := visibleSet.Count(pai)
-// 	if err != nil {
-// 		return false, err
-// 	}
-// 	return c >= n, nil
-// }
+func isVisibleNOrMore(pai *base.Pai, n int, visibleSet *base.PaiSet) (bool, error) {
+	c, err := visibleSet.Count(pai)
+	if err != nil {
+		return false, err
+	}
+	return c >= n, nil
+}
 
 // func isSujiVisible(pai *base.Pai, n int, visibleSet *base.PaiSet) (bool, error) {
 // 	if pai.IsTsupai() {
@@ -816,15 +816,15 @@ func registerEvaluators() *evaluators {
 	// 	}
 	// }
 
-	// // Whether i tiles are visible from one's perspective.
-	// // Includes one's own hand. Excludes the tile one is about to discard.
-	// for i := 1; i < 4; i++ {
-	// 	featureName := fmt.Sprintf("visible>=%d", i)
-	// 	n := i
-	// 	ev[featureName] = func(scene *Scene, pai *base.Pai) (bool, error) {
-	// 		return isVisibleNOrMore(pai, n+1, scene.visibleSet)
-	// 	}
-	// }
+	// Whether i tiles are visible from one's perspective.
+	// Includes one's own hand. Excludes the tile one is about to discard.
+	for i := 1; i < 4; i++ {
+		featureName := fmt.Sprintf("visible>=%d", i)
+		n := i
+		ev[featureName] = func(scene *Scene, pai *base.Pai) (bool, error) {
+			return isVisibleNOrMore(pai, n+1, scene.visibleSet)
+		}
+	}
 
 	// // Among the Suji of that tile, whether one is visible no more than i copies.
 	// // The tile itself should not be counted.

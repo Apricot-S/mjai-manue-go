@@ -895,3 +895,63 @@ func TestScene_Evaluate_SenkiSuji(t *testing.T) {
 		})
 	}
 }
+
+// Exclude the tile being discarded from the count.
+func TestScene_Evaluate_VisibleNOrMore(t *testing.T) {
+	tests := []testCase{}
+
+	scene1, _ := NewScene(nil, nil, mustPais("1p", "1p"), nil, nil, nil, nil)
+
+	{
+		tests = append(tests, testCase{
+			name:    "1 or more 1p are visible",
+			scene:   scene1,
+			args:    args{name: "visible>=1", pai: mustPai("1p")},
+			want:    true,
+			wantErr: false,
+		})
+	}
+	{
+		tests = append(tests, testCase{
+			name:    "2 or more 1p are not visible",
+			scene:   scene1,
+			args:    args{name: "visible>=2", pai: mustPai("1p")},
+			want:    false,
+			wantErr: false,
+		})
+	}
+
+	scene2, _ := NewScene(nil, nil, mustPais("1p", "1p", "1p"), nil, nil, nil, nil)
+
+	{
+		tests = append(tests, testCase{
+			name:    "2 or more 1p are visible",
+			scene:   scene2,
+			args:    args{name: "visible>=2", pai: mustPai("1p")},
+			want:    true,
+			wantErr: false,
+		})
+	}
+	{
+		tests = append(tests, testCase{
+			name:    "3 or more 1p are not visible",
+			scene:   scene2,
+			args:    args{name: "visible>=3", pai: mustPai("1p")},
+			want:    false,
+			wantErr: false,
+		})
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := tt.scene.Evaluate(tt.args.name, tt.args.pai)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("Scene.Evaluate() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if got != tt.want {
+				t.Errorf("Scene.Evaluate() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
