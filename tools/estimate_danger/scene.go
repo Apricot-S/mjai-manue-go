@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"slices"
+	"strings"
 
 	"github.com/Apricot-S/mjai-manue-go/internal/ai/core"
 	"github.com/Apricot-S/mjai-manue-go/internal/base"
@@ -112,6 +113,16 @@ func (s *Scene) FeatureVector(pai *base.Pai) (*BitVector, error) {
 		}
 	}
 	return boolArrayToBitVector(boolArray), nil
+}
+
+func (s *Scene) FeatureVectorToStr(featureVector *BitVector) string {
+	var features []string
+	for i, name := range s.featureNames {
+		if featureVector.Bit(i) == 1 {
+			features = append(features, name)
+		}
+	}
+	return strings.Join(features, " ")
 }
 
 func (s *Scene) evaluate(name string, pai *base.Pai) (bool, error) {
