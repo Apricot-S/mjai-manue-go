@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"slices"
 
 	"github.com/Apricot-S/mjai-manue-go/internal/ai/core"
 	"github.com/Apricot-S/mjai-manue-go/internal/base"
@@ -11,7 +12,7 @@ import (
 type evaluator func(*Scene, *base.Pai) (bool, error)
 type evaluators map[string]evaluator
 
-var defaultEvaluators = registerEvaluators()
+var defaultFeatureNames, defaultEvaluators = registerEvaluators()
 
 type Scene struct {
 	tehaiSet   *base.PaiSet
@@ -26,7 +27,8 @@ type Scene struct {
 	lateSutehaiSet     *base.PaiSet
 	reachPaiSet        *base.PaiSet
 
-	evaluators *evaluators
+	featureNames []string
+	evaluators   *evaluators
 }
 
 func NewScene(
@@ -34,9 +36,10 @@ func NewScene(
 	bakaze, targetKaze *base.Pai,
 ) (*Scene, error) {
 	s := &Scene{
-		bakaze:     bakaze,
-		targetKaze: targetKaze,
-		evaluators: defaultEvaluators,
+		bakaze:       bakaze,
+		targetKaze:   targetKaze,
+		featureNames: defaultFeatureNames,
+		evaluators:   defaultEvaluators,
 	}
 
 	var err error
@@ -718,63 +721,101 @@ func fanpaiFansu(pai, bakaze, targetKaze *base.Pai) int {
 	return fan
 }
 
-func registerEvaluators() *evaluators {
+func registerEvaluators() ([]string, *evaluators) {
+	var featureNames []string
 	ev := evaluators{}
 
+	featureNames = append(featureNames, "anpai")
 	ev["anpai"] = func(scene *Scene, pai *base.Pai) (bool, error) {
 		return isAnpai(pai, scene.anpaiSet)
 	}
+
+	featureNames = append(featureNames, "tsupai")
 	ev["tsupai"] = func(scene *Scene, pai *base.Pai) (bool, error) {
 		return isTsupai(pai), nil
 	}
+
+	featureNames = append(featureNames, "suji")
 	ev["suji"] = func(scene *Scene, pai *base.Pai) (bool, error) {
 		return isSuji(pai, scene.anpaiSet)
 	}
+
+	featureNames = append(featureNames, "weak_suji")
 	ev["weak_suji"] = func(scene *Scene, pai *base.Pai) (bool, error) {
 		return isWeakSuji(pai, scene.anpaiSet)
 	}
+
+	featureNames = append(featureNames, "reach_suji")
 	ev["reach_suji"] = func(scene *Scene, pai *base.Pai) (bool, error) {
 		return isReachSuji(pai, scene.reachPaiSet)
 	}
+
+	featureNames = append(featureNames, "prereach_suji")
 	ev["prereach_suji"] = func(scene *Scene, pai *base.Pai) (bool, error) {
 		return isPrereachSuji(pai, scene.prereachSutehaiSet)
 	}
+
+	featureNames = append(featureNames, "urasuji")
 	ev["urasuji"] = func(scene *Scene, pai *base.Pai) (bool, error) {
 		return isUrasuji(pai, scene.prereachSutehaiSet, scene.anpaiSet)
 	}
+
+	featureNames = append(featureNames, "early_urasuji")
 	ev["early_urasuji"] = func(scene *Scene, pai *base.Pai) (bool, error) {
 		return isEarlyUrasuji(pai, scene.earlySutehaiSet, scene.anpaiSet)
 	}
+
+	featureNames = append(featureNames, "reach_urasuji")
 	ev["reach_urasuji"] = func(scene *Scene, pai *base.Pai) (bool, error) {
 		return isReachUrasuji(pai, scene.reachPaiSet, scene.anpaiSet)
 	}
+
+	featureNames = append(featureNames, "urasuji_of_5")
 	ev["urasuji_of_5"] = func(scene *Scene, pai *base.Pai) (bool, error) {
 		return isUrasujiOf5(pai, scene.prereachSutehaiSet, scene.anpaiSet)
 	}
+
+	featureNames = append(featureNames, "aida4ken")
 	ev["aida4ken"] = func(scene *Scene, pai *base.Pai) (bool, error) {
 		return isAida4ken(pai, scene.prereachSutehaiSet)
 	}
+
+	featureNames = append(featureNames, "matagisuji")
 	ev["matagisuji"] = func(scene *Scene, pai *base.Pai) (bool, error) {
 		return isMatagisuji(pai, scene.prereachSutehaiSet, scene.anpaiSet)
 	}
+
+	featureNames = append(featureNames, "early_matagisuji")
 	ev["early_matagisuji"] = func(scene *Scene, pai *base.Pai) (bool, error) {
 		return isEarlyMatagisuji(pai, scene.earlySutehaiSet, scene.anpaiSet)
 	}
+
+	featureNames = append(featureNames, "late_matagisuji")
 	ev["late_matagisuji"] = func(scene *Scene, pai *base.Pai) (bool, error) {
 		return isLateMatagisuji(pai, scene.lateSutehaiSet, scene.anpaiSet)
 	}
+
+	featureNames = append(featureNames, "reach_matagisuji")
 	ev["reach_matagisuji"] = func(scene *Scene, pai *base.Pai) (bool, error) {
 		return isReachMatagisuji(pai, scene.reachPaiSet, scene.anpaiSet)
 	}
+
+	featureNames = append(featureNames, "senkisuji")
 	ev["senkisuji"] = func(scene *Scene, pai *base.Pai) (bool, error) {
 		return isSenkisuji(pai, scene.prereachSutehaiSet, scene.anpaiSet)
 	}
+
+	featureNames = append(featureNames, "early_senkisuji")
 	ev["early_senkisuji"] = func(scene *Scene, pai *base.Pai) (bool, error) {
 		return isEarlySenkisuji(pai, scene.earlySutehaiSet, scene.anpaiSet)
 	}
+
+	featureNames = append(featureNames, "outer_prereach_sutehai")
 	ev["outer_prereach_sutehai"] = func(scene *Scene, pai *base.Pai) (bool, error) {
 		return isOuterPrereachSutehai(pai, scene.prereachSutehaiSet)
 	}
+
+	featureNames = append(featureNames, "outer_early_sutehai")
 	ev["outer_early_sutehai"] = func(scene *Scene, pai *base.Pai) (bool, error) {
 		return isOuterEarlySutehai(pai, scene.earlySutehaiSet)
 	}
@@ -782,6 +823,7 @@ func registerEvaluators() *evaluators {
 	for i := range 4 {
 		featureName := fmt.Sprintf("chances<=%d", i)
 		n := i
+		featureNames = append(featureNames, featureName)
 		ev[featureName] = func(scene *Scene, pai *base.Pai) (bool, error) {
 			return isNChanceOrLess(pai, n, scene.visibleSet)
 		}
@@ -792,6 +834,7 @@ func registerEvaluators() *evaluators {
 	for i := 1; i < 4; i++ {
 		featureName := fmt.Sprintf("visible>=%d", i)
 		n := i
+		featureNames = append(featureNames, featureName)
 		ev[featureName] = func(scene *Scene, pai *base.Pai) (bool, error) {
 			return isVisibleNOrMore(pai, n+1, scene.visibleSet)
 		}
@@ -804,6 +847,7 @@ func registerEvaluators() *evaluators {
 	for i := range 4 {
 		featureName := fmt.Sprintf("suji_visible<=%d", i)
 		n := i
+		featureNames = append(featureNames, featureName)
 		ev[featureName] = func(scene *Scene, pai *base.Pai) (bool, error) {
 			return isSujiVisible(pai, n, scene.visibleSet)
 		}
@@ -812,17 +856,23 @@ func registerEvaluators() *evaluators {
 	for i := uint8(2); i < 6; i++ {
 		featureName := fmt.Sprintf("%d<=n<=%d", i, 10-i)
 		n := i
+		featureNames = append(featureNames, featureName)
 		ev[featureName] = func(scene *Scene, pai *base.Pai) (bool, error) {
 			return isNumNOrInner(pai, n), nil
 		}
 	}
 
+	featureNames = append(featureNames, "dora")
 	ev["dora"] = func(scene *Scene, pai *base.Pai) (bool, error) {
 		return isDora(pai, scene.doraSet)
 	}
+
+	featureNames = append(featureNames, "dora_suji")
 	ev["dora_suji"] = func(scene *Scene, pai *base.Pai) (bool, error) {
 		return isDoraSuji(pai, scene.doraSet)
 	}
+
+	featureNames = append(featureNames, "dora_matagi")
 	ev["dora_matagi"] = func(scene *Scene, pai *base.Pai) (bool, error) {
 		return isDoraMatagi(pai, scene.doraSet, scene.anpaiSet)
 	}
@@ -830,6 +880,7 @@ func registerEvaluators() *evaluators {
 	for i := 2; i < 5; i++ {
 		featureName := fmt.Sprintf("in_tehais>=%d", i)
 		n := i
+		featureNames = append(featureNames, featureName)
 		ev[featureName] = func(scene *Scene, pai *base.Pai) (bool, error) {
 			return isInTehais(pai, n, scene.tehaiSet)
 		}
@@ -842,6 +893,7 @@ func registerEvaluators() *evaluators {
 	for i := 1; i < 5; i++ {
 		featureName := fmt.Sprintf("suji_in_tehais>=%d", i)
 		n := i
+		featureNames = append(featureNames, featureName)
 		ev[featureName] = func(scene *Scene, pai *base.Pai) (bool, error) {
 			return isSujiInTehais(pai, n, scene.tehaiSet)
 		}
@@ -852,6 +904,7 @@ func registerEvaluators() *evaluators {
 			featureName := fmt.Sprintf("+-%d_in_prereach_sutehais>=%d", i, j)
 			distance := i
 			threshold := j
+			featureNames = append(featureNames, featureName)
 			ev[featureName] = func(scene *Scene, pai *base.Pai) (bool, error) {
 				return isNOrMoreOfNeighborsInPrereachSutehais(
 					pai,
@@ -866,6 +919,7 @@ func registerEvaluators() *evaluators {
 	for i := 1; i < 3; i++ {
 		featureName := fmt.Sprintf("%d_outer_prereach_sutehai", i)
 		n := i
+		featureNames = append(featureNames, featureName)
 		ev[featureName] = func(scene *Scene, pai *base.Pai) (bool, error) {
 			return isNOuterPrereachSutehai(pai, n, scene.prereachSutehaiSet)
 		}
@@ -874,6 +928,7 @@ func registerEvaluators() *evaluators {
 	for i := 1; i < 3; i++ {
 		featureName := fmt.Sprintf("%d_inner_prereach_sutehai", i)
 		n := i
+		featureNames = append(featureNames, featureName)
 		ev[featureName] = func(scene *Scene, pai *base.Pai) (bool, error) {
 			return isNOuterPrereachSutehai(pai, -n, scene.prereachSutehaiSet)
 		}
@@ -882,29 +937,41 @@ func registerEvaluators() *evaluators {
 	for i := 1; i < 9; i++ {
 		featureName := fmt.Sprintf("same_type_in_prereach>=%d", i)
 		n := i
+		featureNames = append(featureNames, featureName)
 		ev[featureName] = func(scene *Scene, pai *base.Pai) (bool, error) {
 			return isSameTypeInPrereach(pai, n, scene.prereachSutehaiSet)
 		}
 	}
 
+	featureNames = append(featureNames, "fanpai")
 	ev["fanpai"] = func(scene *Scene, pai *base.Pai) (bool, error) {
 		return isFanpai(pai, scene.bakaze, scene.targetKaze), nil
 	}
+
+	featureNames = append(featureNames, "ryenfonpai")
 	ev["ryenfonpai"] = func(scene *Scene, pai *base.Pai) (bool, error) {
 		return isRyenfonpai(pai, scene.bakaze, scene.targetKaze), nil
 	}
+
+	featureNames = append(featureNames, "sangenpai")
 	ev["sangenpai"] = func(scene *Scene, pai *base.Pai) (bool, error) {
 		return isSangenpai(pai), nil
 	}
+
+	featureNames = append(featureNames, "fonpai")
 	ev["fonpai"] = func(scene *Scene, pai *base.Pai) (bool, error) {
 		return isFonpai(pai), nil
 	}
+
+	featureNames = append(featureNames, "bakaze")
 	ev["bakaze"] = func(scene *Scene, pai *base.Pai) (bool, error) {
 		return isBakaze(pai, scene.bakaze), nil
 	}
+
+	featureNames = append(featureNames, "jikaze")
 	ev["jikaze"] = func(scene *Scene, pai *base.Pai) (bool, error) {
 		return isJikaze(pai, scene.targetKaze), nil
 	}
 
-	return &ev
+	return slices.Clip(featureNames), &ev
 }
