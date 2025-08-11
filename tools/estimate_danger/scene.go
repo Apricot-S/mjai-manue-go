@@ -100,7 +100,8 @@ func NewScene(
 		return nil, err
 	}
 
-	s.candidates = base.GetUniquePais(tehais, func(cand base.Pai) bool {
+	// Convert from tehaiSet to turn red 5 into normal 5
+	s.candidates = base.GetUniquePais(s.tehaiSet.ToPais(), func(cand base.Pai) bool {
 		isAnpai, _ := s.anpaiSet.Has(&cand)
 		return isAnpai
 	})
