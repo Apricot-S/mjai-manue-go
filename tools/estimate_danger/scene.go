@@ -90,9 +90,9 @@ func NewScene(
 
 	var reachPais base.Pais = nil
 	if len(prereachSutehais) != 0 {
-		// prereach_sutehais can be empty in unit tests.
-		reachPai := prereachSutehais[len(prereachSutehais)-1].RemoveRed()
-		reachPais = base.Pais{*reachPai}
+		// prereachSutehais can be empty in unit tests.
+		reachPai := prereachSutehais[len(prereachSutehais)-1]
+		reachPais = base.Pais{reachPai}
 	}
 	if s.reachPaiSet, err = base.NewPaiSet(reachPais); err != nil {
 		return nil, err
