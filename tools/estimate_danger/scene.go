@@ -47,6 +47,8 @@ type Scene struct {
 	lateSutehaiSet     *base.PaiSet
 	reachPaiSet        *base.PaiSet
 
+	candidates base.Pais
+
 	featureNames []string
 	evaluators   *evaluators
 }
@@ -98,6 +100,11 @@ func NewScene(
 		return nil, err
 	}
 
+	s.candidates = base.GetUniquePais(tehais, func(cand base.Pai) bool {
+		isAnpai, _ := s.anpaiSet.Has(&cand)
+		return isAnpai
+	})
+
 	return s, nil
 }
 
@@ -117,6 +124,10 @@ func NewSceneWithState(gameState game.StateViewer, me *base.Player, target *base
 		gameState.Bakaze(),
 		gameState.Jikaze(target),
 	)
+}
+
+func (s *Scene) Candidates() base.Pais {
+	return s.candidates
 }
 
 func (s *Scene) FeatureVector(pai *base.Pai) (*BitVector, error) {
