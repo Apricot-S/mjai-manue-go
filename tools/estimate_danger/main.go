@@ -5,7 +5,56 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"slices"
 )
+
+type Options struct {
+	Verbose bool
+	Start   string
+	Num     int
+	Output  string
+	MinGap  float64
+	Filter  string
+}
+
+func parseOptions(args []string) (*Options, []string, error) {
+	opts := Options{}
+
+	fs := flag.NewFlagSet("estimate_danger", flag.ExitOnError)
+
+	fs.BoolVar(&opts.Verbose, "v", false, "enable verbose mode")
+	fs.StringVar(&opts.Start, "start", "", "start filepath")
+	fs.IntVar(&opts.Num, "n", 0, "limit number of files")
+	fs.StringVar(&opts.Output, "o", "", "output filepath")
+	fs.Float64Var(&opts.MinGap, "min_gap", 0.0, "minimum gap percentage")
+	fs.StringVar(&opts.Filter, "filter", "", "filter expression")
+
+	if err := fs.Parse(args); err != nil {
+		return nil, nil, fmt.Errorf("failed to parse flags: %w", err)
+	}
+
+	// Convert min_gap from percent to decimal
+	opts.MinGap = opts.MinGap / 100.0
+
+	paths := fs.Args()
+
+	return &opts, paths, nil
+}
+
+func filterInputPaths(paths []string, opts *Options) []string {
+	if opts.Start != "" {
+		startIndex := slices.Index(paths, opts.Start)
+		if startIndex >= 0 {
+			paths = paths[startIndex:]
+		}
+	}
+
+	if opts.Num > 0 && len(paths) > opts.Num {
+		paths = paths[:opts.Num]
+	}
+
+	return paths
+}
 
 func main() {
 	if len(os.Args) < 2 {
@@ -15,30 +64,22 @@ func main() {
 	action := os.Args[1]
 	args := os.Args[2:]
 
-	// サブコマンド共通のオプション群
-	fs := flag.NewFlagSet(action, flag.ExitOnError)
-	var (
-		verbose bool
-		start   string
-		n       int
-		o       string
-		minGap  float64
-		filter  string
-	)
-	fs.BoolVar(&verbose, "v", false, "verbose mode")
-	fs.StringVar(&start, "start", "", "start filename")
-	fs.IntVar(&n, "n", 0, "limit number of files")
-	fs.StringVar(&o, "o", "", "output path")
-	fs.Float64Var(&minGap, "min_gap", 0.0, "minimum gap percentage")
-	fs.StringVar(&filter, "filter", "", "filter expression")
-
-	if err := fs.Parse(args); err != nil {
-		log.Fatalf("failed to parse flags: %v\n", err)
+	opts, paths, err := parseOptions(args)
+	if err != nil {
+		log.Fatal(err)
 	}
+
+	paths = filterInputPaths(paths, opts)
 
 	switch action {
 	case "extract":
-		panic("extract not implemented")
+		if opts.Output == "" {
+			log.Fatal("-o is missing")
+		}
+
+		if err := ExtractFeaturesFromFiles(paths, opts.Output, nil); err != nil {
+			log.Fatal(err)
+		}
 	case "single":
 		panic("single not implemented")
 	case "interesting":
