@@ -1,0 +1,6 @@
+services:
+  app:
+    build: .
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    command: ["./system.exe", "mjai_client", "11600", "./setup_mjai.json"]
