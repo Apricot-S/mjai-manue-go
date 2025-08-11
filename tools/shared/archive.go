@@ -12,6 +12,7 @@ import (
 	"github.com/Apricot-S/mjai-manue-go/internal/game"
 	"github.com/Apricot-S/mjai-manue-go/internal/game/event/inbound"
 	"github.com/Apricot-S/mjai-manue-go/internal/protocol"
+	"github.com/schollz/progressbar/v3"
 )
 
 type Archive struct {
@@ -34,12 +35,13 @@ func (a *Archive) StateViewer() game.StateViewer {
 
 func (a *Archive) PlayLight(onAction func(inbound.Event) error) error {
 	numFiles := len(a.paths)
-	for i, p := range a.paths {
-		if numFiles > 1 {
-			fmt.Fprintf(os.Stderr, "%d/%d\n", i+1, numFiles) // tentative
+	bar := progressbar.Default(int64(numFiles))
+	for _, p := range a.paths {
+		if err := a.playLightInner(p, onAction); err != nil {
+			return err
 		}
 
-		if err := a.playLightInner(p, onAction); err != nil {
+		if err := bar.Add(1); err != nil {
 			return err
 		}
 	}
