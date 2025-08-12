@@ -217,7 +217,7 @@ func main() {
 	if err != nil {
 		log.Fatalf("error in glob: %v", err)
 	}
-	a := shared.NewArchive(paths, &mjai.MjaiAdapter{})
+	archive := shared.NewArchive(paths, &mjai.MjaiAdapter{})
 
 	basic := NewBasicCounter()
 	horaPoints := NewHoraPointsCounter()
@@ -230,14 +230,14 @@ func main() {
 			return fmt.Errorf("error in the log")
 		}
 		for _, counter := range counters {
-			if err := counter.OnAction(action, a.StateViewer()); err != nil {
+			if err := counter.OnAction(action, archive.StateViewer()); err != nil {
 				return err
 			}
 		}
 		return nil
 	}
 
-	if err := a.Play(onAction); err != nil {
+	if err := archive.Play(onAction); err != nil {
 		log.Fatalf("error in processing log: %v", err)
 	}
 

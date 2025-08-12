@@ -101,7 +101,7 @@ func main() {
 	if err != nil {
 		log.Fatalf("error in glob: %v", err)
 	}
-	a := shared.NewArchive(paths, &mjai.MjaiAdapter{})
+	archive := shared.NewArchive(paths, &mjai.MjaiAdapter{})
 	counter := NewScoreCounter()
 
 	onAction := func(action inbound.Event) error {
@@ -111,7 +111,7 @@ func main() {
 		return counter.OnAction(action)
 	}
 
-	if err := a.PlayLight(onAction); err != nil {
+	if err := archive.PlayLight(onAction); err != nil {
 		log.Fatalf("error in processing log: %v", err)
 	}
 
