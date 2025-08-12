@@ -1,6 +1,9 @@
 package main
 
-import "math/big"
+import (
+	"math/big"
+	"slices"
+)
 
 type BitVector = big.Int
 
@@ -8,9 +11,9 @@ var one = big.NewInt(1)
 
 func BoolArrayToBitVector(boolArray []bool) *BitVector {
 	bitVector := big.NewInt(0)
-	for i := len(boolArray) - 1; i >= 0; i-- {
+	for _, b := range slices.Backward(boolArray) {
 		bitVector.Lsh(bitVector, 1)
-		if boolArray[i] {
+		if b {
 			bitVector.Or(bitVector, one)
 		}
 	}
