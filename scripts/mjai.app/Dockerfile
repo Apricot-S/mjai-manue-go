@@ -4,9 +4,15 @@ FROM golang:1.24-bookworm AS builder
 
 WORKDIR /app
 
-COPY . .
+RUN --mount=type=cache,target=/go/pkg/mod \
+    --mount=type=bind,source=go.sum,target=go.sum \
+    --mount=type=bind,source=go.mod,target=go.mod \
+    go mod download -x
 
-RUN go build -ldflags="-s -w" -trimpath ./cmd/mjai-manue
+RUN --mount=type=cache,target=/go/pkg/mod \
+    --mount=type=cache,target=/root/.cache/go-build \
+    --mount=type=bind,target=. \
+    go build -ldflags="-s -w" -trimpath -o /usr/local/bin/ ./cmd/mjai-manue
 
 FROM debian:bookworm-slim
 
@@ -20,8 +26,8 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
 
 WORKDIR /build
 
-COPY --from=builder /app/mjai-manue .
-
 COPY /scripts/mjai.app/bot.py .
+
+COPY --from=builder /usr/local/bin/mjai-manue .
 
 RUN zip mjai-app.zip *
