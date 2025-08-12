@@ -30,7 +30,7 @@ func extractFeaturesBatch(
 		return fmt.Errorf("failed to encode metadata: %w", err)
 	}
 
-	storedKyokus := make([]StoredKyoku, 0)
+	var storedKyokus []StoredKyoku
 
 	for i, path := range inputPaths {
 		r, err := os.Open(path)
@@ -55,7 +55,7 @@ func extractFeaturesBatch(
 			if err := encoder.Encode(storedKyokus); err != nil {
 				return fmt.Errorf("failed to encode storedKyokus: %w", err)
 			}
-			storedKyokus = make([]StoredKyoku, 0)
+			storedKyokus = nil
 		}
 	}
 
