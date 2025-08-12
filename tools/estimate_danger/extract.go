@@ -33,14 +33,6 @@ func extractFeaturesBatch(
 	storedKyokus := make([]StoredKyoku, 0)
 
 	for i, path := range inputPaths {
-		if i%100 == 0 && i > 0 {
-			// Dump every 100 games
-			if err := encoder.Encode(storedKyokus); err != nil {
-				return fmt.Errorf("failed to encode storedKyokus: %w", err)
-			}
-			storedKyokus = make([]StoredKyoku, 0)
-		}
-
 		r, err := os.Open(path)
 		if err != nil {
 			return fmt.Errorf("failed to open input file: %w", err)
@@ -56,6 +48,14 @@ func extractFeaturesBatch(
 
 		if err := bar.Add(1); err != nil {
 			return err
+		}
+
+		if i%100 == 99 {
+			// Dump every 100 games
+			if err := encoder.Encode(storedKyokus); err != nil {
+				return fmt.Errorf("failed to encode storedKyokus: %w", err)
+			}
+			storedKyokus = make([]StoredKyoku, 0)
 		}
 	}
 
