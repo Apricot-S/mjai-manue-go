@@ -4,77 +4,14 @@ import (
 	"flag"
 	"fmt"
 	"log"
-	"net"
-	"net/url"
 	"os"
-	"path"
-	"strings"
 
 	"github.com/Apricot-S/mjai-manue-go/internal/agent"
 	"github.com/Apricot-S/mjai-manue-go/internal/ai"
-	"github.com/Apricot-S/mjai-manue-go/internal/client"
+	"github.com/Apricot-S/mjai-manue-go/internal/cli"
 )
 
 const defaultName = "Manue020"
-const defaultPort = "11600"
-
-func getRoom(rawURL string) (string, error) {
-	if rawURL == "" {
-		return "", nil
-	}
-
-	u, err := url.Parse(rawURL)
-	if err != nil {
-		return "", fmt.Errorf("invalid URL: %v", err)
-	}
-
-	room := path.Base(u.Path)
-	if room == "." || room == "/" {
-		room = ""
-	}
-	return room, nil
-}
-
-func getHost(rawURL string) (string, error) {
-	u, err := url.Parse(rawURL)
-	if err != nil {
-		return "", fmt.Errorf("invalid URL: %v", err)
-	}
-
-	host := u.Host
-	if !strings.Contains(host, ":") {
-		host += fmt.Sprintf(":%s", defaultPort)
-	}
-
-	return host, nil
-}
-
-func runPipeMode(agent agent.Agent) error {
-	c := client.NewMjaiClient(os.Stdin, os.Stdout, agent)
-	return c.Run()
-}
-
-func runTCPClientMode(rawURL string, agent agent.Agent) error {
-	host, err := getHost(rawURL)
-	if err != nil {
-		return err
-	}
-
-	conn, err := net.Dial("tcp", host)
-	if err != nil {
-		return fmt.Errorf("error accepting connection: %v", err)
-	}
-	defer conn.Close()
-
-	fmt.Fprintf(os.Stderr, "connected: %s\n", host)
-
-	c := client.NewMjaiClient(conn, conn, agent)
-	if err := c.Run(); err != nil {
-		return fmt.Errorf("client error: %v", err)
-	}
-
-	return nil
-}
 
 func main() {
 	var name string
@@ -99,7 +36,7 @@ func main() {
 		os.Exit(2)
 	}
 
-	room, err := getRoom(rawURL)
+	room, err := cli.GetRoom(rawURL)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -111,9 +48,9 @@ func main() {
 	agent := agent.NewAIAgentDefault(name, room, ai)
 
 	if usePipe {
-		err = runPipeMode(agent)
+		err = cli.RunPipeMode(agent)
 	} else {
-		err = runTCPClientMode(rawURL, agent)
+		err = cli.RunTCPClientMode(rawURL, agent)
 	}
 
 	if err != nil {
