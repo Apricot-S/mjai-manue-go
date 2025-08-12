@@ -59,9 +59,11 @@ func extractFeaturesBatch(
 		}
 	}
 
-	// Dump the rest
-	if err := encoder.Encode(storedKyokus); err != nil {
-		return fmt.Errorf("failed to encode storedKyokus: %w", err)
+	if len(storedKyokus) > 0 {
+		// Dump the rest
+		if err := encoder.Encode(storedKyokus); err != nil {
+			return fmt.Errorf("failed to encode storedKyokus: %w", err)
+		}
 	}
 
 	return nil
