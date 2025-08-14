@@ -32,7 +32,6 @@ services:
     environment:
       PORT: 11600
       NUM_GAMES: ${NUM_GAMES:-1}
-    command: ["./run_akochan.sh"]
 
   akochan2:
     image: akochan:latest
@@ -41,7 +40,6 @@ services:
     environment:
       PORT: 11600
       NUM_GAMES: ${NUM_GAMES:-1}
-    command: ["./run_akochan.sh"]
 
   akochan3:
     image: akochan:latest
@@ -50,4 +48,3 @@ services:
     environment:
       PORT: 11600
       NUM_GAMES: ${NUM_GAMES:-1}
-    command: ["./run_akochan.sh"]
