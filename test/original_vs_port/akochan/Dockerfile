@@ -26,9 +26,8 @@ USER ubuntu
 RUN mkdir build
 RUN git clone https://github.com/critter-mj/akochan.git
 
-COPY --chown=ubuntu patch.sh /app/
-
-RUN cd ./akochan/ai_src && \
+RUN --mount=type=bind,source=patch.sh,target=patch.sh \
+    cd ./akochan/ai_src && \
     make -f Makefile_Linux && \
     cd ../ && \
     /app/patch.sh && \
