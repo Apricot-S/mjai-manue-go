@@ -54,3 +54,7 @@ USER ubuntu
 COPY --from=build --chown=ubuntu /app/build /app/akochan
 
 ENV LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/app/akochan
+
+COPY --chown=node ./run_akochan.sh .
+
+ENTRYPOINT [ "./run_akochan.sh" ]

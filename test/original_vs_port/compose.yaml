@@ -1,0 +1,53 @@
+services:
+  server:
+    build:
+      context: ./server
+    volumes:
+      - ./logs:/logs
+    environment:
+      PORT: 11600
+      ROOM: default
+      NUM_GAMES: ${NUM_GAMES:-1}
+      GAME_TYPE: tonnan
+    ports:
+      - "11600:11600"
+
+  manue:
+    build: 
+      context: ./manue
+    depends_on:
+      - server
+    environment:
+      HOST: server
+      PORT: 11600
+      ROOM: default
+      NUM_GAMES: ${NUM_GAMES:-1}
+
+  akochan1:
+    build:
+      context: ./akochan
+    image: akochan:latest
+    depends_on:
+      - server
+    environment:
+      PORT: 11600
+      NUM_GAMES: ${NUM_GAMES:-1}
+    command: ["./run_akochan.sh"]
+
+  akochan2:
+    image: akochan:latest
+    depends_on:
+      - server
+    environment:
+      PORT: 11600
+      NUM_GAMES: ${NUM_GAMES:-1}
+    command: ["./run_akochan.sh"]
+
+  akochan3:
+    image: akochan:latest
+    depends_on:
+      - server
+    environment:
+      PORT: 11600
+      NUM_GAMES: ${NUM_GAMES:-1}
+    command: ["./run_akochan.sh"]
