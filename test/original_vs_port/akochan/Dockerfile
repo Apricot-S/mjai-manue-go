@@ -2,7 +2,7 @@
 
 FROM ubuntu:noble AS base
 
-FROM base AS build
+FROM base AS builder
 
 RUN rm -f /etc/apt/apt.conf.d/docker-clean; \
     echo 'Binary::apt::APT::Keep-Downloaded-Packages "true";' > /etc/apt/apt.conf.d/keep-cache
@@ -51,10 +51,10 @@ WORKDIR /app/akochan
 
 USER ubuntu
 
-COPY --from=build --chown=ubuntu /app/build /app/akochan
+COPY --from=builder --chown=ubuntu /app/build /app/akochan
 
 ENV LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/app/akochan
 
-COPY --chown=node ./run_akochan.sh .
+COPY --chown=ubuntu ./run_akochan.sh .
 
 ENTRYPOINT [ "./run_akochan.sh" ]
