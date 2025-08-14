@@ -5,8 +5,8 @@ PORT=${PORT:-11600}
 ROOM=${ROOM:-default}
 NUM_GAMES=${NUM_GAMES:-1}
 
-echo "Waiting 15 seconds for mjai server to start..."
-sleep 15
+echo "Waiting 5 seconds for mjai server to start..."
+sleep 5
 
 for i in $(seq 1 "$NUM_GAMES"); do
     echo "$i/$NUM_GAMES games"
