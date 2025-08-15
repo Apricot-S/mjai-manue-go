@@ -51,10 +51,10 @@ WORKDIR /app/akochan
 
 USER ubuntu
 
-COPY --from=builder --chown=ubuntu /app/build /app/akochan
+COPY --from=builder /app/build /app/akochan
 
-ENV LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/app/akochan
+ENV LD_LIBRARY_PATH=${LD_LIBRARY_PATH:+$LD_LIBRARY_PATH:}/app/akochan
 
-COPY --chown=ubuntu ./run_akochan.sh .
+COPY ./run_akochan.sh .
 
-ENTRYPOINT [ "./run_akochan.sh" ]
+ENTRYPOINT [ "/app/akochan/run_akochan.sh" ]

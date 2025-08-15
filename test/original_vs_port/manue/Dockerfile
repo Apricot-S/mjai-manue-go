@@ -1,9 +1,9 @@
 # syntax=docker/dockerfile:1
 
 ARG NODE_VERSION=22
-ARG OS_VERSION=trixie-slim
+ARG OS_VERSION=trixie
 
-FROM node:${NODE_VERSION}-${OS_VERSION} AS base
+FROM node:${NODE_VERSION}-${OS_VERSION}-slim AS base
 
 FROM base AS downloader
 
@@ -45,6 +45,6 @@ RUN cd mjai-manue/coffee && \
 
 USER node
 
-COPY --chown=node ./run_manue.sh .
+COPY ./run_manue.sh .
 
-ENTRYPOINT [ "./run_manue.sh" ]
+ENTRYPOINT [ "/app/run_manue.sh" ]
