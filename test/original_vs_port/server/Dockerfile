@@ -14,10 +14,13 @@ RUN adduser \
     --no-create-home \
     --uid "${UID}" \
     appuser
-USER appuser
 
 RUN gem install mjai
 
-COPY --chown=appuser ./run_server.sh .
+WORKDIR /app
 
-ENTRYPOINT [ "./run_server.sh" ]
+USER appuser
+
+COPY ./run_server.sh .
+
+ENTRYPOINT [ "/app/run_server.sh" ]
