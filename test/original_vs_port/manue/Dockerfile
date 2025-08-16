@@ -3,18 +3,7 @@
 ARG NODE_VERSION=22
 ARG OS_VERSION=trixie
 
-FROM node:${NODE_VERSION}-${OS_VERSION}-slim AS base
-
-FROM base AS downloader
-
-RUN rm -f /etc/apt/apt.conf.d/docker-clean; \
-    echo 'Binary::apt::APT::Keep-Downloaded-Packages "true";' > /etc/apt/apt.conf.d/keep-cache
-RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
-    --mount=type=cache,target=/var/lib/apt,sharing=locked \
-    apt-get update && \
-    DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
-        ca-certificates \
-        git-core
+FROM node:${NODE_VERSION}-${OS_VERSION} AS downloader
 
 RUN mkdir -p /app && \
     chown -R node /app
@@ -25,7 +14,7 @@ USER node
 
 RUN git clone https://github.com/gimite/mjai-manue.git
 
-FROM base AS final
+FROM node:${NODE_VERSION}-${OS_VERSION}-slim AS final
 
 ENV NODE_ENV=production
 
