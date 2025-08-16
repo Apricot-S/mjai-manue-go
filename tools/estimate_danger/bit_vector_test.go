@@ -31,3 +31,87 @@ func TestBoolArrayToBitVector(t *testing.T) {
 		})
 	}
 }
+
+func TestMatches(t *testing.T) {
+	type args struct {
+		featureVector *BitVector
+		positiveMask  *BitVector
+		negativeMask  *BitVector
+	}
+	tests := []struct {
+		name string
+		args args
+		want bool
+	}{
+		{
+			name: "feature: 0, pos: 0, neg: 0",
+			args: args{
+				featureVector: big.NewInt(0),
+				positiveMask:  big.NewInt(0),
+				negativeMask:  big.NewInt(0),
+			},
+			want: true,
+		},
+		{
+			name: "feature: 1, pos: 1, neg: 1",
+			args: args{
+				featureVector: big.NewInt(1),
+				positiveMask:  big.NewInt(1),
+				negativeMask:  big.NewInt(1),
+			},
+			want: true,
+		},
+		{
+			name: "feature: 1, pos: 1, neg: 0",
+			args: args{
+				featureVector: big.NewInt(1),
+				positiveMask:  big.NewInt(1),
+				negativeMask:  big.NewInt(0),
+			},
+			want: false,
+		},
+		{
+			name: "feature: 1, pos: 0, neg: 1",
+			args: args{
+				featureVector: big.NewInt(1),
+				positiveMask:  big.NewInt(0),
+				negativeMask:  big.NewInt(1),
+			},
+			want: true,
+		},
+		{
+			name: "feature: 0b1010, pos: 0b1010, neg: 0b1000",
+			args: args{
+				featureVector: big.NewInt(0b1010),
+				positiveMask:  big.NewInt(0b1010),
+				negativeMask:  big.NewInt(0b1000),
+			},
+			want: false,
+		},
+		{
+			name: "feature: 0b1010, pos: 0b0010, neg: 0b1000",
+			args: args{
+				featureVector: big.NewInt(0b1010),
+				positiveMask:  big.NewInt(0b0010),
+				negativeMask:  big.NewInt(0b1000),
+			},
+			want: false,
+		},
+		{
+			name: "feature: 0b1010, pos: 0b0010, neg: 0b0100",
+			args: args{
+				featureVector: big.NewInt(0b1010),
+				positiveMask:  big.NewInt(0b0010),
+				negativeMask:  big.NewInt(0b0100),
+			},
+			want: false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := Matches(tt.args.featureVector, tt.args.positiveMask, tt.args.negativeMask); got != tt.want {
+				t.Errorf("Matches() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
