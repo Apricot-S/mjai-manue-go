@@ -1,6 +1,9 @@
 # syntax=docker/dockerfile:1
 
-FROM golang:1.24-bookworm AS builder
+ARG GO_VERSION=1.25
+ARG OS_VERSION=trixie
+
+FROM golang:${GO_VERSION}-${OS_VERSION} AS builder
 
 WORKDIR /app
 
@@ -14,7 +17,7 @@ RUN --mount=type=cache,target=/go/pkg/mod \
     --mount=type=bind,target=. \
     go build -ldflags="-s -w" -trimpath -o /usr/local/bin/ ./cmd/mjai-manue
 
-FROM debian:bookworm-slim
+FROM debian:${OS_VERSION}-slim
 
 RUN rm -f /etc/apt/apt.conf.d/docker-clean; \
     echo 'Binary::apt::APT::Keep-Downloaded-Packages "true";' > /etc/apt/apt.conf.d/keep-cache
