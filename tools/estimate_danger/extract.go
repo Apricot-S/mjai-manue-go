@@ -1,29 +1,120 @@
 package main
 
 import (
+	"bufio"
+	"bytes"
 	"encoding/gob"
 	"fmt"
 	"io"
 	"os"
 	"slices"
 
+	"github.com/Apricot-S/mjai-manue-go/internal/base"
+	"github.com/Apricot-S/mjai-manue-go/internal/game"
+	"github.com/Apricot-S/mjai-manue-go/internal/game/event/inbound"
+	"github.com/Apricot-S/mjai-manue-go/internal/protocol/mjai"
 	"github.com/schollz/progressbar/v3"
 )
 
-func extractFeaturesSingle(input io.Reader, listener any) ([]StoredKyoku, error) {
-	panic("not implemented")
+var adapter = mjai.MjaiAdapter{}
+
+var excludedPlayers = []string{"ASAPIN", "（≧▽≦）"}
+
+func extractFeaturesSingle(reader io.Reader, listener any) ([]StoredKyoku, error) {
+	state := game.StateImpl{}
+	var storedKyokus []StoredKyoku
+	var reacher *base.Player = nil
+	var waited base.Pais = nil
+	skip := false
+
+	scanner := bufio.NewScanner(reader)
+	for scanner.Scan() {
+		line := bytes.TrimSpace(scanner.Bytes())
+		if len(line) == 0 {
+			continue
+		}
+
+		actions, err := adapter.DecodeMessages(line)
+		if err != nil {
+			return nil, fmt.Errorf("failed to decode: %w", err)
+		}
+
+		storedKyoku := &StoredKyoku{Scenes: nil}
+		for _, action := range actions {
+			if err := state.Update(action); err != nil {
+				return nil, fmt.Errorf("failed to update state: %w", err)
+			}
+
+			switch a := action.(type) {
+			case *inbound.StartKyoku:
+				storedKyoku.Scenes = nil
+				reacher = nil
+				skip = false
+			case *inbound.EndKyoku:
+				if skip {
+					continue
+				}
+				if storedKyoku == nil {
+					return nil, fmt.Errorf("should not happen")
+				}
+				storedKyokus = append(storedKyokus, *storedKyoku)
+				storedKyoku = nil
+			case *inbound.ReachAccepted:
+				if slices.Contains(excludedPlayers, state.Players()[a.Actor].Name()) || reacher != nil {
+					skip = true
+				}
+				if skip {
+					continue
+				}
+				reacher = &state.Players()[a.Actor]
+			case *inbound.Dahai:
+				me := &state.Players()[a.Actor]
+				scene, err := NewSceneWithState(&state, me, reacher)
+				if err != nil {
+					return nil, err
+				}
+
+				storedScene := StoredScene{Candidates: nil}
+				var candidates []CandidateInfo
+				for _, pai := range scene.candidates {
+					hit := slices.Contains(waited, pai)
+					featureVector, err := scene.FeatureVector(&pai)
+					if err != nil {
+						return nil, err
+					}
+					candidate := CandidateData{
+						FeatureVector: featureVector,
+						Hit:           hit,
+					}
+					storedScene.Candidates = append(storedScene.Candidates, candidate)
+					candidateInfo := CandidateInfo{
+						Pai:           pai,
+						Hit:           hit,
+						FeatureVector: featureVector,
+					}
+					candidates = append(candidates, candidateInfo)
+				}
+
+				storedKyoku.Scenes = append(storedKyoku.Scenes, storedScene)
+			}
+		}
+	}
+	if err := scanner.Err(); err != nil {
+		return nil, fmt.Errorf("scanner error: %w", err)
+	}
+	return storedKyokus, nil
 }
 
 func extractFeaturesBatch(
 	inputPaths []string,
-	output io.Writer,
+	writer io.Writer,
 	featureExtractor func(io.Reader) ([]StoredKyoku, error),
 ) error {
 	numInputs := len(inputPaths)
 	fmt.Fprintf(os.Stderr, "%d files.\n", numInputs)
 	bar := progressbar.Default(int64(numInputs))
 
-	encoder := gob.NewEncoder(output)
+	encoder := gob.NewEncoder(writer)
 
 	metaData := MetaData{FeatureNames: FeatureNames()}
 	if err := encoder.Encode(metaData); err != nil {
