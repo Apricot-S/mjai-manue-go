@@ -3,7 +3,7 @@ services:
     build:
       context: ./server
     volumes:
-      - ./log_dir:/log_dir
+      - ../log_dir:/log_dir
     environment:
       HOST: server
       PORT: 11600
