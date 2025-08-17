@@ -29,9 +29,9 @@ RUN mkdir -p /app && \
 
 WORKDIR /app
 
-COPY --from=downloader /app /app
-
 RUN npm install -g coffeescript@1.12.7
+
+COPY --from=downloader /app /app
 
 USER node
 
