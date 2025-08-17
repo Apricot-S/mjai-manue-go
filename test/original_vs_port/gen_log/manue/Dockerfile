@@ -14,6 +14,12 @@ USER node
 
 RUN git clone https://github.com/gimite/mjai-manue.git
 
+RUN cd mjai-manue/coffee && \
+    npm install \
+        glob@11.0.3 \
+        printf@0.6.1 \
+        seed-random@2.2.0
+
 FROM node:${NODE_VERSION}-${OS_VERSION}-slim AS final
 
 ENV NODE_ENV=production
@@ -25,12 +31,7 @@ WORKDIR /app
 
 COPY --from=downloader /app /app
 
-RUN cd mjai-manue/coffee && \
-    npm install -g coffeescript@1.12.7 && \
-    npm install \
-        glob@11.0.3 \
-        printf@0.6.1 \
-        seed-random@2.2.0
+RUN npm install -g coffeescript@1.12.7
 
 USER node
 
