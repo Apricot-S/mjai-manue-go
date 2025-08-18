@@ -19,12 +19,12 @@ type StateImpl struct {
 	prevDahaiActor int
 	prevDahaiPai   *base.Pai
 	currentEvent   inbound.Event
-
-	playerID int
 	// -1 if there is no action
 	lastActor  int
 	lastAction inbound.Event
+	kanCount   int
 
+	playerID int
 	// The tiles that cannot be discarded because they would result in swap calling (喰い替え)
 	kuikaePais     []base.Pai
 	missedRon      bool

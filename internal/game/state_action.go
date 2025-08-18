@@ -336,6 +336,11 @@ func (s *StateImpl) ponCandidates() ([]base.Furo, error) {
 }
 
 func (s *StateImpl) daiminkanCandidates() ([]base.Furo, error) {
+	if s.kanCount >= 4 {
+		// cannot 5th kan
+		return nil, nil
+	}
+
 	taken := s.prevDahaiPai
 	if taken == nil {
 		return nil, nil

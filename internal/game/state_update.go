@@ -91,11 +91,11 @@ func (s *StateImpl) onStartGame(event *inbound.StartGame) error {
 	s.prevDahaiActor = noActor
 	s.prevDahaiPai = nil
 	s.currentEvent = nil
-
-	s.playerID = event.ID
 	s.lastActor = noActor
 	s.lastAction = nil
+	s.kanCount = 0
 
+	s.playerID = event.ID
 	s.kuikaePais = make([]base.Pai, 0, 3)
 	s.missedRon = false
 	s.isFuriten = false
@@ -131,9 +131,9 @@ func (s *StateImpl) onStartKyoku(event *inbound.StartKyoku) error {
 
 	s.prevDahaiActor = noActor
 	s.prevDahaiPai = nil
-
 	s.lastActor = noActor
 	s.lastAction = nil
+	s.kanCount = 0
 
 	s.kuikaePais = make([]base.Pai, 0, 3)
 	s.missedRon = false
@@ -355,6 +355,9 @@ func (s *StateImpl) onDaiminkan(event *inbound.Daiminkan) error {
 	if s.numPipais <= 0 {
 		return fmt.Errorf("daiminkan is not possible if numPipais is 0 or negative: %d", s.numPipais)
 	}
+	if s.kanCount >= 4 {
+		return fmt.Errorf("cannot 5th kan: %v", event)
+	}
 
 	pai := event.Taken
 	furo, err := base.NewDaiminkan(pai, event.Consumed, event.Target)
@@ -374,6 +377,7 @@ func (s *StateImpl) onDaiminkan(event *inbound.Daiminkan) error {
 
 	s.lastActor = actor
 	s.lastAction = event
+	s.kanCount++
 
 	if actor == s.playerID {
 		s.isRinshanTsumo = true
@@ -390,6 +394,9 @@ func (s *StateImpl) onAnkan(event *inbound.Ankan) error {
 	if s.numPipais <= 0 {
 		return fmt.Errorf("ankan is not possible if numPipais is 0 or negative: %d", s.numPipais)
 	}
+	if s.kanCount >= 4 {
+		return fmt.Errorf("cannot 5th kan: %v", event)
+	}
 
 	furo, err := base.NewAnkan(event.Consumed)
 	if err != nil {
@@ -403,6 +410,7 @@ func (s *StateImpl) onAnkan(event *inbound.Ankan) error {
 
 	s.lastActor = actor
 	s.lastAction = event
+	s.kanCount++
 
 	if actor == s.playerID {
 		s.isRinshanTsumo = true
@@ -418,6 +426,9 @@ func (s *StateImpl) onKakan(event *inbound.Kakan) error {
 
 	if s.numPipais <= 0 {
 		return fmt.Errorf("kakan is not possible if numPipais is 0 or negative: %d", s.numPipais)
+	}
+	if s.kanCount >= 4 {
+		return fmt.Errorf("cannot 5th kan: %v", event)
 	}
 
 	pai := event.Added
@@ -437,6 +448,7 @@ func (s *StateImpl) onKakan(event *inbound.Kakan) error {
 
 	s.lastActor = actor
 	s.lastAction = event
+	s.kanCount++
 
 	if actor == s.playerID {
 		s.isRinshanTsumo = true
