@@ -355,7 +355,7 @@ func (s *StateImpl) onDaiminkan(event *inbound.Daiminkan) error {
 	if s.numPipais <= 0 {
 		return fmt.Errorf("daiminkan is not possible if numPipais is 0 or negative: %d", s.numPipais)
 	}
-	if s.kanCount >= 4 {
+	if s.kanCount >= maxNumKan {
 		return fmt.Errorf("cannot 5th kan: %v", event)
 	}
 
@@ -394,7 +394,7 @@ func (s *StateImpl) onAnkan(event *inbound.Ankan) error {
 	if s.numPipais <= 0 {
 		return fmt.Errorf("ankan is not possible if numPipais is 0 or negative: %d", s.numPipais)
 	}
-	if s.kanCount >= 4 {
+	if s.kanCount >= maxNumKan {
 		return fmt.Errorf("cannot 5th kan: %v", event)
 	}
 
@@ -427,7 +427,7 @@ func (s *StateImpl) onKakan(event *inbound.Kakan) error {
 	if s.numPipais <= 0 {
 		return fmt.Errorf("kakan is not possible if numPipais is 0 or negative: %d", s.numPipais)
 	}
-	if s.kanCount >= 4 {
+	if s.kanCount >= maxNumKan {
 		return fmt.Errorf("cannot 5th kan: %v", event)
 	}
 

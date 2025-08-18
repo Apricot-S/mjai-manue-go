@@ -336,7 +336,7 @@ func (s *StateImpl) ponCandidates() ([]base.Furo, error) {
 }
 
 func (s *StateImpl) daiminkanCandidates() ([]base.Furo, error) {
-	if s.kanCount >= 4 {
+	if s.kanCount >= maxNumKan {
 		// cannot 5th kan
 		return nil, nil
 	}

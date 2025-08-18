@@ -12,6 +12,8 @@ const (
 	NumInitPipais     = base.NumIDs*4 - 13*NumPlayers - 14
 	FinalTurn         = float64(NumInitPipais) / float64(NumPlayers)
 
+	maxNumKan = 4
+
 	// Indicates that no action has been taken by anyone.
 	noActor = -1
 )
