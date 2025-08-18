@@ -19,11 +19,9 @@ func (s *StateImpl) Update(event inbound.Event) error {
 		return nil
 	}
 
-	s.prevEvent = s.currentEvent
-
 	// This is specially handled here because it's not an anpai if the dahai is followed by a hora.
 	if _, isHora := event.(*inbound.Hora); !isHora {
-		switch s.prevEvent.(type) {
+		switch s.currentEvent.(type) {
 		case *inbound.Dahai, *inbound.Kakan:
 			for _, p := range s.players {
 				if p.ID() != s.prevDahaiActor {
@@ -101,7 +99,6 @@ func (s *StateImpl) onStartGame(event *inbound.StartGame) error {
 	s.doraMarkers = make([]base.Pai, 0, MaxNumDoraMarkers)
 	s.numPipais = NumInitPipais
 
-	s.prevEvent = nil
 	s.prevDahaiActor = noActor
 	s.prevDahaiPai = nil
 	s.currentEvent = nil
@@ -143,7 +140,6 @@ func (s *StateImpl) onStartKyoku(event *inbound.StartKyoku) error {
 		}
 	}
 
-	s.prevEvent = nil
 	s.prevDahaiActor = noActor
 	s.prevDahaiPai = nil
 

@@ -15,7 +15,6 @@ type StateImpl struct {
 	doraMarkers []base.Pai
 	numPipais   int
 
-	prevEvent inbound.Event
 	// -1 if prev action is not dahai
 	prevDahaiActor int
 	prevDahaiPai   *base.Pai
