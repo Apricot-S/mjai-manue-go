@@ -116,9 +116,9 @@ func (s *StateImpl) IsTsumoPai(pai *base.Pai) bool {
 	if s.lastActor != s.playerID {
 		return false
 	}
-	_, isTsumo := s.lastAction.(*inbound.Tsumo)
-	_, isReach := s.lastAction.(*inbound.Reach)
-	if !isTsumo && !isReach {
+	switch s.lastAction.(type) {
+	case *inbound.Tsumo, *inbound.Reach:
+	default:
 		return false
 	}
 
