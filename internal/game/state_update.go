@@ -31,45 +31,34 @@ func (s *StateImpl) Update(event inbound.Event) error {
 		}
 	}
 
+	s.currentEvent = event
+
 	switch e := event.(type) {
 	case *inbound.StartKyoku:
-		s.currentEvent = e
 		return s.onStartKyoku(e)
 	case *inbound.Tsumo:
-		s.currentEvent = e
 		return s.onTsumo(e)
 	case *inbound.Dahai:
-		s.currentEvent = e
 		return s.onDahai(e)
 	case *inbound.Chi:
-		s.currentEvent = e
 		return s.onChi(e)
 	case *inbound.Pon:
-		s.currentEvent = e
 		return s.onPon(e)
 	case *inbound.Daiminkan:
-		s.currentEvent = e
 		return s.onDaiminkan(e)
 	case *inbound.Ankan:
-		s.currentEvent = e
 		return s.onAnkan(e)
 	case *inbound.Kakan:
-		s.currentEvent = e
 		return s.onKakan(e)
 	case *inbound.Dora:
-		s.currentEvent = e
 		return s.onDora(e)
 	case *inbound.Reach:
-		s.currentEvent = e
 		return s.onReach(e)
 	case *inbound.ReachAccepted:
-		s.currentEvent = e
 		return s.onReachAccepted(e)
 	case *inbound.Hora:
-		s.currentEvent = e
 		return s.onHora(e)
 	case *inbound.Ryukyoku:
-		s.currentEvent = e
 		return s.onRyukyoku(e)
 	default:
 		return fmt.Errorf("unknown event type: %v", event)
