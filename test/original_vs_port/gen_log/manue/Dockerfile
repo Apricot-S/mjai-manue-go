@@ -14,6 +14,8 @@ USER node
 
 RUN git clone https://github.com/gimite/mjai-manue.git
 
+ENV NODE_ENV=production
+
 RUN cd mjai-manue/coffee && \
     npm install \
         glob@11.0.3 \
