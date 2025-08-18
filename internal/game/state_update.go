@@ -7,6 +7,8 @@ import (
 	"github.com/Apricot-S/mjai-manue-go/internal/game/event/inbound"
 )
 
+var east, _ = base.NewPaiWithName("E")
+
 func (s *StateImpl) Update(event inbound.Event) error {
 	switch e := event.(type) {
 	case *inbound.StartGame:
@@ -79,11 +81,6 @@ func (s *StateImpl) Update(event inbound.Event) error {
 func (s *StateImpl) onStartGame(event *inbound.StartGame) error {
 	if event == nil {
 		return fmt.Errorf("start_game event is nil")
-	}
-
-	east, err := base.NewPaiWithName("E")
-	if err != nil {
-		return err
 	}
 
 	var players [NumPlayers]base.Player
