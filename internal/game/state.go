@@ -15,7 +15,8 @@ const (
 	maxNumKan = 4
 
 	// Indicates that no action has been taken by anyone.
-	noActor = -1
+	noActor                 = -1
+	kanPlayerStatusMultiple = 4
 )
 
 func GetPlayerDistance(p1 *base.Player, p2 *base.Player) int {

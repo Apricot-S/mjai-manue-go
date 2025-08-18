@@ -94,6 +94,7 @@ func (s *StateImpl) onStartGame(event *inbound.StartGame) error {
 	s.lastActor = noActor
 	s.lastAction = nil
 	s.kanCount = 0
+	s.kanPlayerStatus = noActor
 
 	s.playerID = event.ID
 	s.kuikaePais = make([]base.Pai, 0, 3)
@@ -134,6 +135,7 @@ func (s *StateImpl) onStartKyoku(event *inbound.StartKyoku) error {
 	s.lastActor = noActor
 	s.lastAction = nil
 	s.kanCount = 0
+	s.kanPlayerStatus = noActor
 
 	s.kuikaePais = make([]base.Pai, 0, 3)
 	s.missedRon = false
@@ -379,6 +381,17 @@ func (s *StateImpl) onDaiminkan(event *inbound.Daiminkan) error {
 	s.lastAction = event
 	s.kanCount++
 
+	switch s.kanPlayerStatus {
+	case kanPlayerStatusMultiple:
+		// Do nothing
+	case noActor:
+		s.kanPlayerStatus = actor
+	default:
+		if s.kanPlayerStatus != actor {
+			s.kanPlayerStatus = kanPlayerStatusMultiple
+		}
+	}
+
 	if actor == s.playerID {
 		s.isRinshanTsumo = true
 	}
@@ -411,6 +424,17 @@ func (s *StateImpl) onAnkan(event *inbound.Ankan) error {
 	s.lastActor = actor
 	s.lastAction = event
 	s.kanCount++
+
+	switch s.kanPlayerStatus {
+	case kanPlayerStatusMultiple:
+		// Do nothing
+	case noActor:
+		s.kanPlayerStatus = actor
+	default:
+		if s.kanPlayerStatus != actor {
+			s.kanPlayerStatus = kanPlayerStatusMultiple
+		}
+	}
 
 	if actor == s.playerID {
 		s.isRinshanTsumo = true
@@ -449,6 +473,17 @@ func (s *StateImpl) onKakan(event *inbound.Kakan) error {
 	s.lastActor = actor
 	s.lastAction = event
 	s.kanCount++
+
+	switch s.kanPlayerStatus {
+	case kanPlayerStatusMultiple:
+		// Do nothing
+	case noActor:
+		s.kanPlayerStatus = actor
+	default:
+		if s.kanPlayerStatus != actor {
+			s.kanPlayerStatus = kanPlayerStatusMultiple
+		}
+	}
 
 	if actor == s.playerID {
 		s.isRinshanTsumo = true

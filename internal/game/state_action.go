@@ -149,6 +149,10 @@ func (s *StateImpl) FuroCandidates() ([]base.Furo, error) {
 		// Furo is not possible if discarded tile is a last tile.
 		return nil, nil
 	}
+	if s.kanCount >= maxNumKan && s.kanPlayerStatus == kanPlayerStatusMultiple {
+		// A tile that results in a Four-Kan Abortive Draw (四槓散了) cannot be furo.
+		return nil, nil
+	}
 
 	player := &s.players[s.playerID]
 	if player.ReachState() != base.NotReach {
