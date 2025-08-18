@@ -371,11 +371,19 @@ func (s *StateImpl) HoraCandidate() (*base.Hora, error) {
 		return nil, nil
 	}
 
-	_, isTsumo := s.lastAction.(*inbound.Tsumo)
-	_, isDahai := s.lastAction.(*inbound.Dahai)
-	_, isKakan := s.lastAction.(*inbound.Kakan)
-	isTsumoSituation := s.lastActor == s.playerID && isTsumo
-	isRonSituation := s.lastActor != s.playerID && (isDahai || isKakan)
+	isTsumoSituation := false
+	isRonSituation := false
+	hasChankan := false
+	switch s.lastAction.(type) {
+	case *inbound.Tsumo:
+		isTsumoSituation = s.lastActor == s.playerID
+	case *inbound.Dahai:
+		isRonSituation = s.lastActor != s.playerID
+	case *inbound.Kakan:
+		isRonSituation = s.lastActor != s.playerID
+		hasChankan = true
+	}
+
 	if !isTsumoSituation && !isRonSituation {
 		// The last action is not a valid situation for hora.
 		return nil, nil
@@ -419,7 +427,6 @@ func (s *StateImpl) HoraCandidate() (*base.Hora, error) {
 	// Situation Yaku
 	hasMenzenchinTsumoho := isTsumoSituation && player.IsMenzen()
 	hasReach := player.ReachState() == base.ReachAccepted
-	hasChankan := isKakan
 	hasRinshankaiho := s.isRinshanTsumo
 	hasHaiteimoyueOrHoteiraoyui := s.NumPipais() == 0
 
