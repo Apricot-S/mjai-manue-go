@@ -9,9 +9,12 @@ import (
 )
 
 func isEndOfRound(currentEvent inbound.Event) bool {
-	_, isHora := currentEvent.(*inbound.Hora)
-	_, isRyukyoku := currentEvent.(*inbound.Ryukyoku)
-	return isHora || isRyukyoku
+	switch currentEvent.(type) {
+	case *inbound.Hora, *inbound.Ryukyoku:
+		return true
+	default:
+		return false
+	}
 }
 
 func (s *StateImpl) DahaiCandidates() []base.Pai {
