@@ -3,7 +3,7 @@ module github.com/Apricot-S/mjai-manue-go
 go 1.24.5
 
 require (
-	github.com/go-json-experiment/json v0.0.0-20250714165856-be8212f5270d
+	github.com/go-json-experiment/json v0.0.0-20250813233538-9b1f9ea2e11b
 	github.com/go-playground/validator/v10 v10.27.0
 	github.com/schollz/progressbar/v3 v3.18.0
 )
@@ -15,9 +15,9 @@ require (
 	github.com/leodido/go-urn v1.4.0 // indirect
 	github.com/mitchellh/colorstring v0.0.0-20190213212951-d06e56a500db // indirect
 	github.com/rivo/uniseg v0.4.7 // indirect
-	golang.org/x/crypto v0.40.0 // indirect
-	golang.org/x/net v0.42.0 // indirect
+	golang.org/x/crypto v0.41.0 // indirect
+	golang.org/x/net v0.43.0 // indirect
 	golang.org/x/sys v0.35.0 // indirect
 	golang.org/x/term v0.34.0 // indirect
-	golang.org/x/text v0.27.0 // indirect
+	golang.org/x/text v0.28.0 // indirect
 )
