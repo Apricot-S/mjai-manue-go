@@ -18,6 +18,8 @@ func sum(arr [base.NumIDs]int) int {
 }
 
 func verifyShantenAndGoals(t *testing.T, paiSet *base.PaiSet, expectedShanten int, expectedGoalsSize int) {
+	t.Helper()
+
 	shanten, goals, err := game.AnalyzeShanten(paiSet)
 	if err != nil {
 		t.Errorf("AnalyzeShanten() error = %v", err)
@@ -38,7 +40,9 @@ func verifyShantenAndGoals(t *testing.T, paiSet *base.PaiSet, expectedShanten in
 	}
 }
 
-func verifyShantenWithUpperBounds(t *testing.T, paiSet *base.PaiSet, expectedShanten int, expectedGoalsSize int) {
+func verifyShantenWithUpperBounds(t *testing.T, paiSet *base.PaiSet, wantShanten int, wantGoalsCount int) {
+	t.Helper()
+
 	for i := -1; i <= 8; i++ {
 		shanten, goals, err := game.AnalyzeShantenWithOption(paiSet, 0, i)
 		if err != nil {
@@ -46,132 +50,252 @@ func verifyShantenWithUpperBounds(t *testing.T, paiSet *base.PaiSet, expectedSha
 			return
 		}
 
-		expectedShantenWithUpperBound := expectedShanten
-		if expectedShanten > i {
-			expectedShantenWithUpperBound = game.InfinityShanten
+		wantShantenWithUpperBound := wantShanten
+		if wantShanten > i {
+			wantShantenWithUpperBound = game.InfinityShanten
 		}
-		expectedGoalsSizeWithUpperBound := expectedGoalsSize
-		if expectedShanten > i {
-			expectedGoalsSizeWithUpperBound = 0
+		wantGoalsCountWithUpperBound := wantGoalsCount
+		if wantShanten > i {
+			wantGoalsCountWithUpperBound = 0
 		}
-		if shanten != expectedShantenWithUpperBound {
-			t.Errorf("i = %v, AnalyzeShantenWithOption() shanten = %v, want %v", i, shanten, expectedShantenWithUpperBound)
+		if shanten != wantShantenWithUpperBound {
+			t.Errorf("i = %v, AnalyzeShantenWithOption() shanten = %v, want %v", i, shanten, wantShantenWithUpperBound)
 		}
-		if len(goals) != expectedGoalsSizeWithUpperBound {
-			t.Errorf("i = %v, AnalyzeShantenWithOption() len(goals) = %v, want %v", i, len(goals), expectedGoalsSizeWithUpperBound)
+		if len(goals) != wantGoalsCountWithUpperBound {
+			t.Errorf("i = %v, AnalyzeShantenWithOption() len(goals) = %v, want %v", i, len(goals), wantGoalsCountWithUpperBound)
 		}
 
 		numRequiredBlock := sum(*paiSet)/3 + 1
 		for _, goal := range goals {
 			if len(goal.Mentsus) != numRequiredBlock {
-				t.Errorf("i = %v, AnalyzeShantenWithOption() len(goal.Mentsus) = %v, want %v", i, len(goals), expectedGoalsSizeWithUpperBound)
+				t.Errorf("i = %v, AnalyzeShantenWithOption() len(goal.Mentsus) = %v, want %v", i, len(goals), wantGoalsCountWithUpperBound)
 			}
 		}
 	}
 }
 
-func testAnalyzeShantenInternal(t *testing.T, paiStr string, expectedShanten int, expectedGoalsSize int) {
-	pais, _ := base.StrToPais(paiStr)
-	paiSet, _ := base.NewPaiSet(pais)
-
-	verifyShantenAndGoals(t, paiSet, expectedShanten, expectedGoalsSize)
-	verifyShantenWithUpperBounds(t, paiSet, expectedShanten, expectedGoalsSize)
-}
-
 func TestAnalyzeShanten(t *testing.T) {
-	type args struct {
-		ps string
-	}
 	type testCase struct {
-		args  args
-		want  int
-		want1 int
+		name           string
+		input          string
+		wantShanten    int
+		wantGoalsCount int
 	}
 	tests := []testCase{
-		// case 1
-		{args{"1m 2m 3m 7m 8m 9m 2s 3s 4s S S S W"}, 0, 1},
-		// case 2
-		{args{"1m 2m 3m 7m 8m 9m 2s 3s S S S W N"}, 1, 4},
-		// empty : An empty hand is one step away from being a pair wait -> Shanten number: 1
-		{args{""}, 1, 34},
-		// thirteen orphans
-		{args{"1m 9m 1p 9p 1s 9s E S W N P F C"}, 8, 27675},
-		// tenpai
-		{args{"1m 2m 3m 4p 5pr 6p 7s 8s 9s E E S S"}, 0, 2},
-		// win
-		{args{"1m 2m 3m 4p 5pr 6p 7s 8s 9s E E S S S"}, -1, 1},
-		// with meld
-		{args{"1m 2m 3m 4p 5pr 6p 7s 8s 9s E"}, 0, 1},
-		// without pair
-		{args{"1m 2m 3m 8m 9m 4p 5p 6p 1s 2s 7s 8s 9s E"}, 1, 6},
-		// too many meld candidates
-		{args{"1m 2m 3m 8m 9m 4p 5p 6p 1s 2s 8s 9s E E"}, 1, 3},
-		// not enough meld candidates
-		{args{"1m 3m 3m 3m 4m 5m 5m 6m 8m S W F C C"}, 2, 1},
-		// incomplete hand 4 melds without a pair
-		{args{"2p 3p 4p 5s 6s 7s"}, 1, 38},
-		// triplet sequence
-		{args{"2p 2p 2p 3p 4p 5p E S W N P F C"}, 4, 105},
-		// sequence isolated sequence
-		{args{"2p 3p 4p 4p 4p 5p 6p E S W N P F"}, 4, 285},
-		// pair triplet sequence
-		{args{"1p 1p 2p 2p 2p 3p 4p 5p E S W N P"}, 3, 30},
-		// pair sequence sequence pair
-		{args{"2p 2p 3p 4p 5p 5p 6p 7p 8p 8p E S W"}, 2, 9},
-		// waiting for the 5th tile 1
-		{args{"1m 1m 1m 1m 1p 2p 3p 1s 1s 2s 2s 3s 3s"}, 1, 40},
-		// waiting for the 5th tile 2
-		{args{"1m 1m 1m 1m 2m 3m 4m 4m 4m 4m 1p 1p 1p 1p"}, 1, 82},
-		// waiting for the 5th tile 3
-		{args{"E E E E S S S S W W W N N N"}, 1, 30},
-		// 2 isolated 4 tiles 1
-		{args{"1m 1m 1m 1m 2m 4m 7m 7m 7m 7m"}, 1, 1},
-		// 2 isolated 4 tiles 2
-		{args{"1m 1m 1m 1m 2m 4m 7m 7m 7m 7m E E E S"}, 1, 3},
-		// 2 isolated 4 tiles 3
-		{args{"1m 1m 1m 1m 4m 4m 4m 4m"}, 1, 40},
-		// 2 isolated 4 tiles 4
-		{args{"1m 1m 1m 1m 2m 4m E E E E"}, 1, 1},
-		// 2 isolated 4 tiles 5
-		{args{"1m 1m 1m 1m 4m 4m 4m 4m 7m 8m"}, 2, 89},
-		// 3 isolated 4 tiles
-		{args{"1m 1m 1m 1m 2m 4m 7m 7m 7m 7m E E E E"}, 1, 1},
-		// 4 honors 1
-		{args{"E E E E"}, 1, 33},
-		// 4 honors 2
-		{args{"1m 2m 3m E E E E"}, 1, 34},
-		// 4 honors 3
-		{args{"E E E E S S S S"}, 1, 32},
-		// 4 honors 4
-		{args{"1m 2m 3m 1p 1p E E E E S S S S"}, 2, 37},
-		// can be interpreted in multiple set decompositions
-		{args{"1m 1m 1m 2m 2m 2m 3m 3m 3m 7p 8p 9p 9p 9p"}, -1, 2},
+		{
+			name:           "case 1",
+			input:          "1m 2m 3m 7m 8m 9m 2s 3s 4s S S S W",
+			wantShanten:    0,
+			wantGoalsCount: 1,
+		},
+		{
+			name:           "case 2",
+			input:          "1m 2m 3m 7m 8m 9m 2s 3s S S S W N",
+			wantShanten:    1,
+			wantGoalsCount: 4,
+		},
+		{
+			name:           "empty : An empty hand is one step away from being a pair wait -> Shanten number: 1",
+			input:          "",
+			wantShanten:    1,
+			wantGoalsCount: 34,
+		},
+		{
+			name:           "thirteen orphans",
+			input:          "1m 9m 1p 9p 1s 9s E S W N P F C",
+			wantShanten:    8,
+			wantGoalsCount: 27675,
+		},
+		{
+			name:           "tenpai",
+			input:          "1m 2m 3m 4p 5pr 6p 7s 8s 9s E E S S",
+			wantShanten:    0,
+			wantGoalsCount: 2,
+		},
+		{
+			name:           "win",
+			input:          "1m 2m 3m 4p 5pr 6p 7s 8s 9s E E S S S",
+			wantShanten:    -1,
+			wantGoalsCount: 1,
+		},
+		{
+			name:           "with meld",
+			input:          "1m 2m 3m 4p 5pr 6p 7s 8s 9s E",
+			wantShanten:    0,
+			wantGoalsCount: 1,
+		},
+		{
+			name:           "without pair",
+			input:          "1m 2m 3m 8m 9m 4p 5p 6p 1s 2s 7s 8s 9s E",
+			wantShanten:    1,
+			wantGoalsCount: 6,
+		},
+		{
+			name:           "too many meld candidates",
+			input:          "1m 2m 3m 8m 9m 4p 5p 6p 1s 2s 8s 9s E E",
+			wantShanten:    1,
+			wantGoalsCount: 3,
+		},
+		{
+			name:           "not enough meld candidates",
+			input:          "1m 3m 3m 3m 4m 5m 5m 6m 8m S W F C C",
+			wantShanten:    2,
+			wantGoalsCount: 1,
+		},
+		{
+			name:           "incomplete hand 4 melds without a pair",
+			input:          "2p 3p 4p 5s 6s 7s",
+			wantShanten:    1,
+			wantGoalsCount: 38,
+		},
+		{
+			name:           "triplet sequence",
+			input:          "2p 2p 2p 3p 4p 5p E S W N P F C",
+			wantShanten:    4,
+			wantGoalsCount: 105,
+		},
+		{
+			name:           "sequence isolated sequence",
+			input:          "2p 3p 4p 4p 4p 5p 6p E S W N P F",
+			wantShanten:    4,
+			wantGoalsCount: 285,
+		},
+		{
+			name:           "pair triplet sequence",
+			input:          "1p 1p 2p 2p 2p 3p 4p 5p E S W N P",
+			wantShanten:    3,
+			wantGoalsCount: 30,
+		},
+		{
+			name:           "pair sequence sequence pair",
+			input:          "2p 2p 3p 4p 5p 5p 6p 7p 8p 8p E S W",
+			wantShanten:    2,
+			wantGoalsCount: 9,
+		},
+		{
+			name:           "waiting for the 5th tile 1",
+			input:          "1m 1m 1m 1m 1p 2p 3p 1s 1s 2s 2s 3s 3s",
+			wantShanten:    1,
+			wantGoalsCount: 40,
+		},
+		{
+			name:           "waiting for the 5th tile 2",
+			input:          "1m 1m 1m 1m 2m 3m 4m 4m 4m 4m 1p 1p 1p 1p",
+			wantShanten:    1,
+			wantGoalsCount: 82,
+		},
+		{
+			name:           "waiting for the 5th tile 3",
+			input:          "E E E E S S S S W W W N N N",
+			wantShanten:    1,
+			wantGoalsCount: 30,
+		},
+		{
+			name:           "2 isolated 4 tiles 1",
+			input:          "1m 1m 1m 1m 2m 4m 7m 7m 7m 7m",
+			wantShanten:    1,
+			wantGoalsCount: 1,
+		},
+		{
+			name:           "2 isolated 4 tiles 2",
+			input:          "1m 1m 1m 1m 2m 4m 7m 7m 7m 7m E E E S",
+			wantShanten:    1,
+			wantGoalsCount: 3,
+		},
+		{
+			name:           "2 isolated 4 tiles 3",
+			input:          "1m 1m 1m 1m 4m 4m 4m 4m",
+			wantShanten:    1,
+			wantGoalsCount: 40,
+		},
+		{
+			name:           "2 isolated 4 tiles 4",
+			input:          "1m 1m 1m 1m 2m 4m E E E E",
+			wantShanten:    1,
+			wantGoalsCount: 1,
+		},
+		{
+			name:           "2 isolated 4 tiles 5",
+			input:          "1m 1m 1m 1m 4m 4m 4m 4m 7m 8m",
+			wantShanten:    2,
+			wantGoalsCount: 89,
+		},
+		{
+			name:           "3 isolated 4 tiles",
+			input:          "1m 1m 1m 1m 2m 4m 7m 7m 7m 7m E E E E",
+			wantShanten:    1,
+			wantGoalsCount: 1,
+		},
+		{
+			name:           "4 honors 1",
+			input:          "E E E E",
+			wantShanten:    1,
+			wantGoalsCount: 33,
+		},
+		{
+			name:           "4 honors 2",
+			input:          "1m 2m 3m E E E E",
+			wantShanten:    1,
+			wantGoalsCount: 34,
+		},
+		{
+			name:           "4 honors 3",
+			input:          "E E E E S S S S",
+			wantShanten:    1,
+			wantGoalsCount: 32,
+		},
+		{
+			name:           "4 honors 4",
+			input:          "1m 2m 3m 1p 1p E E E E S S S S",
+			wantShanten:    2,
+			wantGoalsCount: 37,
+		},
+		{
+			name:           "can be interpreted in multiple set decompositions",
+			input:          "1m 1m 1m 2m 2m 2m 3m 3m 3m 7p 8p 9p 9p 9p",
+			wantShanten:    -1,
+			wantGoalsCount: 2,
+		},
 	}
 
 	for _, tt := range tests {
-		t.Run(tt.args.ps, func(t *testing.T) {
-			testAnalyzeShantenInternal(t, tt.args.ps, tt.want, tt.want1)
+		t.Run(tt.name, func(t *testing.T) {
+			pais, err := base.StrToPais(tt.input)
+			if err != nil {
+				t.Errorf("StrToPais() error = %v", err)
+				return
+			}
+			paiSet, err := base.NewPaiSet(pais)
+			if err != nil {
+				t.Errorf("NewPaiSet() error = %v", err)
+				return
+			}
+
+			verifyShantenAndGoals(t, paiSet, tt.wantShanten, tt.wantGoalsCount)
+			verifyShantenWithUpperBounds(t, paiSet, tt.wantShanten, tt.wantGoalsCount)
 		})
 	}
 }
 
 func TestAnalyzeShanten_Invalid(t *testing.T) {
-	type args struct {
-		ps string
-	}
 	type testCase struct {
-		args    args
-		shanten int
-		goals   []game.Goal
+		name        string
+		input       string
+		wantShanten int
+		wantGoals   []game.Goal
 	}
 	tests := []testCase{
-		// 5 identical tiles
-		{args{"1m 1m 1m 1m 1m"}, math.MaxInt, nil},
+		{
+			name:        "5 identical tiles",
+			input:       "1m 1m 1m 1m 1m",
+			wantShanten: math.MaxInt,
+			wantGoals:   nil,
+		},
 	}
 
 	for _, tt := range tests {
-		t.Run(tt.args.ps, func(t *testing.T) {
-			pais, _ := base.StrToPais(tt.args.ps)
+		t.Run(tt.name, func(t *testing.T) {
+			pais, _ := base.StrToPais(tt.input)
 			paiSet, _ := base.NewPaiSet(pais)
 
 			shanten, goals, err := game.AnalyzeShanten(paiSet)
@@ -179,11 +303,11 @@ func TestAnalyzeShanten_Invalid(t *testing.T) {
 				t.Errorf("AnalyzeShanten() error = %v", err)
 				return
 			}
-			if shanten != tt.shanten {
-				t.Errorf("AnalyzeShanten() shanten = %v, want %v", shanten, tt.shanten)
+			if shanten != tt.wantShanten {
+				t.Errorf("AnalyzeShanten() shanten = %v, want %v", shanten, tt.wantShanten)
 			}
-			if !reflect.DeepEqual(goals, tt.goals) {
-				t.Errorf("AnalyzeShanten() goals = %v, want %v", goals, tt.goals)
+			if !reflect.DeepEqual(goals, tt.wantGoals) {
+				t.Errorf("AnalyzeShanten() goals = %v, want %v", goals, tt.wantGoals)
 			}
 		})
 	}
