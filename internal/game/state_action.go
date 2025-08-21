@@ -82,11 +82,11 @@ func (s *StateImpl) ReachDahaiCandidates() ([]base.Pai, error) {
 	if err != nil {
 		return nil, err
 	}
-	shanten, _, err := AnalyzeShantenWithOption(tehaiCounts, 0, 0)
+	isTenpai, err := IsTenpaiGeneral(tehaiCounts)
 	if err != nil {
 		return nil, err
 	}
-	if shanten > 0 {
+	if !isTenpai {
 		// If the hand is not tenpai, return nil.
 		return nil, nil
 	}
@@ -96,11 +96,11 @@ func (s *StateImpl) ReachDahaiCandidates() ([]base.Pai, error) {
 	for _, p := range tehaiPais {
 		i := p.RemoveRed().ID()
 		tehaiCounts[i] -= 1
-		shanten, _, err := AnalyzeShantenWithOption(tehaiCounts, 0, 0)
+		isTenpai, err := IsTenpaiGeneral(tehaiCounts)
 		if err != nil {
 			return nil, err
 		}
-		if shanten <= 0 {
+		if isTenpai {
 			candidates = append(candidates, p)
 		}
 		tehaiCounts[i] += 1

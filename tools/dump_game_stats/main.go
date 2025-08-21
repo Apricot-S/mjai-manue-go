@@ -21,11 +21,7 @@ func isTenpai(actor *base.Player) (bool, error) {
 	if err != nil {
 		return false, fmt.Errorf("failed to get the hand: %w", err)
 	}
-	shantenNumber, _, err := game.AnalyzeShantenWithOption(tehaiSet, 0, 0)
-	if err != nil {
-		return false, fmt.Errorf("failed to calculate shanten number: %w", err)
-	}
-	return shantenNumber <= 0, nil
+	return game.IsTenpaiGeneral(tehaiSet)
 }
 
 type Counter interface {
