@@ -64,6 +64,21 @@ var (
 	}()
 )
 
+func countPais(ps *base.PaiSet) (int, error) {
+	sum := 0
+	for _, c := range ps {
+		if c < 0 {
+			return 0, fmt.Errorf("negative number of tiles in the PaiSet")
+		}
+		if c > 4 {
+			return 0, fmt.Errorf("more than 4 tiles of the same type in the PaiSet")
+		}
+		sum += c
+	}
+
+	return sum, nil
+}
+
 // AnalyzeShanten calculates the shanten number and the list of Goal for the given PaiSet.
 // When the list of Goal is empty, [InfinityShanten] is returned as the shanten number.
 // It does not consider Seven Pairs or Thirteen Orphans.
@@ -72,19 +87,13 @@ func AnalyzeShanten(ps *base.PaiSet) (int, []Goal, error) {
 }
 
 func AnalyzeShantenWithOption(ps *base.PaiSet, allowedExtraPais int, upperbound int) (int, []Goal, error) {
-	sum := 0
-	for _, c := range ps {
-		if c < 0 {
-			return InfinityShanten, nil, fmt.Errorf("negative number of tiles in the PaiSet")
-		}
-		if c > 4 {
-			return InfinityShanten, nil, fmt.Errorf("more than 4 tiles of the same type in the PaiSet")
-		}
-		sum += c
+	numPais, err := countPais(ps)
+	if err != nil {
+		return InfinityShanten, nil, err
 	}
 
 	targetVector := base.PaiSet{}
-	numMentsus := min(sum/3, 4)
+	numMentsus := min(numPais/3, 4)
 	mentsus := make([]base.Mentsu, 0, numMentsus+1) // +1 for the pair
 	allGoals := []Goal{}
 
@@ -252,4 +261,33 @@ func makeNewMentsus(mentsus []base.Mentsu, newMentsu base.Mentsu) []base.Mentsu 
 	newMentsus := make([]base.Mentsu, len(mentsus), cap(mentsus))
 	copy(newMentsus, mentsus)
 	return append(newMentsus, newMentsu)
+}
+
+func AnalyzeShantenChitoitsu(ps *base.PaiSet) (int, error) {
+	numPais, err := countPais(ps)
+	if err != nil {
+		return InfinityShanten, err
+	}
+
+	if numPais < 13 {
+		return InfinityShanten, nil
+	}
+
+	numPairs := 0
+	numKinds := 0
+	for _, c := range ps {
+		if c >= 2 {
+			numPairs++
+		}
+		if c >= 1 {
+			numKinds++
+		}
+	}
+
+	shanten := 6 - numPairs
+	if numKinds < 7 {
+		shanten += 7 - numKinds
+	}
+
+	return shanten, nil
 }

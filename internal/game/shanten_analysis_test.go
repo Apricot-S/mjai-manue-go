@@ -17,7 +17,7 @@ func sum(arr [base.NumIDs]int) int {
 	return sum
 }
 
-func verifyShantenAndGoals(t *testing.T, paiSet *base.PaiSet, expectedShanten int, expectedGoalsSize int) {
+func verifyShantenAndGoals(t *testing.T, paiSet *base.PaiSet, wantShanten int, wantGoalsCount int) {
 	t.Helper()
 
 	shanten, goals, err := game.AnalyzeShanten(paiSet)
@@ -25,17 +25,17 @@ func verifyShantenAndGoals(t *testing.T, paiSet *base.PaiSet, expectedShanten in
 		t.Errorf("AnalyzeShanten() error = %v", err)
 		return
 	}
-	if shanten != expectedShanten {
-		t.Errorf("AnalyzeShanten() shanten = %v, want %v", shanten, expectedShanten)
+	if shanten != wantShanten {
+		t.Errorf("AnalyzeShanten() shanten = %v, want %v", shanten, wantShanten)
 	}
-	if len(goals) != expectedGoalsSize {
-		t.Errorf("AnalyzeShanten() len(goals) = %v, want %v", len(goals), expectedGoalsSize)
+	if len(goals) != wantGoalsCount {
+		t.Errorf("AnalyzeShanten() len(goals) = %v, want %v", len(goals), wantGoalsCount)
 	}
 
 	numRequiredBlock := sum(*paiSet)/3 + 1
 	for _, goal := range goals {
 		if len(goal.Mentsus) != numRequiredBlock {
-			t.Errorf("AnalyzeShanten() len(goal.Mentsus) = %v, want %v", len(goals), expectedGoalsSize)
+			t.Errorf("AnalyzeShanten() len(goal.Mentsus) = %v, want %v", len(goals), wantGoalsCount)
 		}
 	}
 }
@@ -309,6 +309,76 @@ func TestAnalyzeShanten_Invalid(t *testing.T) {
 			if !reflect.DeepEqual(goals, tt.wantGoals) {
 				t.Errorf("AnalyzeShanten() goals = %v, want %v", goals, tt.wantGoals)
 			}
+		})
+	}
+}
+
+func TestAnalyzeShantenChitoitsu(t *testing.T) {
+	type testCase struct {
+		name        string
+		input       string
+		wantShanten int
+	}
+	tests := []testCase{
+		{
+			name:        "without pair",
+			input:       "1m 9m 1p 9p 1s 9s E S W N P F C",
+			wantShanten: 6,
+		},
+		{
+			name:        "with quadruple",
+			input:       "1m 1m 8m 8m 2p 8p 8p 5s 5s E E E E",
+			wantShanten: 2,
+		},
+		{
+			name:        "with triplet",
+			input:       "1m 1m 8m 8m 2p 3p 8p 8p 5s 5s E E E",
+			wantShanten: 1,
+		},
+		{
+			name:        "with 2 triplets",
+			input:       "1m 1m 8m 8m 2p 8p 8p 5s 5s 5s E E E",
+			wantShanten: 2,
+		},
+		{
+			name:        "tenpai",
+			input:       "1m 1m 8m 8m 2p 8p 8p 5s 5s E E C C",
+			wantShanten: 0,
+		},
+		{
+			name:        "win",
+			input:       "1m 1m 8m 8m 2p 2p 8p 8p 5s 5s E E C C",
+			wantShanten: -1,
+		},
+		{
+			name:        "incomplete_hand",
+			input:       "1m 1m 8m 8m 5s 5s E E S S",
+			wantShanten: game.InfinityShanten,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			pais, err := base.StrToPais(tt.input)
+			if err != nil {
+				t.Errorf("StrToPais() error = %v", err)
+				return
+			}
+			paiSet, err := base.NewPaiSet(pais)
+			if err != nil {
+				t.Errorf("NewPaiSet() error = %v", err)
+				return
+			}
+
+			shanten, err := game.AnalyzeShantenChitoitsu(paiSet)
+			if err != nil {
+				t.Errorf("AnalyzeShantenChitoitsu() error = %v", err)
+				return
+			}
+			if shanten != tt.wantShanten {
+				t.Errorf("AnalyzeShantenChitoitsu() shanten = %v, want %v", shanten, tt.wantShanten)
+			}
+
 		})
 	}
 }
