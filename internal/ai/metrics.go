@@ -166,7 +166,7 @@ func (a *ManueAI) getMetricsInternal(
 	if err != nil {
 		return nil, err
 	}
-	shanten, goals, err := game.AnalyzeShantenWithOption(ps, 1, 8)
+	shanten, goals, err := game.AnalyzeShantenWithOption(ps, 1, game.MaxShantenNumber)
 	if err != nil {
 		return nil, err
 	}

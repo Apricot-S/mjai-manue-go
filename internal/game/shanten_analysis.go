@@ -26,10 +26,10 @@ type Goal struct {
 }
 
 const (
-	InfinityShanten = math.MaxInt
+	InfinityShanten  = math.MaxInt
+	MaxShantenNumber = 8
 
-	maxShantenNumber = 8
-	numChows         = 7 * 3
+	numChows = 7 * 3
 )
 
 var (
@@ -83,7 +83,7 @@ func countPais(ps *base.PaiSet) (int, error) {
 // When the list of Goal is empty, [InfinityShanten] is returned as the shanten number.
 // It does not consider Seven Pairs or Thirteen Orphans.
 func AnalyzeShanten(ps *base.PaiSet) (int, []Goal, error) {
-	return AnalyzeShantenWithOption(ps, 0, maxShantenNumber)
+	return AnalyzeShantenWithOption(ps, 0, MaxShantenNumber)
 }
 
 func AnalyzeShantenWithOption(ps *base.PaiSet, allowedExtraPais int, upperbound int) (int, []Goal, error) {
