@@ -291,3 +291,27 @@ func AnalyzeShantenChitoitsu(ps *base.PaiSet) (int, error) {
 
 	return shanten, nil
 }
+
+func AnalyzeShantenKokushimuso(ps *base.PaiSet) (int, error) {
+	numPais, err := countPais(ps)
+	if err != nil {
+		return InfinityShanten, err
+	}
+
+	if numPais < 13 {
+		return InfinityShanten, nil
+	}
+
+	numKinds := 0
+	hasPair := 0
+	for _, i := range yaochuhaiIndices {
+		if ps[i] >= 1 {
+			numKinds++
+		}
+		if ps[i] >= 2 {
+			hasPair = 1
+		}
+	}
+
+	return 13 - numKinds - hasPair, nil
+}

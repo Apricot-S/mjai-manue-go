@@ -382,3 +382,73 @@ func TestAnalyzeShantenChitoitsu(t *testing.T) {
 		})
 	}
 }
+
+func TestAnalyzeShantenKokushimuso(t *testing.T) {
+	type testCase struct {
+		name        string
+		input       string
+		wantShanten int
+	}
+	tests := []testCase{
+		{
+			name:        "no terminals and honors",
+			input:       "2m 3m 4m 5m 5m 3p 4p 5p 4s 5s 6s 7s 8s",
+			wantShanten: 13,
+		},
+		{
+			name:        "without pair",
+			input:       "1m 8m 9m 1p 2p 2s 4s 9s E S W N P",
+			wantShanten: 4,
+		},
+		{
+			name:        "with_pair",
+			input:       "1m 1m 9m 1p 2p 2s 9s 9s E S W N P",
+			wantShanten: 3,
+		},
+		{
+			name:        "tenpai",
+			input:       "1m 1m 1p 9p 1s 9s E S W N P F C",
+			wantShanten: 0,
+		},
+		{
+			name:        "tenpai 13 wait",
+			input:       "1m 9m 1p 9p 1s 9s E S W N P F C",
+			wantShanten: 0,
+		},
+		{
+			name:        "win",
+			input:       "1m 1m 9m 1p 9p 1s 9s E S W N P F C",
+			wantShanten: -1,
+		},
+		{
+			name:        "incomplete_hand",
+			input:       "9m 1p 9p 1s 9s E S W N P F C",
+			wantShanten: game.InfinityShanten,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			pais, err := base.StrToPais(tt.input)
+			if err != nil {
+				t.Errorf("StrToPais() error = %v", err)
+				return
+			}
+			paiSet, err := base.NewPaiSet(pais)
+			if err != nil {
+				t.Errorf("NewPaiSet() error = %v", err)
+				return
+			}
+
+			shanten, err := game.AnalyzeShantenKokushimuso(paiSet)
+			if err != nil {
+				t.Errorf("AnalyzeShantenKokushimuso() error = %v", err)
+				return
+			}
+			if shanten != tt.wantShanten {
+				t.Errorf("AnalyzeShantenKokushimuso() shanten = %v, want %v", shanten, tt.wantShanten)
+			}
+
+		})
+	}
+}
