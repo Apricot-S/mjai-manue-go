@@ -29,7 +29,7 @@ type StateImpl struct {
 	playerID int
 	// The tiles that cannot be discarded because they would result in swap calling (喰い替え)
 	kuikaePais     []base.Pai
-	missedRon      bool
+	canRon         bool
 	isFuriten      bool
 	isRinshanTsumo bool
 }

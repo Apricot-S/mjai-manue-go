@@ -98,7 +98,7 @@ func (s *StateImpl) onStartGame(event *inbound.StartGame) error {
 
 	s.playerID = event.ID
 	s.kuikaePais = make([]base.Pai, 0, 3)
-	s.missedRon = false
+	s.canRon = false
 	s.isFuriten = false
 	s.isRinshanTsumo = false
 
@@ -138,7 +138,7 @@ func (s *StateImpl) onStartKyoku(event *inbound.StartKyoku) error {
 	s.kanPlayerStatus = noActor
 
 	s.kuikaePais = make([]base.Pai, 0, 3)
-	s.missedRon = false
+	s.canRon = false
 	s.isFuriten = false
 	s.isRinshanTsumo = false
 
@@ -193,7 +193,7 @@ func (s *StateImpl) onDahai(event *inbound.Dahai) error {
 	if actor == s.playerID {
 		s.kuikaePais = make([]base.Pai, 0, 3)
 		if player.ReachState() != base.ReachAccepted {
-			s.missedRon = false
+			s.canRon = false
 			s.isFuriten = false
 		}
 		s.isRinshanTsumo = false
@@ -218,7 +218,7 @@ func (s *StateImpl) onDahai(event *inbound.Dahai) error {
 			}
 		}
 	} else {
-		if s.missedRon {
+		if s.canRon {
 			// The previous ron-able tile was missed
 			s.isFuriten = true
 		}
@@ -231,8 +231,8 @@ func (s *StateImpl) onDahai(event *inbound.Dahai) error {
 		if err != nil {
 			return fmt.Errorf("failed to check if tehaiCounts is hora form: %w", err)
 		}
-		if isHoraFrom && !s.missedRon && !s.isFuriten {
-			s.missedRon = true
+		if isHoraFrom && !s.canRon && !s.isFuriten {
+			s.canRon = true
 		}
 	}
 
@@ -493,7 +493,7 @@ func (s *StateImpl) onKakan(event *inbound.Kakan) error {
 			return err
 		}
 
-		if s.missedRon {
+		if s.canRon {
 			// The previous ron-able tile was missed
 			s.isFuriten = true
 		}
@@ -506,8 +506,8 @@ func (s *StateImpl) onKakan(event *inbound.Kakan) error {
 		if err != nil {
 			return fmt.Errorf("failed to check if tehaiCounts is hora form: %w", err)
 		}
-		if isHoraFrom && !s.missedRon && !s.isFuriten {
-			s.missedRon = true
+		if isHoraFrom && !s.canRon && !s.isFuriten {
+			s.canRon = true
 		}
 	}
 
