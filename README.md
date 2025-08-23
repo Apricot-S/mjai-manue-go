@@ -4,18 +4,25 @@
 
 Go port of [mjai-manue](https://github.com/gimite/mjai-manue)
 
-Differences from the original:
+For more information, see [the original README (Japanese)](https://github.com/gimite/mjai-manue/blob/master/README.md) or [its translation](docs/README-en.md).
+
+## Differences from Original
+
+### Protocol Support Extensions
 
 - Supports both [Gimite's original Mjai protocol](https://gimite.net/pukiwiki/index.php?Mjai%20%E9%BA%BB%E9%9B%80AI%E5%AF%BE%E6%88%A6%E3%82%B5%E3%83%BC%E3%83%90) and [a minor modified version of the Mjai protocol used by RiichiLab](https://mjai.app/docs/mjai-protocol).
+
+### Architecture Improvements
+
 - The configuration files is embedded at build time rather than loaded at runtime.
 - Fixed the miscalculation of the shanten number when the hand contains four identical tiles.
 - Improved error handling to more reliably reject invalid or anomalous input.
 - Refactored the code to improve readability and maintainability.
 
+### Target Version
+
 > [!NOTE]
 > The original project includes an older version written in Ruby and a newer version written in CoffeeScript. This project ports only the new version.
-
-For more information, see [the original README (Japanese)](https://github.com/gimite/mjai-manue/blob/master/README.md) or [its translation](docs/README-en.md).
 
 ## Installation
 
