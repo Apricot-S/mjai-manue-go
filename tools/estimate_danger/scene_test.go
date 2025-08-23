@@ -38,7 +38,7 @@ type testCase struct {
 func TestScene_Evaluate_Tsupai(t *testing.T) {
 	tests := []testCase{}
 
-	scene, _ := NewScene(nil, nil, nil, nil, nil, nil, nil)
+	scene, _ := NewSceneFromParams(nil, nil, nil, nil, nil, nil, nil)
 
 	{
 		tests = append(tests, testCase{
@@ -76,7 +76,7 @@ func TestScene_Evaluate_Tsupai(t *testing.T) {
 func TestScene_Evaluate_Suji(t *testing.T) {
 	tests := []testCase{}
 
-	scene, _ := NewScene(nil, mustPais("4p"), nil, nil, nil, nil, nil)
+	scene, _ := NewSceneFromParams(nil, mustPais("4p"), nil, nil, nil, nil, nil)
 
 	{
 		tests = append(tests, testCase{
@@ -168,7 +168,7 @@ func TestScene_Evaluate_Suji(t *testing.T) {
 func TestScene_Evaluate_NakaSuji(t *testing.T) {
 	tests := []testCase{}
 
-	scene, _ := NewScene(nil, mustPais("1p", "7p"), nil, nil, nil, nil, nil)
+	scene, _ := NewSceneFromParams(nil, mustPais("1p", "7p"), nil, nil, nil, nil, nil)
 
 	{
 		tests = append(tests, testCase{
@@ -206,7 +206,7 @@ func TestScene_Evaluate_NakaSuji(t *testing.T) {
 func TestScene_Evaluate_KataSuji(t *testing.T) {
 	tests := []testCase{}
 
-	scene, _ := NewScene(nil, mustPais("1p"), nil, nil, nil, nil, nil)
+	scene, _ := NewSceneFromParams(nil, mustPais("1p"), nil, nil, nil, nil, nil)
 
 	{
 		tests = append(tests, testCase{
@@ -244,7 +244,7 @@ func TestScene_Evaluate_KataSuji(t *testing.T) {
 func TestScene_Evaluate_ReachSuji(t *testing.T) {
 	tests := []testCase{}
 
-	scene, _ := NewScene(nil, mustPais("5p", "4p"), nil, nil, mustPais("5p", "4p"), nil, nil)
+	scene, _ := NewSceneFromParams(nil, mustPais("5p", "4p"), nil, nil, mustPais("5p", "4p"), nil, nil)
 
 	{
 		tests = append(tests, testCase{
@@ -282,7 +282,7 @@ func TestScene_Evaluate_ReachSuji(t *testing.T) {
 func TestScene_Evaluate_ReachKataSuji(t *testing.T) {
 	tests := []testCase{}
 
-	scene, _ := NewScene(nil, mustPais("1p"), nil, nil, mustPais("1p"), nil, nil)
+	scene, _ := NewSceneFromParams(nil, mustPais("1p"), nil, nil, mustPais("1p"), nil, nil)
 
 	{
 		tests = append(tests, testCase{
@@ -311,7 +311,7 @@ func TestScene_Evaluate_ReachKataSuji(t *testing.T) {
 func TestScene_Evaluate_PrereachSuji(t *testing.T) {
 	tests := []testCase{}
 
-	scene, _ := NewScene(nil, mustPais("4p", "E", "4s"), nil, nil, mustPais("4p", "E"), nil, nil)
+	scene, _ := NewSceneFromParams(nil, mustPais("4p", "E", "4s"), nil, nil, mustPais("4p", "E"), nil, nil)
 
 	{
 		tests = append(tests, testCase{
@@ -349,7 +349,7 @@ func TestScene_Evaluate_PrereachSuji(t *testing.T) {
 func TestScene_Evaluate_UraSuji(t *testing.T) {
 	tests := []testCase{}
 
-	scene, _ := NewScene(nil, mustPais("1p"), nil, nil, mustPais("1p"), nil, nil)
+	scene, _ := NewSceneFromParams(nil, mustPais("1p"), nil, nil, mustPais("1p"), nil, nil)
 
 	{
 		tests = append(tests, testCase{
@@ -396,7 +396,7 @@ func TestScene_Evaluate_UraSuji(t *testing.T) {
 func TestScene_Evaluate_UraSujiOf5(t *testing.T) {
 	tests := []testCase{}
 
-	scene, _ := NewScene(nil, mustPais("5p"), nil, nil, mustPais("5p"), nil, nil)
+	scene, _ := NewSceneFromParams(nil, mustPais("5p"), nil, nil, mustPais("5p"), nil, nil)
 
 	{
 		tests = append(tests, testCase{
@@ -461,7 +461,7 @@ func TestScene_Evaluate_UraSujiOf5(t *testing.T) {
 func TestScene_Evaluate_UraSuji_ReachPai(t *testing.T) {
 	tests := []testCase{}
 
-	scene, _ := NewScene(nil, mustPais("1p", "5p"), nil, nil, mustPais("1p"), nil, nil)
+	scene, _ := NewSceneFromParams(nil, mustPais("1p", "5p"), nil, nil, mustPais("1p"), nil, nil)
 
 	{
 		tests = append(tests, testCase{
@@ -490,7 +490,7 @@ func TestScene_Evaluate_UraSuji_ReachPai(t *testing.T) {
 func TestScene_Evaluate_EarlyUraSuji_ReachUraSuji(t *testing.T) {
 	tests := []testCase{}
 
-	scene, _ := NewScene(nil, mustPais("1p", "E", "S", "W", "1s"), nil, nil, mustPais("1p", "E", "S", "W", "1s"), nil, nil)
+	scene, _ := NewSceneFromParams(nil, mustPais("1p", "E", "S", "W", "1s"), nil, nil, mustPais("1p", "E", "S", "W", "1s"), nil, nil)
 
 	{
 		tests = append(tests, testCase{
@@ -546,7 +546,7 @@ func TestScene_Evaluate_EarlyUraSuji_ReachUraSuji(t *testing.T) {
 func TestScene_Evaluate_Only_UraSujiOf5(t *testing.T) {
 	tests := []testCase{}
 
-	scene, _ := NewScene(nil, mustPais("1p", "5s"), nil, nil, mustPais("1p", "5s"), nil, nil)
+	scene, _ := NewSceneFromParams(nil, mustPais("1p", "5s"), nil, nil, mustPais("1p", "5s"), nil, nil)
 
 	{
 		tests = append(tests, testCase{
@@ -584,7 +584,7 @@ func TestScene_Evaluate_Only_UraSujiOf5(t *testing.T) {
 func TestScene_Evaluate_Aida4ken(t *testing.T) {
 	tests := []testCase{}
 
-	scene, _ := NewScene(nil, mustPais("1p", "6p"), nil, nil, mustPais("1p", "6p"), nil, nil)
+	scene, _ := NewSceneFromParams(nil, mustPais("1p", "6p"), nil, nil, mustPais("1p", "6p"), nil, nil)
 
 	{
 		tests = append(tests, testCase{
@@ -631,7 +631,7 @@ func TestScene_Evaluate_Aida4ken(t *testing.T) {
 func TestScene_Evaluate_MatagiSuji(t *testing.T) {
 	tests := []testCase{}
 
-	scene1, _ := NewScene(nil, mustPais("3p"), nil, nil, mustPais("3p"), nil, nil)
+	scene1, _ := NewSceneFromParams(nil, mustPais("3p"), nil, nil, mustPais("3p"), nil, nil)
 
 	{
 		tests = append(tests, testCase{
@@ -679,7 +679,7 @@ func TestScene_Evaluate_MatagiSuji(t *testing.T) {
 		})
 	}
 
-	scene2, _ := NewScene(nil, mustPais("2p"), nil, nil, mustPais("2p"), nil, nil)
+	scene2, _ := NewSceneFromParams(nil, mustPais("2p"), nil, nil, mustPais("2p"), nil, nil)
 
 	{
 		tests = append(tests, testCase{
@@ -709,7 +709,7 @@ func TestScene_Evaluate_MatagiSuji(t *testing.T) {
 		})
 	}
 
-	scene3, _ := NewScene(nil, mustPais("3p", "4p"), nil, nil, mustPais("3p"), nil, nil)
+	scene3, _ := NewSceneFromParams(nil, mustPais("3p", "4p"), nil, nil, mustPais("3p"), nil, nil)
 
 	{
 		tests = append(tests, testCase{
@@ -738,7 +738,7 @@ func TestScene_Evaluate_MatagiSuji(t *testing.T) {
 func TestScene_Evaluate_EarlyMatagiSuji(t *testing.T) {
 	tests := []testCase{}
 
-	scene, _ := NewScene(nil, mustPais("3p", "E", "S", "7p", "W"), nil, nil, mustPais("3p", "E", "S", "7p", "W"), nil, nil)
+	scene, _ := NewSceneFromParams(nil, mustPais("3p", "E", "S", "7p", "W"), nil, nil, mustPais("3p", "E", "S", "7p", "W"), nil, nil)
 
 	{
 		tests = append(tests, testCase{
@@ -776,7 +776,7 @@ func TestScene_Evaluate_EarlyMatagiSuji(t *testing.T) {
 func TestScene_Evaluate_LateMatagiSuji(t *testing.T) {
 	tests := []testCase{}
 
-	scene, _ := NewScene(nil, mustPais("3p", "E", "S", "7p", "W"), nil, nil, mustPais("3p", "E", "S", "7p", "W"), nil, nil)
+	scene, _ := NewSceneFromParams(nil, mustPais("3p", "E", "S", "7p", "W"), nil, nil, mustPais("3p", "E", "S", "7p", "W"), nil, nil)
 
 	{
 		tests = append(tests, testCase{
@@ -814,7 +814,7 @@ func TestScene_Evaluate_LateMatagiSuji(t *testing.T) {
 func TestScene_Evaluate_ReachMatagiSuji(t *testing.T) {
 	tests := []testCase{}
 
-	scene, _ := NewScene(nil, mustPais("3p", "E", "S", "7p"), nil, nil, mustPais("3p", "E", "S", "7p"), nil, nil)
+	scene, _ := NewSceneFromParams(nil, mustPais("3p", "E", "S", "7p"), nil, nil, mustPais("3p", "E", "S", "7p"), nil, nil)
 
 	{
 		tests = append(tests, testCase{
@@ -852,7 +852,7 @@ func TestScene_Evaluate_ReachMatagiSuji(t *testing.T) {
 func TestScene_Evaluate_SenkiSuji(t *testing.T) {
 	tests := []testCase{}
 
-	scene, _ := NewScene(nil, mustPais("1p"), nil, nil, mustPais("1p"), nil, nil)
+	scene, _ := NewSceneFromParams(nil, mustPais("1p"), nil, nil, mustPais("1p"), nil, nil)
 
 	{
 		tests = append(tests, testCase{
@@ -900,7 +900,7 @@ func TestScene_Evaluate_SenkiSuji(t *testing.T) {
 func TestScene_Evaluate_VisibleNOrMore(t *testing.T) {
 	tests := []testCase{}
 
-	scene1, _ := NewScene(nil, nil, mustPais("1p", "1p"), nil, nil, nil, nil)
+	scene1, _ := NewSceneFromParams(nil, nil, mustPais("1p", "1p"), nil, nil, nil, nil)
 
 	{
 		tests = append(tests, testCase{
@@ -921,7 +921,7 @@ func TestScene_Evaluate_VisibleNOrMore(t *testing.T) {
 		})
 	}
 
-	scene2, _ := NewScene(nil, nil, mustPais("1p", "1p", "1p"), nil, nil, nil, nil)
+	scene2, _ := NewSceneFromParams(nil, nil, mustPais("1p", "1p", "1p"), nil, nil, nil, nil)
 
 	{
 		tests = append(tests, testCase{
@@ -959,7 +959,7 @@ func TestScene_Evaluate_VisibleNOrMore(t *testing.T) {
 func TestScene_Evaluate_SujiVisible(t *testing.T) {
 	tests := []testCase{}
 
-	scene1, _ := NewScene(nil, nil, mustPais("4p"), nil, nil, nil, nil)
+	scene1, _ := NewSceneFromParams(nil, nil, mustPais("4p"), nil, nil, nil, nil)
 
 	{
 		tests = append(tests, testCase{
@@ -980,7 +980,7 @@ func TestScene_Evaluate_SujiVisible(t *testing.T) {
 		})
 	}
 
-	scene2, _ := NewScene(nil, nil, mustPais("4p", "4p"), nil, nil, nil, nil)
+	scene2, _ := NewSceneFromParams(nil, nil, mustPais("4p", "4p"), nil, nil, nil, nil)
 
 	{
 		tests = append(tests, testCase{

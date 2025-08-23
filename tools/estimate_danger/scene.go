@@ -53,7 +53,7 @@ type Scene struct {
 	evaluators   *evaluators
 }
 
-func NewScene(
+func NewSceneFromParams(
 	tehais, anpais, visibles, doras, prereachSutehais base.Pais,
 	bakaze, targetKaze *base.Pai,
 ) (*Scene, error) {
@@ -109,7 +109,7 @@ func NewScene(
 	return s, nil
 }
 
-func NewSceneWithState(
+func NewScene(
 	gameState game.StateViewer,
 	me *base.Player,
 	dapai *base.Pai,
@@ -127,7 +127,7 @@ func NewSceneWithState(
 		tehais = append(tehais, *dapai)
 	}
 
-	return NewScene(
+	return NewSceneFromParams(
 		tehais,
 		gameState.Anpais(target),
 		gameState.VisiblePais(me),
