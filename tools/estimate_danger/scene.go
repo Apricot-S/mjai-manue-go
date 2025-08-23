@@ -109,15 +109,26 @@ func NewScene(
 	return s, nil
 }
 
-func NewSceneWithState(gameState game.StateViewer, me *base.Player, target *base.Player) (*Scene, error) {
+func NewSceneWithState(
+	gameState game.StateViewer,
+	me *base.Player,
+	dapai *base.Pai,
+	target *base.Player,
+) (*Scene, error) {
 	var prereachSutehais base.Pais = nil
 	if idx := target.ReachSutehaiIndex(); idx != -1 {
 		sutehais := target.Sutehais()
 		prereachSutehais = sutehais[:idx+1]
 	}
 
+	tehais := me.Tehais()
+	if dapai != nil {
+		// Adds dapai because the game object points to the scene after the dapai.
+		tehais = append(tehais, *dapai)
+	}
+
 	return NewScene(
-		me.Tehais(),
+		tehais,
 		gameState.Anpais(target),
 		gameState.VisiblePais(me),
 		gameState.Doras(),

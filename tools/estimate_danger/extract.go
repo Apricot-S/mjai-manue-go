@@ -96,7 +96,7 @@ func extractFeaturesSingle(reader io.Reader, listener Listener) ([]StoredKyoku, 
 					continue
 				}
 
-				scene, err := NewSceneWithState(&state, me, reacher)
+				scene, err := NewSceneWithState(&state, me, &a.Pai, reacher)
 				if err != nil {
 					return nil, err
 				}
