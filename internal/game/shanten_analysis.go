@@ -1,7 +1,6 @@
 package game
 
 import (
-	"fmt"
 	"math"
 	"slices"
 
@@ -63,21 +62,6 @@ var (
 		return m
 	}()
 )
-
-func countPais(ps *base.PaiSet) (int, error) {
-	sum := 0
-	for _, c := range ps {
-		if c < 0 {
-			return 0, fmt.Errorf("negative number of tiles in the PaiSet")
-		}
-		if c > 4 {
-			return 0, fmt.Errorf("more than 4 tiles of the same type in the PaiSet")
-		}
-		sum += c
-	}
-
-	return sum, nil
-}
 
 // AnalyzeShanten calculates the shanten number and the list of Goal for the given PaiSet.
 // When the list of Goal is empty, [InfinityShanten] is returned as the shanten number.

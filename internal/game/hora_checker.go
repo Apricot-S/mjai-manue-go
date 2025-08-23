@@ -6,26 +6,35 @@ import (
 	"github.com/Apricot-S/mjai-manue-go/internal/base"
 )
 
-func IsHoraForm(ps *base.PaiSet) (bool, error) {
+func countPais(ps *base.PaiSet) (int, error) {
 	sum := 0
 	for _, c := range ps {
 		if c < 0 {
-			return false, fmt.Errorf("negative number of tiles in the PaiSet")
+			return 0, fmt.Errorf("negative number of tiles in the PaiSet")
 		}
 		if c > 4 {
-			return false, fmt.Errorf("more than 4 tiles of the same type in the PaiSet")
+			return 0, fmt.Errorf("more than 4 tiles of the same type in the PaiSet")
 		}
 		sum += c
 	}
-	if sum > 14 {
-		return false, fmt.Errorf("too many tiles in hand %d", sum)
+
+	return sum, nil
+}
+
+func IsHoraForm(ps *base.PaiSet) (bool, error) {
+	numPais, err := countPais(ps)
+	if err != nil {
+		return false, err
 	}
-	if sum%3 != 2 {
-		return false, fmt.Errorf("invalid hand length %d", sum)
+	if numPais > 14 {
+		return false, fmt.Errorf("too many tiles in hand %d", numPais)
+	}
+	if numPais%3 != 2 {
+		return false, fmt.Errorf("invalid hand length %d", numPais)
 	}
 
 	ret := isHoraFormGeneral(ps)
-	if sum == 14 {
+	if numPais == 14 {
 		ret = ret || isHoraFormChitoitsu(ps)
 		ret = ret || isHoraFormKokushimuso(ps)
 	}
