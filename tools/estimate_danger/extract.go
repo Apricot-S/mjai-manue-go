@@ -24,7 +24,7 @@ func extractFeaturesSingle(reader io.Reader, listener any) ([]StoredKyoku, error
 	state := game.StateImpl{}
 	var storedKyokus []StoredKyoku
 	var reacher *base.Player = nil
-	var waited base.Pais = nil
+	var waited *base.PaiSet = nil
 	skip := false
 
 	scanner := bufio.NewScanner(reader)
@@ -60,15 +60,31 @@ func extractFeaturesSingle(reader io.Reader, listener any) ([]StoredKyoku, error
 				storedKyokus = append(storedKyokus, *storedKyoku)
 				storedKyoku = nil
 			case *inbound.ReachAccepted:
-				if slices.Contains(excludedPlayers, state.Players()[a.Actor].Name()) || reacher != nil {
+				reacher = &state.Players()[a.Actor]
+				if slices.Contains(excludedPlayers, reacher.Name()) {
+					skip = true
+				}
+				if reacher != nil {
 					skip = true
 				}
 				if skip {
 					continue
 				}
-				reacher = &state.Players()[a.Actor]
+
+				tehaiSet, err := base.NewPaiSet(reacher.Tehais())
+				if err != nil {
+					return nil, err
+				}
+				waited, err = game.GetWaitedPaisAll(tehaiSet)
+				if err != nil {
+					return nil, err
+				}
 			case *inbound.Dahai:
 				me := &state.Players()[a.Actor]
+				if skip || reacher == nil || me.ReachState() == base.ReachAccepted {
+					continue
+				}
+
 				scene, err := NewSceneWithState(&state, me, reacher)
 				if err != nil {
 					return nil, err
@@ -76,8 +92,11 @@ func extractFeaturesSingle(reader io.Reader, listener any) ([]StoredKyoku, error
 
 				storedScene := StoredScene{Candidates: nil}
 				var candidates []CandidateInfo
-				for _, pai := range scene.candidates {
-					hit := slices.Contains(waited, pai)
+				for _, pai := range scene.Candidates() {
+					hit, err := waited.Has(&pai)
+					if err != nil {
+						return nil, err
+					}
 					featureVector, err := scene.FeatureVector(&pai)
 					if err != nil {
 						return nil, err
