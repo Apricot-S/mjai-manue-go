@@ -225,3 +225,5 @@ func (a *MjaiAdapter) EncodeResponse(ev outbound.Event) ([]byte, error) {
 		return nil, fmt.Errorf("unknown event type: %T", ev)
 	}
 }
+
+var Adapter = &MjaiAdapter{}

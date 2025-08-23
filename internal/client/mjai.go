@@ -22,7 +22,6 @@ func NewMjaiClient(reader io.Reader, writer io.Writer, agent agent.Agent) *MjaiC
 }
 
 func (c *MjaiClient) Run() error {
-	adapter := mjai.MjaiAdapter{}
 	decoder := jsontext.NewDecoder(c.reader)
 	var raw jsontext.Value
 
@@ -35,7 +34,7 @@ func (c *MjaiClient) Run() error {
 		}
 		fmt.Fprintf(os.Stderr, "<-\t%s\n", raw)
 
-		events, err := adapter.DecodeMessages(raw)
+		events, err := mjai.Adapter.DecodeMessages(raw)
 		if err != nil {
 			return err
 		}
@@ -45,7 +44,7 @@ func (c *MjaiClient) Run() error {
 			return fmt.Errorf("failed to respond from agent: %w", err)
 		}
 
-		res, err := adapter.EncodeResponse(resEv)
+		res, err := mjai.Adapter.EncodeResponse(resEv)
 		if err != nil {
 			return fmt.Errorf("failed to convert event to message: %w", err)
 		}

@@ -26,8 +26,6 @@ type Listener interface {
 	onDahai(state game.StateViewer, action inbound.Event, reacher *base.Player, candidates []CandidateInfo)
 }
 
-var adapter = mjai.MjaiAdapter{}
-
 const batchSize = 100
 
 var excludedPlayers = []string{"ASAPIN", "（≧▽≦）"}
@@ -46,7 +44,7 @@ func extractFeaturesSingle(reader io.Reader, listener Listener) ([]StoredKyoku, 
 			continue
 		}
 
-		actions, err := adapter.DecodeMessages(line)
+		actions, err := mjai.Adapter.DecodeMessages(line)
 		if err != nil {
 			return nil, fmt.Errorf("failed to decode: %w", err)
 		}

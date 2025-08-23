@@ -30,11 +30,11 @@ func TestNewArchive(t *testing.T) {
 			name: "multiple paths",
 			args: args{
 				paths:   []string{"test1.json", "test1.json.gz"},
-				adapter: &mjai.MjaiAdapter{},
+				adapter: mjai.Adapter,
 			},
 			want: &Archive{
 				paths:   []string{"test1.json", "test1.json.gz"},
-				adapter: &mjai.MjaiAdapter{},
+				adapter: mjai.Adapter,
 				state:   &game.StateImpl{},
 			},
 		},
@@ -42,11 +42,11 @@ func TestNewArchive(t *testing.T) {
 			name: "empty",
 			args: args{
 				paths:   []string{},
-				adapter: &mjai.MjaiAdapter{},
+				adapter: mjai.Adapter,
 			},
 			want: &Archive{
 				paths:   []string{},
-				adapter: &mjai.MjaiAdapter{},
+				adapter: mjai.Adapter,
 				state:   &game.StateImpl{},
 			},
 		},
@@ -54,11 +54,11 @@ func TestNewArchive(t *testing.T) {
 			name: "nil",
 			args: args{
 				paths:   nil,
-				adapter: &mjai.MjaiAdapter{},
+				adapter: mjai.Adapter,
 			},
 			want: &Archive{
 				paths:   nil,
-				adapter: &mjai.MjaiAdapter{},
+				adapter: mjai.Adapter,
 				state:   &game.StateImpl{},
 			},
 		},
@@ -113,7 +113,7 @@ func TestArchive_PlayLight_SingleFile(t *testing.T) {
 	dahai, _ := inbound.NewDahai(0, *pai, true)
 	want := []inbound.Event{tsumo, dahai}
 
-	archive := NewArchive([]string{path}, &mjai.MjaiAdapter{})
+	archive := NewArchive([]string{path}, mjai.Adapter)
 	var got []inbound.Event
 	err := archive.PlayLight(func(act inbound.Event) error {
 		got = append(got, act)
@@ -137,7 +137,7 @@ func TestArchive_PlayLight_GzipFile(t *testing.T) {
 	dahai, _ := inbound.NewDahai(0, *pai, true)
 	want := []inbound.Event{tsumo, dahai}
 
-	archive := NewArchive([]string{path}, &mjai.MjaiAdapter{})
+	archive := NewArchive([]string{path}, mjai.Adapter)
 	var got []inbound.Event
 	err := archive.PlayLight(func(act inbound.Event) error {
 		got = append(got, act)
@@ -159,7 +159,7 @@ func TestArchive_PlayLight_InvalidJSON(t *testing.T) {
 	}
 	path := writeTestFile(t, "broken.json", data)
 
-	archive := NewArchive([]string{path}, &mjai.MjaiAdapter{})
+	archive := NewArchive([]string{path}, mjai.Adapter)
 	err := archive.PlayLight(func(act inbound.Event) error { return nil })
 
 	if err == nil {
@@ -168,7 +168,7 @@ func TestArchive_PlayLight_InvalidJSON(t *testing.T) {
 }
 
 func TestArchive_PlayLight_FileNotFound(t *testing.T) {
-	archive := NewArchive([]string{"/nonexistent/path.json"}, &mjai.MjaiAdapter{})
+	archive := NewArchive([]string{"/nonexistent/path.json"}, mjai.Adapter)
 	err := archive.PlayLight(func(act inbound.Event) error { return nil })
 
 	if err == nil || !strings.Contains(err.Error(), "failed to open") {
@@ -183,7 +183,7 @@ func TestArchive_PlayLight_ErrorInCallback(t *testing.T) {
 	}
 	path := writeTestFile(t, "actions.json", data)
 
-	archive := NewArchive([]string{path}, &mjai.MjaiAdapter{})
+	archive := NewArchive([]string{path}, mjai.Adapter)
 	err := archive.PlayLight(func(act inbound.Event) error {
 		return errors.New("")
 	})

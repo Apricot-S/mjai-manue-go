@@ -213,7 +213,7 @@ func main() {
 	if err != nil {
 		log.Fatalf("error in glob: %v", err)
 	}
-	archive := shared.NewArchive(paths, &mjai.MjaiAdapter{})
+	archive := shared.NewArchive(paths, mjai.Adapter)
 
 	basic := NewBasicCounter()
 	horaPoints := NewHoraPointsCounter()
