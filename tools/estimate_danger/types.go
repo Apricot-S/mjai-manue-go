@@ -1,7 +1,5 @@
 package main
 
-import "github.com/Apricot-S/mjai-manue-go/internal/base"
-
 type MetaData struct {
 	FeatureNames []string
 }
@@ -11,16 +9,10 @@ type StoredKyoku struct {
 }
 
 type StoredScene struct {
-	Candidates []CandidateData
+	Candidates []Candidate
 }
 
-type CandidateData struct {
+type Candidate struct {
 	FeatureVector *BitVector
 	Hit           bool
-}
-
-type CandidateInfo struct {
-	Pai           base.Pai
-	Hit           bool
-	FeatureVector *BitVector
 }

@@ -16,11 +16,21 @@ import (
 	"github.com/schollz/progressbar/v3"
 )
 
+type CandidateInfo struct {
+	Pai           base.Pai
+	Hit           bool
+	FeatureVector *BitVector
+}
+
+type Listener interface {
+	onDahai(state game.StateViewer, action inbound.Event, reacher *base.Player, candidates []CandidateInfo)
+}
+
 var adapter = mjai.MjaiAdapter{}
 
 var excludedPlayers = []string{"ASAPIN", "（≧▽≦）"}
 
-func extractFeaturesSingle(reader io.Reader, listener any) ([]StoredKyoku, error) {
+func extractFeaturesSingle(reader io.Reader, listener Listener) ([]StoredKyoku, error) {
 	state := game.StateImpl{}
 	var storedKyokus []StoredKyoku
 	var reacher *base.Player = nil
@@ -60,10 +70,10 @@ func extractFeaturesSingle(reader io.Reader, listener any) ([]StoredKyoku, error
 				storedKyokus = append(storedKyokus, *storedKyoku)
 				storedKyoku = nil
 			case *inbound.ReachAccepted:
-				reacher = &state.Players()[a.Actor]
-				if slices.Contains(excludedPlayers, reacher.Name()) {
+				if slices.Contains(excludedPlayers, state.Players()[a.Actor].Name()) {
 					skip = true
 				}
+
 				if reacher != nil {
 					skip = true
 				}
@@ -71,6 +81,7 @@ func extractFeaturesSingle(reader io.Reader, listener any) ([]StoredKyoku, error
 					continue
 				}
 
+				reacher = &state.Players()[a.Actor]
 				tehaiSet, err := base.NewPaiSet(reacher.Tehais())
 				if err != nil {
 					return nil, err
@@ -101,11 +112,13 @@ func extractFeaturesSingle(reader io.Reader, listener any) ([]StoredKyoku, error
 					if err != nil {
 						return nil, err
 					}
-					candidate := CandidateData{
+
+					candidate := Candidate{
 						FeatureVector: featureVector,
 						Hit:           hit,
 					}
 					storedScene.Candidates = append(storedScene.Candidates, candidate)
+
 					candidateInfo := CandidateInfo{
 						Pai:           pai,
 						Hit:           hit,
@@ -115,6 +128,10 @@ func extractFeaturesSingle(reader io.Reader, listener any) ([]StoredKyoku, error
 				}
 
 				storedKyoku.Scenes = append(storedKyoku.Scenes, storedScene)
+
+				if listener != nil {
+					listener.onDahai(&state, action, reacher, candidates)
+				}
 			}
 		}
 	}
@@ -179,7 +196,7 @@ func extractFeaturesBatch(
 	return nil
 }
 
-func ExtractFeaturesFromFiles(inputPaths []string, outputPath string, listener any) error {
+func ExtractFeaturesFromFiles(inputPaths []string, outputPath string, listener Listener) error {
 	featureExtractor := func(input io.Reader) ([]StoredKyoku, error) {
 		return extractFeaturesSingle(input, listener)
 	}
