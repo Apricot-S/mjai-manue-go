@@ -4,6 +4,8 @@
 
 Go port of [mjai-manue](https://github.com/gimite/mjai-manue) — a Mahjong AI for the [Mjai Mahjong AI match server](https://gimite.net/pukiwiki/index.php?Mjai%20%E9%BA%BB%E9%9B%80AI%E5%AF%BE%E6%88%A6%E3%82%B5%E3%83%BC%E3%83%90)
 
+[Sample game record of a self-match](https://apricot-s.github.io/mjai-manue-go/)
+
 For more information, see [the original README (Japanese)](https://github.com/gimite/mjai-manue/blob/master/README.md) or [its translation](docs/README-en.md).
 
 ## Differences from Original
