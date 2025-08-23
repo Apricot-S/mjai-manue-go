@@ -28,6 +28,8 @@ type Listener interface {
 
 var adapter = mjai.MjaiAdapter{}
 
+const batchSize = 100
+
 var excludedPlayers = []string{"ASAPIN", "（≧▽≦）"}
 
 func extractFeaturesSingle(reader io.Reader, listener Listener) ([]StoredKyoku, error) {
@@ -177,8 +179,8 @@ func extractFeaturesBatch(
 			return err
 		}
 
-		if i%100 == 99 {
-			// Dump every 100 games
+		if i%batchSize == batchSize-1 {
+			// Dump every batchSize games
 			if err := encoder.Encode(storedKyokus); err != nil {
 				return fmt.Errorf("failed to encode storedKyokus: %w", err)
 			}
