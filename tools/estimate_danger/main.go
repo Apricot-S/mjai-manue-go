@@ -77,7 +77,7 @@ func main() {
 			log.Fatal("-o is missing")
 		}
 
-		if err := ExtractFeaturesFromFiles(paths, opts.Output, nil); err != nil {
+		if err := ExtractFeaturesFromFiles(paths, opts.Output, nil, opts.Verbose); err != nil {
 			log.Fatal(err)
 		}
 	case "single":

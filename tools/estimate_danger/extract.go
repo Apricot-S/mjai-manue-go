@@ -30,7 +30,7 @@ const batchSize = 100
 
 var excludedPlayers = []string{"ASAPIN", "（≧▽≦）"}
 
-func extractFeaturesSingle(reader io.Reader, listener Listener) ([]StoredKyoku, error) {
+func extractFeaturesSingle(reader io.Reader, listener Listener, verbose bool) ([]StoredKyoku, error) {
 	state := game.StateImpl{}
 	var storedKyokus []StoredKyoku
 	var reacher *base.Player = nil
@@ -53,6 +53,10 @@ func extractFeaturesSingle(reader io.Reader, listener Listener) ([]StoredKyoku, 
 		for _, action := range actions {
 			if err := state.Update(action); err != nil {
 				return nil, fmt.Errorf("failed to update state: %w", err)
+			}
+
+			if verbose {
+				// TODO: Encode message
 			}
 
 			switch a := action.(type) {
@@ -101,6 +105,10 @@ func extractFeaturesSingle(reader io.Reader, listener Listener) ([]StoredKyoku, 
 					return nil, err
 				}
 
+				if verbose {
+					fmt.Printf("reacher: %d\n", reacher.ID())
+				}
+
 				storedScene := StoredScene{Candidates: nil}
 				var candidates []CandidateInfo
 				for _, pai := range scene.Candidates() {
@@ -125,6 +133,14 @@ func extractFeaturesSingle(reader io.Reader, listener Listener) ([]StoredKyoku, 
 						FeatureVector: featureVector,
 					}
 					candidates = append(candidates, candidateInfo)
+
+					if verbose {
+						h := 0
+						if hit {
+							h = 1
+						}
+						fmt.Printf("candidate %s: hit=%d, %s\n", pai.ToString(), h, FeatureVectorToStr(featureVector))
+					}
 				}
 
 				storedKyoku.Scenes = append(storedKyoku.Scenes, storedScene)
@@ -196,9 +212,9 @@ func extractFeaturesBatch(
 	return nil
 }
 
-func ExtractFeaturesFromFiles(inputPaths []string, outputPath string, listener Listener) error {
+func ExtractFeaturesFromFiles(inputPaths []string, outputPath string, listener Listener, verbose bool) error {
 	featureExtractor := func(input io.Reader) ([]StoredKyoku, error) {
-		return extractFeaturesSingle(input, listener)
+		return extractFeaturesSingle(input, listener, verbose)
 	}
 
 	f, err := os.Create(outputPath)
