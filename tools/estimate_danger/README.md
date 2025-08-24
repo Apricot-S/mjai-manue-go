@@ -10,28 +10,14 @@ This tool analyzes game logs in Mjai format and generates a decision tree to est
 > Unlike the original implementation, this tool only supports the Mjai format.
 > `mjlog` format is not supported.
 
-## What It Does
-
-(TODO)
-
-## Output
-
-(TODO)
-
-## Usage
-
-With the top-level directory of working tree of this repository as the current directory, run the following command:
-
-```sh
-go run ./tools/estimate_danger <SUB COMMAND> [OPTIONS] <PATH/TO/INPUT_FILES>
-```
-
 ## extract
 
 The `extract` command extracts feature vectors from Mjai format game logs and generates training data for decision tree learning.
 It focuses specifically on **situations where exactly one player has declared Riichi**, analyzing the safety of each tile discarded by the other players.
 
 ### Usage
+
+With the top-level directory of working tree of this repository as the current directory, run the following command:
 
 ```sh
 go run ./tools/estimate_danger extract -o OUTPUT_FILEPATH [OPTIONS] <PATH/TO/INPUT_FILES>
