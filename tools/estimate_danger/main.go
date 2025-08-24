@@ -77,7 +77,12 @@ func main() {
 			log.Fatal("-o is missing")
 		}
 
-		if err := ExtractFeaturesFromFiles(paths, opts.Output, nil, opts.Verbose); err != nil {
+		var listener *DumpListener = nil
+		if opts.Filter != "" {
+			listener = NewDumpListener(opts.Filter)
+		}
+
+		if err := ExtractFeaturesFromFiles(paths, opts.Output, listener, opts.Verbose); err != nil {
 			log.Fatal(err)
 		}
 	case "single":

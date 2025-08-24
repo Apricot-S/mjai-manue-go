@@ -23,7 +23,7 @@ type CandidateInfo struct {
 }
 
 type Listener interface {
-	onDahai(state game.StateViewer, action inbound.Event, reacher *base.Player, candidates []CandidateInfo)
+	OnDahai(state game.StateViewer, action inbound.Event, reacher *base.Player, candidates []CandidateInfo)
 }
 
 const batchSize = 100
@@ -108,7 +108,7 @@ func processActions(actions []inbound.Event, listener Listener, verbose bool) ([
 				current.Scenes = append(current.Scenes, *scene)
 			}
 			if listener != nil && candidates != nil {
-				listener.onDahai(state, action, reacher, candidates)
+				listener.OnDahai(state, action, reacher, candidates)
 			}
 		}
 	}
