@@ -26,12 +26,12 @@ With the top-level directory of working tree of this repository as the current d
 go run ./tools/estimate_danger <SUB COMMAND> [OPTIONS] <PATH/TO/INPUT_FILES>
 ```
 
-### extract
+## extract
 
 The `extract` command extracts feature vectors from Mjai format game logs and generates training data for decision tree learning.
 It focuses specifically on **situations where exactly one player has declared Riichi**, analyzing the safety of each tile discarded by the other players.
 
-#### Usage
+### Usage
 
 ```sh
 go run ./tools/estimate_danger extract -o OUTPUT_FILEPATH [OPTIONS] <PATH/TO/INPUT_FILES>
@@ -46,27 +46,28 @@ Optional Flags
 
 - `-v`  
 Verbose mode (prints feature vectors for each discard candidate to standard output)
-- `-filter`: (TODO)
+- `-filter`  
+(TODO)
 - `-start FILEPATH`  
 Start processing from the specified file
 - -n NUMBER  
 Limit the number of files to process
 
-#### What It Does
+### What It Does
 
 - Identifies discard situations after a Riichi declaration by another player; excludes cases with multiple Riichi declarations
 - Evaluates feature vectors for each discard candidate
 - Determines whether each discard candidate would deal into the Riichi player's hand
 - Stores feature vectors and hit information in `.gob` format
 
-#### Output
+### Output
 
 The output file includes the following information:
 
 - Metadata: List of feature names
 - Candidate Data: Feature vectors and hit information for each discard candidate in each situation
 
-#### Example of Usage
+### Example of Usage
 
 ```sh
 # Basic usage
