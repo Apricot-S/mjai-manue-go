@@ -30,7 +30,13 @@ const batchSize = 100
 
 var excludedPlayers = []string{"ASAPIN", "（≧▽≦）"}
 
-func extractFeaturesSingle(r io.Reader, listener Listener, verbose bool) ([]StoredKyoku, error) {
+func extractFeaturesSingle(inputPath string, listener Listener, verbose bool) ([]StoredKyoku, error) {
+	r, err := os.Open(inputPath)
+	if err != nil {
+		return nil, fmt.Errorf("failed to open input file: %w", err)
+	}
+	defer r.Close()
+
 	lines, err := readAllLines(r)
 	if err != nil {
 		return nil, err
@@ -222,7 +228,7 @@ func onDahai(
 func extractFeaturesBatch(
 	inputPaths []string,
 	writer io.Writer,
-	featureExtractor func(io.Reader) ([]StoredKyoku, error),
+	featureExtractor func(string) ([]StoredKyoku, error),
 ) error {
 	numInputs := len(inputPaths)
 	fmt.Fprintf(os.Stderr, "%d files.\n", numInputs)
@@ -238,17 +244,10 @@ func extractFeaturesBatch(
 	var storedKyokus []StoredKyoku
 
 	for i, path := range inputPaths {
-		r, err := os.Open(path)
-		if err != nil {
-			return fmt.Errorf("failed to open input file: %w", err)
-		}
-
-		storedKyoku, err := featureExtractor(r)
-		r.Close()
+		storedKyoku, err := featureExtractor(path)
 		if err != nil {
 			return fmt.Errorf("error at %s: %w", path, err)
 		}
-
 		storedKyokus = slices.Concat(storedKyokus, storedKyoku)
 
 		if err := bar.Add(1); err != nil {
@@ -275,8 +274,8 @@ func extractFeaturesBatch(
 }
 
 func ExtractFeaturesFromFiles(inputPaths []string, outputPath string, listener Listener, verbose bool) error {
-	featureExtractor := func(input io.Reader) ([]StoredKyoku, error) {
-		return extractFeaturesSingle(input, listener, verbose)
+	featureExtractor := func(inputPath string) ([]StoredKyoku, error) {
+		return extractFeaturesSingle(inputPath, listener, verbose)
 	}
 
 	f, err := os.Create(outputPath)
