@@ -56,7 +56,7 @@ Filter extracted scenes by feature conditions and print only matching candidates
 FILTER_SPEC format: `feature1:1&feature2:0&hit:1` where conditions are joined by `&`, each condition is `key:value`, and values are `1` (true) or `0` (false). Supports any feature name defined in `Scene` struct (e.g., suji, urasuji, visible>=3, dora) plus `hit` for actual deal-in results.
 - `-start FILEPATH`  
 Start processing from the specified file
-- -n NUMBER  
+- `-n NUMBER ` 
 Limit the number of files to process
 
 ### What It Does
