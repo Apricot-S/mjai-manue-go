@@ -34,8 +34,8 @@ Optional Flags
 Verbose mode (prints feature vectors for each discard candidate to standard output)
 - `-filter FILTER_SPEC`  
 Filters extracted scenes by feature conditions and prints only matching candidates to standard output.
-FILTER_SPEC format: `"feature1:1&feature2:0&hit:1"` where conditions are joined by `'&'`, each condition is `"key:value"`, and values are `1` (true) or `0` (false).
-Supports any feature name defined in `Scene` struct (e.g., suji, urasuji, visible>=3, dora) plus `'hit'` for actual deal-in results.
+FILTER_SPEC format: `feature1:1&feature2:0&hit:1` where conditions are joined by `&`, each condition is `key:value`, and values are `1` (true) or `0` (false).
+Supports any feature name defined in `Scene` struct (e.g., suji, urasuji, visible>=3, dora) plus `hit` for actual deal-in results.
 - `-start FILEPATH`  
 Start processing from the specified file
 - -n NUMBER  
