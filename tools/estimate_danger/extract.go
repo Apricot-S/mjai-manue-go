@@ -30,131 +30,193 @@ const batchSize = 100
 
 var excludedPlayers = []string{"ASAPIN", "（≧▽≦）"}
 
-func extractFeaturesSingle(reader io.Reader, listener Listener, verbose bool) ([]StoredKyoku, error) {
-	state := game.StateImpl{}
-	var storedKyokus []StoredKyoku
-	var reacher *base.Player = nil
-	var waited *base.PaiSet = nil
-	skip := false
+func extractFeaturesSingle(r io.Reader, listener Listener, verbose bool) ([]StoredKyoku, error) {
+	lines, err := readAllLines(r)
+	if err != nil {
+		return nil, err
+	}
 
-	scanner := bufio.NewScanner(reader)
-	for scanner.Scan() {
-		line := bytes.TrimSpace(scanner.Bytes())
-		if len(line) == 0 {
-			continue
-		}
-
-		actions, err := mjai.Adapter.DecodeMessages(line)
+	var actions []inbound.Event
+	for _, line := range lines {
+		as, err := mjai.Adapter.DecodeMessages(line)
 		if err != nil {
 			return nil, fmt.Errorf("failed to decode: %w", err)
 		}
+		actions = slices.Concat(actions, as)
+	}
 
-		storedKyoku := &StoredKyoku{Scenes: nil}
-		for _, action := range actions {
-			if err := state.Update(action); err != nil {
-				return nil, fmt.Errorf("failed to update state: %w", err)
-			}
+	storedKyokus, err := processActions(actions, listener, verbose)
+	if err != nil {
+		return nil, err
+	}
+	return storedKyokus, nil
+}
 
-			if verbose {
-				// TODO: Encode message
-			}
-
-			switch a := action.(type) {
-			case *inbound.StartKyoku:
-				storedKyoku.Scenes = nil
-				reacher = nil
-				skip = false
-			case *inbound.EndKyoku:
-				if skip {
-					continue
-				}
-				if storedKyoku == nil {
-					return nil, fmt.Errorf("should not happen")
-				}
-				storedKyokus = append(storedKyokus, *storedKyoku)
-				storedKyoku = nil
-			case *inbound.ReachAccepted:
-				if slices.Contains(excludedPlayers, state.Players()[a.Actor].Name()) {
-					skip = true
-				}
-
-				if reacher != nil {
-					skip = true
-				}
-				if skip {
-					continue
-				}
-
-				reacher = &state.Players()[a.Actor]
-				tehaiSet, err := base.NewPaiSet(reacher.Tehais())
-				if err != nil {
-					return nil, err
-				}
-				waited, err = game.GetWaitedPaisAll(tehaiSet)
-				if err != nil {
-					return nil, err
-				}
-			case *inbound.Dahai:
-				me := &state.Players()[a.Actor]
-				if skip || reacher == nil || me.ReachState() == base.ReachAccepted {
-					continue
-				}
-
-				scene, err := NewScene(&state, me, &a.Pai, reacher)
-				if err != nil {
-					return nil, err
-				}
-
-				if verbose {
-					fmt.Printf("reacher: %d\n", reacher.ID())
-				}
-
-				storedScene := StoredScene{Candidates: nil}
-				var candidates []CandidateInfo
-				for _, pai := range scene.Candidates() {
-					hit, err := waited.Has(&pai)
-					if err != nil {
-						return nil, err
-					}
-					featureVector, err := scene.FeatureVector(&pai)
-					if err != nil {
-						return nil, err
-					}
-
-					candidate := Candidate{
-						FeatureVector: featureVector,
-						Hit:           hit,
-					}
-					storedScene.Candidates = append(storedScene.Candidates, candidate)
-
-					candidateInfo := CandidateInfo{
-						Pai:           pai,
-						Hit:           hit,
-						FeatureVector: featureVector,
-					}
-					candidates = append(candidates, candidateInfo)
-
-					if verbose {
-						h := 0
-						if hit {
-							h = 1
-						}
-						fmt.Printf("candidate %s: hit=%d, %s\n", pai.ToString(), h, FeatureVectorToStr(featureVector))
-					}
-				}
-
-				storedKyoku.Scenes = append(storedKyoku.Scenes, storedScene)
-
-				if listener != nil {
-					listener.onDahai(&state, action, reacher, candidates)
-				}
-			}
+func readAllLines(r io.Reader) ([][]byte, error) {
+	var lines [][]byte
+	scanner := bufio.NewScanner(r)
+	for scanner.Scan() {
+		line := bytes.TrimSpace(scanner.Bytes())
+		if len(line) > 0 {
+			lines = append(lines, bytes.Clone(line))
 		}
 	}
+
 	if err := scanner.Err(); err != nil {
 		return nil, fmt.Errorf("scanner error: %w", err)
 	}
-	return storedKyokus, nil
+
+	return lines, nil
+}
+
+func processActions(actions []inbound.Event, listener Listener, verbose bool) ([]StoredKyoku, error) {
+	state := &game.StateImpl{}
+	var kyokus []StoredKyoku
+	var current *StoredKyoku
+	var reacher *base.Player
+	var waited *base.PaiSet
+	skip := false
+
+	for _, action := range actions {
+		if err := state.Update(action); err != nil {
+			return nil, fmt.Errorf("failed to update state: %w", err)
+		}
+
+		if verbose {
+			// TODO: Log message
+		}
+
+		switch a := action.(type) {
+		case *inbound.StartKyoku:
+			current, reacher, waited, skip = onStartKyoku()
+		case *inbound.EndKyoku:
+			var err error
+			if kyokus, current, err = onEndKyoku(kyokus, current, skip); err != nil {
+				return nil, err
+			}
+		case *inbound.ReachAccepted:
+			var err error
+			if reacher, waited, skip, err = onReachAccepted(a, state, skip, reacher); err != nil {
+				return nil, err
+			}
+		case *inbound.Dahai:
+			scene, candidates, err := onDahai(a, state, skip, reacher, waited, verbose)
+			if err != nil {
+				return nil, err
+			}
+			if scene != nil {
+				current.Scenes = append(current.Scenes, *scene)
+			}
+			if listener != nil && candidates != nil {
+				listener.onDahai(state, action, reacher, candidates)
+			}
+		}
+	}
+	if current != nil {
+		return nil, fmt.Errorf(`game log ended without "end_kyoku"`)
+	}
+	return kyokus, nil
+}
+
+func onStartKyoku() (current *StoredKyoku, reacher *base.Player, waited *base.PaiSet, skip bool) {
+	return &StoredKyoku{Scenes: nil}, nil, nil, false
+}
+
+func onEndKyoku(kyokus []StoredKyoku, current *StoredKyoku, skip bool) ([]StoredKyoku, *StoredKyoku, error) {
+	if current == nil {
+		return nil, nil, fmt.Errorf(`"end_kyoku" exists before "start_kyoku"`)
+	}
+	if skip {
+		return kyokus, nil, nil
+	}
+	kyokus = append(kyokus, *current)
+	return kyokus, nil, nil
+}
+
+func onReachAccepted(
+	action *inbound.ReachAccepted,
+	state game.State,
+	skip bool,
+	reacher *base.Player,
+) (*base.Player, *base.PaiSet, bool, error) {
+	if slices.Contains(excludedPlayers, state.Players()[action.Actor].Name()) {
+		skip = true
+	}
+	if reacher != nil {
+		// Skip if the second player has declared Riichi
+		skip = true
+	}
+	if skip {
+		return reacher, nil, true, nil
+	}
+
+	reacher = &state.Players()[action.Actor]
+	tehaiSet, err := base.NewPaiSet(reacher.Tehais())
+	if err != nil {
+		return nil, nil, false, err
+	}
+	waited, err := game.GetWaitedPaisAll(tehaiSet)
+	if err != nil {
+		return nil, nil, false, err
+	}
+	return reacher, waited, false, nil
+}
+
+func onDahai(
+	action *inbound.Dahai,
+	state game.State,
+	skip bool,
+	reacher *base.Player,
+	waited *base.PaiSet,
+	verbose bool,
+) (*StoredScene, []CandidateInfo, error) {
+	me := &state.Players()[action.Actor]
+	if skip || reacher == nil || me.ReachState() == base.ReachAccepted {
+		// Skip if:
+		// - No player has declared Riichi
+		// - Dahai by the Riichi declarer itself
+		return nil, nil, nil
+	}
+
+	scene, err := NewScene(state, me, &action.Pai, reacher)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	if verbose {
+		fmt.Printf("reacher: %d\n", reacher.ID())
+	}
+
+	storedScene := &StoredScene{Candidates: nil}
+	var candidates []CandidateInfo
+	for _, pai := range scene.Candidates() {
+		hit, err := waited.Has(&pai)
+		if err != nil {
+			return nil, nil, err
+		}
+		feature, err := scene.FeatureVector(&pai)
+		if err != nil {
+			return nil, nil, err
+		}
+		storedScene.Candidates = append(storedScene.Candidates, Candidate{
+			FeatureVector: feature,
+			Hit:           hit,
+		})
+		candidates = append(candidates, CandidateInfo{
+			Pai:           pai,
+			Hit:           hit,
+			FeatureVector: feature,
+		})
+
+		if verbose {
+			h := 0
+			if hit {
+				h = 1
+			}
+			fmt.Printf("candidate %s: hit=%d, %s\n", pai.ToString(), h, FeatureVectorToStr(feature))
+		}
+	}
+	return storedScene, candidates, nil
 }
 
 func extractFeaturesBatch(
