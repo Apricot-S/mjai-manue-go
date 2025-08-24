@@ -244,11 +244,11 @@ func extractFeaturesBatch(
 	var storedKyokus []StoredKyoku
 
 	for i, path := range inputPaths {
-		storedKyoku, err := featureExtractor(path)
+		sks, err := featureExtractor(path)
 		if err != nil {
 			return fmt.Errorf("error at %s: %w", path, err)
 		}
-		storedKyokus = slices.Concat(storedKyokus, storedKyoku)
+		storedKyokus = slices.Concat(storedKyokus, sks)
 
 		if err := bar.Add(1); err != nil {
 			return err
