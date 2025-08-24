@@ -23,7 +23,7 @@ type CandidateInfo struct {
 }
 
 type Listener interface {
-	OnDahai(state game.StateViewer, action inbound.Event, reacher *base.Player, candidates []CandidateInfo)
+	OnDahai(path string, state game.StateViewer, action inbound.Event, reacher *base.Player, candidates []CandidateInfo)
 }
 
 const batchSize = 100
@@ -51,7 +51,7 @@ func extractFeaturesSingle(inputPath string, listener Listener, verbose bool) ([
 		actions = slices.Concat(actions, as)
 	}
 
-	storedKyokus, err := processActions(actions, listener, verbose)
+	storedKyokus, err := processActions(inputPath, actions, listener, verbose)
 	if err != nil {
 		return nil, err
 	}
@@ -75,7 +75,7 @@ func readAllLines(r io.Reader) ([][]byte, error) {
 	return lines, nil
 }
 
-func processActions(actions []inbound.Event, listener Listener, verbose bool) ([]StoredKyoku, error) {
+func processActions(path string, actions []inbound.Event, listener Listener, verbose bool) ([]StoredKyoku, error) {
 	state := &game.StateImpl{}
 	var kyokus []StoredKyoku
 	var current *StoredKyoku
@@ -114,7 +114,7 @@ func processActions(actions []inbound.Event, listener Listener, verbose bool) ([
 				current.Scenes = append(current.Scenes, *scene)
 			}
 			if listener != nil && candidates != nil {
-				listener.OnDahai(state, action, reacher, candidates)
+				listener.OnDahai(path, state, action, reacher, candidates)
 			}
 		}
 	}

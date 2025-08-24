@@ -26,6 +26,7 @@ func NewDumpListener(filterSpec string) *DumpListener {
 }
 
 func (dl *DumpListener) OnDahai(
+	path string,
 	state game.StateViewer,
 	action inbound.Event,
 	reacher *base.Player,
@@ -42,7 +43,7 @@ func (dl *DumpListener) OnDahai(
 		return
 	}
 
-	// fmt.Println(state.Path())
+	fmt.Println(path)
 	// state.DumpAction(action)
 	fmt.Printf("reacher: %d\n", reacher.ID())
 	for _, cand := range cands {
