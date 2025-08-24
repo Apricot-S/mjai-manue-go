@@ -45,7 +45,7 @@ go run ./tools/estimate_danger extract -o OUTPUT_FILEPATH [options...] <PATH/TO/
 Required Option
 
 - `-o OUTPUT_FILEPATH`  
-Path to the output file for the extracted feature data (in `.gob` format)
+Path to the output file for the extracted feature data (in gob format)
 
 Optional Flags
 
@@ -56,7 +56,7 @@ Filter extracted scenes by feature conditions and print only matching candidates
 FILTER_SPEC format: `feature1:1&feature2:0&hit:1` where conditions are joined by `&`, each condition is `key:value`, and values are `1` (true) or `0` (false). Supports any feature name defined in `Scene` struct (e.g., suji, urasuji, visible>=3, dora) plus `hit` for actual deal-in results.
 - `-start FILEPATH`  
 Start processing from the specified file
-- `-n NUMBER ` 
+- `-n NUMBER`  
 Limit the number of files to process
 
 ### What It Does
@@ -64,11 +64,11 @@ Limit the number of files to process
 - Identifies discard situations after a Riichi declaration by another player; excludes cases with multiple Riichi declarations
 - Evaluates feature vectors for each discard candidate
 - Determines whether each discard candidate would deal into the Riichi player's hand
-- Stores feature vectors and deal-in information in `.gob` format
+- Stores feature vectors and deal-in information in gob format
 
 ### Output
 
-The tool outputs a binary GOB-encoded file containing:
+The tool outputs a binary gob-encoded file containing:
 
 - Metadata: List of feature names
 - Candidate Data: Feature vectors and deal-in information for each discard candidate in each situation
