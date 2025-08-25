@@ -1,7 +1,6 @@
 package base
 
 import (
-	"fmt"
 	"reflect"
 	"testing"
 )
@@ -499,45 +498,6 @@ func TestPaiSet_RemovePaiSet(t *testing.T) {
 
 			if !reflect.DeepEqual(ps, tt.want) {
 				t.Errorf("removed = %v, want %v", ps, tt.want)
-			}
-		})
-	}
-}
-
-func TestPaiSet_ToString(t *testing.T) {
-	type fields struct {
-		array [NumIDs]int
-	}
-	type testCase struct {
-		name   string
-		fields fields
-		want   string
-	}
-	tests := []testCase{}
-
-	tests = append(tests, testCase{"empty", fields{[NumIDs]int{}}, ""})
-
-	for i := range uint8(NumIDs) {
-		array := [NumIDs]int{}
-		array[i] = 1
-		p, _ := NewPaiWithID(i)
-		want := p.ToString()
-		tests = append(tests, testCase{want, fields{array}, want})
-	}
-
-	for i := range uint8(NumIDs) {
-		array := [NumIDs]int{}
-		array[i] = 2
-		p, _ := NewPaiWithID(i)
-		want := fmt.Sprintf("%s %s", p.ToString(), p.ToString())
-		tests = append(tests, testCase{want, fields{array}, want})
-	}
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			ps := PaiSet(tt.fields.array)
-			if got := ps.ToString(); got != tt.want {
-				t.Errorf("PaiSet.ToString() = %v, want %v", got, tt.want)
 			}
 		})
 	}

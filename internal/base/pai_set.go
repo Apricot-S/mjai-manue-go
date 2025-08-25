@@ -81,7 +81,3 @@ func (ps *PaiSet) RemovePaiSet(paiSet *PaiSet) {
 		ps[i] -= c
 	}
 }
-
-func (ps *PaiSet) ToString() string {
-	return PaisToStr(ps.ToPais())
-}
