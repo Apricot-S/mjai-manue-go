@@ -23,14 +23,22 @@ type CandidateInfo struct {
 }
 
 type Listener interface {
-	OnDahai(path string, state game.StateViewer, action inbound.Event, reacher *base.Player, candidates []CandidateInfo)
+	OnDahai(
+		logger io.Writer,
+		state game.StateViewer,
+		action inbound.Event,
+		reacher *base.Player,
+		candidates []CandidateInfo,
+		path string,
+		rawAction []byte,
+	)
 }
 
 const batchSize = 100
 
 var excludedPlayers = []string{"ASAPIN", "（≧▽≦）"}
 
-func extractFeaturesSingle(inputPath string, listener Listener, verbose bool) ([]StoredKyoku, error) {
+func extractFeaturesSingle(inputPath string, listener Listener, verbose bool, logger io.Writer) ([]StoredKyoku, error) {
 	r, err := os.Open(inputPath)
 	if err != nil {
 		return nil, fmt.Errorf("failed to open input file: %w", err)
@@ -51,7 +59,7 @@ func extractFeaturesSingle(inputPath string, listener Listener, verbose bool) ([
 		actions = slices.Concat(actions, as)
 	}
 
-	storedKyokus, err := processActions(inputPath, actions, listener, verbose)
+	storedKyokus, err := processActions(actions, listener, verbose, logger, inputPath, lines)
 	if err != nil {
 		return nil, err
 	}
@@ -75,7 +83,14 @@ func readAllLines(r io.Reader) ([][]byte, error) {
 	return lines, nil
 }
 
-func processActions(path string, actions []inbound.Event, listener Listener, verbose bool) ([]StoredKyoku, error) {
+func processActions(
+	actions []inbound.Event,
+	listener Listener,
+	verbose bool,
+	logger io.Writer,
+	path string,
+	rawActions [][]byte,
+) ([]StoredKyoku, error) {
 	state := &game.StateImpl{}
 	var kyokus []StoredKyoku
 	var current *StoredKyoku
@@ -83,13 +98,15 @@ func processActions(path string, actions []inbound.Event, listener Listener, ver
 	var waited *base.PaiSet
 	skip := false
 
-	for _, action := range actions {
+	for i, action := range actions {
 		if err := state.Update(action); err != nil {
 			return nil, fmt.Errorf("failed to update state: %w", err)
 		}
 
 		if verbose {
-			// TODO: Log message
+			logger.Write(rawActions[i])
+			fmt.Fprintln(logger)
+			// io.print(render_board())
 		}
 
 		switch a := action.(type) {
@@ -106,7 +123,7 @@ func processActions(path string, actions []inbound.Event, listener Listener, ver
 				return nil, err
 			}
 		case *inbound.Dahai:
-			scene, candidates, err := onDahai(a, state, skip, reacher, waited, verbose)
+			scene, candidates, err := onDahai(a, state, skip, reacher, waited, verbose, logger)
 			if err != nil {
 				return nil, err
 			}
@@ -114,7 +131,7 @@ func processActions(path string, actions []inbound.Event, listener Listener, ver
 				current.Scenes = append(current.Scenes, *scene)
 			}
 			if listener != nil && candidates != nil {
-				listener.OnDahai(path, state, action, reacher, candidates)
+				listener.OnDahai(logger, state, action, reacher, candidates, path, rawActions[i])
 			}
 		}
 	}
@@ -175,6 +192,7 @@ func onDahai(
 	reacher *base.Player,
 	waited *base.PaiSet,
 	verbose bool,
+	logger io.Writer,
 ) (*StoredScene, []CandidateInfo, error) {
 	me := &state.Players()[action.Actor]
 	if skip || reacher == nil || me.ReachState() == base.ReachAccepted {
@@ -190,7 +208,7 @@ func onDahai(
 	}
 
 	if verbose {
-		fmt.Printf("reacher: %d\n", reacher.ID())
+		fmt.Fprintf(logger, "reacher: %d\n", reacher.ID())
 	}
 
 	storedScene := &StoredScene{Candidates: nil}
@@ -219,7 +237,7 @@ func onDahai(
 			if hit {
 				h = 1
 			}
-			fmt.Printf("candidate %s: hit=%d, %s\n", pai.ToString(), h, FeatureVectorToStr(feature))
+			fmt.Fprintf(logger, "candidate %s: hit=%d, %s\n", pai.ToString(), h, FeatureVectorToStr(feature))
 		}
 	}
 	return storedScene, candidates, nil
@@ -273,9 +291,15 @@ func extractFeaturesBatch(
 	return nil
 }
 
-func ExtractFeaturesFromFiles(inputPaths []string, outputPath string, listener Listener, verbose bool) error {
+func ExtractFeaturesFromFiles(
+	inputPaths []string,
+	outputPath string,
+	listener Listener,
+	verbose bool,
+	logger io.Writer,
+) error {
 	featureExtractor := func(inputPath string) ([]StoredKyoku, error) {
-		return extractFeaturesSingle(inputPath, listener, verbose)
+		return extractFeaturesSingle(inputPath, listener, verbose, logger)
 	}
 
 	f, err := os.Create(outputPath)

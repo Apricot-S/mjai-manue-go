@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bufio"
 	"flag"
 	"fmt"
 	"log"
@@ -77,12 +78,15 @@ func main() {
 			log.Fatal("-o is missing")
 		}
 
-		var listener *DumpListener = nil
+		var listener Listener = nil
 		if opts.Filter != "" {
 			listener = NewDumpListener(opts.Filter)
 		}
 
-		if err := ExtractFeaturesFromFiles(paths, opts.Output, listener, opts.Verbose); err != nil {
+		w := bufio.NewWriter(os.Stdout)
+		defer w.Flush()
+
+		if err := ExtractFeaturesFromFiles(paths, opts.Output, listener, opts.Verbose, w); err != nil {
 			log.Fatal(err)
 		}
 	case "single":
