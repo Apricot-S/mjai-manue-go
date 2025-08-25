@@ -680,14 +680,15 @@ func TestPaisToStr(t *testing.T) {
 
 	// 1 pai
 	for _, name := range allNames {
+		names := fmt.Sprintf("%-3s", name)
 		pai, _ := NewPaiWithName(name)
 		pais := []Pai{*pai}
-		tests = append(tests, testCase{name, args{pais}, name})
+		tests = append(tests, testCase{name, args{pais}, names})
 	}
 
 	// 2 pais
 	for _, name := range allNames {
-		names := fmt.Sprintf("%s %s", name, name)
+		names := fmt.Sprintf("%-3s%-3s", name, name)
 		pai, _ := NewPaiWithName(name)
 		pais := []Pai{*pai, *pai}
 		tests = append(tests, testCase{names, args{pais}, names})

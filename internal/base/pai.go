@@ -254,9 +254,9 @@ func (p *Pai) ToString() string {
 func PaisToStr(pais []Pai) string {
 	var strs []string
 	for _, p := range pais {
-		strs = append(strs, p.ToString())
+		strs = append(strs, fmt.Sprintf("%-3s", p.ToString()))
 	}
-	return strings.Join(strs, " ")
+	return strings.Join(strs, "")
 }
 
 func StrToPais(str string) ([]Pai, error) {
