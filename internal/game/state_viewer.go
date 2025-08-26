@@ -119,17 +119,66 @@ func (s *StateImpl) RankedPlayers() [NumPlayers]base.Player {
 }
 
 func (s *StateImpl) RenderBoard() string {
-	var b strings.Builder
-	for _, p := range s.players {
-		fmt.Fprintf(
-			&b,
-			`[%d] tehai: %s
-       ho: %s
+	// TODO: start_gameのときはほとんど出力させない
+	var sb strings.Builder
 
-`,
-			p.ID(),
-			base.PaisToStr(p.Tehais()),
-			base.PaisToStr(p.Ho()))
+	sb.WriteString(fmt.Sprintf("%s-%d kyoku %d honba  ", s.Bakaze().ToString(), s.KyokuNum(), s.Honba()))
+	sb.WriteString(fmt.Sprintf("pipai: %d  ", s.NumPipais()))
+
+	doraMarkers := slices.Collect(func(yield func(string) bool) {
+		for _, d := range s.DoraMarkers() {
+			if !yield(d.ToString()) {
+				return
+			}
+		}
+	})
+	sb.WriteString(fmt.Sprintf("dora_marker: %s  ", strings.Join(doraMarkers, " ")))
+
+	sb.WriteString("\n")
+
+	oyaID := s.Oya().ID()
+	for i, player := range s.Players() {
+		var actorMark string
+		if player.ID() == s.lastActor {
+			actorMark = "*"
+		} else {
+			actorMark = " "
+		}
+
+		var playerNum string
+		if player.ID() == oyaID {
+			playerNum = fmt.Sprintf("{%d}", i)
+		} else {
+			playerNum = fmt.Sprintf("[%d]", i)
+		}
+
+		var furoStrs []string
+		// furoStrs := slices.Collect(func(yield func(string) bool) {
+		// 	for _, f := range player.Furos() {
+		// 		if !yield(f.ToString()) {
+		// 			return
+		// 		}
+		// 	}
+		// })
+
+		sb.WriteString(fmt.Sprintf(
+			"%s%s tehai: %s %s\n",
+			actorMark, playerNum, base.PaisToStr(player.Tehais()), strings.Join(furoStrs, " "),
+		))
+
+		var hoStr string
+		reachHoIndex := player.ReachHoIndex()
+		ho := player.Ho()
+		if reachHoIndex >= 0 {
+			// If the player has declared Riichi, insert "=" just before the Riichi declaration tile.
+			hoStr = base.PaisToStr(ho[:reachHoIndex]) + "=" + base.PaisToStr(ho[reachHoIndex:])
+		} else {
+			hoStr = base.PaisToStr(ho)
+		}
+		sb.WriteString(fmt.Sprintf("     ho:    %s\n", hoStr))
 	}
-	return b.String()
+
+	sb.WriteString(strings.Repeat("-", 80))
+	sb.WriteString("\n")
+	return sb.String()
 }
