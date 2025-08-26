@@ -49,7 +49,7 @@ func (dl *DumpListener) OnDahai(
 	fmt.Fprintln(logger, path)
 	logger.Write(rawAction)
 	fmt.Fprintln(logger)
-	// io.print(render_board())
+	fmt.Fprint(logger, state.RenderBoard())
 	fmt.Fprintf(logger, "reacher: %d\n", reacher.ID())
 	for _, cand := range cands {
 		h := 0

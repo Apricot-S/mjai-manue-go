@@ -106,7 +106,7 @@ func processActions(
 		if verbose {
 			logger.Write(rawActions[i])
 			fmt.Fprintln(logger)
-			// io.print(render_board())
+			fmt.Fprint(logger, state.RenderBoard())
 		}
 
 		switch a := action.(type) {
