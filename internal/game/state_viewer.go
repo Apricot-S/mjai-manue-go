@@ -152,14 +152,13 @@ func (s *StateImpl) RenderBoard() string {
 			playerNum = fmt.Sprintf("[%d]", i)
 		}
 
-		var furoStrs []string
-		// furoStrs := slices.Collect(func(yield func(string) bool) {
-		// 	for _, f := range player.Furos() {
-		// 		if !yield(f.ToString()) {
-		// 			return
-		// 		}
-		// 	}
-		// })
+		furoStrs := slices.Collect(func(yield func(string) bool) {
+			for _, f := range player.Furos() {
+				if !yield(f.ToString()) {
+					return
+				}
+			}
+		})
 
 		sb.WriteString(fmt.Sprintf(
 			"%s%s tehai: %s %s\n",

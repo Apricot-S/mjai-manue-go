@@ -3,6 +3,7 @@ package base
 import (
 	"fmt"
 	"sort"
+	"strings"
 )
 
 type Furo interface {
@@ -11,6 +12,7 @@ type Furo interface {
 	Target() *int
 	Pais() []Pai
 	ToMentsu() Mentsu
+	ToString() string
 }
 
 type Chi struct {
@@ -56,6 +58,10 @@ func (c *Chi) ToMentsu() Mentsu {
 	return NewShuntsu(c.pais[0], c.pais[1], c.pais[2])
 }
 
+func (c *Chi) ToString() string {
+	return furoToString(c)
+}
+
 type Pon struct {
 	taken    Pai
 	consumed [2]Pai
@@ -97,6 +103,10 @@ func (p *Pon) Pais() []Pai {
 
 func (p *Pon) ToMentsu() Mentsu {
 	return NewKotsu(p.pais[0], p.pais[1], p.pais[2])
+}
+
+func (p *Pon) ToString() string {
+	return furoToString(p)
 }
 
 type Daiminkan struct {
@@ -142,6 +152,10 @@ func (d *Daiminkan) ToMentsu() Mentsu {
 	return NewKantsu(d.pais[0], d.pais[1], d.pais[2], d.pais[3])
 }
 
+func (d *Daiminkan) ToString() string {
+	return furoToString(d)
+}
+
 type Ankan struct {
 	consumed [4]Pai
 	pais     []Pai
@@ -175,6 +189,10 @@ func (a *Ankan) Pais() []Pai {
 
 func (a *Ankan) ToMentsu() Mentsu {
 	return NewKantsu(a.pais[0], a.pais[1], a.pais[2], a.pais[3])
+}
+
+func (a *Ankan) ToString() string {
+	return fmt.Sprintf("[# %s %s #]", a.consumed[0].ToString(), a.consumed[1].ToString())
 }
 
 type Kakan struct {
@@ -249,6 +267,20 @@ func (k *Kakan) Pais() []Pai {
 
 func (k *Kakan) ToMentsu() Mentsu {
 	return NewKantsu(k.pais[0], k.pais[1], k.pais[2], k.pais[3])
+}
+
+func (k *Kakan) ToString() string {
+	consumedStrs := []string{k.consumed[0].ToString(), k.consumed[1].ToString(), k.added.ToString()}
+	return fmt.Sprintf("[%s(%d)/%s]", k.Taken().ToString(), *k.Target(), strings.Join(consumedStrs, " "))
+}
+
+func furoToString(f Furo) string {
+	consumedStrs := make([]string, len(f.Consumed()))
+	for i, pai := range f.Consumed() {
+		consumedStrs[i] = pai.ToString()
+	}
+
+	return fmt.Sprintf("[%s(%d)/%s]", f.Taken().ToString(), *f.Target(), strings.Join(consumedStrs, " "))
 }
 
 func IsKuikae(furo Furo, dahai *Pai) bool {
