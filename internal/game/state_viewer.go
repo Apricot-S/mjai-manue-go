@@ -3,8 +3,8 @@ package game
 import (
 	"cmp"
 	"fmt"
-	"os"
 	"slices"
+	"strings"
 
 	"github.com/Apricot-S/mjai-manue-go/internal/base"
 )
@@ -118,10 +118,11 @@ func (s *StateImpl) RankedPlayers() [NumPlayers]base.Player {
 	return players
 }
 
-func (s *StateImpl) Print() {
+func (s *StateImpl) Print() string {
+	var b strings.Builder
 	for _, p := range s.players {
 		fmt.Fprintf(
-			os.Stderr,
+			&b,
 			`[%d] tehai: %s
        ho: %s
 
@@ -130,4 +131,5 @@ func (s *StateImpl) Print() {
 			base.PaisToStr(p.Tehais()),
 			base.PaisToStr(p.Ho()))
 	}
+	return b.String()
 }

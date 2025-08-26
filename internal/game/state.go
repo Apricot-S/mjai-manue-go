@@ -50,7 +50,7 @@ type StateViewer interface {
 	Turn() float64
 	RankedPlayers() [NumPlayers]base.Player
 
-	Print()
+	Print() string
 }
 
 // StateUpdater is an interface for updating the game state.
