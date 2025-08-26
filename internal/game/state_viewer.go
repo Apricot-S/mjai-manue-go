@@ -118,7 +118,7 @@ func (s *StateImpl) RankedPlayers() [NumPlayers]base.Player {
 	return players
 }
 
-func (s *StateImpl) Print() string {
+func (s *StateImpl) RenderBoard() string {
 	var b strings.Builder
 	for _, p := range s.players {
 		fmt.Fprintf(

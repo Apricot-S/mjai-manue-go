@@ -141,7 +141,7 @@ func (s *MockState) NumPipais() int                { panic("not implemented") }
 func (s *MockState) NextKyoku() (*base.Pai, int)   { panic("not implemented") }
 func (s *MockState) Turn() float64                 { panic("not implemented") }
 func (s *MockState) RankedPlayers() [4]base.Player { panic("not implemented") }
-func (s *MockState) Print() string                 { panic("not implemented") }
+func (s *MockState) RenderBoard() string           { panic("not implemented") }
 
 func TestScene_Evaluate(t *testing.T) {
 	type args struct {

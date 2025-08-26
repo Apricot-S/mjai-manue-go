@@ -58,7 +58,7 @@ func (a *AIAgent) Respond(events []inbound.Event) (outbound.Event, error) {
 			return nil, fmt.Errorf("failed to update state: %w", err)
 		}
 	}
-	fmt.Fprint(os.Stderr, a.state.Print())
+	fmt.Fprint(os.Stderr, a.state.RenderBoard())
 
 	// Ask AI for decision
 	action, err := a.ai.DecideAction(a.state, a.playerID)
