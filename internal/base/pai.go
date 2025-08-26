@@ -252,11 +252,11 @@ func (p *Pai) ToString() string {
 }
 
 func PaisToStr(pais []Pai) string {
-	var strs []string
+	var b strings.Builder
 	for _, p := range pais {
-		strs = append(strs, fmt.Sprintf("%-3s", p.ToString()))
+		fmt.Fprintf(&b, "%-3s", p.ToString())
 	}
-	return strings.Join(strs, "")
+	return b.String()
 }
 
 func StrToPais(str string) ([]Pai, error) {
