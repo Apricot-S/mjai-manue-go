@@ -2,6 +2,7 @@ package agent
 
 import (
 	"fmt"
+	"os"
 
 	"github.com/Apricot-S/mjai-manue-go/internal/ai"
 	"github.com/Apricot-S/mjai-manue-go/internal/game"
@@ -57,7 +58,7 @@ func (a *AIAgent) Respond(events []inbound.Event) (outbound.Event, error) {
 			return nil, fmt.Errorf("failed to update state: %w", err)
 		}
 	}
-	a.state.Print()
+	fmt.Fprint(os.Stderr, a.state.Print())
 
 	// Ask AI for decision
 	action, err := a.ai.DecideAction(a.state, a.playerID)
