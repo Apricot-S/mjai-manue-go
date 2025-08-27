@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"github.com/Apricot-S/mjai-manue-go/internal/base"
+	"github.com/Apricot-S/mjai-manue-go/internal/game/event/inbound"
 )
 
 func (s *StateImpl) Players() *[NumPlayers]base.Player {
@@ -119,8 +120,14 @@ func (s *StateImpl) RankedPlayers() [NumPlayers]base.Player {
 }
 
 func (s *StateImpl) RenderBoard() string {
-	// TODO: start_gameのときはほとんど出力させない
 	var sb strings.Builder
+
+	if _, ok := s.currentEvent.(*inbound.StartGame); ok {
+		sb.WriteString("\n")
+		sb.WriteString(strings.Repeat("-", 80))
+		sb.WriteString("\n")
+		return sb.String()
+	}
 
 	sb.WriteString(fmt.Sprintf("%s-%d kyoku %d honba  ", s.Bakaze().ToString(), s.KyokuNum(), s.Honba()))
 	sb.WriteString(fmt.Sprintf("pipai: %d  ", s.NumPipais()))

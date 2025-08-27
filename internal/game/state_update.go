@@ -12,10 +12,10 @@ var east, _ = base.NewPaiWithName("E")
 func (s *StateImpl) Update(event inbound.Event) error {
 	switch e := event.(type) {
 	case *inbound.StartGame:
-		s.currentEvent = e
+		s.currentEvent = event
 		return s.onStartGame(e)
 	case *inbound.EndKyoku, *inbound.EndGame:
-		// For game records only
+		s.currentEvent = event
 		return nil
 	}
 
@@ -90,7 +90,6 @@ func (s *StateImpl) onStartGame(event *inbound.StartGame) error {
 
 	s.prevDahaiActor = noActor
 	s.prevDahaiPai = nil
-	s.currentEvent = nil
 	s.lastActor = noActor
 	s.lastAction = nil
 	s.kanCount = 0
