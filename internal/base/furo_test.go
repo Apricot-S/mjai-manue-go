@@ -490,6 +490,154 @@ func TestKakan_ToMentsu(t *testing.T) {
 	}
 }
 
+func TestChi_ToString(t *testing.T) {
+	type testCase struct {
+		name string
+		meld *Chi
+		want string
+	}
+	tests := []testCase{}
+
+	{
+		t, _ := NewPaiWithName("1m")
+		c0, _ := NewPaiWithName("2m")
+		c1, _ := NewPaiWithName("3m")
+		meld, _ := NewChi(*t, [2]Pai{*c0, *c1}, 0)
+		tests = append(tests, testCase{
+			name: "Chi 1m-2m3m from 0",
+			meld: meld,
+			want: "[1m(0)/2m 3m]",
+		})
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := tt.meld.ToString(); got != tt.want {
+				t.Errorf("Chi.ToString() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestPon_ToString(t *testing.T) {
+	type testCase struct {
+		name string
+		meld *Pon
+		want string
+	}
+	tests := []testCase{}
+
+	{
+		t, _ := NewPaiWithName("5p")
+		c0, _ := NewPaiWithName("5p")
+		c1, _ := NewPaiWithName("5pr")
+		meld, _ := NewPon(*t, [2]Pai{*c0, *c1}, 1)
+		tests = append(tests, testCase{
+			name: "Pon 5p-5p5pr from 1",
+			meld: meld,
+			want: "[5p(1)/5p 5pr]",
+		})
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := tt.meld.ToString(); got != tt.want {
+				t.Errorf("Pon.ToString() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestDaiminkan_ToString(t *testing.T) {
+	type testCase struct {
+		name string
+		meld *Daiminkan
+		want string
+	}
+	tests := []testCase{}
+
+	{
+		t, _ := NewPaiWithName("5p")
+		c0, _ := NewPaiWithName("5p")
+		c1, _ := NewPaiWithName("5p")
+		c2, _ := NewPaiWithName("5pr")
+		meld, _ := NewDaiminkan(*t, [3]Pai{*c0, *c1, *c2}, 3)
+		tests = append(tests, testCase{
+			name: "Daiminkan 5p-5p5p5pr from 3",
+			meld: meld,
+			want: "[5p(3)/5p 5p 5pr]",
+		})
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := tt.meld.ToString(); got != tt.want {
+				t.Errorf("Daiminkan.ToString() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestAnkan_ToString(t *testing.T) {
+	type testCase struct {
+		name string
+		meld *Ankan
+		want string
+	}
+	tests := []testCase{}
+
+	{
+		c0, _ := NewPaiWithName("5pr")
+		c1, _ := NewPaiWithName("5p")
+		c2, _ := NewPaiWithName("5p")
+		c3, _ := NewPaiWithName("5p")
+		meld, _ := NewAnkan([4]Pai{*c0, *c1, *c2, *c3})
+		tests = append(tests, testCase{
+			name: "Ankan 5pr5p5p5p",
+			meld: meld,
+			want: "[# 5pr 5p #]",
+		})
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := tt.meld.ToString(); got != tt.want {
+				t.Errorf("Ankan.ToString() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestKakan_ToString(t *testing.T) {
+	type testCase struct {
+		name string
+		meld *Kakan
+		want string
+	}
+	tests := []testCase{}
+
+	{
+		t, _ := NewPaiWithName("5pr")
+		c0, _ := NewPaiWithName("5p")
+		c1, _ := NewPaiWithName("5p")
+		a, _ := NewPaiWithName("5p")
+		meld, _ := NewKakan(*t, [2]Pai{*c0, *c1}, *a, 3)
+		tests = append(tests, testCase{
+			name: "Kakan 5p-5p5p5pr from 3",
+			meld: meld,
+			want: "[5pr(3)/5p 5p 5p]",
+		})
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := tt.meld.ToString(); got != tt.want {
+				t.Errorf("Kakan.ToString() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
 func TestIsKuikae(t *testing.T) {
 	type args struct {
 		furo  Furo
