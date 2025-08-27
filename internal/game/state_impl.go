@@ -15,6 +15,7 @@ type StateImpl struct {
 	doraMarkers []base.Pai
 	numPipais   int
 
+	isInKyoku bool
 	// -1 if prev action is not dahai
 	prevDahaiActor int
 	prevDahaiPai   *base.Pai

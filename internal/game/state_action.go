@@ -8,17 +8,8 @@ import (
 	"github.com/Apricot-S/mjai-manue-go/internal/game/event/inbound"
 )
 
-func isEndOfRound(currentEvent inbound.Event) bool {
-	switch currentEvent.(type) {
-	case *inbound.Hora, *inbound.Ryukyoku:
-		return true
-	default:
-		return false
-	}
-}
-
 func (s *StateImpl) DahaiCandidates() []base.Pai {
-	if isEndOfRound(s.currentEvent) {
+	if !s.isInKyoku {
 		return nil
 	}
 
@@ -54,7 +45,7 @@ func (s *StateImpl) DahaiCandidates() []base.Pai {
 
 // ReachDahaiCandidates returns the candidates for the reach declaration tile.
 func (s *StateImpl) ReachDahaiCandidates() ([]base.Pai, error) {
-	if isEndOfRound(s.currentEvent) {
+	if !s.isInKyoku {
 		return nil, nil
 	}
 
@@ -127,7 +118,7 @@ func (s *StateImpl) IsTsumoPai(pai *base.Pai) bool {
 }
 
 func (s *StateImpl) FuroCandidates() ([]base.Furo, error) {
-	if isEndOfRound(s.currentEvent) {
+	if !s.isInKyoku {
 		return nil, nil
 	}
 
@@ -372,7 +363,7 @@ func (s *StateImpl) daiminkanCandidates() ([]base.Furo, error) {
 }
 
 func (s *StateImpl) HoraCandidate() (*base.Hora, error) {
-	if isEndOfRound(s.currentEvent) {
+	if !s.isInKyoku {
 		return nil, nil
 	}
 

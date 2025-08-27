@@ -16,6 +16,7 @@ func (s *StateImpl) Update(event inbound.Event) error {
 		return s.onStartGame(e)
 	case *inbound.EndKyoku, *inbound.EndGame:
 		s.currentEvent = event
+		s.isInKyoku = false
 		return nil
 	}
 
@@ -88,6 +89,7 @@ func (s *StateImpl) onStartGame(event *inbound.StartGame) error {
 	s.doraMarkers = nil
 	s.numPipais = NumInitPipais
 
+	s.isInKyoku = false
 	s.prevDahaiActor = noActor
 	s.prevDahaiPai = nil
 	s.lastActor = noActor
@@ -127,6 +129,7 @@ func (s *StateImpl) onStartKyoku(event *inbound.StartKyoku) error {
 		}
 	}
 
+	s.isInKyoku = false
 	s.prevDahaiActor = noActor
 	s.prevDahaiPai = nil
 	s.lastActor = noActor
@@ -158,6 +161,8 @@ func (s *StateImpl) onTsumo(event *inbound.Tsumo) error {
 		return err
 	}
 
+	// After start_kyoku, oya's tsumo always comes.
+	s.isInKyoku = true
 	s.lastActor = actor
 	s.lastAction = event
 
@@ -575,8 +580,8 @@ func (s *StateImpl) onHora(event *inbound.Hora) error {
 		}
 	}
 
-	// After hora, only end_kyoku comes, so reset the last action.
-	s.lastActor = noActor
+	s.isInKyoku = false
+	s.lastActor = event.Actor
 	s.lastAction = nil
 
 	return nil
@@ -593,8 +598,7 @@ func (s *StateImpl) onRyukyoku(event *inbound.Ryukyoku) error {
 		}
 	}
 
-	// After ryukyoku, only end_kyoku comes, so reset the last action.
-	s.lastActor = noActor
+	s.isInKyoku = false
 	s.lastAction = nil
 
 	return nil
