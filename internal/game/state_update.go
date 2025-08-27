@@ -85,7 +85,7 @@ func (s *StateImpl) onStartGame(event *inbound.StartGame) error {
 	s.honba = 0
 	s.oya = &s.players[0]
 	s.chicha = &s.players[0]
-	s.doraMarkers = make([]base.Pai, 0, MaxNumDoraMarkers)
+	s.doraMarkers = nil
 	s.numPipais = NumInitPipais
 
 	s.prevDahaiActor = noActor
@@ -118,13 +118,11 @@ func (s *StateImpl) onStartKyoku(event *inbound.StartKyoku) error {
 	s.numPipais = NumInitPipais
 
 	for i := range NumPlayers {
-		var err error
+		var score *int
 		if event.Scores != nil {
-			err = s.players[i].OnStartKyoku(event.Tehais[i], &event.Scores[i])
-		} else {
-			err = s.players[i].OnStartKyoku(event.Tehais[i], nil)
+			score = &event.Scores[i]
 		}
-		if err != nil {
+		if err := s.players[i].OnStartKyoku(event.Tehais[i], score); err != nil {
 			return err
 		}
 	}
@@ -555,13 +553,11 @@ func (s *StateImpl) onReachAccepted(event *inbound.ReachAccepted) error {
 
 	actor := event.Actor
 	player := &s.players[actor]
-	var err error
+	var score *int
 	if event.Scores != nil {
-		err = player.OnReachAccepted(&event.Scores[actor])
-	} else {
-		err = player.OnReachAccepted(nil)
+		score = &event.Scores[actor]
 	}
-	if err != nil {
+	if err := player.OnReachAccepted(score); err != nil {
 		return err
 	}
 
