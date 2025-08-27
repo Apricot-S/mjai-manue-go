@@ -16,10 +16,11 @@ For more information, see [the original README (Japanese)](https://github.com/gi
 
 ### Architecture Improvements
 
-- The configuration files is embedded at build time rather than loaded at runtime.
-- Fixed the miscalculation of the shanten number when the hand contains four identical tiles.
+- Embed configuration files at build time instead of loading them at runtime.
+- Fixed an incorrect shanten number calculation when a hand contains four identical tiles.
+- Log more detailed information about the game state.
 - Improved error handling to more reliably reject invalid or anomalous input.
-- Refactored the code to improve readability and maintainability.
+- Refactored the code for better readability and maintainability.
 
 ### Target Version
 
@@ -67,6 +68,8 @@ mjai-manue
 ## Credits
 
 This project is a Go port of [mjai-manue](https://github.com/gimite/mjai-manue), created by [Hiroshi Ichikawa](https://github.com/gimite).
+
+Some parts of the code are ported from [mjai](https://github.com/gimite/mjai), created by [Hiroshi Ichikawa](https://github.com/gimite).
 
 ## Licenses
 
