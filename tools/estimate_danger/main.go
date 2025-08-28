@@ -69,11 +69,17 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-
-	paths = filterInputPaths(paths, opts)
+	if len(paths) == 0 {
+		log.Fatal("no file specified for processing")
+	}
 
 	switch action {
 	case "extract":
+		paths = filterInputPaths(paths, opts)
+		if len(paths) == 0 {
+			log.Fatal("there are no files to process")
+		}
+
 		if opts.Output == "" {
 			log.Fatal("-o is missing")
 		}
