@@ -44,7 +44,7 @@ func createCriterionMasks(featureNames []string, criteria []map[string]bool) (ma
 
 		keyBytes, err := json.Marshal(criterion, json.Deterministic(true))
 		if err != nil {
-			return nil, fmt.Errorf("failed to decode criterion: %w", err)
+			return nil, fmt.Errorf("failed to encode criterion: %w", err)
 		}
 		key := string(keyBytes)
 		criterionMasks[key] = [2]*BitVector{BoolArrayToBitVector(pa), BoolArrayToBitVector(na)}
