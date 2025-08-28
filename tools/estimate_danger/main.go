@@ -96,7 +96,12 @@ func main() {
 			log.Fatal(err)
 		}
 	case "single":
-		panic("single not implemented")
+		w := bufio.NewWriter(os.Stdout)
+		defer w.Flush()
+
+		if err := CalculateSingleProbabilities(paths[0], w); err != nil {
+			log.Fatal(err)
+		}
 	case "interesting":
 		panic("interesting not implemented")
 	case "interesting_graph":
