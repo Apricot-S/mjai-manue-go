@@ -53,19 +53,30 @@ func createCriterionMasks(featureNames []string, criteria []map[string]bool) (ma
 	return criterionMasks, nil
 }
 
-func processFeaturesFile(r io.Reader, w io.Writer, featureNames []string, criterionMasks map[string][2]*BitVector) error {
-	return nil
+func processFeaturesFile(
+	r io.Reader,
+	w io.Writer,
+	featureNames []string,
+	criterionMasks map[string][2]*BitVector,
+) (map[string][]float64, error) {
+	kyokuProbsMap := make(map[string][]float64)
+	return kyokuProbsMap, nil
 }
 
-func createKyokuProbsMap(r io.Reader, w io.Writer, featureNames []string, criteria []map[string]bool) (any, error) {
+func createKyokuProbsMap(
+	r io.Reader,
+	w io.Writer,
+	featureNames []string,
+	criteria []map[string]bool,
+) (map[string][]float64, error) {
 	criterionMasks, err := createCriterionMasks(featureNames, criteria)
 	if err != nil {
 		return nil, err
 	}
-	return nil, processFeaturesFile(r, w, featureNames, criterionMasks)
+	return processFeaturesFile(r, w, featureNames, criterionMasks)
 }
 
-func aggregateProbabilities(w io.Writer, kyokuProbsMap any, criteria []map[string]bool) (any, error) {
+func aggregateProbabilities(w io.Writer, kyokuProbsMap map[string][]float64, criteria []map[string]bool) (any, error) {
 	return nil, nil
 }
 
