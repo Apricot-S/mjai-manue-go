@@ -33,6 +33,8 @@ func parseOptions(action string, args []string) (*Options, []string, error) {
 		fs.StringVar(&opts.Filter, "filter", "", "filter expression")
 	case "single":
 		// no options
+	case "interesting":
+		fs.StringVar(&opts.Output, "o", "", "output filepath")
 	case "tree":
 		fs.StringVar(&opts.Output, "o", "", "output filepath")
 		fs.Float64Var(&opts.MinGap, "min_gap", 0.0, "minimum gap percentage")
@@ -89,6 +91,10 @@ func runExtract(paths []string, opts *Options, w io.Writer) error {
 	return nil
 }
 
+func runInteresting(path string, opts *Options, w io.Writer) error {
+	return nil
+}
+
 func main() {
 	if len(os.Args) < 2 {
 		fmt.Fprintln(os.Stderr, "missing action argument")
@@ -121,7 +127,12 @@ func main() {
 			log.Fatal(err)
 		}
 	case "interesting":
-		panic("interesting not implemented")
+		w := bufio.NewWriter(os.Stdout)
+		defer w.Flush()
+
+		if err := runInteresting(paths[0], opts, w); err != nil {
+			log.Fatal(err)
+		}
 	case "interesting_graph":
 		panic("interesting_graph not implemented")
 	case "benchmark":
