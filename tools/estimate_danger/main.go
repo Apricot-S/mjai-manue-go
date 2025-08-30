@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"flag"
 	"fmt"
+	"io"
 	"log"
 	"os"
 	"slices"
@@ -66,6 +67,28 @@ func filterInputPaths(paths []string, opts *Options) []string {
 	return paths
 }
 
+func runExtract(paths []string, opts *Options, w io.Writer) error {
+	paths = filterInputPaths(paths, opts)
+	if len(paths) == 0 {
+		return fmt.Errorf("there are no files to process")
+	}
+
+	if opts.Output == "" {
+		return fmt.Errorf("-o is missing")
+	}
+
+	var listener Listener = nil
+	if opts.Filter != "" {
+		listener = NewDumpListener(opts.Filter)
+	}
+
+	if err := ExtractFeaturesFromFiles(paths, opts.Output, listener, opts.Verbose, w); err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func main() {
 	if len(os.Args) < 2 {
 		fmt.Fprintln(os.Stderr, "missing action argument")
@@ -84,24 +107,10 @@ func main() {
 
 	switch action {
 	case "extract":
-		paths = filterInputPaths(paths, opts)
-		if len(paths) == 0 {
-			log.Fatal("there are no files to process")
-		}
-
-		if opts.Output == "" {
-			log.Fatal("-o is missing")
-		}
-
-		var listener Listener = nil
-		if opts.Filter != "" {
-			listener = NewDumpListener(opts.Filter)
-		}
-
 		w := bufio.NewWriter(os.Stdout)
 		defer w.Flush()
 
-		if err := ExtractFeaturesFromFiles(paths, opts.Output, listener, opts.Verbose, w); err != nil {
+		if err := runExtract(paths, opts, w); err != nil {
 			log.Fatal(err)
 		}
 	case "single":
