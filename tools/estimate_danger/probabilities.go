@@ -5,21 +5,12 @@ import (
 	"fmt"
 	"io"
 	"maps"
-	"os"
 	"slices"
 
 	"github.com/Apricot-S/mjai-manue-go/configs"
 	"github.com/go-json-experiment/json"
 	"github.com/schollz/progressbar/v3"
 )
-
-func getCriteria(featureNames []string) []Criterion {
-	criteria := make([]Criterion, 0, len(featureNames)*2)
-	for _, s := range featureNames {
-		criteria = append(criteria, Criterion{s: false}, Criterion{s: true})
-	}
-	return criteria
-}
 
 func createCriterionMasks(featureNames []string, criteria []Criterion) (CriterionMasks, error) {
 	positiveAry := make([]bool, len(featureNames))
@@ -201,24 +192,4 @@ func calculateProbabilities(
 	}
 
 	return aggregateProbabilities(w, kyokuProbsMap, criteria)
-}
-
-func CalculateSingleProbabilities(featuresPath string, w io.Writer) error {
-	r, err := os.Open(featuresPath)
-	if err != nil {
-		return fmt.Errorf("failed to open features file: %w", err)
-	}
-	defer r.Close()
-
-	stat, err := r.Stat()
-	if err != nil {
-		return err
-	}
-
-	fn := FeatureNames()
-	criteria := getCriteria(fn)
-	if _, err := calculateProbabilities(r, w, stat.Size(), fn, criteria); err != nil {
-		return err
-	}
-	return nil
 }
