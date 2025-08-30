@@ -85,7 +85,7 @@ func loadStoredKyokus(r io.Reader, featureNames []string) ([]StoredKyoku, error)
 	return storedKyokus, nil
 }
 
-func updateMetricsForKyoku(storedKyoku StoredKyoku, criterionMasks CriterionMasks) (map[string][]float64, error) {
+func createMetricsForKyoku(storedKyoku StoredKyoku, criterionMasks CriterionMasks) (map[string][]float64, error) {
 	sceneProbSums := make(map[string]float64)
 	sceneCounts := make(map[string]int)
 	for _, storedScene := range storedKyoku.Scenes {
@@ -127,7 +127,7 @@ func createKyokuProbsMap(r io.Reader, featureNames []string, criteria []Criterio
 
 	kyokuProbsMap := make(map[string][]float64)
 	for _, sk := range storedKyokus {
-		kpm, err := updateMetricsForKyoku(sk, criterionMasks)
+		kpm, err := createMetricsForKyoku(sk, criterionMasks)
 		if err != nil {
 			return nil, err
 		}
