@@ -160,7 +160,7 @@ func aggregateProbabilities(
 		fmt.Fprintf(
 			w,
 			"%v\n  %.2f [%.2f, %.2f] (%d samples)\n\n",
-			node,
+			criterion,
 			node.AverageProb*100.0,
 			node.ConfInterval[0]*100.0,
 			node.ConfInterval[1]*100.0,
