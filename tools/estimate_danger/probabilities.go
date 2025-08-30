@@ -136,11 +136,10 @@ func createKyokuProbsMap(
 }
 
 func aggregateProbabilities(
-	w io.Writer,
 	kyokuProbsMap map[string][]float64,
 	criteria []Criterion,
 ) (map[string]*configs.DecisionNode, error) {
-	result := make(map[string]*configs.DecisionNode)
+	results := make(map[string]*configs.DecisionNode)
 	for _, criterion := range criteria {
 		key, err := json.Marshal(criterion, json.Deterministic(true))
 		if err != nil {
@@ -164,7 +163,22 @@ func aggregateProbabilities(
 			ConfInterval: [2]float64{lower, upper},
 			NumSamples:   numSamples,
 		}
-		result[string(key)] = node
+		results[string(key)] = node
+	}
+	return results, nil
+}
+
+func printAggregateResults(w io.Writer, criteria []Criterion, result map[string]*configs.DecisionNode) error {
+	for _, criterion := range criteria {
+		key, err := json.Marshal(criterion, json.Deterministic(true))
+		if err != nil {
+			return fmt.Errorf("failed to encode criterion: %w", err)
+		}
+
+		node, found := result[string(key)]
+		if !found {
+			continue
+		}
 
 		fmt.Fprintf(
 			w,
@@ -176,7 +190,7 @@ func aggregateProbabilities(
 			node.NumSamples,
 		)
 	}
-	return result, nil
+	return nil
 }
 
 func calculateProbabilities(
@@ -191,5 +205,14 @@ func calculateProbabilities(
 		return nil, err
 	}
 
-	return aggregateProbabilities(w, kyokuProbsMap, criteria)
+	results, err := aggregateProbabilities(kyokuProbsMap, criteria)
+	if err != nil {
+		return nil, err
+	}
+
+	if err := printAggregateResults(w, criteria, results); err != nil {
+		return nil, err
+	}
+
+	return results, nil
 }
