@@ -4,7 +4,6 @@ import (
 	"encoding/gob"
 	"fmt"
 	"io"
-	"maps"
 	"slices"
 
 	"github.com/Apricot-S/mjai-manue-go/configs"
@@ -128,7 +127,9 @@ func createKyokuProbsMap(
 	kyokuProbsMap := make(map[string][]float64)
 	for _, sk := range storedKyokus {
 		kpm := createMetricsForKyoku(sk, criterionMasks)
-		maps.Copy(kyokuProbsMap, kpm)
+		for key, value := range kpm {
+			kyokuProbsMap[key] = slices.Concat(kyokuProbsMap[key], value)
+		}
 	}
 
 	return kyokuProbsMap, nil
