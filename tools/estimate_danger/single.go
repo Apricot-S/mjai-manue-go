@@ -86,7 +86,32 @@ func loadStoredKyokus(r io.Reader, featureNames []string) ([]StoredKyoku, error)
 }
 
 func updateMetricsForKyoku(storedKyoku StoredKyoku, criterionMasks CriterionMasks) (map[string][]float64, error) {
-	panic("")
+	sceneProbSums := make(map[string]float64)
+	sceneCounts := make(map[string]int)
+	for _, storedScene := range storedKyoku.Scenes {
+		paiFreqs := make(map[string]map[bool]int)
+		for _, candidate := range storedScene.Candidates {
+			for criterion, masks := range criterionMasks {
+				if Matches(candidate.FeatureVector, masks[0], masks[1]) {
+					paiFreqs[criterion] = make(map[bool]int)
+					paiFreqs[criterion][candidate.Hit] += 1
+				}
+			}
+		}
+
+		for criterionKey, freqs := range paiFreqs {
+			sceneProb := float64(freqs[true]) / float64(freqs[false]+freqs[true])
+			sceneProbSums[criterionKey] += sceneProb
+			sceneCounts[criterionKey] += 1
+		}
+	}
+
+	kyokuProbsMap := make(map[string][]float64)
+	for criterionKey, count := range sceneCounts {
+		kyokuProb := sceneProbSums[criterionKey] / float64(count)
+		kyokuProbsMap[criterionKey] = append(kyokuProbsMap[criterionKey], kyokuProb)
+	}
+	return kyokuProbsMap, nil
 }
 
 func createKyokuProbsMap(r io.Reader, featureNames []string, criteria []Criterion) (map[string][]float64, error) {
