@@ -18,7 +18,7 @@ This tool analyzes game logs in Mjai format and generates a decision tree to est
 | `single`            | Calculate danger probability for a single feature                               |
 | `interesting`       | Calculate danger probabilities for predefined interesting feature combinations  |
 | `interesting_graph` | Generate graph images and HTML files from `interesting` results                 |
-| `benchmark`         | Benchmark model performance                                                     |
+| `benchmark`         | Load feature data and create probability maps in memory for performance testing |
 | `tree`              | Generate decision tree model from extracted features and display in text format |
 | `dump_tree`         | Display saved decision tree model in text format                                |
 | `dump_tree_json`    | Export saved decision tree model to JSON format                                 |
