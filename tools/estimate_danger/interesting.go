@@ -166,7 +166,7 @@ func BuildInterestingCriteria() []Criterion {
 	return criteria
 }
 
-func CalculateProbabilitiesForInteresting(featuresPath string, w io.Writer) (map[string]*configs.DecisionNode, error) {
+func CalculateInterestingProbabilities(featuresPath string, w io.Writer) (map[string]*configs.DecisionNode, error) {
 	r, err := os.Open(featuresPath)
 	if err != nil {
 		return nil, fmt.Errorf("failed to open features file: %w", err)

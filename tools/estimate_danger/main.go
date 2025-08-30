@@ -94,7 +94,7 @@ func runExtract(paths []string, opts *Options, w io.Writer) error {
 }
 
 func runInteresting(path string, opts *Options, w io.Writer) error {
-	probs, err := CalculateProbabilitiesForInteresting(path, w)
+	probs, err := CalculateInterestingProbabilities(path, w)
 	if err != nil {
 		return err
 	}
