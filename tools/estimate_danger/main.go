@@ -162,25 +162,19 @@ func main() {
 		log.Fatal("no file specified for processing")
 	}
 
+	w := bufio.NewWriter(os.Stdout)
+	defer w.Flush()
+
 	switch action {
 	case "extract":
-		w := bufio.NewWriter(os.Stdout)
-		defer w.Flush()
-
 		if err := runExtract(paths, opts, w); err != nil {
 			log.Fatal(err)
 		}
 	case "single":
-		w := bufio.NewWriter(os.Stdout)
-		defer w.Flush()
-
 		if err := CalculateSingleProbabilities(paths[0], w); err != nil {
 			log.Fatal(err)
 		}
 	case "interesting":
-		w := bufio.NewWriter(os.Stdout)
-		defer w.Flush()
-
 		if err := runInteresting(paths[0], opts, w); err != nil {
 			log.Fatal(err)
 		}
