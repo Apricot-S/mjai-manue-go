@@ -13,7 +13,7 @@ import (
 )
 
 func getCriteria(featureNames []string) []Criterion {
-	criteria := make([]Criterion, len(featureNames)*2)
+	criteria := make([]Criterion, 0, len(featureNames)*2)
 	for _, s := range featureNames {
 		criteria = append(criteria, Criterion{s: false}, Criterion{s: true})
 	}
