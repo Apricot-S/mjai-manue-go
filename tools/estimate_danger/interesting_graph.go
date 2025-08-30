@@ -63,8 +63,12 @@ func createGraph(probs map[string]*configs.DecisionNode, outputDir string) error
 
 			baseFileName := fmt.Sprintf("%s/%d.base.points", outputDir, id)
 			testFileName := fmt.Sprintf("%s/%d.test.points", outputDir, id)
-			createPointsFile(baseFileName, baseNodes, 0.0)
-			createPointsFile(testFileName, testNodes, 0.05)
+			if err := createPointsFile(baseFileName, baseNodes, 0.0); err != nil {
+				return err
+			}
+			if err := createPointsFile(testFileName, testNodes, 0.05); err != nil {
+				return err
+			}
 		}
 		id++
 	}
