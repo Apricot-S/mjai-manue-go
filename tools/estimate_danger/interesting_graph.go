@@ -61,8 +61,8 @@ func createGraph(probs map[string]*configs.DecisionNode, outputDir string) error
 				testNodes[i] = probs[string(testKey)]
 			}
 
-			baseFileName := fmt.Sprintf("exp/graphs/%d.base.points", id)
-			testFileName := fmt.Sprintf("exp/graphs/%d.test.points", id)
+			baseFileName := fmt.Sprintf("%s/%d.base.points", outputDir, id)
+			testFileName := fmt.Sprintf("%s/%d.test.points", outputDir, id)
 			createPointsFile(baseFileName, baseNodes, 0.0)
 			createPointsFile(testFileName, testNodes, 0.05)
 		}
