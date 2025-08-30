@@ -101,17 +101,17 @@ func createMetricsForKyoku(storedKyoku StoredKyoku, criterionMasks CriterionMask
 			}
 		}
 
-		for criterionKey, freqs := range paiFreqs {
+		for criterion, freqs := range paiFreqs {
 			sceneProb := float64(freqs[true]) / float64(freqs[false]+freqs[true])
-			sceneProbSums[criterionKey] += sceneProb
-			sceneCounts[criterionKey] += 1
+			sceneProbSums[criterion] += sceneProb
+			sceneCounts[criterion] += 1
 		}
 	}
 
 	kyokuProbsMap := make(map[string][]float64)
-	for criterionKey, count := range sceneCounts {
-		kyokuProb := sceneProbSums[criterionKey] / float64(count)
-		kyokuProbsMap[criterionKey] = append(kyokuProbsMap[criterionKey], kyokuProb)
+	for criterion, count := range sceneCounts {
+		kyokuProb := sceneProbSums[criterion] / float64(count)
+		kyokuProbsMap[criterion] = append(kyokuProbsMap[criterion], kyokuProb)
 	}
 	return kyokuProbsMap, nil
 }
