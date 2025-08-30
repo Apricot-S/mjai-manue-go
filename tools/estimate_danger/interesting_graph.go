@@ -42,16 +42,16 @@ func createPointsFile(path string, nodes []*configs.DecisionNode, gap float64) e
 
 func generateGnuplotSpec(id int, baseTitle, testTitle string) string {
 	return fmt.Sprintf(`
-		set terminal png size 640,480 font "/usr/share/fonts/opentype/ipafont/ipag.ttf"
-		set output "exp/graphs/%d.graph.png"
-		set xrange [0:6]
-		set yrange [0:25]
-		set xlabel "牌の数字"
-		set ylabel "放銃率 [%%]"
-		set xtics ("1,9" 1, "2,8" 2, "3,7" 3, "4,6" 4, "5" 5)
-		plot  "exp/graphs/%d.base.points" using 1:2:3:4 with yerrorbars title "%s", \
-			"exp/graphs/%d.test.points" using 1:2:3:4 with yerrorbars title "%s"
-		`,
+ set terminal png size 640,480 font "/usr/share/fonts/opentype/ipafont/ipag.ttf"
+ set output "exp/graphs/%d.graph.png"
+ set xrange [0:6]
+ set yrange [0:25]
+ set xlabel "牌の数字"
+ set ylabel "放銃率 [%%]"
+ set xtics ("1,9" 1, "2,8" 2, "3,7" 3, "4,6" 4, "5" 5)
+ plot  "exp/graphs/%d.base.points" using 1:2:3:4 with yerrorbars title "%s", \
+   "exp/graphs/%d.test.points" using 1:2:3:4 with yerrorbars title "%s"
+`,
 		id,
 		id,
 		baseTitle,
