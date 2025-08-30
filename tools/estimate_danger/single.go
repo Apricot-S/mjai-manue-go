@@ -154,7 +154,17 @@ func aggregateProbabilities(
 			continue
 		}
 
-		node := &configs.DecisionNode{}
+		numSamples := len(kyokuProbs)
+		n := 0.0
+		for _, p := range kyokuProbs {
+			n += p
+		}
+
+		node := &configs.DecisionNode{
+			AverageProb:  n / float64(numSamples),
+			ConfInterval: [2]float64{0.0, 0.0},
+			NumSamples:   numSamples,
+		}
 		result[key] = node
 
 		fmt.Fprintf(
