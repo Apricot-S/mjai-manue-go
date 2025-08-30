@@ -119,16 +119,16 @@ func createGraph(probs map[string]*configs.DecisionNode, outputDir string) error
 			}
 
 			baseTitle := fmt.Sprintf("%#v", entry.Base)
-			baseTitle = re1.ReplaceAllString(baseTitle, "\\{")
-			baseTitle = re2.ReplaceAllString(baseTitle, `\\\"$1\\\":`)
-			baseTitle = re3.ReplaceAllString(baseTitle, "\\_")
-			baseTitle = re4.ReplaceAllString(baseTitle, "\\}")
+			baseTitle = re1.ReplaceAllString(baseTitle, `\\{`)
+			baseTitle = re2.ReplaceAllString(baseTitle, `\"$1\":`)
+			baseTitle = re3.ReplaceAllString(baseTitle, `\\_`)
+			baseTitle = re4.ReplaceAllString(baseTitle, `\\}`)
 
 			testTitle := fmt.Sprintf("%#v", testCriterion)
-			testTitle = re1.ReplaceAllString(testTitle, "\\{")
-			testTitle = re2.ReplaceAllString(testTitle, `\\\"$1\\\":`)
-			testTitle = re3.ReplaceAllString(testTitle, "\\_")
-			testTitle = re4.ReplaceAllString(testTitle, "\\}")
+			testTitle = re1.ReplaceAllString(testTitle, `\\{`)
+			testTitle = re2.ReplaceAllString(testTitle, `\"$1\":`)
+			testTitle = re3.ReplaceAllString(testTitle, `\\_`)
+			testTitle = re4.ReplaceAllString(testTitle, `\\}`)
 
 			spec := generateGnuplotSpec(id, baseTitle, testTitle)
 			if err := executeGnuplot(id, spec, outputDir); err != nil {
