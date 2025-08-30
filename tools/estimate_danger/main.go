@@ -2,6 +2,7 @@ package main
 
 import (
 	"bufio"
+	"encoding/gob"
 	"flag"
 	"fmt"
 	"io"
@@ -91,8 +92,40 @@ func runExtract(paths []string, opts *Options, w io.Writer) error {
 	return nil
 }
 
-func runInteresting(path string, opts *Options, w io.Writer) error {
-	return nil
+func runInteresting(featuresPath string, opts *Options, w io.Writer) error {
+	r, err := os.Open(featuresPath)
+	if err != nil {
+		return fmt.Errorf("failed to open features file: %w", err)
+	}
+	defer r.Close()
+
+	stat, err := r.Stat()
+	if err != nil {
+		return err
+	}
+
+	fn := FeatureNames()
+	criteria := BuildAllCriteria()
+	criteria = slices.DeleteFunc(criteria, func(c Criterion) bool {
+		return c == nil
+	})
+	result, err := CalculateProbabilities(r, w, stat.Size(), fn, criteria)
+	if err != nil {
+		return err
+	}
+
+	if opts.Output == "" {
+		return nil
+	}
+
+	f, err := os.Create(opts.Output)
+	if err != nil {
+		return fmt.Errorf("failed to open output file: %w", err)
+	}
+	defer f.Close()
+
+	encoder := gob.NewEncoder(f)
+	return encoder.Encode(result)
 }
 
 func main() {
