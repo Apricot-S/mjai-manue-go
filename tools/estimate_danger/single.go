@@ -10,6 +10,7 @@ import (
 
 	"github.com/Apricot-S/mjai-manue-go/configs"
 	"github.com/go-json-experiment/json"
+	"github.com/schollz/progressbar/v3"
 )
 
 func getCriteria(featureNames []string) []Criterion {
@@ -55,8 +56,11 @@ func createCriterionMasks(featureNames []string, criteria []Criterion) (Criterio
 	return criterionMasks, nil
 }
 
-func loadStoredKyokus(r io.Reader, featureNames []string) ([]StoredKyoku, error) {
-	decoder := gob.NewDecoder(r)
+func loadStoredKyokus(r io.Reader, fileSize int64, featureNames []string) ([]StoredKyoku, error) {
+	bar := progressbar.DefaultBytes(fileSize, "loading")
+	tr := io.TeeReader(r, bar)
+
+	decoder := gob.NewDecoder(tr)
 
 	var metaData MetaData
 	if err := decoder.Decode(&metaData); err != nil {
@@ -65,8 +69,6 @@ func loadStoredKyokus(r io.Reader, featureNames []string) ([]StoredKyoku, error)
 	if slices.Compare(metaData.FeatureNames, featureNames) != 0 {
 		return nil, fmt.Errorf("feature set has been changed")
 	}
-
-	// bar := progressbar.DefaultBytes(-1)
 
 	var storedKyokus []StoredKyoku
 	for {
@@ -116,13 +118,18 @@ func createMetricsForKyoku(storedKyoku StoredKyoku, criterionMasks CriterionMask
 	return kyokuProbsMap
 }
 
-func createKyokuProbsMap(r io.Reader, featureNames []string, criteria []Criterion) (map[string][]float64, error) {
+func createKyokuProbsMap(
+	r io.Reader,
+	fileSize int64,
+	featureNames []string,
+	criteria []Criterion,
+) (map[string][]float64, error) {
 	criterionMasks, err := createCriterionMasks(featureNames, criteria)
 	if err != nil {
 		return nil, err
 	}
 
-	storedKyokus, err := loadStoredKyokus(r, featureNames)
+	storedKyokus, err := loadStoredKyokus(r, fileSize, featureNames)
 	if err != nil {
 		return nil, err
 	}
@@ -184,10 +191,11 @@ func aggregateProbabilities(
 func calculateProbabilities(
 	r io.Reader,
 	w io.Writer,
+	fileSize int64,
 	featureNames []string,
 	criteria []Criterion,
 ) (map[string]*configs.DecisionNode, error) {
-	kyokuProbsMap, err := createKyokuProbsMap(r, featureNames, criteria)
+	kyokuProbsMap, err := createKyokuProbsMap(r, fileSize, featureNames, criteria)
 	if err != nil {
 		return nil, err
 	}
@@ -202,9 +210,14 @@ func CalculateSingleProbabilities(featuresPath string, w io.Writer) error {
 	}
 	defer r.Close()
 
+	stat, err := r.Stat()
+	if err != nil {
+		return err
+	}
+
 	fn := FeatureNames()
 	criteria := getCriteria(fn)
-	if _, err := calculateProbabilities(r, w, fn, criteria); err != nil {
+	if _, err := calculateProbabilities(r, w, stat.Size(), fn, criteria); err != nil {
 		return err
 	}
 	return nil
