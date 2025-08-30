@@ -1,30 +1,32 @@
 package main
 
 import (
+	"encoding/gob"
 	"fmt"
 	"io"
+	"maps"
 	"os"
 	"slices"
 
 	"github.com/go-json-experiment/json"
 )
 
-func getCriteria(featureNames []string) []map[string]bool {
-	criteria := make([]map[string]bool, len(featureNames)*2)
+func getCriteria(featureNames []string) []Criterion {
+	criteria := make([]Criterion, len(featureNames)*2)
 	for _, s := range featureNames {
-		criteria = append(criteria, map[string]bool{s: false}, map[string]bool{s: true})
+		criteria = append(criteria, Criterion{s: false}, Criterion{s: true})
 	}
 	return criteria
 }
 
-func createCriterionMasks(featureNames []string, criteria []map[string]bool) (map[string][2]*BitVector, error) {
+func createCriterionMasks(featureNames []string, criteria []Criterion) (CriterionMasks, error) {
 	positiveAry := make([]bool, len(featureNames))
 	negativeAry := make([]bool, len(featureNames))
 	for i := range len(negativeAry) {
 		negativeAry[i] = true
 	}
 
-	criterionMasks := make(map[string][2]*BitVector, len(criteria))
+	criterionMasks := make(CriterionMasks, len(criteria))
 	for _, criterion := range criteria {
 		pa := slices.Clone(positiveAry)
 		na := slices.Clone(negativeAry)
@@ -53,35 +55,69 @@ func createCriterionMasks(featureNames []string, criteria []map[string]bool) (ma
 	return criterionMasks, nil
 }
 
-func processFeaturesFile(
-	r io.Reader,
-	w io.Writer,
-	featureNames []string,
-	criterionMasks map[string][2]*BitVector,
-) (map[string][]float64, error) {
-	kyokuProbsMap := make(map[string][]float64)
-	return kyokuProbsMap, nil
+func loadStoredKyokus(r io.Reader, featureNames []string) ([]StoredKyoku, error) {
+	decoder := gob.NewDecoder(r)
+
+	var metaData MetaData
+	if err := decoder.Decode(&metaData); err != nil {
+		return nil, fmt.Errorf("failed to load features %w", err)
+	}
+	if slices.Compare(metaData.FeatureNames, featureNames) != 0 {
+		return nil, fmt.Errorf("feature set has been changed")
+	}
+
+	// bar := progressbar.DefaultBytes(-1)
+
+	var storedKyokus []StoredKyoku
+	for {
+		var sks []StoredKyoku
+		err := decoder.Decode(&sks)
+		if err == io.EOF {
+			break
+		}
+		if err != nil {
+			return nil, err
+		}
+
+		storedKyokus = slices.Concat(storedKyokus, sks)
+	}
+
+	return storedKyokus, nil
 }
 
-func createKyokuProbsMap(
-	r io.Reader,
-	w io.Writer,
-	featureNames []string,
-	criteria []map[string]bool,
-) (map[string][]float64, error) {
+func updateMetricsForKyoku(storedKyoku StoredKyoku, criterionMasks CriterionMasks) (map[string][]float64, error) {
+	panic("")
+}
+
+func createKyokuProbsMap(r io.Reader, featureNames []string, criteria []Criterion) (map[string][]float64, error) {
 	criterionMasks, err := createCriterionMasks(featureNames, criteria)
 	if err != nil {
 		return nil, err
 	}
-	return processFeaturesFile(r, w, featureNames, criterionMasks)
+
+	storedKyokus, err := loadStoredKyokus(r, featureNames)
+	if err != nil {
+		return nil, err
+	}
+
+	kyokuProbsMap := make(map[string][]float64)
+	for _, sk := range storedKyokus {
+		kpm, err := updateMetricsForKyoku(sk, criterionMasks)
+		if err != nil {
+			return nil, err
+		}
+		maps.Copy(kyokuProbsMap, kpm)
+	}
+
+	return kyokuProbsMap, nil
 }
 
-func aggregateProbabilities(w io.Writer, kyokuProbsMap map[string][]float64, criteria []map[string]bool) (any, error) {
+func aggregateProbabilities(w io.Writer, kyokuProbsMap map[string][]float64, criteria []Criterion) (any, error) {
 	return nil, nil
 }
 
-func calculateProbabilities(r io.Reader, w io.Writer, featureNames []string, criteria []map[string]bool) (any, error) {
-	kyokuProbsMap, err := createKyokuProbsMap(r, w, featureNames, criteria)
+func calculateProbabilities(r io.Reader, w io.Writer, featureNames []string, criteria []Criterion) (any, error) {
+	kyokuProbsMap, err := createKyokuProbsMap(r, featureNames, criteria)
 	if err != nil {
 		return nil, err
 	}
