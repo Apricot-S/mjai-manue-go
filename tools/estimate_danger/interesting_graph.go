@@ -42,7 +42,8 @@ func createPointsFile(path string, nodes []*configs.DecisionNode, gap float64) e
 
 func generateGnuplotSpec(id int, baseTitle, testTitle string) string {
 	return fmt.Sprintf(`
- set terminal png size 640,480 font "/usr/share/fonts/opentype/ipafont/ipag.ttf"
+ set encoding utf8
+ set terminal png size 640,480 font "IPAGothic"
  set output "exp/graphs/%d.graph.png"
  set xrange [0:6]
  set yrange [0:25]
