@@ -47,7 +47,7 @@ func createCriterionMasks(featureNames []string, criteria []Criterion) (Criterio
 }
 
 func loadStoredKyokus(r io.Reader, fileSize int64, featureNames []string) ([]StoredKyoku, error) {
-	bar := progressbar.DefaultBytes(fileSize, "loading")
+	bar := progressbar.DefaultBytes(fileSize, "loading   ")
 	tr := io.TeeReader(r, bar)
 
 	decoder := gob.NewDecoder(tr)
@@ -125,10 +125,15 @@ func createKyokuProbsMap(
 	}
 
 	kyokuProbsMap := make(map[string][]float64)
+	bar := progressbar.Default(int64(len(storedKyokus)), "processing")
 	for _, sk := range storedKyokus {
 		kpm := createMetricsForKyoku(sk, criterionMasks)
 		for key, value := range kpm {
 			kyokuProbsMap[key] = slices.Concat(kyokuProbsMap[key], value)
+		}
+
+		if err := bar.Add(1); err != nil {
+			return nil, err
 		}
 	}
 
