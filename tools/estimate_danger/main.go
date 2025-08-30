@@ -36,6 +36,8 @@ func parseOptions(action string, args []string) (*Options, []string, error) {
 		// no options
 	case "interesting":
 		fs.StringVar(&opts.Output, "o", "", "output filepath")
+	case "benchmark":
+		// no options
 	case "tree":
 		fs.StringVar(&opts.Output, "o", "", "output filepath")
 		fs.Float64Var(&opts.MinGap, "min_gap", 0.0, "minimum gap percentage")
