@@ -8,6 +8,7 @@ import (
 	"os"
 	"slices"
 
+	"github.com/Apricot-S/mjai-manue-go/configs"
 	"github.com/go-json-experiment/json"
 )
 
@@ -44,12 +45,11 @@ func createCriterionMasks(featureNames []string, criteria []Criterion) (Criterio
 			}
 		}
 
-		keyBytes, err := json.Marshal(criterion, json.Deterministic(true))
+		key, err := json.Marshal(criterion, json.Deterministic(true))
 		if err != nil {
 			return nil, fmt.Errorf("failed to encode criterion: %w", err)
 		}
-		key := string(keyBytes)
-		criterionMasks[key] = [2]*BitVector{BoolArrayToBitVector(pa), BoolArrayToBitVector(na)}
+		criterionMasks[string(key)] = [2]*BitVector{BoolArrayToBitVector(pa), BoolArrayToBitVector(na)}
 	}
 
 	return criterionMasks, nil
@@ -93,7 +93,7 @@ func createMetricsForKyoku(storedKyoku StoredKyoku, criterionMasks CriterionMask
 		for _, candidate := range storedScene.Candidates {
 			for criterion, masks := range criterionMasks {
 				if Matches(candidate.FeatureVector, masks[0], masks[1]) {
-					if _, ok := paiFreqs[criterion]; !ok {
+					if _, found := paiFreqs[criterion]; !found {
 						paiFreqs[criterion] = make(map[bool]int)
 					}
 					paiFreqs[criterion][candidate.Hit] += 1
@@ -136,11 +136,46 @@ func createKyokuProbsMap(r io.Reader, featureNames []string, criteria []Criterio
 	return kyokuProbsMap, nil
 }
 
-func aggregateProbabilities(w io.Writer, kyokuProbsMap map[string][]float64, criteria []Criterion) (any, error) {
-	return nil, nil
+func aggregateProbabilities(
+	w io.Writer,
+	kyokuProbsMap map[string][]float64,
+	criteria []Criterion,
+) (map[string]*configs.DecisionNode, error) {
+	result := make(map[string]*configs.DecisionNode)
+	for _, criterion := range criteria {
+		keyBytes, err := json.Marshal(criterion, json.Deterministic(true))
+		if err != nil {
+			return nil, fmt.Errorf("failed to encode criterion: %w", err)
+		}
+		key := string(keyBytes)
+
+		kyokuProbs := kyokuProbsMap[key]
+		if len(kyokuProbs) == 0 {
+			continue
+		}
+
+		node := &configs.DecisionNode{}
+		result[key] = node
+
+		fmt.Fprintf(
+			w,
+			"%v\n  %.2f [%.2f, %.2f] (%d samples)\n\n",
+			node,
+			node.AverageProb*100.0,
+			node.ConfInterval[0]*100.0,
+			node.ConfInterval[1]*100.0,
+			node.NumSamples,
+		)
+	}
+	return result, nil
 }
 
-func calculateProbabilities(r io.Reader, w io.Writer, featureNames []string, criteria []Criterion) (any, error) {
+func calculateProbabilities(
+	r io.Reader,
+	w io.Writer,
+	featureNames []string,
+	criteria []Criterion,
+) (map[string]*configs.DecisionNode, error) {
 	kyokuProbsMap, err := createKyokuProbsMap(r, featureNames, criteria)
 	if err != nil {
 		return nil, err
