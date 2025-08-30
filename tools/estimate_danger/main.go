@@ -18,17 +18,26 @@ type Options struct {
 	Filter  string
 }
 
-func parseOptions(args []string) (*Options, []string, error) {
+func parseOptions(action string, args []string) (*Options, []string, error) {
 	opts := Options{}
 
-	fs := flag.NewFlagSet("estimate_danger", flag.ExitOnError)
-
-	fs.BoolVar(&opts.Verbose, "v", false, "enable verbose mode")
-	fs.StringVar(&opts.Start, "start", "", "start filepath")
-	fs.IntVar(&opts.Num, "n", 0, "limit number of files")
-	fs.StringVar(&opts.Output, "o", "", "output filepath")
-	fs.Float64Var(&opts.MinGap, "min_gap", 0.0, "minimum gap percentage")
-	fs.StringVar(&opts.Filter, "filter", "", "filter expression")
+	name := fmt.Sprintf("estimate_danger %s", action)
+	fs := flag.NewFlagSet(name, flag.ExitOnError)
+	switch action {
+	case "extract":
+		fs.StringVar(&opts.Output, "o", "", "output filepath")
+		fs.BoolVar(&opts.Verbose, "v", false, "enable verbose mode")
+		fs.StringVar(&opts.Start, "start", "", "start filepath")
+		fs.IntVar(&opts.Num, "n", 0, "limit number of files")
+		fs.StringVar(&opts.Filter, "filter", "", "filter expression")
+	case "single":
+		// no options
+	case "tree":
+		fs.StringVar(&opts.Output, "o", "", "output filepath")
+		fs.Float64Var(&opts.MinGap, "min_gap", 0.0, "minimum gap percentage")
+	default:
+		log.Fatalf("unknown action: %s\n", action)
+	}
 
 	if err := fs.Parse(args); err != nil {
 		return nil, nil, fmt.Errorf("failed to parse flags: %w", err)
@@ -65,7 +74,7 @@ func main() {
 	action := os.Args[1]
 	args := os.Args[2:]
 
-	opts, paths, err := parseOptions(args)
+	opts, paths, err := parseOptions(action, args)
 	if err != nil {
 		log.Fatal(err)
 	}
