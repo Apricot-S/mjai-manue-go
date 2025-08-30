@@ -108,7 +108,7 @@ func createMetricsForKyoku(storedKyoku StoredKyoku, criterionMasks CriterionMask
 	return kyokuProbsMap
 }
 
-func createKyokuProbsMap(
+func CreateKyokuProbsMap(
 	r io.Reader,
 	fileSize int64,
 	featureNames []string,
@@ -205,7 +205,7 @@ func CalculateProbabilities(
 	featureNames []string,
 	criteria []Criterion,
 ) (map[string]*configs.DecisionNode, error) {
-	kyokuProbsMap, err := createKyokuProbsMap(r, fileSize, featureNames, criteria)
+	kyokuProbsMap, err := CreateKyokuProbsMap(r, fileSize, featureNames, criteria)
 	if err != nil {
 		return nil, err
 	}

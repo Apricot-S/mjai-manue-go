@@ -128,6 +128,31 @@ func runInteresting(featuresPath string, opts *Options, w io.Writer) error {
 	return encoder.Encode(result)
 }
 
+func runBenchmark(featuresPath string) error {
+	r, err := os.Open(featuresPath)
+	if err != nil {
+		return fmt.Errorf("failed to open features file: %w", err)
+	}
+	defer r.Close()
+
+	stat, err := r.Stat()
+	if err != nil {
+		return err
+	}
+
+	fn := FeatureNames()
+	criteria := BuildAllCriteria()
+	criteria = slices.DeleteFunc(criteria, func(c Criterion) bool {
+		return c == nil
+	})
+
+	if _, err := CreateKyokuProbsMap(r, stat.Size(), fn, criteria); err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func main() {
 	if len(os.Args) < 2 {
 		fmt.Fprintln(os.Stderr, "missing action argument")
@@ -169,7 +194,9 @@ func main() {
 	case "interesting_graph":
 		panic("interesting_graph not implemented")
 	case "benchmark":
-		panic("benchmark not implemented")
+		if err := runBenchmark(paths[0]); err != nil {
+			log.Fatal(err)
+		}
 	case "tree":
 		panic("tree not implemented")
 	case "dump_tree":
