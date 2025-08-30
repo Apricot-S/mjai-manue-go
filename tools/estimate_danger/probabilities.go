@@ -4,6 +4,7 @@ import (
 	"encoding/gob"
 	"fmt"
 	"io"
+	"os"
 	"slices"
 
 	"github.com/Apricot-S/mjai-manue-go/configs"
@@ -220,4 +221,15 @@ func CalculateProbabilities(
 	}
 
 	return results, nil
+}
+
+func DumpProbabilities(probs map[string]*configs.DecisionNode, outputPath string) error {
+	f, err := os.Create(outputPath)
+	if err != nil {
+		return fmt.Errorf("failed to open output file: %w", err)
+	}
+	defer f.Close()
+
+	encoder := gob.NewEncoder(f)
+	return encoder.Encode(probs)
 }

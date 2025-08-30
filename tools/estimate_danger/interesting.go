@@ -2,8 +2,12 @@ package main
 
 import (
 	"fmt"
+	"io"
 	"maps"
+	"os"
 	"slices"
+
+	"github.com/Apricot-S/mjai-manue-go/configs"
 )
 
 type SupaiCriteriaEntry struct {
@@ -160,4 +164,47 @@ func BuildInterestingCriteria() []Criterion {
 	})
 
 	return criteria
+}
+
+func CalculateProbabilitiesForInteresting(featuresPath string, w io.Writer) (map[string]*configs.DecisionNode, error) {
+	r, err := os.Open(featuresPath)
+	if err != nil {
+		return nil, fmt.Errorf("failed to open features file: %w", err)
+	}
+	defer r.Close()
+
+	stat, err := r.Stat()
+	if err != nil {
+		return nil, err
+	}
+
+	fn := FeatureNames()
+	criteria := BuildInterestingCriteria()
+	result, err := CalculateProbabilities(r, w, stat.Size(), fn, criteria)
+	if err != nil {
+		return nil, err
+	}
+
+	return result, nil
+}
+
+func RunBenchmark(featuresPath string) error {
+	r, err := os.Open(featuresPath)
+	if err != nil {
+		return fmt.Errorf("failed to open features file: %w", err)
+	}
+	defer r.Close()
+
+	stat, err := r.Stat()
+	if err != nil {
+		return err
+	}
+
+	fn := FeatureNames()
+	criteria := BuildInterestingCriteria()
+	if _, err := CreateKyokuProbsMap(r, stat.Size(), fn, criteria); err != nil {
+		return err
+	}
+
+	return nil
 }
