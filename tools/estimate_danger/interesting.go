@@ -139,16 +139,16 @@ func GetNumberCriteria(baseCriterion Criterion) []Criterion {
 	return result
 }
 
-func BuildAllCriteria(supaiCriteria []SupaiCriteriaEntry) []Criterion {
+func BuildAllCriteria() []Criterion {
 	var criteria []Criterion
 	criteria = slices.Clone(TsupaiCriteria)
 
-	for _, entry := range supaiCriteria {
+	for _, entry := range SupaiCriteria {
 		criteria = append(criteria, entry.Base)
 		criteria = slices.Concat(criteria, entry.Test)
 	}
 
-	for _, entry := range supaiCriteria {
+	for _, entry := range SupaiCriteria {
 		criteria = slices.Concat(criteria, GetNumberCriteria(entry.Base))
 		for _, testCriterion := range entry.Test {
 			criteria = slices.Concat(criteria, GetNumberCriteria(testCriterion))
