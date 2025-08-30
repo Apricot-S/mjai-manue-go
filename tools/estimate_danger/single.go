@@ -6,7 +6,7 @@ import (
 	"os"
 )
 
-func getCriteria(featureNames []string) []Criterion {
+func buildSingleCriteria(featureNames []string) []Criterion {
 	criteria := make([]Criterion, 0, len(featureNames)*2)
 	for _, s := range featureNames {
 		criteria = append(criteria, Criterion{s: false}, Criterion{s: true})
@@ -27,7 +27,7 @@ func CalculateSingleProbabilities(featuresPath string, w io.Writer) error {
 	}
 
 	fn := FeatureNames()
-	criteria := getCriteria(fn)
+	criteria := buildSingleCriteria(fn)
 	if _, err := calculateProbabilities(r, w, stat.Size(), fn, criteria); err != nil {
 		return err
 	}
