@@ -35,6 +35,8 @@ func parseOptions(action string, args []string) (*Options, []string, error) {
 		// no options
 	case "interesting":
 		fs.StringVar(&opts.Output, "o", "", "output filepath")
+	case "interesting_graph":
+		// no options
 	case "benchmark":
 		// no options
 	case "tree":
@@ -140,7 +142,9 @@ func main() {
 			log.Fatal(err)
 		}
 	case "interesting_graph":
-		panic("interesting_graph not implemented")
+		if err := RunInterestingGraph(paths[0]); err != nil {
+			log.Fatal(err)
+		}
 	case "benchmark":
 		if err := RunBenchmark(paths[0]); err != nil {
 			log.Fatal(err)
