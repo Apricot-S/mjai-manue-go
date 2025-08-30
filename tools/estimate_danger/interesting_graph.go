@@ -71,7 +71,7 @@ func createGraph(probs map[string]*configs.DecisionNode, outputDir string) error
 
 	f, err := os.Create(fmt.Sprintf("%s/graphs.html", outputDir))
 	if err != nil {
-		panic(err)
+		return err
 	}
 	defer f.Close()
 
