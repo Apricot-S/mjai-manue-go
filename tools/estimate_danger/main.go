@@ -37,7 +37,7 @@ func parseOptions(action string, args []string) (*Options, []string, error) {
 		fs.StringVar(&opts.Output, "o", "", "output filepath")
 		fs.Float64Var(&opts.MinGap, "min_gap", 0.0, "minimum gap percentage")
 	default:
-		log.Fatalf("unknown action: %s\n", action)
+		return nil, nil, fmt.Errorf("unknown action: %s", action)
 	}
 
 	if err := fs.Parse(args); err != nil {
