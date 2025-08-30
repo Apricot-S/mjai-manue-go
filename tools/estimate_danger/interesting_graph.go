@@ -84,7 +84,7 @@ func createGraph(probs map[string]*configs.DecisionNode, outputDir string) error
 	}
 
 	re1 := regexp.MustCompile(`^main\.Criterion\{`)
-	re2 := regexp.MustCompile(`"([^"]+)":`)
+	re2 := regexp.MustCompile(`"`)
 	re3 := regexp.MustCompile(`_`)
 	re4 := regexp.MustCompile(`}`)
 
@@ -120,13 +120,13 @@ func createGraph(probs map[string]*configs.DecisionNode, outputDir string) error
 
 			baseTitle := fmt.Sprintf("%#v", entry.Base)
 			baseTitle = re1.ReplaceAllString(baseTitle, `\\{`)
-			baseTitle = re2.ReplaceAllString(baseTitle, `\"$1\":`)
+			baseTitle = re2.ReplaceAllString(baseTitle, `\"`)
 			baseTitle = re3.ReplaceAllString(baseTitle, `\\_`)
 			baseTitle = re4.ReplaceAllString(baseTitle, `\\}`)
 
 			testTitle := fmt.Sprintf("%#v", testCriterion)
 			testTitle = re1.ReplaceAllString(testTitle, `\\{`)
-			testTitle = re2.ReplaceAllString(testTitle, `\"$1\":`)
+			testTitle = re2.ReplaceAllString(testTitle, `\"`)
 			testTitle = re3.ReplaceAllString(testTitle, `\\_`)
 			testTitle = re4.ReplaceAllString(testTitle, `\\}`)
 
