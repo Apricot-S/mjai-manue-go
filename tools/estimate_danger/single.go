@@ -28,7 +28,7 @@ func CalculateSingleProbabilities(featuresPath string, w io.Writer) error {
 
 	fn := FeatureNames()
 	criteria := buildSingleCriteria(fn)
-	if _, err := calculateProbabilities(r, w, stat.Size(), fn, criteria); err != nil {
+	if _, err := CalculateProbabilities(r, w, stat.Size(), fn, criteria); err != nil {
 		return err
 	}
 	return nil

@@ -198,7 +198,7 @@ func printAggregateResults(w io.Writer, criteria []Criterion, result map[string]
 	return nil
 }
 
-func calculateProbabilities(
+func CalculateProbabilities(
 	r io.Reader,
 	w io.Writer,
 	fileSize int64,
