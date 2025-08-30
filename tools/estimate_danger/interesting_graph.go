@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
+	"regexp"
 
 	"github.com/Apricot-S/mjai-manue-go/configs"
 	"github.com/go-json-experiment/json"
@@ -82,6 +83,11 @@ func createGraph(probs map[string]*configs.DecisionNode, outputDir string) error
 		return err
 	}
 
+	re1 := regexp.MustCompile(`^main\.Criterion\{`)
+	re2 := regexp.MustCompile(`"([^"]+)":`)
+	re3 := regexp.MustCompile(`_`)
+	re4 := regexp.MustCompile(`}`)
+
 	id := 0
 	for _, entry := range SupaiCriteria {
 		for _, testCriterion := range entry.Test {
@@ -112,8 +118,18 @@ func createGraph(probs map[string]*configs.DecisionNode, outputDir string) error
 				return err
 			}
 
-			baseTitle := fmt.Sprintf("%v", entry.Base)
-			testTitle := fmt.Sprintf("%v", testCriterion)
+			baseTitle := fmt.Sprintf("%#v", entry.Base)
+			baseTitle = re1.ReplaceAllString(baseTitle, "\\{")
+			baseTitle = re2.ReplaceAllString(baseTitle, `\\\"$1\\\":`)
+			baseTitle = re3.ReplaceAllString(baseTitle, "\\_")
+			baseTitle = re4.ReplaceAllString(baseTitle, "\\}")
+
+			testTitle := fmt.Sprintf("%#v", testCriterion)
+			testTitle = re1.ReplaceAllString(testTitle, "\\{")
+			testTitle = re2.ReplaceAllString(testTitle, `\\\"$1\\\":`)
+			testTitle = re3.ReplaceAllString(testTitle, "\\_")
+			testTitle = re4.ReplaceAllString(testTitle, "\\}")
+
 			spec := generateGnuplotSpec(id, baseTitle, testTitle)
 			if err := executeGnuplot(id, spec, outputDir); err != nil {
 				return err
