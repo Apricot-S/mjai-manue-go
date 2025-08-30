@@ -40,6 +40,10 @@ func createPointsFile(path string, nodes []*configs.DecisionNode, gap float64) e
 }
 
 func createGraph(probs map[string]*configs.DecisionNode, outputDir string) error {
+	if err := os.MkdirAll(outputDir, 0755); err != nil {
+		return err
+	}
+
 	id := 0
 	for _, entry := range SupaiCriteria {
 		for _, testCriterion := range entry.Test {
