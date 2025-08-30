@@ -142,13 +142,12 @@ func aggregateProbabilities(
 ) (map[string]*configs.DecisionNode, error) {
 	result := make(map[string]*configs.DecisionNode)
 	for _, criterion := range criteria {
-		keyBytes, err := json.Marshal(criterion, json.Deterministic(true))
+		key, err := json.Marshal(criterion, json.Deterministic(true))
 		if err != nil {
 			return nil, fmt.Errorf("failed to encode criterion: %w", err)
 		}
-		key := string(keyBytes)
 
-		kyokuProbs := kyokuProbsMap[key]
+		kyokuProbs := kyokuProbsMap[string(key)]
 		if len(kyokuProbs) == 0 {
 			continue
 		}
@@ -165,7 +164,7 @@ func aggregateProbabilities(
 			ConfInterval: [2]float64{lower, upper},
 			NumSamples:   numSamples,
 		}
-		result[key] = node
+		result[string(key)] = node
 
 		fmt.Fprintf(
 			w,
