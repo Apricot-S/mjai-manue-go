@@ -139,7 +139,7 @@ func GetNumberCriteria(baseCriterion Criterion) []Criterion {
 	return result
 }
 
-func BuildAllCriteria() []Criterion {
+func BuildInterestingCriteria() []Criterion {
 	var criteria []Criterion
 	criteria = slices.Clone(TsupaiCriteria)
 
@@ -154,6 +154,10 @@ func BuildAllCriteria() []Criterion {
 			criteria = slices.Concat(criteria, GetNumberCriteria(testCriterion))
 		}
 	}
+
+	criteria = slices.DeleteFunc(criteria, func(c Criterion) bool {
+		return c == nil
+	})
 
 	return criteria
 }

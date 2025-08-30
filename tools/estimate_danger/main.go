@@ -105,10 +105,7 @@ func runInteresting(featuresPath string, opts *Options, w io.Writer) error {
 	}
 
 	fn := FeatureNames()
-	criteria := BuildAllCriteria()
-	criteria = slices.DeleteFunc(criteria, func(c Criterion) bool {
-		return c == nil
-	})
+	criteria := BuildInterestingCriteria()
 	result, err := CalculateProbabilities(r, w, stat.Size(), fn, criteria)
 	if err != nil {
 		return err
@@ -141,11 +138,7 @@ func runBenchmark(featuresPath string) error {
 	}
 
 	fn := FeatureNames()
-	criteria := BuildAllCriteria()
-	criteria = slices.DeleteFunc(criteria, func(c Criterion) bool {
-		return c == nil
-	})
-
+	criteria := BuildInterestingCriteria()
 	if _, err := CreateKyokuProbsMap(r, stat.Size(), fn, criteria); err != nil {
 		return err
 	}
