@@ -1,5 +1,16 @@
 package main
 
+import (
+	"fmt"
+	"maps"
+	"slices"
+)
+
+type SupaiCriteriaEntry struct {
+	Base Criterion
+	Test []Criterion
+}
+
 var TsupaiCriteria = []Criterion{
 	{"tsupai": true},
 	{"tsupai": true, "sangenpai": true},
@@ -12,10 +23,7 @@ var TsupaiCriteria = []Criterion{
 	{"tsupai": true, "visible>=1": false},
 }
 
-var SupaiCriteria = []struct {
-	Base Criterion
-	Test []Criterion
-}{
+var SupaiCriteria = []SupaiCriteriaEntry{
 	{
 		Base: Criterion{"tsupai": false, "suji": false},
 		Test: []Criterion{
@@ -100,4 +108,52 @@ var SupaiCriteria = []struct {
 			{"tsupai": false, "suji": false, "same_type_in_prereach>=1": false},
 		},
 	},
+}
+
+func GetNumberCriteria(baseCriterion Criterion) []Criterion {
+	result := make([]Criterion, 5)
+	for i := 1; i <= 5; i++ {
+		criterion := make(Criterion)
+		maps.Copy(criterion, baseCriterion)
+
+		if i > 1 {
+			name := fmt.Sprintf("%d<=n<=%d", i, 10-i)
+			if val, ok := criterion[name]; ok && !val {
+				result[i-1] = nil
+				continue
+			}
+			criterion[name] = true
+		}
+
+		if i < 5 {
+			name := fmt.Sprintf("%d<=n<=%d", i+1, 10-(i+1))
+			if val, ok := criterion[name]; ok && val {
+				result[i-1] = nil
+				continue
+			}
+			criterion[name] = false
+		}
+
+		result[i-1] = criterion
+	}
+	return result
+}
+
+func BuildAllCriteria(supaiCriteria []SupaiCriteriaEntry) []Criterion {
+	var criteria []Criterion
+	criteria = slices.Clone(TsupaiCriteria)
+
+	for _, entry := range supaiCriteria {
+		criteria = append(criteria, entry.Base)
+		criteria = slices.Concat(criteria, entry.Test)
+	}
+
+	for _, entry := range supaiCriteria {
+		criteria = slices.Concat(criteria, GetNumberCriteria(entry.Base))
+		for _, testCriterion := range entry.Test {
+			criteria = slices.Concat(criteria, GetNumberCriteria(testCriterion))
+		}
+	}
+
+	return criteria
 }
