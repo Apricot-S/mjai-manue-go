@@ -93,7 +93,9 @@ func createMetricsForKyoku(storedKyoku StoredKyoku, criterionMasks CriterionMask
 		for _, candidate := range storedScene.Candidates {
 			for criterion, masks := range criterionMasks {
 				if Matches(candidate.FeatureVector, masks[0], masks[1]) {
-					paiFreqs[criterion] = make(map[bool]int)
+					if _, ok := paiFreqs[criterion]; !ok {
+						paiFreqs[criterion] = make(map[bool]int)
+					}
 					paiFreqs[criterion][candidate.Hit] += 1
 				}
 			}
