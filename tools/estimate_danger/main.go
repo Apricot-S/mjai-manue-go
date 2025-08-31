@@ -109,6 +109,21 @@ func runInteresting(path string, opts *Options, w io.Writer) error {
 	return nil
 }
 
+func runTree(path string, opts *Options, w io.Writer) error {
+	root, err := GenerateDecisionTree(path, w, opts.MinGap)
+	if err != nil {
+		log.Fatal(err)
+	}
+	RenderDecisionTree(w, root, "all", 0)
+	if opts.Output == "" {
+		return nil
+	}
+	if err := DumpDecisionTree(root, opts.Output); err != nil {
+		return err
+	}
+	return nil
+}
+
 func main() {
 	if len(os.Args) < 2 {
 		fmt.Fprintln(os.Stderr, "missing action argument")
@@ -150,7 +165,9 @@ func main() {
 			log.Fatal(err)
 		}
 	case "tree":
-		panic("tree not implemented")
+		if err := runTree(paths[0], opts, w); err != nil {
+			log.Fatal(err)
+		}
 	case "dump_tree":
 		panic("dump_tree not implemented")
 	case "dump_tree_json":

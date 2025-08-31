@@ -1,10 +1,14 @@
 package main
 
 import (
+	"cmp"
+	"encoding/gob"
 	"fmt"
 	"io"
 	"maps"
 	"os"
+	"slices"
+	"strings"
 
 	"github.com/Apricot-S/mjai-manue-go/configs"
 	"github.com/go-json-experiment/json"
@@ -143,4 +147,48 @@ func GenerateDecisionTree(featuresPath string, w io.Writer, minGap float64) (*co
 	}
 
 	return generateDecisionTreeImpl(r, w, stat.Size(), FeatureNames(), nil, nil, nil, minGap)
+}
+
+func RenderDecisionTree(w io.Writer, node *configs.DecisionNode, label string, indent int) {
+	fmt.Fprintf(
+		w,
+		"%s%s : %.2f [%.2f, %.2f] (%d samples)\n",
+		strings.Repeat("  ", indent),
+		label,
+		node.AverageProb*100.0,
+		node.ConfInterval[0]*100.0,
+		node.ConfInterval[1]*100.0,
+		node.NumSamples,
+	)
+
+	if node.FeatureName != nil {
+		type childNode struct {
+			Value bool
+			Node  *configs.DecisionNode
+		}
+		children := []childNode{{false, node.Negative}, {true, node.Positive}}
+		slices.SortFunc(children, func(a, b childNode) int {
+			return cmp.Compare(a.Node.AverageProb, b.Node.AverageProb)
+		})
+
+		for _, child := range children {
+			RenderDecisionTree(
+				w,
+				child.Node,
+				fmt.Sprintf("%s = %v", *node.FeatureName, child.Value),
+				indent+1,
+			)
+		}
+	}
+}
+
+func DumpDecisionTree(node *configs.DecisionNode, outputPath string) error {
+	f, err := os.Create(outputPath)
+	if err != nil {
+		return fmt.Errorf("failed to open output file: %w", err)
+	}
+	defer f.Close()
+
+	encoder := gob.NewEncoder(f)
+	return encoder.Encode(node)
 }
