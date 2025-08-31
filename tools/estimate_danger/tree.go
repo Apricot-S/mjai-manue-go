@@ -99,7 +99,31 @@ func generateDecisionTreeImpl(
 		}
 
 		if maxName != "" {
+			c := targets[maxName]
+			baseNode.FeatureName = &maxName
 
+			negativeKey, err := json.Marshal(c[0], json.Deterministic(true))
+			if err != nil {
+				return nil, fmt.Errorf("failed to encode criterion: %w", err)
+			}
+			baseNode.Negative = nodeMap[string(negativeKey)]
+
+			positiveKey, err := json.Marshal(c[1], json.Deterministic(true))
+			if err != nil {
+				return nil, fmt.Errorf("failed to encode criterion: %w", err)
+			}
+			baseNode.Positive = nodeMap[string(positiveKey)]
+
+			// render_decision_tree(root, "all")
+
+			_, err = generateDecisionTreeImpl(r, w, fileSize, featureNames, *c[0], baseNode.Negative, root, minGap)
+			if err != nil {
+				return nil, err
+			}
+			_, err = generateDecisionTreeImpl(r, w, fileSize, featureNames, *c[1], baseNode.Positive, root, minGap)
+			if err != nil {
+				return nil, err
+			}
 		}
 	}
 
