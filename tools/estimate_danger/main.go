@@ -8,6 +8,8 @@ import (
 	"log"
 	"os"
 	"slices"
+
+	"github.com/go-json-experiment/json"
 )
 
 type Options struct {
@@ -44,6 +46,8 @@ func parseOptions(action string, args []string) (*Options, []string, error) {
 		fs.Float64Var(&opts.MinGap, "min_gap", 0.0, "minimum gap percentage")
 	case "dump_tree":
 		// no options
+	case "dump_tree_json":
+		fs.StringVar(&opts.Output, "o", "", "output filepath")
 	default:
 		return nil, nil, fmt.Errorf("unknown action: %s", action)
 	}
@@ -135,6 +139,28 @@ func runDumpTree(path string, w io.Writer) error {
 	return nil
 }
 
+func runDumpTreeJson(path string, opts *Options) error {
+	if opts.Output == "" {
+		return fmt.Errorf("-o is missing")
+	}
+
+	root, err := LoadDecisionTree(path)
+	if err != nil {
+		return err
+	}
+
+	f, err := os.Create(opts.Output)
+	if err != nil {
+		return fmt.Errorf("failed to open output file: %w", err)
+	}
+	defer f.Close()
+
+	if err := json.MarshalWrite(f, root, json.Deterministic(true)); err != nil {
+		return fmt.Errorf("failed to encode tree to JSON: %w", err)
+	}
+	return nil
+}
+
 func main() {
 	if len(os.Args) < 2 {
 		fmt.Fprintln(os.Stderr, "missing action argument")
@@ -184,7 +210,9 @@ func main() {
 			log.Fatal(err)
 		}
 	case "dump_tree_json":
-		panic("dump_tree_json not implemented")
+		if err := runDumpTreeJson(paths[0], opts); err != nil {
+			log.Fatal(err)
+		}
 	default:
 		log.Fatalf("unknown action: %s\n", action)
 	}

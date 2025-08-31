@@ -1,9 +1,5 @@
 # estimate_danger
 
-> 🚧 **Work in Progress**
->
-> estimate_danger is currently in development and not usable yet.
-
 This tool analyzes game logs in Mjai format and generates a decision tree to estimate deal-in risk based on game state.
 
 > [!IMPORTANT]
