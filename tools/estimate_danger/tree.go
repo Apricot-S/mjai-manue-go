@@ -87,44 +87,44 @@ func generateDecisionTreeImpl(
 		if gap > minGap {
 			gaps[name] = gap
 		}
+	}
 
-		var maxName string
-		var maxValue float64
-		first := true
-		for name, value := range gaps {
-			if first || value > maxValue {
-				maxName = name
-				maxValue = value
-				first = false
-			}
+	var maxName string
+	var maxValue float64
+	first := true
+	for name, value := range gaps {
+		if first || value > maxValue {
+			maxName = name
+			maxValue = value
+			first = false
 		}
+	}
 
-		if maxName != "" {
-			c := targets[maxName]
-			baseNode.FeatureName = &maxName
+	if maxName != "" {
+		c := targets[maxName]
+		baseNode.FeatureName = &maxName
 
-			negativeKey, err := json.Marshal(c[0], json.Deterministic(true))
-			if err != nil {
-				return nil, fmt.Errorf("failed to encode criterion: %w", err)
-			}
-			baseNode.Negative = nodeMap[string(negativeKey)]
+		negativeKey, err := json.Marshal(c[0], json.Deterministic(true))
+		if err != nil {
+			return nil, fmt.Errorf("failed to encode criterion: %w", err)
+		}
+		baseNode.Negative = nodeMap[string(negativeKey)]
 
-			positiveKey, err := json.Marshal(c[1], json.Deterministic(true))
-			if err != nil {
-				return nil, fmt.Errorf("failed to encode criterion: %w", err)
-			}
-			baseNode.Positive = nodeMap[string(positiveKey)]
+		positiveKey, err := json.Marshal(c[1], json.Deterministic(true))
+		if err != nil {
+			return nil, fmt.Errorf("failed to encode criterion: %w", err)
+		}
+		baseNode.Positive = nodeMap[string(positiveKey)]
 
-			RenderDecisionTree(w, root, "all", 0)
+		RenderDecisionTree(w, root, "all", 0)
 
-			_, err = generateDecisionTreeImpl(w, storedKyokus, featureNames, *c[0], baseNode.Negative, root, minGap)
-			if err != nil {
-				return nil, err
-			}
-			_, err = generateDecisionTreeImpl(w, storedKyokus, featureNames, *c[1], baseNode.Positive, root, minGap)
-			if err != nil {
-				return nil, err
-			}
+		_, err = generateDecisionTreeImpl(w, storedKyokus, featureNames, *c[0], baseNode.Negative, root, minGap)
+		if err != nil {
+			return nil, err
+		}
+		_, err = generateDecisionTreeImpl(w, storedKyokus, featureNames, *c[1], baseNode.Positive, root, minGap)
+		if err != nil {
+			return nil, err
 		}
 	}
 
