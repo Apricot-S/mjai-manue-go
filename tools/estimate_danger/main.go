@@ -139,7 +139,7 @@ func runDumpTree(path string, w io.Writer) error {
 	return nil
 }
 
-func runDumpTreeJson(path string, opts *Options) error {
+func runDumpTreeJSON(path string, opts *Options) error {
 	if opts.Output == "" {
 		return fmt.Errorf("-o is missing")
 	}
@@ -210,7 +210,7 @@ func main() {
 			log.Fatal(err)
 		}
 	case "dump_tree_json":
-		if err := runDumpTreeJson(paths[0], opts); err != nil {
+		if err := runDumpTreeJSON(paths[0], opts); err != nil {
 			log.Fatal(err)
 		}
 	default:
