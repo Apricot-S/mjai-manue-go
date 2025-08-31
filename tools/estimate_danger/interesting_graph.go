@@ -13,6 +13,13 @@ import (
 
 const rootDir = "exp/graphs"
 
+var (
+	re1 = regexp.MustCompile(`^main\.Criterion\{`)
+	re2 = regexp.MustCompile(`"`)
+	re3 = regexp.MustCompile(`_`)
+	re4 = regexp.MustCompile(`}`)
+)
+
 func createPointsFile(path string, nodes []*configs.DecisionNode, gap float64) error {
 	f, err := os.Create(path)
 	if err != nil {
@@ -39,6 +46,15 @@ func createPointsFile(path string, nodes []*configs.DecisionNode, gap float64) e
 	}
 
 	return nil
+}
+
+func formatCriterionTitle(c Criterion) string {
+	title := fmt.Sprintf("%#v", c)
+	title = re1.ReplaceAllString(title, `\\{`)
+	title = re2.ReplaceAllString(title, `\"`)
+	title = re3.ReplaceAllString(title, `\\_`)
+	title = re4.ReplaceAllString(title, `\\}`)
+	return title
 }
 
 func generateGnuplotSpec(id int, baseTitle, testTitle string) string {
@@ -83,11 +99,6 @@ func createGraph(probs map[string]*configs.DecisionNode, outputDir string) error
 		return err
 	}
 
-	re1 := regexp.MustCompile(`^main\.Criterion\{`)
-	re2 := regexp.MustCompile(`"`)
-	re3 := regexp.MustCompile(`_`)
-	re4 := regexp.MustCompile(`}`)
-
 	id := 0
 	for _, entry := range SupaiCriteria {
 		for _, testCriterion := range entry.Test {
@@ -118,18 +129,8 @@ func createGraph(probs map[string]*configs.DecisionNode, outputDir string) error
 				return err
 			}
 
-			baseTitle := fmt.Sprintf("%#v", entry.Base)
-			baseTitle = re1.ReplaceAllString(baseTitle, `\\{`)
-			baseTitle = re2.ReplaceAllString(baseTitle, `\"`)
-			baseTitle = re3.ReplaceAllString(baseTitle, `\\_`)
-			baseTitle = re4.ReplaceAllString(baseTitle, `\\}`)
-
-			testTitle := fmt.Sprintf("%#v", testCriterion)
-			testTitle = re1.ReplaceAllString(testTitle, `\\{`)
-			testTitle = re2.ReplaceAllString(testTitle, `\"`)
-			testTitle = re3.ReplaceAllString(testTitle, `\\_`)
-			testTitle = re4.ReplaceAllString(testTitle, `\\}`)
-
+			baseTitle := formatCriterionTitle(entry.Base)
+			testTitle := formatCriterionTitle(testCriterion)
 			spec := generateGnuplotSpec(id, baseTitle, testTitle)
 			if err := executeGnuplot(id, spec, outputDir); err != nil {
 				return err
