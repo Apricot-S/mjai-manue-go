@@ -58,8 +58,8 @@ func generateDecisionTreeImpl(
 	}
 
 	gaps := make(map[string]float64)
-	for name, np := range targets {
-		negativeKey, err := json.Marshal(np[0], json.Deterministic(true))
+	for name, c := range targets {
+		negativeKey, err := json.Marshal(c[0], json.Deterministic(true))
 		if err != nil {
 			return nil, fmt.Errorf("failed to encode criterion: %w", err)
 		}
@@ -68,7 +68,7 @@ func generateDecisionTreeImpl(
 			continue
 		}
 
-		positiveKey, err := json.Marshal(np[1], json.Deterministic(true))
+		positiveKey, err := json.Marshal(c[1], json.Deterministic(true))
 		if err != nil {
 			return nil, fmt.Errorf("failed to encode criterion: %w", err)
 		}
