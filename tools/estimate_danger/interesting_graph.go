@@ -94,6 +94,19 @@ func executeGnuplot(id int, spec string, outputDir string) error {
 	return cmd.Run()
 }
 
+func createGraphsHTML(outputDir string, id int) error {
+	f, err := os.Create(fmt.Sprintf("%s/graphs.html", outputDir))
+	if err != nil {
+		return err
+	}
+	defer f.Close()
+
+	for i := range id {
+		fmt.Fprintf(f, "<div><img src='%d.graph.png'></div>\n", i)
+	}
+	return nil
+}
+
 func createGraph(probs map[string]*configs.DecisionNode, outputDir string) error {
 	if err := os.MkdirAll(outputDir, 0755); err != nil {
 		return err
@@ -139,14 +152,8 @@ func createGraph(probs map[string]*configs.DecisionNode, outputDir string) error
 		}
 	}
 
-	f, err := os.Create(fmt.Sprintf("%s/graphs.html", outputDir))
-	if err != nil {
+	if err := createGraphsHTML(outputDir, id); err != nil {
 		return err
-	}
-	defer f.Close()
-
-	for i := range id {
-		fmt.Fprintf(f, "<div><img src='%d.graph.png'></div>\n", i)
 	}
 
 	return nil
