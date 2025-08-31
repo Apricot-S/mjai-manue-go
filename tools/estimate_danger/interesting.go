@@ -179,8 +179,13 @@ func CalculateInterestingProbabilities(featuresPath string, w io.Writer) (map[st
 	}
 
 	fn := FeatureNames()
+	storedKyokus, err := LoadStoredKyokus(r, stat.Size(), fn)
+	if err != nil {
+		return nil, err
+	}
+
 	criteria := BuildInterestingCriteria()
-	result, err := CalculateProbabilities(r, w, stat.Size(), fn, criteria)
+	result, err := CalculateProbabilities(w, storedKyokus, fn, criteria)
 	if err != nil {
 		return nil, err
 	}
@@ -201,8 +206,13 @@ func RunBenchmark(featuresPath string) error {
 	}
 
 	fn := FeatureNames()
+	storedKyokus, err := LoadStoredKyokus(r, stat.Size(), fn)
+	if err != nil {
+		return err
+	}
+
 	criteria := BuildInterestingCriteria()
-	if _, err := CreateKyokuProbsMap(r, stat.Size(), fn, criteria); err != nil {
+	if _, err := CreateKyokuProbsMap(storedKyokus, fn, criteria); err != nil {
 		return err
 	}
 

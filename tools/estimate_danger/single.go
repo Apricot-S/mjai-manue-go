@@ -27,8 +27,13 @@ func CalculateSingleProbabilities(featuresPath string, w io.Writer) error {
 	}
 
 	fn := FeatureNames()
+	storedKyokus, err := LoadStoredKyokus(r, stat.Size(), fn)
+	if err != nil {
+		return err
+	}
+
 	criteria := buildSingleCriteria(fn)
-	if _, err := CalculateProbabilities(r, w, stat.Size(), fn, criteria); err != nil {
+	if _, err := CalculateProbabilities(w, storedKyokus, fn, criteria); err != nil {
 		return err
 	}
 	return nil

@@ -15,16 +15,13 @@ import (
 )
 
 func generateDecisionTreeImpl(
-	r io.ReadSeeker,
 	w io.Writer,
-	fileSize int64,
+	storedKyokus []StoredKyoku,
 	featureNames []string,
 	baseCriterion Criterion,
 	baseNode, root *configs.DecisionNode,
 	minGap float64,
 ) (*configs.DecisionNode, error) {
-	r.Seek(0, io.SeekStart)
-
 	targets := make(map[string][2]*Criterion)
 
 	var criteria []Criterion
@@ -46,7 +43,7 @@ func generateDecisionTreeImpl(
 		criteria = append(criteria, negativeCriterion, positiveCriterion)
 	}
 
-	nodeMap, err := CalculateProbabilities(r, w, fileSize, featureNames, criteria)
+	nodeMap, err := CalculateProbabilities(w, storedKyokus, featureNames, criteria)
 	if err != nil {
 		return nil, err
 	}
@@ -120,11 +117,11 @@ func generateDecisionTreeImpl(
 
 			RenderDecisionTree(w, root, "all", 0)
 
-			_, err = generateDecisionTreeImpl(r, w, fileSize, featureNames, *c[0], baseNode.Negative, root, minGap)
+			_, err = generateDecisionTreeImpl(w, storedKyokus, featureNames, *c[0], baseNode.Negative, root, minGap)
 			if err != nil {
 				return nil, err
 			}
-			_, err = generateDecisionTreeImpl(r, w, fileSize, featureNames, *c[1], baseNode.Positive, root, minGap)
+			_, err = generateDecisionTreeImpl(w, storedKyokus, featureNames, *c[1], baseNode.Positive, root, minGap)
 			if err != nil {
 				return nil, err
 			}
@@ -146,7 +143,13 @@ func GenerateDecisionTree(featuresPath string, w io.Writer, minGap float64) (*co
 		return nil, err
 	}
 
-	return generateDecisionTreeImpl(r, w, stat.Size(), FeatureNames(), make(Criterion), nil, nil, minGap)
+	fn := FeatureNames()
+	storedKyokus, err := LoadStoredKyokus(r, stat.Size(), fn)
+	if err != nil {
+		return nil, err
+	}
+
+	return generateDecisionTreeImpl(w, storedKyokus, FeatureNames(), make(Criterion), nil, nil, minGap)
 }
 
 func RenderDecisionTree(w io.Writer, node *configs.DecisionNode, label string, indent int) {

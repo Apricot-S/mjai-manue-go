@@ -47,7 +47,7 @@ func createCriterionMasks(featureNames []string, criteria []Criterion) (Criterio
 	return criterionMasks, nil
 }
 
-func loadStoredKyokus(r io.Reader, fileSize int64, featureNames []string) ([]StoredKyoku, error) {
+func LoadStoredKyokus(r io.Reader, fileSize int64, featureNames []string) ([]StoredKyoku, error) {
 	bar := progressbar.DefaultBytes(fileSize, "loading   ")
 	tr := io.TeeReader(r, bar)
 
@@ -110,17 +110,11 @@ func createMetricsForKyoku(storedKyoku StoredKyoku, criterionMasks CriterionMask
 }
 
 func CreateKyokuProbsMap(
-	r io.Reader,
-	fileSize int64,
+	storedKyokus []StoredKyoku,
 	featureNames []string,
 	criteria []Criterion,
 ) (map[string][]float64, error) {
 	criterionMasks, err := createCriterionMasks(featureNames, criteria)
-	if err != nil {
-		return nil, err
-	}
-
-	storedKyokus, err := loadStoredKyokus(r, fileSize, featureNames)
 	if err != nil {
 		return nil, err
 	}
@@ -200,13 +194,12 @@ func printAggregateResults(w io.Writer, criteria []Criterion, result map[string]
 }
 
 func CalculateProbabilities(
-	r io.Reader,
 	w io.Writer,
-	fileSize int64,
+	storedKyokus []StoredKyoku,
 	featureNames []string,
 	criteria []Criterion,
 ) (map[string]*configs.DecisionNode, error) {
-	kyokuProbsMap, err := CreateKyokuProbsMap(r, fileSize, featureNames, criteria)
+	kyokuProbsMap, err := CreateKyokuProbsMap(storedKyokus, featureNames, criteria)
 	if err != nil {
 		return nil, err
 	}
