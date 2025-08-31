@@ -118,7 +118,7 @@ func generateDecisionTreeImpl(
 			}
 			baseNode.Positive = nodeMap[string(positiveKey)]
 
-			// render_decision_tree(root, "all")
+			RenderDecisionTree(w, root, "all", 0)
 
 			_, err = generateDecisionTreeImpl(r, w, fileSize, featureNames, *c[0], baseNode.Negative, root, minGap)
 			if err != nil {
