@@ -38,9 +38,9 @@ func generateDecisionTreeImpl(
 		}
 
 		negativeCriterion := maps.Clone(baseCriterion)
-		maps.Copy(negativeCriterion, Criterion{name: false})
+		negativeCriterion[name] = false
 		positiveCriterion := maps.Clone(baseCriterion)
-		maps.Copy(positiveCriterion, Criterion{name: true})
+		positiveCriterion[name] = true
 
 		targets[name] = [2]*Criterion{&negativeCriterion, &positiveCriterion}
 		criteria = append(criteria, negativeCriterion, positiveCriterion)
@@ -146,7 +146,7 @@ func GenerateDecisionTree(featuresPath string, w io.Writer, minGap float64) (*co
 		return nil, err
 	}
 
-	return generateDecisionTreeImpl(r, w, stat.Size(), FeatureNames(), nil, nil, nil, minGap)
+	return generateDecisionTreeImpl(r, w, stat.Size(), FeatureNames(), make(Criterion), nil, nil, minGap)
 }
 
 func RenderDecisionTree(w io.Writer, node *configs.DecisionNode, label string, indent int) {
