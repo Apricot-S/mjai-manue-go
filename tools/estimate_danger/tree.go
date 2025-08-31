@@ -195,3 +195,18 @@ func DumpDecisionTree(node *configs.DecisionNode, outputPath string) error {
 	encoder := gob.NewEncoder(f)
 	return encoder.Encode(node)
 }
+
+func LoadDecisionTree(treePath string) (*configs.DecisionNode, error) {
+	f, err := os.Open(treePath)
+	if err != nil {
+		return nil, fmt.Errorf("failed to open tree file: %w", err)
+	}
+	defer f.Close()
+
+	decoder := gob.NewDecoder(f)
+	var node configs.DecisionNode
+	if err := decoder.Decode(&node); err != nil {
+		return nil, fmt.Errorf("failed to decode tree file: %w", err)
+	}
+	return &node, nil
+}

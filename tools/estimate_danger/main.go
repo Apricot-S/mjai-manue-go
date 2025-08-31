@@ -42,6 +42,8 @@ func parseOptions(action string, args []string) (*Options, []string, error) {
 	case "tree":
 		fs.StringVar(&opts.Output, "o", "", "output filepath")
 		fs.Float64Var(&opts.MinGap, "min_gap", 0.0, "minimum gap percentage")
+	case "dump_tree":
+		// no options
 	default:
 		return nil, nil, fmt.Errorf("unknown action: %s", action)
 	}
@@ -124,6 +126,15 @@ func runTree(path string, opts *Options, w io.Writer) error {
 	return nil
 }
 
+func runDumpTree(path string, w io.Writer) error {
+	root, err := LoadDecisionTree(path)
+	if err != nil {
+		return err
+	}
+	RenderDecisionTree(w, root, "all", 0)
+	return nil
+}
+
 func main() {
 	if len(os.Args) < 2 {
 		fmt.Fprintln(os.Stderr, "missing action argument")
@@ -169,7 +180,9 @@ func main() {
 			log.Fatal(err)
 		}
 	case "dump_tree":
-		panic("dump_tree not implemented")
+		if err := runDumpTree(paths[0], w); err != nil {
+			log.Fatal(err)
+		}
 	case "dump_tree_json":
 		panic("dump_tree_json not implemented")
 	default:
