@@ -138,7 +138,7 @@ func GenerateDecisionTree(featuresPath string, w io.Writer, minGap float64) (*co
 		return nil, err
 	}
 
-	return generateDecisionTreeImpl(w, storedKyokus, FeatureNames(), make(Criterion), nil, nil, minGap)
+	return generateDecisionTreeImpl(w, storedKyokus, fn, make(Criterion), nil, nil, minGap)
 }
 
 func RenderDecisionTree(w io.Writer, node *configs.DecisionNode, label string, indent int) {
