@@ -22,6 +22,8 @@ func generateDecisionTreeImpl(
 	baseNode, root *configs.DecisionNode,
 	minGap float64,
 ) (*configs.DecisionNode, error) {
+	fmt.Fprintf(w, ":generate_decision_tree, %#v\n", baseCriterion)
+
 	targets := make(map[string][2]*Criterion)
 
 	var criteria []Criterion
@@ -87,6 +89,8 @@ func generateDecisionTreeImpl(
 		} else {
 			gap = negative.ConfInterval[0] - positive.ConfInterval[1]
 		}
+		fmt.Fprintf(w, "%#v, %#v\n", name, gap)
+
 		if gap > minGap {
 			gaps[name] = gap
 		}
@@ -102,6 +106,7 @@ func generateDecisionTreeImpl(
 			first = false
 		}
 	}
+	fmt.Fprintf(w, ":max_name, %#v\n", maxName)
 
 	if maxName != "" {
 		c := targets[maxName]
