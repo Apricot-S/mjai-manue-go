@@ -1,9 +1,7 @@
 package main
 
 import (
-	"fmt"
 	"io"
-	"os"
 )
 
 func buildSingleCriteria(featureNames []string) []Criterion {
@@ -15,19 +13,8 @@ func buildSingleCriteria(featureNames []string) []Criterion {
 }
 
 func CalculateSingleProbabilities(featuresPath string, w io.Writer) error {
-	r, err := os.Open(featuresPath)
-	if err != nil {
-		return fmt.Errorf("failed to open features file: %w", err)
-	}
-	defer r.Close()
-
-	stat, err := r.Stat()
-	if err != nil {
-		return err
-	}
-
 	fn := FeatureNames()
-	storedKyokus, err := LoadStoredKyokus(r, stat.Size(), fn)
+	storedKyokus, err := LoadStoredKyokus(featuresPath, fn)
 	if err != nil {
 		return err
 	}

@@ -132,19 +132,8 @@ func generateDecisionTreeImpl(
 }
 
 func GenerateDecisionTree(featuresPath string, w io.Writer, minGap float64) (*configs.DecisionNode, error) {
-	r, err := os.Open(featuresPath)
-	if err != nil {
-		return nil, fmt.Errorf("failed to open features file: %w", err)
-	}
-	defer r.Close()
-
-	stat, err := r.Stat()
-	if err != nil {
-		return nil, err
-	}
-
 	fn := FeatureNames()
-	storedKyokus, err := LoadStoredKyokus(r, stat.Size(), fn)
+	storedKyokus, err := LoadStoredKyokus(featuresPath, fn)
 	if err != nil {
 		return nil, err
 	}

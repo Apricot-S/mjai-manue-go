@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"io"
 	"maps"
-	"os"
 	"slices"
 
 	"github.com/Apricot-S/mjai-manue-go/configs"
@@ -167,19 +166,8 @@ func BuildInterestingCriteria() []Criterion {
 }
 
 func CalculateInterestingProbabilities(featuresPath string, w io.Writer) (map[string]*configs.DecisionNode, error) {
-	r, err := os.Open(featuresPath)
-	if err != nil {
-		return nil, fmt.Errorf("failed to open features file: %w", err)
-	}
-	defer r.Close()
-
-	stat, err := r.Stat()
-	if err != nil {
-		return nil, err
-	}
-
 	fn := FeatureNames()
-	storedKyokus, err := LoadStoredKyokus(r, stat.Size(), fn)
+	storedKyokus, err := LoadStoredKyokus(featuresPath, fn)
 	if err != nil {
 		return nil, err
 	}
@@ -194,19 +182,8 @@ func CalculateInterestingProbabilities(featuresPath string, w io.Writer) (map[st
 }
 
 func RunBenchmark(featuresPath string) error {
-	r, err := os.Open(featuresPath)
-	if err != nil {
-		return fmt.Errorf("failed to open features file: %w", err)
-	}
-	defer r.Close()
-
-	stat, err := r.Stat()
-	if err != nil {
-		return err
-	}
-
 	fn := FeatureNames()
-	storedKyokus, err := LoadStoredKyokus(r, stat.Size(), fn)
+	storedKyokus, err := LoadStoredKyokus(featuresPath, fn)
 	if err != nil {
 		return err
 	}

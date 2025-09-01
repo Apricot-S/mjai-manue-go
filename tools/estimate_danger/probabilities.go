@@ -47,11 +47,8 @@ func createCriterionMasks(featureNames []string, criteria []Criterion) (Criterio
 	return criterionMasks, nil
 }
 
-func LoadStoredKyokus(r io.Reader, fileSize int64, featureNames []string) ([]StoredKyoku, error) {
-	bar := progressbar.DefaultBytes(fileSize, "loading   ")
-	tr := io.TeeReader(r, bar)
-
-	decoder := gob.NewDecoder(tr)
+func loadStoredKyokusImpl(r io.Reader, featureNames []string) ([]StoredKyoku, error) {
+	decoder := gob.NewDecoder(r)
 
 	var metaData MetaData
 	if err := decoder.Decode(&metaData); err != nil {
@@ -76,6 +73,23 @@ func LoadStoredKyokus(r io.Reader, fileSize int64, featureNames []string) ([]Sto
 	}
 
 	return storedKyokus, nil
+}
+
+func LoadStoredKyokus(featuresPath string, featureNames []string) ([]StoredKyoku, error) {
+	f, err := os.Open(featuresPath)
+	if err != nil {
+		return nil, fmt.Errorf("failed to open features file: %w", err)
+	}
+	defer f.Close()
+
+	stat, err := f.Stat()
+	if err != nil {
+		return nil, err
+	}
+
+	bar := progressbar.DefaultBytes(stat.Size(), "loading   ")
+	tr := io.TeeReader(f, bar)
+	return loadStoredKyokusImpl(tr, featureNames)
 }
 
 func createMetricsForKyoku(storedKyoku StoredKyoku, criterionMasks CriterionMasks) map[string][]float64 {
