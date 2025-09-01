@@ -60,7 +60,10 @@ func generateDecisionTreeImpl(
 
 	gaps := make(map[string]float64)
 	for name, c := range targets {
-		negativeKey, err := json.Marshal(c[0], json.Deterministic(true))
+		negativeCriterion := c[0]
+		positiveCriterion := c[1]
+
+		negativeKey, err := json.Marshal(negativeCriterion, json.Deterministic(true))
 		if err != nil {
 			return nil, fmt.Errorf("failed to encode criterion: %w", err)
 		}
@@ -69,7 +72,7 @@ func generateDecisionTreeImpl(
 			continue
 		}
 
-		positiveKey, err := json.Marshal(c[1], json.Deterministic(true))
+		positiveKey, err := json.Marshal(positiveCriterion, json.Deterministic(true))
 		if err != nil {
 			return nil, fmt.Errorf("failed to encode criterion: %w", err)
 		}
@@ -102,15 +105,17 @@ func generateDecisionTreeImpl(
 
 	if maxName != "" {
 		c := targets[maxName]
+		negativeCriterion := c[0]
+		positiveCriterion := c[1]
 		baseNode.FeatureName = &maxName
 
-		negativeKey, err := json.Marshal(c[0], json.Deterministic(true))
+		negativeKey, err := json.Marshal(negativeCriterion, json.Deterministic(true))
 		if err != nil {
 			return nil, fmt.Errorf("failed to encode criterion: %w", err)
 		}
 		baseNode.Negative = nodeMap[string(negativeKey)]
 
-		positiveKey, err := json.Marshal(c[1], json.Deterministic(true))
+		positiveKey, err := json.Marshal(positiveCriterion, json.Deterministic(true))
 		if err != nil {
 			return nil, fmt.Errorf("failed to encode criterion: %w", err)
 		}
@@ -118,11 +123,11 @@ func generateDecisionTreeImpl(
 
 		RenderDecisionTree(w, root, "all", 0)
 
-		_, err = generateDecisionTreeImpl(w, storedKyokus, featureNames, *c[0], baseNode.Negative, root, minGap)
+		_, err = generateDecisionTreeImpl(w, storedKyokus, featureNames, *negativeCriterion, baseNode.Negative, root, minGap)
 		if err != nil {
 			return nil, err
 		}
-		_, err = generateDecisionTreeImpl(w, storedKyokus, featureNames, *c[1], baseNode.Positive, root, minGap)
+		_, err = generateDecisionTreeImpl(w, storedKyokus, featureNames, *positiveCriterion, baseNode.Positive, root, minGap)
 		if err != nil {
 			return nil, err
 		}
