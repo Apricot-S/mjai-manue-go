@@ -94,7 +94,7 @@ func executeGnuplot(id int, spec string, outputDir string) error {
 	return cmd.Run()
 }
 
-func createGraphsHTML(outputDir string, id int) error {
+func createGraphsHTML(id int, outputDir string) error {
 	f, err := os.Create(fmt.Sprintf("%s/graphs.html", outputDir))
 	if err != nil {
 		return err
@@ -152,7 +152,7 @@ func createGraph(probs map[string]*configs.DecisionNode, outputDir string) error
 		}
 	}
 
-	if err := createGraphsHTML(outputDir, id); err != nil {
+	if err := createGraphsHTML(id, outputDir); err != nil {
 		return err
 	}
 
