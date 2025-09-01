@@ -57,22 +57,25 @@ func formatCriterionTitle(c Criterion) string {
 	return title
 }
 
-func generateGnuplotSpec(id int, baseTitle, testTitle string) string {
+func generateGnuplotSpec(id int, baseTitle, testTitle string, outputDir string) string {
 	return fmt.Sprintf(`
  set encoding utf8
  set terminal pngcairo size 640,480 font "IPAGothic"
- set output "exp/graphs/%d.graph.png"
+ set output "%s/%d.graph.png"
  set xrange [0:6]
  set yrange [0:25]
  set xlabel "牌の数字"
  set ylabel "放銃率 [%%]"
  set xtics ("1,9" 1, "2,8" 2, "3,7" 3, "4,6" 4, "5" 5)
- plot  "exp/graphs/%d.base.points" using 1:2:3:4 with yerrorbars title "%s", \
-   "exp/graphs/%d.test.points" using 1:2:3:4 with yerrorbars title "%s"
+ plot  "%s/%d.base.points" using 1:2:3:4 with yerrorbars title "%s", \
+   "%s/%d.test.points" using 1:2:3:4 with yerrorbars title "%s"
 `,
+		outputDir,
 		id,
+		outputDir,
 		id,
 		baseTitle,
+		outputDir,
 		id,
 		testTitle,
 	)
@@ -144,7 +147,7 @@ func createGraph(probs map[string]*configs.DecisionNode, outputDir string) error
 
 			baseTitle := formatCriterionTitle(entry.Base)
 			testTitle := formatCriterionTitle(testCriterion)
-			spec := generateGnuplotSpec(id, baseTitle, testTitle)
+			spec := generateGnuplotSpec(id, baseTitle, testTitle, outputDir)
 			if err := executeGnuplot(id, spec, outputDir); err != nil {
 				return err
 			}
