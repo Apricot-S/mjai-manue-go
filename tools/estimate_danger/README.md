@@ -24,7 +24,7 @@ This tool analyzes game logs in Mjai format and generates a decision tree to est
 With the top-level directory of working tree of this repository as the current directory, run the following command:
 
 ```sh
-go run ./tools/estimate_danger <subcommand> [options...] <PATH/TO/INPUT_FILES>
+go run ./tools/estimate_danger <SUBCOMMAND> [OPTIONS]... <PATH/TO/INPUT_FILES>
 ```
 
 ## extract
@@ -35,7 +35,7 @@ It focuses specifically on **situations where exactly one player has declared Ri
 ### Usage
 
 ```sh
-go run ./tools/estimate_danger extract -o OUTPUT_FILEPATH [options...] <PATH/TO/INPUT_FILES>
+go run ./tools/estimate_danger extract -o <OUTPUT_FILEPATH> [OPTIONS]... <PATH/TO/INPUT_FILES>...
 ```
 
 Required Option
@@ -83,4 +83,342 @@ go run ./tools/estimate_danger extract -o features.gob -start logs/game_050.mjso
 
 # Specify filter conditions (only filters the standard output display, does not affect data extraction)
 go run ./tools/estimate_danger extract -o features.gob -filter "hit:1&suji:0" logs/*.mjson
+```
+
+## single
+
+(TODO)
+
+### Usage
+
+```sh
+go run ./tools/estimate_danger single <PATH/TO/INPUT_FILE>
+```
+
+### What It Does
+
+(TODO)
+
+### Output
+
+(TODO)
+
+### Example of Usage
+
+(TODO)
+
+### Sample Output
+
+```txt
+map[anpai:false]
+  9.01 [8.65, 9.75] (545 samples)
+
+map[tsupai:false]
+  9.44 [9.06, 10.21] (545 samples)
+
+map[tsupai:true]
+  3.07 [2.07, 4.65] (490 samples)
+
+map[suji:false]
+  9.64 [9.15, 10.50] (545 samples)
+
+...
+
+map[bakaze:true]
+  1.56 [0.00, 4.64] (192 samples)
+
+map[jikaze:false]
+  9.08 [8.70, 9.83] (545 samples)
+
+map[jikaze:true]
+  0.00 [0.00, 2.11] (188 samples)
+
+```
+
+## interesting
+
+(TODO)
+
+### Usage
+
+```sh
+go run ./tools/estimate_danger interesting [-o <OUTPUT_FILEPATH>] <PATH/TO/INPUT_FILE>
+```
+
+### What It Does
+
+(TODO)
+
+### Output
+
+(TODO)
+
+### Example of Usage
+
+(TODO)
+
+### Sample Output
+
+```txt
+map[tsupai:true]
+  3.07 [2.05, 4.63] (490 samples)
+
+map[sangenpai:true tsupai:true]
+  3.13 [1.83, 4.97] (358 samples)
+
+map[sangenpai:false tsupai:true]
+  1.95 [1.03, 3.49] (417 samples)
+
+...
+
+map[3<=n<=7:true 4<=n<=6:false same_type_in_prereach>=1:false suji:false tsupai:false]
+  13.23 [9.84, 17.58] (185 samples)
+
+map[4<=n<=6:true 5<=n<=5:false same_type_in_prereach>=1:false suji:false tsupai:false]
+  11.08 [7.76, 15.41] (185 samples)
+
+map[5<=n<=5:true same_type_in_prereach>=1:false suji:false tsupai:false]
+  8.61 [5.50, 13.41] (164 samples)
+
+```
+
+## interesting_graph
+
+(TODO)
+
+### Usage
+
+```sh
+go run ./tools/estimate_danger interesting_graph <PATH/TO/INPUT_FILE>
+```
+
+### What It Does
+
+(TODO)
+
+### Output
+
+(TODO)
+
+### Example of Usage
+
+(TODO)
+
+### Sample Output
+
+![interesting_graph.sample](interesting_graph.sample.png)
+
+## benchmark
+
+(TODO)
+
+### Usage
+
+```sh
+go run ./tools/estimate_danger benchmark <PATH/TO/INPUT_FILE>
+```
+
+### What It Does
+
+(TODO)
+
+### Output
+
+Nothing except progress bars.
+
+### Example of Usage
+
+(TODO)
+
+## tree
+
+(TODO)
+
+### Usage
+
+```sh
+go run ./tools/estimate_danger tree [-o <OUTPUT_FILEPATH>] [-min_gap PERCENTAGE] <PATH/TO/INPUT_FILE>
+```
+
+### What It Does
+
+(TODO)
+
+### Output
+
+(TODO)
+
+### Example of Usage
+
+(TODO)
+
+### Sample Output
+
+```txt
+:generate_decision_tree, main.Criterion{}
+map[]
+  9.01 [8.65, 9.74] (545 samples)
+
+map[anpai:false]
+  9.01 [8.67, 9.72] (545 samples)
+
+...
+
+"matagisuji", 0.005008593482568255
+"senkisuji", -0.016123104870598315
+"suji_visible<=3", 0.04216014640822681
+
+...
+
+"suji_in_tehais>=3", 0.00048345349694561834
+"+-2_in_prereach_sutehais>=2", 0.010061817156363381
+"1_inner_prereach_sutehai", -0.0004900895548952955
+:max_name, "jikaze"
+all : 9.01 [8.65, 9.74] (545 samples)
+  jikaze = true : 0.00 [0.00, 1.58] (188 samples)
+  jikaze = false : 9.08 [8.63, 9.84] (545 samples)
+:generate_decision_tree, main.Criterion{"jikaze":false}
+map[anpai:false jikaze:false]
+  9.08 [8.71, 9.84] (545 samples)
+
+...
+
+"visible>=3", -0.01935483870967742
+"ryenfonpai", -0.02054794520547945
+"dora", -0.02247191011235955
+"in_tehais>=2", -0.018404907975460124
+"bakaze", -0.02054794520547945
+"visible>=1", -0.07317073170731707
+"in_tehais>=3", -0.016216216216216217
+"visible>=2", -0.02912621359223301
+:max_name, ""
+all : 9.01 [8.65, 9.74] (545 samples)
+  jikaze = true : 0.00 [0.00, 1.58] (188 samples)
+  jikaze = false : 9.08 [8.63, 9.84] (545 samples)
+    fonpai = true : 2.20 [1.18, 3.89] (380 samples)
+    fonpai = false : 9.27 [8.90, 9.98] (545 samples)
+      chances<=0 = true : 2.99 [1.87, 4.95] (290 samples)
+        suji_visible<=1 = true : 1.07 [0.42, 2.75] (223 samples)
+        suji_visible<=1 = false : 6.28 [4.02, 10.19] (197 samples)
+      chances<=0 = false : 9.45 [9.03, 10.22] (545 samples)
+        sangenpai = true : 3.13 [1.82, 5.06] (358 samples)
+        sangenpai = false : 9.66 [9.25, 10.45] (545 samples)
+          suji = true : 4.33 [3.27, 5.93] (471 samples)
+          suji = false : 10.51 [9.90, 11.39] (545 samples)
+            +-2_in_prereach_sutehais>=1 = true : 7.83 [6.98, 9.12] (544 samples)
+              reach_suji = true : 0.00 [0.00, 5.00] (58 samples)
+              reach_suji = false : 7.95 [7.11, 9.13] (544 samples)
+            +-2_in_prereach_sutehais>=1 = false : 13.37 [12.04, 15.15] (514 samples)
+              visible>=3 = true : 2.97 [0.76, 7.47] (130 samples)
+              visible>=3 = false : 13.53 [12.15, 15.46] (513 samples)
+```
+
+## dump_tree
+
+(TODO)
+
+### Usage
+
+```sh
+go run ./tools/estimate_danger dump_tree <PATH/TO/INPUT_FILE>
+```
+
+### What It Does
+
+(TODO)
+
+### Output
+
+(TODO)
+
+### Example of Usage
+
+(TODO)
+
+### Sample Output
+
+```txt
+all : 9.01 [8.64, 9.76] (545 samples)
+  jikaze = true : 0.00 [0.00, 1.58] (188 samples)
+  jikaze = false : 9.08 [8.70, 9.77] (545 samples)
+    fonpai = true : 2.20 [1.17, 3.88] (380 samples)
+      dora = false : 1.44 [0.71, 2.91] (376 samples)
+      dora = true : 16.67 [7.69, 34.62] (24 samples)
+    fonpai = false : 9.27 [8.90, 10.00] (545 samples)
+      chances<=0 = true : 2.99 [1.93, 5.05] (290 samples)
+      chances<=0 = false : 9.45 [9.06, 10.19] (545 samples)
+        fanpai = true : 3.13 [1.80, 5.10] (358 samples)
+        fanpai = false : 9.66 [9.25, 10.48] (545 samples)
+          suji = true : 4.33 [3.30, 5.96] (471 samples)
+          suji = false : 10.51 [9.88, 11.41] (545 samples)
+            +-2_in_prereach_sutehais>=1 = true : 7.83 [7.06, 9.07] (544 samples)
+              reach_suji = true : 0.00 [0.00, 5.00] (58 samples)
+              reach_suji = false : 7.95 [7.13, 9.08] (544 samples)
+            +-2_in_prereach_sutehais>=1 = false : 13.37 [11.98, 15.18] (514 samples)
+              visible>=3 = true : 2.97 [0.76, 7.25] (130 samples)
+              visible>=3 = false : 13.53 [12.11, 15.42] (513 samples)
+```
+
+## dump_tree_json
+
+(TODO)
+
+### Usage
+
+```sh
+go run ./tools/estimate_danger dump_tree_json -o <OUTPUT_FILEPATH> <PATH/TO/INPUT_FILE>
+```
+
+### What It Does
+
+(TODO)
+
+### Output
+
+(TODO)
+
+The output is directly usable as `configs/danger_tree.all.json`.
+
+### Example of Usage
+
+(TODO)
+
+### Sample Output (formatted)
+
+```json
+{
+    "average_prob": 0.09012803017969008,
+    "conf_interval": [
+        0.08637499653863692,
+        0.097555236551518
+    ],
+    "num_samples": 545,
+    "feature_name": "jikaze",
+    "negative": {
+        "average_prob": 0.09082334116711277,
+        "conf_interval": [
+            0.08701252817577079,
+            0.09765686765558763
+        ],
+        "num_samples": 545,
+        "feature_name": "fonpai",
+        "negative": {
+            ...
+        },
+        "positive": {
+            ...
+        }
+    },
+    "positive": {
+        "average_prob": 0,
+        "conf_interval": [
+            0,
+            0.015789473684210527
+        ],
+        "num_samples": 188,
+        "feature_name": null,
+        "negative": null,
+        "positive": null
+    }
+}
 ```
