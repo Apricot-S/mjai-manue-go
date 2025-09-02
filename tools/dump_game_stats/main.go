@@ -204,7 +204,7 @@ func (rtc *RyukyokuTenpaiCounter) OnAction(action inbound.Event, g game.StateVie
 
 func main() {
 	if len(os.Args) < 2 {
-		fmt.Fprintf(os.Stderr, "Usage: %s <log_glob_patterns...>\n", os.Args[0])
+		fmt.Fprintf(os.Stderr, "Usage: %s <LOG_GLOB_PATTERNS>...\n", os.Args[0])
 		os.Exit(2)
 	}
 
