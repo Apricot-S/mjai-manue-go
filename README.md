@@ -6,8 +6,6 @@ Go port of [mjai-manue](https://github.com/gimite/mjai-manue) — a Mahjong AI f
 
 [Sample game record of a self-match](https://apricot-s.github.io/mjai-manue-go/)
 
-For more information, see [the original README (Japanese)](https://github.com/gimite/mjai-manue/blob/master/README.md) or [its translation](docs/README-en.md).
-
 ## Differences from Original
 
 ### Protocol Support Extensions
@@ -26,6 +24,14 @@ For more information, see [the original README (Japanese)](https://github.com/gi
 
 > [!NOTE]
 > The original project includes an older version written in Ruby and a newer version written in CoffeeScript. This project ports only the new version.
+
+## How It Works
+
+(TODO)
+
+The discard that minimizes this avgRank is selected.
+
+Decisions such as "whether to call or not" and "whether to declare Riichi or not" are also made in a similar method.
 
 ## Installation
 
