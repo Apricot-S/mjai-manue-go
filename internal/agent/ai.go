@@ -33,23 +33,18 @@ func (a *AIAgent) Respond(events []inbound.Event) (outbound.Event, error) {
 	switch firstEvent := events[0].(type) {
 	case *inbound.Hello:
 		return a.makeJoinResponse(), nil
-	case *inbound.StartGame:
-		a.onStartGame(*firstEvent)
-		if err := a.state.Update(firstEvent); err != nil {
-			return nil, fmt.Errorf("failed to update state: %w", err)
-		}
-		a.ai.Initialize()
-		return a.makeNoneResponse(), nil
-	case *inbound.EndKyoku:
-		// Message during the game, but does not affect the game, so process it here
-		return a.makeNoneResponse(), nil
-	case *inbound.EndGame, *inbound.Error:
+	case *inbound.Error:
 		a.onEndGame()
 		return a.makeNoneResponse(), nil
-	}
-
-	if !a.inGame {
-		return nil, fmt.Errorf("received message while not in game: %v", events)
+	case *inbound.StartGame:
+		a.onStartGame(*firstEvent)
+		a.ai.Initialize()
+	case *inbound.EndGame:
+		a.onEndGame()
+	default:
+		if !a.inGame {
+			return nil, fmt.Errorf("received message while not in game: %v", events)
+		}
 	}
 
 	// Update state for all messages

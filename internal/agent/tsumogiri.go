@@ -22,19 +22,17 @@ func (a *TsumogiriAgent) Respond(events []inbound.Event) (outbound.Event, error)
 	switch firstEvent := events[0].(type) {
 	case *inbound.Hello:
 		return a.makeJoinResponse(), nil
-	case *inbound.StartGame:
-		a.onStartGame(*firstEvent)
-		return a.makeNoneResponse(), nil
-	case *inbound.EndKyoku:
-		// Message during the game, but does not affect the game, so process it here
-		return a.makeNoneResponse(), nil
-	case *inbound.EndGame, *inbound.Error:
+	case *inbound.Error:
 		a.onEndGame()
 		return a.makeNoneResponse(), nil
-	}
-
-	if !a.inGame {
-		return nil, fmt.Errorf("received message while not in game: %v", events)
+	case *inbound.StartGame:
+		a.onStartGame(*firstEvent)
+	case *inbound.EndGame:
+		a.onEndGame()
+	default:
+		if !a.inGame {
+			return nil, fmt.Errorf("received message while not in game: %v", events)
+		}
 	}
 
 	if lastEvent, ok := events[len(events)-1].(*inbound.Tsumo); ok {
