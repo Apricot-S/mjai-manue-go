@@ -10,6 +10,7 @@ import (
 	"github.com/Apricot-S/mjai-manue-go/internal/ai"
 	"github.com/Apricot-S/mjai-manue-go/internal/game"
 	"github.com/Apricot-S/mjai-manue-go/internal/game/event/inbound"
+	"github.com/Apricot-S/mjai-manue-go/internal/game/event/outbound"
 	"github.com/Apricot-S/mjai-manue-go/internal/protocol/mjai"
 	"github.com/Apricot-S/mjai-manue-go/tools/shared"
 )
@@ -20,6 +21,7 @@ const room = "default"
 type Verifier struct {
 	PlayerID int
 	Agent    agent.Agent
+	Response outbound.Event
 }
 
 func NewVerifier(agent agent.Agent) *Verifier {
@@ -28,7 +30,7 @@ func NewVerifier(agent agent.Agent) *Verifier {
 
 // BeforeAction is called before applying the action to the state.
 // It can modify the action if needed.
-func (v *Verifier) BeforeAction(action inbound.Event, g game.StateAnalyzer) error {
+func (v *Verifier) BeforeAction(action inbound.Event) error {
 	switch a := action.(type) {
 	case *inbound.Error:
 		return fmt.Errorf("error in the log: %+v", a)
@@ -44,6 +46,13 @@ func (v *Verifier) BeforeAction(action inbound.Event, g game.StateAnalyzer) erro
 		}
 		action = startGame
 	}
+
+	res, err := v.Agent.Respond([]inbound.Event{action})
+	if err != nil {
+		return fmt.Errorf("failed to respond from agent: %w", err)
+	}
+	v.Response = res
+
 	return nil
 }
 
@@ -66,7 +75,7 @@ func run(args []string) (bool, error) {
 
 	archive := shared.NewArchive(paths, &mjai.MjaiAdapter{})
 	onAction := func(action inbound.Event) error {
-		if err := verifier.BeforeAction(action, archive.StateAnalyzer()); err != nil {
+		if err := verifier.BeforeAction(action); err != nil {
 			return err
 		}
 		if err := archive.StateUpdater().Update(action); err != nil {
