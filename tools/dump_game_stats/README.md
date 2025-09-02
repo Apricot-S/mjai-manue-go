@@ -23,10 +23,10 @@ The output is directly usable as `configs/game_stats.json`.
 With the top-level directory of working tree of this repository as the current directory, run the following command:
 
 ```sh
-go run ./tools/dump_game_stats <log_glob_patterns...> > PATH/TO/game_stats.json
+go run ./tools/dump_game_stats <LOG_GLOB_PATTERNS>... > <PATH/TO/game_stats.json>
 ```
 
-- Replace `<log_glob_patterns...>` with one or more file path patterns matching your target logs, such as `"logs/*/*.mjson"` and `"logs/*/*.mjson.gz"`. You can specify multiple patterns, separated by spaces.
+- Replace `<LOG_GLOB_PATTERNS>...` with one or more file path patterns matching your target logs, such as `"logs/*/*.mjson"` and `"logs/*/*.mjson.gz"`. You can specify multiple patterns, separated by spaces.
 
 ### Sample Output (formatted)
 

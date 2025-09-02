@@ -17,7 +17,7 @@ Formatted text output is printed to standard output.
 With the top-level directory of working tree of this repository as the current directory, run the following command:
 
 ```sh
-go run ./tools/print_game_stats PATH/TO/game_stats.json
+go run ./tools/print_game_stats <PATH/TO/game_stats.json>
 ```
 
 ### Example Output

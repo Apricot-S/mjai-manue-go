@@ -21,7 +21,7 @@ The output is directly usable as `configs/light_game_stats.json`.
 With the top-level directory of working tree of this repository as the current directory, run the following command:
 
 ```sh
-go run ./tools/postprocess_light_game_stats PATH/TO/score_stats.json > PATH/TO/light_game_stats.json
+go run ./tools/postprocess_light_game_stats <PATH/TO/score_stats.json> > <PATH/TO/light_game_stats.json>
 ```
 
 - `score_stats.json` must contain the raw output from `dump_light_game_stats`.
