@@ -33,6 +33,14 @@ func (a *Archive) StateViewer() game.StateViewer {
 	return a.state
 }
 
+func (a *Archive) StateUpdater() game.StateUpdater {
+	return a.state
+}
+
+func (a *Archive) StateAnalyzer() game.StateAnalyzer {
+	return a.state
+}
+
 func (a *Archive) PlayLight(onAction func(inbound.Event) error) error {
 	numFiles := len(a.paths)
 	bar := progressbar.Default(int64(numFiles))
