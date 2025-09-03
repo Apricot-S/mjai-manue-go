@@ -55,6 +55,63 @@ func (v *Verifier) BeforeAction(action inbound.Event, g game.StateAnalyzer) erro
 }
 
 func (v *Verifier) VerifyAction(action inbound.Event, g game.StateViewer) error {
+	switch a := action.(type) {
+	case *inbound.Dahai:
+		if a.Actor != v.PlayerID {
+			return nil
+		}
+		da, ok := v.Decision.(*outbound.Dahai)
+		if !ok {
+			return fmt.Errorf("expected dahai decision, got %T", v.Decision)
+		}
+		if a.Pai != da.Pai || a.Tsumogiri != da.Tsumogiri {
+			return fmt.Errorf("dahai mismatch: expected %+v, got %+v", da, a)
+		}
+	case *inbound.Chi:
+		if a.Actor != v.PlayerID {
+			return nil
+		}
+		ch, ok := v.Decision.(*outbound.Chi)
+		if !ok {
+			return fmt.Errorf("expected chi decision, got %T", v.Decision)
+		}
+		if a.Taken != ch.Taken || a.Consumed != ch.Consumed {
+			return fmt.Errorf("chi mismatch: expected %+v, got %+v", ch, a)
+		}
+	case *inbound.Pon:
+		if a.Actor != v.PlayerID {
+			return nil
+		}
+		po, ok := v.Decision.(*outbound.Pon)
+		if !ok {
+			return fmt.Errorf("expected pon decision, got %T", v.Decision)
+		}
+		if a.Target != po.Target || a.Taken != po.Taken || a.Consumed != po.Consumed {
+			return fmt.Errorf("pon mismatch: expected %+v, got %+v", po, a)
+		}
+	case *inbound.Daiminkan:
+		if a.Actor != v.PlayerID {
+			return nil
+		}
+		dm, ok := v.Decision.(*outbound.Daiminkan)
+		if !ok {
+			return fmt.Errorf("expected daiminkan decision, got %T", v.Decision)
+		}
+		if a.Target != dm.Target || a.Taken != dm.Taken {
+			return fmt.Errorf("daiminkan mismatch: expected %+v, got %+v", dm, a)
+		}
+	case *inbound.Hora:
+		if a.Actor != v.PlayerID {
+			return nil
+		}
+		ho, ok := v.Decision.(*outbound.Hora)
+		if !ok {
+			return fmt.Errorf("expected hora decision, got %T", v.Decision)
+		}
+		if a.Target != ho.Target || a.Pai != &ho.Pai {
+			return fmt.Errorf("hora mismatch: expected %+v, got %+v", ho, a)
+		}
+	}
 	return nil
 }
 
