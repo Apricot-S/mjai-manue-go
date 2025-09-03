@@ -29,7 +29,7 @@ type ScoreCounter struct {
 	scores     [game.NumPlayers]int
 	stats      Stats
 	kyokuStats []KyokuStat
-	chichaId   int
+	chichaID   int
 }
 
 func NewScoreCounter() *ScoreCounter {
@@ -37,7 +37,7 @@ func NewScoreCounter() *ScoreCounter {
 		scores:     InitScores,
 		stats:      make(Stats),
 		kyokuStats: []KyokuStat{},
-		chichaId:   0,
+		chichaID:   0,
 	}
 }
 
@@ -70,10 +70,10 @@ func (sc *ScoreCounter) OnAction(action inbound.Event) error {
 		}
 		sc.kyokuStats = append(sc.kyokuStats, snapshot)
 	case *inbound.EndGame:
-		for playerId := range game.NumPlayers {
-			position := getDistance(playerId, sc.chichaId)
+		for playerID := range game.NumPlayers {
+			position := getDistance(playerID, sc.chichaID)
 			for _, stat := range sc.kyokuStats {
-				scoreDiff := sc.scores[playerId] - stat.Scores[playerId]
+				scoreDiff := sc.scores[playerID] - stat.Scores[playerID]
 				key := fmt.Sprintf("%s,%d", stat.KyokuName, position)
 				if _, ok := sc.stats[key]; !ok {
 					sc.stats[key] = make(map[int]int)
@@ -86,8 +86,8 @@ func (sc *ScoreCounter) OnAction(action inbound.Event) error {
 	return nil
 }
 
-func getDistance(playerId1, playerId2 int) int {
-	return (4 + playerId1 - playerId2) % 4
+func getDistance(playerID1, playerID2 int) int {
+	return (4 + playerID1 - playerID2) % 4
 }
 
 func main() {

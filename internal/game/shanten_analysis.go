@@ -54,10 +54,10 @@ var (
 			pai, _ := base.NewPaiWithID(i)
 			m[i] = base.NewKotsu(*pai, *pai, *pai)
 		}
-		for chowId := range uint8(numChows) {
-			i := chowStartIDs[chowId]
+		for chowID := range uint8(numChows) {
+			i := chowStartIDs[chowID]
 			pai, _ := base.NewPaiWithID(i)
-			m[chowId+base.NumIDs] = base.NewShuntsu(*pai, *pai.Next(1), *pai.Next(2))
+			m[chowID+base.NumIDs] = base.NewShuntsu(*pai, *pai.Next(1), *pai.Next(2))
 		}
 		return m
 	}()
@@ -120,7 +120,7 @@ func analyzeShantenInternal(
 	targetVector *base.PaiSet,
 	currentShanten int,
 	numMeldsLeft int,
-	minMeldId int,
+	minMeldID int,
 	upperbound int,
 	mentsus []base.Mentsu,
 	goals *[]Goal,
@@ -157,7 +157,7 @@ func analyzeShantenInternal(
 	}
 
 	// Add Pungs
-	for i := minMeldId; i < base.NumIDs; i++ {
+	for i := minMeldID; i < base.NumIDs; i++ {
 		if targetVector[i] >= 2 {
 			// Can't add a Pung
 			continue
@@ -192,9 +192,9 @@ func analyzeShantenInternal(
 	}
 
 	// Add Chows
-	startChowId := max(minMeldId-base.NumIDs, 0)
-	for chowId := startChowId; chowId < numChows; chowId++ {
-		i := chowStartIDs[chowId]
+	startChowID := max(minMeldID-base.NumIDs, 0)
+	for chowID := startChowID; chowID < numChows; chowID++ {
+		i := chowStartIDs[chowID]
 		if targetVector[i] >= 4 || targetVector[i+1] >= 4 || targetVector[i+2] >= 4 {
 			// Can't add a Chow
 			continue
@@ -226,9 +226,9 @@ func analyzeShantenInternal(
 				targetVector,
 				newShanten,
 				numMeldsLeft-1,
-				chowId+base.NumIDs,
+				chowID+base.NumIDs,
 				upperbound,
-				makeNewMentsus(mentsus, allMelds[chowId+base.NumIDs]),
+				makeNewMentsus(mentsus, allMelds[chowID+base.NumIDs]),
 				goals,
 				allowedExtraPais,
 			)
