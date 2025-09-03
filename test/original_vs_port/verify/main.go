@@ -6,7 +6,6 @@ import (
 	"os"
 	"slices"
 
-	"github.com/Apricot-S/mjai-manue-go/internal/agent"
 	"github.com/Apricot-S/mjai-manue-go/internal/ai"
 	"github.com/Apricot-S/mjai-manue-go/internal/game"
 	"github.com/Apricot-S/mjai-manue-go/internal/game/event/inbound"
@@ -16,21 +15,20 @@ import (
 )
 
 const playerName = "Manue014"
-const room = "default"
 
 type Verifier struct {
 	PlayerID int
-	Agent    agent.Agent
-	Response outbound.Event
+	AI       ai.AI
+	Decision outbound.Event
 }
 
-func NewVerifier(agent agent.Agent) *Verifier {
-	return &Verifier{Agent: agent}
+func NewVerifier(ai ai.AI) *Verifier {
+	return &Verifier{AI: ai}
 }
 
 // BeforeAction is called before applying the action to the state.
 // It can modify the action if needed.
-func (v *Verifier) BeforeAction(action inbound.Event) error {
+func (v *Verifier) BeforeAction(action inbound.Event, g game.StateAnalyzer) error {
 	switch a := action.(type) {
 	case *inbound.Error:
 		return fmt.Errorf("error in the log: %+v", a)
@@ -47,11 +45,11 @@ func (v *Verifier) BeforeAction(action inbound.Event) error {
 		action = startGame
 	}
 
-	res, err := v.Agent.Respond([]inbound.Event{action})
+	decision, err := v.AI.DecideAction(g, v.PlayerID)
 	if err != nil {
-		return fmt.Errorf("failed to respond from agent: %w", err)
+		return fmt.Errorf("failed to decide action: %w", err)
 	}
-	v.Response = res
+	v.Decision = decision
 
 	return nil
 }
@@ -70,12 +68,11 @@ func run(args []string) (bool, error) {
 	if err != nil {
 		log.Fatalf("failed to create AI: %v", err)
 	}
-	agent := agent.NewAIAgentDefault(playerName, room, ai)
-	verifier := NewVerifier(agent)
+	verifier := NewVerifier(ai)
 
 	archive := shared.NewArchive(paths, &mjai.MjaiAdapter{})
 	onAction := func(action inbound.Event) error {
-		if err := verifier.BeforeAction(action); err != nil {
+		if err := verifier.BeforeAction(action, archive.StateAnalyzer()); err != nil {
 			return err
 		}
 		if err := archive.StateUpdater().Update(action); err != nil {
