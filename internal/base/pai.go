@@ -130,7 +130,7 @@ func NewPaiWithDetail(typ rune, number uint8, isRed bool) (*Pai, error) {
 }
 
 func newPaiWithDetailUnchecked(typ rune, number uint8, isRed bool) *Pai {
-	id := toId(typ, number, isRed)
+	id := toID(typ, number, isRed)
 	return &Pai{
 		id:     id,
 		typ:    typ,
@@ -156,7 +156,7 @@ func toNumber(id uint8, isRed bool) uint8 {
 	return id%9 + 1
 }
 
-func toId(typ rune, number uint8, isRed bool) uint8 {
+func toID(typ rune, number uint8, isRed bool) uint8 {
 	typeIndex := uint8(slices.Index(types[:], typ))
 	if isRed {
 		return minRedID + typeIndex
