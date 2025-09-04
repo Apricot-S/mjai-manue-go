@@ -3,7 +3,6 @@ module github.com/Apricot-S/mjai-manue-go
 go 1.25.0
 
 require (
-	github.com/go-json-experiment/json v0.0.0-20250813233538-9b1f9ea2e11b
 	github.com/go-playground/validator/v10 v10.27.0
 	github.com/schollz/progressbar/v3 v3.18.0
 )

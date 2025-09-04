@@ -1,6 +1,6 @@
 package core
 
-import "github.com/go-json-experiment/json"
+import "encoding/json/v2"
 
 type HashMapKey interface {
 	float64 | []float64

@@ -2,8 +2,7 @@ package configs
 
 import (
 	_ "embed"
-
-	"github.com/go-json-experiment/json"
+	"encoding/json/v2"
 )
 
 // DecisionNode represents a node of a decision tree for danger estimation.

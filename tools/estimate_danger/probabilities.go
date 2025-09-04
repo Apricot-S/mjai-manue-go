@@ -2,13 +2,13 @@ package main
 
 import (
 	"encoding/gob"
+	"encoding/json/v2"
 	"fmt"
 	"io"
 	"os"
 	"slices"
 
 	"github.com/Apricot-S/mjai-manue-go/configs"
-	"github.com/go-json-experiment/json"
 	"github.com/schollz/progressbar/v3"
 )
 

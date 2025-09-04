@@ -2,6 +2,7 @@ package main
 
 import (
 	"cmp"
+	"encoding/json/v2"
 	"fmt"
 	"log"
 	"maps"
@@ -10,7 +11,6 @@ import (
 	"strconv"
 
 	"github.com/Apricot-S/mjai-manue-go/configs"
-	"github.com/go-json-experiment/json"
 )
 
 type Stats = map[string]map[string]float64
