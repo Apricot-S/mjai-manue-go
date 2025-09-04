@@ -128,6 +128,7 @@ func run(args []string) (bool, error) {
 	verifier := NewVerifier(ai)
 
 	archive := shared.NewArchive(paths, &mjai.MjaiAdapter{})
+	hasMismatch := false
 	onAction := func(action inbound.Event) error {
 		if err := verifier.BeforeAction(action, archive.StateAnalyzer()); err != nil {
 			return err
@@ -136,7 +137,8 @@ func run(args []string) (bool, error) {
 			return err
 		}
 		if err := verifier.VerifyAction(action, archive.StateViewer()); err != nil {
-			return err
+			fmt.Printf("VerifyAction mismatch:\n%v\n", err)
+			hasMismatch = true
 		}
 		return nil
 	}
@@ -145,7 +147,7 @@ func run(args []string) (bool, error) {
 		return false, fmt.Errorf("error in processing log: %w", err)
 	}
 
-	return true, nil
+	return !hasMismatch, nil
 }
 
 func main() {
