@@ -7,6 +7,8 @@ FROM golang:${GO_VERSION}-${OS_VERSION} AS builder
 
 WORKDIR /app
 
+ENV GOEXPERIMENT=jsonv2
+
 RUN --mount=type=cache,target=/go/pkg/mod \
     --mount=type=bind,source=go.sum,target=go.sum \
     --mount=type=bind,source=go.mod,target=go.mod \
