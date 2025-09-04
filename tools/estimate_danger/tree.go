@@ -3,6 +3,7 @@ package main
 import (
 	"cmp"
 	"encoding/gob"
+	"encoding/json/v2"
 	"fmt"
 	"io"
 	"maps"
@@ -11,7 +12,6 @@ import (
 	"strings"
 
 	"github.com/Apricot-S/mjai-manue-go/configs"
-	"github.com/go-json-experiment/json"
 )
 
 func generateDecisionTreeImpl(

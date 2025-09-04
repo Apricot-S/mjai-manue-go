@@ -1,14 +1,14 @@
 package client
 
 import (
+	"encoding/json/jsontext"
+	"encoding/json/v2"
 	"fmt"
 	"io"
 	"os"
 
 	"github.com/Apricot-S/mjai-manue-go/internal/agent"
 	"github.com/Apricot-S/mjai-manue-go/internal/protocol/mjai"
-	"github.com/go-json-experiment/json"
-	"github.com/go-json-experiment/json/jsontext"
 )
 
 type MjaiClient struct {

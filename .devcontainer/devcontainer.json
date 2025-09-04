@@ -3,10 +3,9 @@
 {
 	"name": "Go",
 	// Or use a Dockerfile or Docker Compose file. More info: https://containers.dev/guide/dockerfile
-	"image": "mcr.microsoft.com/devcontainers/go:1-1.24-bookworm",
+	"image": "mcr.microsoft.com/devcontainers/go:2-1.25-trixie",
 	"features": {
-		"ghcr.io/va-h/devcontainers-features/uv:1": {},
-		"ghcr.io/devcontainers/features/docker-outside-of-docker:1": {}
+		"ghcr.io/va-h/devcontainers-features/uv:1": {}
 	},
 
 	// Features to add to the dev container. More info: https://containers.dev/features.
@@ -34,6 +33,10 @@
 				}
 			}
 		}
+	},
+
+	"containerEnv": {
+		"GOEXPERIMENT": "jsonv2"
 	}
 
 	// Uncomment to connect as root instead. More info: https://aka.ms/dev-containers-non-root.

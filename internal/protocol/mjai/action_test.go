@@ -1,10 +1,9 @@
 package mjai
 
 import (
+	"encoding/json/v2"
 	"reflect"
 	"testing"
-
-	"github.com/go-json-experiment/json"
 )
 
 func TestAction_Marshal(t *testing.T) {

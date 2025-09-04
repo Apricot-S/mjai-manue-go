@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json/v2"
 	"fmt"
 	"log"
 	"os"
@@ -9,7 +10,6 @@ import (
 	"github.com/Apricot-S/mjai-manue-go/internal/game/event/inbound"
 	"github.com/Apricot-S/mjai-manue-go/internal/protocol/mjai"
 	"github.com/Apricot-S/mjai-manue-go/tools/shared"
-	"github.com/go-json-experiment/json"
 )
 
 var InitScores = [game.NumPlayers]int{game.InitScore, game.InitScore, game.InitScore, game.InitScore}

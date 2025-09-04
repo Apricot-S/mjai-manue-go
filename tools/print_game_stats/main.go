@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json/v2"
 	"fmt"
 	"log"
 	"math"
@@ -9,7 +10,6 @@ import (
 
 	"github.com/Apricot-S/mjai-manue-go/configs"
 	"github.com/Apricot-S/mjai-manue-go/internal/game"
-	"github.com/go-json-experiment/json"
 )
 
 func printNumTurnsDistribution(stats configs.GameStats) {

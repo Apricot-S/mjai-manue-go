@@ -2,13 +2,13 @@ package main
 
 import (
 	"encoding/gob"
+	"encoding/json/v2"
 	"fmt"
 	"os"
 	"os/exec"
 	"regexp"
 
 	"github.com/Apricot-S/mjai-manue-go/configs"
-	"github.com/go-json-experiment/json"
 )
 
 const rootDir = "exp/graphs"

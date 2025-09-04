@@ -1,11 +1,11 @@
 package mjai
 
 import (
+	"encoding/json/v2"
 	"reflect"
 	"testing"
 
 	"github.com/Apricot-S/mjai-manue-go/internal/game/event/outbound"
-	"github.com/go-json-experiment/json"
 )
 
 func TestNewNone(t *testing.T) {

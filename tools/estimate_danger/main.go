@@ -2,14 +2,13 @@ package main
 
 import (
 	"bufio"
+	"encoding/json/v2"
 	"flag"
 	"fmt"
 	"io"
 	"log"
 	"os"
 	"slices"
-
-	"github.com/go-json-experiment/json"
 )
 
 type Options struct {

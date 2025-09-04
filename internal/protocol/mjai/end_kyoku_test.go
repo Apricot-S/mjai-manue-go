@@ -1,11 +1,11 @@
 package mjai
 
 import (
+	"encoding/json/v2"
 	"reflect"
 	"testing"
 
 	"github.com/Apricot-S/mjai-manue-go/internal/game/event/inbound"
-	"github.com/go-json-experiment/json"
 )
 
 func TestNewEndKyoku(t *testing.T) {
