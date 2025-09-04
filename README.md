@@ -35,7 +35,7 @@ Decisions such as "whether to call or not" and "whether to declare Riichi or not
 
 ## Installation
 
-Requires [Go 1.24 or later](https://go.dev/dl/).
+Requires [Go 1.25 or later](https://go.dev/dl/).
 
 ```sh
 go install github.com/Apricot-S/mjai-manue-go/cmd/mjai-manue@latest
