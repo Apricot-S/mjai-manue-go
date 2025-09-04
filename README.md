@@ -33,9 +33,14 @@ The discard that minimizes this avgRank is selected.
 
 Decisions such as "whether to call or not" and "whether to declare Riichi or not" are also made in a similar method.
 
-## Installation
+## Prerequisites
 
-Requires [Go 1.25 or later](https://go.dev/dl/).
+This project (including all tools under [tools/](tools/)) requires:
+
+- [Go 1.25 or later](https://go.dev/dl/)
+- Environment variable `GOEXPERIMENT=jsonv2` enabled when building, installing or running with `go run`
+
+## Installation
 
 ```sh
 go install github.com/Apricot-S/mjai-manue-go/cmd/mjai-manue@latest
