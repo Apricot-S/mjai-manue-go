@@ -26,93 +26,93 @@ func NewVerifier(ai ai.AI) *Verifier {
 	return &Verifier{AI: ai}
 }
 
-// BeforeAction is called before applying the action to the state.
+// ModifyAction is called before applying the action to the state.
 // It can modify the action if needed.
-func (v *Verifier) BeforeAction(action inbound.Event, g game.StateAnalyzer) error {
+func (v *Verifier) ModifyAction(action inbound.Event, g game.StateAnalyzer) (inbound.Event, error) {
 	switch a := action.(type) {
 	case *inbound.Error:
-		return fmt.Errorf("error in the log: %+v", a)
+		return action, fmt.Errorf("error in the log: %+v", a)
 	case *inbound.StartGame:
 		v.PlayerID = slices.Index(a.Names[:], playerName)
 		if v.PlayerID == -1 {
-			return fmt.Errorf("player name %q not found in players %v", playerName, a.Names)
+			return action, fmt.Errorf("player name %q not found in players %v", playerName, a.Names)
 		}
 
 		startGame, err := inbound.NewStartGame(v.PlayerID, a.Names)
 		if err != nil {
-			return err
+			return action, err
 		}
 		action = startGame
 	}
 
 	decision, err := v.AI.DecideAction(g, v.PlayerID)
 	if err != nil {
-		return fmt.Errorf("failed to decide action: %w", err)
+		return action, fmt.Errorf("failed to decide action: %w", err)
 	}
 	v.Decision = decision
 
-	return nil
+	return action, nil
 }
 
-func (v *Verifier) VerifyAction(action inbound.Event, g game.StateViewer) error {
+func (v *Verifier) VerifyAction(action inbound.Event, g game.StateViewer) string {
 	switch a := action.(type) {
 	case *inbound.Dahai:
 		if a.Actor != v.PlayerID {
-			return nil
+			return ""
 		}
 		da, ok := v.Decision.(*outbound.Dahai)
 		if !ok {
-			return fmt.Errorf("expected dahai decision, got %T", v.Decision)
+			return fmt.Sprintf("expected dahai decision, got %#v", v.Decision)
 		}
 		if a.Pai != da.Pai || a.Tsumogiri != da.Tsumogiri {
-			return fmt.Errorf("dahai mismatch: expected %+v, got %+v", da, a)
+			return fmt.Sprintf("dahai mismatch:\nexpected:\n%+v\n\ngot:\n%+v\n\n", da, a)
 		}
 	case *inbound.Chi:
 		if a.Actor != v.PlayerID {
-			return nil
+			return ""
 		}
 		ch, ok := v.Decision.(*outbound.Chi)
 		if !ok {
-			return fmt.Errorf("expected chi decision, got %T", v.Decision)
+			return fmt.Sprintf("expected chi decision, got %#v", v.Decision)
 		}
 		if a.Taken != ch.Taken || a.Consumed != ch.Consumed {
-			return fmt.Errorf("chi mismatch: expected %+v, got %+v", ch, a)
+			return fmt.Sprintf("chi mismatch:\nexpected:\n%+v\n\ngot:\n%+v\n\n", ch, a)
 		}
 	case *inbound.Pon:
 		if a.Actor != v.PlayerID {
-			return nil
+			return ""
 		}
 		po, ok := v.Decision.(*outbound.Pon)
 		if !ok {
-			return fmt.Errorf("expected pon decision, got %T", v.Decision)
+			return fmt.Sprintf("expected pon decision, got %#v", v.Decision)
 		}
 		if a.Target != po.Target || a.Taken != po.Taken || a.Consumed != po.Consumed {
-			return fmt.Errorf("pon mismatch: expected %+v, got %+v", po, a)
+			return fmt.Sprintf("pon mismatch:\nexpected:\n%+v\n\ngot:\n%+v\n\n", po, a)
 		}
 	case *inbound.Daiminkan:
 		if a.Actor != v.PlayerID {
-			return nil
+			return ""
 		}
 		dm, ok := v.Decision.(*outbound.Daiminkan)
 		if !ok {
-			return fmt.Errorf("expected daiminkan decision, got %T", v.Decision)
+			return fmt.Sprintf("expected daiminkan decision, got %#v", v.Decision)
 		}
 		if a.Target != dm.Target || a.Taken != dm.Taken {
-			return fmt.Errorf("daiminkan mismatch: expected %+v, got %+v", dm, a)
+			return fmt.Sprintf("daiminkan mismatch:\nexpected:\n%+v\n\ngot:\n%+v\n\n", dm, a)
 		}
 	case *inbound.Hora:
 		if a.Actor != v.PlayerID {
-			return nil
+			return ""
 		}
 		ho, ok := v.Decision.(*outbound.Hora)
 		if !ok {
-			return fmt.Errorf("expected hora decision, got %T", v.Decision)
+			return fmt.Sprintf("expected hora decision, got %#v", v.Decision)
 		}
 		if a.Target != ho.Target || a.Pai != &ho.Pai {
-			return fmt.Errorf("hora mismatch: expected %+v, got %+v", ho, a)
+			return fmt.Sprintf("hora mismatch:\nexpected:\n%+v\n\ngot:\n%+v\n\n", ho, a)
 		}
 	}
-	return nil
+	return ""
 }
 
 func run(args []string) (bool, error) {
@@ -130,14 +130,15 @@ func run(args []string) (bool, error) {
 	archive := shared.NewArchive(paths, &mjai.MjaiAdapter{})
 	hasMismatch := false
 	onAction := func(action inbound.Event) error {
-		if err := verifier.BeforeAction(action, archive.StateAnalyzer()); err != nil {
+		action, err := verifier.ModifyAction(action, archive.StateAnalyzer())
+		if err != nil {
 			return err
 		}
 		if err := archive.StateUpdater().Update(action); err != nil {
 			return err
 		}
-		if err := verifier.VerifyAction(action, archive.StateViewer()); err != nil {
-			fmt.Printf("VerifyAction mismatch:\n%v\n", err)
+		if detail := verifier.VerifyAction(action, archive.StateViewer()); detail != "" {
+			fmt.Printf("VerifyAction mismatch:\n%v\n", detail)
 			hasMismatch = true
 		}
 		return nil
