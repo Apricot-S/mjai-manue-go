@@ -54,65 +54,65 @@ func (v *Verifier) ModifyAction(action inbound.Event, g game.StateAnalyzer) (inb
 	return action, nil
 }
 
-func (v *Verifier) VerifyAction(action inbound.Event, g game.StateViewer) string {
+func (v *Verifier) VerifyAction(action inbound.Event, g game.StateViewer) (string, error) {
 	switch a := action.(type) {
 	case *inbound.Dahai:
 		if a.Actor != v.PlayerID {
-			return ""
+			return "", nil
 		}
 		da, ok := v.Decision.(*outbound.Dahai)
 		if !ok {
-			return fmt.Sprintf("expected dahai decision, got %#v", v.Decision)
+			return "", fmt.Errorf("expected dahai decision, got %#v", v.Decision)
 		}
 		if a.Pai != da.Pai || a.Tsumogiri != da.Tsumogiri {
-			return fmt.Sprintf("dahai mismatch:\nexpected:\n%+v\n\ngot:\n%+v\n\n", da, a)
+			return fmt.Sprintf("dahai mismatch:\nexpected:\n%+v\n\ngot:\n%+v\n\n", da, a), nil
 		}
 	case *inbound.Chi:
 		if a.Actor != v.PlayerID {
-			return ""
+			return "", nil
 		}
 		ch, ok := v.Decision.(*outbound.Chi)
 		if !ok {
-			return fmt.Sprintf("expected chi decision, got %#v", v.Decision)
+			return "", fmt.Errorf("expected chi decision, got %#v", v.Decision)
 		}
 		if a.Taken != ch.Taken || a.Consumed != ch.Consumed {
-			return fmt.Sprintf("chi mismatch:\nexpected:\n%+v\n\ngot:\n%+v\n\n", ch, a)
+			return fmt.Sprintf("chi mismatch:\nexpected:\n%+v\n\ngot:\n%+v\n\n", ch, a), nil
 		}
 	case *inbound.Pon:
 		if a.Actor != v.PlayerID {
-			return ""
+			return "", nil
 		}
 		po, ok := v.Decision.(*outbound.Pon)
 		if !ok {
-			return fmt.Sprintf("expected pon decision, got %#v", v.Decision)
+			return "", fmt.Errorf("expected pon decision, got %#v", v.Decision)
 		}
 		if a.Target != po.Target || a.Taken != po.Taken || a.Consumed != po.Consumed {
-			return fmt.Sprintf("pon mismatch:\nexpected:\n%+v\n\ngot:\n%+v\n\n", po, a)
+			return fmt.Sprintf("pon mismatch:\nexpected:\n%+v\n\ngot:\n%+v\n\n", po, a), nil
 		}
 	case *inbound.Daiminkan:
 		if a.Actor != v.PlayerID {
-			return ""
+			return "", nil
 		}
 		dm, ok := v.Decision.(*outbound.Daiminkan)
 		if !ok {
-			return fmt.Sprintf("expected daiminkan decision, got %#v", v.Decision)
+			return "", fmt.Errorf("expected daiminkan decision, got %#v", v.Decision)
 		}
 		if a.Target != dm.Target || a.Taken != dm.Taken {
-			return fmt.Sprintf("daiminkan mismatch:\nexpected:\n%+v\n\ngot:\n%+v\n\n", dm, a)
+			return fmt.Sprintf("daiminkan mismatch:\nexpected:\n%+v\n\ngot:\n%+v\n\n", dm, a), nil
 		}
 	case *inbound.Hora:
 		if a.Actor != v.PlayerID {
-			return ""
+			return "", nil
 		}
 		ho, ok := v.Decision.(*outbound.Hora)
 		if !ok {
-			return fmt.Sprintf("expected hora decision, got %#v", v.Decision)
+			return "", fmt.Errorf("expected hora decision, got %#v", v.Decision)
 		}
 		if a.Target != ho.Target || *a.Pai != ho.Pai {
-			return fmt.Sprintf("hora mismatch:\nexpected:\n%+v\n\ngot:\n%+v\n\n", ho, a)
+			return fmt.Sprintf("hora mismatch:\nexpected:\n%+v\n\ngot:\n%+v\n\n", ho, a), nil
 		}
 	}
-	return ""
+	return "", nil
 }
 
 func run(args []string) (bool, error) {
@@ -137,7 +137,11 @@ func run(args []string) (bool, error) {
 		if err := archive.StateUpdater().Update(action); err != nil {
 			return err
 		}
-		if detail := verifier.VerifyAction(action, archive.StateViewer()); detail != "" {
+		detail, err := verifier.VerifyAction(action, archive.StateViewer())
+		if err != nil {
+			return err
+		}
+		if detail != "" {
 			fmt.Printf("VerifyAction mismatch:\n%v\n", detail)
 			hasMismatch = true
 		}
