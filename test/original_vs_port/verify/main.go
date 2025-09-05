@@ -108,7 +108,7 @@ func (v *Verifier) VerifyAction(action inbound.Event, g game.StateViewer) string
 		if !ok {
 			return fmt.Sprintf("expected hora decision, got %#v", v.Decision)
 		}
-		if a.Target != ho.Target || a.Pai != &ho.Pai {
+		if a.Target != ho.Target || *a.Pai != ho.Pai {
 			return fmt.Sprintf("hora mismatch:\nexpected:\n%+v\n\ngot:\n%+v\n\n", ho, a)
 		}
 	}
