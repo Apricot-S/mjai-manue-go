@@ -41,11 +41,11 @@ func (a *Archive) StateAnalyzer() game.StateAnalyzer {
 	return a.state
 }
 
-func (a *Archive) PlayLight(onAction func(inbound.Event) error) error {
+func (a *Archive) PlayLight(onAction func(inbound.Event) error, onRaw ...func([]byte) error) error {
 	numFiles := len(a.paths)
 	bar := progressbar.Default(int64(numFiles))
 	for _, p := range a.paths {
-		if err := a.playLightInner(p, onAction); err != nil {
+		if err := a.playLightInner(p, onAction, onRaw); err != nil {
 			return err
 		}
 
@@ -56,7 +56,11 @@ func (a *Archive) PlayLight(onAction func(inbound.Event) error) error {
 	return nil
 }
 
-func (a *Archive) playLightInner(singlePath string, onAction func(inbound.Event) error) error {
+func (a *Archive) playLightInner(
+	singlePath string,
+	onAction func(inbound.Event) error,
+	onRaw [](func([]byte) error),
+) error {
 	reader, err := openMaybeGzip(singlePath)
 	if err != nil {
 		return err
@@ -77,6 +81,12 @@ func (a *Archive) playLightInner(singlePath string, onAction func(inbound.Event)
 
 		if err := onAction(action); err != nil {
 			return fmt.Errorf("failed to callback: %w", err)
+		}
+
+		for _, f := range onRaw {
+			if err := f(line); err != nil {
+				return fmt.Errorf("failed to callback raw json: %w", err)
+			}
 		}
 	}
 	if err := scanner.Err(); err != nil {
@@ -129,12 +139,12 @@ func (g *gzipReadCloser) Close() error {
 	return err2
 }
 
-func (a *Archive) Play(onAction func(inbound.Event) error) error {
+func (a *Archive) Play(onAction func(inbound.Event) error, onRaw ...func([]byte) error) error {
 	onLightAction := func(action inbound.Event) error {
 		if err := a.state.Update(action); err != nil {
 			return err
 		}
 		return onAction(action)
 	}
-	return a.PlayLight(onLightAction)
+	return a.PlayLight(onLightAction, onRaw...)
 }
