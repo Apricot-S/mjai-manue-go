@@ -218,9 +218,11 @@ func main() {
 	}
 
 	w := bufio.NewWriter(os.Stdout)
-	defer w.Flush()
+	err := run(os.Args[1:], w)
+	w.Flush()
 
-	if err := run(os.Args[1:], w); err != nil {
+	if err != nil {
 		fmt.Println(err)
+		os.Exit(1)
 	}
 }
