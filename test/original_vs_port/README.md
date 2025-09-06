@@ -10,7 +10,7 @@ Docker Compose configuration and related scripts for generating game logs. It ru
 
 - server  
   - The mjai server.
-  - Manages game progression and outputs logs to `../log_dir` (output directory can be changed).
+  - Manages game progression and outputs logs to the specified directory.
 - manue  
   - The original mjai-manue (1 instance).
   - Connects to the server to play matches.
@@ -21,7 +21,7 @@ Docker Compose configuration and related scripts for generating game logs. It ru
 ### Log Output
 
 - After each game, the server outputs a game log in mjson (JSON Lines) format.
-- Logs are saved under `gen_log/../log_dir/` (output directory can be changed).
+- Logs are saved under the specified directory.
 - Filenames are timestamp-based (e.g., `2025-08-14-163231.mjson`).
 
 ### Usage
@@ -32,11 +32,14 @@ With `test/original_vs_port/gen_log/` as the current directory, run the followin
 NUM_GAMES=<NUMBER_OF_GAMES> docker compose up
 ```
 
-Specify the number of games to run in `NUM_GAMES` (default is 1).
+- `NUM_GAMES`  
+  The number of games to run (default: `1`).
+- `LOG_DIR`  
+  The directory to save logs (default: `test/original_vs_port/log_dir`).
 
 ## compare
 
-A Go program that checks for differences in decision-making between the original mjai-manue and the port. Reads specified logs in mjson format and compares their actions at each decision-making point. When differences are found, outputs a report showing the state and chosen action.
+A Go program that checks for differences in decision-making between the original mjai-manue and the port. Reads game logs and compares their actions at each decision-making point. When differences are found, outputs a report showing the game state and chosen action.
 
 ### Input
 
