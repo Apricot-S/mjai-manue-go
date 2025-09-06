@@ -1,8 +1,10 @@
 package main
 
 import (
+	"bufio"
 	"encoding/json/v2"
 	"fmt"
+	"io"
 	"log"
 	"os"
 	"slices"
@@ -129,7 +131,7 @@ func (v *Verifier) VerifyAction(action inbound.Event, g game.StateViewer) (strin
 	return "", nil
 }
 
-func run(args []string) error {
+func run(args []string, w io.Writer) error {
 	paths, err := shared.GlobAll(args)
 	if err != nil {
 		return fmt.Errorf("error in glob: %w", err)
@@ -159,12 +161,14 @@ func run(args []string) error {
 		}
 
 		if detail != "" {
-			fmt.Print("VerifyAction mismatch:\n\n")
-			fmt.Printf("state (after action):\n%s\n", archive.StateViewer().RenderBoard())
-			fmt.Printf("%v", detail)
-			fmt.Println("original:")
-			fmt.Println(prevLog)
-			fmt.Println(separator)
+			fmt.Fprintf(
+				w,
+				"VerifyAction mismatch:\n\nstate (after action):\n%s\n%voriginal:\n%s\n%s\n",
+				archive.StateViewer().RenderBoard(),
+				detail,
+				prevLog,
+				separator,
+			)
 		}
 		return nil
 	}
@@ -197,7 +201,9 @@ func main() {
 		os.Exit(2)
 	}
 
-	if err := run(os.Args[1:]); err != nil {
-		fmt.Println(err)
+	w := bufio.NewWriter(os.Stdout)
+
+	if err := run(os.Args[1:], w); err != nil {
+		fmt.Fprintln(os.Stderr, err)
 	}
 }
