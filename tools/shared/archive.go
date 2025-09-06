@@ -33,11 +33,19 @@ func (a *Archive) StateViewer() game.StateViewer {
 	return a.state
 }
 
-func (a *Archive) PlayLight(onAction func(inbound.Event) error) error {
+func (a *Archive) StateUpdater() game.StateUpdater {
+	return a.state
+}
+
+func (a *Archive) StateAnalyzer() game.StateAnalyzer {
+	return a.state
+}
+
+func (a *Archive) PlayLight(onAction func(inbound.Event) error, onRaw ...func([]byte) error) error {
 	numFiles := len(a.paths)
 	bar := progressbar.Default(int64(numFiles))
 	for _, p := range a.paths {
-		if err := a.playLightInner(p, onAction); err != nil {
+		if err := a.playLightInner(p, onAction, onRaw); err != nil {
 			return err
 		}
 
@@ -48,7 +56,11 @@ func (a *Archive) PlayLight(onAction func(inbound.Event) error) error {
 	return nil
 }
 
-func (a *Archive) playLightInner(singlePath string, onAction func(inbound.Event) error) error {
+func (a *Archive) playLightInner(
+	singlePath string,
+	onAction func(inbound.Event) error,
+	onRaw [](func([]byte) error),
+) error {
 	reader, err := openMaybeGzip(singlePath)
 	if err != nil {
 		return err
@@ -62,14 +74,18 @@ func (a *Archive) playLightInner(singlePath string, onAction func(inbound.Event)
 			continue
 		}
 
-		actions, err := a.adapter.DecodeMessages(line)
+		action, err := a.parseAction(line)
 		if err != nil {
-			return fmt.Errorf("failed to decode: %w", err)
+			return err
 		}
 
-		for _, action := range actions {
-			if err := onAction(action); err != nil {
-				return fmt.Errorf("failed to callback: %w", err)
+		if err := onAction(action); err != nil {
+			return fmt.Errorf("failed to callback: %w", err)
+		}
+
+		for _, f := range onRaw {
+			if err := f(line); err != nil {
+				return fmt.Errorf("failed to callback raw json: %w", err)
 			}
 		}
 	}
@@ -98,6 +114,17 @@ func openMaybeGzip(path string) (io.ReadCloser, error) {
 	return &gzipReadCloser{gz, file}, nil
 }
 
+func (a *Archive) parseAction(line []byte) (inbound.Event, error) {
+	actions, err := a.adapter.DecodeMessages(line)
+	if err != nil {
+		return nil, fmt.Errorf("failed to decode: %w", err)
+	}
+	if len(actions) != 1 {
+		return nil, fmt.Errorf("expected 1 action in 1 line, got %d", len(actions))
+	}
+	return actions[0], nil
+}
+
 type gzipReadCloser struct {
 	*gzip.Reader
 	file *os.File
@@ -112,12 +139,12 @@ func (g *gzipReadCloser) Close() error {
 	return err2
 }
 
-func (a *Archive) Play(onAction func(inbound.Event) error) error {
+func (a *Archive) Play(onAction func(inbound.Event) error, onRaw ...func([]byte) error) error {
 	onLightAction := func(action inbound.Event) error {
 		if err := a.state.Update(action); err != nil {
 			return err
 		}
 		return onAction(action)
 	}
-	return a.PlayLight(onLightAction)
+	return a.PlayLight(onLightAction, onRaw...)
 }
