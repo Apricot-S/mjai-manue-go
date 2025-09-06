@@ -70,15 +70,13 @@ func (a *Archive) playLightInner(singlePath string, onAction func(inbound.Event)
 			continue
 		}
 
-		actions, err := a.adapter.DecodeMessages(line)
+		action, err := a.parseAction(line)
 		if err != nil {
-			return fmt.Errorf("failed to decode: %w", err)
+			return err
 		}
 
-		for _, action := range actions {
-			if err := onAction(action); err != nil {
-				return fmt.Errorf("failed to callback: %w", err)
-			}
+		if err := onAction(action); err != nil {
+			return fmt.Errorf("failed to callback: %w", err)
 		}
 	}
 	if err := scanner.Err(); err != nil {
@@ -104,6 +102,17 @@ func openMaybeGzip(path string) (io.ReadCloser, error) {
 	}
 
 	return &gzipReadCloser{gz, file}, nil
+}
+
+func (a *Archive) parseAction(line []byte) (inbound.Event, error) {
+	actions, err := a.adapter.DecodeMessages(line)
+	if err != nil {
+		return nil, fmt.Errorf("failed to decode: %w", err)
+	}
+	if len(actions) != 1 {
+		return nil, fmt.Errorf("expected 1 action in 1 line, got %d", len(actions))
+	}
+	return actions[0], nil
 }
 
 type gzipReadCloser struct {
