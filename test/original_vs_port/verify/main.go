@@ -50,16 +50,19 @@ func (v *Verifier) ModifyAction(action inbound.Event, g game.StateAnalyzer) (inb
 		if err != nil {
 			return action, err
 		}
-		action = startGame
+		return startGame, nil
+	default:
+		return action, nil
 	}
+}
 
+func (v *Verifier) MakeDecision(g game.StateAnalyzer) error {
 	decision, err := v.AI.DecideAction(g, v.PlayerID)
 	if err != nil {
-		return action, fmt.Errorf("failed to decide action: %w", err)
+		return fmt.Errorf("failed to decide action: %w", err)
 	}
 	v.Decision = decision
-
-	return action, nil
+	return nil
 }
 
 func (v *Verifier) VerifyAction(action inbound.Event, g game.StateViewer) (string, error) {
@@ -152,6 +155,9 @@ func run(args []string, w io.Writer) error {
 		if err != nil {
 			return err
 		}
+		if err := verifier.MakeDecision(archive.StateAnalyzer()); err != nil {
+			return err
+		}
 		if err := archive.StateUpdater().Update(action); err != nil {
 			return err
 		}
@@ -202,6 +208,7 @@ func main() {
 	}
 
 	w := bufio.NewWriter(os.Stdout)
+	defer w.Flush()
 
 	if err := run(os.Args[1:], w); err != nil {
 		fmt.Fprintln(os.Stderr, err)
