@@ -71,6 +71,11 @@ func (v *Verifier) VerifyAction(action inbound.Event, g game.StateViewer) (strin
 		if a.Actor != v.PlayerID {
 			return "", nil
 		}
+
+		if re, ok := v.Decision.(*outbound.Reach); ok {
+			return fmt.Sprintf("dahai mismatch:\nport:\n%+v\n", re.Log), nil
+		}
+
 		da, ok := v.Decision.(*outbound.Dahai)
 		if !ok {
 			return "", fmt.Errorf("expected dahai decision, got %#v", v.Decision)
@@ -115,6 +120,11 @@ func (v *Verifier) VerifyAction(action inbound.Event, g game.StateViewer) (strin
 		if a.Actor != v.PlayerID {
 			return "", nil
 		}
+
+		if da, ok := v.Decision.(*outbound.Dahai); ok {
+			return fmt.Sprintf("reach mismatch:\nport:\n%+v\n", da.Log), nil
+		}
+
 		_, ok := v.Decision.(*outbound.Reach)
 		if !ok {
 			return "", fmt.Errorf("expected reach decision, got %#v", v.Decision)
@@ -211,6 +221,6 @@ func main() {
 	defer w.Flush()
 
 	if err := run(os.Args[1:], w); err != nil {
-		fmt.Fprintln(os.Stderr, err)
+		fmt.Println(err)
 	}
 }
