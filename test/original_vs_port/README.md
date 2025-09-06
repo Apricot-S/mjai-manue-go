@@ -56,7 +56,7 @@ Outputs the differences as a report (text format) to standard output.
 With the top-level directory of working tree of this repository as the current directory, run the following command:
 
 ```sh
-go run ./test/original_vs_port/compare <LOG_GLOB_PATTERNS>... > <OUTPUT_FILEPATH>
+go run ./test/original_vs_port/compare <LOG_GLOB_PATTERNS>... > <OUTPUT_FILEPATH> 2>/dev/null
 ```
 
 - `<LOG_GLOB_PATTERNS>`  
