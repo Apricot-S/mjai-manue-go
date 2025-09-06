@@ -59,5 +59,9 @@ With the top-level directory of working tree of this repository as the current d
 go run ./test/original_vs_port/compare <LOG_GLOB_PATTERNS>... > <OUTPUT_FILEPATH> 2>/dev/null
 ```
 
+Errors are printed at the end of standard output.
+
+The Go port log is output to standard error output. There is no need to check this as it is not relevant to comparing differences.
+
 - `<LOG_GLOB_PATTERNS>`  
   Log file patterns to compare (e.g., `./test/original_vs_port/log_dir/*.mjson`).
