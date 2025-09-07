@@ -24,19 +24,19 @@ type LawEvent struct {
 
 const playerName = "Manue014"
 
-type Verifier struct {
+type Comparer struct {
 	PlayerID int
 	AI       ai.AI
 	Decision outbound.Event
 }
 
-func NewVerifier(ai ai.AI) *Verifier {
-	return &Verifier{AI: ai}
+func NewComparer(ai ai.AI) *Comparer {
+	return &Comparer{AI: ai}
 }
 
 // ModifyAction is called before applying the action to the state.
 // It can modify the action if needed.
-func (v *Verifier) ModifyAction(action inbound.Event, g game.StateAnalyzer) (inbound.Event, error) {
+func (v *Comparer) ModifyAction(action inbound.Event, g game.StateAnalyzer) (inbound.Event, error) {
 	switch a := action.(type) {
 	case *inbound.Error:
 		return action, fmt.Errorf("error in the log: %+v", a)
@@ -56,7 +56,7 @@ func (v *Verifier) ModifyAction(action inbound.Event, g game.StateAnalyzer) (inb
 	}
 }
 
-func (v *Verifier) MakeDecision(g game.StateAnalyzer) error {
+func (v *Comparer) MakeDecision(g game.StateAnalyzer) error {
 	decision, err := v.AI.DecideAction(g, v.PlayerID)
 	if err != nil {
 		return fmt.Errorf("failed to decide action: %w", err)
@@ -65,7 +65,7 @@ func (v *Verifier) MakeDecision(g game.StateAnalyzer) error {
 	return nil
 }
 
-func (v *Verifier) VerifyAction(action inbound.Event, g game.StateViewer) (string, error) {
+func (v *Comparer) CompareAction(action inbound.Event, g game.StateViewer) (string, error) {
 	switch a := action.(type) {
 	case *inbound.Dahai:
 		if a.Actor != v.PlayerID {
@@ -154,7 +154,7 @@ func run(args []string, w io.Writer) error {
 	if err != nil {
 		log.Fatalf("failed to create AI: %v", err)
 	}
-	verifier := NewVerifier(ai)
+	verifier := NewComparer(ai)
 
 	archive := shared.NewArchive(paths, &mjai.MjaiAdapter{})
 	var prevLog string
@@ -171,7 +171,7 @@ func run(args []string, w io.Writer) error {
 		if err := archive.StateUpdater().Update(action); err != nil {
 			return err
 		}
-		detail, err := verifier.VerifyAction(action, archive.StateViewer())
+		detail, err := verifier.CompareAction(action, archive.StateViewer())
 		if err != nil {
 			return err
 		}
@@ -179,7 +179,7 @@ func run(args []string, w io.Writer) error {
 		if detail != "" {
 			fmt.Fprintf(
 				w,
-				"VerifyAction mismatch:\n\nstate (after action):\n%s\n%voriginal:\n%s\n%s\n",
+				"action mismatch:\n\nstate (after action):\n%s\n%voriginal:\n%s\n%s\n",
 				archive.StateViewer().RenderBoard(),
 				detail,
 				prevLog,
