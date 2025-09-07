@@ -75,7 +75,7 @@ Optional Flags
 
 ### Output
 
-The tool outputs a binary gob-encoded file containing:
+Outputs a binary gob-encoded file containing:
 
 - Metadata: List of feature names
 - Candidate Data: Feature vectors and deal-in information for each discard candidate in each situation
