@@ -339,7 +339,7 @@ Optional Flags
   Path to the output file for saving the generated decision tree (in gob format). If not specified, the tree is only displayed to standard output.
 
 - `-min_gap <PERCENTAGE>`  
-  Minimum confidence interval gap percentage required for feature splits (default: 0.0). Higher values create simpler trees by requiring larger statistical differences between branches.
+  Minimum confidence interval gap percentage required for feature splits (default: `0.0`). Higher values create simpler trees by requiring larger statistical differences between branches.
 
 ### What It Does
 
@@ -364,9 +364,9 @@ Generation Process Information:
 Incremental Tree Structure:
 
 - After each feature split, displays the complete tree structure built so far
-- Node probabilities with confidence intervals and sample counts
-- Feature splits with true/false branches
 - Hierarchical tree structure with indentation showing the decision path
+  - Node probabilities with confidence intervals and sample counts
+  - Feature splits with true/false branches
 
 If `-o` option is specified, also saves the final decision tree in gob format for use with `dump_tree` and `dump_tree_json` commands.
 
