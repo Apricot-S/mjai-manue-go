@@ -262,7 +262,7 @@ Arguments
 
 ### Output
 
-The command creates the following files in the `exp/graphs` directory
+Outputs the following files in the `exp/graphs` directory
 
 - Data point files used by Gnuplot (`*.base.points`, `*.test.points`)
 - Gnuplot script files (`*.plot`)
