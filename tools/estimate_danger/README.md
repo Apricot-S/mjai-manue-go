@@ -35,8 +35,13 @@ It focuses specifically on **situations where exactly one player has declared Ri
 ### Usage
 
 ```sh
-go run ./tools/estimate_danger extract -o <OUTPUT_FILEPATH> [OPTIONS]... <PATH/TO/INPUT_FILES>...
+go run ./tools/estimate_danger extract -o <OUTPUT_FILEPATH> [OPTIONS]... <PATH/TO/GAME_LOGS>...
 ```
+
+Arguments
+
+- `<PATH/TO/GAME_LOGS>`  
+  Paths to Mjai format game log files to process. Multiple files can be specified.
 
 Required Option
 
