@@ -237,7 +237,7 @@ Nothing except progress bars.
 ### Usage
 
 ```sh
-go run ./tools/estimate_danger tree [-o <OUTPUT_FILEPATH>] [-min_gap PERCENTAGE] <PATH/TO/INPUT_FILE>
+go run ./tools/estimate_danger tree [-o <OUTPUT_FILEPATH>] [-min_gap <PERCENTAGE>] <PATH/TO/INPUT_FILE>
 ```
 
 ### What It Does
