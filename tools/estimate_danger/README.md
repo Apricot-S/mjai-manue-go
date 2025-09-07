@@ -41,19 +41,25 @@ go run ./tools/estimate_danger extract -o <OUTPUT_FILEPATH> [OPTIONS]... <PATH/T
 Required Option
 
 - `-o OUTPUT_FILEPATH`  
-Path to the output file for the extracted feature data (in gob format)
+  Path to the output file for the extracted feature data (in gob format)
 
 Optional Flags
 
 - `-v`  
-Enable verbose mode (prints feature vectors for each discard candidate to standard output)
+  Enable verbose mode (prints feature vectors for each discard candidate to standard output)
 - `-filter FILTER_SPEC`  
-Filter extracted scenes by feature conditions and print only matching candidates to standard output.  
-FILTER_SPEC format: `feature1:1&feature2:0&hit:1` where conditions are joined by `&`, each condition is `key:value`, and values are `1` (true) or `0` (false). Supports any feature name defined in `Scene` struct (e.g., suji, urasuji, visible>=3, dora) plus `hit` for actual deal-in results.
+  Filter extracted scenes by feature conditions and print only matching candidates to standard output.
+  - Format: `feature1:1&feature2:0&hit:1`
+  - Delimiter: `&`
+  - Condition format: `key:value` pairs
+  - Value specification: `1` (true) or `0` (false)
+  - Available keys:
+    - Feature names defined in `Scene` struct (e.g., `suji`, `urasuji`, `visible>=3`, `dora`)
+    - Special key `hit` (whether the tile is a winning tile for the Riichi player)
 - `-start FILEPATH`  
-Start processing from the specified file
+  Start processing from the specified file
 - `-n NUMBER`  
-Limit the number of files to process
+  Limit the number of files to process
 
 ### What It Does
 
