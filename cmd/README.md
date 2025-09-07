@@ -31,7 +31,7 @@ go build ./cmd/mjai-manue
 
 ```sh
 # Basic format
-<APP_NAME> [--name PLAYER_NAME] [URL]
+<APP_NAME> [--name <PLAYER_NAME>] [<URL>]
 
 # Pipe mode (standard I/O)
 mjai-manue 2> mjai-manue.log
