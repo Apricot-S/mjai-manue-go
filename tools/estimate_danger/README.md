@@ -45,14 +45,14 @@ Arguments
 
 Required Option
 
-- `-o OUTPUT_FILEPATH`  
+- `-o <OUTPUT_FILEPATH>`  
   Path to the output file for the extracted feature data (in gob format)
 
 Optional Flags
 
 - `-v`  
   Enable verbose mode (prints feature vectors for each discard candidate to standard output)
-- `-filter FILTER_SPEC`  
+- `-filter <FILTER_SPEC>`  
   Filter extracted scenes by feature conditions and print only matching candidates to standard output.
   - Format: `feature1:1&feature2:0&hit:1`
   - Delimiter: `&`
@@ -61,9 +61,9 @@ Optional Flags
   - Available keys:
     - Feature names defined in `Scene` struct (e.g., `suji`, `urasuji`, `visible>=3`, `dora`)
     - Special key `hit` (whether the tile is a winning tile for the Riichi player)
-- `-start FILEPATH`  
+- `-start <FILEPATH>`  
   Start processing from the specified file
-- `-n NUMBER`  
+- `-n <NUMBER>`  
   Limit the number of files to process
 
 ### What It Does
@@ -178,7 +178,7 @@ Arguments
 
 Optional Flags
 
-- `-o OUTPUT_FILEPATH`  
+- `-o <OUTPUT_FILEPATH>`  
   Path to the output file for saving the calculated probabilities (in gob format). If not specified, results are only displayed to standard output.
 
 ### What It Does
