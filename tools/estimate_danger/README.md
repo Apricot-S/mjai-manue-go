@@ -529,7 +529,7 @@ Required Flags
 
 ### Output
 
-Creates a JSON file containing the complete decision tree structure with:
+Outputs a JSON file containing the complete decision tree structure with:
 
 - Nested structure representing the tree hierarchy
   - Node probabilities with confidence intervals and sample counts
