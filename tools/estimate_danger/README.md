@@ -43,7 +43,7 @@ Arguments
 - `<PATH/TO/GAME_LOGS>`  
   Paths to Mjai format game log files to process. Multiple files can be specified.
 
-Required Option
+Required Flags
 
 - `-o <OUTPUT_FILEPATH>`  
   Path to the output file for the extracted feature data (in gob format)
