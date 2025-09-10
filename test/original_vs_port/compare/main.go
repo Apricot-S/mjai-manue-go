@@ -154,24 +154,24 @@ func run(args []string, w io.Writer) error {
 	if err != nil {
 		log.Fatalf("failed to create AI: %v", err)
 	}
-	verifier := NewComparer(ai)
+	comparer := NewComparer(ai)
 
 	archive := shared.NewArchive(paths, &mjai.MjaiAdapter{})
 	var prevLog string
 	separator := strings.Repeat("=", 122)
 
 	onAction := func(action inbound.Event) error {
-		action, err := verifier.ModifyAction(action, archive.StateAnalyzer())
+		action, err := comparer.ModifyAction(action, archive.StateAnalyzer())
 		if err != nil {
 			return err
 		}
-		if err := verifier.MakeDecision(archive.StateAnalyzer()); err != nil {
+		if err := comparer.MakeDecision(archive.StateAnalyzer()); err != nil {
 			return err
 		}
 		if err := archive.StateUpdater().Update(action); err != nil {
 			return err
 		}
-		detail, err := verifier.CompareAction(action, archive.StateViewer())
+		detail, err := comparer.CompareAction(action, archive.StateViewer())
 		if err != nil {
 			return err
 		}
