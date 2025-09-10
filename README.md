@@ -60,6 +60,8 @@ mjai-manue mjsonp://example.com:11600/default
 mjai-manue
 ```
 
+For more information, see [cmd/](cmd/).
+
 > [!NOTE]
 > In practice, `mjai.app` runs `bot.py` in the submission `.zip` file.
 > You need to call the above command from within `bot.py` and pipe the standard input and output.
