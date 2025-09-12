@@ -131,12 +131,10 @@ func (a *ManueAI) getScoreChangesDistOnRyukyoku(
 		}
 		ryukyokuTenpaiProb := currentTenpaiProb + (1.0-currentTenpaiProb)*notenRyukyokuTenpaiProb
 
-		var tenpais [4]float64
-		for i := range 4 {
-			if player.ID() == playerID {
+		tenpais := [4]float64{0.0, 0.0, 0.0, 0.0}
+		for i, p := range state.Players() {
+			if p.ID() == player.ID() {
 				tenpais[i] = 1.0
-			} else {
-				tenpais[i] = 0.0
 			}
 		}
 
