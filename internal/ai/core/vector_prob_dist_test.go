@@ -2,6 +2,7 @@ package core
 
 import (
 	"reflect"
+	"slices"
 	"testing"
 )
 
@@ -133,7 +134,51 @@ func TestVectorProbDist_MapValueScalar(t *testing.T) {
 	tests := []testCase{}
 
 	{
-		// TODO: Add test cases.
+		hm1 := NewHashMap[[]float64]()
+		hm1.Set([]float64{1, 2, 0, 0}, 0.3)
+		hm1.Set([]float64{2, 3, 0, 0}, 0.4)
+		hm1.Set([]float64{3, 4, 0, 0}, 0.3)
+
+		mapper := func(v []float64) float64 {
+			return v[0] + v[1]
+		}
+
+		wantDist := NewHashMap[float64]()
+		wantDist.Set(3.0, 0.3)
+		wantDist.Set(5.0, 0.4)
+		wantDist.Set(7.0, 0.3)
+		want := &ScalarProbDist{dist: wantDist}
+
+		tests = append(tests, testCase{
+			name:   "map to sum of first two elements",
+			arg:    hm1,
+			mapper: mapper,
+			want:   want,
+		})
+	}
+
+	{
+		hm1 := NewHashMap[[]float64]()
+		hm1.Set([]float64{1, 1, 0, 0}, 0.2)
+		hm1.Set([]float64{1, 2, 0, 0}, 0.3)
+		hm1.Set([]float64{2, 1, 0, 0}, 0.3)
+		hm1.Set([]float64{2, 2, 0, 0}, 0.2)
+
+		mapper := func(v []float64) float64 {
+			return slices.Max(v)
+		}
+
+		wantDist := NewHashMap[float64]()
+		wantDist.Set(1.0, 0.2)
+		wantDist.Set(2.0, 0.8)
+		want := &ScalarProbDist{dist: wantDist}
+
+		tests = append(tests, testCase{
+			name:   "map to max of first two elements with overlaps",
+			arg:    hm1,
+			mapper: mapper,
+			want:   want,
+		})
 	}
 
 	for _, tt := range tests {
@@ -157,7 +202,54 @@ func TestVectorProbDist_MapValueVector(t *testing.T) {
 	tests := []testCase{}
 
 	{
-		// TODO: Add test cases.
+		hm1 := NewHashMap[[]float64]()
+		hm1.Set([]float64{1, 2, 0, 0}, 0.5)
+		hm1.Set([]float64{3, 4, 0, 0}, 0.5)
+
+		mapper := func(v []float64) []float64 {
+			vv := make([]float64, len(v))
+			for i, e := range v {
+				vv[i] = e * 2
+			}
+			return vv
+		}
+
+		wantDist := NewHashMap[[]float64]()
+		wantDist.Set([]float64{2, 4, 0, 0}, 0.5)
+		wantDist.Set([]float64{6, 8, 0, 0}, 0.5)
+		want := &VectorProbDist{dist: wantDist}
+
+		tests = append(tests, testCase{
+			name:   "map to double each element",
+			arg:    hm1,
+			mapper: mapper,
+			want:   want,
+		})
+	}
+
+	{
+		hm1 := NewHashMap[[]float64]()
+		hm1.Set([]float64{1, 2, 0, 0}, 0.2)
+		hm1.Set([]float64{2, 1, 0, 0}, 0.3)
+		hm1.Set([]float64{3, 4, 0, 0}, 0.5)
+
+		mapper := func(v []float64) []float64 {
+			vv := slices.Clone(v)
+			slices.Sort(vv)
+			return vv
+		}
+
+		wantDist := NewHashMap[[]float64]()
+		wantDist.Set([]float64{0, 0, 1, 2}, 0.5)
+		wantDist.Set([]float64{0, 0, 3, 4}, 0.5)
+		want := &VectorProbDist{dist: wantDist}
+
+		tests = append(tests, testCase{
+			name:   "map to sorted vector with overlaps",
+			arg:    hm1,
+			mapper: mapper,
+			want:   want,
+		})
 	}
 
 	for _, tt := range tests {
