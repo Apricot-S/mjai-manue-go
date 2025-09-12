@@ -463,7 +463,7 @@ func (a *ManueAI) getAverageRank(
 ) float64 {
 	hm1 := core.NewHashMap[[]float64]()
 	hm1.Set([]float64{0.0, 0.0, 0.0, 0.0}, 1.0)
-	winsDist := core.NewProbDist(hm1)
+	winsDist := core.NewVectorProbDist(hm1)
 	for _, other := range state.Players() {
 		if other.ID() == playerID {
 			continue
@@ -474,11 +474,11 @@ func (a *ManueAI) getAverageRank(
 		w := []float64{0.0, 0.0, 0.0, 0.0}
 		w[other.ID()] = 1.0
 		hm2.Set(w, winProb)
-		d := core.NewProbDist(hm2)
-		winsDist = core.Add[[]float64, []float64, []float64](winsDist, d)
+		d := core.NewVectorProbDist(hm2)
+		winsDist = core.AddVectorVector(winsDist, d)
 	}
 
-	rankDist := winsDist.MapValue2(func(wins []float64) float64 {
+	rankDist := winsDist.MapValueScalar(func(wins []float64) float64 {
 		c, _ := core.Count(wins, func(w float64) (bool, error) {
 			// Since w == 1.0 is problematic, a threshold is tentatively set
 			return math.Abs(w-1.0) < 1e-5, nil
