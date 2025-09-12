@@ -2,10 +2,10 @@ package core
 
 // Returns probability distribution of sum of two random variables assuming these two are independent.
 func AddVectorVector(lhs *VectorProbDist, rhs *VectorProbDist) *VectorProbDist {
-	dist := NewHashMap[[]float64]()
-	lhs.dist.ForEach(func(v1 []float64, p1 float64) {
-		rhs.dist.ForEach(func(v2 []float64, p2 float64) {
-			v := make([]float64, 4) // Assuming 4-dimensional vectors
+	dist := NewHashMap[[4]float64]()
+	lhs.dist.ForEach(func(v1 [4]float64, p1 float64) {
+		rhs.dist.ForEach(func(v2 [4]float64, p2 float64) {
+			v := [4]float64{0.0, 0.0, 0.0, 0.0}
 			for i := range len(v) {
 				v[i] = v1[i] + v2[i]
 			}
@@ -17,10 +17,10 @@ func AddVectorVector(lhs *VectorProbDist, rhs *VectorProbDist) *VectorProbDist {
 
 // Returns probability distribution of product of two random variables assuming these two are independent.
 func MultScalarVector(lhs *ScalarProbDist, rhs *VectorProbDist) *VectorProbDist {
-	dist := NewHashMap[[]float64]()
+	dist := NewHashMap[[4]float64]()
 	lhs.dist.ForEach(func(v1 float64, p1 float64) {
-		rhs.dist.ForEach(func(v2 []float64, p2 float64) {
-			v := make([]float64, 4) // Assuming 4-dimensional vectors
+		rhs.dist.ForEach(func(v2 [4]float64, p2 float64) {
+			v := [4]float64{0.0, 0.0, 0.0, 0.0}
 			for i := range len(v) {
 				v[i] = v1 * v2[i]
 			}
@@ -39,9 +39,9 @@ type WeightedVectorProbDist struct {
 // Returns a probability distribution of a random variable which follows probDist1 in prob1
 // and follows probDist2 in prob2 etc.
 func MergeVector(items []WeightedVectorProbDist) *VectorProbDist {
-	dist := NewHashMap[[]float64]()
+	dist := NewHashMap[[4]float64]()
 	for _, item := range items {
-		item.Pd.dist.ForEach(func(v []float64, p float64) {
+		item.Pd.dist.ForEach(func(v [4]float64, p float64) {
 			dist.Set(v, dist.Get(v, 0)+p*item.Prob)
 		})
 	}

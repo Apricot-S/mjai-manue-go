@@ -7,15 +7,15 @@ import (
 )
 
 func TestAddVectorVector(t *testing.T) {
-	hm3 := NewHashMap[[]float64]()
-	hm3.Set([]float64{0, 1, 0, 0}, 0.5)
-	hm3.Set([]float64{2, 3, 0, 0}, 0.5)
+	hm3 := NewHashMap[[4]float64]()
+	hm3.Set([4]float64{0, 1, 0, 0}, 0.5)
+	hm3.Set([4]float64{2, 3, 0, 0}, 0.5)
 	pb3 := NewVectorProbDist(hm3)
 
-	wantHm := NewHashMap[[]float64]()
-	wantHm.Set([]float64{0, 2, 0, 0}, 0.25)
-	wantHm.Set([]float64{2, 4, 0, 0}, 0.5)
-	wantHm.Set([]float64{4, 6, 0, 0}, 0.25)
+	wantHm := NewHashMap[[4]float64]()
+	wantHm.Set([4]float64{0, 2, 0, 0}, 0.25)
+	wantHm.Set([4]float64{2, 4, 0, 0}, 0.5)
+	wantHm.Set([4]float64{4, 6, 0, 0}, 0.25)
 	wantPd := NewVectorProbDist(wantHm)
 
 	tests := []struct {
@@ -47,17 +47,17 @@ func TestMultScalarVector(t *testing.T) {
 	hm4.Set(-1, 0.5)
 	pb4 := NewScalarProbDist(hm4)
 
-	hm5 := NewHashMap[[]float64]()
-	hm5.Set([]float64{1, 2, 0, 0}, 0.5)
-	hm5.Set([]float64{4, 8, 0, 0}, 0.5)
+	hm5 := NewHashMap[[4]float64]()
+	hm5.Set([4]float64{1, 2, 0, 0}, 0.5)
+	hm5.Set([4]float64{4, 8, 0, 0}, 0.5)
 	pb5 := NewVectorProbDist(hm5)
 
 	negZero := math.Copysign(0.0, -1.0)
-	wantHm := NewHashMap[[]float64]()
-	wantHm.Set([]float64{1, 2, 0, 0}, 0.25)
-	wantHm.Set([]float64{-1, -2, negZero, negZero}, 0.25)
-	wantHm.Set([]float64{4, 8, 0, 0}, 0.25)
-	wantHm.Set([]float64{-4, -8, negZero, negZero}, 0.25)
+	wantHm := NewHashMap[[4]float64]()
+	wantHm.Set([4]float64{1, 2, 0, 0}, 0.25)
+	wantHm.Set([4]float64{-1, -2, negZero, negZero}, 0.25)
+	wantHm.Set([4]float64{4, 8, 0, 0}, 0.25)
+	wantHm.Set([4]float64{-4, -8, negZero, negZero}, 0.25)
 	wantPd := NewVectorProbDist(wantHm)
 
 	tests := []struct {
@@ -84,20 +84,20 @@ func TestMultScalarVector(t *testing.T) {
 }
 
 func TestMergeVector(t *testing.T) {
-	hm1 := NewHashMap[[]float64]()
-	hm1.Set([]float64{0, 0, 0, 0}, 0.5)
-	hm1.Set([]float64{8000, 0, 0, 0}, 0.5)
+	hm1 := NewHashMap[[4]float64]()
+	hm1.Set([4]float64{0, 0, 0, 0}, 0.5)
+	hm1.Set([4]float64{8000, 0, 0, 0}, 0.5)
 	pb1 := NewVectorProbDist(hm1)
 
-	hm2 := NewHashMap[[]float64]()
-	hm2.Set([]float64{0, 0, 0, 0}, 0.5)
-	hm2.Set([]float64{-2000, 0, 0, 0}, 0.5)
+	hm2 := NewHashMap[[4]float64]()
+	hm2.Set([4]float64{0, 0, 0, 0}, 0.5)
+	hm2.Set([4]float64{-2000, 0, 0, 0}, 0.5)
 	pb2 := NewVectorProbDist(hm2)
 
-	wantHm := NewHashMap[[]float64]()
-	wantHm.Set([]float64{0, 0, 0, 0}, 0.5)
-	wantHm.Set([]float64{8000, 0, 0, 0}, 0.25)
-	wantHm.Set([]float64{-2000, 0, 0, 0}, 0.25)
+	wantHm := NewHashMap[[4]float64]()
+	wantHm.Set([4]float64{0, 0, 0, 0}, 0.5)
+	wantHm.Set([4]float64{8000, 0, 0, 0}, 0.25)
+	wantHm.Set([4]float64{-2000, 0, 0, 0}, 0.25)
 	wantPd := NewVectorProbDist(wantHm)
 
 	tests := []struct {

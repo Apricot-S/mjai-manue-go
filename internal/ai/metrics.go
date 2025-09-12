@@ -244,7 +244,7 @@ func (a *ManueAI) getMetricsInternal(
 		}
 
 		m.futureScoreChangesDist = core.MergeVector(items)
-		m.scoreChangesDist = m.immediateScoreChangesDist.Replace(a.noChanges[:], m.futureScoreChangesDist)
+		m.scoreChangesDist = m.immediateScoreChangesDist.Replace(a.noChanges, m.futureScoreChangesDist)
 		m.expectedPoints = m.scoreChangesDist.Expected()[playerID]
 		m.averageRank = a.getAverageRank(state, playerID, m.scoreChangesDist)
 

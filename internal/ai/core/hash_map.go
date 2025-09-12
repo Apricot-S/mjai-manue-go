@@ -3,7 +3,7 @@ package core
 import "encoding/json/v2"
 
 type HashMapKey interface {
-	float64 | []float64
+	float64 | [4]float64
 }
 
 type HashMapEntry[T HashMapKey] struct {

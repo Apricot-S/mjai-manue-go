@@ -30,10 +30,10 @@ func TestHashMap(t *testing.T) {
 	})
 
 	t.Run("multiple element keys", func(t *testing.T) {
-		h := NewHashMap[[]float64]()
+		h := NewHashMap[[4]float64]()
 
-		key1 := []float64{1.0, 2.0}
-		key2 := []float64{3.0, 4.0}
+		key1 := [4]float64{1.0, 2.0}
+		key2 := [4]float64{3.0, 4.0}
 
 		// Set & Get
 		h.Set(key1, 100.0)
@@ -71,15 +71,15 @@ func TestHashMap(t *testing.T) {
 	})
 
 	t.Run("ForEach with multiple element keys", func(t *testing.T) {
-		h := NewHashMap[[]float64]()
-		key1 := []float64{1.0, 2.0}
-		key2 := []float64{3.0, 4.0}
+		h := NewHashMap[[4]float64]()
+		key1 := [4]float64{1.0, 2.0}
+		key2 := [4]float64{3.0, 4.0}
 		h.Set(key1, 100.0)
 		h.Set(key2, 200.0)
 
 		sum := 0.0
 		keySum := []float64{0.0, 0.0}
-		h.ForEach(func(key []float64, value float64) {
+		h.ForEach(func(key [4]float64, value float64) {
 			sum += value
 			keySum[0] += key[0]
 			keySum[1] += key[1]
