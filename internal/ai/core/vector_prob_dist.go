@@ -1,7 +1,5 @@
 package core
 
-import "slices"
-
 type VectorProbDist struct {
 	dist HashMap[[4]float64]
 }
@@ -35,7 +33,7 @@ func (pd *VectorProbDist) Replace(oldValue [4]float64, newPb *VectorProbDist) *V
 	prob := 0.0
 
 	pd.dist.ForEach(func(v [4]float64, p float64) {
-		if slices.Compare(v[:], oldValue[:]) == 0 {
+		if v == oldValue {
 			prob = p
 		} else {
 			dist.Set(v, p)
