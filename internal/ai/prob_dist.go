@@ -15,8 +15,8 @@ import (
 func (a *ManueAI) getScoreChangesDistOnHora(
 	state game.StateViewer,
 	playerID int,
-	horaPointsDist *core.ProbDist[float64],
-) *core.ProbDist[[]float64] {
+	horaPointsDist *core.ScalarProbDist,
+) *core.VectorProbDist {
 	tsumoHoraProb := float64(a.stats.NumTsumoHoras) / float64(a.stats.NumHoras)
 	unitDistMap := core.NewHashMap[[]float64]()
 
@@ -44,8 +44,8 @@ func (a *ManueAI) getScoreChangesDistOnHora(
 		unitDistMap.Set(changes, prob)
 	}
 
-	u := core.NewProbDist(unitDistMap)
-	return core.Mult[float64, []float64, []float64](horaPointsDist, u)
+	u := core.NewVectorProbDist(unitDistMap)
+	return core.MultScalarVector(horaPointsDist, u)
 }
 
 func (a *ManueAI) getRyukyokuAveragePoints(
@@ -112,11 +112,11 @@ func (a *ManueAI) getScoreChangesDistOnRyukyoku(
 	state game.StateViewer,
 	playerID int,
 	selfTenpai bool,
-) *core.ProbDist[[]float64] {
+) *core.VectorProbDist {
 	notenRyukyokuTenpaiProb := a.getNotenRyukyokuTenpaiProb(state)
 	hm1 := core.NewHashMap[[]float64]()
 	hm1.Set([]float64{0.0, 0.0, 0.0, 0.0}, 1.0)
-	tenpaisDist := core.NewProbDist(hm1)
+	tenpaisDist := core.NewVectorProbDist(hm1)
 
 	for _, player := range state.Players() {
 		var currentTenpaiProb float64
@@ -143,11 +143,11 @@ func (a *ManueAI) getScoreChangesDistOnRyukyoku(
 		hm2 := core.NewHashMap[[]float64]()
 		hm2.Set([]float64{0.0, 0.0, 0.0, 0.0}, 1.0-ryukyokuTenpaiProb)
 		hm2.Set(tenpais, ryukyokuTenpaiProb)
-		dist := core.NewProbDist(hm2)
-		tenpaisDist = core.Add[[]float64, []float64, []float64](tenpaisDist, dist)
+		dist := core.NewVectorProbDist(hm2)
+		tenpaisDist = core.AddVectorVector(tenpaisDist, dist)
 	}
 
-	return tenpaisDist.MapValue(tenpaisToRyukyokuPointsFloat)
+	return tenpaisDist.MapValueVector(tenpaisToRyukyokuPointsFloat)
 }
 
 func tenpaisToRyukyokuPointsFloat(tenpais []float64) []float64 {
@@ -235,8 +235,8 @@ func (a *ManueAI) getImmediateScoreChangesDists(
 	state game.StateViewer,
 	playerID int,
 	dahaiCandidates []base.Pai,
-) map[string]*core.ProbDist[[]float64] {
-	scoreChangesDists := make(map[string]*core.ProbDist[[]float64], len(dahaiCandidates))
+) map[string]*core.VectorProbDist {
+	scoreChangesDists := make(map[string]*core.VectorProbDist, len(dahaiCandidates))
 	for _, pai := range dahaiCandidates {
 		var key string
 		if pai.IsUnknown() {
@@ -246,7 +246,7 @@ func (a *ManueAI) getImmediateScoreChangesDists(
 		}
 		hm := core.NewHashMap[[]float64]()
 		hm.Set(a.noChanges[:], 1.0)
-		scoreChangesDists[key] = core.NewProbDist(hm)
+		scoreChangesDists[key] = core.NewVectorProbDist(hm)
 	}
 
 	me := state.Players()[playerID]
@@ -281,7 +281,7 @@ func (a *ManueAI) getImmediateScoreChangesDists(
 			f := float64(freq) / totalFreqs
 			hm.Set(p, f)
 		}
-		horaPointsDist := core.NewProbDist(hm)
+		horaPointsDist := core.NewScalarProbDist(hm)
 
 		hojuChanges := []float64{0.0, 0.0, 0.0, 0.0}
 		hojuChanges[horaPlayer.ID()] = 1.0
@@ -311,9 +311,9 @@ func (a *ManueAI) getImmediateScoreChangesDists(
 			hm := core.NewHashMap[[]float64]()
 			hm.Set(hojuChanges, hojuProb)
 			hm.Set(a.noChanges[:], 1.0-hojuProb)
-			unitDist := core.NewProbDist(hm)
+			unitDist := core.NewVectorProbDist(hm)
 			// Considers only the first ron for double/triple ron to avoid too many combinations.
-			new := core.Mult[float64, []float64, []float64](horaPointsDist, unitDist)
+			new := core.MultScalarVector(horaPointsDist, unitDist)
 			scoreChangesDists[key] = scoreChangesDists[key].Replace(a.noChanges[:], new)
 		}
 	}
@@ -329,7 +329,7 @@ func (a *ManueAI) getRandomHoraScoreChangesDist(
 	state game.StateViewer,
 	playerID int,
 	actor *base.Player,
-) *core.ProbDist[[]float64] {
+) *core.VectorProbDist {
 	var horaPointsFreqs map[string]int
 	if actor.ID() == state.Oya().ID() {
 		horaPointsFreqs = a.stats.OyaHoraPointsFreqs
@@ -351,16 +351,16 @@ func (a *ManueAI) getRandomHoraScoreChangesDist(
 		hm.Set(p, f)
 	}
 
-	horaPointsDist := core.NewProbDist(hm)
+	horaPointsDist := core.NewScalarProbDist(hm)
 	horaFactorsDist := a.getHoraFactorsDist(state, playerID, actor)
-	return core.Mult[float64, []float64, []float64](horaPointsDist, horaFactorsDist)
+	return core.MultScalarVector(horaPointsDist, horaFactorsDist)
 }
 
 func (a *ManueAI) getHoraFactorsDist(
 	state game.StateViewer,
 	playerID int,
 	actor *base.Player,
-) *core.ProbDist[[]float64] {
+) *core.VectorProbDist {
 	tsumoHoraProb := float64(a.stats.NumTsumoHoras) / float64(a.stats.NumHoras)
 	m := core.NewHashMap[[]float64]()
 	for _, target := range state.Players() {
@@ -372,7 +372,7 @@ func (a *ManueAI) getHoraFactorsDist(
 		}
 		m.Set(a.getHoraFactors(state, actor, &target), prob)
 	}
-	return core.NewProbDist(m)
+	return core.NewVectorProbDist(m)
 }
 
 func (a *ManueAI) getHoraFactors(state game.StateViewer, actor, target *base.Player) []float64 {
@@ -459,7 +459,7 @@ func (a *ManueAI) getRyukyokuProb(state game.StateViewer) float64 {
 func (a *ManueAI) getAverageRank(
 	state game.StateViewer,
 	playerID int,
-	scoreChangesDist *core.ProbDist[[]float64],
+	scoreChangesDist *core.VectorProbDist,
 ) float64 {
 	hm1 := core.NewHashMap[[]float64]()
 	hm1.Set([]float64{0.0, 0.0, 0.0, 0.0}, 1.0)
@@ -491,7 +491,7 @@ func (a *ManueAI) getAverageRank(
 func (a *ManueAI) getWinProb(
 	state game.StateViewer,
 	playerID int,
-	scoreChangesDist *core.ProbDist[[]float64],
+	scoreChangesDist *core.VectorProbDist,
 	other *base.Player,
 ) float64 {
 	me := &state.Players()[playerID]
@@ -501,7 +501,7 @@ func (a *ManueAI) getWinProb(
 	otherPos := game.GetPlayerDistance(other, state.Chicha())
 	key := fmt.Sprintf("%s%d,%d,%d", nexttKyokuBakaze.ToString(), nextKyokuNum, myPos, otherPos)
 	winProbs := a.stats.WinProbsMap[key]
-	relativeScoreDist := scoreChangesDist.MapValue2(func(scoreChanges []float64) float64 {
+	relativeScoreDist := scoreChangesDist.MapValueScalar(func(scoreChanges []float64) float64 {
 		return (float64(me.Score()) + scoreChanges[playerID]) - (float64(other.Score()) + scoreChanges[other.ID()])
 	})
 	winProb := 0.0
