@@ -16,14 +16,14 @@ func NewVectorProbDist(arg HashMap[[]float64]) *VectorProbDist {
 	return pd
 }
 
-func (p *VectorProbDist) Dist() *HashMap[[]float64] {
-	return &p.dist
+func (pd *VectorProbDist) Dist() *HashMap[[]float64] {
+	return &pd.dist
 }
 
-func (p *VectorProbDist) Expected() []float64 {
+func (pd *VectorProbDist) Expected() []float64 {
 	// result := [4]float64{0.0, 0.0, 0.0, 0.0}
 	result := make([]float64, 4) // Assuming 4-dimensional vectors
-	p.dist.ForEach(func(value []float64, prob float64) {
+	pd.dist.ForEach(func(value []float64, prob float64) {
 		for i, v := range value {
 			result[i] += prob * v
 		}
@@ -31,11 +31,11 @@ func (p *VectorProbDist) Expected() []float64 {
 	return result
 }
 
-func (p *VectorProbDist) Replace(oldValue []float64, newPb *VectorProbDist) *VectorProbDist {
+func (pd *VectorProbDist) Replace(oldValue []float64, newPb *VectorProbDist) *VectorProbDist {
 	dist := NewHashMap[[]float64]()
 	prob := 0.0
 
-	p.dist.ForEach(func(v []float64, p float64) {
+	pd.dist.ForEach(func(v []float64, p float64) {
 		if slices.Compare(v, oldValue) == 0 {
 			prob = p
 		} else {
@@ -50,18 +50,18 @@ func (p *VectorProbDist) Replace(oldValue []float64, newPb *VectorProbDist) *Vec
 	return &VectorProbDist{dist: dist}
 }
 
-func (p *VectorProbDist) MapValueScalar(mapper func([]float64) float64) *ScalarProbDist {
+func (pd *VectorProbDist) MapValueScalar(mapper func([]float64) float64) *ScalarProbDist {
 	dist := NewHashMap[float64]()
-	p.dist.ForEach(func(v []float64, p float64) {
+	pd.dist.ForEach(func(v []float64, p float64) {
 		newValue := mapper(v)
 		dist.Set(newValue, dist.Get(newValue, 0.0)+p)
 	})
 	return &ScalarProbDist{dist: dist}
 }
 
-func (p *VectorProbDist) MapValueVector(mapper func([]float64) []float64) *VectorProbDist {
+func (pd *VectorProbDist) MapValueVector(mapper func([]float64) []float64) *VectorProbDist {
 	dist := NewHashMap[[]float64]()
-	p.dist.ForEach(func(v []float64, p float64) {
+	pd.dist.ForEach(func(v []float64, p float64) {
 		newValue := mapper(v)
 		dist.Set(newValue, dist.Get(newValue, 0.0)+p)
 	})

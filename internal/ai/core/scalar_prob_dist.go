@@ -14,13 +14,13 @@ func NewScalarProbDist(arg HashMap[float64]) *ScalarProbDist {
 	return pd
 }
 
-func (p *ScalarProbDist) Dist() *HashMap[float64] {
-	return &p.dist
+func (pd *ScalarProbDist) Dist() *HashMap[float64] {
+	return &pd.dist
 }
 
-func (p *ScalarProbDist) Expected() float64 {
+func (pd *ScalarProbDist) Expected() float64 {
 	result := 0.0
-	p.dist.ForEach(func(value float64, prob float64) {
+	pd.dist.ForEach(func(value float64, prob float64) {
 		result += prob * value
 	})
 	return result
