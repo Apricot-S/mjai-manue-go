@@ -26,12 +26,12 @@ type metric struct {
 	othersHoraProb             float64
 	averageHoraPoints          float64
 	ryukyokuAveragePoints      float64
-	horaPointsDist             *core.ProbDist[float64]
-	immediateScoreChangesDist  *core.ProbDist[[]float64]
-	futureScoreChangesDist     *core.ProbDist[[]float64]
-	scoreChangesDist           *core.ProbDist[[]float64]
-	scoreChangesDistOnHora     *core.ProbDist[[]float64]
-	scoreChangesDistOnRyukyoku *core.ProbDist[[]float64]
+	horaPointsDist             *core.ScalarProbDist
+	immediateScoreChangesDist  *core.VectorProbDist
+	futureScoreChangesDist     *core.VectorProbDist
+	scoreChangesDist           *core.VectorProbDist
+	scoreChangesDistOnHora     *core.VectorProbDist
+	scoreChangesDistOnRyukyoku *core.VectorProbDist
 	expectedPoints             float64
 	expectedHoraPoints         float64
 	safeExpectedPoints         float64
@@ -188,7 +188,7 @@ func (a *ManueAI) getMetricsInternal(
 
 	scoreChangesDistOnRyukyokuIfTenpaiNow := a.getScoreChangesDistOnRyukyoku(state, playerID, true)
 	scoreChangesDistOnRyukyokuIfNotenNow := a.getScoreChangesDistOnRyukyoku(state, playerID, false)
-	scoreChangesDistsOnOtherHora := make([]*core.ProbDist[[]float64], 0, 3)
+	scoreChangesDistsOnOtherHora := make([]*core.VectorProbDist, 0, 3)
 	for _, p := range state.Players() {
 		if p.ID() == playerID {
 			continue
@@ -229,13 +229,13 @@ func (a *ManueAI) getMetricsInternal(
 		m.ryukyokuProb = (1.0 - m.horaProb) * ryukyokuProbOnMyNoHora
 		m.othersHoraProb = (1.0 - m.horaProb) * (1.0 - ryukyokuProbOnMyNoHora)
 
-		myHoraItem := core.WeightedProbDist[[]float64]{Pd: m.scoreChangesDistOnHora, Prob: m.horaProb}
-		ryukyokuItem := core.WeightedProbDist[[]float64]{Pd: m.scoreChangesDistOnRyukyoku, Prob: m.ryukyokuProb}
-		var otherHoraItems [3]core.WeightedProbDist[[]float64]
+		myHoraItem := core.WeightedVectorProbDist{Pd: m.scoreChangesDistOnHora, Prob: m.horaProb}
+		ryukyokuItem := core.WeightedVectorProbDist{Pd: m.scoreChangesDistOnRyukyoku, Prob: m.ryukyokuProb}
+		var otherHoraItems [3]core.WeightedVectorProbDist
 		for i, d := range scoreChangesDistsOnOtherHora {
-			otherHoraItems[i] = core.WeightedProbDist[[]float64]{Pd: d, Prob: m.othersHoraProb / 3.0}
+			otherHoraItems[i] = core.WeightedVectorProbDist{Pd: d, Prob: m.othersHoraProb / 3.0}
 		}
-		items := []core.WeightedProbDist[[]float64]{
+		items := []core.WeightedVectorProbDist{
 			myHoraItem,
 			ryukyokuItem,
 			otherHoraItems[0],
@@ -243,8 +243,8 @@ func (a *ManueAI) getMetricsInternal(
 			otherHoraItems[2],
 		}
 
-		m.futureScoreChangesDist = core.Merge(items)
-		m.scoreChangesDist = m.immediateScoreChangesDist.Replace(a.noChanges[:], m.futureScoreChangesDist)
+		m.futureScoreChangesDist = core.MergeVector(items)
+		m.scoreChangesDist = m.immediateScoreChangesDist.Replace(a.noChanges, m.futureScoreChangesDist)
 		m.expectedPoints = m.scoreChangesDist.Expected()[playerID]
 		m.averageRank = a.getAverageRank(state, playerID, m.scoreChangesDist)
 
@@ -500,7 +500,7 @@ func (a *ManueAI) getHoraEstimation(
 		m := metric{
 			horaProb:           float64(totalHoraVector[pid]) / numTriesFloat,
 			averageHoraPoints:  float64(totalPointsVector[pid]) / float64(totalHoraVector[pid]),
-			horaPointsDist:     core.NewProbDist(hm),
+			horaPointsDist:     core.NewScalarProbDist(hm),
 			expectedHoraPoints: float64(totalPointsVector[pid]) / numTriesFloat,
 			shanten:            shantenVector[pid],
 		}
