@@ -233,7 +233,7 @@ func (a *ManueAI) getImmediateScoreChangesDists(
 	state game.StateViewer,
 	playerID int,
 	dahaiCandidates []base.Pai,
-) map[string]*core.VectorProbDist {
+) (map[string]*core.VectorProbDist, error) {
 	scoreChangesDists := make(map[string]*core.VectorProbDist, len(dahaiCandidates))
 	for _, pai := range dahaiCandidates {
 		var key string
@@ -255,7 +255,7 @@ func (a *ManueAI) getImmediateScoreChangesDists(
 
 		scene, err := estimator.NewScene(state, &me, &horaPlayer)
 		if err != nil {
-			panic(err)
+			return nil, fmt.Errorf("an error occurred in getImmediateScoreChangesDists: %w", err)
 		}
 
 		tenpaiProb := a.tenpaiProbEstimator.Estimate(&horaPlayer, state)
@@ -274,7 +274,7 @@ func (a *ManueAI) getImmediateScoreChangesDists(
 			}
 			p, err := strconv.ParseFloat(points, 64)
 			if err != nil {
-				panic("Invalid stats file: failed to convert key of horaPointsFreqs to float64 (" + points + ").")
+				return nil, fmt.Errorf("invalid stats file: failed to convert key of horaPointsFreqs to float64 (%s)", points)
 			}
 			f := float64(freq) / totalFreqs
 			hm.Set(p, f)
@@ -292,7 +292,7 @@ func (a *ManueAI) getImmediateScoreChangesDists(
 			key := pai.ToString()
 			isAnpai, err := scene.Evaluate("anpai", &pai)
 			if err != nil {
-				panic(err)
+				return nil, fmt.Errorf("an error occurred in getImmediateScoreChangesDists: %w", err)
 			}
 
 			var hojuProb float64
@@ -301,7 +301,7 @@ func (a *ManueAI) getImmediateScoreChangesDists(
 			} else {
 				probInfo, err := a.dangerEstimator.EstimateProb(scene, &pai)
 				if err != nil {
-					panic(err)
+					return nil, fmt.Errorf("an error occurred in getImmediateScoreChangesDists: %w", err)
 				}
 				hojuProb = tenpaiProb * probInfo.Prob
 			}
@@ -316,7 +316,7 @@ func (a *ManueAI) getImmediateScoreChangesDists(
 		}
 	}
 
-	return scoreChangesDists
+	return scoreChangesDists, nil
 }
 
 func (a *ManueAI) getRyukyokuProbOnMyNoHora(state game.StateViewer) float64 {

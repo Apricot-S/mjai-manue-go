@@ -175,7 +175,10 @@ func (a *ManueAI) getMetricsInternal(
 	if err != nil {
 		return nil, err
 	}
-	immediateScoreChangesDists := a.getImmediateScoreChangesDists(state, playerID, dahaiCandidates)
+	immediateScoreChangesDists, err := a.getImmediateScoreChangesDists(state, playerID, dahaiCandidates)
+	if err != nil {
+		return nil, err
+	}
 	ms, err := a.getHoraEstimation(state, playerID, dahaiCandidates, shanten, goals, tehais, furos, reach)
 	if err != nil {
 		return nil, err
