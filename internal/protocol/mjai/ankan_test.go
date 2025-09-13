@@ -8,6 +8,7 @@ import (
 	"github.com/Apricot-S/mjai-manue-go/internal/base"
 	"github.com/Apricot-S/mjai-manue-go/internal/game/event/inbound"
 	"github.com/Apricot-S/mjai-manue-go/internal/game/event/outbound"
+	"github.com/Apricot-S/mjai-manue-go/internal/testutil"
 )
 
 func TestNewAnkan(t *testing.T) {
@@ -405,7 +406,7 @@ func TestAnkan_ToEvent(t *testing.T) {
 			},
 			want: &inbound.Ankan{
 				Actor:    1,
-				Consumed: [4]base.Pai(mustPais("C", "C", "C", "C")),
+				Consumed: [4]base.Pai(testutil.MustPais("C", "C", "C", "C")),
 			},
 			wantErr: false,
 		},
@@ -438,7 +439,7 @@ func TestAnkan_ToEvent(t *testing.T) {
 }
 
 func TestNewAnkanFromEvent(t *testing.T) {
-	valid, _ := outbound.NewAnkan(1, [4]base.Pai(mustPais("5p", "5p", "5p", "5pr")), "test")
+	valid, _ := outbound.NewAnkan(1, [4]base.Pai(testutil.MustPais("5p", "5p", "5p", "5pr")), "test")
 	invalid := *valid
 	invalid.Actor = -1
 

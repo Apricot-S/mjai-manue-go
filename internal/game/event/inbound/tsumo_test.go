@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/Apricot-S/mjai-manue-go/internal/base"
+	"github.com/Apricot-S/mjai-manue-go/internal/testutil"
 )
 
 func TestNewTsumo(t *testing.T) {
@@ -22,11 +23,11 @@ func TestNewTsumo(t *testing.T) {
 			name: "valid",
 			args: args{
 				actor: 0,
-				pai:   *mustPai("?"),
+				pai:   *testutil.MustPai("?"),
 			},
 			want: &Tsumo{
 				Actor: 0,
-				Pai:   *mustPai("?"),
+				Pai:   *testutil.MustPai("?"),
 			},
 			wantErr: false,
 		},
@@ -34,7 +35,7 @@ func TestNewTsumo(t *testing.T) {
 			name: "invalid actor min",
 			args: args{
 				actor: -1,
-				pai:   *mustPai("?"),
+				pai:   *testutil.MustPai("?"),
 			},
 			want:    nil,
 			wantErr: true,
@@ -43,7 +44,7 @@ func TestNewTsumo(t *testing.T) {
 			name: "invalid actor max",
 			args: args{
 				actor: 4,
-				pai:   *mustPai("?"),
+				pai:   *testutil.MustPai("?"),
 			},
 			want:    nil,
 			wantErr: true,

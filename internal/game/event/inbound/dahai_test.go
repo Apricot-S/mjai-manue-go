@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/Apricot-S/mjai-manue-go/internal/base"
+	"github.com/Apricot-S/mjai-manue-go/internal/testutil"
 )
 
 func TestNewDahai(t *testing.T) {
@@ -23,12 +24,12 @@ func TestNewDahai(t *testing.T) {
 			name: "valid",
 			args: args{
 				actor:     0,
-				pai:       *mustPai("7p"),
+				pai:       *testutil.MustPai("7p"),
 				tsumogiri: false,
 			},
 			want: &Dahai{
 				Actor:     0,
-				Pai:       *mustPai("7p"),
+				Pai:       *testutil.MustPai("7p"),
 				Tsumogiri: false,
 			},
 			wantErr: false,
@@ -37,7 +38,7 @@ func TestNewDahai(t *testing.T) {
 			name: "invalid actor min",
 			args: args{
 				actor:     -1,
-				pai:       *mustPai("7p"),
+				pai:       *testutil.MustPai("7p"),
 				tsumogiri: false,
 			},
 			want:    nil,
@@ -47,7 +48,7 @@ func TestNewDahai(t *testing.T) {
 			name: "invalid actor max",
 			args: args{
 				actor:     4,
-				pai:       *mustPai("7p"),
+				pai:       *testutil.MustPai("7p"),
 				tsumogiri: true,
 			},
 			want:    nil,
@@ -57,7 +58,7 @@ func TestNewDahai(t *testing.T) {
 			name: "unknown pai",
 			args: args{
 				actor:     2,
-				pai:       *mustPai("?"),
+				pai:       *testutil.MustPai("?"),
 				tsumogiri: true,
 			},
 			want:    nil,

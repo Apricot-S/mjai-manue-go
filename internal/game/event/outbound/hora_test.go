@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/Apricot-S/mjai-manue-go/internal/base"
+	"github.com/Apricot-S/mjai-manue-go/internal/testutil"
 )
 
 func TestNewHora(t *testing.T) {
@@ -25,7 +26,7 @@ func TestNewHora(t *testing.T) {
 			args: args{
 				actor:  1,
 				target: 0,
-				pai:    *mustPai("6s"),
+				pai:    *testutil.MustPai("6s"),
 				log:    "",
 			},
 			want: &Hora{
@@ -34,7 +35,7 @@ func TestNewHora(t *testing.T) {
 					Log:   "",
 				},
 				Target: 0,
-				Pai:    *mustPai("6s"),
+				Pai:    *testutil.MustPai("6s"),
 			},
 			wantErr: false,
 		},
@@ -43,7 +44,7 @@ func TestNewHora(t *testing.T) {
 			args: args{
 				actor:  3,
 				target: 2,
-				pai:    *mustPai("5sr"),
+				pai:    *testutil.MustPai("5sr"),
 				log:    "test",
 			},
 			want: &Hora{
@@ -52,7 +53,7 @@ func TestNewHora(t *testing.T) {
 					Log:   "test",
 				},
 				Target: 2,
-				Pai:    *mustPai("5sr"),
+				Pai:    *testutil.MustPai("5sr"),
 			},
 			wantErr: false,
 		},
@@ -61,7 +62,7 @@ func TestNewHora(t *testing.T) {
 			args: args{
 				actor:  -1,
 				target: 0,
-				pai:    *mustPai("6s"),
+				pai:    *testutil.MustPai("6s"),
 				log:    "",
 			},
 			want:    nil,
@@ -72,7 +73,7 @@ func TestNewHora(t *testing.T) {
 			args: args{
 				actor:  4,
 				target: 3,
-				pai:    *mustPai("6s"),
+				pai:    *testutil.MustPai("6s"),
 				log:    "",
 			},
 			want:    nil,
@@ -83,7 +84,7 @@ func TestNewHora(t *testing.T) {
 			args: args{
 				actor:  0,
 				target: -1,
-				pai:    *mustPai("6s"),
+				pai:    *testutil.MustPai("6s"),
 				log:    "",
 			},
 			want:    nil,
@@ -94,7 +95,7 @@ func TestNewHora(t *testing.T) {
 			args: args{
 				actor:  0,
 				target: 4,
-				pai:    *mustPai("6s"),
+				pai:    *testutil.MustPai("6s"),
 				log:    "",
 			},
 			want:    nil,
@@ -105,7 +106,7 @@ func TestNewHora(t *testing.T) {
 			args: args{
 				actor:  0,
 				target: 3,
-				pai:    *mustPai("?"),
+				pai:    *testutil.MustPai("?"),
 				log:    "",
 			},
 			want:    nil,

@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/Apricot-S/mjai-manue-go/internal/game/event/inbound"
+	"github.com/Apricot-S/mjai-manue-go/internal/testutil"
 )
 
 func TestNewTsumo(t *testing.T) {
@@ -388,7 +389,7 @@ func TestTsumo_ToEvent(t *testing.T) {
 			},
 			want: &inbound.Tsumo{
 				Actor: 1,
-				Pai:   *mustPai("?"),
+				Pai:   *testutil.MustPai("?"),
 			},
 			wantErr: false,
 		},

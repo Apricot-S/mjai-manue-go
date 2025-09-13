@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/Apricot-S/mjai-manue-go/internal/base"
+	"github.com/Apricot-S/mjai-manue-go/internal/testutil"
 )
 
 func TestNewDora(t *testing.T) {
@@ -20,17 +21,17 @@ func TestNewDora(t *testing.T) {
 		{
 			name: "valid dora marker",
 			args: args{
-				doraMarker: *mustPai("6s"),
+				doraMarker: *testutil.MustPai("6s"),
 			},
 			want: &Dora{
-				DoraMarker: *mustPai("6s"),
+				DoraMarker: *testutil.MustPai("6s"),
 			},
 			wantErr: false,
 		},
 		{
 			name: "unknown dora marker",
 			args: args{
-				doraMarker: *mustPai("?"),
+				doraMarker: *testutil.MustPai("?"),
 			},
 			want:    nil,
 			wantErr: true,

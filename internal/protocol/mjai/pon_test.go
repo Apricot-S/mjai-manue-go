@@ -8,6 +8,7 @@ import (
 	"github.com/Apricot-S/mjai-manue-go/internal/base"
 	"github.com/Apricot-S/mjai-manue-go/internal/game/event/inbound"
 	"github.com/Apricot-S/mjai-manue-go/internal/game/event/outbound"
+	"github.com/Apricot-S/mjai-manue-go/internal/testutil"
 )
 
 func TestNewPon(t *testing.T) {
@@ -642,8 +643,8 @@ func TestPon_ToEvent(t *testing.T) {
 			want: &inbound.Pon{
 				Actor:    1,
 				Target:   0,
-				Taken:    *mustPai("6s"),
-				Consumed: [2]base.Pai(mustPais("6s", "6s")),
+				Taken:    *testutil.MustPai("6s"),
+				Consumed: [2]base.Pai(testutil.MustPais("6s", "6s")),
 			},
 			wantErr: false,
 		},
@@ -678,7 +679,7 @@ func TestPon_ToEvent(t *testing.T) {
 }
 
 func TestNewPonFromEvent(t *testing.T) {
-	valid, _ := outbound.NewPon(1, 0, *mustPai("1m"), [2]base.Pai(mustPais("1m", "1m")), "test")
+	valid, _ := outbound.NewPon(1, 0, *testutil.MustPai("1m"), [2]base.Pai(testutil.MustPais("1m", "1m")), "test")
 	invalid := *valid
 	invalid.Actor = -1
 

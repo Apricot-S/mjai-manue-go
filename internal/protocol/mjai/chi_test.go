@@ -8,6 +8,7 @@ import (
 	"github.com/Apricot-S/mjai-manue-go/internal/base"
 	"github.com/Apricot-S/mjai-manue-go/internal/game/event/inbound"
 	"github.com/Apricot-S/mjai-manue-go/internal/game/event/outbound"
+	"github.com/Apricot-S/mjai-manue-go/internal/testutil"
 )
 
 func TestNewChi(t *testing.T) {
@@ -642,8 +643,8 @@ func TestChi_ToEvent(t *testing.T) {
 			want: &inbound.Chi{
 				Actor:    1,
 				Target:   0,
-				Taken:    *mustPai("6s"),
-				Consumed: [2]base.Pai(mustPais("5sr", "7s")),
+				Taken:    *testutil.MustPai("6s"),
+				Consumed: [2]base.Pai(testutil.MustPais("5sr", "7s")),
 			},
 			wantErr: false,
 		},
@@ -678,7 +679,7 @@ func TestChi_ToEvent(t *testing.T) {
 }
 
 func TestNewChiFromEvent(t *testing.T) {
-	valid, _ := outbound.NewChi(1, 0, *mustPai("1m"), [2]base.Pai(mustPais("2m", "3m")), "test")
+	valid, _ := outbound.NewChi(1, 0, *testutil.MustPai("1m"), [2]base.Pai(testutil.MustPais("2m", "3m")), "test")
 	invalid := *valid
 	invalid.Actor = 4
 

@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/Apricot-S/mjai-manue-go/internal/base"
+	"github.com/Apricot-S/mjai-manue-go/internal/testutil"
 )
 
 func TestNewHora(t *testing.T) {
@@ -26,14 +27,14 @@ func TestNewHora(t *testing.T) {
 			args: args{
 				actor:      1,
 				target:     0,
-				pai:        mustPai("6s"),
+				pai:        testutil.MustPai("6s"),
 				horaPoints: nil,
 				scores:     nil,
 			},
 			want: &Hora{
 				Actor:      1,
 				Target:     0,
-				Pai:        mustPai("6s"),
+				Pai:        testutil.MustPai("6s"),
 				HoraPoints: nil,
 				Scores:     nil,
 			},
@@ -44,14 +45,14 @@ func TestNewHora(t *testing.T) {
 			args: args{
 				actor:      1,
 				target:     0,
-				pai:        mustPai("6s"),
+				pai:        testutil.MustPai("6s"),
 				horaPoints: func() *int { p := 2600; return &p }(),
 				scores:     nil,
 			},
 			want: &Hora{
 				Actor:      1,
 				Target:     0,
-				Pai:        mustPai("6s"),
+				Pai:        testutil.MustPai("6s"),
 				HoraPoints: func() *int { p := 2600; return &p }(),
 				Scores:     nil,
 			},
@@ -62,14 +63,14 @@ func TestNewHora(t *testing.T) {
 			args: args{
 				actor:      1,
 				target:     0,
-				pai:        mustPai("6s"),
+				pai:        testutil.MustPai("6s"),
 				horaPoints: func() *int { p := 2600; return &p }(),
 				scores:     &[4]int{27500, 22300, 24300, 25900},
 			},
 			want: &Hora{
 				Actor:      1,
 				Target:     0,
-				Pai:        mustPai("6s"),
+				Pai:        testutil.MustPai("6s"),
 				HoraPoints: func() *int { p := 2600; return &p }(),
 				Scores:     &[4]int{27500, 22300, 24300, 25900},
 			},
@@ -80,7 +81,7 @@ func TestNewHora(t *testing.T) {
 			args: args{
 				actor:      -1,
 				target:     0,
-				pai:        mustPai("6s"),
+				pai:        testutil.MustPai("6s"),
 				horaPoints: func() *int { p := 2600; return &p }(),
 				scores:     &[4]int{27500, 22300, 24300, 25900},
 			},
@@ -92,7 +93,7 @@ func TestNewHora(t *testing.T) {
 			args: args{
 				actor:      4,
 				target:     3,
-				pai:        mustPai("6s"),
+				pai:        testutil.MustPai("6s"),
 				horaPoints: func() *int { p := 2600; return &p }(),
 				scores:     &[4]int{27500, 22300, 24300, 25900},
 			},
@@ -104,7 +105,7 @@ func TestNewHora(t *testing.T) {
 			args: args{
 				actor:      0,
 				target:     -1,
-				pai:        mustPai("6s"),
+				pai:        testutil.MustPai("6s"),
 				horaPoints: func() *int { p := 2600; return &p }(),
 				scores:     &[4]int{27500, 22300, 24300, 25900},
 			},
@@ -116,7 +117,7 @@ func TestNewHora(t *testing.T) {
 			args: args{
 				actor:      0,
 				target:     4,
-				pai:        mustPai("6s"),
+				pai:        testutil.MustPai("6s"),
 				horaPoints: func() *int { p := 2600; return &p }(),
 				scores:     &[4]int{27500, 22300, 24300, 25900},
 			},
@@ -146,7 +147,7 @@ func TestNewHora(t *testing.T) {
 			args: args{
 				actor:      0,
 				target:     1,
-				pai:        mustPai("?"),
+				pai:        testutil.MustPai("?"),
 				horaPoints: func() *int { p := 0; return &p }(),
 				scores:     &[4]int{27500, 22300, 24300, 25900},
 			},
@@ -158,7 +159,7 @@ func TestNewHora(t *testing.T) {
 			args: args{
 				actor:      0,
 				target:     2,
-				pai:        mustPai("6s"),
+				pai:        testutil.MustPai("6s"),
 				horaPoints: func() *int { p := -1; return &p }(),
 				scores:     &[4]int{27500, 22300, 24300, 25900},
 			},

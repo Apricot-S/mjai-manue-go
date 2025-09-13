@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/Apricot-S/mjai-manue-go/internal/game/event/inbound"
+	"github.com/Apricot-S/mjai-manue-go/internal/testutil"
 )
 
 func TestNewDora(t *testing.T) {
@@ -235,7 +236,7 @@ func TestDora_ToEvent(t *testing.T) {
 				DoraMarker: "6s",
 			},
 			want: &inbound.Dora{
-				DoraMarker: *mustPai("6s"),
+				DoraMarker: *testutil.MustPai("6s"),
 			},
 			wantErr: false,
 		},

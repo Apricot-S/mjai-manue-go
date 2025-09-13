@@ -8,6 +8,7 @@ import (
 	"github.com/Apricot-S/mjai-manue-go/internal/base"
 	"github.com/Apricot-S/mjai-manue-go/internal/game/event/inbound"
 	"github.com/Apricot-S/mjai-manue-go/internal/game/event/outbound"
+	"github.com/Apricot-S/mjai-manue-go/internal/testutil"
 )
 
 func TestNewDaiminkan(t *testing.T) {
@@ -642,8 +643,8 @@ func TestDaiminkan_ToEvent(t *testing.T) {
 			want: &inbound.Daiminkan{
 				Actor:    1,
 				Target:   0,
-				Taken:    *mustPai("6s"),
-				Consumed: [3]base.Pai(mustPais("6s", "6s", "6s")),
+				Taken:    *testutil.MustPai("6s"),
+				Consumed: [3]base.Pai(testutil.MustPais("6s", "6s", "6s")),
 			},
 			wantErr: false,
 		},
@@ -678,7 +679,7 @@ func TestDaiminkan_ToEvent(t *testing.T) {
 }
 
 func TestNewDaiminkanFromEvent(t *testing.T) {
-	valid, _ := outbound.NewDaiminkan(1, 0, *mustPai("5p"), [3]base.Pai(mustPais("5p", "5p", "5pr")), "test")
+	valid, _ := outbound.NewDaiminkan(1, 0, *testutil.MustPai("5p"), [3]base.Pai(testutil.MustPais("5p", "5p", "5pr")), "test")
 	invalid := *valid
 	invalid.Actor = -1
 
