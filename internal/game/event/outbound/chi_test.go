@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/Apricot-S/mjai-manue-go/internal/base"
+	"github.com/Apricot-S/mjai-manue-go/internal/testutil"
 )
 
 func TestNewChi(t *testing.T) {
@@ -26,8 +27,8 @@ func TestNewChi(t *testing.T) {
 			args: args{
 				actor:    1,
 				target:   0,
-				taken:    *mustPai("6s"),
-				consumed: [2]base.Pai(mustPais("5sr", "7s")),
+				taken:    *testutil.MustPai("6s"),
+				consumed: [2]base.Pai(testutil.MustPais("5sr", "7s")),
 				log:      "",
 			},
 			want: &Chi{
@@ -36,8 +37,8 @@ func TestNewChi(t *testing.T) {
 					Log:   "",
 				},
 				Target:   0,
-				Taken:    *mustPai("6s"),
-				Consumed: [2]base.Pai(mustPais("5sr", "7s")),
+				Taken:    *testutil.MustPai("6s"),
+				Consumed: [2]base.Pai(testutil.MustPais("5sr", "7s")),
 			},
 			wantErr: false,
 		},
@@ -46,8 +47,8 @@ func TestNewChi(t *testing.T) {
 			args: args{
 				actor:    3,
 				target:   2,
-				taken:    *mustPai("5sr"),
-				consumed: [2]base.Pai(mustPais("4s", "6s")),
+				taken:    *testutil.MustPai("5sr"),
+				consumed: [2]base.Pai(testutil.MustPais("4s", "6s")),
 				log:      "test",
 			},
 			want: &Chi{
@@ -56,8 +57,8 @@ func TestNewChi(t *testing.T) {
 					Log:   "test",
 				},
 				Target:   2,
-				Taken:    *mustPai("5sr"),
-				Consumed: [2]base.Pai(mustPais("4s", "6s")),
+				Taken:    *testutil.MustPai("5sr"),
+				Consumed: [2]base.Pai(testutil.MustPais("4s", "6s")),
 			},
 			wantErr: false,
 		},
@@ -66,8 +67,8 @@ func TestNewChi(t *testing.T) {
 			args: args{
 				actor:    -1,
 				target:   0,
-				taken:    *mustPai("6s"),
-				consumed: [2]base.Pai(mustPais("5sr", "7s")),
+				taken:    *testutil.MustPai("6s"),
+				consumed: [2]base.Pai(testutil.MustPais("5sr", "7s")),
 				log:      "",
 			},
 			want:    nil,
@@ -78,8 +79,8 @@ func TestNewChi(t *testing.T) {
 			args: args{
 				actor:    4,
 				target:   3,
-				taken:    *mustPai("6s"),
-				consumed: [2]base.Pai(mustPais("5sr", "7s")),
+				taken:    *testutil.MustPai("6s"),
+				consumed: [2]base.Pai(testutil.MustPais("5sr", "7s")),
 				log:      "",
 			},
 			want:    nil,
@@ -90,8 +91,8 @@ func TestNewChi(t *testing.T) {
 			args: args{
 				actor:    0,
 				target:   -1,
-				taken:    *mustPai("6s"),
-				consumed: [2]base.Pai(mustPais("5sr", "7s")),
+				taken:    *testutil.MustPai("6s"),
+				consumed: [2]base.Pai(testutil.MustPais("5sr", "7s")),
 				log:      "",
 			},
 			want:    nil,
@@ -102,8 +103,8 @@ func TestNewChi(t *testing.T) {
 			args: args{
 				actor:    0,
 				target:   4,
-				taken:    *mustPai("6s"),
-				consumed: [2]base.Pai(mustPais("5sr", "7s")),
+				taken:    *testutil.MustPai("6s"),
+				consumed: [2]base.Pai(testutil.MustPais("5sr", "7s")),
 				log:      "",
 			},
 			want:    nil,
@@ -114,8 +115,8 @@ func TestNewChi(t *testing.T) {
 			args: args{
 				actor:    0,
 				target:   1,
-				taken:    *mustPai("6s"),
-				consumed: [2]base.Pai(mustPais("5sr", "7s")),
+				taken:    *testutil.MustPai("6s"),
+				consumed: [2]base.Pai(testutil.MustPais("5sr", "7s")),
 				log:      "",
 			},
 			want:    nil,
@@ -126,8 +127,8 @@ func TestNewChi(t *testing.T) {
 			args: args{
 				actor:    0,
 				target:   3,
-				taken:    *mustPai("?"),
-				consumed: [2]base.Pai(mustPais("?", "?")),
+				taken:    *testutil.MustPai("?"),
+				consumed: [2]base.Pai(testutil.MustPais("?", "?")),
 				log:      "",
 			},
 			want:    nil,
@@ -138,8 +139,8 @@ func TestNewChi(t *testing.T) {
 			args: args{
 				actor:    0,
 				target:   3,
-				taken:    *mustPai("E"),
-				consumed: [2]base.Pai(mustPais("S", "W")),
+				taken:    *testutil.MustPai("E"),
+				consumed: [2]base.Pai(testutil.MustPais("S", "W")),
 				log:      "",
 			},
 			want:    nil,
@@ -150,8 +151,8 @@ func TestNewChi(t *testing.T) {
 			args: args{
 				actor:    0,
 				target:   3,
-				taken:    *mustPai("6s"),
-				consumed: [2]base.Pai(mustPais("5p", "7p")),
+				taken:    *testutil.MustPai("6s"),
+				consumed: [2]base.Pai(testutil.MustPais("5p", "7p")),
 				log:      "",
 			},
 			want:    nil,
@@ -162,8 +163,8 @@ func TestNewChi(t *testing.T) {
 			args: args{
 				actor:    0,
 				target:   3,
-				taken:    *mustPai("6p"),
-				consumed: [2]base.Pai(mustPais("5p", "7s")),
+				taken:    *testutil.MustPai("6p"),
+				consumed: [2]base.Pai(testutil.MustPais("5p", "7s")),
 				log:      "",
 			},
 			want:    nil,
@@ -174,8 +175,8 @@ func TestNewChi(t *testing.T) {
 			args: args{
 				actor:    0,
 				target:   3,
-				taken:    *mustPai("6p"),
-				consumed: [2]base.Pai(mustPais("5p", "8p")),
+				taken:    *testutil.MustPai("6p"),
+				consumed: [2]base.Pai(testutil.MustPais("5p", "8p")),
 				log:      "",
 			},
 			want:    nil,

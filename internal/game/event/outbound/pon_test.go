@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/Apricot-S/mjai-manue-go/internal/base"
+	"github.com/Apricot-S/mjai-manue-go/internal/testutil"
 )
 
 func TestNewPon(t *testing.T) {
@@ -26,8 +27,8 @@ func TestNewPon(t *testing.T) {
 			args: args{
 				actor:    1,
 				target:   0,
-				taken:    *mustPai("6s"),
-				consumed: [2]base.Pai(mustPais("6s", "6s")),
+				taken:    *testutil.MustPai("6s"),
+				consumed: [2]base.Pai(testutil.MustPais("6s", "6s")),
 				log:      "",
 			},
 			want: &Pon{
@@ -36,8 +37,8 @@ func TestNewPon(t *testing.T) {
 					Log:   "",
 				},
 				Target:   0,
-				Taken:    *mustPai("6s"),
-				Consumed: [2]base.Pai(mustPais("6s", "6s")),
+				Taken:    *testutil.MustPai("6s"),
+				Consumed: [2]base.Pai(testutil.MustPais("6s", "6s")),
 			},
 			wantErr: false,
 		},
@@ -46,8 +47,8 @@ func TestNewPon(t *testing.T) {
 			args: args{
 				actor:    1,
 				target:   0,
-				taken:    *mustPai("6s"),
-				consumed: [2]base.Pai(mustPais("6s", "6s")),
+				taken:    *testutil.MustPai("6s"),
+				consumed: [2]base.Pai(testutil.MustPais("6s", "6s")),
 				log:      "test",
 			},
 			want: &Pon{
@@ -56,8 +57,8 @@ func TestNewPon(t *testing.T) {
 					Log:   "test",
 				},
 				Target:   0,
-				Taken:    *mustPai("6s"),
-				Consumed: [2]base.Pai(mustPais("6s", "6s")),
+				Taken:    *testutil.MustPai("6s"),
+				Consumed: [2]base.Pai(testutil.MustPais("6s", "6s")),
 			},
 			wantErr: false,
 		},
@@ -66,8 +67,8 @@ func TestNewPon(t *testing.T) {
 			args: args{
 				actor:    -1,
 				target:   0,
-				taken:    *mustPai("6s"),
-				consumed: [2]base.Pai(mustPais("6s", "6s")),
+				taken:    *testutil.MustPai("6s"),
+				consumed: [2]base.Pai(testutil.MustPais("6s", "6s")),
 				log:      "",
 			},
 			want:    nil,
@@ -78,8 +79,8 @@ func TestNewPon(t *testing.T) {
 			args: args{
 				actor:    4,
 				target:   3,
-				taken:    *mustPai("6s"),
-				consumed: [2]base.Pai(mustPais("6s", "6s")),
+				taken:    *testutil.MustPai("6s"),
+				consumed: [2]base.Pai(testutil.MustPais("6s", "6s")),
 				log:      "",
 			},
 			want:    nil,
@@ -90,8 +91,8 @@ func TestNewPon(t *testing.T) {
 			args: args{
 				actor:    0,
 				target:   -1,
-				taken:    *mustPai("6s"),
-				consumed: [2]base.Pai(mustPais("6s", "6s")),
+				taken:    *testutil.MustPai("6s"),
+				consumed: [2]base.Pai(testutil.MustPais("6s", "6s")),
 				log:      "",
 			},
 			want:    nil,
@@ -102,8 +103,8 @@ func TestNewPon(t *testing.T) {
 			args: args{
 				actor:    0,
 				target:   4,
-				taken:    *mustPai("6s"),
-				consumed: [2]base.Pai(mustPais("6s", "6s")),
+				taken:    *testutil.MustPai("6s"),
+				consumed: [2]base.Pai(testutil.MustPais("6s", "6s")),
 				log:      "",
 			},
 			want:    nil,
@@ -114,8 +115,8 @@ func TestNewPon(t *testing.T) {
 			args: args{
 				actor:    0,
 				target:   0,
-				taken:    *mustPai("6s"),
-				consumed: [2]base.Pai(mustPais("6s", "6s")),
+				taken:    *testutil.MustPai("6s"),
+				consumed: [2]base.Pai(testutil.MustPais("6s", "6s")),
 				log:      "",
 			},
 			want:    nil,
@@ -126,8 +127,8 @@ func TestNewPon(t *testing.T) {
 			args: args{
 				actor:    0,
 				target:   1,
-				taken:    *mustPai("?"),
-				consumed: [2]base.Pai(mustPais("?", "?")),
+				taken:    *testutil.MustPai("?"),
+				consumed: [2]base.Pai(testutil.MustPais("?", "?")),
 				log:      "",
 			},
 			want:    nil,
@@ -138,8 +139,8 @@ func TestNewPon(t *testing.T) {
 			args: args{
 				actor:    0,
 				target:   1,
-				taken:    *mustPai("6s"),
-				consumed: [2]base.Pai(mustPais("7s", "7s")),
+				taken:    *testutil.MustPai("6s"),
+				consumed: [2]base.Pai(testutil.MustPais("7s", "7s")),
 				log:      "",
 			},
 			want:    nil,
@@ -150,8 +151,8 @@ func TestNewPon(t *testing.T) {
 			args: args{
 				actor:    2,
 				target:   3,
-				taken:    *mustPai("6s"),
-				consumed: [2]base.Pai(mustPais("6s", "7s")),
+				taken:    *testutil.MustPai("6s"),
+				consumed: [2]base.Pai(testutil.MustPais("6s", "7s")),
 				log:      "",
 			},
 			want:    nil,
@@ -162,8 +163,8 @@ func TestNewPon(t *testing.T) {
 			args: args{
 				actor:    2,
 				target:   3,
-				taken:    *mustPai("5sr"),
-				consumed: [2]base.Pai(mustPais("5s", "5s")),
+				taken:    *testutil.MustPai("5sr"),
+				consumed: [2]base.Pai(testutil.MustPais("5s", "5s")),
 				log:      "",
 			},
 			want: &Pon{
@@ -172,8 +173,8 @@ func TestNewPon(t *testing.T) {
 					Log:   "",
 				},
 				Target:   3,
-				Taken:    *mustPai("5sr"),
-				Consumed: [2]base.Pai(mustPais("5s", "5s")),
+				Taken:    *testutil.MustPai("5sr"),
+				Consumed: [2]base.Pai(testutil.MustPais("5s", "5s")),
 			},
 			wantErr: false,
 		},
@@ -182,8 +183,8 @@ func TestNewPon(t *testing.T) {
 			args: args{
 				actor:    2,
 				target:   3,
-				taken:    *mustPai("5s"),
-				consumed: [2]base.Pai(mustPais("5s", "5sr")),
+				taken:    *testutil.MustPai("5s"),
+				consumed: [2]base.Pai(testutil.MustPais("5s", "5sr")),
 				log:      "",
 			},
 			want: &Pon{
@@ -192,8 +193,8 @@ func TestNewPon(t *testing.T) {
 					Log:   "",
 				},
 				Target:   3,
-				Taken:    *mustPai("5s"),
-				Consumed: [2]base.Pai(mustPais("5s", "5sr")),
+				Taken:    *testutil.MustPai("5s"),
+				Consumed: [2]base.Pai(testutil.MustPais("5s", "5sr")),
 			},
 			wantErr: false,
 		},

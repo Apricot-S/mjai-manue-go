@@ -1,10 +1,10 @@
-package inbound
+package testutil
 
 import (
 	"github.com/Apricot-S/mjai-manue-go/internal/base"
 )
 
-func mustPai(name string) *base.Pai {
+func MustPai(name string) *base.Pai {
 	p, err := base.NewPaiWithName(name)
 	if err != nil {
 		panic(err)
@@ -12,10 +12,10 @@ func mustPai(name string) *base.Pai {
 	return p
 }
 
-func mustPais(names ...string) []base.Pai {
+func MustPais(names ...string) []base.Pai {
 	pais := make([]base.Pai, len(names))
 	for i, n := range names {
-		pais[i] = *mustPai(n)
+		pais[i] = *MustPai(n)
 	}
 	return pais
 }

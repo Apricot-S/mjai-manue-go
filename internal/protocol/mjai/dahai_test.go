@@ -7,6 +7,7 @@ import (
 
 	"github.com/Apricot-S/mjai-manue-go/internal/game/event/inbound"
 	"github.com/Apricot-S/mjai-manue-go/internal/game/event/outbound"
+	"github.com/Apricot-S/mjai-manue-go/internal/testutil"
 )
 
 func TestNewDahai(t *testing.T) {
@@ -424,7 +425,7 @@ func TestDahai_ToEvent(t *testing.T) {
 			},
 			want: &inbound.Dahai{
 				Actor:     1,
-				Pai:       *mustPai("P"),
+				Pai:       *testutil.MustPai("P"),
 				Tsumogiri: true,
 			},
 			wantErr: false,
@@ -459,7 +460,7 @@ func TestDahai_ToEvent(t *testing.T) {
 }
 
 func TestNewDahaiFromEvent(t *testing.T) {
-	valid, _ := outbound.NewDahai(1, *mustPai("E"), true, "test")
+	valid, _ := outbound.NewDahai(1, *testutil.MustPai("E"), true, "test")
 	invalid := *valid
 	invalid.Actor = 4
 

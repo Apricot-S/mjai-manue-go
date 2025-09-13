@@ -7,6 +7,7 @@ import (
 
 	"github.com/Apricot-S/mjai-manue-go/internal/game/event/inbound"
 	"github.com/Apricot-S/mjai-manue-go/internal/game/event/outbound"
+	"github.com/Apricot-S/mjai-manue-go/internal/testutil"
 )
 
 func TestNewHora(t *testing.T) {
@@ -879,7 +880,7 @@ func TestHora_ToEvent(t *testing.T) {
 			want: &inbound.Hora{
 				Actor:      1,
 				Target:     1,
-				Pai:        mustPai("2p"),
+				Pai:        testutil.MustPai("2p"),
 				HoraPoints: nil,
 				Scores:     nil,
 			},
@@ -901,7 +902,7 @@ func TestHora_ToEvent(t *testing.T) {
 			want: &inbound.Hora{
 				Actor:      1,
 				Target:     1,
-				Pai:        mustPai("2p"),
+				Pai:        testutil.MustPai("2p"),
 				HoraPoints: horaPoints,
 				Scores:     nil,
 			},
@@ -923,7 +924,7 @@ func TestHora_ToEvent(t *testing.T) {
 			want: &inbound.Hora{
 				Actor:      1,
 				Target:     1,
-				Pai:        mustPai("2p"),
+				Pai:        testutil.MustPai("2p"),
 				HoraPoints: nil,
 				Scores:     &[4]int{26000, 24000, 23000, 24000},
 			},
@@ -961,7 +962,7 @@ func TestHora_ToEvent(t *testing.T) {
 }
 
 func TestNewHoraFromEvent(t *testing.T) {
-	valid, _ := outbound.NewHora(1, 0, *mustPai("1m"), "test")
+	valid, _ := outbound.NewHora(1, 0, *testutil.MustPai("1m"), "test")
 	invalid := *valid
 	invalid.Actor = 4
 

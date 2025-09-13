@@ -7,6 +7,7 @@ import (
 
 	"github.com/Apricot-S/mjai-manue-go/internal/base"
 	"github.com/Apricot-S/mjai-manue-go/internal/game/event/inbound"
+	"github.com/Apricot-S/mjai-manue-go/internal/testutil"
 )
 
 func TestNewStartKyoku(t *testing.T) {
@@ -1098,18 +1099,18 @@ func TestStartKyoku_ToEvent(t *testing.T) {
 				},
 			},
 			want: &inbound.StartKyoku{
-				Bakaze:     *mustPai("E"),
+				Bakaze:     *testutil.MustPai("E"),
 				Kyoku:      1,
 				Honba:      0,
 				Kyotaku:    0,
 				Oya:        0,
-				DoraMarker: *mustPai("7s"),
+				DoraMarker: *testutil.MustPai("7s"),
 				Scores:     nil,
 				Tehais: [4][13]base.Pai{
-					[13]base.Pai(mustPais("?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?")),
-					[13]base.Pai(mustPais("3m", "4m", "3p", "5pr", "7p", "9p", "4s", "4s", "5sr", "7s", "7s", "W", "N")),
-					[13]base.Pai(mustPais("?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?")),
-					[13]base.Pai(mustPais("?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?")),
+					[13]base.Pai(testutil.MustPais("?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?")),
+					[13]base.Pai(testutil.MustPais("3m", "4m", "3p", "5pr", "7p", "9p", "4s", "4s", "5sr", "7s", "7s", "W", "N")),
+					[13]base.Pai(testutil.MustPais("?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?")),
+					[13]base.Pai(testutil.MustPais("?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?")),
 				},
 			},
 			wantErr: false,
@@ -1133,18 +1134,18 @@ func TestStartKyoku_ToEvent(t *testing.T) {
 				},
 			},
 			want: &inbound.StartKyoku{
-				Bakaze:     *mustPai("S"),
+				Bakaze:     *testutil.MustPai("S"),
 				Kyoku:      1,
 				Honba:      0,
 				Kyotaku:    0,
 				Oya:        0,
-				DoraMarker: *mustPai("7s"),
+				DoraMarker: *testutil.MustPai("7s"),
 				Scores:     &[4]int{25000, 25000, 25000, 25000},
 				Tehais: [4][13]base.Pai{
-					[13]base.Pai(mustPais("?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?")),
-					[13]base.Pai(mustPais("3m", "4m", "3p", "5pr", "7p", "9p", "4s", "4s", "5sr", "7s", "7s", "W", "N")),
-					[13]base.Pai(mustPais("?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?")),
-					[13]base.Pai(mustPais("?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?")),
+					[13]base.Pai(testutil.MustPais("?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?")),
+					[13]base.Pai(testutil.MustPais("3m", "4m", "3p", "5pr", "7p", "9p", "4s", "4s", "5sr", "7s", "7s", "W", "N")),
+					[13]base.Pai(testutil.MustPais("?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?")),
+					[13]base.Pai(testutil.MustPais("?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?")),
 				},
 			},
 			wantErr: false,

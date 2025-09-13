@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/Apricot-S/mjai-manue-go/internal/base"
+	"github.com/Apricot-S/mjai-manue-go/internal/testutil"
 )
 
 func TestNewAnkan(t *testing.T) {
@@ -22,11 +23,11 @@ func TestNewAnkan(t *testing.T) {
 			name: "valid",
 			args: args{
 				actor:    1,
-				consumed: [4]base.Pai(mustPais("6s", "6s", "6s", "6s")),
+				consumed: [4]base.Pai(testutil.MustPais("6s", "6s", "6s", "6s")),
 			},
 			want: &Ankan{
 				Actor:    1,
-				Consumed: [4]base.Pai(mustPais("6s", "6s", "6s", "6s")),
+				Consumed: [4]base.Pai(testutil.MustPais("6s", "6s", "6s", "6s")),
 			},
 			wantErr: false,
 		},
@@ -34,7 +35,7 @@ func TestNewAnkan(t *testing.T) {
 			name: "invalid consumed tiles",
 			args: args{
 				actor:    2,
-				consumed: [4]base.Pai(mustPais("6s", "6s", "6s", "7s")),
+				consumed: [4]base.Pai(testutil.MustPais("6s", "6s", "6s", "7s")),
 			},
 			want:    nil,
 			wantErr: true,
@@ -43,7 +44,7 @@ func TestNewAnkan(t *testing.T) {
 			name: "unknown consumed tiles",
 			args: args{
 				actor:    2,
-				consumed: [4]base.Pai(mustPais("?", "?", "?", "?")),
+				consumed: [4]base.Pai(testutil.MustPais("?", "?", "?", "?")),
 			},
 			want:    nil,
 			wantErr: true,
@@ -52,11 +53,11 @@ func TestNewAnkan(t *testing.T) {
 			name: "red tile in consumed",
 			args: args{
 				actor:    2,
-				consumed: [4]base.Pai(mustPais("5s", "5s", "5s", "5sr")),
+				consumed: [4]base.Pai(testutil.MustPais("5s", "5s", "5s", "5sr")),
 			},
 			want: &Ankan{
 				Actor:    2,
-				Consumed: [4]base.Pai(mustPais("5s", "5s", "5s", "5sr")),
+				Consumed: [4]base.Pai(testutil.MustPais("5s", "5s", "5s", "5sr")),
 			},
 			wantErr: false,
 		},

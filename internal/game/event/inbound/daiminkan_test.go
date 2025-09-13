@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/Apricot-S/mjai-manue-go/internal/base"
+	"github.com/Apricot-S/mjai-manue-go/internal/testutil"
 )
 
 func TestNewDaiminkan(t *testing.T) {
@@ -25,14 +26,14 @@ func TestNewDaiminkan(t *testing.T) {
 			args: args{
 				actor:    1,
 				target:   0,
-				taken:    *mustPai("6s"),
-				consumed: [3]base.Pai(mustPais("6s", "6s", "6s")),
+				taken:    *testutil.MustPai("6s"),
+				consumed: [3]base.Pai(testutil.MustPais("6s", "6s", "6s")),
 			},
 			want: &Daiminkan{
 				Actor:    1,
 				Target:   0,
-				Taken:    *mustPai("6s"),
-				Consumed: [3]base.Pai(mustPais("6s", "6s", "6s")),
+				Taken:    *testutil.MustPai("6s"),
+				Consumed: [3]base.Pai(testutil.MustPais("6s", "6s", "6s")),
 			},
 			wantErr: false,
 		},
@@ -41,8 +42,8 @@ func TestNewDaiminkan(t *testing.T) {
 			args: args{
 				actor:    -1,
 				target:   0,
-				taken:    *mustPai("6s"),
-				consumed: [3]base.Pai(mustPais("6s", "6s", "6s")),
+				taken:    *testutil.MustPai("6s"),
+				consumed: [3]base.Pai(testutil.MustPais("6s", "6s", "6s")),
 			},
 			want:    nil,
 			wantErr: true,
@@ -52,8 +53,8 @@ func TestNewDaiminkan(t *testing.T) {
 			args: args{
 				actor:    4,
 				target:   3,
-				taken:    *mustPai("6s"),
-				consumed: [3]base.Pai(mustPais("6s", "6s", "6s")),
+				taken:    *testutil.MustPai("6s"),
+				consumed: [3]base.Pai(testutil.MustPais("6s", "6s", "6s")),
 			},
 			want:    nil,
 			wantErr: true,
@@ -63,8 +64,8 @@ func TestNewDaiminkan(t *testing.T) {
 			args: args{
 				actor:    0,
 				target:   -1,
-				taken:    *mustPai("6s"),
-				consumed: [3]base.Pai(mustPais("6s", "6s", "6s")),
+				taken:    *testutil.MustPai("6s"),
+				consumed: [3]base.Pai(testutil.MustPais("6s", "6s", "6s")),
 			},
 			want:    nil,
 			wantErr: true,
@@ -74,8 +75,8 @@ func TestNewDaiminkan(t *testing.T) {
 			args: args{
 				actor:    0,
 				target:   4,
-				taken:    *mustPai("6s"),
-				consumed: [3]base.Pai(mustPais("6s", "6s", "6s")),
+				taken:    *testutil.MustPai("6s"),
+				consumed: [3]base.Pai(testutil.MustPais("6s", "6s", "6s")),
 			},
 			want:    nil,
 			wantErr: true,
@@ -85,8 +86,8 @@ func TestNewDaiminkan(t *testing.T) {
 			args: args{
 				actor:    0,
 				target:   0,
-				taken:    *mustPai("6s"),
-				consumed: [3]base.Pai(mustPais("6s", "6s", "6s")),
+				taken:    *testutil.MustPai("6s"),
+				consumed: [3]base.Pai(testutil.MustPais("6s", "6s", "6s")),
 			},
 			want:    nil,
 			wantErr: true,
@@ -96,8 +97,8 @@ func TestNewDaiminkan(t *testing.T) {
 			args: args{
 				actor:    0,
 				target:   1,
-				taken:    *mustPai("?"),
-				consumed: [3]base.Pai(mustPais("?", "?", "?")),
+				taken:    *testutil.MustPai("?"),
+				consumed: [3]base.Pai(testutil.MustPais("?", "?", "?")),
 			},
 			want:    nil,
 			wantErr: true,
@@ -107,8 +108,8 @@ func TestNewDaiminkan(t *testing.T) {
 			args: args{
 				actor:    0,
 				target:   1,
-				taken:    *mustPai("6s"),
-				consumed: [3]base.Pai(mustPais("7s", "7s", "7s")),
+				taken:    *testutil.MustPai("6s"),
+				consumed: [3]base.Pai(testutil.MustPais("7s", "7s", "7s")),
 			},
 			want:    nil,
 			wantErr: true,
@@ -118,8 +119,8 @@ func TestNewDaiminkan(t *testing.T) {
 			args: args{
 				actor:    2,
 				target:   3,
-				taken:    *mustPai("6s"),
-				consumed: [3]base.Pai(mustPais("6s", "6s", "7s")),
+				taken:    *testutil.MustPai("6s"),
+				consumed: [3]base.Pai(testutil.MustPais("6s", "6s", "7s")),
 			},
 			want:    nil,
 			wantErr: true,
@@ -129,14 +130,14 @@ func TestNewDaiminkan(t *testing.T) {
 			args: args{
 				actor:    2,
 				target:   3,
-				taken:    *mustPai("5sr"),
-				consumed: [3]base.Pai(mustPais("5s", "5s", "5s")),
+				taken:    *testutil.MustPai("5sr"),
+				consumed: [3]base.Pai(testutil.MustPais("5s", "5s", "5s")),
 			},
 			want: &Daiminkan{
 				Actor:    2,
 				Target:   3,
-				Taken:    *mustPai("5sr"),
-				Consumed: [3]base.Pai(mustPais("5s", "5s", "5s")),
+				Taken:    *testutil.MustPai("5sr"),
+				Consumed: [3]base.Pai(testutil.MustPais("5s", "5s", "5s")),
 			},
 			wantErr: false,
 		},
@@ -145,14 +146,14 @@ func TestNewDaiminkan(t *testing.T) {
 			args: args{
 				actor:    2,
 				target:   3,
-				taken:    *mustPai("5s"),
-				consumed: [3]base.Pai(mustPais("5s", "5s", "5sr")),
+				taken:    *testutil.MustPai("5s"),
+				consumed: [3]base.Pai(testutil.MustPais("5s", "5s", "5sr")),
 			},
 			want: &Daiminkan{
 				Actor:    2,
 				Target:   3,
-				Taken:    *mustPai("5s"),
-				Consumed: [3]base.Pai(mustPais("5s", "5s", "5sr")),
+				Taken:    *testutil.MustPai("5s"),
+				Consumed: [3]base.Pai(testutil.MustPais("5s", "5s", "5sr")),
 			},
 			wantErr: false,
 		},

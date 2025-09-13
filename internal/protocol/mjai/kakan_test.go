@@ -8,6 +8,7 @@ import (
 	"github.com/Apricot-S/mjai-manue-go/internal/base"
 	"github.com/Apricot-S/mjai-manue-go/internal/game/event/inbound"
 	"github.com/Apricot-S/mjai-manue-go/internal/game/event/outbound"
+	"github.com/Apricot-S/mjai-manue-go/internal/testutil"
 )
 
 func TestNewKakan(t *testing.T) {
@@ -511,9 +512,9 @@ func TestKakan_ToEvent(t *testing.T) {
 			want: &inbound.Kakan{
 				Actor:    1,
 				Target:   0,
-				Taken:    *mustPai("6s"),
-				Consumed: [2]base.Pai(mustPais("6s", "6s")),
-				Added:    *mustPai("6s"),
+				Taken:    *testutil.MustPai("6s"),
+				Consumed: [2]base.Pai(testutil.MustPais("6s", "6s")),
+				Added:    *testutil.MustPai("6s"),
 			},
 			wantErr: false,
 		},
@@ -547,7 +548,7 @@ func TestKakan_ToEvent(t *testing.T) {
 }
 
 func TestNewKakanFromEvent(t *testing.T) {
-	valid, _ := outbound.NewKakan(1, 0, *mustPai("5mr"), [2]base.Pai(mustPais("5m", "5m")), *mustPai("5m"), "test")
+	valid, _ := outbound.NewKakan(1, 0, *testutil.MustPai("5mr"), [2]base.Pai(testutil.MustPais("5m", "5m")), *testutil.MustPai("5m"), "test")
 	invalid := *valid
 	invalid.Actor = -1
 

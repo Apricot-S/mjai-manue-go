@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/Apricot-S/mjai-manue-go/internal/base"
+	"github.com/Apricot-S/mjai-manue-go/internal/testutil"
 )
 
 func TestNewDahai(t *testing.T) {
@@ -24,7 +25,7 @@ func TestNewDahai(t *testing.T) {
 			name: "without log",
 			args: args{
 				actor:     0,
-				pai:       *mustPai("1m"),
+				pai:       *testutil.MustPai("1m"),
 				tsumogiri: false,
 				log:       "",
 			},
@@ -33,7 +34,7 @@ func TestNewDahai(t *testing.T) {
 					Actor: 0,
 					Log:   "",
 				},
-				Pai:       *mustPai("1m"),
+				Pai:       *testutil.MustPai("1m"),
 				Tsumogiri: false,
 			},
 			wantErr: false,
@@ -42,7 +43,7 @@ func TestNewDahai(t *testing.T) {
 			name: "with log",
 			args: args{
 				actor:     3,
-				pai:       *mustPai("5sr"),
+				pai:       *testutil.MustPai("5sr"),
 				tsumogiri: true,
 				log:       "test",
 			},
@@ -51,7 +52,7 @@ func TestNewDahai(t *testing.T) {
 					Actor: 3,
 					Log:   "test",
 				},
-				Pai:       *mustPai("5sr"),
+				Pai:       *testutil.MustPai("5sr"),
 				Tsumogiri: true,
 			},
 			wantErr: false,
@@ -60,7 +61,7 @@ func TestNewDahai(t *testing.T) {
 			name: "invalid pai unknown",
 			args: args{
 				actor:     -1,
-				pai:       *mustPai("?"),
+				pai:       *testutil.MustPai("?"),
 				tsumogiri: false,
 			},
 			want:    nil,
@@ -70,7 +71,7 @@ func TestNewDahai(t *testing.T) {
 			name: "invalid actor min",
 			args: args{
 				actor:     -1,
-				pai:       *mustPai("1m"),
+				pai:       *testutil.MustPai("1m"),
 				tsumogiri: false,
 			},
 			want:    nil,
@@ -80,7 +81,7 @@ func TestNewDahai(t *testing.T) {
 			name: "invalid actor max",
 			args: args{
 				actor:     4,
-				pai:       *mustPai("1m"),
+				pai:       *testutil.MustPai("1m"),
 				tsumogiri: true,
 			},
 			want:    nil,

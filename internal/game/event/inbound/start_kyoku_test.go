@@ -5,12 +5,13 @@ import (
 	"testing"
 
 	"github.com/Apricot-S/mjai-manue-go/internal/base"
+	"github.com/Apricot-S/mjai-manue-go/internal/testutil"
 )
 
 func mustTehaiPai(tehai ...string) [13]base.Pai {
 	tehaiPai := [13]base.Pai{}
 	for i, paiStr := range tehai {
-		tehaiPai[i] = *mustPai(paiStr)
+		tehaiPai[i] = *testutil.MustPai(paiStr)
 	}
 	return tehaiPai
 }
@@ -35,12 +36,12 @@ func TestNewStartKyoku(t *testing.T) {
 		{
 			name: "without scores",
 			args: args{
-				bakaze:     *mustPai("E"),
+				bakaze:     *testutil.MustPai("E"),
 				kyoku:      1,
 				honba:      0,
 				kyotaku:    0,
 				oya:        0,
-				doraMarker: *mustPai("7s"),
+				doraMarker: *testutil.MustPai("7s"),
 				scores:     nil,
 				tehais: [4][13]base.Pai{
 					mustTehaiPai("?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?"),
@@ -50,12 +51,12 @@ func TestNewStartKyoku(t *testing.T) {
 				},
 			},
 			want: &StartKyoku{
-				Bakaze:     *mustPai("E"),
+				Bakaze:     *testutil.MustPai("E"),
 				Kyoku:      1,
 				Honba:      0,
 				Kyotaku:    0,
 				Oya:        0,
-				DoraMarker: *mustPai("7s"),
+				DoraMarker: *testutil.MustPai("7s"),
 				Scores:     nil,
 				Tehais: [4][13]base.Pai{
 					mustTehaiPai("?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?"),
@@ -69,12 +70,12 @@ func TestNewStartKyoku(t *testing.T) {
 		{
 			name: "with scores",
 			args: args{
-				bakaze:     *mustPai("S"),
+				bakaze:     *testutil.MustPai("S"),
 				kyoku:      1,
 				honba:      0,
 				kyotaku:    0,
 				oya:        0,
-				doraMarker: *mustPai("7s"),
+				doraMarker: *testutil.MustPai("7s"),
 				scores:     &[4]int{25000, 25000, 25000, 25000},
 				tehais: [4][13]base.Pai{
 					mustTehaiPai("?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?"),
@@ -84,12 +85,12 @@ func TestNewStartKyoku(t *testing.T) {
 				},
 			},
 			want: &StartKyoku{
-				Bakaze:     *mustPai("S"),
+				Bakaze:     *testutil.MustPai("S"),
 				Kyoku:      1,
 				Honba:      0,
 				Kyotaku:    0,
 				Oya:        0,
-				DoraMarker: *mustPai("7s"),
+				DoraMarker: *testutil.MustPai("7s"),
 				Scores:     &[4]int{25000, 25000, 25000, 25000},
 				Tehais: [4][13]base.Pai{
 					mustTehaiPai("?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?"),
@@ -103,12 +104,12 @@ func TestNewStartKyoku(t *testing.T) {
 		{
 			name: "invalid bakaze",
 			args: args{
-				bakaze:     *mustPai("P"),
+				bakaze:     *testutil.MustPai("P"),
 				kyoku:      1,
 				honba:      0,
 				kyotaku:    0,
 				oya:        0,
-				doraMarker: *mustPai("7s"),
+				doraMarker: *testutil.MustPai("7s"),
 				scores:     nil,
 				tehais: [4][13]base.Pai{
 					mustTehaiPai("?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?"),
@@ -123,12 +124,12 @@ func TestNewStartKyoku(t *testing.T) {
 		{
 			name: "invalid kyoku min",
 			args: args{
-				bakaze:     *mustPai("E"),
+				bakaze:     *testutil.MustPai("E"),
 				kyoku:      0,
 				honba:      0,
 				kyotaku:    0,
 				oya:        0,
-				doraMarker: *mustPai("7s"),
+				doraMarker: *testutil.MustPai("7s"),
 				scores:     nil,
 				tehais: [4][13]base.Pai{
 					mustTehaiPai("?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?"),
@@ -143,12 +144,12 @@ func TestNewStartKyoku(t *testing.T) {
 		{
 			name: "invalid kyoku max",
 			args: args{
-				bakaze:     *mustPai("E"),
+				bakaze:     *testutil.MustPai("E"),
 				kyoku:      5,
 				honba:      0,
 				kyotaku:    0,
 				oya:        0,
-				doraMarker: *mustPai("7s"),
+				doraMarker: *testutil.MustPai("7s"),
 				scores:     nil,
 				tehais: [4][13]base.Pai{
 					mustTehaiPai("?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?"),
@@ -163,12 +164,12 @@ func TestNewStartKyoku(t *testing.T) {
 		{
 			name: "invalid honba",
 			args: args{
-				bakaze:     *mustPai("E"),
+				bakaze:     *testutil.MustPai("E"),
 				kyoku:      1,
 				honba:      -1,
 				kyotaku:    0,
 				oya:        0,
-				doraMarker: *mustPai("7s"),
+				doraMarker: *testutil.MustPai("7s"),
 				scores:     nil,
 				tehais: [4][13]base.Pai{
 					mustTehaiPai("?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?"),
@@ -183,12 +184,12 @@ func TestNewStartKyoku(t *testing.T) {
 		{
 			name: "invalid kyotaku",
 			args: args{
-				bakaze:     *mustPai("E"),
+				bakaze:     *testutil.MustPai("E"),
 				kyoku:      1,
 				honba:      0,
 				kyotaku:    -1,
 				oya:        0,
-				doraMarker: *mustPai("7s"),
+				doraMarker: *testutil.MustPai("7s"),
 				scores:     nil,
 				tehais: [4][13]base.Pai{
 					mustTehaiPai("?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?"),
@@ -203,12 +204,12 @@ func TestNewStartKyoku(t *testing.T) {
 		{
 			name: "invalid oya min",
 			args: args{
-				bakaze:     *mustPai("E"),
+				bakaze:     *testutil.MustPai("E"),
 				kyoku:      1,
 				honba:      0,
 				kyotaku:    0,
 				oya:        -1,
-				doraMarker: *mustPai("7s"),
+				doraMarker: *testutil.MustPai("7s"),
 				scores:     nil,
 				tehais: [4][13]base.Pai{
 					mustTehaiPai("?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?"),
@@ -223,12 +224,12 @@ func TestNewStartKyoku(t *testing.T) {
 		{
 			name: "invalid oya max",
 			args: args{
-				bakaze:     *mustPai("E"),
+				bakaze:     *testutil.MustPai("E"),
 				kyoku:      1,
 				honba:      0,
 				kyotaku:    0,
 				oya:        4,
-				doraMarker: *mustPai("7s"),
+				doraMarker: *testutil.MustPai("7s"),
 				scores:     nil,
 				tehais: [4][13]base.Pai{
 					mustTehaiPai("?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?"),
@@ -243,12 +244,12 @@ func TestNewStartKyoku(t *testing.T) {
 		{
 			name: "unknown dora marker",
 			args: args{
-				bakaze:     *mustPai("E"),
+				bakaze:     *testutil.MustPai("E"),
 				kyoku:      1,
 				honba:      0,
 				kyotaku:    0,
 				oya:        3,
-				doraMarker: *mustPai("?"),
+				doraMarker: *testutil.MustPai("?"),
 				scores:     nil,
 				tehais: [4][13]base.Pai{
 					mustTehaiPai("?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?"),
