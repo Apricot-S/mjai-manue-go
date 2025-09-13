@@ -196,7 +196,10 @@ func (a *ManueAI) getMetricsInternal(
 		if p.ID() == playerID {
 			continue
 		}
-		d := a.getRandomHoraScoreChangesDist(state, playerID, &p)
+		d, err := a.getRandomHoraScoreChangesDist(state, playerID, &p)
+		if err != nil {
+			return nil, err
+		}
 		scoreChangesDistsOnOtherHora = append(scoreChangesDistsOnOtherHora, d)
 	}
 

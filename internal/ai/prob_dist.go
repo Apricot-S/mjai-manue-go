@@ -327,7 +327,7 @@ func (a *ManueAI) getRandomHoraScoreChangesDist(
 	state game.StateViewer,
 	playerID int,
 	actor *base.Player,
-) *core.VectorProbDist {
+) (*core.VectorProbDist, error) {
 	var horaPointsFreqs map[string]int
 	if actor.ID() == state.Oya().ID() {
 		horaPointsFreqs = a.stats.OyaHoraPointsFreqs
@@ -343,7 +343,7 @@ func (a *ManueAI) getRandomHoraScoreChangesDist(
 		}
 		p, err := strconv.ParseFloat(points, 64)
 		if err != nil {
-			panic("Invalid stats file: failed to convert key of horaPointsFreqs to float64 (" + points + ").")
+			return nil, fmt.Errorf("invalid stats file: failed to convert key of horaPointsFreqs to float64 (%s)", points)
 		}
 		f := float64(freq) / totalFreqs
 		hm.Set(p, f)
@@ -351,7 +351,7 @@ func (a *ManueAI) getRandomHoraScoreChangesDist(
 
 	horaPointsDist := core.NewScalarProbDist(hm)
 	horaFactorsDist := a.getHoraFactorsDist(state, playerID, actor)
-	return core.MultScalarVector(horaPointsDist, horaFactorsDist)
+	return core.MultScalarVector(horaPointsDist, horaFactorsDist), nil
 }
 
 func (a *ManueAI) getHoraFactorsDist(
