@@ -1,6 +1,7 @@
 package ai
 
 import (
+	"cmp"
 	"fmt"
 	"os"
 	"slices"
@@ -273,17 +274,11 @@ func (a *ManueAI) chooseBestMetric(ms metrics, preferBlack bool) string {
 }
 
 func (a *ManueAI) compareMetric(lhs, rhs *metric, preferBlack bool) int {
-	if lhs.averageRank < rhs.averageRank {
-		return -1
+	if r := cmp.Compare(lhs.averageRank, rhs.averageRank); r != 0 {
+		return r
 	}
-	if lhs.averageRank > rhs.averageRank {
-		return 1
-	}
-	if lhs.expectedPoints > rhs.expectedPoints {
-		return -1
-	}
-	if lhs.expectedPoints < rhs.expectedPoints {
-		return 1
+	if r := cmp.Compare(rhs.expectedPoints, lhs.expectedPoints); r != 0 {
+		return r
 	}
 	if preferBlack {
 		if !lhs.red && rhs.red {
