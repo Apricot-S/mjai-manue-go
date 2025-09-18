@@ -4,10 +4,10 @@ This directory contains the command line applications.
 
 ## Applications
 
-| Application  | Description                         | Default Name |
-| ------------ | ----------------------------------- | ------------ |
-| `mjai-manue` | AI-powered agent                    | "Manue020"   |
-| `tsumogiri`  | Simple rule-based agent for testing | "Tsumogiri"  |
+| Application      | Description                                      | Default Name |
+| ---------------- | ------------------------------------------------ | ------------ |
+| `mjai-manue`     | AI-powered agent                                 | "Manue020"   |
+| `mjai-tsumogiri` | Simple agent that always discards the drawn tile | "tsumogiri"  |
 
 ## Installation
 
@@ -15,8 +15,8 @@ This directory contains the command line applications.
 # Install mjai-manue
 go install github.com/Apricot-S/mjai-manue-go/cmd/mjai-manue@latest
 
-# Install tsumogiri
-go install github.com/Apricot-S/mjai-manue-go/cmd/tsumogiri@latest
+# Install mjai-tsumogiri
+go install github.com/Apricot-S/mjai-manue-go/cmd/mjai-tsumogiri@latest
 ```
 
 ### To customize configuration files
@@ -35,9 +35,9 @@ go build ./cmd/mjai-manue
 
 # Pipe mode (standard I/O)
 mjai-manue 2> mjai-manue.log
-tsumogiri --name "SimpleBot"
+mjai-tsumogiri --name "SimpleBot"
 
 # TCP/IP client mode
 mjai-manue --name "ManueGo" mjsonp://example.com:11600/default
-tsumogiri mjsonp://example.com:11600/room
+mjai-tsumogiri mjsonp://example.com:11600/room
 ```
