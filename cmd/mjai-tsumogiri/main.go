@@ -10,7 +10,7 @@ import (
 	"github.com/Apricot-S/mjai-manue-go/internal/cli"
 )
 
-const defaultName = "Tsumogiri"
+const defaultName = "tsumogiri"
 
 func main() {
 	var name string
