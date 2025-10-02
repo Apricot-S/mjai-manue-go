@@ -7,7 +7,7 @@ FROM ruby:${RUBY_VERSION}-${OS_VERSION} AS builder
 
 WORKDIR /opt
 
-RUN git clone https://github.com/gimite/mjai.git
+RUN git clone --depth=1 https://github.com/gimite/mjai.git
 
 RUN --mount=type=bind,source=patch.sh,target=patch.sh \
     cd mjai && \
