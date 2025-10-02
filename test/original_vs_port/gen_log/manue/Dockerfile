@@ -12,7 +12,7 @@ WORKDIR /app
 
 USER node
 
-RUN git clone https://github.com/gimite/mjai-manue.git
+RUN git clone --depth=1 https://github.com/gimite/mjai-manue.git
 
 ENV NODE_ENV=production
 
