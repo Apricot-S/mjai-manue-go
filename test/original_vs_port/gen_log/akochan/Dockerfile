@@ -24,7 +24,7 @@ WORKDIR /app
 USER ubuntu
 
 RUN mkdir build
-RUN git clone https://github.com/critter-mj/akochan.git
+RUN git clone --depth=1 https://github.com/critter-mj/akochan.git
 
 RUN --mount=type=bind,source=patch.sh,target=patch.sh \
     cd ./akochan/ai_src && \
