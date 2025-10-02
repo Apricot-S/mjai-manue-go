@@ -14,7 +14,8 @@ fi
 
 sudo apt-get update
 sudo DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
-  gnuplot fonts-ipafont-gothic
+  gnuplot \
+  fonts-ipafont-gothic
 sudo apt-get clean
 sudo rm -rf /var/lib/apt/lists/*
 
