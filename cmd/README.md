@@ -6,7 +6,7 @@ This directory contains the command line applications.
 
 | Application      | Description                                      | Default Name |
 | ---------------- | ------------------------------------------------ | ------------ |
-| `mjai-manue`     | AI-powered agent                                 | "Manue020"   |
+| `mjai-manue`     | AI-powered agent                                 | "Manue030"   |
 | `mjai-tsumogiri` | Simple agent that always discards the drawn tile | "tsumogiri"  |
 
 ## Installation
