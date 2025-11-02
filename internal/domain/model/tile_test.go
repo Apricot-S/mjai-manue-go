@@ -1,0 +1,58 @@
+package model_test
+
+import (
+	"testing"
+
+	"github.com/Apricot-S/mjai-manue-go/internal/domain/model"
+)
+
+func TestNewTileFromID(t *testing.T) {
+	tests := []struct {
+		name    string
+		id      int
+		wantID  int
+		wantErr bool
+	}{
+		{
+			name:    "0 is minimum valid ID",
+			id:      0,
+			wantID:  0,
+			wantErr: false,
+		},
+		{
+			name:    "37 is maximum valid ID",
+			id:      37,
+			wantID:  37,
+			wantErr: false,
+		},
+		{
+			name:    "-1 is an invalid ID",
+			id:      -1,
+			wantID:  -1,
+			wantErr: true,
+		},
+		{
+			name:    "38 is an invalid ID",
+			id:      38,
+			wantID:  38,
+			wantErr: true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, gotErr := model.NewTileFromID(tt.id)
+			if gotErr != nil {
+				if !tt.wantErr {
+					t.Errorf("NewTileFromID() failed: %v", gotErr)
+				}
+				return
+			}
+			if tt.wantErr {
+				t.Fatal("NewTileFromID() succeeded unexpectedly")
+			}
+			if got.ID() != tt.wantID {
+				t.Errorf("NewTileFromID().ID() = %v, want %v", got, tt.wantID)
+			}
+		})
+	}
+}
