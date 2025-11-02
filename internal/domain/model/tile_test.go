@@ -56,3 +56,107 @@ func TestNewTileFromID(t *testing.T) {
 		})
 	}
 }
+
+func TestNewTileFromCode(t *testing.T) {
+	tests := []struct {
+		name    string
+		code    string
+		wantID  int
+		wantErr bool
+	}{
+		{
+			name:    "1m is ID 0",
+			code:    "1m",
+			wantID:  0,
+			wantErr: false,
+		},
+		{
+			name:    "C is ID 33",
+			code:    "C",
+			wantID:  33,
+			wantErr: false,
+		},
+		{
+			name:    "5sr is ID 36",
+			code:    "5sr",
+			wantID:  36,
+			wantErr: false,
+		},
+		{
+			name:    "? is ID 37",
+			code:    "?",
+			wantID:  37,
+			wantErr: false,
+		},
+		{
+			name:    "1z is an invalid code",
+			code:    "1z",
+			wantID:  27,
+			wantErr: true,
+		},
+		{
+			name:    "0m is an invalid code",
+			code:    "0m",
+			wantID:  34,
+			wantErr: true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, gotErr := model.NewTileFromCode(tt.code)
+			if gotErr != nil {
+				if !tt.wantErr {
+					t.Errorf("NewTileFromCode() failed: %v", gotErr)
+				}
+				return
+			}
+			if tt.wantErr {
+				t.Fatal("NewTileFromCode() succeeded unexpectedly")
+			}
+			if got.ID() != tt.wantID {
+				t.Errorf("NewTileFromCode().ID() = %v, want %v", got, tt.wantID)
+			}
+		})
+	}
+}
+
+func TestTile_Code(t *testing.T) {
+	tests := []struct {
+		name string
+		id   int
+		want string
+	}{
+		{
+			name: "1m is ID 0",
+			id:   0,
+			want: "1m",
+		},
+		{
+			name: "C is ID 33",
+			id:   33,
+			want: "C",
+		},
+		{
+			name: "5sr is ID 36",
+			id:   36,
+			want: "5sr",
+		},
+		{
+			name: "? is ID 37",
+			id:   37,
+			want: "?",
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			ti, err := model.NewTileFromID(tt.id)
+			if err != nil {
+				t.Fatalf("could not construct receiver type: %v", err)
+			}
+			got := ti.Code()
+			if got != tt.want {
+				t.Errorf("Code() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
