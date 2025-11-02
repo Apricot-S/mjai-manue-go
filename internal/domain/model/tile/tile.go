@@ -1,13 +1,13 @@
-package model
+package tile
 
 import (
 	"fmt"
 	"slices"
 )
 
-const numTileType = 3*9 + 4 + 3 + 3 + 1
+const NumTileType = 3*9 + 4 + 3 + 3 + 1
 
-var tileCodes = [numTileType]string{
+var tileCodes = [NumTileType]string{
 	"1m", "2m", "3m", "4m", "5m", "6m", "7m", "8m", "9m", // m
 	"1p", "2p", "3p", "4p", "5p", "6p", "7p", "8p", "9p", // p
 	"1s", "2s", "3s", "4s", "5s", "6s", "7s", "8s", "9s", // s

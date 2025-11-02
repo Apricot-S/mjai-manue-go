@@ -1,9 +1,9 @@
-package model_test
+package tile_test
 
 import (
 	"testing"
 
-	"github.com/Apricot-S/mjai-manue-go/internal/domain/model"
+	"github.com/Apricot-S/mjai-manue-go/internal/domain/model/tile"
 )
 
 func TestNewTileFromID(t *testing.T) {
@@ -40,7 +40,7 @@ func TestNewTileFromID(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, gotErr := model.NewTileFromID(tt.id)
+			got, gotErr := tile.NewTileFromID(tt.id)
 			if gotErr != nil {
 				if !tt.wantErr {
 					t.Errorf("NewTileFromID() failed: %v", gotErr)
@@ -103,7 +103,7 @@ func TestNewTileFromCode(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, gotErr := model.NewTileFromCode(tt.code)
+			got, gotErr := tile.NewTileFromCode(tt.code)
 			if gotErr != nil {
 				if !tt.wantErr {
 					t.Errorf("NewTileFromCode() failed: %v", gotErr)
@@ -149,7 +149,7 @@ func TestTile_Code(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			ti, err := model.NewTileFromID(tt.id)
+			ti, err := tile.NewTileFromID(tt.id)
 			if err != nil {
 				t.Fatalf("could not construct receiver type: %v", err)
 			}
