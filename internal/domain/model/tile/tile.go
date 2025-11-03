@@ -14,6 +14,8 @@ const NumTileType37 = NumTileType34 + 3
 // NumTileType38 is the number of distinct tile types with red fives and unknown tile (?).
 const NumTileType38 = NumTileType37 + 1
 
+const minTileID = 0
+
 var tileCodes = [NumTileType38]string{
 	"1m", "2m", "3m", "4m", "5m", "6m", "7m", "8m", "9m", // m
 	"1p", "2p", "3p", "4p", "5p", "6p", "7p", "8p", "9p", // p
@@ -32,10 +34,17 @@ func (t *Tile) ID() int {
 }
 
 func NewTileFromID(id int) (*Tile, error) {
-	if id < 0 || id >= 38 {
+	if id < minTileID || id >= NumTileType38 {
 		return nil, fmt.Errorf("invalid tile id: %d", id)
 	}
 	return &Tile{id: id}, nil
+}
+
+func MustTileFromID(id int) *Tile {
+	if id < minTileID || id >= NumTileType38 {
+		panic(fmt.Sprintf("invalid tile id: %d", id))
+	}
+	return &Tile{id: id}
 }
 
 func NewTileFromCode(code string) (*Tile, error) {
@@ -44,6 +53,14 @@ func NewTileFromCode(code string) (*Tile, error) {
 		return nil, fmt.Errorf("invalid tile code: %s", code)
 	}
 	return NewTileFromID(id)
+}
+
+func MustTileFromCode(code string) *Tile {
+	id := slices.Index(tileCodes[:], code)
+	if id == -1 {
+		panic(fmt.Sprintf("invalid tile code: %s", code))
+	}
+	return MustTileFromID(id)
 }
 
 func (t *Tile) Code() string {
