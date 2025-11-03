@@ -160,3 +160,41 @@ func TestTile_Code(t *testing.T) {
 		})
 	}
 }
+
+func TestTile_IsRed(t *testing.T) {
+	tests := []struct {
+		name string
+		code string
+		want bool
+	}{
+		{
+			name: "5m is not red",
+			code: "5m",
+			want: false,
+		},
+		{
+			name: "5mr is not red",
+			code: "5mr",
+			want: true,
+		},
+		{
+			name: "P is not red",
+			code: "P",
+			want: false,
+		},
+		{
+			name: "? is not red",
+			code: "?",
+			want: false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			ti := tile.MustTileFromCode(tt.code)
+			got := ti.IsRed()
+			if got != tt.want {
+				t.Errorf("IsRed() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}

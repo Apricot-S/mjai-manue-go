@@ -16,8 +16,12 @@ const NumTileType38 = NumTileType37 + 1
 
 const minTileID = 0
 
-const MinHonorID = 9 * 3
-const MinRedID = MinHonorID + 4 + 3
+const MinSuitID = minTileID
+const MaxSuitID = MinSuitID + 9*3 - 1
+const MinHonorID = MaxSuitID + 1
+const MaxHonorID = MinHonorID + 4 + 3 - 1
+const MinRedID = MaxHonorID + 1
+const MaxRedID = MinRedID + 2
 
 var tileCodes = [NumTileType38]string{
 	"1m", "2m", "3m", "4m", "5m", "6m", "7m", "8m", "9m", // m
@@ -68,4 +72,8 @@ func MustTileFromCode(code string) *Tile {
 
 func (t *Tile) Code() string {
 	return tileCodes[t.id]
+}
+
+func (t *Tile) IsRed() bool {
+	return t.id >= MinRedID && t.id <= MaxRedID
 }
