@@ -161,6 +161,44 @@ func TestTile_Code(t *testing.T) {
 	}
 }
 
+func TestTile_Number(t *testing.T) {
+	tests := []struct {
+		name string
+		code string
+		want int
+	}{
+		{
+			name: "5p's number is 5",
+			code: "5p",
+			want: 5,
+		},
+		{
+			name: "5pr's number is 5",
+			code: "5pr",
+			want: 5,
+		},
+		{
+			name: "E's number is 1",
+			code: "E",
+			want: 1,
+		},
+		{
+			name: "?'s number is 0",
+			code: "?",
+			want: 0,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			ti := tile.MustTileFromCode(tt.code)
+			got := ti.Number()
+			if got != tt.want {
+				t.Errorf("Number() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
 func TestTile_IsRed(t *testing.T) {
 	tests := []struct {
 		name string
@@ -173,7 +211,7 @@ func TestTile_IsRed(t *testing.T) {
 			want: false,
 		},
 		{
-			name: "5mr is not red",
+			name: "5mr is red",
 			code: "5mr",
 			want: true,
 		},
