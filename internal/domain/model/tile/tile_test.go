@@ -274,3 +274,41 @@ func TestTile_IsSuit(t *testing.T) {
 		})
 	}
 }
+
+func TestTile_IsHonor(t *testing.T) {
+	tests := []struct {
+		name string
+		code string
+		want bool
+	}{
+		{
+			name: "9s is not honor",
+			code: "9s",
+			want: false,
+		},
+		{
+			name: "5mr is not honor",
+			code: "5mr",
+			want: false,
+		},
+		{
+			name: "E is honor",
+			code: "E",
+			want: true,
+		},
+		{
+			name: "? is not honor",
+			code: "?",
+			want: false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			ti := tile.MustTileFromCode(tt.code)
+			got := ti.IsHonor()
+			if got != tt.want {
+				t.Errorf("IsHonor() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}

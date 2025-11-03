@@ -22,6 +22,7 @@ const MinHonorID = MaxSuitID + 1
 const MaxHonorID = MinHonorID + 4 + 3 - 1
 const MinRedID = MaxHonorID + 1
 const MaxRedID = MinRedID + 2
+const unknownID = MaxRedID + 1
 
 var tileCodes = [NumTileType38]string{
 	"1m", "2m", "3m", "4m", "5m", "6m", "7m", "8m", "9m", // m
@@ -112,4 +113,8 @@ func (t *Tile) IsRed() bool {
 
 func (t *Tile) IsSuit() bool {
 	return t.id < MinHonorID || t.IsRed()
+}
+
+func (t *Tile) IsHonor() bool {
+	return !t.IsSuit() && t.id != unknownID
 }
