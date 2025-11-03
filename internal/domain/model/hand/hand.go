@@ -19,8 +19,15 @@ func NewHand(tiles []tile.Tile) (*Hand, error) {
 		id := t.ID()
 		tileCounts[id]++
 
-		if id < tile.NumTileType37 && tileCounts[id] > maxCopies {
-			return nil, fmt.Errorf("tiles contains five identical tiles: %s", t.Code())
+		if id >= tile.NumTileType37 {
+			// There can be any number of unknowns.
+			continue
+		}
+		if tileCounts[id] > maxCopies {
+			return nil, fmt.Errorf("tiles cannot contain five identical tiles: %s", t.Code())
+		}
+		if id >= tile.NumTileType34 && tileCounts[id] > 1 {
+			return nil, fmt.Errorf("tiles cannot contain multiple red fives of the same suit: %s", t.Code())
 		}
 	}
 
@@ -29,7 +36,7 @@ func NewHand(tiles []tile.Tile) (*Hand, error) {
 		sum += c
 	}
 	if sum > maxNumTilesInHand {
-		return nil, fmt.Errorf("tiles contains 15 or more tiles: %d", sum)
+		return nil, fmt.Errorf("tiles cannot contain 15 or more tiles: %d", sum)
 	}
 
 	return &Hand{tileCounts: tileCounts}, nil
