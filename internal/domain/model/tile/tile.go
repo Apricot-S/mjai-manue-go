@@ -16,6 +16,9 @@ const NumTileType38 = NumTileType37 + 1
 
 const minTileID = 0
 
+const MinHonorID = 9 * 3
+const MinRedID = MinHonorID + 4 + 3
+
 var tileCodes = [NumTileType38]string{
 	"1m", "2m", "3m", "4m", "5m", "6m", "7m", "8m", "9m", // m
 	"1p", "2p", "3p", "4p", "5p", "6p", "7p", "8p", "9p", // p
