@@ -109,3 +109,7 @@ func (t *Tile) Number() int {
 func (t *Tile) IsRed() bool {
 	return t.isRed
 }
+
+func (t *Tile) IsSuit() bool {
+	return t.id < MinHonorID || t.IsRed()
+}
