@@ -10,20 +10,42 @@ import (
 
 func TestNewHand(t *testing.T) {
 	tests := []struct {
-		name string // description of this test case
-		// Named input parameters for target function.
-		tiles []tile.Tile
-		want  []tile.Tile
+		name    string
+		tiles   []tile.Tile
+		want    []tile.Tile
+		wantErr bool
 	}{
 		{
-			name:  "empty hand",
-			tiles: []tile.Tile{},
-			want:  []tile.Tile{},
+			name:    "empty hand",
+			tiles:   []tile.Tile{},
+			want:    []tile.Tile{},
+			wantErr: false,
+		},
+		{
+			name:    "hand can contains four identical tiles",
+			tiles:   []tile.Tile{*tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"), *tile.MustTileFromCode("?")},
+			want:    []tile.Tile{*tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"), *tile.MustTileFromCode("?")},
+			wantErr: false,
+		},
+		{
+			name:    "hand cannot contains five identical tiles",
+			tiles:   []tile.Tile{*tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"), *tile.MustTileFromCode("?")},
+			want:    []tile.Tile{*tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"), *tile.MustTileFromCode("?")},
+			wantErr: true,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got := hand.NewHand(tt.tiles)
+			got, gotErr := hand.NewHand(tt.tiles)
+			if gotErr != nil {
+				if !tt.wantErr {
+					t.Errorf("NewHand() failed: %v", gotErr)
+				}
+				return
+			}
+			if tt.wantErr {
+				t.Fatal("NewHand() succeeded unexpectedly")
+			}
 			if !reflect.DeepEqual(got.ToTiles(), tt.tiles) {
 				t.Errorf("NewHand() = %v, want %v", got, tt.want)
 			}
