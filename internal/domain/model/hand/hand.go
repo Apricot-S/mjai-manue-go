@@ -14,16 +14,25 @@ type Hand struct {
 }
 
 func NewHand(tiles []tile.Tile) (*Hand, error) {
-	h := Hand{}
+	tileCounts := [tile.NumTileType38]int{}
 	for _, t := range tiles {
 		id := t.ID()
-		h.tileCounts[id]++
+		tileCounts[id]++
 
-		if h.tileCounts[id] > maxCopies {
+		if id < tile.NumTileType37 && tileCounts[id] > maxCopies {
 			return nil, fmt.Errorf("tiles contains five identical tiles: %s", t.Code())
 		}
 	}
-	return &h, nil
+
+	sum := 0
+	for _, c := range tileCounts {
+		sum += c
+	}
+	if sum > maxNumTilesInHand {
+		return nil, fmt.Errorf("tiles contains 15 or more tiles: %d", sum)
+	}
+
+	return &Hand{tileCounts: tileCounts}, nil
 }
 
 func (h *Hand) ToTiles() []tile.Tile {
