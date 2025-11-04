@@ -33,6 +33,15 @@ var tileCodes = [NumTileType38]string{
 	"?", // unknown
 }
 
+var tileColors = [NumTileType38]rune{
+	'm', 'm', 'm', 'm', 'm', 'm', 'm', 'm', 'm',
+	'p', 'p', 'p', 'p', 'p', 'p', 'p', 'p', 'p',
+	's', 's', 's', 's', 's', 's', 's', 's', 's',
+	't', 't', 't', 't', 't', 't', 't',
+	'm', 'p', 's',
+	'?',
+}
+
 var tileNumbers = [NumTileType38]int{
 	1, 2, 3, 4, 5, 6, 7, 8, 9,
 	1, 2, 3, 4, 5, 6, 7, 8, 9,
@@ -53,6 +62,7 @@ var tileIsReds = [NumTileType38]bool{
 
 type Tile struct {
 	id     int
+	color  rune
 	number int
 	isRed  bool
 }
@@ -67,6 +77,7 @@ func NewTileFromID(id int) (*Tile, error) {
 	}
 	return &Tile{
 		id:     id,
+		color:  tileColors[id],
 		number: tileNumbers[id],
 		isRed:  tileIsReds[id],
 	}, nil
@@ -78,6 +89,7 @@ func MustTileFromID(id int) *Tile {
 	}
 	return &Tile{
 		id:     id,
+		color:  tileColors[id],
 		number: tileNumbers[id],
 		isRed:  tileIsReds[id],
 	}
@@ -101,6 +113,10 @@ func MustTileFromCode(code string) *Tile {
 
 func (t *Tile) Code() string {
 	return tileCodes[t.id]
+}
+
+func (t *Tile) Color() rune {
+	return t.color
 }
 
 func (t *Tile) Number() int {

@@ -161,6 +161,54 @@ func TestTile_Code(t *testing.T) {
 	}
 }
 
+func TestTile_Color(t *testing.T) {
+	tests := []struct {
+		name string
+		code string
+		want rune
+	}{
+		{
+			name: "1m's color is m",
+			code: "1m",
+			want: 'm',
+		},
+		{
+			name: "1p's color is p",
+			code: "1p",
+			want: 'p',
+		},
+		{
+			name: "1s's color is s",
+			code: "1s",
+			want: 's',
+		},
+		{
+			name: "E's color is t",
+			code: "E",
+			want: 't',
+		},
+		{
+			name: "5mr's color is m",
+			code: "5mr",
+			want: 'm',
+		},
+		{
+			name: "?'s color is ?",
+			code: "?",
+			want: '?',
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			ti := tile.MustTileFromCode(tt.code)
+			got := ti.Color()
+			if got != tt.want {
+				t.Errorf("Color() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
 func TestTile_Number(t *testing.T) {
 	tests := []struct {
 		name string
