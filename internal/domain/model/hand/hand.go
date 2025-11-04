@@ -29,7 +29,7 @@ func NewHand(tiles []tile.Tile) (*Hand, error) {
 		if t.IsRed() && tileCounts[id] > 1 {
 			return nil, fmt.Errorf("tiles cannot contain multiple red fives of the same suit: %s", t.Code())
 		}
-		if t.IsSuit() && t.Number() == 5 && tileCounts[id] > 3 {
+		if t.IsSuits() && t.Number() == 5 && tileCounts[id] > 3 {
 			return nil, fmt.Errorf("tiles cannot contain four fives of the same suit: %s", t.Code())
 		}
 	}

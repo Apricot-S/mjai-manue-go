@@ -237,29 +237,29 @@ func TestTile_IsRed(t *testing.T) {
 	}
 }
 
-func TestTile_IsSuit(t *testing.T) {
+func TestTile_IsSuits(t *testing.T) {
 	tests := []struct {
 		name string
 		code string
 		want bool
 	}{
 		{
-			name: "9s is suit",
+			name: "9s is suits",
 			code: "9s",
 			want: true,
 		},
 		{
-			name: "5mr is suit",
+			name: "5mr is suits",
 			code: "5mr",
 			want: true,
 		},
 		{
-			name: "E is not suit",
+			name: "E is not suits",
 			code: "E",
 			want: false,
 		},
 		{
-			name: "? is not suit",
+			name: "? is not suits",
 			code: "?",
 			want: false,
 		},
@@ -267,37 +267,37 @@ func TestTile_IsSuit(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			ti := tile.MustTileFromCode(tt.code)
-			got := ti.IsSuit()
+			got := ti.IsSuits()
 			if got != tt.want {
-				t.Errorf("IsSuit() = %v, want %v", got, tt.want)
+				t.Errorf("IsSuits() = %v, want %v", got, tt.want)
 			}
 		})
 	}
 }
 
-func TestTile_IsHonor(t *testing.T) {
+func TestTile_IsHonors(t *testing.T) {
 	tests := []struct {
 		name string
 		code string
 		want bool
 	}{
 		{
-			name: "9s is not honor",
+			name: "9s is not honors",
 			code: "9s",
 			want: false,
 		},
 		{
-			name: "5mr is not honor",
+			name: "5mr is not honors",
 			code: "5mr",
 			want: false,
 		},
 		{
-			name: "E is honor",
+			name: "E is honors",
 			code: "E",
 			want: true,
 		},
 		{
-			name: "? is not honor",
+			name: "? is not honors",
 			code: "?",
 			want: false,
 		},
@@ -305,9 +305,9 @@ func TestTile_IsHonor(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			ti := tile.MustTileFromCode(tt.code)
-			got := ti.IsHonor()
+			got := ti.IsHonors()
 			if got != tt.want {
-				t.Errorf("IsHonor() = %v, want %v", got, tt.want)
+				t.Errorf("IsHonors() = %v, want %v", got, tt.want)
 			}
 		})
 	}

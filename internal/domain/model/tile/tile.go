@@ -16,11 +16,11 @@ const NumTileType38 = NumTileType37 + 1
 
 const minTileID = 0
 
-const MinSuitID = minTileID
-const MaxSuitID = MinSuitID + 9*3 - 1
-const MinHonorID = MaxSuitID + 1
-const MaxHonorID = MinHonorID + 4 + 3 - 1
-const MinRedID = MaxHonorID + 1
+const MinSuitsID = minTileID
+const MaxSuitsID = MinSuitsID + 9*3 - 1
+const MinHonorsID = MaxSuitsID + 1
+const MaxHonorsID = MinHonorsID + 4 + 3 - 1
+const MinRedID = MaxHonorsID + 1
 const MaxRedID = MinRedID + 2
 const unknownID = MaxRedID + 1
 
@@ -111,10 +111,10 @@ func (t *Tile) IsRed() bool {
 	return t.isRed
 }
 
-func (t *Tile) IsSuit() bool {
-	return t.id < MinHonorID || t.IsRed()
+func (t *Tile) IsSuits() bool {
+	return t.id < MinHonorsID || t.IsRed()
 }
 
-func (t *Tile) IsHonor() bool {
-	return !t.IsSuit() && t.id != unknownID
+func (t *Tile) IsHonors() bool {
+	return !t.IsSuits() && t.id != unknownID
 }
