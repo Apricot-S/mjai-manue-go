@@ -10,11 +10,11 @@ const maxNumTilesInHand = 14
 const maxCopies = 4
 
 type Hand struct {
-	tileCounts [tile.NumTileType38]uint8
+	tileCounts [tile.NumTileType38]int
 }
 
 func NewHand(tiles []tile.Tile) (*Hand, error) {
-	tileCounts := [tile.NumTileType38]uint8{}
+	tileCounts := [tile.NumTileType38]int{}
 	for _, t := range tiles {
 		id := t.ID()
 		tileCounts[id]++
@@ -34,7 +34,7 @@ func NewHand(tiles []tile.Tile) (*Hand, error) {
 		}
 	}
 
-	var sum uint8 = 0
+	sum := 0
 	for _, c := range tileCounts {
 		sum += c
 	}
