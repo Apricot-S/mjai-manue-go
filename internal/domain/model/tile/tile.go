@@ -16,13 +16,13 @@ const NumTileType38 = NumTileType37 + 1
 
 const minTileID = 0
 
-const MinSuitsID = minTileID
-const MaxSuitsID = MinSuitsID + 9*3 - 1
-const MinHonorsID = MaxSuitsID + 1
-const MaxHonorsID = MinHonorsID + 4 + 3 - 1
-const MinRedID = MaxHonorsID + 1
-const MaxRedID = MinRedID + 2
-const unknownID = MaxRedID + 1
+const minSuitsID = minTileID
+const maxSuitsID = minSuitsID + 9*3 - 1
+const minHonorsID = maxSuitsID + 1
+const maxHonorsID = minHonorsID + 4 + 3 - 1
+const minRedID = maxHonorsID + 1
+const maxRedID = minRedID + 2
+const unknownID = maxRedID + 1
 
 var tileCodes = [NumTileType38]string{
 	"1m", "2m", "3m", "4m", "5m", "6m", "7m", "8m", "9m", // m
@@ -112,7 +112,7 @@ func (t *Tile) IsRed() bool {
 }
 
 func (t *Tile) IsSuits() bool {
-	return t.id < MinHonorsID || t.IsRed()
+	return t.id < minHonorsID || t.IsRed()
 }
 
 func (t *Tile) IsHonors() bool {
