@@ -312,3 +312,41 @@ func TestTile_IsHonors(t *testing.T) {
 		})
 	}
 }
+
+func TestTile_IsUnknown(t *testing.T) {
+	tests := []struct {
+		name string
+		code string
+		want bool
+	}{
+		{
+			name: "9s is not unknown",
+			code: "9s",
+			want: false,
+		},
+		{
+			name: "5mr is not unknown",
+			code: "5mr",
+			want: false,
+		},
+		{
+			name: "E is not unknown",
+			code: "E",
+			want: false,
+		},
+		{
+			name: "? is unknown",
+			code: "?",
+			want: true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			ti := tile.MustTileFromCode(tt.code)
+			got := ti.IsUnknown()
+			if got != tt.want {
+				t.Errorf("IsUnknown() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
