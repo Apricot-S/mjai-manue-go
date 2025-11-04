@@ -14,6 +14,12 @@ const NumTileType37 = NumTileType34 + 3
 // NumTileType38 is the number of distinct tile types with red fives and unknown tile (?).
 const NumTileType38 = NumTileType37 + 1
 
+const ManzuColor = 'm'
+const PinzuColor = 'p'
+const SouzuColor = 's'
+const HonorsColor = 't'
+const UnknownColor = '?'
+
 const minTileID = 0
 
 const minSuitsID = minTileID
