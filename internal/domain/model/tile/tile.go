@@ -116,7 +116,7 @@ func (t *Tile) IsSuits() bool {
 }
 
 func (t *Tile) IsHonors() bool {
-	return !t.IsSuits() && t.id != unknownID
+	return !t.IsSuits() && !t.IsUnknown()
 }
 
 func (t *Tile) IsUnknown() bool {
