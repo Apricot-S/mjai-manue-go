@@ -19,6 +19,24 @@ type Block interface {
 	ToTiles() []tile.Tile
 }
 
+type Triplet struct {
+	tiles []tile.Tile
+}
+
+func NewTriplet(t tile.Tile) (*Triplet, error) {
+	if t.IsUnknown() {
+		return nil, fmt.Errorf("cannot create triplet from unknown tile")
+	}
+	if t.IsRed() {
+		return nil, fmt.Errorf("cannot create triplet from red five")
+	}
+	return &Triplet{tiles: []tile.Tile{t, t, t}}, nil
+}
+
+func (p *Triplet) ToTiles() []tile.Tile {
+	return p.tiles
+}
+
 type Pair struct {
 	tiles []tile.Tile
 }
