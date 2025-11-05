@@ -144,3 +144,17 @@ func (t *Tile) IsHonors() bool {
 func (t *Tile) IsUnknown() bool {
 	return t.id == unknownID
 }
+
+func (t *Tile) Next(n int) *Tile {
+	if t.IsUnknown() || t.IsHonors() {
+		return nil
+	}
+
+	nextNumber := t.Number() + n
+	if nextNumber < 1 || 9 < nextNumber {
+		return nil
+	}
+
+	nextID := t.ID() - t.Number() + nextNumber
+	return MustTileFromID(nextID)
+}

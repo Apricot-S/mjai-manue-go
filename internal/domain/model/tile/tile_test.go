@@ -1,6 +1,7 @@
 package tile_test
 
 import (
+	"reflect"
 	"testing"
 
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/model/tile"
@@ -394,6 +395,67 @@ func TestTile_IsUnknown(t *testing.T) {
 			got := ti.IsUnknown()
 			if got != tt.want {
 				t.Errorf("IsUnknown() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestTile_Next(t *testing.T) {
+	tests := []struct {
+		name string
+		code string
+		n    int
+		want *tile.Tile
+	}{
+		{
+			name: "no next tile for unknown",
+			code: "?",
+			n:    0,
+			want: nil,
+		},
+		{
+			name: "no next tile for honors",
+			code: "E",
+			n:    1,
+			want: nil,
+		},
+		{
+			name: "no next tile for 9",
+			code: "9m",
+			n:    1,
+			want: nil,
+		},
+		{
+			name: "no prev tile for 1",
+			code: "1s",
+			n:    -1,
+			want: nil,
+		},
+		{
+			name: "0 after of 9 is 9",
+			code: "9p",
+			n:    0,
+			want: tile.MustTileFromCode("9p"),
+		},
+		{
+			name: "1 after of 8 is 9",
+			code: "8p",
+			n:    1,
+			want: tile.MustTileFromCode("9p"),
+		},
+		{
+			name: "2 before of 3 is 1",
+			code: "3m",
+			n:    -2,
+			want: tile.MustTileFromCode("1m"),
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			ti := tile.MustTileFromCode(tt.code)
+			got := ti.Next(tt.n)
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("Next() = %v, want %v", got, tt.want)
 			}
 		})
 	}
