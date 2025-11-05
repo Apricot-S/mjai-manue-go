@@ -6,6 +6,7 @@ import (
 
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/model/hand"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/model/tile"
+	"github.com/Apricot-S/mjai-manue-go/internal/domain/model/tilecount"
 )
 
 func TestNewHand(t *testing.T) {
@@ -96,6 +97,52 @@ func TestNewHand(t *testing.T) {
 			}
 			if !reflect.DeepEqual(got.ToTiles(), tt.tiles) {
 				t.Errorf("NewHand().ToTiles() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestHand_ToTileCounts34(t *testing.T) {
+	tests := []struct {
+		name  string
+		tiles []tile.Tile
+		want  *tilecount.TileCounts34
+	}{
+		{
+			name:  "empty hand",
+			tiles: nil,
+			want:  &tilecount.TileCounts34{},
+		},
+		{
+			name:  "ignore unknown",
+			tiles: []tile.Tile{*tile.MustTileFromCode("?")},
+			want:  &tilecount.TileCounts34{},
+		},
+		{
+			name:  "1m 1m",
+			tiles: []tile.Tile{*tile.MustTileFromCode("1m"), *tile.MustTileFromCode("1m")},
+			want:  &tilecount.TileCounts34{0: 2},
+		},
+		{
+			name:  "C",
+			tiles: []tile.Tile{*tile.MustTileFromCode("C")},
+			want:  &tilecount.TileCounts34{33: 1},
+		},
+		{
+			name:  "5mr 5pr 5sr",
+			tiles: []tile.Tile{*tile.MustTileFromCode("5mr"), *tile.MustTileFromCode("5pr"), *tile.MustTileFromCode("5sr")},
+			want:  &tilecount.TileCounts34{4: 1, 13: 1, 22: 1},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			h, err := hand.NewHand(tt.tiles)
+			if err != nil {
+				t.Fatalf("could not construct receiver type: %v", err)
+			}
+			got := h.ToTileCounts34()
+			if *got != *tt.want {
+				t.Errorf("ToTileCounts34() = %v, want %v", got, tt.want)
 			}
 		})
 	}

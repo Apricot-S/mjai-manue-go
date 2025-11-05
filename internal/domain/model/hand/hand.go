@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/model/tile"
+	"github.com/Apricot-S/mjai-manue-go/internal/domain/model/tilecount"
 )
 
 const maxNumTilesInHand = 14
@@ -53,4 +54,12 @@ func (h *Hand) ToTiles() []tile.Tile {
 		}
 	}
 	return tiles
+}
+
+func (h *Hand) ToTileCounts34() *tilecount.TileCounts34 {
+	tc := tilecount.TileCounts34(h.tileCounts[:34])
+	tc[4] += h.tileCounts[34]
+	tc[13] += h.tileCounts[35]
+	tc[22] += h.tileCounts[36]
+	return &tc
 }
