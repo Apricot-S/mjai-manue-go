@@ -24,7 +24,7 @@ func NewSequence(t tile.Tile) (*Sequence, error) {
 	if t.Number() > 7 {
 		return nil, fmt.Errorf("cannot create sequence starting with 8 or 9: %s", t.Code())
 	}
-	return &Sequence{tiles: []tile.Tile{t, t, t}}, nil
+	return &Sequence{tiles: []tile.Tile{t, *t.Next(1), *t.Next(2)}}, nil
 }
 
 func (p *Sequence) ToTiles() []tile.Tile {

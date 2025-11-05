@@ -16,6 +16,12 @@ func TestNewSequence(t *testing.T) {
 		wantErr bool
 	}{
 		{
+			name:    "can create sequence starting with 7",
+			tile:    *tile.MustTileFromCode("7s"),
+			want:    []tile.Tile{*tile.MustTileFromCode("7s"), *tile.MustTileFromCode("8s"), *tile.MustTileFromCode("9s")},
+			wantErr: false,
+		},
+		{
 			name:    "cannot create sequence starting with 8",
 			tile:    *tile.MustTileFromCode("8m"),
 			want:    nil,
