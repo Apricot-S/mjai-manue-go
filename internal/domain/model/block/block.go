@@ -37,6 +37,24 @@ func (p *Triplet) ToTiles() []tile.Tile {
 	return p.tiles
 }
 
+type Quad struct {
+	tiles []tile.Tile
+}
+
+func NewQuad(t tile.Tile) (*Quad, error) {
+	if t.IsUnknown() {
+		return nil, fmt.Errorf("cannot create quad from unknown tile")
+	}
+	if t.IsRed() {
+		return nil, fmt.Errorf("cannot create quad from red five")
+	}
+	return &Quad{tiles: []tile.Tile{t, t, t, t}}, nil
+}
+
+func (p *Quad) ToTiles() []tile.Tile {
+	return p.tiles
+}
+
 type Pair struct {
 	tiles []tile.Tile
 }
