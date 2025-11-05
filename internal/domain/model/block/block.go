@@ -11,7 +11,7 @@ type Block interface {
 }
 
 type Sequence struct {
-	tiles []tile.Tile
+	tiles [3]tile.Tile
 }
 
 func NewSequence(t tile.Tile) (*Sequence, error) {
@@ -24,15 +24,15 @@ func NewSequence(t tile.Tile) (*Sequence, error) {
 	if t.Number() > 7 {
 		return nil, fmt.Errorf("cannot create sequence starting with 8 or 9: %s", t.Code())
 	}
-	return &Sequence{tiles: []tile.Tile{t, *t.Next(1), *t.Next(2)}}, nil
+	return &Sequence{tiles: [3]tile.Tile{t, *t.Next(1), *t.Next(2)}}, nil
 }
 
 func (p *Sequence) ToTiles() []tile.Tile {
-	return p.tiles
+	return p.tiles[:]
 }
 
 type Triplet struct {
-	tiles []tile.Tile
+	tiles [3]tile.Tile
 }
 
 func NewTriplet(t tile.Tile) (*Triplet, error) {
@@ -42,15 +42,15 @@ func NewTriplet(t tile.Tile) (*Triplet, error) {
 	if t.IsRed() {
 		return nil, fmt.Errorf("cannot create triplet from red five")
 	}
-	return &Triplet{tiles: []tile.Tile{t, t, t}}, nil
+	return &Triplet{tiles: [3]tile.Tile{t, t, t}}, nil
 }
 
 func (p *Triplet) ToTiles() []tile.Tile {
-	return p.tiles
+	return p.tiles[:]
 }
 
 type Quad struct {
-	tiles []tile.Tile
+	tiles [4]tile.Tile
 }
 
 func NewQuad(t tile.Tile) (*Quad, error) {
@@ -60,15 +60,15 @@ func NewQuad(t tile.Tile) (*Quad, error) {
 	if t.IsRed() {
 		return nil, fmt.Errorf("cannot create quad from red five")
 	}
-	return &Quad{tiles: []tile.Tile{t, t, t, t}}, nil
+	return &Quad{tiles: [4]tile.Tile{t, t, t, t}}, nil
 }
 
 func (p *Quad) ToTiles() []tile.Tile {
-	return p.tiles
+	return p.tiles[:]
 }
 
 type Pair struct {
-	tiles []tile.Tile
+	tiles [2]tile.Tile
 }
 
 func NewPair(t tile.Tile) (*Pair, error) {
@@ -78,9 +78,9 @@ func NewPair(t tile.Tile) (*Pair, error) {
 	if t.IsRed() {
 		return nil, fmt.Errorf("cannot create pair from red five")
 	}
-	return &Pair{tiles: []tile.Tile{t, t}}, nil
+	return &Pair{tiles: [2]tile.Tile{t, t}}, nil
 }
 
 func (p *Pair) ToTiles() []tile.Tile {
-	return p.tiles
+	return p.tiles[:]
 }
