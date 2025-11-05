@@ -57,6 +57,7 @@ var (
 			t := tile.MustTileFromID(i)
 			ms[i], _ = block.NewTriplet(*t)
 		}
+
 		for chowID := range numChows {
 			i := chowStartIDs[chowID]
 			t := tile.MustTileFromID(i)
