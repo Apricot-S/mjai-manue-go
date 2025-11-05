@@ -70,7 +70,7 @@ var (
 
 type shantenConfig struct {
 	allowedExtraTiles int
-	upperbound        int
+	upperBound        int
 }
 
 type shantenOption func(*shantenConfig)
@@ -83,7 +83,7 @@ func AllowedExtraTiles(n int) shantenOption {
 
 func UpperBound(n int) shantenOption {
 	return func(cfg *shantenConfig) {
-		cfg.upperbound = n
+		cfg.upperBound = n
 	}
 }
 
@@ -93,7 +93,7 @@ func UpperBound(n int) shantenOption {
 func AnalyzeShanten(hand *hand.Hand, opts ...shantenOption) (int, []Goal) {
 	cfg := &shantenConfig{
 		allowedExtraTiles: 0,
-		upperbound:        MaxShantenNumber,
+		upperBound:        MaxShantenNumber,
 	}
 
 	for _, opt := range opts {
@@ -118,12 +118,12 @@ func AnalyzeShanten(hand *hand.Hand, opts ...shantenOption) (int, []Goal) {
 		-1,
 		numRequiredBlocks,
 		0,
-		cfg.upperbound,
+		cfg.upperBound,
 		blocks,
 		&allGoals,
 		cfg.allowedExtraTiles,
 	)
-	newUpperbound := min(shanten+cfg.allowedExtraTiles, cfg.upperbound)
+	newUpperbound := min(shanten+cfg.allowedExtraTiles, cfg.upperBound)
 
 	// Filter out the goals that exceed newUpperbound
 	goals := make([]Goal, 0, len(allGoals))
