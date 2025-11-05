@@ -27,6 +27,12 @@ func TestNewPair(t *testing.T) {
 			want:    nil,
 			wantErr: true,
 		},
+		{
+			name:    "cannot create pair from red five",
+			tile:    *tile.MustTileFromCode("5mr"),
+			want:    nil,
+			wantErr: true,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
