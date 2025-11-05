@@ -68,14 +68,38 @@ var (
 	}()
 )
 
+type shantenConfig struct {
+	allowedExtraTiles int
+	upperbound        int
+}
+
+type shantenOption func(*shantenConfig)
+
+func AllowedExtraTiles(n int) shantenOption {
+	return func(cfg *shantenConfig) {
+		cfg.allowedExtraTiles = n
+	}
+}
+
+func UpperBound(n int) shantenOption {
+	return func(cfg *shantenConfig) {
+		cfg.upperbound = n
+	}
+}
+
 // AnalyzeShanten calculates the shanten number and the list of Goal for the given PaiSet.
 // When the list of Goal is empty, [InfinityShanten] is returned as the shanten number.
 // It does not consider Seven Pairs or Thirteen Orphans.
-func AnalyzeShanten(hand *hand.Hand) (int, []Goal) {
-	return AnalyzeShantenWithOption(hand, 0, MaxShantenNumber)
-}
+func AnalyzeShanten(hand *hand.Hand, opts ...shantenOption) (int, []Goal) {
+	cfg := &shantenConfig{
+		allowedExtraTiles: 0,
+		upperbound:        MaxShantenNumber,
+	}
 
-func AnalyzeShantenWithOption(hand *hand.Hand, allowedExtraTiles int, upperbound int) (int, []Goal) {
+	for _, opt := range opts {
+		opt(cfg)
+	}
+
 	tc34 := hand.ToTileCounts34()
 
 	sum := 0
@@ -94,12 +118,12 @@ func AnalyzeShantenWithOption(hand *hand.Hand, allowedExtraTiles int, upperbound
 		-1,
 		numRequiredBlocks,
 		0,
-		upperbound,
+		cfg.upperbound,
 		blocks,
 		&allGoals,
-		allowedExtraTiles,
+		cfg.allowedExtraTiles,
 	)
-	newUpperbound := min(shanten+allowedExtraTiles, upperbound)
+	newUpperbound := min(shanten+cfg.allowedExtraTiles, cfg.upperbound)
 
 	// Filter out the goals that exceed newUpperbound
 	goals := make([]Goal, 0, len(allGoals))
