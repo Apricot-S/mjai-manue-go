@@ -46,7 +46,7 @@ var (
 		ps := [tile.NumTileType34]block.Block{}
 		for i := range tile.NumTileType34 {
 			t := tile.MustTileFromID(i)
-			ps[i], _ = block.NewPair(*t)
+			ps[i] = block.MustPair(*t)
 		}
 		return ps
 	}()
@@ -55,13 +55,13 @@ var (
 		ms := [tile.NumTileType34 + numChows]block.Block{}
 		for i := range tile.NumTileType34 {
 			t := tile.MustTileFromID(i)
-			ms[i], _ = block.NewTriplet(*t)
+			ms[i] = block.MustTriplet(*t)
 		}
 
 		for chowID := range numChows {
 			i := chowStartIDs[chowID]
 			t := tile.MustTileFromID(i)
-			ms[chowID+tile.NumTileType34], _ = block.NewSequence(*t)
+			ms[chowID+tile.NumTileType34] = block.MustSequence(*t)
 		}
 		return ms
 	}()

@@ -27,6 +27,14 @@ func NewSequence(t tile.Tile) (*Sequence, error) {
 	return &Sequence{tiles: [3]tile.Tile{t, *t.Next(1), *t.Next(2)}}, nil
 }
 
+func MustSequence(t tile.Tile) *Sequence {
+	s, err := NewSequence(t)
+	if err != nil {
+		panic(err)
+	}
+	return s
+}
+
 func (p *Sequence) ToTiles() []tile.Tile {
 	return p.tiles[:]
 }
@@ -43,6 +51,14 @@ func NewTriplet(t tile.Tile) (*Triplet, error) {
 		return nil, fmt.Errorf("cannot create triplet from red five")
 	}
 	return &Triplet{tiles: [3]tile.Tile{t, t, t}}, nil
+}
+
+func MustTriplet(t tile.Tile) *Triplet {
+	tp, err := NewTriplet(t)
+	if err != nil {
+		panic(err)
+	}
+	return tp
 }
 
 func (p *Triplet) ToTiles() []tile.Tile {
@@ -63,6 +79,14 @@ func NewQuad(t tile.Tile) (*Quad, error) {
 	return &Quad{tiles: [4]tile.Tile{t, t, t, t}}, nil
 }
 
+func MustQuad(t tile.Tile) *Quad {
+	q, err := NewQuad(t)
+	if err != nil {
+		panic(err)
+	}
+	return q
+}
+
 func (p *Quad) ToTiles() []tile.Tile {
 	return p.tiles[:]
 }
@@ -79,6 +103,14 @@ func NewPair(t tile.Tile) (*Pair, error) {
 		return nil, fmt.Errorf("cannot create pair from red five")
 	}
 	return &Pair{tiles: [2]tile.Tile{t, t}}, nil
+}
+
+func MustPair(t tile.Tile) *Pair {
+	p, err := NewPair(t)
+	if err != nil {
+		panic(err)
+	}
+	return p
 }
 
 func (p *Pair) ToTiles() []tile.Tile {
