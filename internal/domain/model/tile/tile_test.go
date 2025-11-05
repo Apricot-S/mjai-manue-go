@@ -449,6 +449,12 @@ func TestTile_Next(t *testing.T) {
 			n:    -2,
 			want: tile.MustTileFromCode("1m"),
 		},
+		{
+			name: "1 next of 5r is 6",
+			code: "5pr",
+			n:    1,
+			want: tile.MustTileFromCode("6p"),
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -456,6 +462,82 @@ func TestTile_Next(t *testing.T) {
 			got := ti.Next(tt.n)
 			if !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("Next() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestTile_AddRed(t *testing.T) {
+	tests := []struct {
+		name string
+		code string
+		want *tile.Tile
+	}{
+		{
+			name: "unknown will not be red",
+			code: "?",
+			want: tile.MustTileFromCode("?"),
+		},
+		{
+			name: "suits other than 5 will not be red",
+			code: "4s",
+			want: tile.MustTileFromCode("4s"),
+		},
+		{
+			name: "red 5 stays red",
+			code: "5sr",
+			want: tile.MustTileFromCode("5sr"),
+		},
+		{
+			name: "normal 5 becomes red 5",
+			code: "5s",
+			want: tile.MustTileFromCode("5sr"),
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			ti := tile.MustTileFromCode(tt.code)
+			got := ti.AddRed()
+			if *got != *tt.want {
+				t.Errorf("AddRed() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestTile_RemoveRed(t *testing.T) {
+	tests := []struct {
+		name string
+		code string
+		want *tile.Tile
+	}{
+		{
+			name: "no change unknown",
+			code: "?",
+			want: tile.MustTileFromCode("?"),
+		},
+		{
+			name: "no change except for 5 suits",
+			code: "4s",
+			want: tile.MustTileFromCode("4s"),
+		},
+		{
+			name: "normal 5 stays normal",
+			code: "5m",
+			want: tile.MustTileFromCode("5m"),
+		},
+		{
+			name: "red 5 becomes normal 5",
+			code: "5mr",
+			want: tile.MustTileFromCode("5m"),
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			ti := tile.MustTileFromCode(tt.code)
+			got := ti.RemoveRed()
+			if *got != *tt.want {
+				t.Errorf("RemoveRed() = %v, want %v", got, tt.want)
 			}
 		})
 	}

@@ -155,6 +155,32 @@ func (t *Tile) Next(n int) *Tile {
 		return nil
 	}
 
-	nextID := t.ID() - t.Number() + nextNumber
+	nextID := t.RemoveRed().ID() - t.Number() + nextNumber
 	return MustTileFromID(nextID)
+}
+
+func (t *Tile) AddRed() *Tile {
+	switch t.ID() {
+	case 4:
+		return MustTileFromID(minRedID)
+	case 13:
+		return MustTileFromID(minRedID + 1)
+	case 22:
+		return MustTileFromID(minRedID + 2)
+	default:
+		return t
+	}
+}
+
+func (t *Tile) RemoveRed() *Tile {
+	switch t.ID() {
+	case minRedID:
+		return MustTileFromID(4)
+	case minRedID + 1:
+		return MustTileFromID(13)
+	case minRedID + 2:
+		return MustTileFromID(22)
+	default:
+		return t
+	}
 }
