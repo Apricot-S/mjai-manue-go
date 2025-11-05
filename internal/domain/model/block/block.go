@@ -6,17 +6,26 @@ import (
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/model/tile"
 )
 
-type BlockType int
-
-// const (
-// 	Sequence BlockType = iota + 1
-// 	Triplet
-// 	Quad
-// 	Pair
-// )
-
 type Block interface {
 	ToTiles() []tile.Tile
+}
+
+type Sequence struct {
+	tiles []tile.Tile
+}
+
+func NewSequence(t tile.Tile) (*Sequence, error) {
+	if !t.IsSuits() {
+		return nil, fmt.Errorf("cannot create sequence from honors or unknown tile: %s", t.Code())
+	}
+	if t.IsRed() {
+		return nil, fmt.Errorf("cannot create sequence from red five")
+	}
+	return &Sequence{tiles: []tile.Tile{t, t, t}}, nil
+}
+
+func (p *Sequence) ToTiles() []tile.Tile {
+	return p.tiles
 }
 
 type Triplet struct {
