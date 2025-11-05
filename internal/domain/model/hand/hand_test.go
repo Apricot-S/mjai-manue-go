@@ -95,7 +95,7 @@ func TestNewHand(t *testing.T) {
 				t.Fatal("NewHand() succeeded unexpectedly")
 			}
 			if !reflect.DeepEqual(got.ToTiles(), tt.tiles) {
-				t.Errorf("NewHand() = %v, want %v", got, tt.want)
+				t.Errorf("NewHand().ToTiles() = %v, want %v", got, tt.want)
 			}
 		})
 	}
