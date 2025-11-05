@@ -17,7 +17,6 @@ type BlockType int
 
 type Block interface {
 	ToTiles() []tile.Tile
-	ToString() string
 }
 
 type Pair struct {
