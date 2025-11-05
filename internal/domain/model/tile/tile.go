@@ -134,11 +134,11 @@ func (t *Tile) IsRed() bool {
 }
 
 func (t *Tile) IsSuits() bool {
-	return t.id < minHonorsID || t.IsRed()
+	return !t.IsHonors() && !t.IsUnknown()
 }
 
 func (t *Tile) IsHonors() bool {
-	return !t.IsSuits() && !t.IsUnknown()
+	return t.Color() == HonorsColor
 }
 
 func (t *Tile) IsUnknown() bool {
