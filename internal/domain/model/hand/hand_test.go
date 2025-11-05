@@ -40,7 +40,7 @@ func TestNewHand(t *testing.T) {
 			wantErr: false,
 		},
 		{
-			name:    "hand can contain two red fives",
+			name:    "hand cannot contain two red fives",
 			tiles:   []tile.Tile{*tile.MustTileFromCode("5mr"), *tile.MustTileFromCode("5mr")},
 			want:    nil,
 			wantErr: true,
