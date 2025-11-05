@@ -16,6 +16,12 @@ func TestNewSequence(t *testing.T) {
 		wantErr bool
 	}{
 		{
+			name:    "cannot create sequence starting with 8",
+			tile:    *tile.MustTileFromCode("8m"),
+			want:    nil,
+			wantErr: true,
+		},
+		{
 			name:    "cannot create sequence from honors",
 			tile:    *tile.MustTileFromCode("C"),
 			want:    nil,

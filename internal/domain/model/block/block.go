@@ -21,6 +21,9 @@ func NewSequence(t tile.Tile) (*Sequence, error) {
 	if t.IsRed() {
 		return nil, fmt.Errorf("cannot create sequence from red five")
 	}
+	if t.Number() > 7 {
+		return nil, fmt.Errorf("cannot create sequence starting with 8 or 9: %s", t.Code())
+	}
 	return &Sequence{tiles: []tile.Tile{t, t, t}}, nil
 }
 
