@@ -155,7 +155,7 @@ func (t *Tile) Next(n int) *Tile {
 		return nil
 	}
 
-	nextID := t.RemoveRed().ID() - t.Number() + nextNumber
+	nextID := t.RemoveRed().ID() + n
 	return MustTileFromID(nextID)
 }
 
