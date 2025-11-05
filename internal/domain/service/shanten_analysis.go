@@ -286,8 +286,6 @@ func AnalyzeShantenChitoitsu(hand *hand.Hand) int {
 	return shanten
 }
 
-var yaochuhaiIndices = [13]int{0, 8, 9, 17, 18, 26, 27, 28, 29, 30, 31, 32, 33}
-
 func AnalyzeShantenKokushimuso(hand *hand.Hand) int {
 	tc34 := hand.ToTileCounts34()
 
@@ -302,7 +300,7 @@ func AnalyzeShantenKokushimuso(hand *hand.Hand) int {
 
 	numKinds := 0
 	hasPair := 0
-	for _, i := range yaochuhaiIndices {
+	for _, i := range tile.YaochuhaiIDs {
 		if tc34[i] >= 1 {
 			numKinds++
 		}

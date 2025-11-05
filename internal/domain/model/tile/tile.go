@@ -20,6 +20,8 @@ const SouzuColor = 's'
 const HonorsColor = 't'
 const UnknownColor = '?'
 
+var YaochuhaiIDs = [13]int{0, 8, 9, 17, 18, 26, 27, 28, 29, 30, 31, 32, 33}
+
 const minTileID = 0
 
 const minSuitsID = minTileID
