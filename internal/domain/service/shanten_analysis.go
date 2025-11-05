@@ -31,16 +31,32 @@ const (
 	InfinityShanten  = math.MaxInt
 	MaxShantenNumber = 8
 
-	numChows = 7 * 3
+	numChowTypes = 7 * 3
+	numMeldTypes = tile.NumTileType34 + numChowTypes
 )
 
 var (
 	// chowStartIDs is a set of IDs of first tile in Chow.
-	chowStartIDs = [numChows]int{
+	chowStartIDs = [numChowTypes]int{
 		0, 1, 2, 3, 4, 5, 6,
 		9, 10, 11, 12, 13, 14, 15,
 		18, 19, 20, 21, 22, 23, 24,
 	}
+
+	allMelds [numMeldTypes]block.Block = func() [numMeldTypes]block.Block {
+		ms := [numMeldTypes]block.Block{}
+		for i := range tile.NumTileType34 {
+			t := tile.MustTileFromID(i)
+			ms[i] = block.MustTriplet(*t)
+		}
+
+		for chowID := range numChowTypes {
+			i := chowStartIDs[chowID]
+			t := tile.MustTileFromID(i)
+			ms[chowID+tile.NumTileType34] = block.MustSequence(*t)
+		}
+		return ms
+	}()
 
 	allPairs [tile.NumTileType34]block.Block = func() [tile.NumTileType34]block.Block {
 		ps := [tile.NumTileType34]block.Block{}
@@ -49,21 +65,6 @@ var (
 			ps[i] = block.MustPair(*t)
 		}
 		return ps
-	}()
-
-	allMelds [tile.NumTileType34 + numChows]block.Block = func() [tile.NumTileType34 + numChows]block.Block {
-		ms := [tile.NumTileType34 + numChows]block.Block{}
-		for i := range tile.NumTileType34 {
-			t := tile.MustTileFromID(i)
-			ms[i] = block.MustTriplet(*t)
-		}
-
-		for chowID := range numChows {
-			i := chowStartIDs[chowID]
-			t := tile.MustTileFromID(i)
-			ms[chowID+tile.NumTileType34] = block.MustSequence(*t)
-		}
-		return ms
 	}()
 )
 
@@ -200,7 +201,7 @@ func analyzeShantenInternal(
 
 	// Add Chows
 	startChowID := max(minMeldID-tile.NumTileType34, 0)
-	for chowID := startChowID; chowID < numChows; chowID++ {
+	for chowID := startChowID; chowID < numChowTypes; chowID++ {
 		i := chowStartIDs[chowID]
 		if targetVector[i] >= 4 || targetVector[i+1] >= 4 || targetVector[i+2] >= 4 {
 			// Can't add a Chow
