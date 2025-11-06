@@ -35,8 +35,8 @@ func MustSequence(t tile.Tile) *Sequence {
 	return s
 }
 
-func (p *Sequence) ToTiles() []tile.Tile {
-	return p.tiles[:]
+func (s *Sequence) ToTiles() []tile.Tile {
+	return s.tiles[:]
 }
 
 type Triplet struct {
@@ -54,15 +54,15 @@ func NewTriplet(t tile.Tile) (*Triplet, error) {
 }
 
 func MustTriplet(t tile.Tile) *Triplet {
-	tp, err := NewTriplet(t)
+	tr, err := NewTriplet(t)
 	if err != nil {
 		panic(err)
 	}
-	return tp
+	return tr
 }
 
-func (p *Triplet) ToTiles() []tile.Tile {
-	return p.tiles[:]
+func (tr *Triplet) ToTiles() []tile.Tile {
+	return tr.tiles[:]
 }
 
 type Quad struct {
@@ -87,8 +87,8 @@ func MustQuad(t tile.Tile) *Quad {
 	return q
 }
 
-func (p *Quad) ToTiles() []tile.Tile {
-	return p.tiles[:]
+func (q *Quad) ToTiles() []tile.Tile {
+	return q.tiles[:]
 }
 
 type Pair struct {
