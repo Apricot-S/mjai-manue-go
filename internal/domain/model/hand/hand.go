@@ -46,6 +46,14 @@ func NewHand(tiles []tile.Tile) (*Hand, error) {
 	return &Hand{tileCounts: tileCounts}, nil
 }
 
+func MustHand(tiles []tile.Tile) *Hand {
+	h, err := NewHand(tiles)
+	if err != nil {
+		panic(err)
+	}
+	return h
+}
+
 func (h *Hand) ToTiles() []tile.Tile {
 	tiles := make([]tile.Tile, 0, maxNumTilesInHand)
 	for i, c := range h.tileCounts {
