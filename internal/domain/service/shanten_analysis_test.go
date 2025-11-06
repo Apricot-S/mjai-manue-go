@@ -212,7 +212,59 @@ func TestAnalyzeShanten(t *testing.T) {
 				t.Errorf("AnalyzeShanten() = %v, want %v", got, tt.wantShanten)
 			}
 			if len(got2) != tt.wantGoalsCount {
-				t.Errorf("AnalyzeShanten() = %v, want %v", got2, tt.wantGoalsCount)
+				t.Errorf("AnalyzeShanten() = %v, want %v", len(got2), tt.wantGoalsCount)
+			}
+		})
+	}
+}
+
+func TestAnalyzeShanten_Options(t *testing.T) {
+	tests := []struct {
+		name              string
+		codes             []string
+		allowedExtraTiles int
+		upperBound        int
+		wantShanten       int
+		wantGoalsCount    int
+	}{
+		{
+			name:              "case 1, allowedExtraTiles: 0, upperBound: 8",
+			codes:             []string{"1m", "2m", "3m", "7m", "8m", "9m", "2s", "3s", "4s", "S", "S", "S", "W"},
+			allowedExtraTiles: 0,
+			upperBound:        8,
+			wantShanten:       0,
+			wantGoalsCount:    1,
+		},
+		{
+			name:              "case 1, allowedExtraTiles: 1, upperBound: 8",
+			codes:             []string{"1m", "2m", "3m", "7m", "8m", "9m", "2s", "3s", "4s", "S", "S", "S", "W"},
+			allowedExtraTiles: 1,
+			upperBound:        8,
+			wantShanten:       0,
+			wantGoalsCount:    42,
+		},
+		{
+			name:              "case 1, allowedExtraTiles: 0, upperBound: -1",
+			codes:             []string{"1m", "2m", "3m", "7m", "8m", "9m", "2s", "3s", "4s", "S", "S", "S", "W"},
+			allowedExtraTiles: 0,
+			upperBound:        -1,
+			wantShanten:       service.InfinityShanten,
+			wantGoalsCount:    0,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			hand := codesToHand(tt.codes)
+			got, got2 := service.AnalyzeShanten(
+				hand,
+				service.AllowedExtraTiles(tt.allowedExtraTiles),
+				service.UpperBound(tt.upperBound),
+			)
+			if got != tt.wantShanten {
+				t.Errorf("AnalyzeShanten() = %v, want %v", got, tt.wantShanten)
+			}
+			if len(got2) != tt.wantGoalsCount {
+				t.Errorf("AnalyzeShanten() = %v, want %v", len(got2), tt.wantGoalsCount)
 			}
 		})
 	}
