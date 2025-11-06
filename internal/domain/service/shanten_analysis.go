@@ -107,15 +107,15 @@ func AnalyzeShanten(hand *hand.Hand, opts ...shantenOption) (int, []Goal) {
 	}
 
 	targetVector := tilecount.TileCounts34{}
-	numRequiredBlocks := min(sum/3, 4)
-	blocks := make([]block.Block, 0, numRequiredBlocks+1) // +1 for the pair
+	numRequiredMelds := min(sum/3, 4)
+	blocks := make([]block.Block, 0, numRequiredMelds+1) // +1 for the pair
 	allGoals := []Goal{}
 
 	shanten := analyzeShantenInternal(
 		tc34,
 		&targetVector,
 		-1,
-		numRequiredBlocks,
+		numRequiredMelds,
 		0,
 		cfg.upperBound,
 		blocks,
