@@ -455,6 +455,12 @@ func TestTile_Next(t *testing.T) {
 			n:    1,
 			want: tile.MustTileFromCode("6p"),
 		},
+		{
+			name: "0 next of 5r is 5",
+			code: "5pr",
+			n:    0,
+			want: tile.MustTileFromCode("5p"),
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
