@@ -17,8 +17,8 @@ type Goal struct {
 	// Shanten is the shanten number from the current hand to the winning hand.
 	// If the current hand and the winning hand are the same, it will be -1.
 	Shanten int
-	// Mentsus is a list of sets in the winning hand.
-	Mentsus []block.Block
+	// Blocks is a list of blocks in the winning hand.
+	Blocks []block.Block
 	// CountVector is the number of each tile included in the winning hand.
 	CountVector tilecount.TileCounts34
 	// RequiredVector is the number of each tile required for the winning hand.
@@ -173,7 +173,7 @@ func analyzeShantenInternal(
 				goalVector[i] += 2
 				goal := Goal{
 					Shanten:     newShanten,
-					Mentsus:     makeNewBlocks(blocks, allPairs[i]),
+					Blocks:      makeNewBlocks(blocks, allPairs[i]),
 					CountVector: goalVector,
 				}
 				*goals = append(*goals, goal)
@@ -272,10 +272,10 @@ func analyzeShantenInternal(
 	return upperbound
 }
 
-func makeNewBlocks(mentsus []block.Block, newMentsu block.Block) []block.Block {
-	newMentsus := make([]block.Block, len(mentsus), cap(mentsus))
-	copy(newMentsus, mentsus)
-	return append(newMentsus, newMentsu)
+func makeNewBlocks(blocks []block.Block, newBlock block.Block) []block.Block {
+	newBlocks := make([]block.Block, len(blocks), cap(blocks))
+	copy(newBlocks, blocks)
+	return append(newBlocks, newBlock)
 }
 
 func AnalyzeShantenChitoitsu(hand *hand.Hand) int {
