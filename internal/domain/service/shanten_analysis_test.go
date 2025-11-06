@@ -198,10 +198,16 @@ func TestAnalyzeShanten(t *testing.T) {
 			wantGoalsCount: 37,
 		},
 		{
-			name:           "can be interpreted in multiple set decompositions",
+			name:           "can be interpreted in 2 set decompositions",
 			codes:          []string{"1m", "1m", "1m", "2m", "2m", "2m", "3m", "3m", "3m", "7p", "8p", "9p", "9p", "9p"},
 			wantShanten:    -1,
 			wantGoalsCount: 2,
+		},
+		{
+			name:           "can be interpreted in 4 set decompositions",
+			codes:          []string{"3m", "3m", "3m", "4m", "4m", "4m", "5m", "5m", "5m", "6m", "6m", "6m", "7m", "7m"},
+			wantShanten:    -1,
+			wantGoalsCount: 4,
 		},
 	}
 	for _, tt := range tests {
