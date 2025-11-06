@@ -47,10 +47,10 @@ func TestNewHand(t *testing.T) {
 			wantErr: true,
 		},
 		{
-			name:    "hand cannot contain four normal fives",
+			name:    "hand can contain four normal fives",
 			tiles:   []tile.Tile{*tile.MustTileFromCode("5m"), *tile.MustTileFromCode("5m"), *tile.MustTileFromCode("5m"), *tile.MustTileFromCode("5m")},
-			want:    nil,
-			wantErr: true,
+			want:    []tile.Tile{*tile.MustTileFromCode("5m"), *tile.MustTileFromCode("5m"), *tile.MustTileFromCode("5m"), *tile.MustTileFromCode("5m")},
+			wantErr: false,
 		},
 		{
 			name: "hand can contain 14 tiles",
