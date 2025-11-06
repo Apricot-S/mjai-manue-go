@@ -50,8 +50,7 @@ var (
 			ms[i] = block.MustTriplet(*t)
 		}
 
-		for chowID := range numChowTypes {
-			i := chowStartIDs[chowID]
+		for chowID, i := range chowStartIDs {
 			t := tile.MustTileFromID(i)
 			ms[chowID+tile.NumTileType34] = block.MustSequence(*t)
 		}
