@@ -550,6 +550,56 @@ func TestTile_RemoveRed(t *testing.T) {
 	}
 }
 
+func TestTile_HasSameSymbol(t *testing.T) {
+	tests := []struct {
+		name      string
+		code      string
+		otherCode string
+		want      bool
+	}{
+		{
+			name:      "1m-1m same",
+			code:      "1m",
+			otherCode: "1m",
+			want:      true,
+		},
+		{
+			name:      "1m-1p not same",
+			code:      "1m",
+			otherCode: "1p",
+			want:      false,
+		},
+		{
+			name:      "5p-5pr same",
+			code:      "5p",
+			otherCode: "5pr",
+			want:      true,
+		},
+		{
+			name:      "?-? same",
+			code:      "?",
+			otherCode: "?",
+			want:      true,
+		},
+		{
+			name:      "1m-? not same",
+			code:      "1m",
+			otherCode: "?",
+			want:      false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			ti := tile.MustTileFromCode(tt.code)
+			other := tile.MustTileFromCode(tt.otherCode)
+			got := ti.HasSameSymbol(other)
+			if got != tt.want {
+				t.Errorf("HasSameSymbol() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
 func TestSortTiles(t *testing.T) {
 	names := [...]string{
 		"?",

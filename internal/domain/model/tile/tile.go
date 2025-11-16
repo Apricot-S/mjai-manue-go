@@ -188,6 +188,10 @@ func (t *Tile) RemoveRed() *Tile {
 	}
 }
 
+func (t *Tile) HasSameSymbol(other *Tile) bool {
+	return t.Number() == other.Number() && t.Color() == other.Color()
+}
+
 var tileSortKeyTable = [NumTileType38]int{
 	0, 1, 2, 3, 4, 6, 7, 8, 9, // m
 	10, 11, 12, 13, 14, 16, 17, 18, 19, // p
