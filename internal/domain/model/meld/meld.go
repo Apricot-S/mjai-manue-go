@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"slices"
 	"sort"
+	"strings"
 
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/model/block"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/model/tile"
@@ -20,6 +21,15 @@ type Meld interface {
 
 func isValidTarget(target int) bool {
 	return 0 <= target && target <= 3
+}
+
+func meldToString(m Meld) string {
+	consumedStrs := make([]string, len(m.Consumed()))
+	for i, t := range m.Consumed() {
+		consumedStrs[i] = t.Code()
+	}
+
+	return fmt.Sprintf("[%s(%d)/%s]", m.Taken().Code(), m.Target(), strings.Join(consumedStrs, " "))
 }
 
 type Pon struct {
@@ -86,6 +96,6 @@ func (p *Pon) ToBlock() block.Block {
 	return block.MustTriplet(p.tiles[0])
 }
 
-func ToString() string {
-	panic("")
+func (p *Pon) ToString() string {
+	return meldToString(p)
 }

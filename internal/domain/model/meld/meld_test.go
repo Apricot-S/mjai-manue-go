@@ -273,3 +273,47 @@ func TestPon_ToBlock(t *testing.T) {
 		})
 	}
 }
+
+func TestPon_ToString(t *testing.T) {
+	tests := []struct {
+		name     string
+		taken    tile.Tile
+		consumed [2]tile.Tile
+		target   int
+		want     string
+	}{
+		{
+			name:     "1m-1m1m from 1",
+			taken:    *tile.MustTileFromCode("1m"),
+			consumed: [2]tile.Tile{*tile.MustTileFromCode("1m"), *tile.MustTileFromCode("1m")},
+			target:   1,
+			want:     "[1m(1)/1m 1m]",
+		},
+		{
+			name:     "5sr-5s5s from 3",
+			taken:    *tile.MustTileFromCode("5sr"),
+			consumed: [2]tile.Tile{*tile.MustTileFromCode("5s"), *tile.MustTileFromCode("5s")},
+			target:   3,
+			want:     "[5sr(3)/5s 5s]",
+		},
+		{
+			name:     "5s-5s5sr from 3",
+			taken:    *tile.MustTileFromCode("5s"),
+			consumed: [2]tile.Tile{*tile.MustTileFromCode("5s"), *tile.MustTileFromCode("5sr")},
+			target:   3,
+			want:     "[5s(3)/5s 5sr]",
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			p, err := meld.NewPon(tt.taken, tt.consumed, tt.target)
+			if err != nil {
+				t.Fatalf("could not construct receiver type: %v", err)
+			}
+			got := p.ToString()
+			if got != tt.want {
+				t.Errorf("ToString() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
