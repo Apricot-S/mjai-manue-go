@@ -42,7 +42,7 @@ func NewPon(taken tile.Tile, consumed [2]tile.Tile, target int) (*Pon, error) {
 		taken:    taken,
 		consumed: consumed,
 		target:   target,
-		tiles:    []tile.Tile{taken, consumed[0], consumed[1]},
+		tiles:    tiles,
 	}, nil
 }
 
