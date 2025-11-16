@@ -15,7 +15,7 @@ func TestNewPon(t *testing.T) {
 		consumed     [2]tile.Tile
 		target       int
 		wantTaken    *tile.Tile
-		wantConsumed [2]tile.Tile
+		wantConsumed []tile.Tile
 		wantTarget   int
 		wantErr      bool
 	}{
@@ -25,8 +25,18 @@ func TestNewPon(t *testing.T) {
 			consumed:     [2]tile.Tile{*tile.MustTileFromCode("1p"), *tile.MustTileFromCode("1p")},
 			target:       0,
 			wantTaken:    tile.MustTileFromCode("1p"),
-			wantConsumed: [2]tile.Tile{*tile.MustTileFromCode("1p"), *tile.MustTileFromCode("1p")},
+			wantConsumed: []tile.Tile{*tile.MustTileFromCode("1p"), *tile.MustTileFromCode("1p")},
 			wantTarget:   0,
+			wantErr:      false,
+		},
+		{
+			name:         "valid target: 3",
+			taken:        *tile.MustTileFromCode("C"),
+			consumed:     [2]tile.Tile{*tile.MustTileFromCode("C"), *tile.MustTileFromCode("C")},
+			target:       3,
+			wantTaken:    tile.MustTileFromCode("C"),
+			wantConsumed: []tile.Tile{*tile.MustTileFromCode("C"), *tile.MustTileFromCode("C")},
+			wantTarget:   3,
 			wantErr:      false,
 		},
 		{
@@ -35,7 +45,7 @@ func TestNewPon(t *testing.T) {
 			consumed:     [2]tile.Tile{*tile.MustTileFromCode("1p"), *tile.MustTileFromCode("1p")},
 			target:       -1,
 			wantTaken:    tile.MustTileFromCode("1p"),
-			wantConsumed: [2]tile.Tile{*tile.MustTileFromCode("1p"), *tile.MustTileFromCode("1p")},
+			wantConsumed: []tile.Tile{*tile.MustTileFromCode("1p"), *tile.MustTileFromCode("1p")},
 			wantTarget:   -1,
 			wantErr:      true,
 		},
@@ -45,7 +55,7 @@ func TestNewPon(t *testing.T) {
 			consumed:     [2]tile.Tile{*tile.MustTileFromCode("1p"), *tile.MustTileFromCode("1p")},
 			target:       -1,
 			wantTaken:    tile.MustTileFromCode("1p"),
-			wantConsumed: [2]tile.Tile{*tile.MustTileFromCode("1p"), *tile.MustTileFromCode("1p")},
+			wantConsumed: []tile.Tile{*tile.MustTileFromCode("1p"), *tile.MustTileFromCode("1p")},
 			wantTarget:   -1,
 			wantErr:      true,
 		},
@@ -62,13 +72,13 @@ func TestNewPon(t *testing.T) {
 			if tt.wantErr {
 				t.Fatal("NewPon() succeeded unexpectedly")
 			}
-			if reflect.DeepEqual(got.Taken(), tt.wantTaken) {
+			if !reflect.DeepEqual(got.Taken(), tt.wantTaken) {
 				t.Errorf("NewPon().Taken() = %v, want %v", got.Taken(), tt.wantTaken)
 			}
-			if reflect.DeepEqual(got.Consumed(), tt.wantConsumed) {
+			if !reflect.DeepEqual(got.Consumed(), tt.wantConsumed) {
 				t.Errorf("NewPon().Consumed() = %v, want %v", got.Consumed(), tt.wantConsumed)
 			}
-			if reflect.DeepEqual(got.Target(), tt.wantTarget) {
+			if !reflect.DeepEqual(got.Target(), tt.wantTarget) {
 				t.Errorf("NewPon().Target() = %v, want %v", got.Target(), tt.wantTarget)
 			}
 		})

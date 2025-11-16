@@ -32,7 +32,12 @@ func NewPon(taken tile.Tile, consumed [2]tile.Tile, target int) (*Pon, error) {
 		return nil, fmt.Errorf("invalid target: %d", target)
 	}
 
-	panic("")
+	return &Pon{
+		taken:    taken,
+		consumed: consumed,
+		target:   target,
+		tiles:    []tile.Tile{taken, consumed[0], consumed[1]},
+	}, nil
 }
 
 func (p *Pon) Taken() *tile.Tile {
