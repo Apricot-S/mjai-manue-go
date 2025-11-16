@@ -181,9 +181,16 @@ func TestPon_ToTiles(t *testing.T) {
 			want:     []tile.Tile{*tile.MustTileFromCode("1m"), *tile.MustTileFromCode("1m"), *tile.MustTileFromCode("1m")},
 		},
 		{
-			name:     "sort tiles: 5m-5mr5m to 5m-5m5mr",
+			name:     "sort tiles: 5m-5mr5m to 5m5m5mr",
 			taken:    *tile.MustTileFromCode("5m"),
 			consumed: [2]tile.Tile{*tile.MustTileFromCode("5mr"), *tile.MustTileFromCode("5m")},
+			target:   2,
+			want:     []tile.Tile{*tile.MustTileFromCode("5m"), *tile.MustTileFromCode("5m"), *tile.MustTileFromCode("5mr")},
+		},
+		{
+			name:     "sort tiles: 5mr-5m5m to 5m5m5mr",
+			taken:    *tile.MustTileFromCode("5mr"),
+			consumed: [2]tile.Tile{*tile.MustTileFromCode("5m"), *tile.MustTileFromCode("5m")},
 			target:   2,
 			want:     []tile.Tile{*tile.MustTileFromCode("5m"), *tile.MustTileFromCode("5m"), *tile.MustTileFromCode("5mr")},
 		},
