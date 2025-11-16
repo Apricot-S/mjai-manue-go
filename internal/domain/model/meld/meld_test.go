@@ -101,14 +101,24 @@ func TestNewPon(t *testing.T) {
 			wantErr:      false,
 		},
 		{
-			name:         "valid tiles: allow 5pr-5pr5pr",
+			name:         "invalid tiles: 5pr-5p5pr",
 			taken:        *tile.MustTileFromCode("5pr"),
+			consumed:     [2]tile.Tile{*tile.MustTileFromCode("5p"), *tile.MustTileFromCode("5pr")},
+			target:       0,
+			wantTaken:    nil,
+			wantConsumed: nil,
+			wantTarget:   0,
+			wantErr:      true,
+		},
+		{
+			name:         "invalid tiles: 5p-5pr5pr",
+			taken:        *tile.MustTileFromCode("5p"),
 			consumed:     [2]tile.Tile{*tile.MustTileFromCode("5pr"), *tile.MustTileFromCode("5pr")},
 			target:       0,
-			wantTaken:    tile.MustTileFromCode("5pr"),
-			wantConsumed: []tile.Tile{*tile.MustTileFromCode("5pr"), *tile.MustTileFromCode("5pr")},
+			wantTaken:    nil,
+			wantConsumed: nil,
 			wantTarget:   0,
-			wantErr:      false,
+			wantErr:      true,
 		},
 		{
 			name:         "invalid tiles: ?",
@@ -228,7 +238,27 @@ func TestPon_ToBlock(t *testing.T) {
 		target   int
 		want     block.Block
 	}{
-		// TODO: Add test cases.
+		{
+			name:     "1m-1m1m to 1m triplet",
+			taken:    *tile.MustTileFromCode("1m"),
+			consumed: [2]tile.Tile{*tile.MustTileFromCode("1m"), *tile.MustTileFromCode("1m")},
+			target:   0,
+			want:     block.MustTriplet(*tile.MustTileFromCode("1m")),
+		},
+		{
+			name:     "5sr-5s5s to 5s triplet",
+			taken:    *tile.MustTileFromCode("5sr"),
+			consumed: [2]tile.Tile{*tile.MustTileFromCode("5s"), *tile.MustTileFromCode("5s")},
+			target:   0,
+			want:     block.MustTriplet(*tile.MustTileFromCode("5s")),
+		},
+		{
+			name:     "5s-5s5sr to 5s triplet",
+			taken:    *tile.MustTileFromCode("5s"),
+			consumed: [2]tile.Tile{*tile.MustTileFromCode("5s"), *tile.MustTileFromCode("5sr")},
+			target:   0,
+			want:     block.MustTriplet(*tile.MustTileFromCode("5s")),
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -237,8 +267,7 @@ func TestPon_ToBlock(t *testing.T) {
 				t.Fatalf("could not construct receiver type: %v", err)
 			}
 			got := p.ToBlock()
-			// TODO: update the condition below to compare got with tt.want.
-			if true {
+			if !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("ToBlock() = %v, want %v", got, tt.want)
 			}
 		})

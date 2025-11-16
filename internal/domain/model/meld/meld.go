@@ -41,6 +41,17 @@ func NewPon(taken tile.Tile, consumed [2]tile.Tile, target int) (*Pon, error) {
 	if slices.ContainsFunc(tiles, func(t tile.Tile) bool { return !taken.HasSameSymbol(&t) }) {
 		return nil, fmt.Errorf("mismatch taken: %+v, consumed: %+v", taken, consumed)
 	}
+
+	numRed := 0
+	for _, t := range tiles {
+		if t.IsRed() {
+			numRed++
+		}
+	}
+	if numRed > 1 {
+		return nil, fmt.Errorf("cannot use 2 or more red fives for Pon; taken: %+v, consumed: %+v", taken, consumed)
+	}
+
 	sort.Sort(tiles)
 
 	csm := tile.Tiles(consumed[:])
@@ -71,7 +82,8 @@ func (p *Pon) ToTiles() []tile.Tile {
 }
 
 func (p *Pon) ToBlock() block.Block {
-	panic("")
+	// Red five is sorted after normal, so RemoveRed() is not necessary.
+	return block.MustTriplet(p.tiles[0])
 }
 
 func ToString() string {
