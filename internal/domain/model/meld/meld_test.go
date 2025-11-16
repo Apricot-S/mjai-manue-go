@@ -4,6 +4,7 @@ import (
 	"reflect"
 	"testing"
 
+	"github.com/Apricot-S/mjai-manue-go/internal/domain/model/block"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/model/meld"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/model/tile"
 )
@@ -96,6 +97,16 @@ func TestNewPon(t *testing.T) {
 			target:       0,
 			wantTaken:    tile.MustTileFromCode("5p"),
 			wantConsumed: []tile.Tile{*tile.MustTileFromCode("5p"), *tile.MustTileFromCode("5pr")},
+			wantTarget:   0,
+			wantErr:      false,
+		},
+		{
+			name:         "valid tiles: allow 5pr-5pr5pr",
+			taken:        *tile.MustTileFromCode("5pr"),
+			consumed:     [2]tile.Tile{*tile.MustTileFromCode("5pr"), *tile.MustTileFromCode("5pr")},
+			target:       0,
+			wantTaken:    tile.MustTileFromCode("5pr"),
+			wantConsumed: []tile.Tile{*tile.MustTileFromCode("5pr"), *tile.MustTileFromCode("5pr")},
 			wantTarget:   0,
 			wantErr:      false,
 		},
@@ -204,6 +215,31 @@ func TestPon_ToTiles(t *testing.T) {
 			got := p.ToTiles()
 			if !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("ToTiles() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestPon_ToBlock(t *testing.T) {
+	tests := []struct {
+		name     string
+		taken    tile.Tile
+		consumed [2]tile.Tile
+		target   int
+		want     block.Block
+	}{
+		// TODO: Add test cases.
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			p, err := meld.NewPon(tt.taken, tt.consumed, tt.target)
+			if err != nil {
+				t.Fatalf("could not construct receiver type: %v", err)
+			}
+			got := p.ToBlock()
+			// TODO: update the condition below to compare got with tt.want.
+			if true {
+				t.Errorf("ToBlock() = %v, want %v", got, tt.want)
 			}
 		})
 	}
