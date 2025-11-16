@@ -1,0 +1,102 @@
+package meld_test
+
+import (
+	"reflect"
+	"testing"
+
+	"github.com/Apricot-S/mjai-manue-go/internal/domain/model/meld"
+	"github.com/Apricot-S/mjai-manue-go/internal/domain/model/tile"
+)
+
+func TestNewPon(t *testing.T) {
+	tests := []struct {
+		name         string
+		taken        tile.Tile
+		consumed     [2]tile.Tile
+		target       int
+		wantTaken    *tile.Tile
+		wantConsumed [2]tile.Tile
+		wantTarget   int
+		wantErr      bool
+	}{
+		{
+			name:         "valid target: 0",
+			taken:        *tile.MustTileFromCode("1p"),
+			consumed:     [2]tile.Tile{*tile.MustTileFromCode("1p"), *tile.MustTileFromCode("1p")},
+			target:       0,
+			wantTaken:    tile.MustTileFromCode("1p"),
+			wantConsumed: [2]tile.Tile{*tile.MustTileFromCode("1p"), *tile.MustTileFromCode("1p")},
+			wantTarget:   0,
+			wantErr:      false,
+		},
+		{
+			name:         "invalid target: -1",
+			taken:        *tile.MustTileFromCode("1p"),
+			consumed:     [2]tile.Tile{*tile.MustTileFromCode("1p"), *tile.MustTileFromCode("1p")},
+			target:       -1,
+			wantTaken:    tile.MustTileFromCode("1p"),
+			wantConsumed: [2]tile.Tile{*tile.MustTileFromCode("1p"), *tile.MustTileFromCode("1p")},
+			wantTarget:   -1,
+			wantErr:      true,
+		},
+		{
+			name:         "invalid target: 4",
+			taken:        *tile.MustTileFromCode("1p"),
+			consumed:     [2]tile.Tile{*tile.MustTileFromCode("1p"), *tile.MustTileFromCode("1p")},
+			target:       -1,
+			wantTaken:    tile.MustTileFromCode("1p"),
+			wantConsumed: [2]tile.Tile{*tile.MustTileFromCode("1p"), *tile.MustTileFromCode("1p")},
+			wantTarget:   -1,
+			wantErr:      true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, gotErr := meld.NewPon(tt.taken, tt.consumed, tt.target)
+			if gotErr != nil {
+				if !tt.wantErr {
+					t.Errorf("NewPon() failed: %v", gotErr)
+				}
+				return
+			}
+			if tt.wantErr {
+				t.Fatal("NewPon() succeeded unexpectedly")
+			}
+			if reflect.DeepEqual(got.Taken(), tt.wantTaken) {
+				t.Errorf("NewPon().Taken() = %v, want %v", got.Taken(), tt.wantTaken)
+			}
+			if reflect.DeepEqual(got.Consumed(), tt.wantConsumed) {
+				t.Errorf("NewPon().Consumed() = %v, want %v", got.Consumed(), tt.wantConsumed)
+			}
+			if reflect.DeepEqual(got.Target(), tt.wantTarget) {
+				t.Errorf("NewPon().Target() = %v, want %v", got.Target(), tt.wantTarget)
+			}
+		})
+	}
+}
+
+func TestPon_ToTiles(t *testing.T) {
+	tests := []struct {
+		name string // description of this test case
+		// Named input parameters for receiver constructor.
+		taken    tile.Tile
+		consumed [2]tile.Tile
+		target   int
+		want     []tile.Tile
+	}{
+		// TODO: Add test cases.
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			p, err := meld.NewPon(tt.taken, tt.consumed, tt.target)
+			if err != nil {
+				t.Fatalf("could not construct receiver type: %v", err)
+			}
+			got := p.ToTiles()
+			// TODO: update the condition below to compare got with tt.want.
+			if true {
+				t.Errorf("ToTiles() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
