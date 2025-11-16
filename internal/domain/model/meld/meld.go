@@ -36,7 +36,7 @@ func NewPon(taken tile.Tile, consumed [2]tile.Tile, target int) (*Pon, error) {
 
 	tiles := tile.Tiles{taken, consumed[0], consumed[1]}
 	if slices.ContainsFunc(tiles, func(t tile.Tile) bool { return t.IsUnknown() }) {
-		return nil, fmt.Errorf("? cannot use for Pon")
+		return nil, fmt.Errorf("unknown tile cannot use for Pon")
 	}
 	if slices.IndexFunc(tiles, func(t tile.Tile) bool { return !taken.HasSameSymbol(&t) }) != -1 {
 		return nil, fmt.Errorf("mismatch taken: %+v, consumed: %+v", taken, consumed)
