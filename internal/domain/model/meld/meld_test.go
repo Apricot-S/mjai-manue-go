@@ -167,14 +167,26 @@ func TestNewPon(t *testing.T) {
 
 func TestPon_ToTiles(t *testing.T) {
 	tests := []struct {
-		name string // description of this test case
-		// Named input parameters for receiver constructor.
+		name     string
 		taken    tile.Tile
 		consumed [2]tile.Tile
 		target   int
 		want     []tile.Tile
 	}{
-		// TODO: Add test cases.
+		{
+			name:     "1m-1m1m",
+			taken:    *tile.MustTileFromCode("1m"),
+			consumed: [2]tile.Tile{*tile.MustTileFromCode("1m"), *tile.MustTileFromCode("1m")},
+			target:   0,
+			want:     []tile.Tile{*tile.MustTileFromCode("1m"), *tile.MustTileFromCode("1m"), *tile.MustTileFromCode("1m")},
+		},
+		{
+			name:     "sort tiles: 5m-5mr5m to 5m-5m5mr",
+			taken:    *tile.MustTileFromCode("5m"),
+			consumed: [2]tile.Tile{*tile.MustTileFromCode("5mr"), *tile.MustTileFromCode("5m")},
+			target:   2,
+			want:     []tile.Tile{*tile.MustTileFromCode("5m"), *tile.MustTileFromCode("5m"), *tile.MustTileFromCode("5mr")},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -183,8 +195,7 @@ func TestPon_ToTiles(t *testing.T) {
 				t.Fatalf("could not construct receiver type: %v", err)
 			}
 			got := p.ToTiles()
-			// TODO: update the condition below to compare got with tt.want.
-			if true {
+			if !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("ToTiles() = %v, want %v", got, tt.want)
 			}
 		})
