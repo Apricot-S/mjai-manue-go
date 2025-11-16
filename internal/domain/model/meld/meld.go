@@ -23,6 +23,16 @@ func isValidTarget(target int) bool {
 	return 0 <= target && target <= 3
 }
 
+func countRed(tiles []tile.Tile) int {
+	numRed := 0
+	for _, t := range tiles {
+		if t.IsRed() {
+			numRed++
+		}
+	}
+	return numRed
+}
+
 func meldToString(m Meld) string {
 	consumedStrs := make([]string, len(m.Consumed()))
 	for i, t := range m.Consumed() {
@@ -51,14 +61,7 @@ func NewPon(taken tile.Tile, consumed [2]tile.Tile, target int) (*Pon, error) {
 	if slices.ContainsFunc(tiles, func(t tile.Tile) bool { return !taken.HasSameSymbol(&t) }) {
 		return nil, fmt.Errorf("mismatch taken: %+v, consumed: %+v", taken, consumed)
 	}
-
-	numRed := 0
-	for _, t := range tiles {
-		if t.IsRed() {
-			numRed++
-		}
-	}
-	if numRed > 1 {
+	if countRed(tiles) > 1 {
 		return nil, fmt.Errorf("cannot use 2 or more red fives for Pon; taken: %+v, consumed: %+v", taken, consumed)
 	}
 
