@@ -2,6 +2,7 @@ package meld
 
 import (
 	"fmt"
+	"slices"
 
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/model/block"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/model/tile"
@@ -30,6 +31,11 @@ type Pon struct {
 func NewPon(taken tile.Tile, consumed [2]tile.Tile, target int) (*Pon, error) {
 	if !isValidTarget(target) {
 		return nil, fmt.Errorf("invalid target: %d", target)
+	}
+
+	tiles := tile.Tiles{taken, consumed[0], consumed[1]}
+	if slices.ContainsFunc(tiles, func(t tile.Tile) bool { return t.IsUnknown() }) {
+		return nil, fmt.Errorf("? cannot use for Pon")
 	}
 
 	return &Pon{
