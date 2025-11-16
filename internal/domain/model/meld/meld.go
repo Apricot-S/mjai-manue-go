@@ -3,6 +3,7 @@ package meld
 import (
 	"fmt"
 	"slices"
+	"sort"
 
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/model/block"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/model/tile"
@@ -37,10 +38,17 @@ func NewPon(taken tile.Tile, consumed [2]tile.Tile, target int) (*Pon, error) {
 	if slices.ContainsFunc(tiles, func(t tile.Tile) bool { return t.IsUnknown() }) {
 		return nil, fmt.Errorf("? cannot use for Pon")
 	}
+	if slices.IndexFunc(tiles, func(t tile.Tile) bool { return !taken.HasSameSymbol(&t) }) != -1 {
+		return nil, fmt.Errorf("mismatch taken: %+v, consumed: %+v", taken, consumed)
+	}
+	sort.Sort(tiles)
+
+	csm := tile.Tiles(consumed[:])
+	sort.Sort(csm)
 
 	return &Pon{
 		taken:    taken,
-		consumed: consumed,
+		consumed: [2]tile.Tile(csm),
 		target:   target,
 		tiles:    tiles,
 	}, nil
