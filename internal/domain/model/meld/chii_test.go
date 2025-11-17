@@ -174,3 +174,47 @@ func TestNewChii(t *testing.T) {
 		})
 	}
 }
+
+func TestChii_ToTiles(t *testing.T) {
+	tests := []struct {
+		name     string
+		taken    tile.Tile
+		consumed [2]tile.Tile
+		target   int
+		want     []tile.Tile
+	}{
+		{
+			name:     "1-23m",
+			taken:    *tile.MustTileFromCode("1m"),
+			consumed: [2]tile.Tile{*tile.MustTileFromCode("2m"), *tile.MustTileFromCode("3m")},
+			target:   0,
+			want:     []tile.Tile{*tile.MustTileFromCode("1m"), *tile.MustTileFromCode("2m"), *tile.MustTileFromCode("3m")},
+		},
+		{
+			name:     "5r-46p",
+			taken:    *tile.MustTileFromCode("5pr"),
+			consumed: [2]tile.Tile{*tile.MustTileFromCode("4p"), *tile.MustTileFromCode("6p")},
+			target:   0,
+			want:     []tile.Tile{*tile.MustTileFromCode("4p"), *tile.MustTileFromCode("5pr"), *tile.MustTileFromCode("6p")},
+		},
+		{
+			name:     "6-5r4p",
+			taken:    *tile.MustTileFromCode("6p"),
+			consumed: [2]tile.Tile{*tile.MustTileFromCode("5pr"), *tile.MustTileFromCode("4p")},
+			target:   0,
+			want:     []tile.Tile{*tile.MustTileFromCode("4p"), *tile.MustTileFromCode("5pr"), *tile.MustTileFromCode("6p")},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			c, err := meld.NewChii(tt.taken, tt.consumed, tt.target)
+			if err != nil {
+				t.Fatalf("could not construct receiver type: %v", err)
+			}
+			got := c.ToTiles()
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("ToTiles() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
