@@ -228,11 +228,11 @@ func TestCalledKan_ToTiles(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			p, err := meld.NewCalledKan(tt.taken, tt.consumed, tt.target)
+			k, err := meld.NewCalledKan(tt.taken, tt.consumed, tt.target)
 			if err != nil {
 				t.Fatalf("could not construct receiver type: %v", err)
 			}
-			got := p.ToTiles()
+			got := k.ToTiles()
 			if !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("ToTiles() = %v, want %v", got, tt.want)
 			}
@@ -272,11 +272,11 @@ func TestCalledKan_ToBlock(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			p, err := meld.NewCalledKan(tt.taken, tt.consumed, tt.target)
+			k, err := meld.NewCalledKan(tt.taken, tt.consumed, tt.target)
 			if err != nil {
 				t.Fatalf("could not construct receiver type: %v", err)
 			}
-			got := p.ToBlock()
+			got := k.ToBlock()
 			if !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("ToBlock() = %v, want %v", got, tt.want)
 			}
@@ -316,11 +316,11 @@ func TestCalledKan_ToString(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			p, err := meld.NewCalledKan(tt.taken, tt.consumed, tt.target)
+			k, err := meld.NewCalledKan(tt.taken, tt.consumed, tt.target)
 			if err != nil {
 				t.Fatalf("could not construct receiver type: %v", err)
 			}
-			got := p.ToString()
+			got := k.ToString()
 			if got != tt.want {
 				t.Errorf("ToString() = %v, want %v", got, tt.want)
 			}
