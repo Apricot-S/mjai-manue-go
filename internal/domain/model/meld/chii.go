@@ -35,6 +35,7 @@ func NewChii(taken tile.Tile, consumed [2]tile.Tile, target int) (*Chii, error) 
 	}
 
 	csm := tile.Tiles(consumed[:])
+	sort.Sort(csm)
 
 	return &Chii{
 		taken:    taken,

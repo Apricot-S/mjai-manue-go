@@ -139,6 +139,16 @@ func TestNewChii(t *testing.T) {
 			wantTarget:   0,
 			wantErr:      true,
 		},
+		{
+			name:         "sort tiles: 8-97s to 8-79s",
+			taken:        *tile.MustTileFromCode("8s"),
+			consumed:     [2]tile.Tile{*tile.MustTileFromCode("9s"), *tile.MustTileFromCode("7s")},
+			target:       3,
+			wantTaken:    tile.MustTileFromCode("8s"),
+			wantConsumed: []tile.Tile{*tile.MustTileFromCode("7s"), *tile.MustTileFromCode("9s")},
+			wantTarget:   3,
+			wantErr:      false,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
