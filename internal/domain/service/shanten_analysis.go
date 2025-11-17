@@ -101,13 +101,8 @@ func AnalyzeShanten(hand *hand.Hand, opts ...shantenOption) (int, []Goal) {
 
 	tc34 := hand.ToTileCounts34()
 
-	sum := 0
-	for _, c := range tc34 {
-		sum += c
-	}
-
 	targetVector := tilecount.TileCounts34{}
-	numRequiredMelds := min(sum/3, 4)
+	numRequiredMelds := min(tc34.NumTiles()/3, 4)
 	blocks := make([]block.Block, 0, numRequiredMelds+1) // +1 for the pair
 	allGoals := []Goal{}
 
@@ -281,12 +276,7 @@ func makeNewBlocks(blocks []block.Block, newBlock block.Block) []block.Block {
 func AnalyzeShantenChitoitsu(hand *hand.Hand) int {
 	tc34 := hand.ToTileCounts34()
 
-	sum := 0
-	for _, c := range tc34 {
-		sum += c
-	}
-
-	if sum < 13 {
+	if tc34.NumTiles() < 13 {
 		return InfinityShanten
 	}
 
@@ -312,12 +302,7 @@ func AnalyzeShantenChitoitsu(hand *hand.Hand) int {
 func AnalyzeShantenKokushimuso(hand *hand.Hand) int {
 	tc34 := hand.ToTileCounts34()
 
-	sum := 0
-	for _, c := range tc34 {
-		sum += c
-	}
-
-	if sum < 13 {
+	if tc34.NumTiles() < 13 {
 		return InfinityShanten
 	}
 
