@@ -9,11 +9,20 @@ import (
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/model/tile"
 )
 
+type chiiType int
+
+const (
+	chiiTypeLow chiiType = iota + 1
+	chiiTypeMiddle
+	chiiTypeHigh
+)
+
 type Chii struct {
 	taken    tile.Tile
 	consumed [2]tile.Tile
 	target   int
 	tiles    []tile.Tile
+	ty       chiiType
 }
 
 func NewChii(taken tile.Tile, consumed [2]tile.Tile, target int) (*Chii, error) {
@@ -37,11 +46,22 @@ func NewChii(taken tile.Tile, consumed [2]tile.Tile, target int) (*Chii, error) 
 	csm := tile.Tiles(consumed[:])
 	sort.Sort(csm)
 
+	var ty chiiType
+	switch {
+	case taken.HasSameSymbol(&tiles[0]):
+		ty = chiiTypeLow
+	case taken.HasSameSymbol(&tiles[1]):
+		ty = chiiTypeMiddle
+	case taken.HasSameSymbol(&tiles[2]):
+		ty = chiiTypeHigh
+	}
+
 	return &Chii{
 		taken:    taken,
 		consumed: [2]tile.Tile(csm),
 		target:   target,
 		tiles:    tiles,
+		ty:       ty,
 	}, nil
 }
 
