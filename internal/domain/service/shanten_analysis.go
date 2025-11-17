@@ -87,7 +87,7 @@ func UpperBound(n int) shantenOption {
 }
 
 // AnalyzeShanten calculates the shanten number and the list of Goal for the given PaiSet.
-// When the list of Goal is empty, [InfinityShanten] is returned as the shanten number.
+// When the list of Goal is empty, `InfinityShanten` is returned as the shanten number.
 // It does not consider Seven Pairs or Thirteen Orphans.
 func AnalyzeShanten(hand *hand.Hand, opts ...shantenOption) (int, []Goal) {
 	cfg := &shantenConfig{
