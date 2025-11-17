@@ -270,3 +270,47 @@ func TestChii_ToBlock(t *testing.T) {
 		})
 	}
 }
+
+func TestChii_ToString(t *testing.T) {
+	tests := []struct {
+		name     string
+		taken    tile.Tile
+		consumed [2]tile.Tile
+		target   int
+		want     string
+	}{
+		{
+			name:     "1-23m from 0",
+			taken:    *tile.MustTileFromCode("1m"),
+			consumed: [2]tile.Tile{*tile.MustTileFromCode("2m"), *tile.MustTileFromCode("3m")},
+			target:   0,
+			want:     "[1m(0)/2m 3m]",
+		},
+		{
+			name:     "5r-46s from 1",
+			taken:    *tile.MustTileFromCode("5sr"),
+			consumed: [2]tile.Tile{*tile.MustTileFromCode("4s"), *tile.MustTileFromCode("6s")},
+			target:   1,
+			want:     "[5sr(1)/4s 6s]",
+		},
+		{
+			name:     "6-45pr from 2",
+			taken:    *tile.MustTileFromCode("6p"),
+			consumed: [2]tile.Tile{*tile.MustTileFromCode("4p"), *tile.MustTileFromCode("5pr")},
+			target:   2,
+			want:     "[6p(2)/4p 5pr]",
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			c, err := meld.NewChii(tt.taken, tt.consumed, tt.target)
+			if err != nil {
+				t.Fatalf("could not construct receiver type: %v", err)
+			}
+			got := c.ToString()
+			if got != tt.want {
+				t.Errorf("ToString() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
