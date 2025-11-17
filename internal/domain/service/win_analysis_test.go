@@ -3,6 +3,7 @@ package service_test
 import (
 	"testing"
 
+	"github.com/Apricot-S/mjai-manue-go/internal/domain/model/hand"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/service"
 )
 
@@ -35,7 +36,7 @@ func TestIsWinningFormChitoitsu(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			hand := codesToHand(tt.codes)
+			hand := hand.CodesToHand(tt.codes)
 			got := service.IsWinningFormChitoitsu(hand)
 			if got != tt.want {
 				t.Errorf("IsWinningFormChitoitsu() = %v, want %v", got, tt.want)
@@ -78,7 +79,7 @@ func TestIsWinningFormKokushimuso(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			hand := codesToHand(tt.codes)
+			hand := hand.CodesToHand(tt.codes)
 			got := service.IsWinningFormKokushimuso(hand)
 			if got != tt.want {
 				t.Errorf("IsWinningFormKokushimuso() = %v, want %v", got, tt.want)

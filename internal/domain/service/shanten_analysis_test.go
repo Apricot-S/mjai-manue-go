@@ -3,6 +3,7 @@ package service_test
 import (
 	"testing"
 
+	"github.com/Apricot-S/mjai-manue-go/internal/domain/model/hand"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/service"
 )
 
@@ -196,7 +197,7 @@ func TestAnalyzeShanten(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			hand := codesToHand(tt.codes)
+			hand := hand.CodesToHand(tt.codes)
 			got, got2 := service.AnalyzeShanten(hand)
 			if got != tt.wantShanten {
 				t.Errorf("AnalyzeShanten() = %v, want %v", got, tt.wantShanten)
@@ -244,7 +245,7 @@ func TestAnalyzeShanten_Options(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			hand := codesToHand(tt.codes)
+			hand := hand.CodesToHand(tt.codes)
 			got, got2 := service.AnalyzeShanten(
 				hand,
 				service.AllowedExtraTiles(tt.allowedExtraTiles),
@@ -304,7 +305,7 @@ func TestAnalyzeShantenChitoitsu(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			hand := codesToHand(tt.codes)
+			hand := hand.CodesToHand(tt.codes)
 			got := service.AnalyzeShantenChitoitsu(hand)
 			if got != tt.want {
 				t.Errorf("AnalyzeShantenChitoitsu() = %v, want %v", got, tt.want)
@@ -357,7 +358,7 @@ func TestAnalyzeShantenKokushimuso(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			hand := codesToHand(tt.codes)
+			hand := hand.CodesToHand(tt.codes)
 			got := service.AnalyzeShantenKokushimuso(hand)
 			if got != tt.want {
 				t.Errorf("AnalyzeShantenKokushimuso() = %v, want %v", got, tt.want)

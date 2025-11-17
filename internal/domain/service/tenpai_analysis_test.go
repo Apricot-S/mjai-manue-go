@@ -3,6 +3,7 @@ package service_test
 import (
 	"testing"
 
+	"github.com/Apricot-S/mjai-manue-go/internal/domain/model/hand"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/service"
 )
 
@@ -45,7 +46,7 @@ func TestIsTenpaiGeneral(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			hand := codesToHand(tt.codes)
+			hand := hand.CodesToHand(tt.codes)
 			got := service.IsTenpaiGeneral(hand)
 			if got != tt.want {
 				t.Errorf("IsTenpaiGeneral() = %v, want %v", got, tt.want)
@@ -93,7 +94,7 @@ func TestIsTenpaiAll(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			hand := codesToHand(tt.codes)
+			hand := hand.CodesToHand(tt.codes)
 			got := service.IsTenpaiAll(hand)
 			if got != tt.want {
 				t.Errorf("IsTenpaiAll() = %v, want %v", got, tt.want)
