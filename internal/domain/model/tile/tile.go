@@ -2,7 +2,6 @@ package tile
 
 import (
 	"fmt"
-	"log"
 	"slices"
 )
 
@@ -190,38 +189,4 @@ func (t *Tile) RemoveRed() *Tile {
 
 func (t *Tile) HasSameSymbol(other *Tile) bool {
 	return t.Number() == other.Number() && t.Color() == other.Color()
-}
-
-var tileSortKeyTable = [NumTileType38]int{
-	0, 1, 2, 3, 4, 6, 7, 8, 9, // m
-	10, 11, 12, 13, 14, 16, 17, 18, 19, // p
-	20, 21, 22, 23, 24, 26, 27, 28, 29, // s
-	30, 31, 32, 33, 34, 35, 36, // z
-	5, 15, 25, // red
-	37, // unknown
-}
-
-func (t *Tile) sortKey() int {
-	return tileSortKeyTable[t.ID()]
-}
-
-func (t *Tile) compareTo(other *Tile) int {
-	if other == nil {
-		log.Panic("Other tile is nil")
-	}
-	return t.sortKey() - other.sortKey()
-}
-
-type Tiles []Tile
-
-func (ts Tiles) Len() int {
-	return len(ts)
-}
-
-func (ts Tiles) Less(i, j int) bool {
-	return ts[i].compareTo(&ts[j]) < 0
-}
-
-func (ts Tiles) Swap(i, j int) {
-	ts[i], ts[j] = ts[j], ts[i]
 }
