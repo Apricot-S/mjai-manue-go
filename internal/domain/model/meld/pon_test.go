@@ -81,6 +81,16 @@ func TestNewPon(t *testing.T) {
 			wantErr:      false,
 		},
 		{
+			name:         "valid tiles: 5s-5s5s",
+			taken:        *tile.MustTileFromCode("5s"),
+			consumed:     [2]tile.Tile{*tile.MustTileFromCode("5s"), *tile.MustTileFromCode("5s")},
+			target:       0,
+			wantTaken:    tile.MustTileFromCode("5s"),
+			wantConsumed: []tile.Tile{*tile.MustTileFromCode("5s"), *tile.MustTileFromCode("5s")},
+			wantTarget:   0,
+			wantErr:      false,
+		},
+		{
 			name:         "valid tiles: 5sr-5s5s",
 			taken:        *tile.MustTileFromCode("5sr"),
 			consumed:     [2]tile.Tile{*tile.MustTileFromCode("5s"), *tile.MustTileFromCode("5s")},
