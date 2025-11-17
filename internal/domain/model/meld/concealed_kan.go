@@ -10,11 +10,11 @@ type ConcealedKan struct {
 }
 
 func NewConcealedKan(consumed [4]tile.Tile) (*ConcealedKan, error) {
-	panic("")
+	return &ConcealedKan{consumed: consumed}, nil
 }
 
 func (k *ConcealedKan) Taken() *tile.Tile {
-	panic("")
+	return nil
 }
 
 func (k *ConcealedKan) Consumed() []tile.Tile {
@@ -22,7 +22,7 @@ func (k *ConcealedKan) Consumed() []tile.Tile {
 }
 
 func (k *ConcealedKan) Target() int {
-	panic("")
+	return -1
 }
 
 func (k *ConcealedKan) ToTiles() []tile.Tile {
