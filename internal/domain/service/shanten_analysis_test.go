@@ -3,24 +3,8 @@ package service_test
 import (
 	"testing"
 
-	"github.com/Apricot-S/mjai-manue-go/internal/domain/model/hand"
-	"github.com/Apricot-S/mjai-manue-go/internal/domain/model/tile"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/service"
 )
-
-func codesToHand(codes []string) *hand.Hand {
-	tiles := make([]tile.Tile, len(codes))
-	for i, code := range codes {
-		tiles[i] = *tile.MustTileFromCode(code)
-	}
-
-	h, err := hand.NewHand(tiles)
-	if err != nil {
-		panic(err)
-	}
-
-	return h
-}
 
 func TestAnalyzeShanten(t *testing.T) {
 	tests := []struct {
