@@ -19,7 +19,16 @@ func NewChii(taken tile.Tile, consumed [2]tile.Tile, target int) (*Chii, error) 
 		return nil, fmt.Errorf("invalid target: %d", target)
 	}
 
-	panic("")
+	tiles := tile.Tiles{taken, consumed[0], consumed[1]}
+
+	csm := tile.Tiles(consumed[:])
+
+	return &Chii{
+		taken:    taken,
+		consumed: [2]tile.Tile(csm),
+		target:   target,
+		tiles:    tiles,
+	}, nil
 }
 
 func (c *Chii) Taken() *tile.Tile {

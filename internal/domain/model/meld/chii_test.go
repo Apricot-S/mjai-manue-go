@@ -20,6 +20,26 @@ func TestNewChii(t *testing.T) {
 		wantErr      bool
 	}{
 		{
+			name:         "valid target: 0",
+			taken:        *tile.MustTileFromCode("1p"),
+			consumed:     [2]tile.Tile{*tile.MustTileFromCode("2p"), *tile.MustTileFromCode("3p")},
+			target:       0,
+			wantTaken:    tile.MustTileFromCode("1p"),
+			wantConsumed: []tile.Tile{*tile.MustTileFromCode("2p"), *tile.MustTileFromCode("3p")},
+			wantTarget:   0,
+			wantErr:      false,
+		},
+		{
+			name:         "valid target: 3",
+			taken:        *tile.MustTileFromCode("7s"),
+			consumed:     [2]tile.Tile{*tile.MustTileFromCode("8s"), *tile.MustTileFromCode("9s")},
+			target:       3,
+			wantTaken:    tile.MustTileFromCode("7s"),
+			wantConsumed: []tile.Tile{*tile.MustTileFromCode("8s"), *tile.MustTileFromCode("9s")},
+			wantTarget:   3,
+			wantErr:      false,
+		},
+		{
 			name:         "invalid target: -1",
 			taken:        *tile.MustTileFromCode("1m"),
 			consumed:     [2]tile.Tile{*tile.MustTileFromCode("2m"), *tile.MustTileFromCode("3m")},
