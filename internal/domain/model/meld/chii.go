@@ -21,8 +21,8 @@ func NewChii(taken tile.Tile, consumed [2]tile.Tile, target int) (*Chii, error) 
 	}
 
 	tiles := tile.Tiles{taken, consumed[0], consumed[1]}
-	if slices.ContainsFunc(tiles, func(t tile.Tile) bool { return t.IsUnknown() }) {
-		return nil, fmt.Errorf("unknown tile cannot use for Chii")
+	if slices.ContainsFunc(tiles, func(t tile.Tile) bool { return !t.IsSuits() }) {
+		return nil, fmt.Errorf("honors or unknown tile cannot use for Chii")
 	}
 
 	csm := tile.Tiles(consumed[:])

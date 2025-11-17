@@ -69,6 +69,16 @@ func TestNewChii(t *testing.T) {
 			wantTarget:   0,
 			wantErr:      true,
 		},
+		{
+			name:         "invalid tiles: ESW",
+			taken:        *tile.MustTileFromCode("E"),
+			consumed:     [2]tile.Tile{*tile.MustTileFromCode("S"), *tile.MustTileFromCode("W")},
+			target:       0,
+			wantTaken:    nil,
+			wantConsumed: nil,
+			wantTarget:   0,
+			wantErr:      true,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
