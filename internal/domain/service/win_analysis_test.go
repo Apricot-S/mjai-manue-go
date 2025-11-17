@@ -35,8 +35,9 @@ func Test_isWinningFormChitoitsu(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			hand := hand.CodesToHand(tt.codes)
-			got := isWinningFormChitoitsu(hand)
+			h := hand.CodesToHand(tt.codes)
+			tc34 := h.ToTileCounts34()
+			got := isWinningFormChitoitsu(tc34)
 			if got != tt.want {
 				t.Errorf("isWinningFormChitoitsu() = %v, want %v", got, tt.want)
 			}
@@ -78,8 +79,9 @@ func Test_isWinningFormKokushimuso(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			hand := hand.CodesToHand(tt.codes)
-			got := isWinningFormKokushimuso(hand)
+			h := hand.CodesToHand(tt.codes)
+			tc34 := h.ToTileCounts34()
+			got := isWinningFormKokushimuso(tc34)
 			if got != tt.want {
 				t.Errorf("isWinningFormKokushimuso() = %v, want %v", got, tt.want)
 			}

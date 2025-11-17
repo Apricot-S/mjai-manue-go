@@ -3,6 +3,7 @@ package service
 import (
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/model/hand"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/model/tile"
+	"github.com/Apricot-S/mjai-manue-go/internal/domain/model/tilecount"
 )
 
 func IsWinningForm(hand *hand.Hand) bool {
@@ -10,13 +11,11 @@ func IsWinningForm(hand *hand.Hand) bool {
 }
 
 // Reference: https://qiita.com/tomohxx/items/20d886d1991ab89f5522
-func isWinningFormGeneral(hand *hand.Hand) bool {
+func isWinningFormGeneral(tc34 *tilecount.TileCounts34) bool {
 	return false
 }
 
-func isWinningFormChitoitsu(hand *hand.Hand) bool {
-	tc34 := hand.ToTileCounts34()
-
+func isWinningFormChitoitsu(tc34 *tilecount.TileCounts34) bool {
 	if tc34.NumTiles() != 14 {
 		return false
 	}
@@ -31,9 +30,7 @@ func isWinningFormChitoitsu(hand *hand.Hand) bool {
 	return numPairs == 7
 }
 
-func isWinningFormKokushimuso(hand *hand.Hand) bool {
-	tc34 := hand.ToTileCounts34()
-
+func isWinningFormKokushimuso(tc34 *tilecount.TileCounts34) bool {
 	if tc34.NumTiles() != 14 {
 		return false
 	}
