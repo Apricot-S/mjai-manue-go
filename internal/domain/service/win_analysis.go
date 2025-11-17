@@ -15,13 +15,26 @@ func IsWinningFormGeneral(hand *hand.Hand) bool {
 }
 
 func IsWinningFormChitoitsu(hand *hand.Hand) bool {
-	return false
+	tc34 := hand.ToTileCounts34()
+
+	if tc34.NumTiles() != 14 {
+		return false
+	}
+
+	numPairs := 0
+	for _, c := range tc34 {
+		if c == 2 {
+			numPairs++
+		}
+	}
+
+	return numPairs == 7
 }
 
 func IsWinningFormKokushimuso(hand *hand.Hand) bool {
 	tc34 := hand.ToTileCounts34()
 
-	if tc34.NumTiles() < 13 {
+	if tc34.NumTiles() != 14 {
 		return false
 	}
 
