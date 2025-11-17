@@ -106,3 +106,39 @@ func TestNewConcealedKan(t *testing.T) {
 		})
 	}
 }
+
+func TestConcealedKan_ToTiles(t *testing.T) {
+	tests := []struct {
+		name     string
+		consumed [4]tile.Tile
+		want     []tile.Tile
+	}{
+		{
+			name:     "1m1m1m1m",
+			consumed: [4]tile.Tile{*tile.MustTileFromCode("1m"), *tile.MustTileFromCode("1m"), *tile.MustTileFromCode("1m"), *tile.MustTileFromCode("1m")},
+			want:     []tile.Tile{*tile.MustTileFromCode("1m"), *tile.MustTileFromCode("1m"), *tile.MustTileFromCode("1m"), *tile.MustTileFromCode("1m")},
+		},
+		{
+			name:     "5m5m5m5mr",
+			consumed: [4]tile.Tile{*tile.MustTileFromCode("5m"), *tile.MustTileFromCode("5m"), *tile.MustTileFromCode("5m"), *tile.MustTileFromCode("5mr")},
+			want:     []tile.Tile{*tile.MustTileFromCode("5m"), *tile.MustTileFromCode("5m"), *tile.MustTileFromCode("5m"), *tile.MustTileFromCode("5mr")},
+		},
+		{
+			name:     "sort tiles: 5mr5m5m5m to 5m5m5m5mr",
+			consumed: [4]tile.Tile{*tile.MustTileFromCode("5mr"), *tile.MustTileFromCode("5m"), *tile.MustTileFromCode("5m"), *tile.MustTileFromCode("5m")},
+			want:     []tile.Tile{*tile.MustTileFromCode("5m"), *tile.MustTileFromCode("5m"), *tile.MustTileFromCode("5m"), *tile.MustTileFromCode("5mr")},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			k, err := meld.NewConcealedKan(tt.consumed)
+			if err != nil {
+				t.Fatalf("could not construct receiver type: %v", err)
+			}
+			got := k.ToTiles()
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("ToTiles() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
