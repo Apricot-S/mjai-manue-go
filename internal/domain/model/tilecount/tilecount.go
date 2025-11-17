@@ -13,3 +13,11 @@ func (tc34 *TileCounts34) ToTiles() []tile.Tile {
 	}
 	return tiles
 }
+
+func (tc34 *TileCounts34) NumTiles() int {
+	sum := 0
+	for _, c := range tc34 {
+		sum += c
+	}
+	return sum
+}

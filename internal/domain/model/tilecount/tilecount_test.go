@@ -34,3 +34,35 @@ func TestTileCounts34_ToTiles(t *testing.T) {
 		})
 	}
 }
+
+func TestTileCounts34_NumTiles(t *testing.T) {
+	tests := []struct {
+		name string
+		tc34 tilecount.TileCounts34
+		want int
+	}{
+		{
+			name: "empty tile counts 34",
+			tc34: tilecount.TileCounts34{},
+			want: 0,
+		},
+		{
+			name: "tile counts 34 can contain five identical tiles",
+			tc34: tilecount.TileCounts34{0: 5, 33: 1},
+			want: 6,
+		},
+		{
+			name: "tile counts 34 can contain negative count",
+			tc34: tilecount.TileCounts34{0: -1, 33: -1},
+			want: -2,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := tt.tc34.NumTiles()
+			if got != tt.want {
+				t.Errorf("NumTiles() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
