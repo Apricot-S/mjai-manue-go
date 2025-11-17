@@ -3,6 +3,7 @@ package meld
 import (
 	"fmt"
 	"slices"
+	"sort"
 
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/model/block"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/model/tile"
@@ -22,7 +23,15 @@ func NewChii(taken tile.Tile, consumed [2]tile.Tile, target int) (*Chii, error) 
 
 	tiles := tile.Tiles{taken, consumed[0], consumed[1]}
 	if slices.ContainsFunc(tiles, func(t tile.Tile) bool { return !t.IsSuits() }) {
-		return nil, fmt.Errorf("honors or unknown tile cannot use for Chii")
+		return nil, fmt.Errorf("honors or unknown tile cannot use for Chii; taken: %+v, consumed: %+v", taken, consumed)
+	}
+
+	sort.Sort(tiles)
+	if tiles[0].Number() > 7 {
+		return nil, fmt.Errorf("Chii cannot start with 8 or 9; taken: %+v, consumed: %+v", taken, consumed)
+	}
+	if !tiles[0].Next(1).HasSameSymbol(&tiles[1]) || !tiles[0].Next(2).HasSameSymbol(&tiles[2]) {
+		return nil, fmt.Errorf("")
 	}
 
 	csm := tile.Tiles(consumed[:])
