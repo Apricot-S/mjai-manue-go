@@ -10,11 +10,11 @@ func IsWinningForm(hand *hand.Hand) bool {
 }
 
 // Reference: https://qiita.com/tomohxx/items/20d886d1991ab89f5522
-func IsWinningFormGeneral(hand *hand.Hand) bool {
+func isWinningFormGeneral(hand *hand.Hand) bool {
 	return false
 }
 
-func IsWinningFormChitoitsu(hand *hand.Hand) bool {
+func isWinningFormChitoitsu(hand *hand.Hand) bool {
 	tc34 := hand.ToTileCounts34()
 
 	if tc34.NumTiles() != 14 {
@@ -31,7 +31,7 @@ func IsWinningFormChitoitsu(hand *hand.Hand) bool {
 	return numPairs == 7
 }
 
-func IsWinningFormKokushimuso(hand *hand.Hand) bool {
+func isWinningFormKokushimuso(hand *hand.Hand) bool {
 	tc34 := hand.ToTileCounts34()
 
 	if tc34.NumTiles() != 14 {

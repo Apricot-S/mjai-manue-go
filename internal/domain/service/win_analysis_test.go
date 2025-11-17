@@ -1,13 +1,12 @@
-package service_test
+package service
 
 import (
 	"testing"
 
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/model/hand"
-	"github.com/Apricot-S/mjai-manue-go/internal/domain/service"
 )
 
-func TestIsWinningFormChitoitsu(t *testing.T) {
+func Test_isWinningFormChitoitsu(t *testing.T) {
 	tests := []struct {
 		name  string
 		codes []string
@@ -37,15 +36,15 @@ func TestIsWinningFormChitoitsu(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			hand := hand.CodesToHand(tt.codes)
-			got := service.IsWinningFormChitoitsu(hand)
+			got := isWinningFormChitoitsu(hand)
 			if got != tt.want {
-				t.Errorf("IsWinningFormChitoitsu() = %v, want %v", got, tt.want)
+				t.Errorf("isWinningFormChitoitsu() = %v, want %v", got, tt.want)
 			}
 		})
 	}
 }
 
-func TestIsWinningFormKokushimuso(t *testing.T) {
+func Test_isWinningFormKokushimuso(t *testing.T) {
 	tests := []struct {
 		name  string
 		codes []string
@@ -80,9 +79,9 @@ func TestIsWinningFormKokushimuso(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			hand := hand.CodesToHand(tt.codes)
-			got := service.IsWinningFormKokushimuso(hand)
+			got := isWinningFormKokushimuso(hand)
 			if got != tt.want {
-				t.Errorf("IsWinningFormKokushimuso() = %v, want %v", got, tt.want)
+				t.Errorf("isWinningFormKokushimuso() = %v, want %v", got, tt.want)
 			}
 		})
 	}
