@@ -121,6 +121,16 @@ func TestNewCalledKan(t *testing.T) {
 			wantErr:      true,
 		},
 		{
+			name:         "invalid tiles: 5p-5p5p5p",
+			taken:        *tile.MustTileFromCode("5p"),
+			consumed:     [3]tile.Tile{*tile.MustTileFromCode("5p"), *tile.MustTileFromCode("5p"), *tile.MustTileFromCode("5p")},
+			target:       2,
+			wantTaken:    nil,
+			wantConsumed: nil,
+			wantTarget:   2,
+			wantErr:      true,
+		},
+		{
 			name:         "invalid tiles: ?",
 			taken:        *tile.MustTileFromCode("?"),
 			consumed:     [3]tile.Tile{*tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"), *tile.MustTileFromCode("?")},

@@ -28,8 +28,8 @@ func NewCalledKan(taken tile.Tile, consumed [3]tile.Tile, target int) (*CalledKa
 	if slices.ContainsFunc(tiles, func(t tile.Tile) bool { return !taken.HasSameSymbol(&t) }) {
 		return nil, fmt.Errorf("mismatch taken: %+v, consumed: %+v", taken, consumed)
 	}
-	if countRed(tiles) > 1 {
-		return nil, fmt.Errorf("cannot use 2 or more red fives for Called Kan; taken: %+v, consumed: %+v", taken, consumed)
+	if taken.IsSuits() && taken.Number() == 5 && countRed(tiles) != 1 {
+		return nil, fmt.Errorf("must contain a red five for Called Kan of 5; taken: %+v, consumed: %+v", taken, consumed)
 	}
 
 	sort.Sort(tiles)
