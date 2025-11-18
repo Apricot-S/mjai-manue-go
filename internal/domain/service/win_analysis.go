@@ -34,6 +34,20 @@ func isSingleColorWinningFormWithoutPair(singleColorHand []int) bool {
 }
 
 func isSingleColorWinningFormWithPair(singleColorHand []int) bool {
+	sum := 0
+	for i := range 9 {
+		sum += i * singleColorHand[i]
+	}
+
+	for i := sum * 2 % 3; i < 9; i += 3 {
+		singleColorHand[i] -= 2
+		if singleColorHand[i] >= 0 && isSingleColorWinningFormWithoutPair(singleColorHand) {
+			singleColorHand[i] += 2
+			return true
+		}
+		singleColorHand[i] += 2
+	}
+
 	return false
 }
 

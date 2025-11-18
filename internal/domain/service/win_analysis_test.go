@@ -62,7 +62,16 @@ func Test_isSingleColorWinningFormWithPair(t *testing.T) {
 		codes []string
 		want  bool
 	}{
-		// TODO: Add test cases.
+		{
+			name:  "winning form",
+			codes: []string{"1m", "1m", "1m", "1m", "2m", "2m", "3m", "3m"},
+			want:  true,
+		},
+		{
+			name:  "not winning form: without pair",
+			codes: []string{"1m", "1m", "1m", "1m", "2m", "2m", "3m", "3m", "4m"},
+			want:  false,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
