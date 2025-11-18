@@ -15,6 +15,28 @@ func isWinningFormGeneral(tc34 *tilecount.TileCounts34) bool {
 	return false
 }
 
+func isSingleColorWinningFormWithoutPair(singleColorHand []int) bool {
+	var r int
+	a := singleColorHand[0]
+	b := singleColorHand[1]
+
+	for i := range 7 {
+		r = a % 3
+		c := singleColorHand[i+2]
+		if b < r || c < r {
+			return false
+		}
+		a = b - r
+		b = c - r
+	}
+
+	return a%3 == 0 && b%3 == 0
+}
+
+func isSingleColorWinningFormWithPair(singleColorHand []int) bool {
+	return false
+}
+
 func isWinningFormChitoitsu(tc34 *tilecount.TileCounts34) bool {
 	if tc34.NumTiles() != 14 {
 		return false

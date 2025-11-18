@@ -6,6 +6,68 @@ import (
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/model/hand"
 )
 
+func Test_isWinningFormGeneral(t *testing.T) {
+	tests := []struct {
+		name  string
+		codes []string
+		want  bool
+	}{
+		// TODO: Add test cases.
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			h := hand.CodesToHand(tt.codes)
+			tc34 := h.ToTileCounts34()
+			got := isWinningFormGeneral(tc34)
+			if got != tt.want {
+				t.Errorf("isWinningFormGeneral() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func Test_isSingleColorWinningFormWithoutPair(t *testing.T) {
+	tests := []struct {
+		name  string
+		codes []string
+		want  bool
+	}{
+		// TODO: Add test cases.
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			h := hand.CodesToHand(tt.codes)
+			tc34 := h.ToTileCounts34()
+			singleColorHand := tc34[:9]
+			got := isSingleColorWinningFormWithoutPair(singleColorHand)
+			if got != tt.want {
+				t.Errorf("isSingleColorWinningFormWithoutPair() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func Test_isSingleColorWinningFormWithPair(t *testing.T) {
+	tests := []struct {
+		name  string
+		codes []string
+		want  bool
+	}{
+		// TODO: Add test cases.
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			h := hand.CodesToHand(tt.codes)
+			tc34 := h.ToTileCounts34()
+			singleColorHand := tc34[:9]
+			got := isSingleColorWinningFormWithPair(singleColorHand)
+			if got != tt.want {
+				t.Errorf("isSingleColorWinningFormWithPair() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
 func Test_isWinningFormChitoitsu(t *testing.T) {
 	tests := []struct {
 		name  string
