@@ -19,6 +19,7 @@ func isWinningFormGeneral(tc34 *tilecount.TileCounts34) bool {
 		for _, c := range tc34[9*i : 9*i+9] {
 			sum += c
 		}
+
 		switch sum % 3 {
 		case 1:
 			return false
@@ -31,17 +32,8 @@ func isWinningFormGeneral(tc34 *tilecount.TileCounts34) bool {
 		}
 	}
 
-	for i := 27; i < 34; i++ {
-		switch tc34[i] % 3 {
-		case 1:
-			return false
-		case 2:
-			if colorWithPair == -1 {
-				colorWithPair = i
-			} else {
-				return false
-			}
-		}
+	if !isHonorsWinningForm(tc34[27:34], colorWithPair != -1) {
+		return false
 	}
 
 	for i := range 3 {
@@ -52,6 +44,23 @@ func isWinningFormGeneral(tc34 *tilecount.TileCounts34) bool {
 		} else {
 			if !isSingleColorWinningFormWithoutPair(tc34[9*i : 9*i+9]) {
 				return false
+			}
+		}
+	}
+
+	return true
+}
+
+func isHonorsWinningForm(honorsHand []int, hasPair bool) bool {
+	for _, c := range honorsHand {
+		switch c % 3 {
+		case 1:
+			return false
+		case 2:
+			if hasPair {
+				return false
+			} else {
+				hasPair = true
 			}
 		}
 	}
