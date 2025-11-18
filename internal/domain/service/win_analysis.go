@@ -7,7 +7,19 @@ import (
 )
 
 func IsWinningForm(hand *hand.Hand) bool {
-	return false
+	tc34 := hand.ToTileCounts34()
+
+	numTiles := tc34.NumTiles()
+	if numTiles%3 != 2 {
+		return false
+	}
+
+	ret := isWinningFormGeneral(tc34)
+	if numTiles == 14 {
+		ret = ret || isWinningFormChitoitsu(tc34) || isWinningFormKokushimuso(tc34)
+	}
+
+	return ret
 }
 
 // Reference: https://qiita.com/tomohxx/items/20d886d1991ab89f5522
