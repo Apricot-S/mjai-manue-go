@@ -12,7 +12,51 @@ func IsWinningForm(hand *hand.Hand) bool {
 
 // Reference: https://qiita.com/tomohxx/items/20d886d1991ab89f5522
 func isWinningFormGeneral(tc34 *tilecount.TileCounts34) bool {
-	return false
+	colorWithPair := -1
+
+	for i := range 3 {
+		sum := 0
+		for _, c := range tc34[9*i : 9*i+9] {
+			sum += c
+		}
+		switch sum % 3 {
+		case 1:
+			return false
+		case 2:
+			if colorWithPair == -1 {
+				colorWithPair = i
+			} else {
+				return false
+			}
+		}
+	}
+
+	for i := 27; i < 34; i++ {
+		switch tc34[i] % 3 {
+		case 1:
+			return false
+		case 2:
+			if colorWithPair == -1 {
+				colorWithPair = i
+			} else {
+				return false
+			}
+		}
+	}
+
+	for i := range 3 {
+		if i == colorWithPair {
+			if !isSingleColorWinningFormWithPair(tc34[9*i : 9*i+9]) {
+				return false
+			}
+		} else {
+			if !isSingleColorWinningFormWithoutPair(tc34[9*i : 9*i+9]) {
+				return false
+			}
+		}
+	}
+
+	return true
 }
 
 func isSingleColorWinningFormWithoutPair(singleColorHand []int) bool {

@@ -1,6 +1,7 @@
 package service
 
 import (
+	"strings"
 	"testing"
 
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/model/hand"
@@ -8,14 +9,70 @@ import (
 
 func Test_isWinningFormGeneral(t *testing.T) {
 	tests := []struct {
-		name  string
 		codes []string
 		want  bool
 	}{
-		// TODO: Add test cases.
+		{
+			codes: []string{"3m", "3m", "1p", "2p", "3p", "1s", "2s", "3s", "4s", "5s", "6s", "7s", "8s", "9s"},
+			want:  true,
+		},
+		{
+			codes: []string{"1p", "1p", "1p", "2p", "3p", "1s", "2s", "3s", "4s", "5s", "6s", "7s", "8s", "9s"},
+			want:  true,
+		},
+		{
+			codes: []string{"1s", "2s", "3s", "4s", "5s", "6s", "7s", "8s", "9s", "E", "E", "C", "C", "C"},
+			want:  true,
+		},
+		{
+			codes: []string{"1s", "2s", "3s", "4s", "5s", "5s", "5s", "6s", "7s", "7s", "8s", "8s", "9s", "9s"},
+			want:  true,
+		},
+		{
+			codes: []string{"1s", "1s", "1s", "2s", "3s", "4s", "5s", "6s", "7s", "8s", "8s", "9s", "9s", "9s"},
+			want:  true,
+		},
+		{
+			codes: []string{"3m", "4m", "5m", "7p", "8p", "9p", "2s", "3s", "3s", "3s", "3s", "4s", "P", "P"},
+			want:  true,
+		},
+		{
+			codes: []string{"1m", "1m", "1m", "2m", "3m", "3m", "3m", "4m", "4m", "4m", "5m", "5m", "9m", "9m"},
+			want:  true,
+		},
+		{
+			codes: []string{"1m", "1m"},
+			want:  true,
+		},
+		{
+			codes: []string{},
+			want:  true,
+		},
+		{
+			codes: []string{"1m", "1m", "E", "E", "E"},
+			want:  true,
+		},
+
+		{
+			codes: []string{"1p", "2p", "3p", "4p", "5p", "1s", "2s", "3s", "4s", "5s", "6s", "7s", "8s", "9s"},
+			want:  false,
+		},
+		{
+			codes: []string{"1p", "1p", "1p", "4p", "5p", "1s", "1s", "1s", "2s", "2s", "2s", "4s", "4s", "4s"},
+			want:  false,
+		},
+		{
+			codes: []string{"1s", "1s", "1s", "2s", "2s", "2s", "3s", "3s", "3s", "5s", "6s", "8s", "8s", "8s"},
+			want:  false,
+		},
+		{
+			codes: []string{"2p", "2p", "2p", "2s", "3s", "4s", "6s", "7s"},
+			want:  false,
+		},
 	}
 	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
+		name := strings.Join(tt.codes, " ")
+		t.Run(name, func(t *testing.T) {
 			h := hand.CodesToHand(tt.codes)
 			tc34 := h.ToTileCounts34()
 			got := isWinningFormGeneral(tc34)
