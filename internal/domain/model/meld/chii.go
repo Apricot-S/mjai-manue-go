@@ -90,31 +90,31 @@ func (c *Chii) SwapCallTiles() []tile.Tile {
 	n := c.taken.Number()
 
 	if c.ty == chiiTypeHigh {
-		if n == 3 {
+		switch n {
+		case 3:
 			return []tile.Tile{c.taken}
-		}
-		if n == 5 {
+		case 5:
 			return []tile.Tile{*c.taken.Next(-3), *c.taken.RemoveRed(), *c.taken.AddRed()}
-		}
-		if n == 8 {
+		case 8:
 			prev := c.taken.Next(-3)
 			return []tile.Tile{*prev, *prev.AddRed(), c.taken}
+		default:
+			return []tile.Tile{*c.taken.Next(-3), c.taken}
 		}
-		return []tile.Tile{*c.taken.Next(-3), c.taken}
 	}
 
 	if c.ty == chiiTypeLow {
-		if n == 7 {
+		switch n {
+		case 7:
 			return []tile.Tile{c.taken}
-		}
-		if n == 2 {
+		case 5:
+			return []tile.Tile{*c.taken.RemoveRed(), *c.taken.AddRed(), *c.taken.Next(3)}
+		case 2:
 			next := c.taken.Next(3)
 			return []tile.Tile{c.taken, *next, *next.AddRed()}
+		default:
+			return []tile.Tile{c.taken, *c.taken.Next(3)}
 		}
-		if n == 5 {
-			return []tile.Tile{*c.taken.RemoveRed(), *c.taken.AddRed(), *c.taken.Next(3)}
-		}
-		return []tile.Tile{c.taken, *c.taken.Next(3)}
 	}
 
 	if n == 5 {
