@@ -275,3 +275,54 @@ func TestChii_ToString(t *testing.T) {
 		})
 	}
 }
+
+func TestChii_SwapCallTiles(t *testing.T) {
+	tests := []struct {
+		name     string
+		taken    tile.Tile
+		consumed [2]tile.Tile
+		target   playerid.PlayerID
+		want     []tile.Tile
+	}{
+		{
+			name:     "7-89m",
+			taken:    *tile.MustTileFromCode("7m"),
+			consumed: [2]tile.Tile{*tile.MustTileFromCode("8m"), *tile.MustTileFromCode("9m")},
+			target:   *playerid.MustPlayerID(0),
+			want:     []tile.Tile{*tile.MustTileFromCode("7m")},
+		},
+		{
+			name:     "8-79m",
+			taken:    *tile.MustTileFromCode("8m"),
+			consumed: [2]tile.Tile{*tile.MustTileFromCode("7m"), *tile.MustTileFromCode("9m")},
+			target:   *playerid.MustPlayerID(0),
+			want:     []tile.Tile{*tile.MustTileFromCode("8m")},
+		},
+		{
+			name:     "5-46m",
+			taken:    *tile.MustTileFromCode("5m"),
+			consumed: [2]tile.Tile{*tile.MustTileFromCode("4m"), *tile.MustTileFromCode("6m")},
+			target:   *playerid.MustPlayerID(0),
+			want:     []tile.Tile{*tile.MustTileFromCode("5m"), *tile.MustTileFromCode("5mr")},
+		},
+		{
+			name:     "5r-46m",
+			taken:    *tile.MustTileFromCode("5mr"),
+			consumed: [2]tile.Tile{*tile.MustTileFromCode("4m"), *tile.MustTileFromCode("6m")},
+			target:   *playerid.MustPlayerID(0),
+			want:     []tile.Tile{*tile.MustTileFromCode("5m"), *tile.MustTileFromCode("5mr")},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			c, err := meld.NewChii(tt.taken, tt.consumed, tt.target)
+			if err != nil {
+				t.Fatalf("could not construct receiver type: %v", err)
+			}
+			got := c.SwapCallTiles()
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("SwapCallTiles() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}

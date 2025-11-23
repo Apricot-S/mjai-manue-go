@@ -85,3 +85,10 @@ func (c *Chii) ToBlock() block.Block {
 func (c *Chii) ToString() string {
 	return meldToString(c)
 }
+
+func (c *Chii) SwapCallTiles() []tile.Tile {
+	if c.taken.IsSuits() && c.taken.Number() == 5 {
+		return []tile.Tile{*c.taken.RemoveRed(), *c.taken.AddRed()}
+	}
+	return []tile.Tile{c.taken}
+}
