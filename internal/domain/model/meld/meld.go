@@ -43,5 +43,9 @@ func meldToString(m OpenMeld) string {
 		consumedStrs[i] = t.Code()
 	}
 
-	return fmt.Sprintf("[%s(%d)/%s]", m.Taken().Code(), m.Target().Index(), strings.Join(consumedStrs, " "))
+	taken := m.Taken().Code()
+	target := m.Target().Index()
+	consumed := strings.Join(consumedStrs, " ")
+
+	return fmt.Sprintf("[%s(%d)/%s]", taken, target, consumed)
 }
