@@ -4,6 +4,7 @@ import (
 	"reflect"
 	"testing"
 
+	"github.com/Apricot-S/mjai-manue-go/internal/domain/model/block"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/model/meld"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/model/playerid"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/model/tile"
@@ -234,6 +235,62 @@ func TestPromotedKan_ToTiles(t *testing.T) {
 			got := k.ToTiles()
 			if !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("ToTiles() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestPromotedKan_ToBlock(t *testing.T) {
+	tests := []struct {
+		name     string
+		taken    tile.Tile
+		consumed [2]tile.Tile
+		added    tile.Tile
+		target   playerid.PlayerID
+		want     block.Block
+	}{
+		{
+			name:     "1p-1p1p-1p",
+			taken:    *tile.MustTileFromCode("1p"),
+			consumed: [2]tile.Tile{*tile.MustTileFromCode("1p"), *tile.MustTileFromCode("1p")},
+			added:    *tile.MustTileFromCode("1p"),
+			target:   *playerid.MustPlayerID(0),
+			want:     block.MustQuad(*tile.MustTileFromCode("1p")),
+		},
+		{
+			name:     "5p-5p5p-5pr to 5p quad",
+			taken:    *tile.MustTileFromCode("5p"),
+			consumed: [2]tile.Tile{*tile.MustTileFromCode("5p"), *tile.MustTileFromCode("5p")},
+			added:    *tile.MustTileFromCode("5pr"),
+			target:   *playerid.MustPlayerID(0),
+			want:     block.MustQuad(*tile.MustTileFromCode("5p")),
+		},
+		{
+			name:     "5pr-5p5p-5p to 5p quad",
+			taken:    *tile.MustTileFromCode("5pr"),
+			consumed: [2]tile.Tile{*tile.MustTileFromCode("5p"), *tile.MustTileFromCode("5p")},
+			added:    *tile.MustTileFromCode("5p"),
+			target:   *playerid.MustPlayerID(0),
+			want:     block.MustQuad(*tile.MustTileFromCode("5p")),
+		},
+		{
+			name:     "5p-5p5pr-5p to 5p quad",
+			taken:    *tile.MustTileFromCode("5p"),
+			consumed: [2]tile.Tile{*tile.MustTileFromCode("5p"), *tile.MustTileFromCode("5pr")},
+			added:    *tile.MustTileFromCode("5p"),
+			target:   *playerid.MustPlayerID(0),
+			want:     block.MustQuad(*tile.MustTileFromCode("5p")),
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			k, err := meld.NewPromotedKan(tt.taken, tt.consumed, tt.added, tt.target)
+			if err != nil {
+				t.Fatalf("could not construct receiver type: %v", err)
+			}
+			got := k.ToBlock()
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("ToBlock() = %v, want %v", got, tt.want)
 			}
 		})
 	}
