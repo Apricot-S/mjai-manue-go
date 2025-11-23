@@ -21,6 +21,11 @@ type OpenMeld interface {
 	Target() int
 }
 
+type ChiiPon interface {
+	OpenMeld
+	SwapCallTiles() []tile.Tile
+}
+
 func isValidTarget(target int) bool {
 	return 0 <= target && target <= 3
 }
