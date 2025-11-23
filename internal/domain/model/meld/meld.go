@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/model/block"
+	"github.com/Apricot-S/mjai-manue-go/internal/domain/model/playerid"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/model/tile"
 )
 
@@ -18,16 +19,12 @@ type Meld interface {
 type OpenMeld interface {
 	Meld
 	Taken() *tile.Tile
-	Target() int
+	Target() *playerid.PlayerID
 }
 
 type ChiiPon interface {
 	OpenMeld
 	SwapCallTiles() []tile.Tile
-}
-
-func isValidTarget(target int) bool {
-	return 0 <= target && target <= 3
 }
 
 func countRed(tiles []tile.Tile) int {
@@ -46,5 +43,5 @@ func meldToString(m OpenMeld) string {
 		consumedStrs[i] = t.Code()
 	}
 
-	return fmt.Sprintf("[%s(%d)/%s]", m.Taken().Code(), m.Target(), strings.Join(consumedStrs, " "))
+	return fmt.Sprintf("[%s(%d)/%s]", m.Taken().Code(), m.Target().Index(), strings.Join(consumedStrs, " "))
 }

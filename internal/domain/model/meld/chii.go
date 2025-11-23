@@ -6,6 +6,7 @@ import (
 	"sort"
 
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/model/block"
+	"github.com/Apricot-S/mjai-manue-go/internal/domain/model/playerid"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/model/tile"
 )
 
@@ -20,16 +21,12 @@ const (
 type Chii struct {
 	taken    tile.Tile
 	consumed [2]tile.Tile
-	target   int
+	target   playerid.PlayerID
 	tiles    []tile.Tile
 	ty       chiiType
 }
 
-func NewChii(taken tile.Tile, consumed [2]tile.Tile, target int) (*Chii, error) {
-	if !isValidTarget(target) {
-		return nil, fmt.Errorf("invalid target: %d", target)
-	}
-
+func NewChii(taken tile.Tile, consumed [2]tile.Tile, target playerid.PlayerID) (*Chii, error) {
 	tiles := tile.Tiles{taken, consumed[0], consumed[1]}
 	if slices.ContainsFunc(tiles, func(t tile.Tile) bool { return !t.IsSuits() }) {
 		return nil, fmt.Errorf("honors or unknown tile cannot use for Chii; taken: %+v, consumed: %+v", taken, consumed)
@@ -73,8 +70,8 @@ func (c *Chii) Consumed() []tile.Tile {
 	return c.consumed[:]
 }
 
-func (c *Chii) Target() int {
-	return c.target
+func (c *Chii) Target() *playerid.PlayerID {
+	return &c.target
 }
 
 func (c *Chii) ToTiles() []tile.Tile {

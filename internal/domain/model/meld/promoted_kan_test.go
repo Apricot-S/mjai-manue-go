@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/model/meld"
+	"github.com/Apricot-S/mjai-manue-go/internal/domain/model/playerid"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/model/tile"
 )
 
@@ -14,60 +15,24 @@ func TestNewPromotedKan(t *testing.T) {
 		taken        tile.Tile
 		consumed     [2]tile.Tile
 		added        tile.Tile
-		target       int
+		target       playerid.PlayerID
 		wantTaken    *tile.Tile
 		wantConsumed []tile.Tile
 		wantAdded    *tile.Tile
-		wantTarget   int
+		wantTarget   *playerid.PlayerID
 		wantErr      bool
 	}{
 		{
-			name:         "valid target: 0",
+			name:         "valid: 1p-1p1p-1p",
 			taken:        *tile.MustTileFromCode("1p"),
 			consumed:     [2]tile.Tile{*tile.MustTileFromCode("1p"), *tile.MustTileFromCode("1p")},
 			added:        *tile.MustTileFromCode("1p"),
-			target:       0,
+			target:       *playerid.MustPlayerID(0),
 			wantTaken:    tile.MustTileFromCode("1p"),
 			wantConsumed: []tile.Tile{*tile.MustTileFromCode("1p"), *tile.MustTileFromCode("1p")},
 			wantAdded:    tile.MustTileFromCode("1p"),
-			wantTarget:   0,
+			wantTarget:   playerid.MustPlayerID(0),
 			wantErr:      false,
-		},
-		{
-			name:         "valid target: 3",
-			taken:        *tile.MustTileFromCode("C"),
-			consumed:     [2]tile.Tile{*tile.MustTileFromCode("C"), *tile.MustTileFromCode("C")},
-			added:        *tile.MustTileFromCode("C"),
-			target:       3,
-			wantTaken:    tile.MustTileFromCode("C"),
-			wantConsumed: []tile.Tile{*tile.MustTileFromCode("C"), *tile.MustTileFromCode("C")},
-			wantAdded:    tile.MustTileFromCode("C"),
-			wantTarget:   3,
-			wantErr:      false,
-		},
-		{
-			name:         "invalid target: -1",
-			taken:        *tile.MustTileFromCode("1p"),
-			consumed:     [2]tile.Tile{*tile.MustTileFromCode("1p"), *tile.MustTileFromCode("1p")},
-			added:        *tile.MustTileFromCode("1p"),
-			target:       -1,
-			wantTaken:    nil,
-			wantConsumed: nil,
-			wantAdded:    nil,
-			wantTarget:   -1,
-			wantErr:      true,
-		},
-		{
-			name:         "invalid target: 4",
-			taken:        *tile.MustTileFromCode("1p"),
-			consumed:     [2]tile.Tile{*tile.MustTileFromCode("1p"), *tile.MustTileFromCode("1p")},
-			added:        *tile.MustTileFromCode("1p"),
-			target:       4,
-			wantTaken:    nil,
-			wantConsumed: nil,
-			wantAdded:    nil,
-			wantTarget:   4,
-			wantErr:      true,
 		},
 	}
 	for _, tt := range tests {

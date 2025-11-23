@@ -1,8 +1,7 @@
 package meld
 
 import (
-	"fmt"
-
+	"github.com/Apricot-S/mjai-manue-go/internal/domain/model/playerid"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/model/tile"
 )
 
@@ -10,15 +9,16 @@ type PromotedKan struct {
 	taken    tile.Tile
 	consumed [2]tile.Tile
 	added    tile.Tile
-	target   int
+	target   playerid.PlayerID
 	tiles    []tile.Tile
 }
 
-func NewPromotedKan(taken tile.Tile, consumed [2]tile.Tile, added tile.Tile, target int) (*PromotedKan, error) {
-	if !isValidTarget(target) {
-		return nil, fmt.Errorf("invalid target: %d", target)
-	}
-
+func NewPromotedKan(
+	taken tile.Tile,
+	consumed [2]tile.Tile,
+	added tile.Tile,
+	target playerid.PlayerID,
+) (*PromotedKan, error) {
 	return &PromotedKan{
 		taken:    taken,
 		consumed: consumed,
@@ -40,6 +40,6 @@ func (k *PromotedKan) Added() *tile.Tile {
 	return &k.added
 }
 
-func (k *PromotedKan) Target() int {
-	return k.target
+func (k *PromotedKan) Target() *playerid.PlayerID {
+	return &k.target
 }

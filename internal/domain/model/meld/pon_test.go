@@ -6,6 +6,7 @@ import (
 
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/model/block"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/model/meld"
+	"github.com/Apricot-S/mjai-manue-go/internal/domain/model/playerid"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/model/tile"
 )
 
@@ -14,160 +15,120 @@ func TestNewPon(t *testing.T) {
 		name         string
 		taken        tile.Tile
 		consumed     [2]tile.Tile
-		target       int
+		target       playerid.PlayerID
 		wantTaken    *tile.Tile
 		wantConsumed []tile.Tile
-		wantTarget   int
+		wantTarget   *playerid.PlayerID
 		wantErr      bool
 	}{
-		{
-			name:         "valid target: 0",
-			taken:        *tile.MustTileFromCode("1p"),
-			consumed:     [2]tile.Tile{*tile.MustTileFromCode("1p"), *tile.MustTileFromCode("1p")},
-			target:       0,
-			wantTaken:    tile.MustTileFromCode("1p"),
-			wantConsumed: []tile.Tile{*tile.MustTileFromCode("1p"), *tile.MustTileFromCode("1p")},
-			wantTarget:   0,
-			wantErr:      false,
-		},
-		{
-			name:         "valid target: 3",
-			taken:        *tile.MustTileFromCode("C"),
-			consumed:     [2]tile.Tile{*tile.MustTileFromCode("C"), *tile.MustTileFromCode("C")},
-			target:       3,
-			wantTaken:    tile.MustTileFromCode("C"),
-			wantConsumed: []tile.Tile{*tile.MustTileFromCode("C"), *tile.MustTileFromCode("C")},
-			wantTarget:   3,
-			wantErr:      false,
-		},
-		{
-			name:         "invalid target: -1",
-			taken:        *tile.MustTileFromCode("1p"),
-			consumed:     [2]tile.Tile{*tile.MustTileFromCode("1p"), *tile.MustTileFromCode("1p")},
-			target:       -1,
-			wantTaken:    nil,
-			wantConsumed: nil,
-			wantTarget:   -1,
-			wantErr:      true,
-		},
-		{
-			name:         "invalid target: 4",
-			taken:        *tile.MustTileFromCode("1p"),
-			consumed:     [2]tile.Tile{*tile.MustTileFromCode("1p"), *tile.MustTileFromCode("1p")},
-			target:       4,
-			wantTaken:    nil,
-			wantConsumed: nil,
-			wantTarget:   4,
-			wantErr:      true,
-		},
 		{
 			name:         "valid tiles: 1m",
 			taken:        *tile.MustTileFromCode("1m"),
 			consumed:     [2]tile.Tile{*tile.MustTileFromCode("1m"), *tile.MustTileFromCode("1m")},
-			target:       0,
+			target:       *playerid.MustPlayerID(0),
 			wantTaken:    tile.MustTileFromCode("1m"),
 			wantConsumed: []tile.Tile{*tile.MustTileFromCode("1m"), *tile.MustTileFromCode("1m")},
-			wantTarget:   0,
+			wantTarget:   playerid.MustPlayerID(0),
 			wantErr:      false,
 		},
 		{
 			name:         "valid tiles: C",
 			taken:        *tile.MustTileFromCode("C"),
 			consumed:     [2]tile.Tile{*tile.MustTileFromCode("C"), *tile.MustTileFromCode("C")},
-			target:       0,
+			target:       *playerid.MustPlayerID(0),
 			wantTaken:    tile.MustTileFromCode("C"),
 			wantConsumed: []tile.Tile{*tile.MustTileFromCode("C"), *tile.MustTileFromCode("C")},
-			wantTarget:   0,
+			wantTarget:   playerid.MustPlayerID(0),
 			wantErr:      false,
 		},
 		{
 			name:         "valid tiles: 5s-5s5s",
 			taken:        *tile.MustTileFromCode("5s"),
 			consumed:     [2]tile.Tile{*tile.MustTileFromCode("5s"), *tile.MustTileFromCode("5s")},
-			target:       0,
+			target:       *playerid.MustPlayerID(0),
 			wantTaken:    tile.MustTileFromCode("5s"),
 			wantConsumed: []tile.Tile{*tile.MustTileFromCode("5s"), *tile.MustTileFromCode("5s")},
-			wantTarget:   0,
+			wantTarget:   playerid.MustPlayerID(0),
 			wantErr:      false,
 		},
 		{
 			name:         "valid tiles: 5sr-5s5s",
 			taken:        *tile.MustTileFromCode("5sr"),
 			consumed:     [2]tile.Tile{*tile.MustTileFromCode("5s"), *tile.MustTileFromCode("5s")},
-			target:       0,
+			target:       *playerid.MustPlayerID(0),
 			wantTaken:    tile.MustTileFromCode("5sr"),
 			wantConsumed: []tile.Tile{*tile.MustTileFromCode("5s"), *tile.MustTileFromCode("5s")},
-			wantTarget:   0,
+			wantTarget:   playerid.MustPlayerID(0),
 			wantErr:      false,
 		},
 		{
 			name:         "valid tiles: 5p-5p5pr",
 			taken:        *tile.MustTileFromCode("5p"),
 			consumed:     [2]tile.Tile{*tile.MustTileFromCode("5p"), *tile.MustTileFromCode("5pr")},
-			target:       0,
+			target:       *playerid.MustPlayerID(0),
 			wantTaken:    tile.MustTileFromCode("5p"),
 			wantConsumed: []tile.Tile{*tile.MustTileFromCode("5p"), *tile.MustTileFromCode("5pr")},
-			wantTarget:   0,
+			wantTarget:   playerid.MustPlayerID(0),
 			wantErr:      false,
 		},
 		{
 			name:         "invalid tiles: 5pr-5p5pr",
 			taken:        *tile.MustTileFromCode("5pr"),
 			consumed:     [2]tile.Tile{*tile.MustTileFromCode("5p"), *tile.MustTileFromCode("5pr")},
-			target:       0,
+			target:       *playerid.MustPlayerID(0),
 			wantTaken:    nil,
 			wantConsumed: nil,
-			wantTarget:   0,
+			wantTarget:   playerid.MustPlayerID(0),
 			wantErr:      true,
 		},
 		{
 			name:         "invalid tiles: 5p-5pr5pr",
 			taken:        *tile.MustTileFromCode("5p"),
 			consumed:     [2]tile.Tile{*tile.MustTileFromCode("5pr"), *tile.MustTileFromCode("5pr")},
-			target:       0,
+			target:       *playerid.MustPlayerID(0),
 			wantTaken:    nil,
 			wantConsumed: nil,
-			wantTarget:   0,
+			wantTarget:   playerid.MustPlayerID(0),
 			wantErr:      true,
 		},
 		{
 			name:         "invalid tiles: ?",
 			taken:        *tile.MustTileFromCode("?"),
 			consumed:     [2]tile.Tile{*tile.MustTileFromCode("?"), *tile.MustTileFromCode("?")},
-			target:       0,
+			target:       *playerid.MustPlayerID(0),
 			wantTaken:    nil,
 			wantConsumed: nil,
-			wantTarget:   0,
+			wantTarget:   playerid.MustPlayerID(0),
 			wantErr:      true,
 		},
 		{
 			name:         "taken and consumed do not match",
 			taken:        *tile.MustTileFromCode("1m"),
 			consumed:     [2]tile.Tile{*tile.MustTileFromCode("2m"), *tile.MustTileFromCode("2m")},
-			target:       0,
+			target:       *playerid.MustPlayerID(0),
 			wantTaken:    nil,
 			wantConsumed: nil,
-			wantTarget:   0,
+			wantTarget:   playerid.MustPlayerID(0),
 			wantErr:      true,
 		},
 		{
 			name:         "consumed tiles do not match",
 			taken:        *tile.MustTileFromCode("1m"),
 			consumed:     [2]tile.Tile{*tile.MustTileFromCode("1m"), *tile.MustTileFromCode("2m")},
-			target:       0,
+			target:       *playerid.MustPlayerID(0),
 			wantTaken:    nil,
 			wantConsumed: nil,
-			wantTarget:   0,
+			wantTarget:   playerid.MustPlayerID(0),
 			wantErr:      true,
 		},
 		{
 			name:         "sort tiles: 5m-5mr5m to 5m-5m5mr",
 			taken:        *tile.MustTileFromCode("5m"),
 			consumed:     [2]tile.Tile{*tile.MustTileFromCode("5mr"), *tile.MustTileFromCode("5m")},
-			target:       0,
+			target:       *playerid.MustPlayerID(0),
 			wantTaken:    tile.MustTileFromCode("5m"),
 			wantConsumed: []tile.Tile{*tile.MustTileFromCode("5m"), *tile.MustTileFromCode("5mr")},
-			wantTarget:   0,
+			wantTarget:   playerid.MustPlayerID(0),
 			wantErr:      false,
 		},
 	}
@@ -201,28 +162,28 @@ func TestPon_ToTiles(t *testing.T) {
 		name     string
 		taken    tile.Tile
 		consumed [2]tile.Tile
-		target   int
+		target   playerid.PlayerID
 		want     []tile.Tile
 	}{
 		{
 			name:     "1m-1m1m",
 			taken:    *tile.MustTileFromCode("1m"),
 			consumed: [2]tile.Tile{*tile.MustTileFromCode("1m"), *tile.MustTileFromCode("1m")},
-			target:   0,
+			target:   *playerid.MustPlayerID(0),
 			want:     []tile.Tile{*tile.MustTileFromCode("1m"), *tile.MustTileFromCode("1m"), *tile.MustTileFromCode("1m")},
 		},
 		{
 			name:     "sort tiles: 5m-5mr5m to 5m5m5mr",
 			taken:    *tile.MustTileFromCode("5m"),
 			consumed: [2]tile.Tile{*tile.MustTileFromCode("5mr"), *tile.MustTileFromCode("5m")},
-			target:   2,
+			target:   *playerid.MustPlayerID(2),
 			want:     []tile.Tile{*tile.MustTileFromCode("5m"), *tile.MustTileFromCode("5m"), *tile.MustTileFromCode("5mr")},
 		},
 		{
 			name:     "sort tiles: 5mr-5m5m to 5m5m5mr",
 			taken:    *tile.MustTileFromCode("5mr"),
 			consumed: [2]tile.Tile{*tile.MustTileFromCode("5m"), *tile.MustTileFromCode("5m")},
-			target:   2,
+			target:   *playerid.MustPlayerID(2),
 			want:     []tile.Tile{*tile.MustTileFromCode("5m"), *tile.MustTileFromCode("5m"), *tile.MustTileFromCode("5mr")},
 		},
 	}
@@ -245,28 +206,28 @@ func TestPon_ToBlock(t *testing.T) {
 		name     string
 		taken    tile.Tile
 		consumed [2]tile.Tile
-		target   int
+		target   playerid.PlayerID
 		want     block.Block
 	}{
 		{
 			name:     "1m-1m1m to 1m triplet",
 			taken:    *tile.MustTileFromCode("1m"),
 			consumed: [2]tile.Tile{*tile.MustTileFromCode("1m"), *tile.MustTileFromCode("1m")},
-			target:   0,
+			target:   *playerid.MustPlayerID(0),
 			want:     block.MustTriplet(*tile.MustTileFromCode("1m")),
 		},
 		{
 			name:     "5sr-5s5s to 5s triplet",
 			taken:    *tile.MustTileFromCode("5sr"),
 			consumed: [2]tile.Tile{*tile.MustTileFromCode("5s"), *tile.MustTileFromCode("5s")},
-			target:   0,
+			target:   *playerid.MustPlayerID(0),
 			want:     block.MustTriplet(*tile.MustTileFromCode("5s")),
 		},
 		{
 			name:     "5s-5s5sr to 5s triplet",
 			taken:    *tile.MustTileFromCode("5s"),
 			consumed: [2]tile.Tile{*tile.MustTileFromCode("5s"), *tile.MustTileFromCode("5sr")},
-			target:   0,
+			target:   *playerid.MustPlayerID(0),
 			want:     block.MustTriplet(*tile.MustTileFromCode("5s")),
 		},
 	}
@@ -289,28 +250,28 @@ func TestPon_ToString(t *testing.T) {
 		name     string
 		taken    tile.Tile
 		consumed [2]tile.Tile
-		target   int
+		target   playerid.PlayerID
 		want     string
 	}{
 		{
 			name:     "1m-1m1m from 1",
 			taken:    *tile.MustTileFromCode("1m"),
 			consumed: [2]tile.Tile{*tile.MustTileFromCode("1m"), *tile.MustTileFromCode("1m")},
-			target:   1,
+			target:   *playerid.MustPlayerID(1),
 			want:     "[1m(1)/1m 1m]",
 		},
 		{
 			name:     "5sr-5s5s from 3",
 			taken:    *tile.MustTileFromCode("5sr"),
 			consumed: [2]tile.Tile{*tile.MustTileFromCode("5s"), *tile.MustTileFromCode("5s")},
-			target:   3,
+			target:   *playerid.MustPlayerID(3),
 			want:     "[5sr(3)/5s 5s]",
 		},
 		{
 			name:     "5s-5s5sr from 3",
 			taken:    *tile.MustTileFromCode("5s"),
 			consumed: [2]tile.Tile{*tile.MustTileFromCode("5s"), *tile.MustTileFromCode("5sr")},
-			target:   3,
+			target:   *playerid.MustPlayerID(3),
 			want:     "[5s(3)/5s 5sr]",
 		},
 	}

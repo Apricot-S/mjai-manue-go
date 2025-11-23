@@ -6,21 +6,18 @@ import (
 	"sort"
 
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/model/block"
+	"github.com/Apricot-S/mjai-manue-go/internal/domain/model/playerid"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/model/tile"
 )
 
 type CalledKan struct {
 	taken    tile.Tile
 	consumed [3]tile.Tile
-	target   int
+	target   playerid.PlayerID
 	tiles    []tile.Tile
 }
 
-func NewCalledKan(taken tile.Tile, consumed [3]tile.Tile, target int) (*CalledKan, error) {
-	if !isValidTarget(target) {
-		return nil, fmt.Errorf("invalid target: %d", target)
-	}
-
+func NewCalledKan(taken tile.Tile, consumed [3]tile.Tile, target playerid.PlayerID) (*CalledKan, error) {
 	tiles := tile.Tiles{taken, consumed[0], consumed[1], consumed[2]}
 	if slices.ContainsFunc(tiles, func(t tile.Tile) bool { return t.IsUnknown() }) {
 		return nil, fmt.Errorf("unknown tile cannot use for Called Kan")
@@ -53,8 +50,8 @@ func (k *CalledKan) Consumed() []tile.Tile {
 	return k.consumed[:]
 }
 
-func (k *CalledKan) Target() int {
-	return k.target
+func (k *CalledKan) Target() *playerid.PlayerID {
+	return &k.target
 }
 
 func (k *CalledKan) ToTiles() []tile.Tile {
