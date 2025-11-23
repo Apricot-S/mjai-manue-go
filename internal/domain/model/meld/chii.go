@@ -97,7 +97,8 @@ func (c *Chii) SwapCallTiles() []tile.Tile {
 			return []tile.Tile{*c.taken.Next(-3), *c.taken.RemoveRed(), *c.taken.AddRed()}
 		}
 		if n == 8 {
-			return []tile.Tile{*c.taken.Next(-3), *c.taken.Next(-3).AddRed(), c.taken}
+			prev := c.taken.Next(-3)
+			return []tile.Tile{*prev, *prev.AddRed(), c.taken}
 		}
 		return []tile.Tile{*c.taken.Next(-3), c.taken}
 	}
@@ -107,7 +108,8 @@ func (c *Chii) SwapCallTiles() []tile.Tile {
 			return []tile.Tile{c.taken}
 		}
 		if n == 2 {
-			return []tile.Tile{c.taken, *c.taken.Next(3), *c.taken.Next(3).AddRed()}
+			next := c.taken.Next(3)
+			return []tile.Tile{c.taken, *next, *next.AddRed()}
 		}
 		if n == 5 {
 			return []tile.Tile{*c.taken.RemoveRed(), *c.taken.AddRed(), *c.taken.Next(3)}
