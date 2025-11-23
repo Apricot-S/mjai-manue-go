@@ -288,3 +288,61 @@ func TestPon_ToString(t *testing.T) {
 		})
 	}
 }
+
+func TestPon_SwapCallTiles(t *testing.T) {
+	tests := []struct {
+		name     string
+		taken    tile.Tile
+		consumed [2]tile.Tile
+		target   playerid.PlayerID
+		want     []tile.Tile
+	}{
+		{
+			name:     "1m-1m1m",
+			taken:    *tile.MustTileFromCode("1m"),
+			consumed: [2]tile.Tile{*tile.MustTileFromCode("1m"), *tile.MustTileFromCode("1m")},
+			target:   *playerid.MustPlayerID(0),
+			want:     []tile.Tile{*tile.MustTileFromCode("1m")},
+		},
+		{
+			name:     "P-PP",
+			taken:    *tile.MustTileFromCode("P"),
+			consumed: [2]tile.Tile{*tile.MustTileFromCode("P"), *tile.MustTileFromCode("P")},
+			target:   *playerid.MustPlayerID(0),
+			want:     []tile.Tile{*tile.MustTileFromCode("P")},
+		},
+		{
+			name:     "5m-5m5m",
+			taken:    *tile.MustTileFromCode("5m"),
+			consumed: [2]tile.Tile{*tile.MustTileFromCode("5m"), *tile.MustTileFromCode("5m")},
+			target:   *playerid.MustPlayerID(2),
+			want:     []tile.Tile{*tile.MustTileFromCode("5m"), *tile.MustTileFromCode("5mr")},
+		},
+		{
+			name:     "5m-5m5mr",
+			taken:    *tile.MustTileFromCode("5m"),
+			consumed: [2]tile.Tile{*tile.MustTileFromCode("5m"), *tile.MustTileFromCode("5mr")},
+			target:   *playerid.MustPlayerID(2),
+			want:     []tile.Tile{*tile.MustTileFromCode("5m"), *tile.MustTileFromCode("5mr")},
+		},
+		{
+			name:     "5mr-5m5m",
+			taken:    *tile.MustTileFromCode("5mr"),
+			consumed: [2]tile.Tile{*tile.MustTileFromCode("5m"), *tile.MustTileFromCode("5m")},
+			target:   *playerid.MustPlayerID(2),
+			want:     []tile.Tile{*tile.MustTileFromCode("5m"), *tile.MustTileFromCode("5mr")},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			p, err := meld.NewPon(tt.taken, tt.consumed, tt.target)
+			if err != nil {
+				t.Fatalf("could not construct receiver type: %v", err)
+			}
+			got := p.SwapCallTiles()
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("SwapCallTiles() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}

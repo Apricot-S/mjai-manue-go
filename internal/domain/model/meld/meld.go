@@ -24,6 +24,7 @@ type OpenMeld interface {
 
 type ChiiPon interface {
 	OpenMeld
+	// Red five is included.
 	SwapCallTiles() []tile.Tile
 }
 
