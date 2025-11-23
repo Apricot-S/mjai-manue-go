@@ -320,6 +320,13 @@ func TestChii_SwapCallTiles(t *testing.T) {
 			want:     []tile.Tile{*tile.MustTileFromCode("2m"), *tile.MustTileFromCode("5m"), *tile.MustTileFromCode("5mr")},
 		},
 		{
+			name:     "5r-34m",
+			taken:    *tile.MustTileFromCode("5mr"),
+			consumed: [2]tile.Tile{*tile.MustTileFromCode("3m"), *tile.MustTileFromCode("4m")},
+			target:   *playerid.MustPlayerID(0),
+			want:     []tile.Tile{*tile.MustTileFromCode("2m"), *tile.MustTileFromCode("5m"), *tile.MustTileFromCode("5mr")},
+		},
+		{
 			name:     "8-67m",
 			taken:    *tile.MustTileFromCode("8m"),
 			consumed: [2]tile.Tile{*tile.MustTileFromCode("6m"), *tile.MustTileFromCode("7m")},
@@ -350,6 +357,13 @@ func TestChii_SwapCallTiles(t *testing.T) {
 		{
 			name:     "5-67m",
 			taken:    *tile.MustTileFromCode("5m"),
+			consumed: [2]tile.Tile{*tile.MustTileFromCode("6m"), *tile.MustTileFromCode("7m")},
+			target:   *playerid.MustPlayerID(0),
+			want:     []tile.Tile{*tile.MustTileFromCode("5m"), *tile.MustTileFromCode("5mr"), *tile.MustTileFromCode("8m")},
+		},
+		{
+			name:     "5r-67m",
+			taken:    *tile.MustTileFromCode("5mr"),
 			consumed: [2]tile.Tile{*tile.MustTileFromCode("6m"), *tile.MustTileFromCode("7m")},
 			target:   *playerid.MustPlayerID(0),
 			want:     []tile.Tile{*tile.MustTileFromCode("5m"), *tile.MustTileFromCode("5mr"), *tile.MustTileFromCode("8m")},
