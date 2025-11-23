@@ -9,12 +9,16 @@ import (
 )
 
 type Meld interface {
-	Taken() *tile.Tile
 	Consumed() []tile.Tile
-	Target() int
 	ToTiles() []tile.Tile
 	ToBlock() block.Block
 	ToString() string
+}
+
+type OpenMeld interface {
+	Meld
+	Taken() *tile.Tile
+	Target() int
 }
 
 func isValidTarget(target int) bool {
@@ -31,7 +35,7 @@ func countRed(tiles []tile.Tile) int {
 	return numRed
 }
 
-func meldToString(m Meld) string {
+func meldToString(m OpenMeld) string {
 	consumedStrs := make([]string, len(m.Consumed()))
 	for i, t := range m.Consumed() {
 		consumedStrs[i] = t.Code()
