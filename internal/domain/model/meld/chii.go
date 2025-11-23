@@ -89,7 +89,27 @@ func (c *Chii) ToString() string {
 func (c *Chii) SwapCallTiles() []tile.Tile {
 	n := c.taken.Number()
 
-	if c.ty == chiiTypeHigh {
+	switch c.ty {
+	case chiiTypeLow:
+		switch n {
+		case 7:
+			return []tile.Tile{c.taken}
+		case 5:
+			return []tile.Tile{*c.taken.RemoveRed(), *c.taken.AddRed(), *c.taken.Next(3)}
+		case 2:
+			next := c.taken.Next(3)
+			return []tile.Tile{c.taken, *next, *next.AddRed()}
+		default:
+			return []tile.Tile{c.taken, *c.taken.Next(3)}
+		}
+	case chiiTypeMiddle:
+		switch n {
+		case 5:
+			return []tile.Tile{*c.taken.RemoveRed(), *c.taken.AddRed()}
+		default:
+			return []tile.Tile{c.taken}
+		}
+	case chiiTypeHigh:
 		switch n {
 		case 3:
 			return []tile.Tile{c.taken}
@@ -103,22 +123,5 @@ func (c *Chii) SwapCallTiles() []tile.Tile {
 		}
 	}
 
-	if c.ty == chiiTypeLow {
-		switch n {
-		case 7:
-			return []tile.Tile{c.taken}
-		case 5:
-			return []tile.Tile{*c.taken.RemoveRed(), *c.taken.AddRed(), *c.taken.Next(3)}
-		case 2:
-			next := c.taken.Next(3)
-			return []tile.Tile{c.taken, *next, *next.AddRed()}
-		default:
-			return []tile.Tile{c.taken, *c.taken.Next(3)}
-		}
-	}
-
-	if n == 5 {
-		return []tile.Tile{*c.taken.RemoveRed(), *c.taken.AddRed()}
-	}
-	return []tile.Tile{c.taken}
+	panic("unreachable: Chii.SwapCallTiles()")
 }
