@@ -63,3 +63,7 @@ func (k *PromotedKan) Added() *tile.Tile {
 func (k *PromotedKan) Target() *playerid.PlayerID {
 	return &k.target
 }
+
+func (k *PromotedKan) ToTiles() []tile.Tile {
+	return k.tiles
+}
