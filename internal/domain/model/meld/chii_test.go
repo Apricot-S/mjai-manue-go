@@ -312,6 +312,27 @@ func TestChii_SwapCallTiles(t *testing.T) {
 			target:   *playerid.MustPlayerID(0),
 			want:     []tile.Tile{*tile.MustTileFromCode("5m"), *tile.MustTileFromCode("5mr")},
 		},
+		{
+			name:     "9-78m",
+			taken:    *tile.MustTileFromCode("9m"),
+			consumed: [2]tile.Tile{*tile.MustTileFromCode("7m"), *tile.MustTileFromCode("8m")},
+			target:   *playerid.MustPlayerID(0),
+			want:     []tile.Tile{*tile.MustTileFromCode("6m"), *tile.MustTileFromCode("9m")},
+		},
+		{
+			name:     "5-34m",
+			taken:    *tile.MustTileFromCode("5m"),
+			consumed: [2]tile.Tile{*tile.MustTileFromCode("3m"), *tile.MustTileFromCode("4m")},
+			target:   *playerid.MustPlayerID(0),
+			want:     []tile.Tile{*tile.MustTileFromCode("2m"), *tile.MustTileFromCode("5m"), *tile.MustTileFromCode("5mr")},
+		},
+		{
+			name:     "8-67m",
+			taken:    *tile.MustTileFromCode("8m"),
+			consumed: [2]tile.Tile{*tile.MustTileFromCode("6m"), *tile.MustTileFromCode("7m")},
+			target:   *playerid.MustPlayerID(0),
+			want:     []tile.Tile{*tile.MustTileFromCode("5m"), *tile.MustTileFromCode("5mr"), *tile.MustTileFromCode("8m")},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
