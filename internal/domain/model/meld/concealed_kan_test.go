@@ -95,14 +95,8 @@ func TestNewConcealedKan(t *testing.T) {
 			if tt.wantErr {
 				t.Fatal("NewConcealedKan() succeeded unexpectedly")
 			}
-			if !reflect.DeepEqual(got.Taken(), tt.wantTaken) {
-				t.Errorf("NewConcealedKan().Taken() = %v, want %v", got.Taken(), tt.wantTaken)
-			}
 			if !reflect.DeepEqual(got.Consumed(), tt.wantConsumed) {
 				t.Errorf("NewConcealedKan().Consumed() = %v, want %v", got.Consumed(), tt.wantConsumed)
-			}
-			if !reflect.DeepEqual(got.Target(), tt.wantTarget) {
-				t.Errorf("NewConcealedKan().Target() = %v, want %v", got.Target(), tt.wantTarget)
 			}
 		})
 	}
