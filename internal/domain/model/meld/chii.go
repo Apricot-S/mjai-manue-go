@@ -88,6 +88,9 @@ func (c *Chii) ToString() string {
 
 func (c *Chii) SwapCallTiles() []tile.Tile {
 	if c.ty == chiiTypeHigh {
+		if c.taken.Number() == 3 {
+			return []tile.Tile{c.taken}
+		}
 		if c.taken.Number() == 5 {
 			return []tile.Tile{*c.taken.Next(-3), *c.taken.RemoveRed(), *c.taken.AddRed()}
 		}
@@ -95,6 +98,19 @@ func (c *Chii) SwapCallTiles() []tile.Tile {
 			return []tile.Tile{*c.taken.Next(-3), *c.taken.Next(-3).AddRed(), c.taken}
 		}
 		return []tile.Tile{*c.taken.Next(-3), c.taken}
+	}
+
+	if c.ty == chiiTypeLow {
+		if c.taken.Number() == 7 {
+			return []tile.Tile{c.taken}
+		}
+		if c.taken.Number() == 2 {
+			return []tile.Tile{c.taken, *c.taken.Next(3), *c.taken.Next(3).AddRed()}
+		}
+		if c.taken.Number() == 5 {
+			return []tile.Tile{*c.taken.RemoveRed(), *c.taken.AddRed(), *c.taken.Next(3)}
+		}
+		return []tile.Tile{c.taken, *c.taken.Next(3)}
 	}
 
 	if c.taken.Number() == 5 {

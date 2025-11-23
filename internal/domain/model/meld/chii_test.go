@@ -285,13 +285,6 @@ func TestChii_SwapCallTiles(t *testing.T) {
 		want     []tile.Tile
 	}{
 		{
-			name:     "7-89m",
-			taken:    *tile.MustTileFromCode("7m"),
-			consumed: [2]tile.Tile{*tile.MustTileFromCode("8m"), *tile.MustTileFromCode("9m")},
-			target:   *playerid.MustPlayerID(0),
-			want:     []tile.Tile{*tile.MustTileFromCode("7m")},
-		},
-		{
 			name:     "8-79m",
 			taken:    *tile.MustTileFromCode("8m"),
 			consumed: [2]tile.Tile{*tile.MustTileFromCode("7m"), *tile.MustTileFromCode("9m")},
@@ -332,6 +325,41 @@ func TestChii_SwapCallTiles(t *testing.T) {
 			consumed: [2]tile.Tile{*tile.MustTileFromCode("6m"), *tile.MustTileFromCode("7m")},
 			target:   *playerid.MustPlayerID(0),
 			want:     []tile.Tile{*tile.MustTileFromCode("5m"), *tile.MustTileFromCode("5mr"), *tile.MustTileFromCode("8m")},
+		},
+		{
+			name:     "3-12m",
+			taken:    *tile.MustTileFromCode("3m"),
+			consumed: [2]tile.Tile{*tile.MustTileFromCode("1m"), *tile.MustTileFromCode("2m")},
+			target:   *playerid.MustPlayerID(0),
+			want:     []tile.Tile{*tile.MustTileFromCode("3m")},
+		},
+		{
+			name:     "1-23m",
+			taken:    *tile.MustTileFromCode("1m"),
+			consumed: [2]tile.Tile{*tile.MustTileFromCode("2m"), *tile.MustTileFromCode("3m")},
+			target:   *playerid.MustPlayerID(0),
+			want:     []tile.Tile{*tile.MustTileFromCode("1m"), *tile.MustTileFromCode("4m")},
+		},
+		{
+			name:     "2-34m",
+			taken:    *tile.MustTileFromCode("2m"),
+			consumed: [2]tile.Tile{*tile.MustTileFromCode("3m"), *tile.MustTileFromCode("4m")},
+			target:   *playerid.MustPlayerID(0),
+			want:     []tile.Tile{*tile.MustTileFromCode("2m"), *tile.MustTileFromCode("5m"), *tile.MustTileFromCode("5mr")},
+		},
+		{
+			name:     "5-67m",
+			taken:    *tile.MustTileFromCode("5m"),
+			consumed: [2]tile.Tile{*tile.MustTileFromCode("6m"), *tile.MustTileFromCode("7m")},
+			target:   *playerid.MustPlayerID(0),
+			want:     []tile.Tile{*tile.MustTileFromCode("5m"), *tile.MustTileFromCode("5mr"), *tile.MustTileFromCode("8m")},
+		},
+		{
+			name:     "7-89m",
+			taken:    *tile.MustTileFromCode("7m"),
+			consumed: [2]tile.Tile{*tile.MustTileFromCode("8m"), *tile.MustTileFromCode("9m")},
+			target:   *playerid.MustPlayerID(0),
+			want:     []tile.Tile{*tile.MustTileFromCode("7m")},
 		},
 	}
 	for _, tt := range tests {
