@@ -73,3 +73,13 @@ func (k *PromotedKan) ToBlock() block.Block {
 	// Red five is sorted after normal, so RemoveRed() is not necessary.
 	return block.MustQuad(k.tiles[0])
 }
+
+func (k *PromotedKan) ToString() string {
+	taken := k.Taken().Code()
+	target := k.Target().Index()
+	consumed0 := k.consumed[0].Code()
+	consumed1 := k.consumed[1].Code()
+	added := k.Added().Code()
+
+	return fmt.Sprintf("[%s(%d)/%s %s %s]", taken, target, consumed0, consumed1, added)
+}

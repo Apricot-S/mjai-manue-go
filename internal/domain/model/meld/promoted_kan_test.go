@@ -295,3 +295,59 @@ func TestPromotedKan_ToBlock(t *testing.T) {
 		})
 	}
 }
+
+func TestPromotedKan_ToString(t *testing.T) {
+	tests := []struct {
+		name     string
+		taken    tile.Tile
+		consumed [2]tile.Tile
+		added    tile.Tile
+		target   playerid.PlayerID
+		want     string
+	}{
+		{
+			name:     "1p-1p1p-1p from 0",
+			taken:    *tile.MustTileFromCode("1p"),
+			consumed: [2]tile.Tile{*tile.MustTileFromCode("1p"), *tile.MustTileFromCode("1p")},
+			added:    *tile.MustTileFromCode("1p"),
+			target:   *playerid.MustPlayerID(0),
+			want:     "[1p(0)/1p 1p 1p]",
+		},
+		{
+			name:     "5p-5p5p-5pr from 1",
+			taken:    *tile.MustTileFromCode("5p"),
+			consumed: [2]tile.Tile{*tile.MustTileFromCode("5p"), *tile.MustTileFromCode("5p")},
+			added:    *tile.MustTileFromCode("5pr"),
+			target:   *playerid.MustPlayerID(1),
+			want:     "[5p(1)/5p 5p 5pr]",
+		},
+		{
+			name:     "5pr-5p5p-5p from 2",
+			taken:    *tile.MustTileFromCode("5pr"),
+			consumed: [2]tile.Tile{*tile.MustTileFromCode("5p"), *tile.MustTileFromCode("5p")},
+			added:    *tile.MustTileFromCode("5p"),
+			target:   *playerid.MustPlayerID(2),
+			want:     "[5pr(2)/5p 5p 5p]",
+		},
+		{
+			name:     "5p-5p5pr-5p from 3",
+			taken:    *tile.MustTileFromCode("5p"),
+			consumed: [2]tile.Tile{*tile.MustTileFromCode("5p"), *tile.MustTileFromCode("5pr")},
+			added:    *tile.MustTileFromCode("5p"),
+			target:   *playerid.MustPlayerID(3),
+			want:     "[5p(3)/5p 5pr 5p]",
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			k, err := meld.NewPromotedKan(tt.taken, tt.consumed, tt.added, tt.target)
+			if err != nil {
+				t.Fatalf("could not construct receiver type: %v", err)
+			}
+			got := k.ToString()
+			if got != tt.want {
+				t.Errorf("ToString() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
