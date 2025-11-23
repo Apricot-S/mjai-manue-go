@@ -22,6 +22,27 @@ func IsWinningForm(hand *hand.Hand) bool {
 	return ret
 }
 
+func IsWinningFormGeneral(hand *hand.Hand) bool {
+	tc34 := hand.ToTileCounts34()
+
+	numTiles := tc34.NumTiles()
+	if numTiles%3 != 2 {
+		return false
+	}
+
+	return isWinningFormGeneral(tc34)
+}
+
+func IsWinningFormChitoitsu(hand *hand.Hand) bool {
+	tc34 := hand.ToTileCounts34()
+	return isWinningFormChitoitsu(tc34)
+}
+
+func IsWinningFormKokushimuso(hand *hand.Hand) bool {
+	tc34 := hand.ToTileCounts34()
+	return isWinningFormKokushimuso(tc34)
+}
+
 // Reference: https://qiita.com/tomohxx/items/20d886d1991ab89f5522
 func isWinningFormGeneral(tc34 *tilecount.TileCounts34) bool {
 	colorWithPair := -1

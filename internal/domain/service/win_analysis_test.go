@@ -69,7 +69,7 @@ func TestIsWinningForm(t *testing.T) {
 	}
 }
 
-func Test_isWinningFormGeneral(t *testing.T) {
+func TestIsWinningFormGeneral(t *testing.T) {
 	tests := []struct {
 		codes []string
 		want  bool
@@ -108,7 +108,11 @@ func Test_isWinningFormGeneral(t *testing.T) {
 		},
 		{
 			codes: []string{},
-			want:  true,
+			want:  false,
+		},
+		{
+			codes: []string{"1m"},
+			want:  false,
 		},
 		{
 			codes: []string{"1m", "1m", "E", "E", "E"},
@@ -136,10 +140,9 @@ func Test_isWinningFormGeneral(t *testing.T) {
 		name := strings.Join(tt.codes, " ")
 		t.Run(name, func(t *testing.T) {
 			h := hand.CodesToHand(tt.codes)
-			tc34 := h.ToTileCounts34()
-			got := isWinningFormGeneral(tc34)
+			got := IsWinningFormGeneral(h)
 			if got != tt.want {
-				t.Errorf("isWinningFormGeneral() = %v, want %v", got, tt.want)
+				t.Errorf("IsWinningFormGeneral() = %v, want %v", got, tt.want)
 			}
 		})
 	}
@@ -205,7 +208,7 @@ func Test_isSingleColorWinningFormWithPair(t *testing.T) {
 	}
 }
 
-func Test_isWinningFormChitoitsu(t *testing.T) {
+func TestIsWinningFormChitoitsu(t *testing.T) {
 	tests := []struct {
 		name  string
 		codes []string
@@ -235,16 +238,15 @@ func Test_isWinningFormChitoitsu(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			h := hand.CodesToHand(tt.codes)
-			tc34 := h.ToTileCounts34()
-			got := isWinningFormChitoitsu(tc34)
+			got := IsWinningFormChitoitsu(h)
 			if got != tt.want {
-				t.Errorf("isWinningFormChitoitsu() = %v, want %v", got, tt.want)
+				t.Errorf("IsWinningFormChitoitsu() = %v, want %v", got, tt.want)
 			}
 		})
 	}
 }
 
-func Test_isWinningFormKokushimuso(t *testing.T) {
+func TestIsWinningFormKokushimuso(t *testing.T) {
 	tests := []struct {
 		name  string
 		codes []string
@@ -279,10 +281,9 @@ func Test_isWinningFormKokushimuso(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			h := hand.CodesToHand(tt.codes)
-			tc34 := h.ToTileCounts34()
-			got := isWinningFormKokushimuso(tc34)
+			got := IsWinningFormKokushimuso(h)
 			if got != tt.want {
-				t.Errorf("isWinningFormKokushimuso() = %v, want %v", got, tt.want)
+				t.Errorf("IsWinningFormKokushimuso() = %v, want %v", got, tt.want)
 			}
 		})
 	}
