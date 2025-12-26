@@ -89,7 +89,7 @@ func UpperBound(n int) shantenOption {
 // AnalyzeShanten calculates the shanten number and the list of Goal for the given PaiSet.
 // When the list of Goal is empty, `InfinityShanten` is returned as the shanten number.
 // It does not consider Seven Pairs or Thirteen Orphans.
-func AnalyzeShanten(hand *hand.Hand, opts ...shantenOption) (int, []Goal) {
+func AnalyzeShanten(hand *hand.VisibleHand, opts ...shantenOption) (int, []Goal) {
 	cfg := &shantenConfig{
 		allowedExtraTiles: 0,
 		upperBound:        MaxShantenNumber,
@@ -273,7 +273,7 @@ func makeNewBlocks(blocks []block.Block, newBlock block.Block) []block.Block {
 	return append(newBlocks, newBlock)
 }
 
-func AnalyzeShantenChitoitsu(hand *hand.Hand) int {
+func AnalyzeShantenChitoitsu(hand *hand.VisibleHand) int {
 	tc34 := hand.ToTileCounts34()
 
 	if tc34.NumTiles() < 13 {
@@ -299,7 +299,7 @@ func AnalyzeShantenChitoitsu(hand *hand.Hand) int {
 	return shanten
 }
 
-func AnalyzeShantenKokushimuso(hand *hand.Hand) int {
+func AnalyzeShantenKokushimuso(hand *hand.VisibleHand) int {
 	tc34 := hand.ToTileCounts34()
 
 	if tc34.NumTiles() < 13 {

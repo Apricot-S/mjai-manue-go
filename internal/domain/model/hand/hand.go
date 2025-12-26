@@ -10,11 +10,11 @@ import (
 const maxNumTilesInHand = 14
 const maxCopies = 4
 
-type Hand struct {
+type VisibleHand struct {
 	tileCounts [tile.NumTileType38]int
 }
 
-func NewHand(tiles []tile.Tile) (*Hand, error) {
+func NewVisibleHand(tiles []tile.Tile) (*VisibleHand, error) {
 	tileCounts := [tile.NumTileType38]int{}
 	for _, t := range tiles {
 		id := t.ID()
@@ -40,18 +40,18 @@ func NewHand(tiles []tile.Tile) (*Hand, error) {
 		return nil, fmt.Errorf("tiles cannot contain 15 or more tiles: %d", sum)
 	}
 
-	return &Hand{tileCounts: tileCounts}, nil
+	return &VisibleHand{tileCounts: tileCounts}, nil
 }
 
-func MustHand(tiles []tile.Tile) *Hand {
-	h, err := NewHand(tiles)
+func MustVisibleHand(tiles []tile.Tile) *VisibleHand {
+	h, err := NewVisibleHand(tiles)
 	if err != nil {
 		panic(err)
 	}
 	return h
 }
 
-func (h *Hand) ToTiles() []tile.Tile {
+func (h *VisibleHand) ToTiles() []tile.Tile {
 	tiles := make([]tile.Tile, 0, maxNumTilesInHand)
 	for i, c := range h.tileCounts {
 		for range c {
@@ -61,7 +61,7 @@ func (h *Hand) ToTiles() []tile.Tile {
 	return tiles
 }
 
-func (h *Hand) ToTileCounts34() *tilecount.TileCounts34 {
+func (h *VisibleHand) ToTileCounts34() *tilecount.TileCounts34 {
 	tc := tilecount.TileCounts34(h.tileCounts[:34])
 	tc[4] += h.tileCounts[34]
 	tc[13] += h.tileCounts[35]

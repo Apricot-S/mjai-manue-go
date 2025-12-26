@@ -6,7 +6,7 @@ import (
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/model/tilecount"
 )
 
-func IsWinningForm(hand *hand.Hand) bool {
+func IsWinningForm(hand *hand.VisibleHand) bool {
 	tc34 := hand.ToTileCounts34()
 
 	numTiles := tc34.NumTiles()
@@ -22,7 +22,7 @@ func IsWinningForm(hand *hand.Hand) bool {
 	return ret
 }
 
-func IsWinningFormGeneral(hand *hand.Hand) bool {
+func IsWinningFormGeneral(hand *hand.VisibleHand) bool {
 	tc34 := hand.ToTileCounts34()
 
 	numTiles := tc34.NumTiles()
@@ -33,12 +33,12 @@ func IsWinningFormGeneral(hand *hand.Hand) bool {
 	return isWinningFormGeneral(tc34)
 }
 
-func IsWinningFormChitoitsu(hand *hand.Hand) bool {
+func IsWinningFormChitoitsu(hand *hand.VisibleHand) bool {
 	tc34 := hand.ToTileCounts34()
 	return isWinningFormChitoitsu(tc34)
 }
 
-func IsWinningFormKokushimuso(hand *hand.Hand) bool {
+func IsWinningFormKokushimuso(hand *hand.VisibleHand) bool {
 	tc34 := hand.ToTileCounts34()
 	return isWinningFormKokushimuso(tc34)
 }

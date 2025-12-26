@@ -27,7 +27,7 @@ func shuffleWall(rng *rand.Rand, wall []int) {
 	})
 }
 
-func fillHand(wall []int, handLength int) *hand.Hand {
+func fillHand(wall []int, handLength int) *hand.VisibleHand {
 	tc34 := [34]int{}
 	for _, tile := range wall[:handLength] {
 		tc34[tile]++
@@ -45,10 +45,10 @@ func fillHand(wall []int, handLength int) *hand.Hand {
 		}
 	}
 
-	return hand.MustHand(tiles)
+	return hand.MustVisibleHand(tiles)
 }
 
-func generateRandomPureHandImpl(rng *rand.Rand, handLength int) *hand.Hand {
+func generateRandomPureHandImpl(rng *rand.Rand, handLength int) *hand.VisibleHand {
 	wall := [136]int{}
 	for i := range wall {
 		wall[i] = i / 4
@@ -57,16 +57,16 @@ func generateRandomPureHandImpl(rng *rand.Rand, handLength int) *hand.Hand {
 	return fillHand(wall[:], handLength)
 }
 
-func generateRandomPureHand(rng *rand.Rand) *hand.Hand {
+func generateRandomPureHand(rng *rand.Rand) *hand.VisibleHand {
 	handLength := chooseHandLength(rng)
 	return generateRandomPureHandImpl(rng, handLength)
 }
 
-func generateRandomPureHand14(rng *rand.Rand) *hand.Hand {
+func generateRandomPureHand14(rng *rand.Rand) *hand.VisibleHand {
 	return generateRandomPureHandImpl(rng, 14)
 }
 
-func generateRandomHalfFlushPureHandImpl(rng *rand.Rand, handLength int) *hand.Hand {
+func generateRandomHalfFlushPureHandImpl(rng *rand.Rand, handLength int) *hand.VisibleHand {
 	colorStartOptions := [...]int{0, 9, 18}
 	colorStart := colorStartOptions[rng.IntN(len(colorStartOptions))]
 
@@ -82,16 +82,16 @@ func generateRandomHalfFlushPureHandImpl(rng *rand.Rand, handLength int) *hand.H
 	return fillHand(wall[:], handLength)
 }
 
-func generateRandomHalfFlushPureHand(rng *rand.Rand) *hand.Hand {
+func generateRandomHalfFlushPureHand(rng *rand.Rand) *hand.VisibleHand {
 	handLength := chooseHandLength(rng)
 	return generateRandomHalfFlushPureHandImpl(rng, handLength)
 }
 
-func generateRandomHalfFlushPureHand14(rng *rand.Rand) *hand.Hand {
+func generateRandomHalfFlushPureHand14(rng *rand.Rand) *hand.VisibleHand {
 	return generateRandomHalfFlushPureHandImpl(rng, 14)
 }
 
-func generateRandomFullFlushPureHandImpl(rng *rand.Rand, handLength int) *hand.Hand {
+func generateRandomFullFlushPureHandImpl(rng *rand.Rand, handLength int) *hand.VisibleHand {
 	colorStartOptions := [...]int{0, 9, 18}
 	colorStart := colorStartOptions[rng.IntN(len(colorStartOptions))]
 
@@ -103,18 +103,18 @@ func generateRandomFullFlushPureHandImpl(rng *rand.Rand, handLength int) *hand.H
 	return fillHand(wall[:], handLength)
 }
 
-func generateRandomFullFlushPureHand(rng *rand.Rand) *hand.Hand {
+func generateRandomFullFlushPureHand(rng *rand.Rand) *hand.VisibleHand {
 	handLength := chooseHandLength(rng)
 	return generateRandomFullFlushPureHandImpl(rng, handLength)
 }
 
-func generateRandomFullFlushPureHand14(rng *rand.Rand) *hand.Hand {
+func generateRandomFullFlushPureHand14(rng *rand.Rand) *hand.VisibleHand {
 	return generateRandomFullFlushPureHandImpl(rng, 14)
 }
 
 var nonSimples = [...]int{0, 8, 9, 17, 18, 26, 27, 28, 29, 30, 31, 32, 33}
 
-func generateRandomNonSimplePureHandImpl(rng *rand.Rand, handLength int) *hand.Hand {
+func generateRandomNonSimplePureHandImpl(rng *rand.Rand, handLength int) *hand.VisibleHand {
 	wall := [52]int{}
 	for i := range wall {
 		wall[i] = nonSimples[i%13]
@@ -123,12 +123,12 @@ func generateRandomNonSimplePureHandImpl(rng *rand.Rand, handLength int) *hand.H
 	return fillHand(wall[:], handLength)
 }
 
-func generateRandomNonSimplePureHand(rng *rand.Rand) *hand.Hand {
+func generateRandomNonSimplePureHand(rng *rand.Rand) *hand.VisibleHand {
 	handLength := chooseHandLength(rng)
 	return generateRandomNonSimplePureHandImpl(rng, handLength)
 }
 
-func generateRandomNonSimplePureHand14(rng *rand.Rand) *hand.Hand {
+func generateRandomNonSimplePureHand14(rng *rand.Rand) *hand.VisibleHand {
 	return generateRandomNonSimplePureHandImpl(rng, 14)
 }
 

@@ -9,7 +9,7 @@ import (
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/model/tilecount"
 )
 
-func TestNewHand(t *testing.T) {
+func TestNewVisibleHand(t *testing.T) {
 	tests := []struct {
 		name    string
 		tiles   []tile.Tile
@@ -85,24 +85,24 @@ func TestNewHand(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, gotErr := hand.NewHand(tt.tiles)
+			got, gotErr := hand.NewVisibleHand(tt.tiles)
 			if gotErr != nil {
 				if !tt.wantErr {
-					t.Errorf("NewHand() failed: %v", gotErr)
+					t.Errorf("NewVisibleHand() failed: %v", gotErr)
 				}
 				return
 			}
 			if tt.wantErr {
-				t.Fatal("NewHand() succeeded unexpectedly")
+				t.Fatal("NewVisibleHand() succeeded unexpectedly")
 			}
 			if !reflect.DeepEqual(got.ToTiles(), tt.tiles) {
-				t.Errorf("NewHand().ToTiles() = %v, want %v", got, tt.want)
+				t.Errorf("NewVisibleHand().ToTiles() = %v, want %v", got, tt.want)
 			}
 		})
 	}
 }
 
-func TestHand_ToTileCounts34(t *testing.T) {
+func TestVisibleHand_ToTileCounts34(t *testing.T) {
 	tests := []struct {
 		name  string
 		tiles []tile.Tile
@@ -136,7 +136,7 @@ func TestHand_ToTileCounts34(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			h, err := hand.NewHand(tt.tiles)
+			h, err := hand.NewVisibleHand(tt.tiles)
 			if err != nil {
 				t.Fatalf("could not construct receiver type: %v", err)
 			}
