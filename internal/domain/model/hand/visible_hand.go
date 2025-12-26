@@ -8,19 +8,18 @@ import (
 )
 
 type VisibleHand struct {
-	tileCounts [tile.NumTileType38]int
+	tileCounts [tile.NumTileType37]int
 }
 
 func NewVisibleHand(tiles []tile.Tile) (*VisibleHand, error) {
-	tileCounts := [tile.NumTileType38]int{}
+	tileCounts := [tile.NumTileType37]int{}
 	for _, t := range tiles {
 		id := t.ID()
-		tileCounts[id]++
-
 		if id >= tile.NumTileType37 {
-			// There can be any number of unknowns.
-			continue
+			return nil, fmt.Errorf("visible hand cannot contain unknown tiles")
 		}
+
+		tileCounts[id]++
 		if tileCounts[id] > maxCopies {
 			return nil, fmt.Errorf("hand cannot contain five identical tiles: %s", t.Code())
 		}
