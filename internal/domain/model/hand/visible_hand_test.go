@@ -95,8 +95,8 @@ func TestNewVisibleHand(t *testing.T) {
 			if tt.wantErr {
 				t.Fatal("NewVisibleHand() succeeded unexpectedly")
 			}
-			if !reflect.DeepEqual(got.ToTiles(), tt.tiles) {
-				t.Errorf("NewVisibleHand().ToTiles() = %v, want %v", got, tt.want)
+			if !reflect.DeepEqual(got.ToTiles(), tt.want) {
+				t.Errorf("NewVisibleHand().ToTiles() = %v, want %v", got.ToTiles(), tt.want)
 			}
 		})
 	}
