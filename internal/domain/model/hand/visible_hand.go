@@ -7,9 +7,6 @@ import (
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/model/tilecount"
 )
 
-const maxNumTilesInHand = 14
-const maxCopies = 4
-
 type VisibleHand struct {
 	tileCounts [tile.NumTileType38]int
 }
