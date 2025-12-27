@@ -121,7 +121,7 @@ func TestNewTileFromCode(t *testing.T) {
 	}
 }
 
-func TestTile_Code(t *testing.T) {
+func TestTile_String(t *testing.T) {
 	tests := []struct {
 		name string
 		id   int
@@ -154,9 +154,9 @@ func TestTile_Code(t *testing.T) {
 			if err != nil {
 				t.Fatalf("could not construct receiver type: %v", err)
 			}
-			got := ti.Code()
+			got := ti.String()
 			if got != tt.want {
-				t.Errorf("Code() = %v, want %v", got, tt.want)
+				t.Errorf("String() = %v, want %v", got, tt.want)
 			}
 		})
 	}

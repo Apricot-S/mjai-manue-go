@@ -33,8 +33,8 @@ func TestSortTiles(t *testing.T) {
 	}
 
 	for i, sortedName := range sortedNames {
-		if tiles[i].Code() != sortedName {
-			t.Errorf("Expected %s but got %s", sortedName, tiles[i].Code())
+		if tiles[i].String() != sortedName {
+			t.Errorf("Expected %s but got %s", sortedName, tiles[i])
 		}
 	}
 }

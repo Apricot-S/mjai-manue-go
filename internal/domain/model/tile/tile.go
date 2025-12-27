@@ -119,7 +119,7 @@ func (t *Tile) ID() int {
 	return t.id
 }
 
-func (t *Tile) Code() string {
+func (t Tile) String() string {
 	return tileCodes[t.id]
 }
 

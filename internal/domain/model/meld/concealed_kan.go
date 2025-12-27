@@ -47,5 +47,5 @@ func (k *ConcealedKan) ToBlock() block.Block {
 
 func (k *ConcealedKan) String() string {
 	// Red five is in consumed[3]
-	return fmt.Sprintf("[# %s %s #]", k.consumed[2].Code(), k.consumed[3].Code())
+	return fmt.Sprintf("[# %s %s #]", k.consumed[2], k.consumed[3])
 }

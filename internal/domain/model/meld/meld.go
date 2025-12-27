@@ -41,10 +41,10 @@ func countRed(tiles []tile.Tile) int {
 func meldToString(m OpenMeld) string {
 	consumedStrs := make([]string, len(m.Consumed()))
 	for i, t := range m.Consumed() {
-		consumedStrs[i] = t.Code()
+		consumedStrs[i] = t.String()
 	}
 
-	taken := m.Taken().Code()
+	taken := m.Taken().String()
 	target := m.Target().Index()
 	consumed := strings.Join(consumedStrs, " ")
 

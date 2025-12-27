@@ -21,10 +21,10 @@ func NewVisibleHand(tiles []tile.Tile) (*VisibleHand, error) {
 
 		tileCounts[id]++
 		if tileCounts[id] > maxCopies {
-			return nil, fmt.Errorf("hand cannot contain five identical tiles: %s", t.Code())
+			return nil, fmt.Errorf("hand cannot contain five identical tiles: %s", t)
 		}
 		if t.IsRed() && tileCounts[id] > 1 {
-			return nil, fmt.Errorf("hand cannot contain multiple red fives of the same suit: %s", t.Code())
+			return nil, fmt.Errorf("hand cannot contain multiple red fives of the same suit: %s", t)
 		}
 	}
 

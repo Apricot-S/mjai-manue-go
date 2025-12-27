@@ -75,11 +75,11 @@ func (k *PromotedKan) ToBlock() block.Block {
 }
 
 func (k *PromotedKan) String() string {
-	taken := k.Taken().Code()
+	taken := k.Taken().String()
 	target := k.Target().Index()
-	consumed0 := k.consumed[0].Code()
-	consumed1 := k.consumed[1].Code()
-	added := k.Added().Code()
+	consumed0 := k.consumed[0].String()
+	consumed1 := k.consumed[1].String()
+	added := k.Added().String()
 
 	return fmt.Sprintf("[%s(%d)/%s %s %s]", taken, target, consumed0, consumed1, added)
 }
