@@ -63,7 +63,7 @@ func (p *Pon) ToBlock() block.Block {
 	return block.MustTriplet(p.tiles[0])
 }
 
-func (p *Pon) ToString() string {
+func (p *Pon) String() string {
 	return meldToString(p)
 }
 

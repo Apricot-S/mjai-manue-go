@@ -13,7 +13,7 @@ type Meld interface {
 	Consumed() []tile.Tile
 	ToTiles() []tile.Tile
 	ToBlock() block.Block
-	ToString() string
+	String() string
 }
 
 type OpenMeld interface {

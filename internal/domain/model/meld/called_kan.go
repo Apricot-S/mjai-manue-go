@@ -63,6 +63,6 @@ func (k *CalledKan) ToBlock() block.Block {
 	return block.MustQuad(k.tiles[0])
 }
 
-func (k *CalledKan) ToString() string {
+func (k *CalledKan) String() string {
 	return meldToString(k)
 }

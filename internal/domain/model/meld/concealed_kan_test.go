@@ -169,7 +169,7 @@ func TestConcealedKan_ToBlock(t *testing.T) {
 	}
 }
 
-func TestConcealedKan_ToString(t *testing.T) {
+func TestConcealedKan_String(t *testing.T) {
 	tests := []struct {
 		name     string
 		consumed [4]tile.Tile
@@ -197,9 +197,9 @@ func TestConcealedKan_ToString(t *testing.T) {
 			if err != nil {
 				t.Fatalf("could not construct receiver type: %v", err)
 			}
-			got := k.ToString()
+			got := k.String()
 			if got != tt.want {
-				t.Errorf("ToString() = %v, want %v", got, tt.want)
+				t.Errorf("String() = %v, want %v", got, tt.want)
 			}
 		})
 	}

@@ -74,7 +74,7 @@ func (k *PromotedKan) ToBlock() block.Block {
 	return block.MustQuad(k.tiles[0])
 }
 
-func (k *PromotedKan) ToString() string {
+func (k *PromotedKan) String() string {
 	taken := k.Taken().Code()
 	target := k.Target().Index()
 	consumed0 := k.consumed[0].Code()

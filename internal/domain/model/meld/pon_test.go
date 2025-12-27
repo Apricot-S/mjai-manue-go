@@ -245,7 +245,7 @@ func TestPon_ToBlock(t *testing.T) {
 	}
 }
 
-func TestPon_ToString(t *testing.T) {
+func TestPon_String(t *testing.T) {
 	tests := []struct {
 		name     string
 		taken    tile.Tile
@@ -281,9 +281,9 @@ func TestPon_ToString(t *testing.T) {
 			if err != nil {
 				t.Fatalf("could not construct receiver type: %v", err)
 			}
-			got := p.ToString()
+			got := p.String()
 			if got != tt.want {
-				t.Errorf("ToString() = %v, want %v", got, tt.want)
+				t.Errorf("String() = %v, want %v", got, tt.want)
 			}
 		})
 	}
