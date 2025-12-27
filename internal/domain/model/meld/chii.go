@@ -82,8 +82,8 @@ func (c *Chii) ToBlock() block.Block {
 	return block.MustSequence(*c.tiles[0].RemoveRed())
 }
 
-func (c *Chii) String() string {
-	return meldToString(c)
+func (c Chii) String() string {
+	return meldToString(&c)
 }
 
 func (c *Chii) SwapCallTiles() []tile.Tile {
