@@ -50,6 +50,7 @@ func CalculateFuHan(
 
 	yakus = map[string]int{
 		"reach": riichi_(riichi),
+		"tyc":   tanyao(allTiles),
 	}
 	maps.DeleteFunc(yakus, func(k string, v int) bool {
 		return v <= 0
@@ -89,4 +90,13 @@ func riichi_(isRiichi bool) int {
 		return 1
 	}
 	return 0
+}
+
+func tanyao(allTiles []tile.Tile) int {
+	for _, t := range allTiles {
+		if t.IsYaochu() {
+			return 0
+		}
+	}
+	return 1
 }
