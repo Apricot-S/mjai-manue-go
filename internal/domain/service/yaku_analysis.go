@@ -52,14 +52,15 @@ func CalculateFuHan(
 		"reach": riichi_(riichi),
 		"tyc":   tanyao(allTiles),
 		"cty":   chantaiyao(allBlocks, isOpen),
+		"pf":    pinfu(allBlocks, prevalentWind, seatWind, isOpen),
 	}
 	maps.DeleteFunc(yakus, func(k string, v int) bool {
 		return v <= 0
 	})
 
 	// TODO Calculate fu more accurately
-	_, pinfu := yakus["pf"]
-	if pinfu || isOpen {
+	_, isPinfu := yakus["pf"]
+	if isPinfu || isOpen {
 		fu = 30
 	} else {
 		fu = 40
@@ -120,4 +121,34 @@ func chantaiyao(allBlocks []block.Block, isOpen bool) int {
 		return 1
 	}
 	return 2
+}
+
+// TODO Consider ryanmen criteria
+func pinfu(allBlocks []block.Block, prevalentWind wind.Wind, seatWind wind.Wind, isOpen bool) int {
+	if isOpen {
+		return 0
+	}
+
+	for _, b := range allBlocks {
+		switch b.(type) {
+		case *block.Triplet, *block.Quad:
+			return 0
+		case *block.Pair:
+			t := &b.ToTiles()[0]
+			if t.IsSuits() {
+				continue
+			}
+			if t.Number() > 4 {
+				// dragons
+				return 0
+			}
+
+			name := t.String()
+			if name == prevalentWind.String() || name == seatWind.String() {
+				return 0
+			}
+		}
+	}
+
+	return 1
 }
