@@ -46,11 +46,12 @@ func CalculateFuHan(
 		allTiles = append(allTiles, b.ToTiles()...)
 	}
 
-	hasMeld := len(melds) > 0
+	isOpen := len(melds) > 0
 
 	yakus = map[string]int{
 		"reach": riichi_(riichi),
 		"tyc":   tanyao(allTiles),
+		"cty":   chantaiyao(allBlocks, isOpen),
 	}
 	maps.DeleteFunc(yakus, func(k string, v int) bool {
 		return v <= 0
@@ -58,7 +59,7 @@ func CalculateFuHan(
 
 	// TODO Calculate fu more accurately
 	_, pinfu := yakus["pf"]
-	if pinfu || hasMeld {
+	if pinfu || isOpen {
 		fu = 30
 	} else {
 		fu = 40
@@ -99,4 +100,24 @@ func tanyao(allTiles []tile.Tile) int {
 		}
 	}
 	return 1
+}
+
+func chantaiyao(allBlocks []block.Block, isOpen bool) int {
+	for _, b := range allBlocks {
+		isYaochuBlock := false
+		for _, p := range b.ToTiles() {
+			if p.IsYaochu() {
+				isYaochuBlock = true
+				break
+			}
+		}
+		if !isYaochuBlock {
+			return 0
+		}
+	}
+
+	if isOpen {
+		return 1
+	}
+	return 2
 }

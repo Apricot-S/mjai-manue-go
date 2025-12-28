@@ -42,6 +42,14 @@ func NewPon(taken tile.Tile, consumed [2]tile.Tile, target playerid.PlayerID) (*
 	}, nil
 }
 
+func MustPon(taken tile.Tile, consumed [2]tile.Tile, target playerid.PlayerID) *Pon {
+	p, err := NewPon(taken, consumed, target)
+	if err != nil {
+		panic(err)
+	}
+	return p
+}
+
 func (p *Pon) Taken() *tile.Tile {
 	return &p.taken
 }
