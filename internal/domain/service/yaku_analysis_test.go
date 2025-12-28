@@ -8,6 +8,7 @@ import (
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/model/hand"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/model/meld"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/model/tile"
+	"github.com/Apricot-S/mjai-manue-go/internal/domain/model/wind"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/service"
 )
 
@@ -17,8 +18,8 @@ func TestCalculateFuHan(t *testing.T) {
 		handCodes      []string
 		handBlocks     []block.Block
 		melds          []meld.Meld
-		prevalentWind  *tile.Tile
-		seatWind       *tile.Tile
+		prevalentWind  wind.Wind
+		seatWind       wind.Wind
 		doraIndicators []tile.Tile
 		tsumo          bool
 		riichi         bool
@@ -37,8 +38,8 @@ func TestCalculateFuHan(t *testing.T) {
 				block.MustPair(*tile.MustTileFromCode("9s")),
 			},
 			melds:          nil,
-			prevalentWind:  tile.MustTileFromCode("E"),
-			seatWind:       tile.MustTileFromCode("N"),
+			prevalentWind:  wind.East,
+			seatWind:       wind.South,
 			doraIndicators: nil,
 			tsumo:          false,
 			riichi:         false,
@@ -57,8 +58,8 @@ func TestCalculateFuHan(t *testing.T) {
 				block.MustPair(*tile.MustTileFromCode("9s")),
 			},
 			melds:          nil,
-			prevalentWind:  tile.MustTileFromCode("E"),
-			seatWind:       tile.MustTileFromCode("N"),
+			prevalentWind:  wind.East,
+			seatWind:       wind.South,
 			doraIndicators: nil,
 			tsumo:          false,
 			riichi:         true,

@@ -7,6 +7,7 @@ import (
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/model/hand"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/model/meld"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/model/tile"
+	"github.com/Apricot-S/mjai-manue-go/internal/domain/model/wind"
 )
 
 type WinEvent int
@@ -26,8 +27,8 @@ func CalculateFuHan(
 	hand *hand.VisibleHand,
 	handBlocks []block.Block,
 	melds []meld.Meld,
-	prevalentWind *tile.Tile,
-	seatWind *tile.Tile,
+	prevalentWind wind.Wind,
+	seatWind wind.Wind,
 	doraIndicators []tile.Tile,
 	tsumo bool,
 	riichi bool,
@@ -85,8 +86,8 @@ func Has1Han(
 	hand *hand.VisibleHand,
 	melds []meld.Meld,
 	winningTile *tile.Tile,
-	prevalentWind *tile.Tile,
-	seatWind *tile.Tile,
+	prevalentWind wind.Wind,
+	seatWind wind.Wind,
 	tsumo bool,
 	riichi bool,
 	event WinEvent,
