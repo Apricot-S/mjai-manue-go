@@ -31,7 +31,6 @@ func CalculateFuHan(
 	prevalentWind wind.Wind,
 	seatWind wind.Wind,
 	doraIndicators []tile.Tile,
-	tsumo bool,
 	riichi bool,
 ) (fu int, han int, yakus map[string]int) {
 	meldBlocks := make([]block.Block, len(melds))

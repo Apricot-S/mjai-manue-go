@@ -22,7 +22,6 @@ func TestCalculateFuHan(t *testing.T) {
 		prevalentWind  wind.Wind
 		seatWind       wind.Wind
 		doraIndicators []tile.Tile
-		tsumo          bool
 		riichi         bool
 		wantFu         int
 		wantHan        int
@@ -42,7 +41,6 @@ func TestCalculateFuHan(t *testing.T) {
 			prevalentWind:  wind.East,
 			seatWind:       wind.South,
 			doraIndicators: nil,
-			tsumo:          false,
 			riichi:         false,
 			wantFu:         40,
 			wantHan:        0,
@@ -62,7 +60,6 @@ func TestCalculateFuHan(t *testing.T) {
 			prevalentWind:  wind.East,
 			seatWind:       wind.South,
 			doraIndicators: nil,
-			tsumo:          false,
 			riichi:         true,
 			wantFu:         40,
 			wantHan:        1,
@@ -82,7 +79,6 @@ func TestCalculateFuHan(t *testing.T) {
 			prevalentWind:  wind.East,
 			seatWind:       wind.South,
 			doraIndicators: nil,
-			tsumo:          false,
 			riichi:         false,
 			wantFu:         40,
 			wantHan:        1,
@@ -102,7 +98,6 @@ func TestCalculateFuHan(t *testing.T) {
 			prevalentWind:  wind.East,
 			seatWind:       wind.South,
 			doraIndicators: nil,
-			tsumo:          false,
 			riichi:         true,
 			wantFu:         40,
 			wantHan:        2,
@@ -122,7 +117,6 @@ func TestCalculateFuHan(t *testing.T) {
 			prevalentWind:  wind.East,
 			seatWind:       wind.South,
 			doraIndicators: nil,
-			tsumo:          false,
 			riichi:         false,
 			wantFu:         40,
 			wantHan:        2,
@@ -152,7 +146,6 @@ func TestCalculateFuHan(t *testing.T) {
 			prevalentWind:  wind.East,
 			seatWind:       wind.South,
 			doraIndicators: nil,
-			tsumo:          false,
 			riichi:         false,
 			wantFu:         30,
 			wantHan:        1,
@@ -172,7 +165,6 @@ func TestCalculateFuHan(t *testing.T) {
 			prevalentWind:  wind.East,
 			seatWind:       wind.South,
 			doraIndicators: nil,
-			tsumo:          false,
 			riichi:         false,
 			wantFu:         30,
 			wantHan:        1,
@@ -192,7 +184,6 @@ func TestCalculateFuHan(t *testing.T) {
 			prevalentWind:  wind.East,
 			seatWind:       wind.South,
 			doraIndicators: nil,
-			tsumo:          false,
 			riichi:         false,
 			wantFu:         40,
 			wantHan:        0,
@@ -212,7 +203,6 @@ func TestCalculateFuHan(t *testing.T) {
 			prevalentWind:  wind.East,
 			seatWind:       wind.South,
 			doraIndicators: nil,
-			tsumo:          false,
 			riichi:         false,
 			wantFu:         40,
 			wantHan:        0,
@@ -232,7 +222,6 @@ func TestCalculateFuHan(t *testing.T) {
 			prevalentWind:  wind.East,
 			seatWind:       wind.South,
 			doraIndicators: nil,
-			tsumo:          false,
 			riichi:         false,
 			wantFu:         40,
 			wantHan:        0,
@@ -242,7 +231,7 @@ func TestCalculateFuHan(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			hand := hand.CodesToHand(tt.handCodes)
-			fu, han, yakus := service.CalculateFuHan(hand, tt.handBlocks, tt.melds, tt.prevalentWind, tt.seatWind, tt.doraIndicators, tt.tsumo, tt.riichi)
+			fu, han, yakus := service.CalculateFuHan(hand, tt.handBlocks, tt.melds, tt.prevalentWind, tt.seatWind, tt.doraIndicators, tt.riichi)
 			if tt.wantFu != fu {
 				t.Errorf("CalculateFuHan() = %v, want %v", fu, tt.wantFu)
 			}
