@@ -62,6 +62,14 @@ func NewChii(taken tile.Tile, consumed [2]tile.Tile, target playerid.PlayerID) (
 	}, nil
 }
 
+func MustChii(taken tile.Tile, consumed [2]tile.Tile, target playerid.PlayerID) *Chii {
+	c, err := NewChii(taken, consumed, target)
+	if err != nil {
+		panic(err)
+	}
+	return c
+}
+
 func (c *Chii) Taken() *tile.Tile {
 	return &c.taken
 }

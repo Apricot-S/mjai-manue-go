@@ -130,7 +130,7 @@ func TestCalculateFuHan(t *testing.T) {
 		},
 		{
 			name:      "only Chantaiyao open",
-			handCodes: []string{"1p", "2p", "3p", "1s", "2s", "3s", "9s", "9s", "9s", "N", "N"},
+			handCodes: []string{"1p", "2p", "3p", "9s", "9s", "9s", "N", "N"},
 			handBlocks: []block.Block{
 				block.MustSequence(*tile.MustTileFromCode("1p")),
 				block.MustSequence(*tile.MustTileFromCode("1s")),
@@ -141,6 +141,11 @@ func TestCalculateFuHan(t *testing.T) {
 				meld.MustPon(
 					*tile.MustTileFromCode("1m"),
 					[2]tile.Tile{*tile.MustTileFromCode("1m"), *tile.MustTileFromCode("1m")},
+					*playerid.MustPlayerID(2),
+				),
+				meld.MustChii(
+					*tile.MustTileFromCode("7s"),
+					[2]tile.Tile{*tile.MustTileFromCode("8s"), *tile.MustTileFromCode("9s")},
 					*playerid.MustPlayerID(2),
 				),
 			},
