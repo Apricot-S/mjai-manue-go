@@ -1,6 +1,7 @@
 package service
 
 import (
+	"maps"
 	"slices"
 
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/model/block"
@@ -47,36 +48,24 @@ func CalculateFuHan(
 
 	hasMeld := len(melds) > 0
 
-	han = 0
-	yakus = make(map[string]int)
-
-	addYaku := func(existsYaku bool, name string, menzenFan int, kuiFan int) {
-		if !existsYaku {
-			return
-		}
-
-		var yakuFan int
-		if hasMeld {
-			yakuFan = kuiFan
-		} else {
-			yakuFan = menzenFan
-		}
-
-		if yakuFan > 0 {
-			yakus[name] = yakuFan
-			han += yakuFan
-		}
+	yakus = map[string]int{
+		"reach": riichi_(riichi),
 	}
-
-	addYaku(riichi, "reach", 1, 0)
-
-	pinfu := false
+	maps.DeleteFunc(yakus, func(k string, v int) bool {
+		return v <= 0
+	})
 
 	// TODO Calculate fu more accurately
+	_, pinfu := yakus["pf"]
 	if pinfu || hasMeld {
 		fu = 30
 	} else {
 		fu = 40
+	}
+
+	han = 0
+	for _, h := range yakus {
+		han += h
 	}
 
 	return fu, han, yakus
@@ -93,4 +82,11 @@ func Has1Han(
 	event WinEvent,
 ) bool {
 	return false
+}
+
+func riichi_(isRiichi bool) int {
+	if isRiichi {
+		return 1
+	}
+	return 0
 }
