@@ -13,6 +13,8 @@ type VisibleHand struct {
 
 func NewVisibleHand(tiles []tile.Tile) (*VisibleHand, error) {
 	tileCounts := [tile.NumTileType37]int{}
+	sum := 0
+
 	for _, t := range tiles {
 		id := t.ID()
 		if id >= tile.NumTileType37 {
@@ -20,6 +22,7 @@ func NewVisibleHand(tiles []tile.Tile) (*VisibleHand, error) {
 		}
 
 		tileCounts[id]++
+		sum++
 		if tileCounts[id] > maxCopies {
 			return nil, fmt.Errorf("hand cannot contain five identical tiles: %s", t)
 		}
@@ -28,10 +31,6 @@ func NewVisibleHand(tiles []tile.Tile) (*VisibleHand, error) {
 		}
 	}
 
-	sum := 0
-	for _, c := range tileCounts {
-		sum += c
-	}
 	if sum > maxNumTilesInHand {
 		return nil, fmt.Errorf("hand cannot contain 15 or more tiles: %d", sum)
 	}
