@@ -143,6 +143,10 @@ func (t *Tile) IsHonors() bool {
 	return t.Color() == HonorsColor
 }
 
+func (t *Tile) IsYaochu() bool {
+	return slices.Contains(YaochuhaiIDs[:], t.ID())
+}
+
 func (t *Tile) IsUnknown() bool {
 	return t.id == unknownID
 }
