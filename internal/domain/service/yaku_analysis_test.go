@@ -329,6 +329,49 @@ func TestCalculateFuHan(t *testing.T) {
 			wantHan:        3,
 			wantYakus:      map[string]int{"ykh": 3},
 		},
+		{
+			name:      "only Iipeikou",
+			handCodes: []string{"1m", "1m", "1m", "2p", "3p", "4p", "3s", "4s", "5s", "3s", "4s", "5s", "9s", "9s"},
+			handBlocks: []block.Block{
+				block.MustTriplet(*tile.MustTileFromCode("1m")),
+				block.MustSequence(*tile.MustTileFromCode("2p")),
+				block.MustSequence(*tile.MustTileFromCode("3s")),
+				block.MustSequence(*tile.MustTileFromCode("3s")),
+				block.MustPair(*tile.MustTileFromCode("9s")),
+			},
+			melds:          nil,
+			prevalentWind:  wind.East,
+			seatWind:       wind.South,
+			doraIndicators: nil,
+			riichi:         false,
+			wantFu:         40,
+			wantHan:        1,
+			wantYakus:      map[string]int{"ipk": 1},
+		},
+		{
+			name:      "not Iipeikou: open",
+			handCodes: []string{"2p", "3p", "4p", "3s", "4s", "5s", "3s", "4s", "5s", "9s", "9s"},
+			handBlocks: []block.Block{
+				block.MustSequence(*tile.MustTileFromCode("2p")),
+				block.MustSequence(*tile.MustTileFromCode("3s")),
+				block.MustSequence(*tile.MustTileFromCode("3s")),
+				block.MustPair(*tile.MustTileFromCode("9s")),
+			},
+			melds: []meld.Meld{
+				meld.MustPon(
+					*tile.MustTileFromCode("1m"),
+					[2]tile.Tile{*tile.MustTileFromCode("1m"), *tile.MustTileFromCode("1m")},
+					*playerid.MustPlayerID(2),
+				),
+			},
+			prevalentWind:  wind.East,
+			seatWind:       wind.South,
+			doraIndicators: nil,
+			riichi:         false,
+			wantFu:         30,
+			wantHan:        0,
+			wantYakus:      map[string]int{},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
