@@ -53,6 +53,7 @@ func CalculateFuHan(
 		"cty":   chantaiyao(allBlocks, isOpen),
 		"pf":    pinfu(allBlocks, prevalentWind, seatWind, isOpen),
 		"ykh":   yakuhai(allBlocks, prevalentWind, seatWind),
+		"ipk":   iipeikou(allBlocks, isOpen),
 	}
 	maps.DeleteFunc(yakus, func(k string, v int) bool {
 		return v <= 0
@@ -180,4 +181,27 @@ func yakuhai(allBlocks []block.Block, prevalentWind wind.Wind, seatWind wind.Win
 	}
 
 	return han
+}
+
+func iipeikou(allBlocks []block.Block, isOpen bool) int {
+	if isOpen {
+		return 0
+	}
+
+	for i, b1 := range allBlocks {
+		if _, ok := b1.(*block.Sequence); !ok {
+			continue
+		}
+		t1 := b1.ToTiles()[0]
+
+		for _, b2 := range allBlocks[i+1:] {
+			if _, ok := b2.(*block.Sequence); !ok {
+				continue
+			}
+			if t1.HasSameSymbol(&b2.ToTiles()[0]) {
+				return 1
+			}
+		}
+	}
+	return 0
 }
