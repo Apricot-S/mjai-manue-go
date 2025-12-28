@@ -52,6 +52,7 @@ func CalculateFuHan(
 		"tyc":   tanyao(allTiles),
 		"cty":   chantaiyao(allBlocks, isOpen),
 		"pf":    pinfu(allBlocks, prevalentWind, seatWind, isOpen),
+		"ykh":   yakuhai(allBlocks, prevalentWind, seatWind),
 	}
 	maps.DeleteFunc(yakus, func(k string, v int) bool {
 		return v <= 0
@@ -150,4 +151,33 @@ func pinfu(allBlocks []block.Block, prevalentWind wind.Wind, seatWind wind.Wind,
 	}
 
 	return 1
+}
+
+func yakuhai(allBlocks []block.Block, prevalentWind wind.Wind, seatWind wind.Wind) int {
+	han := 0
+
+	for _, b := range allBlocks {
+		switch b.(type) {
+		case *block.Triplet, *block.Quad:
+			t := b.ToTiles()[0]
+			if t.IsSuits() {
+				continue
+			}
+			if t.Number() > 4 {
+				// dragons
+				han++
+				continue
+			}
+
+			name := t.String()
+			if name == prevalentWind.String() {
+				han++
+			}
+			if name == seatWind.String() {
+				han++
+			}
+		}
+	}
+
+	return han
 }
