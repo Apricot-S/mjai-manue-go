@@ -552,6 +552,30 @@ func TestCalculateFuHan(t *testing.T) {
 			wantHan:        3,
 			wantYakus:      map[string]int{"his": 3},
 		},
+		{
+			name:      "only Honiisou open",
+			handCodes: []string{"1m", "2m", "3m", "3m", "4m", "5m", "7m", "8m", "9m", "W", "W"},
+			handBlocks: []block.Block{
+				block.MustSequence(*tile.MustTileFromCode("1m")),
+				block.MustSequence(*tile.MustTileFromCode("3m")),
+				block.MustSequence(*tile.MustTileFromCode("7m")),
+				block.MustPair(*tile.MustTileFromCode("W")),
+			},
+			melds: []meld.Meld{
+				meld.MustPon(
+					*tile.MustTileFromCode("1m"),
+					[2]tile.Tile{*tile.MustTileFromCode("1m"), *tile.MustTileFromCode("1m")},
+					*playerid.MustPlayerID(2),
+				),
+			},
+			prevalentWind:  wind.East,
+			seatWind:       wind.South,
+			doraIndicators: nil,
+			riichi:         false,
+			wantFu:         30,
+			wantHan:        2,
+			wantYakus:      map[string]int{"his": 2},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
