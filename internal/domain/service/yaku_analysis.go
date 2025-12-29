@@ -64,6 +64,13 @@ func CalculateFuHan(
 		return v <= 0
 	})
 
+	if len(yakus) > 0 {
+		numDoras := countDoras(doraIndicators, allTiles)
+		if numDoras > 0 {
+			yakus["dr"] = numDoras
+		}
+	}
+
 	// TODO Calculate fu more accurately
 	_, isPinfu := yakus["pf"]
 	if isPinfu || isOpen {
@@ -78,6 +85,24 @@ func CalculateFuHan(
 	}
 
 	return fu, han, yakus
+}
+
+func countDoras(doraIndicators []tile.Tile, allTiles []tile.Tile) int {
+	doras := make([]tile.Tile, len(doraIndicators))
+	for i := range doras {
+		doras[i] = doraIndicators[i] // TODO: ドラ表示からドラに変換
+	}
+
+	numDoras := 0
+	for i := range allTiles {
+		for j := range doras {
+			if doras[j].HasSameSymbol(&allTiles[i]) {
+				numDoras++
+			}
+		}
+	}
+
+	return numDoras
 }
 
 func Has1Han(
