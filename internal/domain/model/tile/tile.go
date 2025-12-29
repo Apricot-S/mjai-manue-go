@@ -172,20 +172,24 @@ func (t *Tile) NextForDora() *Tile {
 
 	n := t.Number()
 
-	if t.IsSuits() && n == 9 {
-		return MustTileFromID(t.ID() - 8)
-	}
-	if t.IsRed() {
-		return MustTileFromID(t.RemoveRed().ID() + 1)
-	}
-
-	if t.IsHonors() && n == 4 {
-		// N -> E
-		return MustTileFromID(t.ID() - 3)
-	}
-	if t.IsHonors() && n == 7 {
-		// C -> P
-		return MustTileFromID(t.ID() - 2)
+	if t.IsSuits() {
+		if n == 9 {
+			// 9 -> 1
+			return MustTileFromID(t.ID() - 8)
+		}
+		if t.IsRed() {
+			// 5r -> 6
+			return MustTileFromID(t.RemoveRed().ID() + 1)
+		}
+	} else {
+		if n == 4 {
+			// N -> E
+			return MustTileFromID(t.ID() - 3)
+		}
+		if n == 7 {
+			// C -> P
+			return MustTileFromID(t.ID() - 2)
+		}
 	}
 
 	return MustTileFromID(t.ID() + 1)
