@@ -55,6 +55,7 @@ func CalculateFuHan(
 		"ykh":   yakuhai(allBlocks, prevalentWind, seatWind),
 		"ipk":   iipeikou(allBlocks, isOpen),
 		"ssj":   sanshokuDoujun(allBlocks, isOpen),
+		"ikt":   ikkiTsuukan(allBlocks, isOpen),
 	}
 	maps.DeleteFunc(yakus, func(k string, v int) bool {
 		return v <= 0
@@ -208,7 +209,7 @@ func iipeikou(allBlocks []block.Block, isOpen bool) int {
 }
 
 func sanshokuDoujun(allBlocks []block.Block, isOpen bool) int {
-	typeNumMap := map[rune]map[int]bool{
+	colorNumMap := map[rune]map[int]bool{
 		tile.ManzuColor: {},
 		tile.PinzuColor: {},
 		tile.SouzuColor: {},
@@ -221,11 +222,41 @@ func sanshokuDoujun(allBlocks []block.Block, isOpen bool) int {
 		}
 
 		t := sequence.ToTiles()[0]
-		typeNumMap[t.Color()][t.Number()] = true
+		colorNumMap[t.Color()][t.Number()] = true
 	}
 
 	for n := 1; n <= 7; n++ {
-		if typeNumMap[tile.ManzuColor][n] && typeNumMap[tile.PinzuColor][n] && typeNumMap[tile.SouzuColor][n] {
+		if colorNumMap[tile.ManzuColor][n] &&
+			colorNumMap[tile.PinzuColor][n] &&
+			colorNumMap[tile.SouzuColor][n] {
+			if isOpen {
+				return 1
+			}
+			return 2
+		}
+	}
+
+	return 0
+}
+
+func ikkiTsuukan(allBlocks []block.Block, isOpen bool) int {
+	colorNumMap := map[rune]map[int]bool{
+		tile.ManzuColor: {},
+		tile.PinzuColor: {},
+		tile.SouzuColor: {},
+	}
+
+	for _, b := range allBlocks {
+		sequence, ok := b.(*block.Sequence)
+		if !ok {
+			continue
+		}
+		t := sequence.ToTiles()[0]
+		colorNumMap[t.Color()][t.Number()] = true
+	}
+
+	for _, c := range []rune{tile.ManzuColor, tile.PinzuColor, tile.SouzuColor} {
+		if colorNumMap[c][1] && colorNumMap[c][4] && colorNumMap[c][7] {
 			if isOpen {
 				return 1
 			}
