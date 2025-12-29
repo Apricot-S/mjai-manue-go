@@ -143,6 +143,10 @@ func (t *Tile) IsHonors() bool {
 	return t.Color() == HonorsColor
 }
 
+func (t *Tile) IsYaochu() bool {
+	return slices.Contains(YaochuhaiIDs[:], t.ID())
+}
+
 func (t *Tile) IsUnknown() bool {
 	return t.id == unknownID
 }
@@ -159,6 +163,36 @@ func (t *Tile) Next(n int) *Tile {
 
 	nextID := t.RemoveRed().ID() + n
 	return MustTileFromID(nextID)
+}
+
+func (t *Tile) NextForDora() *Tile {
+	if t.IsUnknown() {
+		return t
+	}
+
+	n := t.Number()
+
+	if t.IsSuits() {
+		if n == 9 {
+			// 9 -> 1
+			return MustTileFromID(t.ID() - 8)
+		}
+		if t.IsRed() {
+			// 5r -> 6
+			return MustTileFromID(t.RemoveRed().ID() + 1)
+		}
+	} else {
+		if n == 4 {
+			// N -> E
+			return MustTileFromID(t.ID() - 3)
+		}
+		if n == 7 {
+			// C -> P
+			return MustTileFromID(t.ID() - 2)
+		}
+	}
+
+	return MustTileFromID(t.ID() + 1)
 }
 
 func (t *Tile) AddRed() *Tile {

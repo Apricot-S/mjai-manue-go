@@ -362,6 +362,59 @@ func TestTile_IsHonors(t *testing.T) {
 	}
 }
 
+func TestTile_IsYaochu(t *testing.T) {
+	tests := []struct {
+		name string
+		code string
+		want bool
+	}{
+		{
+			name: "1m is yaochu",
+			code: "1m",
+			want: true,
+		},
+		{
+			name: "2m is not yaochu",
+			code: "2m",
+			want: false,
+		},
+		{
+			name: "8m is not yaochu",
+			code: "8m",
+			want: false,
+		},
+		{
+			name: "9s is yaochu",
+			code: "9s",
+			want: true,
+		},
+		{
+			name: "5mr is not yaochu",
+			code: "5mr",
+			want: false,
+		},
+		{
+			name: "E is yaochu",
+			code: "E",
+			want: true,
+		},
+		{
+			name: "? is not yaochu",
+			code: "?",
+			want: false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			ti := tile.MustTileFromCode(tt.code)
+			got := ti.IsYaochu()
+			if got != tt.want {
+				t.Errorf("IsYaochu() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
 func TestTile_IsUnknown(t *testing.T) {
 	tests := []struct {
 		name string
@@ -468,6 +521,69 @@ func TestTile_Next(t *testing.T) {
 			got := ti.Next(tt.n)
 			if !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("Next() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestTile_NextForDora(t *testing.T) {
+	tests := []struct {
+		name string
+		code string
+		want *tile.Tile
+	}{
+		{
+			name: "? -> ?",
+			code: "?",
+			want: tile.MustTileFromCode("?"),
+		},
+		{
+			name: "1m -> 2m",
+			code: "1m",
+			want: tile.MustTileFromCode("2m"),
+		},
+		{
+			name: "8m -> 9m",
+			code: "8m",
+			want: tile.MustTileFromCode("9m"),
+		},
+		{
+			name: "9m -> 1m",
+			code: "9m",
+			want: tile.MustTileFromCode("1m"),
+		},
+		{
+			name: "E -> S",
+			code: "E",
+			want: tile.MustTileFromCode("S"),
+		},
+		{
+			name: "N -> E",
+			code: "N",
+			want: tile.MustTileFromCode("E"),
+		},
+		{
+			name: "P -> F",
+			code: "P",
+			want: tile.MustTileFromCode("F"),
+		},
+		{
+			name: "C -> P",
+			code: "C",
+			want: tile.MustTileFromCode("P"),
+		},
+		{
+			name: "5mr -> 6m",
+			code: "5mr",
+			want: tile.MustTileFromCode("6m"),
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			ti := tile.MustTileFromCode(tt.code)
+			got := ti.NextForDora()
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("NextForDora() = %v, want %v", got, tt.want)
 			}
 		})
 	}

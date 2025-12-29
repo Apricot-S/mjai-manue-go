@@ -42,6 +42,14 @@ func NewCalledKan(taken tile.Tile, consumed [3]tile.Tile, target playerid.Player
 	}, nil
 }
 
+func MustCalledKan(taken tile.Tile, consumed [3]tile.Tile, target playerid.PlayerID) *CalledKan {
+	k, err := NewCalledKan(taken, consumed, target)
+	if err != nil {
+		panic(err)
+	}
+	return k
+}
+
 func (k *CalledKan) Taken() *tile.Tile {
 	return &k.taken
 }
