@@ -69,6 +69,11 @@ func CalculateFuHan(
 		if numDoras > 0 {
 			yakus["dr"] = numDoras
 		}
+
+		numRedDoras := countRedDoras(hand, melds)
+		if numRedDoras > 0 {
+			yakus["adr"] = numRedDoras
+		}
 	}
 
 	// TODO Calculate fu more accurately
@@ -103,6 +108,26 @@ func countDoras(doraIndicators []tile.Tile, allTiles []tile.Tile) int {
 	}
 
 	return numDoras
+}
+
+func countRedDoras(hand *hand.VisibleHand, melds []meld.Meld) int {
+	numRedDoras := 0
+
+	for _, ht := range hand.ToTiles() {
+		if ht.IsRed() {
+			numRedDoras++
+		}
+	}
+
+	for _, m := range melds {
+		for _, mt := range m.ToTiles() {
+			if mt.IsRed() {
+				numRedDoras++
+			}
+		}
+	}
+
+	return numRedDoras
 }
 
 func Has1Han(

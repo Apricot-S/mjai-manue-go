@@ -29,7 +29,7 @@ func TestCalculateFuHan(t *testing.T) {
 	}{
 		{
 			name:      "no Yaku",
-			handCodes: []string{"1m", "1m", "1m", "2p", "3p", "4p", "3s", "4s", "5s", "6s", "6s", "6s", "9s", "9s"},
+			handCodes: []string{"1m", "1m", "1m", "2p", "3p", "4p", "3s", "4s", "5sr", "6s", "6s", "6s", "9s", "9s"},
 			handBlocks: []block.Block{
 				block.MustTriplet(*tile.MustTileFromCode("1m")),
 				block.MustSequence(*tile.MustTileFromCode("2p")),
@@ -632,6 +632,30 @@ func TestCalculateFuHan(t *testing.T) {
 			wantFu:         40,
 			wantHan:        6,
 			wantYakus:      map[string]int{"reach": 1, "dr": 5},
+		},
+		{
+			name:      "open Tanyao Dora 3 Red 2",
+			handCodes: []string{"2m", "2m", "2m", "3m", "4m", "5mr", "6s", "6s", "6s", "8s", "8s"},
+			handBlocks: []block.Block{
+				block.MustTriplet(*tile.MustTileFromCode("2m")),
+				block.MustSequence(*tile.MustTileFromCode("3m")),
+				block.MustTriplet(*tile.MustTileFromCode("6s")),
+				block.MustPair(*tile.MustTileFromCode("8s")),
+			},
+			melds: []meld.Meld{
+				meld.MustPon(
+					*tile.MustTileFromCode("5p"),
+					[2]tile.Tile{*tile.MustTileFromCode("5p"), *tile.MustTileFromCode("5pr")},
+					*playerid.MustPlayerID(2),
+				),
+			},
+			prevalentWind:  wind.East,
+			seatWind:       wind.South,
+			doraIndicators: []tile.Tile{*tile.MustTileFromCode("4p")},
+			riichi:         false,
+			wantFu:         30,
+			wantHan:        6,
+			wantYakus:      map[string]int{"tyc": 1, "dr": 3, "adr": 2},
 		},
 	}
 	for _, tt := range tests {
