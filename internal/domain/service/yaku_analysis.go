@@ -56,6 +56,7 @@ func CalculateFuHan(
 		"ipk":   iipeikou(allBlocks, isOpen),
 		"ssj":   sanshokuDoujun(allBlocks, isOpen),
 		"ikt":   ikkiTsuukan(allBlocks, isOpen),
+		"tth":   toitoihou(allBlocks),
 	}
 	maps.DeleteFunc(yakus, func(k string, v int) bool {
 		return v <= 0
@@ -265,4 +266,13 @@ func ikkiTsuukan(allBlocks []block.Block, isOpen bool) int {
 	}
 
 	return 0
+}
+
+func toitoihou(allBlocks []block.Block) int {
+	for _, b := range allBlocks {
+		if _, ok := b.(*block.Sequence); ok {
+			return 0
+		}
+	}
+	return 2
 }
