@@ -175,6 +175,9 @@ func (t *Tile) NextForDora() *Tile {
 	if t.IsSuits() && n == 9 {
 		return MustTileFromID(t.ID() - 8)
 	}
+	if t.IsRed() {
+		return MustTileFromID(t.RemoveRed().ID() + 1)
+	}
 
 	if t.IsHonors() && n == 4 {
 		// N -> E

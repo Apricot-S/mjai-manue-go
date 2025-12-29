@@ -572,6 +572,11 @@ func TestTile_NextForDora(t *testing.T) {
 			code: "C",
 			want: tile.MustTileFromCode("P"),
 		},
+		{
+			name: "5mr -> 6m",
+			code: "5mr",
+			want: tile.MustTileFromCode("6m"),
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
