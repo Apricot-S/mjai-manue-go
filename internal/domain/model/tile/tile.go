@@ -170,7 +170,22 @@ func (t *Tile) NextForDora() *Tile {
 		return t
 	}
 
-	panic("unimplemented!")
+	n := t.Number()
+
+	if t.IsSuits() && n == 9 {
+		return MustTileFromID(t.ID() - 8)
+	}
+
+	if t.IsHonors() && n == 4 {
+		// N -> E
+		return MustTileFromID(t.ID() - 3)
+	}
+	if t.IsHonors() && n == 7 {
+		// C -> P
+		return MustTileFromID(t.ID() - 2)
+	}
+
+	return MustTileFromID(t.ID() + 1)
 }
 
 func (t *Tile) AddRed() *Tile {
