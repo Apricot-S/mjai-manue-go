@@ -58,6 +58,7 @@ func CalculateFuHan(
 		"ikt":   ikkiTsuukan(allBlocks, isOpen),
 		"tth":   toitoihou(allBlocks),
 		"cis":   chiniisou(allBlocks, isOpen),
+		"his":   honiisou(allBlocks, isOpen),
 	}
 	maps.DeleteFunc(yakus, func(k string, v int) bool {
 		return v <= 0
@@ -281,8 +282,8 @@ func toitoihou(allBlocks []block.Block) int {
 func chiniisou(allBlocks []block.Block, isOpen bool) int {
 	var color rune
 
-	for i, m := range allBlocks {
-		c := m.ToTiles()[0].Color()
+	for i, b := range allBlocks {
+		c := b.ToTiles()[0].Color()
 		if c == tile.HonorsColor {
 			return 0
 		}
@@ -298,4 +299,35 @@ func chiniisou(allBlocks []block.Block, isOpen bool) int {
 		return 5
 	}
 	return 6
+}
+
+// Note:
+// To reproduce the behavior of the original mjai-manue,
+// Tsuuiisou are also judged as Honiisou.
+func honiisou(allBlocks []block.Block, isOpen bool) int {
+	var color rune = 0
+	hasHonors := false
+
+	for _, b := range allBlocks {
+		c := b.ToTiles()[0].Color()
+		if c == tile.HonorsColor {
+			hasHonors = true
+			continue
+		}
+
+		if color == 0 {
+			color = c
+		} else if c != color {
+			return 0
+		}
+	}
+
+	if !hasHonors {
+		return 0
+	}
+
+	if isOpen {
+		return 2
+	}
+	return 3
 }
