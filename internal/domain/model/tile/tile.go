@@ -165,6 +165,14 @@ func (t *Tile) Next(n int) *Tile {
 	return MustTileFromID(nextID)
 }
 
+func (t *Tile) NextForDora() *Tile {
+	if t.IsUnknown() {
+		return t
+	}
+
+	panic("unimplemented!")
+}
+
 func (t *Tile) AddRed() *Tile {
 	switch t.ID() {
 	case 4:

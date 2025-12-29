@@ -526,6 +526,34 @@ func TestTile_Next(t *testing.T) {
 	}
 }
 
+func TestTile_NextForDora(t *testing.T) {
+	tests := []struct {
+		name string
+		code string
+		want *tile.Tile
+	}{
+		{
+			name: "? -> ?",
+			code: "?",
+			want: tile.MustTileFromCode("?"),
+		},
+		{
+			name: "1m -> 2m",
+			code: "1m",
+			want: tile.MustTileFromCode("2m"),
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			ti := tile.MustTileFromCode(tt.code)
+			got := ti.NextForDora()
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("NextForDora() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
 func TestTile_AddRed(t *testing.T) {
 	tests := []struct {
 		name string
