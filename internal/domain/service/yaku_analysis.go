@@ -90,7 +90,7 @@ func CalculateFuHan(
 func countDoras(doraIndicators []tile.Tile, allTiles []tile.Tile) int {
 	doras := make([]tile.Tile, len(doraIndicators))
 	for i := range doras {
-		doras[i] = doraIndicators[i] // TODO: ドラ表示からドラに変換
+		doras[i] = *doraIndicators[i].NextForDora()
 	}
 
 	numDoras := 0
@@ -282,6 +282,7 @@ func ikkiTsuukan(allBlocks []block.Block, isOpen bool) int {
 		if !ok {
 			continue
 		}
+
 		t := sequence.ToTiles()[0]
 		colorNumMap[t.Color()][t.Number()] = true
 	}
