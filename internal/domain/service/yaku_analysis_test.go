@@ -595,6 +595,25 @@ func TestCalculateFuHan(t *testing.T) {
 			wantHan:        9,
 			wantYakus:      map[string]int{"cty": 2, "ykh": 2, "tth": 2, "his": 3},
 		},
+		{
+			name:      "Riichi Tanyao Pinfu Iipeikou Sanshoku doujun",
+			handCodes: []string{"2m", "2m", "3m", "3m", "4m", "4m", "2p", "3p", "4p", "2s", "3s", "4s", "8s", "8s"},
+			handBlocks: []block.Block{
+				block.MustSequence(*tile.MustTileFromCode("2m")),
+				block.MustSequence(*tile.MustTileFromCode("2m")),
+				block.MustSequence(*tile.MustTileFromCode("2p")),
+				block.MustSequence(*tile.MustTileFromCode("2s")),
+				block.MustPair(*tile.MustTileFromCode("8s")),
+			},
+			melds:          nil,
+			prevalentWind:  wind.East,
+			seatWind:       wind.South,
+			doraIndicators: nil,
+			riichi:         true,
+			wantFu:         30,
+			wantHan:        6,
+			wantYakus:      map[string]int{"reach": 1, "tyc": 1, "pf": 1, "ipk": 1, "ssj": 2},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
