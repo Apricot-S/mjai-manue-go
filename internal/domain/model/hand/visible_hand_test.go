@@ -196,6 +196,13 @@ func TestVisibleHand_Draw(t *testing.T) {
 			wantErr:   true,
 		},
 		{
+			name:      "hand can contain four normal fives",
+			tiles:     []tile.Tile{*tile.MustTileFromCode("5m"), *tile.MustTileFromCode("5m"), *tile.MustTileFromCode("5m")},
+			tile:      tile.MustTileFromCode("5m"),
+			wantTiles: []tile.Tile{*tile.MustTileFromCode("5m"), *tile.MustTileFromCode("5m"), *tile.MustTileFromCode("5m"), *tile.MustTileFromCode("5m")},
+			wantErr:   false,
+		},
+		{
 			name: "hand can draw 14th tile",
 			tiles: []tile.Tile{
 				*tile.MustTileFromCode("1m"), *tile.MustTileFromCode("1m"), *tile.MustTileFromCode("1m"),
