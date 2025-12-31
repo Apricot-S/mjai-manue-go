@@ -142,3 +142,19 @@ func TestVisibleHand_ToTileCounts34(t *testing.T) {
 		})
 	}
 }
+
+func TestVisibleHand_ToTileCounts34_HandAndTileCountsAreIndependent(t *testing.T) {
+	tiles := []tile.Tile{*tile.MustTileFromCode("1m"), *tile.MustTileFromCode("1m")}
+	hand, err := hand.NewVisibleHand(tiles)
+	if err != nil {
+		t.Fatalf("could not construct receiver type: %v", err)
+	}
+
+	counts1 := hand.ToTileCounts34()
+	counts1[0]++
+
+	counts2 := hand.ToTileCounts34()
+	if counts2[0] != 2 {
+		t.Errorf("expected counts2[0] to be 2, but got %v", counts2)
+	}
+}
