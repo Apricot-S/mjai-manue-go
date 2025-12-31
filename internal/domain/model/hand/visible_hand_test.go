@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/model/hand"
+	"github.com/Apricot-S/mjai-manue-go/internal/domain/model/meld"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/model/tile"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/model/tilecount"
 )
@@ -313,6 +314,39 @@ func TestVisibleHand_Discard(t *testing.T) {
 			}
 			if !reflect.DeepEqual(got.ToTiles(), tt.wantTiles) {
 				t.Errorf("Discard() = %v, want %v", got.ToTiles(), tt.wantTiles)
+			}
+		})
+	}
+}
+
+func TestVisibleHand_Call(t *testing.T) {
+	tests := []struct {
+		name      string
+		tiles     []tile.Tile
+		meld      meld.Meld
+		wantTiles []tile.Tile
+		wantErr   bool
+	}{
+		// TODO: Add test cases.
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			h, err := hand.NewVisibleHand(tt.tiles)
+			if err != nil {
+				t.Fatalf("could not construct receiver type: %v", err)
+			}
+			got, gotErr := h.Call(tt.meld)
+			if gotErr != nil {
+				if !tt.wantErr {
+					t.Errorf("Call() failed: %v", gotErr)
+				}
+				return
+			}
+			if tt.wantErr {
+				t.Fatal("Call() succeeded unexpectedly")
+			}
+			if !reflect.DeepEqual(got.ToTiles(), tt.wantTiles) {
+				t.Errorf("Call() = %v, want %v", got.ToTiles(), tt.wantTiles)
 			}
 		})
 	}

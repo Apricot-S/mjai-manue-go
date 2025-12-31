@@ -103,6 +103,6 @@ func (h *VisibleHand) Discard(tile *tile.Tile) (Hand, error) {
 	return &VisibleHand{tileCounts: tileCounts, numTiles: h.numTiles - 1}, nil
 }
 
-func (h *VisibleHand) Call(meld meld.Meld) (Hand, error) {
+func (h *VisibleHand) Call(m meld.Meld) (Hand, error) {
 	panic("")
 }
