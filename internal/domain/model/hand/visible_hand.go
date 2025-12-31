@@ -9,6 +9,7 @@ import (
 
 type VisibleHand struct {
 	tileCounts [tile.NumTileType37]int
+	numTiles   int
 }
 
 func NewVisibleHand(tiles []tile.Tile) (*VisibleHand, error) {
@@ -35,7 +36,7 @@ func NewVisibleHand(tiles []tile.Tile) (*VisibleHand, error) {
 		return nil, fmt.Errorf("hand cannot contain 15 or more tiles: %d", sum)
 	}
 
-	return &VisibleHand{tileCounts: tileCounts}, nil
+	return &VisibleHand{tileCounts: tileCounts, numTiles: sum}, nil
 }
 
 func MustVisibleHand(tiles []tile.Tile) *VisibleHand {
@@ -69,13 +70,8 @@ func (h *VisibleHand) Draw(tile *tile.Tile) (Hand, error) {
 		return nil, fmt.Errorf("visible hand cannot draw an unknown tile")
 	}
 
-	numTiles := 0
-	for _, n := range h.tileCounts {
-		numTiles += n
-	}
-
-	if numTiles >= maxNumTilesInHand {
-		return nil, fmt.Errorf("cannot draw tile: hand already has %d tiles", numTiles)
+	if h.numTiles >= maxNumTilesInHand {
+		return nil, fmt.Errorf("cannot draw tile: hand already has %d tiles", h.numTiles)
 	}
 
 	id := tile.ID()
@@ -88,6 +84,7 @@ func (h *VisibleHand) Draw(tile *tile.Tile) (Hand, error) {
 	}
 
 	tileCounts[id]++
+	h.numTiles++
 
 	return &VisibleHand{tileCounts: tileCounts}, nil
 }
