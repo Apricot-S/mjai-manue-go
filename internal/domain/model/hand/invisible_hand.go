@@ -42,3 +42,7 @@ func (h *InvisibleHand) Draw(tile *tile.Tile) (Hand, error) {
 	}
 	return &InvisibleHand{tileCount: h.tileCount + 1}, nil
 }
+
+func (h *InvisibleHand) Discard(tile *tile.Tile) (Hand, error) {
+	return &InvisibleHand{tileCount: h.tileCount - 1}, nil
+}

@@ -166,3 +166,49 @@ func TestInvisibleHand_Draw(t *testing.T) {
 		})
 	}
 }
+
+func TestInvisibleHand_Discard(t *testing.T) {
+	tests := []struct {
+		name      string
+		tiles     []tile.Tile
+		tile      *tile.Tile
+		wantTiles []tile.Tile
+		wantErr   bool
+	}{
+		{
+			name:      "unknown tile",
+			tiles:     []tile.Tile{*tile.MustTileFromCode("?")},
+			tile:      tile.MustTileFromCode("?"),
+			wantTiles: []tile.Tile{},
+			wantErr:   false,
+		},
+		{
+			name:      "visible tile",
+			tiles:     []tile.Tile{*tile.MustTileFromCode("?")},
+			tile:      tile.MustTileFromCode("1m"),
+			wantTiles: []tile.Tile{},
+			wantErr:   false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			h, err := hand.NewInvisibleHand(tt.tiles)
+			if err != nil {
+				t.Fatalf("could not construct receiver type: %v", err)
+			}
+			got, gotErr := h.Discard(tt.tile)
+			if gotErr != nil {
+				if !tt.wantErr {
+					t.Errorf("Discard() failed: %v", gotErr)
+				}
+				return
+			}
+			if tt.wantErr {
+				t.Fatal("Discard() succeeded unexpectedly")
+			}
+			if !reflect.DeepEqual(got.ToTiles(), tt.wantTiles) {
+				t.Errorf("Discard() = %v, want %v", got.ToTiles(), tt.wantTiles)
+			}
+		})
+	}
+}

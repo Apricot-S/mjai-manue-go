@@ -88,3 +88,7 @@ func (h *VisibleHand) Draw(tile *tile.Tile) (Hand, error) {
 
 	return &VisibleHand{tileCounts: tileCounts}, nil
 }
+
+func (h *VisibleHand) Discard(tile *tile.Tile) (Hand, error) {
+	panic("")
+}
