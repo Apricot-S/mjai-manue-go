@@ -189,6 +189,13 @@ func TestInvisibleHand_Discard(t *testing.T) {
 			wantTiles: []tile.Tile{},
 			wantErr:   false,
 		},
+		{
+			name:      "cannot discard from an empty hand",
+			tiles:     []tile.Tile{},
+			tile:      tile.MustTileFromCode("?"),
+			wantTiles: nil,
+			wantErr:   true,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

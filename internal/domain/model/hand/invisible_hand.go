@@ -44,5 +44,8 @@ func (h *InvisibleHand) Draw(tile *tile.Tile) (Hand, error) {
 }
 
 func (h *InvisibleHand) Discard(tile *tile.Tile) (Hand, error) {
+	if h.tileCount <= 0 {
+		return nil, fmt.Errorf("cannot discard tile: hand is empty")
+	}
 	return &InvisibleHand{tileCount: h.tileCount - 1}, nil
 }
