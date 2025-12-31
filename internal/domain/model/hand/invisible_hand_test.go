@@ -232,10 +232,32 @@ func TestInvisibleHand_Call(t *testing.T) {
 	}{
 		{
 			name:  "chii",
-			tiles: []tile.Tile{*tile.MustTileFromCode("2m"), *tile.MustTileFromCode("3m")},
+			tiles: []tile.Tile{*tile.MustTileFromCode("?"), *tile.MustTileFromCode("?")},
 			meld: meld.MustChii(
 				*tile.MustTileFromCode("1m"),
 				[2]tile.Tile{*tile.MustTileFromCode("2m"), *tile.MustTileFromCode("3m")},
+				*playerid.MustPlayerID(0),
+			),
+			wantTiles: []tile.Tile{},
+			wantErr:   false,
+		},
+		{
+			name:  "pon",
+			tiles: []tile.Tile{*tile.MustTileFromCode("?"), *tile.MustTileFromCode("?")},
+			meld: meld.MustPon(
+				*tile.MustTileFromCode("1m"),
+				[2]tile.Tile{*tile.MustTileFromCode("1m"), *tile.MustTileFromCode("1m")},
+				*playerid.MustPlayerID(0),
+			),
+			wantTiles: []tile.Tile{},
+			wantErr:   false,
+		},
+		{
+			name:  "called kan",
+			tiles: []tile.Tile{*tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"), *tile.MustTileFromCode("?")},
+			meld: meld.MustCalledKan(
+				*tile.MustTileFromCode("1m"),
+				[3]tile.Tile{*tile.MustTileFromCode("1m"), *tile.MustTileFromCode("1m"), *tile.MustTileFromCode("1m")},
 				*playerid.MustPlayerID(0),
 			),
 			wantTiles: []tile.Tile{},
