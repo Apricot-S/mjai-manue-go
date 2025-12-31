@@ -83,6 +83,9 @@ func (h *VisibleHand) Draw(tile *tile.Tile) (Hand, error) {
 	if tileCounts[id] >= maxCopies {
 		return nil, fmt.Errorf("cannot draw tile: hand already has four identical tiles: %s", tile)
 	}
+	if tile.IsRed() && tileCounts[id] >= 1 {
+		return nil, fmt.Errorf("cannot draw tile: hand already has a red five: %s", tile)
+	}
 
 	tileCounts[id]++
 
