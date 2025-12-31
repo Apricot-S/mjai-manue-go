@@ -5,6 +5,8 @@ import (
 	"testing"
 
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/model/hand"
+	"github.com/Apricot-S/mjai-manue-go/internal/domain/model/meld"
+	"github.com/Apricot-S/mjai-manue-go/internal/domain/model/playerid"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/model/tile"
 )
 
@@ -215,6 +217,49 @@ func TestInvisibleHand_Discard(t *testing.T) {
 			}
 			if !reflect.DeepEqual(got.ToTiles(), tt.wantTiles) {
 				t.Errorf("Discard() = %v, want %v", got.ToTiles(), tt.wantTiles)
+			}
+		})
+	}
+}
+
+func TestInvisibleHand_Call(t *testing.T) {
+	tests := []struct {
+		name      string
+		tiles     []tile.Tile
+		meld      meld.Meld
+		wantTiles []tile.Tile
+		wantErr   bool
+	}{
+		{
+			name:  "chii",
+			tiles: []tile.Tile{*tile.MustTileFromCode("2m"), *tile.MustTileFromCode("3m")},
+			meld: meld.MustChii(
+				*tile.MustTileFromCode("1m"),
+				[2]tile.Tile{*tile.MustTileFromCode("2m"), *tile.MustTileFromCode("3m")},
+				*playerid.MustPlayerID(0),
+			),
+			wantTiles: []tile.Tile{},
+			wantErr:   false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			h, err := hand.NewInvisibleHand(tt.tiles)
+			if err != nil {
+				t.Fatalf("could not construct receiver type: %v", err)
+			}
+			got, gotErr := h.Call(tt.meld)
+			if gotErr != nil {
+				if !tt.wantErr {
+					t.Errorf("Call() failed: %v", gotErr)
+				}
+				return
+			}
+			if tt.wantErr {
+				t.Fatal("Call() succeeded unexpectedly")
+			}
+			if !reflect.DeepEqual(got.ToTiles(), tt.wantTiles) {
+				t.Errorf("Call() = %v, want %v", got.ToTiles(), tt.wantTiles)
 			}
 		})
 	}

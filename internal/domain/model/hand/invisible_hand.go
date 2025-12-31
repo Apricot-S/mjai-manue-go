@@ -51,6 +51,10 @@ func (h *InvisibleHand) Discard(tile *tile.Tile) (Hand, error) {
 	return &InvisibleHand{tileCount: h.tileCount - 1}, nil
 }
 
-func (h *InvisibleHand) Call(meld meld.Meld) (Hand, error) {
-	panic("")
+func (h *InvisibleHand) Call(m meld.Meld) (Hand, error) {
+	switch m.(type) {
+	case *meld.Chii:
+		return &InvisibleHand{tileCount: h.tileCount - 2}, nil
+	}
+	panic("unreachable")
 }
