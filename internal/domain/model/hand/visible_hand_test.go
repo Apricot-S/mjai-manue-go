@@ -181,6 +181,20 @@ func TestVisibleHand_Draw(t *testing.T) {
 			wantTiles: []tile.Tile{*tile.MustTileFromCode("1m"), *tile.MustTileFromCode("1m")},
 			wantErr:   false,
 		},
+		{
+			name:      "hand can contain four identical tiles",
+			tiles:     []tile.Tile{*tile.MustTileFromCode("1m"), *tile.MustTileFromCode("1m"), *tile.MustTileFromCode("1m")},
+			tile:      tile.MustTileFromCode("1m"),
+			wantTiles: []tile.Tile{*tile.MustTileFromCode("1m"), *tile.MustTileFromCode("1m"), *tile.MustTileFromCode("1m"), *tile.MustTileFromCode("1m")},
+			wantErr:   false,
+		},
+		{
+			name:      "hand cannot contain five identical tiles",
+			tiles:     []tile.Tile{*tile.MustTileFromCode("1m"), *tile.MustTileFromCode("1m"), *tile.MustTileFromCode("1m"), *tile.MustTileFromCode("1m")},
+			tile:      tile.MustTileFromCode("1m"),
+			wantTiles: nil,
+			wantErr:   true,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
