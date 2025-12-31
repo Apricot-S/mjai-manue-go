@@ -284,6 +284,17 @@ func TestInvisibleHand_Call(t *testing.T) {
 			wantTiles: []tile.Tile{},
 			wantErr:   false,
 		},
+		{
+			name:  "the number of tiles in the hand is less than the number of tiles consumed",
+			tiles: []tile.Tile{*tile.MustTileFromCode("?")},
+			meld: meld.MustChii(
+				*tile.MustTileFromCode("1m"),
+				[2]tile.Tile{*tile.MustTileFromCode("2m"), *tile.MustTileFromCode("3m")},
+				*playerid.MustPlayerID(0),
+			),
+			wantTiles: nil,
+			wantErr:   true,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

@@ -52,15 +52,22 @@ func (h *InvisibleHand) Discard(tile *tile.Tile) (Hand, error) {
 }
 
 func (h *InvisibleHand) Call(m meld.Meld) (Hand, error) {
+	numConsumed := 0
+
 	switch m.(type) {
 	case *meld.Chii, *meld.Pon:
-		return &InvisibleHand{tileCount: h.tileCount - 2}, nil
+		numConsumed = 2
 	case *meld.CalledKan:
-		return &InvisibleHand{tileCount: h.tileCount - 3}, nil
+		numConsumed = 3
 	case *meld.ConcealedKan:
-		return &InvisibleHand{tileCount: h.tileCount - 4}, nil
+		numConsumed = 4
 	case *meld.PromotedKan:
-		return &InvisibleHand{tileCount: h.tileCount - 1}, nil
+		numConsumed = 1
 	}
-	panic("unreachable")
+
+	if h.tileCount < numConsumed {
+		return nil, fmt.Errorf("cannot call %T: need %d tiles but hand has only %d", m, numConsumed, h.tileCount)
+	}
+
+	return &InvisibleHand{tileCount: h.tileCount - numConsumed}, nil
 }
