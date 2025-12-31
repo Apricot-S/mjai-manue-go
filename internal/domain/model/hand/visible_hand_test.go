@@ -158,3 +158,49 @@ func TestVisibleHand_ToTileCounts34_HandAndTileCountsAreIndependent(t *testing.T
 		t.Errorf("expected counts2[0] to be 2, but got %v", counts2)
 	}
 }
+
+func TestVisibleHand_Draw(t *testing.T) {
+	tests := []struct {
+		name      string
+		tiles     []tile.Tile
+		tile      *tile.Tile
+		wantTiles []tile.Tile
+		wantErr   bool
+	}{
+		{
+			name:      "visible hand cannot draw an unknown tile",
+			tiles:     []tile.Tile{},
+			tile:      tile.MustTileFromCode("?"),
+			wantTiles: nil,
+			wantErr:   true,
+		},
+		{
+			name:      "visible tile",
+			tiles:     []tile.Tile{*tile.MustTileFromCode("1m")},
+			tile:      tile.MustTileFromCode("1m"),
+			wantTiles: []tile.Tile{*tile.MustTileFromCode("1m"), *tile.MustTileFromCode("1m")},
+			wantErr:   false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			h, err := hand.NewVisibleHand(tt.tiles)
+			if err != nil {
+				t.Fatalf("could not construct receiver type: %v", err)
+			}
+			got, gotErr := h.Draw(tt.tile)
+			if gotErr != nil {
+				if !tt.wantErr {
+					t.Errorf("Draw() failed: %v", gotErr)
+				}
+				return
+			}
+			if tt.wantErr {
+				t.Fatal("Draw() succeeded unexpectedly")
+			}
+			if !reflect.DeepEqual(got.ToTiles(), tt.wantTiles) {
+				t.Errorf("Draw() = %v, want %v", got.ToTiles(), tt.wantTiles)
+			}
+		})
+	}
+}

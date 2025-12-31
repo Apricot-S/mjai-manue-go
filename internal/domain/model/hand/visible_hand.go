@@ -63,3 +63,23 @@ func (h *VisibleHand) ToTileCounts34() *tilecount.TileCounts34 {
 	tc[22] += h.tileCounts[36]
 	return &tc
 }
+
+func (h *VisibleHand) Draw(tile *tile.Tile) (Hand, error) {
+	if tile.IsUnknown() {
+		return nil, fmt.Errorf("visible hand cannot draw an unknown tile")
+	}
+
+	numTiles := 0
+	for _, n := range h.tileCounts {
+		numTiles += n
+	}
+
+	if numTiles >= maxNumTilesInHand {
+		return nil, fmt.Errorf("cannot draw tile: hand already has %d tiles", numTiles)
+	}
+
+	tileCounts := h.tileCounts
+	tileCounts[tile.ID()]++
+
+	return &VisibleHand{tileCounts: tileCounts}, nil
+}
