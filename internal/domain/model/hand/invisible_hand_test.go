@@ -88,3 +88,81 @@ func TestNewInvisibleHand(t *testing.T) {
 		})
 	}
 }
+
+func TestInvisibleHand_Draw(t *testing.T) {
+	tests := []struct {
+		name      string
+		tiles     []tile.Tile
+		tile      *tile.Tile
+		wantTiles []tile.Tile
+		wantErr   bool
+	}{
+		{
+			name:      "unknown tile",
+			tiles:     []tile.Tile{},
+			tile:      tile.MustTileFromCode("?"),
+			wantTiles: []tile.Tile{*tile.MustTileFromCode("?")},
+			wantErr:   false,
+		},
+		{
+			name:      "visible tile",
+			tiles:     []tile.Tile{*tile.MustTileFromCode("?")},
+			tile:      tile.MustTileFromCode("1m"),
+			wantTiles: []tile.Tile{*tile.MustTileFromCode("?"), *tile.MustTileFromCode("?")},
+			wantErr:   false,
+		},
+		{
+			name: "hand can draw 14th tile",
+			tiles: []tile.Tile{
+				*tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"),
+				*tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"),
+				*tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"),
+				*tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"),
+				*tile.MustTileFromCode("?"),
+			},
+			tile: tile.MustTileFromCode("?"),
+			wantTiles: []tile.Tile{
+				*tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"),
+				*tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"),
+				*tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"),
+				*tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"),
+				*tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"),
+			},
+			wantErr: false,
+		},
+		{
+			name: "hand cannot draw 15th tile",
+			tiles: []tile.Tile{
+				*tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"),
+				*tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"),
+				*tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"),
+				*tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"),
+				*tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"),
+			},
+			tile:      tile.MustTileFromCode("?"),
+			wantTiles: nil,
+			wantErr:   true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			h, err := hand.NewInvisibleHand(tt.tiles)
+			if err != nil {
+				t.Fatalf("could not construct receiver type: %v", err)
+			}
+			got, gotErr := h.Draw(tt.tile)
+			if gotErr != nil {
+				if !tt.wantErr {
+					t.Errorf("Draw() failed: %v", gotErr)
+				}
+				return
+			}
+			if tt.wantErr {
+				t.Fatal("Draw() succeeded unexpectedly")
+			}
+			if !reflect.DeepEqual(got.ToTiles(), tt.wantTiles) {
+				t.Errorf("Draw() = %v, want %v", got.ToTiles(), tt.wantTiles)
+			}
+		})
+	}
+}

@@ -35,3 +35,10 @@ func (h *InvisibleHand) ToTiles() []tile.Tile {
 	}
 	return tiles
 }
+
+func (h *InvisibleHand) Draw(tile *tile.Tile) (Hand, error) {
+	if h.tileCount >= maxNumTilesInHand {
+		return nil, fmt.Errorf("cannot draw tile: hand already has %d tiles", h.tileCount)
+	}
+	return &InvisibleHand{tileCount: h.tileCount + 1}, nil
+}
