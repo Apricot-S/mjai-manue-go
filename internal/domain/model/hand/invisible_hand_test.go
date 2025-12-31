@@ -272,6 +272,18 @@ func TestInvisibleHand_Call(t *testing.T) {
 			wantTiles: []tile.Tile{},
 			wantErr:   false,
 		},
+		{
+			name:  "promoted kan",
+			tiles: []tile.Tile{*tile.MustTileFromCode("?")},
+			meld: meld.MustPromotedKan(
+				*tile.MustTileFromCode("1m"),
+				[2]tile.Tile{*tile.MustTileFromCode("1m"), *tile.MustTileFromCode("1m")},
+				*tile.MustTileFromCode("1m"),
+				*playerid.MustPlayerID(0),
+			),
+			wantTiles: []tile.Tile{},
+			wantErr:   false,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

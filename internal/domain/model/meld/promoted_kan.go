@@ -49,6 +49,19 @@ func NewPromotedKan(
 	}, nil
 }
 
+func MustPromotedKan(
+	taken tile.Tile,
+	consumed [2]tile.Tile,
+	added tile.Tile,
+	target playerid.PlayerID,
+) *PromotedKan {
+	k, err := NewPromotedKan(taken, consumed, added, target)
+	if err != nil {
+		panic(err)
+	}
+	return k
+}
+
 func (k *PromotedKan) Taken() *tile.Tile {
 	return &k.taken
 }
