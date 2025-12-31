@@ -195,6 +195,38 @@ func TestVisibleHand_Draw(t *testing.T) {
 			wantTiles: nil,
 			wantErr:   true,
 		},
+		{
+			name: "hand can draw 14th tile",
+			tiles: []tile.Tile{
+				*tile.MustTileFromCode("1m"), *tile.MustTileFromCode("1m"), *tile.MustTileFromCode("1m"),
+				*tile.MustTileFromCode("2m"), *tile.MustTileFromCode("2m"), *tile.MustTileFromCode("2m"),
+				*tile.MustTileFromCode("3m"), *tile.MustTileFromCode("3m"), *tile.MustTileFromCode("3m"),
+				*tile.MustTileFromCode("4m"), *tile.MustTileFromCode("4m"), *tile.MustTileFromCode("4m"),
+				*tile.MustTileFromCode("5m"),
+			},
+			tile: tile.MustTileFromCode("5m"),
+			wantTiles: []tile.Tile{
+				*tile.MustTileFromCode("1m"), *tile.MustTileFromCode("1m"), *tile.MustTileFromCode("1m"),
+				*tile.MustTileFromCode("2m"), *tile.MustTileFromCode("2m"), *tile.MustTileFromCode("2m"),
+				*tile.MustTileFromCode("3m"), *tile.MustTileFromCode("3m"), *tile.MustTileFromCode("3m"),
+				*tile.MustTileFromCode("4m"), *tile.MustTileFromCode("4m"), *tile.MustTileFromCode("4m"),
+				*tile.MustTileFromCode("5m"), *tile.MustTileFromCode("5m"),
+			},
+			wantErr: false,
+		},
+		{
+			name: "hand cannot draw 15th tile",
+			tiles: []tile.Tile{
+				*tile.MustTileFromCode("1m"), *tile.MustTileFromCode("1m"), *tile.MustTileFromCode("1m"),
+				*tile.MustTileFromCode("2m"), *tile.MustTileFromCode("2m"), *tile.MustTileFromCode("2m"),
+				*tile.MustTileFromCode("3m"), *tile.MustTileFromCode("3m"), *tile.MustTileFromCode("3m"),
+				*tile.MustTileFromCode("4m"), *tile.MustTileFromCode("4m"), *tile.MustTileFromCode("4m"),
+				*tile.MustTileFromCode("5m"), *tile.MustTileFromCode("5m"),
+			},
+			tile:      tile.MustTileFromCode("5m"),
+			wantTiles: nil,
+			wantErr:   true,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
