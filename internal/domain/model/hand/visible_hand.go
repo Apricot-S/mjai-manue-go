@@ -84,9 +84,7 @@ func (h *VisibleHand) Draw(tile *tile.Tile) (Hand, error) {
 	}
 
 	tileCounts[id]++
-	h.numTiles++
-
-	return &VisibleHand{tileCounts: tileCounts}, nil
+	return &VisibleHand{tileCounts: tileCounts, numTiles: h.numTiles + 1}, nil
 }
 
 func (h *VisibleHand) Discard(tile *tile.Tile) (Hand, error) {
