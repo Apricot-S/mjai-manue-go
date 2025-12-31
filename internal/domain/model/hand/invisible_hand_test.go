@@ -264,12 +264,10 @@ func TestInvisibleHand_Call(t *testing.T) {
 			wantErr:   false,
 		},
 		{
-			name:  "called kan",
-			tiles: []tile.Tile{*tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"), *tile.MustTileFromCode("?")},
-			meld: meld.MustCalledKan(
-				*tile.MustTileFromCode("1m"),
-				[3]tile.Tile{*tile.MustTileFromCode("1m"), *tile.MustTileFromCode("1m"), *tile.MustTileFromCode("1m")},
-				*playerid.MustPlayerID(0),
+			name:  "concealed kan",
+			tiles: []tile.Tile{*tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"), *tile.MustTileFromCode("?")},
+			meld: meld.MustConcealedKan(
+				[4]tile.Tile{*tile.MustTileFromCode("1m"), *tile.MustTileFromCode("1m"), *tile.MustTileFromCode("1m"), *tile.MustTileFromCode("1m")},
 			),
 			wantTiles: []tile.Tile{},
 			wantErr:   false,

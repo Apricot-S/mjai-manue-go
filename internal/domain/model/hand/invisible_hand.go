@@ -57,6 +57,8 @@ func (h *InvisibleHand) Call(m meld.Meld) (Hand, error) {
 		return &InvisibleHand{tileCount: h.tileCount - 2}, nil
 	case *meld.CalledKan:
 		return &InvisibleHand{tileCount: h.tileCount - 3}, nil
+	case *meld.ConcealedKan:
+		return &InvisibleHand{tileCount: h.tileCount - 4}, nil
 	}
 	panic("unreachable")
 }
