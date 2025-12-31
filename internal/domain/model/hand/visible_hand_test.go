@@ -287,6 +287,13 @@ func TestVisibleHand_Discard(t *testing.T) {
 			wantTiles: []tile.Tile{},
 			wantErr:   false,
 		},
+		{
+			name:      "cannot discard a tile that are not in the hand",
+			tiles:     []tile.Tile{*tile.MustTileFromCode("5m")},
+			tile:      tile.MustTileFromCode("5mr"),
+			wantTiles: nil,
+			wantErr:   true,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

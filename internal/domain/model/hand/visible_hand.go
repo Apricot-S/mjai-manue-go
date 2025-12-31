@@ -94,6 +94,9 @@ func (h *VisibleHand) Discard(tile *tile.Tile) (Hand, error) {
 
 	id := tile.ID()
 	tileCounts := h.tileCounts
+	if tileCounts[id] <= 0 {
+		return nil, fmt.Errorf("cannot discard tile: %s is not in the hand", tile)
+	}
 
 	tileCounts[id]--
 	return &VisibleHand{tileCounts: tileCounts, numTiles: h.numTiles - 1}, nil
