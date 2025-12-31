@@ -3,6 +3,7 @@ package hand
 import (
 	"fmt"
 
+	"github.com/Apricot-S/mjai-manue-go/internal/domain/model/meld"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/model/tile"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/model/tilecount"
 )
@@ -100,4 +101,8 @@ func (h *VisibleHand) Discard(tile *tile.Tile) (Hand, error) {
 
 	tileCounts[id]--
 	return &VisibleHand{tileCounts: tileCounts, numTiles: h.numTiles - 1}, nil
+}
+
+func (h *VisibleHand) Call(meld meld.Meld) (Hand, error) {
+	panic("")
 }

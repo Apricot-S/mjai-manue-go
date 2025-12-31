@@ -3,6 +3,7 @@ package hand
 import (
 	"fmt"
 
+	"github.com/Apricot-S/mjai-manue-go/internal/domain/model/meld"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/model/tile"
 )
 
@@ -48,4 +49,8 @@ func (h *InvisibleHand) Discard(tile *tile.Tile) (Hand, error) {
 		return nil, fmt.Errorf("cannot discard tile: hand is empty")
 	}
 	return &InvisibleHand{tileCount: h.tileCount - 1}, nil
+}
+
+func (h *InvisibleHand) Call(meld meld.Meld) (Hand, error) {
+	panic("")
 }
