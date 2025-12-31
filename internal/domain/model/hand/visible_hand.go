@@ -90,5 +90,13 @@ func (h *VisibleHand) Draw(tile *tile.Tile) (Hand, error) {
 }
 
 func (h *VisibleHand) Discard(tile *tile.Tile) (Hand, error) {
-	panic("")
+	if tile.IsUnknown() {
+		return nil, fmt.Errorf("visible hand cannot discard an unknown tile")
+	}
+
+	id := tile.ID()
+	tileCounts := h.tileCounts
+
+	tileCounts[id]--
+	return &VisibleHand{tileCounts: tileCounts, numTiles: h.numTiles - 1}, nil
 }
