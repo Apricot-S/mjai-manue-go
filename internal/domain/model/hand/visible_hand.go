@@ -108,9 +108,12 @@ func (h *VisibleHand) Call(m meld.Meld) (*VisibleHand, error) {
 	numConsumed := 0
 
 	switch mm := m.(type) {
-	case *meld.Chii:
+	case *meld.Chii, *meld.Pon:
 		consumed = mm.Consumed()
 		numConsumed = 2
+	case *meld.CalledKan:
+		consumed = mm.Consumed()
+		numConsumed = 3
 	}
 
 	tileCounts := h.tileCounts
