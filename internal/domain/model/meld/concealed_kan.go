@@ -32,6 +32,14 @@ func NewConcealedKan(consumed [4]tile.Tile) (*ConcealedKan, error) {
 	return &ConcealedKan{consumed: [4]tile.Tile(csm)}, nil
 }
 
+func MustConcealedKan(consumed [4]tile.Tile) *ConcealedKan {
+	k, err := NewConcealedKan(consumed)
+	if err != nil {
+		panic(err)
+	}
+	return k
+}
+
 func (k *ConcealedKan) Consumed() []tile.Tile {
 	return k.consumed[:]
 }
