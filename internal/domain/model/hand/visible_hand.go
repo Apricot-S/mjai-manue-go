@@ -114,6 +114,9 @@ func (h *VisibleHand) Call(m meld.Meld) (*VisibleHand, error) {
 	case *meld.CalledKan:
 		consumed = mm.Consumed()
 		numConsumed = 3
+	case *meld.ConcealedKan:
+		consumed = mm.Consumed()
+		numConsumed = 4
 	}
 
 	tileCounts := h.tileCounts

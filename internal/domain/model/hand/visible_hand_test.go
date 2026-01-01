@@ -361,6 +361,15 @@ func TestVisibleHand_Call(t *testing.T) {
 			wantTiles: []tile.Tile{},
 			wantErr:   false,
 		},
+		{
+			name:  "concealed kan",
+			tiles: []tile.Tile{*tile.MustTileFromCode("1m"), *tile.MustTileFromCode("1m"), *tile.MustTileFromCode("1m"), *tile.MustTileFromCode("1m")},
+			meld: meld.MustConcealedKan(
+				[4]tile.Tile{*tile.MustTileFromCode("1m"), *tile.MustTileFromCode("1m"), *tile.MustTileFromCode("1m"), *tile.MustTileFromCode("1m")},
+			),
+			wantTiles: []tile.Tile{},
+			wantErr:   false,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
