@@ -104,5 +104,19 @@ func (h *VisibleHand) Discard(tile *tile.Tile) (*VisibleHand, error) {
 }
 
 func (h *VisibleHand) Call(m meld.Meld) (*VisibleHand, error) {
-	panic("")
+	var consumed []tile.Tile
+	numConsumed := 0
+
+	switch mm := m.(type) {
+	case *meld.Chii:
+		consumed = mm.Consumed()
+		numConsumed = 2
+	}
+
+	tileCounts := h.tileCounts
+	for i := range consumed {
+		tileCounts[consumed[i].ID()]--
+	}
+
+	return &VisibleHand{tileCounts: tileCounts, numTiles: h.numTiles - numConsumed}, nil
 }

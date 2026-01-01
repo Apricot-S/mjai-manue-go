@@ -6,6 +6,7 @@ import (
 
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/model/hand"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/model/meld"
+	"github.com/Apricot-S/mjai-manue-go/internal/domain/model/playerid"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/model/tile"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/model/tilecount"
 )
@@ -327,7 +328,17 @@ func TestVisibleHand_Call(t *testing.T) {
 		wantTiles []tile.Tile
 		wantErr   bool
 	}{
-		// TODO: Add test cases.
+		{
+			name:  "chii",
+			tiles: []tile.Tile{*tile.MustTileFromCode("2m"), *tile.MustTileFromCode("3m")},
+			meld: meld.MustChii(
+				*tile.MustTileFromCode("1m"),
+				[2]tile.Tile{*tile.MustTileFromCode("2m"), *tile.MustTileFromCode("3m")},
+				*playerid.MustPlayerID(0),
+			),
+			wantTiles: []tile.Tile{},
+			wantErr:   false,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
