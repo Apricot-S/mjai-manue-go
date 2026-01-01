@@ -66,7 +66,7 @@ func (h *VisibleHand) ToTileCounts34() *tilecount.TileCounts34 {
 	return &tc
 }
 
-func (h *VisibleHand) Draw(tile *tile.Tile) (Hand, error) {
+func (h *VisibleHand) Draw(tile *tile.Tile) (*VisibleHand, error) {
 	if tile.IsUnknown() {
 		return nil, fmt.Errorf("visible hand cannot draw an unknown tile")
 	}
@@ -88,7 +88,7 @@ func (h *VisibleHand) Draw(tile *tile.Tile) (Hand, error) {
 	return &VisibleHand{tileCounts: tileCounts, numTiles: h.numTiles + 1}, nil
 }
 
-func (h *VisibleHand) Discard(tile *tile.Tile) (Hand, error) {
+func (h *VisibleHand) Discard(tile *tile.Tile) (*VisibleHand, error) {
 	if tile.IsUnknown() {
 		return nil, fmt.Errorf("visible hand cannot discard an unknown tile")
 	}
@@ -103,6 +103,6 @@ func (h *VisibleHand) Discard(tile *tile.Tile) (Hand, error) {
 	return &VisibleHand{tileCounts: tileCounts, numTiles: h.numTiles - 1}, nil
 }
 
-func (h *VisibleHand) Call(m meld.Meld) (Hand, error) {
+func (h *VisibleHand) Call(m meld.Meld) (*VisibleHand, error) {
 	panic("")
 }
