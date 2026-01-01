@@ -382,6 +382,17 @@ func TestVisibleHand_Call(t *testing.T) {
 			wantTiles: []tile.Tile{},
 			wantErr:   false,
 		},
+		{
+			name:  "call fails when meld contains red/normal mismatch",
+			tiles: []tile.Tile{*tile.MustTileFromCode("4m"), *tile.MustTileFromCode("5mr")},
+			meld: meld.MustChii(
+				*tile.MustTileFromCode("6m"),
+				[2]tile.Tile{*tile.MustTileFromCode("4m"), *tile.MustTileFromCode("5m")},
+				*playerid.MustPlayerID(0),
+			),
+			wantTiles: nil,
+			wantErr:   true,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

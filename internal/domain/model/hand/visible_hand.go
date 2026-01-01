@@ -124,6 +124,9 @@ func (h *VisibleHand) Call(m meld.Meld) (*VisibleHand, error) {
 
 	tileCounts := h.tileCounts
 	for i := range consumed {
+		if tileCounts[consumed[i].ID()] <= 0 {
+			return nil, fmt.Errorf("cannot consume tile %s: count is zero or negative", consumed[i])
+		}
 		tileCounts[consumed[i].ID()]--
 	}
 
