@@ -808,6 +808,30 @@ func TestHas1Han(t *testing.T) {
 			event:         service.NoEvent,
 			want:          true,
 		},
+		{
+			name:          "only Pinfu",
+			handCodes:     []string{"2m", "3m", "2p", "3p", "4p", "3s", "4s", "5s", "6s", "7s", "8s", "W", "W"},
+			melds:         nil,
+			winningTile:   tile.MustTileFromCode("1m"),
+			prevalentWind: wind.East,
+			seatWind:      wind.South,
+			tsumo:         false,
+			riichi:        false,
+			event:         service.NoEvent,
+			want:          true,
+		},
+		{
+			name:          "not Pinfu: edge wait",
+			handCodes:     []string{"1m", "2m", "2p", "3p", "4p", "3s", "4s", "5s", "6s", "7s", "8s", "W", "W"},
+			melds:         nil,
+			winningTile:   tile.MustTileFromCode("3m"),
+			prevalentWind: wind.East,
+			seatWind:      wind.South,
+			tsumo:         false,
+			riichi:        false,
+			event:         service.NoEvent,
+			want:          false,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

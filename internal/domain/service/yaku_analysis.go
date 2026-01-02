@@ -178,6 +178,9 @@ func Has1Han(
 			allTiles = append(allTiles, allBlocks[i].ToTiles()...)
 		}
 
+		if pinfuStrict(allBlocks, prevalentWind, seatWind, isOpen, winningTile) > 0 {
+			return true
+		}
 		if iipeikou(allBlocks, isOpen) > 0 {
 			return true
 		}
@@ -256,6 +259,64 @@ func pinfu(allBlocks []block.Block, prevalentWind wind.Wind, seatWind wind.Wind,
 	}
 
 	return 1
+}
+
+func pinfuStrict(
+	allBlocks []block.Block,
+	prevalentWind wind.Wind,
+	seatWind wind.Wind,
+	isOpen bool,
+	winningTile *tile.Tile,
+) int {
+	if isOpen {
+		return 0
+	}
+
+	foundShuntsuWithHoraPai := false
+	for _, b := range allBlocks {
+		switch b.(type) {
+		case *block.Triplet, *block.Quad:
+			return 0
+		case *block.Pair:
+			t := &b.ToTiles()[0]
+			if t.IsSuits() {
+				continue
+			}
+			if t.Number() > 4 {
+				// dragons
+				return 0
+			}
+
+			name := t.String()
+			if name == prevalentWind.String() || name == seatWind.String() {
+				return 0
+			}
+		case *block.Sequence:
+			tiles := b.ToTiles()
+			// Check if the sequence contains the winning tile
+			if !slices.ContainsFunc(tiles, func(t tile.Tile) bool { return t.HasSameSymbol(winningTile) }) {
+				continue
+			}
+			// The middle (kanchan) wait is not allowed
+			if tiles[1].HasSameSymbol(winningTile) {
+				continue
+			}
+			// The edge (penchan) wait is not allowed
+			if winningTile.Number() == 3 && tiles[2].HasSameSymbol(winningTile) {
+				continue
+			}
+			if winningTile.Number() == 7 && tiles[0].HasSameSymbol(winningTile) {
+				continue
+			}
+			// If the sequence contains the winning tile, it must be an open (ryanmen) wait
+			foundShuntsuWithHoraPai = true
+		}
+	}
+
+	if foundShuntsuWithHoraPai {
+		return 1
+	}
+	return 0
 }
 
 func yakuhai(allBlocks []block.Block, prevalentWind wind.Wind, seatWind wind.Wind) int {
