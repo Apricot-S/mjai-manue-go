@@ -149,6 +149,15 @@ func Has1Han(
 		return true
 	}
 
+	shanten, _ := AnalyzeShanten(handWithWinningTile, UpperBound(-1))
+	if shanten > -1 {
+		return false
+	}
+
+	if riichi {
+		return true
+	}
+
 	return false
 }
 
