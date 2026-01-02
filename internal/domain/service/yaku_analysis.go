@@ -148,7 +148,7 @@ func Has1Han(
 		return true
 	}
 
-	shanten, _ := AnalyzeShanten(handWithWinningTile, UpperBound(-1))
+	shanten, goals := AnalyzeShanten(handWithWinningTile, UpperBound(-1))
 	if shanten > -1 {
 		return false
 	}
@@ -163,6 +163,24 @@ func Has1Han(
 	}
 	if event != NoEvent {
 		return true
+	}
+
+	meldBlocks := make([]block.Block, len(melds))
+	for i, m := range melds {
+		meldBlocks[i] = m.ToBlock()
+	}
+
+	for i := range goals {
+		allBlocks := slices.Concat(goals[i].Blocks, meldBlocks)
+
+		allTiles := make(tile.Tiles, 0, 14)
+		for i := range allBlocks {
+			allTiles = append(allTiles, allBlocks[i].ToTiles()...)
+		}
+
+		if tanyao(allTiles) > 0 {
+			return true
+		}
 	}
 
 	return false

@@ -784,6 +784,18 @@ func TestHas1Han(t *testing.T) {
 			event:         service.RobbingAKan,
 			want:          true,
 		},
+		{
+			name:          "only Tanyao",
+			handCodes:     []string{"2m", "2m", "2m", "2p", "3p", "4p", "3s", "4s", "5s", "6s", "6s", "6s", "8s"},
+			melds:         nil,
+			winningTile:   tile.MustTileFromCode("8s"),
+			prevalentWind: wind.East,
+			seatWind:      wind.South,
+			tsumo:         false,
+			riichi:        false,
+			event:         service.NoEvent,
+			want:          true,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
