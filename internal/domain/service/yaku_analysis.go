@@ -188,6 +188,9 @@ func Has1Han(
 		if tanyao(allTiles) > 0 {
 			return true
 		}
+		if yakuhai(allBlocks, prevalentWind, seatWind) > 0 {
+			return true
+		}
 	}
 
 	return false
