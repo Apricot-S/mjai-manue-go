@@ -748,6 +748,24 @@ func TestHas1Han(t *testing.T) {
 			event:         service.NoEvent,
 			want:          true,
 		},
+		{
+			name:      "open tsumohou without yaku",
+			handCodes: []string{"2p", "3p", "4p", "3s", "4s", "5s", "6s", "6s", "6s", "9s"},
+			melds: []meld.Meld{
+				meld.MustPon(
+					*tile.MustTileFromCode("1m"),
+					[2]tile.Tile{*tile.MustTileFromCode("1m"), *tile.MustTileFromCode("1m")},
+					*playerid.MustPlayerID(2),
+				),
+			},
+			winningTile:   tile.MustTileFromCode("9s"),
+			prevalentWind: wind.East,
+			seatWind:      wind.South,
+			tsumo:         true,
+			riichi:        false,
+			event:         service.NoEvent,
+			want:          false,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
