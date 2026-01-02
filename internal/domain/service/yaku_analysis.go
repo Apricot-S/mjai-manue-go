@@ -140,6 +140,15 @@ func Has1Han(
 	riichi bool,
 	event WinEvent,
 ) bool {
+	handWithWinningTile, err := hand.Draw(winningTile)
+	if err != nil {
+		panic(err)
+	}
+
+	if IsWinningFormChiitoitsu(handWithWinningTile) {
+		return true
+	}
+
 	return false
 }
 

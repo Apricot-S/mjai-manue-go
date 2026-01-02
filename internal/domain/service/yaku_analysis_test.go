@@ -690,9 +690,9 @@ func TestHas1Han(t *testing.T) {
 	}{
 		{
 			name:          "chiitoitsu",
-			handCodes:     []string{"1m", "1m", "8m", "8m", "2p", "8p", "8p", "5s", "5s", "E", "E", "C"},
+			handCodes:     []string{"1m", "1m", "8m", "8m", "2p", "8p", "8p", "5s", "5s", "E", "E", "C", "C"},
 			melds:         nil,
-			winningTile:   tile.MustTileFromCode("C"),
+			winningTile:   tile.MustTileFromCode("2p"),
 			prevalentWind: wind.East,
 			seatWind:      wind.South,
 			tsumo:         false,
