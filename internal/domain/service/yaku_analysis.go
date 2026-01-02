@@ -203,7 +203,7 @@ func Has1Han(
 		if toitoihou(allBlocks) > 0 {
 			return true
 		}
-		if sanankou(goals[i].Blocks, meldBlocks, winningTile, tsumo) > 0 {
+		if sanankou(goals[i].Blocks, melds, winningTile, tsumo) > 0 {
 			return true
 		}
 	}
@@ -514,9 +514,32 @@ func honiisou(allBlocks []block.Block, isOpen bool) int {
 
 func sanankou(
 	handBlocks []block.Block,
-	meldBlocks []block.Block,
+	melds []meld.Meld,
 	winningTile *tile.Tile,
 	tsumo bool,
 ) int {
+	numAnkou := 0
+
+	// Count triplets in the hand
+	for _, m := range handBlocks {
+		if t, ok := m.(*block.Triplet); ok {
+			// In the case of Ron, exclude the triplet that contains the winning tile
+			if !tsumo && t.ToTiles()[0].HasSameSymbol(winningTile) {
+				continue
+			}
+			numAnkou++
+		}
+	}
+
+	// Count only the concealed kan in the melds
+	for _, m := range melds {
+		if _, ok := m.(*meld.ConcealedKan); ok {
+			numAnkou++
+		}
+	}
+
+	if numAnkou >= 3 {
+		return 2
+	}
 	return 0
 }
