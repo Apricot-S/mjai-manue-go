@@ -197,6 +197,9 @@ func Has1Han(
 		if sanshokuDoujun(allBlocks, isOpen) > 0 {
 			return true
 		}
+		if ikkiTsuukan(allBlocks, isOpen) > 0 {
+			return true
+		}
 	}
 
 	return false
