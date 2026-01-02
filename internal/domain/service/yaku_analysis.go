@@ -212,6 +212,9 @@ func Has1Han(
 		if sankantsu(allBlocks) > 0 {
 			return true
 		}
+		if honiisou(allBlocks, isOpen) > 0 {
+			return true
+		}
 	}
 
 	return false
