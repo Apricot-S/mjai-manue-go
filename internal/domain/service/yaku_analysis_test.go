@@ -902,6 +902,29 @@ func TestHas1Han(t *testing.T) {
 			event:         service.NoEvent,
 			want:          true,
 		},
+		{
+			name:      "only Toitoihou",
+			handCodes: []string{"2p", "2p", "6p", "6p", "N", "N", "N"},
+			melds: []meld.Meld{
+				meld.MustPon(
+					*tile.MustTileFromCode("2m"),
+					[2]tile.Tile{*tile.MustTileFromCode("2m"), *tile.MustTileFromCode("2m")},
+					*playerid.MustPlayerID(2),
+				),
+				meld.MustCalledKan(
+					*tile.MustTileFromCode("1m"),
+					[3]tile.Tile{*tile.MustTileFromCode("1m"), *tile.MustTileFromCode("1m"), *tile.MustTileFromCode("1m")},
+					*playerid.MustPlayerID(2),
+				),
+			},
+			winningTile:   tile.MustTileFromCode("2p"),
+			prevalentWind: wind.East,
+			seatWind:      wind.South,
+			tsumo:         false,
+			riichi:        false,
+			event:         service.NoEvent,
+			want:          true,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

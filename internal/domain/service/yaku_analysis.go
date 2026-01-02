@@ -200,6 +200,9 @@ func Has1Han(
 		if ikkiTsuukan(allBlocks, isOpen) > 0 {
 			return true
 		}
+		if toitoihou(allBlocks) > 0 {
+			return true
+		}
 	}
 
 	return false
