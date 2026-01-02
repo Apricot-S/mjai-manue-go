@@ -215,6 +215,9 @@ func Has1Han(
 		if honiisou(allBlocks, isOpen) > 0 {
 			return true
 		}
+		if chiniisou(allBlocks, isOpen) > 0 {
+			return true
+		}
 	}
 
 	return false
