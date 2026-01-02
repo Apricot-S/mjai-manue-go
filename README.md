@@ -8,9 +8,10 @@ Go port of [mjai-manue](https://github.com/gimite/mjai-manue) — a Mahjong AI f
 
 ## Differences from Original
 
-### Protocol Support Extensions
+### Extended Protocol Support
 
-- In addition to [Gimite's original Mjai protocol](https://gimite.net/pukiwiki/index.php?Mjai%20%E9%BA%BB%E9%9B%80AI%E5%AF%BE%E6%88%A6%E3%82%B5%E3%83%BC%E3%83%90), also supports [a minor modified version of the Mjai protocol used by RiichiLab](https://mjai.app/docs/mjai-protocol).
+- Supports [Gimite's original Mjai protocol](https://gimite.net/pukiwiki/index.php?Mjai%20%E9%BA%BB%E9%9B%80AI%E5%AF%BE%E6%88%A6%E3%82%B5%E3%83%BC%E3%83%90).
+- Additionally supports [a minor modified version of the Mjai protocol used by RiichiLab](https://mjai.app/docs/mjai-protocol).
 
 ### Architecture Improvements
 
