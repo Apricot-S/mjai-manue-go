@@ -246,7 +246,7 @@ func TestIsWinningFormChiitoitsu(t *testing.T) {
 	}
 }
 
-func TestIsWinningFormKokushimuso(t *testing.T) {
+func TestIsWinningFormKokushimusou(t *testing.T) {
 	tests := []struct {
 		name  string
 		codes []string
@@ -281,9 +281,9 @@ func TestIsWinningFormKokushimuso(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			h := hand.CodesToHand(tt.codes)
-			got := IsWinningFormKokushimuso(h)
+			got := IsWinningFormKokushimusou(h)
 			if got != tt.want {
-				t.Errorf("IsWinningFormKokushimuso() = %v, want %v", got, tt.want)
+				t.Errorf("IsWinningFormKokushimusou() = %v, want %v", got, tt.want)
 			}
 		})
 	}

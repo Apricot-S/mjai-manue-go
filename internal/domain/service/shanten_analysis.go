@@ -299,7 +299,7 @@ func AnalyzeShantenChiitoitsu(hand *hand.VisibleHand) int {
 	return shanten
 }
 
-func AnalyzeShantenKokushimuso(hand *hand.VisibleHand) int {
+func AnalyzeShantenKokushimusou(hand *hand.VisibleHand) int {
 	tc34 := hand.ToTileCounts34()
 
 	if tc34.NumTiles() < 13 {

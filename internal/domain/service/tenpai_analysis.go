@@ -20,6 +20,6 @@ func IsTenpaiAll(hand *hand.VisibleHand) bool {
 		return true
 	}
 
-	shanten = AnalyzeShantenKokushimuso(hand)
+	shanten = AnalyzeShantenKokushimusou(hand)
 	return shanten <= 0
 }

@@ -314,7 +314,7 @@ func TestAnalyzeShantenChiitoitsu(t *testing.T) {
 	}
 }
 
-func TestAnalyzeShantenKokushimuso(t *testing.T) {
+func TestAnalyzeShantenKokushimusou(t *testing.T) {
 	tests := []struct {
 		name  string
 		codes []string
@@ -359,9 +359,9 @@ func TestAnalyzeShantenKokushimuso(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			hand := hand.CodesToHand(tt.codes)
-			got := service.AnalyzeShantenKokushimuso(hand)
+			got := service.AnalyzeShantenKokushimusou(hand)
 			if got != tt.want {
-				t.Errorf("AnalyzeShantenKokushimuso() = %v, want %v", got, tt.want)
+				t.Errorf("AnalyzeShantenKokushimusou() = %v, want %v", got, tt.want)
 			}
 		})
 	}
