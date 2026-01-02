@@ -273,7 +273,7 @@ func pinfuStrict(
 		return 0
 	}
 
-	foundShuntsuWithHoraPai := false
+	isOpenWait := false
 	for _, b := range allBlocks {
 		switch b.(type) {
 		case *block.Triplet, *block.Quad:
@@ -310,11 +310,11 @@ func pinfuStrict(
 				continue
 			}
 			// If the sequence contains the winning tile, it must be an open (ryanmen) wait
-			foundShuntsuWithHoraPai = true
+			isOpenWait = true
 		}
 	}
 
-	if foundShuntsuWithHoraPai {
+	if isOpenWait {
 		return 1
 	}
 	return 0
