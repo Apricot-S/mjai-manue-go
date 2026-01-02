@@ -209,6 +209,9 @@ func Has1Han(
 		if sanshokuDoukou(allBlocks) > 0 {
 			return true
 		}
+		if sankantsu(allBlocks) > 0 {
+			return true
+		}
 	}
 
 	return false
@@ -573,5 +576,18 @@ func sanshokuDoukou(allBlocks []block.Block) int {
 		}
 	}
 
+	return 0
+}
+
+func sankantsu(allBlocks []block.Block) int {
+	numQuad := 0
+	for _, b := range allBlocks {
+		if _, ok := b.(*block.Quad); ok {
+			numQuad++
+		}
+	}
+	if numQuad >= 3 {
+		return 2
+	}
 	return 0
 }
