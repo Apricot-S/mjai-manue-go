@@ -18,6 +18,7 @@ const (
 	RobbingAKan
 	AfterAKan
 	LastTile
+	// Tenhou and Chiihou are always combined with Menzenchin tsumohou, so no flags are required.
 )
 
 // Note:
