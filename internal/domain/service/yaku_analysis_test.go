@@ -674,3 +674,404 @@ func TestCalculateFuHan(t *testing.T) {
 		})
 	}
 }
+
+func TestHas1Han(t *testing.T) {
+	tests := []struct {
+		name          string
+		handCodes     []string
+		melds         []meld.Meld
+		winningTile   *tile.Tile
+		prevalentWind wind.Wind
+		seatWind      wind.Wind
+		tsumo         bool
+		riichi        bool
+		event         service.WinEvent
+		want          bool
+	}{
+		{
+			name:          "chiitoitsu",
+			handCodes:     []string{"1m", "1m", "8m", "8m", "2p", "8p", "8p", "5s", "5s", "E", "E", "C", "C"},
+			melds:         nil,
+			winningTile:   tile.MustTileFromCode("2p"),
+			prevalentWind: wind.East,
+			seatWind:      wind.South,
+			tsumo:         false,
+			riichi:        false,
+			event:         service.NoEvent,
+			want:          true,
+		},
+		{
+			name:          "kokushimusou",
+			handCodes:     []string{"1m", "9m", "1p", "9p", "1s", "9s", "E", "S", "W", "N", "P", "F", "C"},
+			melds:         nil,
+			winningTile:   tile.MustTileFromCode("C"),
+			prevalentWind: wind.East,
+			seatWind:      wind.South,
+			tsumo:         false,
+			riichi:        false,
+			event:         service.NoEvent,
+			want:          true,
+		},
+		{
+			name:          "no Yaku",
+			handCodes:     []string{"1m", "1m", "1m", "2p", "3p", "4p", "3s", "4s", "5s", "6s", "6s", "6s", "9s"},
+			melds:         nil,
+			winningTile:   tile.MustTileFromCode("9s"),
+			prevalentWind: wind.East,
+			seatWind:      wind.South,
+			tsumo:         false,
+			riichi:        false,
+			event:         service.NoEvent,
+			want:          false,
+		},
+		{
+			name:          "only Riichi",
+			handCodes:     []string{"1m", "1m", "1m", "2p", "3p", "4p", "3s", "4s", "5s", "6s", "6s", "6s", "9s"},
+			melds:         nil,
+			winningTile:   tile.MustTileFromCode("9s"),
+			prevalentWind: wind.East,
+			seatWind:      wind.South,
+			tsumo:         false,
+			riichi:        true,
+			event:         service.NoEvent,
+			want:          true,
+		},
+		{
+			name:          "only Menzenchin tsumohou",
+			handCodes:     []string{"1m", "1m", "1m", "2p", "3p", "4p", "3s", "4s", "5s", "6s", "6s", "6s", "9s"},
+			melds:         nil,
+			winningTile:   tile.MustTileFromCode("9s"),
+			prevalentWind: wind.East,
+			seatWind:      wind.South,
+			tsumo:         true,
+			riichi:        false,
+			event:         service.NoEvent,
+			want:          true,
+		},
+		{
+			name:      "open tsumohou without yaku",
+			handCodes: []string{"2p", "3p", "4p", "3s", "4s", "5s", "6s", "6s", "6s", "9s"},
+			melds: []meld.Meld{
+				meld.MustPon(
+					*tile.MustTileFromCode("1m"),
+					[2]tile.Tile{*tile.MustTileFromCode("1m"), *tile.MustTileFromCode("1m")},
+					*playerid.MustPlayerID(2),
+				),
+			},
+			winningTile:   tile.MustTileFromCode("9s"),
+			prevalentWind: wind.East,
+			seatWind:      wind.South,
+			tsumo:         true,
+			riichi:        false,
+			event:         service.NoEvent,
+			want:          false,
+		},
+		{
+			name:      "Robbing a kan",
+			handCodes: []string{"3p", "4p", "3s", "4s", "5s", "6s", "6s", "6s", "9s", "9s"},
+			melds: []meld.Meld{
+				meld.MustPon(
+					*tile.MustTileFromCode("1m"),
+					[2]tile.Tile{*tile.MustTileFromCode("1m"), *tile.MustTileFromCode("1m")},
+					*playerid.MustPlayerID(2),
+				),
+			},
+			winningTile:   tile.MustTileFromCode("2p"),
+			prevalentWind: wind.East,
+			seatWind:      wind.South,
+			tsumo:         false,
+			riichi:        false,
+			event:         service.RobbingAKan,
+			want:          true,
+		},
+		{
+			name:          "only Tanyao",
+			handCodes:     []string{"2m", "2m", "2m", "2p", "3p", "4p", "3s", "4s", "5s", "6s", "6s", "6s", "8s"},
+			melds:         nil,
+			winningTile:   tile.MustTileFromCode("8s"),
+			prevalentWind: wind.East,
+			seatWind:      wind.South,
+			tsumo:         false,
+			riichi:        false,
+			event:         service.NoEvent,
+			want:          true,
+		},
+		{
+			name:          "only Iipeikou",
+			handCodes:     []string{"1m", "1m", "2p", "3p", "4p", "3s", "4s", "5s", "3s", "4s", "5s", "9s", "9s"},
+			melds:         nil,
+			winningTile:   tile.MustTileFromCode("1m"),
+			prevalentWind: wind.East,
+			seatWind:      wind.South,
+			tsumo:         false,
+			riichi:        false,
+			event:         service.NoEvent,
+			want:          true,
+		},
+		{
+			name:          "only Pinfu",
+			handCodes:     []string{"2m", "3m", "2p", "3p", "4p", "3s", "4s", "5s", "6s", "7s", "8s", "W", "W"},
+			melds:         nil,
+			winningTile:   tile.MustTileFromCode("1m"),
+			prevalentWind: wind.East,
+			seatWind:      wind.South,
+			tsumo:         false,
+			riichi:        false,
+			event:         service.NoEvent,
+			want:          true,
+		},
+		{
+			name:          "not Pinfu: edge wait",
+			handCodes:     []string{"1m", "2m", "2p", "3p", "4p", "3s", "4s", "5s", "6s", "7s", "8s", "W", "W"},
+			melds:         nil,
+			winningTile:   tile.MustTileFromCode("3m"),
+			prevalentWind: wind.East,
+			seatWind:      wind.South,
+			tsumo:         false,
+			riichi:        false,
+			event:         service.NoEvent,
+			want:          false,
+		},
+		{
+			name:      "only prevalentWind",
+			handCodes: []string{"2p", "3p", "8s", "8s", "8s", "N", "N"},
+			melds: []meld.Meld{
+				meld.MustPon(
+					*tile.MustTileFromCode("1m"),
+					[2]tile.Tile{*tile.MustTileFromCode("1m"), *tile.MustTileFromCode("1m")},
+					*playerid.MustPlayerID(2),
+				),
+				meld.MustPon(
+					*tile.MustTileFromCode("E"),
+					[2]tile.Tile{*tile.MustTileFromCode("E"), *tile.MustTileFromCode("E")},
+					*playerid.MustPlayerID(2),
+				),
+			},
+			winningTile:   tile.MustTileFromCode("1p"),
+			prevalentWind: wind.East,
+			seatWind:      wind.South,
+			tsumo:         false,
+			riichi:        false,
+			event:         service.NoEvent,
+			want:          true,
+		},
+		{
+			name:      "only Chantaiyao open",
+			handCodes: []string{"1p", "2p", "3p", "9s", "9s", "9s", "N"},
+			melds: []meld.Meld{
+				meld.MustPon(
+					*tile.MustTileFromCode("1m"),
+					[2]tile.Tile{*tile.MustTileFromCode("1m"), *tile.MustTileFromCode("1m")},
+					*playerid.MustPlayerID(2),
+				),
+				meld.MustChii(
+					*tile.MustTileFromCode("7s"),
+					[2]tile.Tile{*tile.MustTileFromCode("8s"), *tile.MustTileFromCode("9s")},
+					*playerid.MustPlayerID(2),
+				),
+			},
+			winningTile:   tile.MustTileFromCode("N"),
+			prevalentWind: wind.East,
+			seatWind:      wind.South,
+			tsumo:         false,
+			riichi:        false,
+			event:         service.NoEvent,
+			want:          true,
+		},
+		{
+			name:          "only Sanshoku doujun concealed",
+			handCodes:     []string{"1m", "1m", "1m", "2m", "3m", "1p", "2p", "3p", "1s", "2s", "3s", "8s", "8s"},
+			melds:         nil,
+			winningTile:   tile.MustTileFromCode("1m"),
+			prevalentWind: wind.East,
+			seatWind:      wind.South,
+			tsumo:         false,
+			riichi:        false,
+			event:         service.NoEvent,
+			want:          true,
+		},
+		{
+			name:          "only Ikki tsuukan concealed",
+			handCodes:     []string{"1m", "1m", "1m", "1p", "2p", "3p", "4p", "5p", "6p", "8p", "9p", "8s", "8s"},
+			melds:         nil,
+			winningTile:   tile.MustTileFromCode("7p"),
+			prevalentWind: wind.East,
+			seatWind:      wind.South,
+			tsumo:         false,
+			riichi:        false,
+			event:         service.NoEvent,
+			want:          true,
+		},
+		{
+			name:      "only Toitoihou",
+			handCodes: []string{"2p", "2p", "6p", "6p", "N", "N", "N"},
+			melds: []meld.Meld{
+				meld.MustPon(
+					*tile.MustTileFromCode("2m"),
+					[2]tile.Tile{*tile.MustTileFromCode("2m"), *tile.MustTileFromCode("2m")},
+					*playerid.MustPlayerID(2),
+				),
+				meld.MustCalledKan(
+					*tile.MustTileFromCode("1m"),
+					[3]tile.Tile{*tile.MustTileFromCode("1m"), *tile.MustTileFromCode("1m"), *tile.MustTileFromCode("1m")},
+					*playerid.MustPlayerID(2),
+				),
+			},
+			winningTile:   tile.MustTileFromCode("2p"),
+			prevalentWind: wind.East,
+			seatWind:      wind.South,
+			tsumo:         false,
+			riichi:        false,
+			event:         service.NoEvent,
+			want:          true,
+		},
+		{
+			name:      "only Sanankou",
+			handCodes: []string{"2p", "2p", "6p", "6p", "N", "N", "N"},
+			melds: []meld.Meld{
+				meld.MustChii(
+					*tile.MustTileFromCode("1m"),
+					[2]tile.Tile{*tile.MustTileFromCode("2m"), *tile.MustTileFromCode("3m")},
+					*playerid.MustPlayerID(2),
+				),
+				meld.MustConcealedKan(
+					[4]tile.Tile{*tile.MustTileFromCode("9s"), *tile.MustTileFromCode("9s"), *tile.MustTileFromCode("9s"), *tile.MustTileFromCode("9s")},
+				),
+			},
+			winningTile:   tile.MustTileFromCode("2p"),
+			prevalentWind: wind.East,
+			seatWind:      wind.South,
+			tsumo:         true,
+			riichi:        false,
+			event:         service.NoEvent,
+			want:          true,
+		},
+		{
+			name:      "not Sanankou: 2 ankou",
+			handCodes: []string{"2p", "2p", "6p", "6p", "N", "N", "N"},
+			melds: []meld.Meld{
+				meld.MustChii(
+					*tile.MustTileFromCode("1m"),
+					[2]tile.Tile{*tile.MustTileFromCode("2m"), *tile.MustTileFromCode("3m")},
+					*playerid.MustPlayerID(2),
+				),
+				meld.MustConcealedKan(
+					[4]tile.Tile{*tile.MustTileFromCode("9s"), *tile.MustTileFromCode("9s"), *tile.MustTileFromCode("9s"), *tile.MustTileFromCode("9s")},
+				),
+			},
+			winningTile:   tile.MustTileFromCode("2p"),
+			prevalentWind: wind.East,
+			seatWind:      wind.South,
+			tsumo:         false,
+			riichi:        false,
+			event:         service.NoEvent,
+			want:          false,
+		},
+		{
+			name:      "only Sanshoku doukou",
+			handCodes: []string{"2p", "4p", "7s", "7s", "7s", "N", "N"},
+			melds: []meld.Meld{
+				meld.MustPon(
+					*tile.MustTileFromCode("7m"),
+					[2]tile.Tile{*tile.MustTileFromCode("7m"), *tile.MustTileFromCode("7m")},
+					*playerid.MustPlayerID(2),
+				),
+				meld.MustPon(
+					*tile.MustTileFromCode("7p"),
+					[2]tile.Tile{*tile.MustTileFromCode("7p"), *tile.MustTileFromCode("7p")},
+					*playerid.MustPlayerID(2),
+				),
+			},
+			winningTile:   tile.MustTileFromCode("3p"),
+			prevalentWind: wind.East,
+			seatWind:      wind.South,
+			tsumo:         false,
+			riichi:        false,
+			event:         service.NoEvent,
+			want:          true,
+		},
+		{
+			name:      "not Sanshoku doukou",
+			handCodes: []string{"2p", "4p", "7s", "7s", "N", "N", "N"},
+			melds: []meld.Meld{
+				meld.MustPon(
+					*tile.MustTileFromCode("7m"),
+					[2]tile.Tile{*tile.MustTileFromCode("7m"), *tile.MustTileFromCode("7m")},
+					*playerid.MustPlayerID(2),
+				),
+				meld.MustPon(
+					*tile.MustTileFromCode("7p"),
+					[2]tile.Tile{*tile.MustTileFromCode("7p"), *tile.MustTileFromCode("7p")},
+					*playerid.MustPlayerID(2),
+				),
+			},
+			winningTile:   tile.MustTileFromCode("3p"),
+			prevalentWind: wind.East,
+			seatWind:      wind.South,
+			tsumo:         false,
+			riichi:        false,
+			event:         service.NoEvent,
+			want:          false,
+		},
+		{
+			name:      "only Sankantsu",
+			handCodes: []string{"2p", "4p", "N", "N"},
+			melds: []meld.Meld{
+				meld.MustCalledKan(
+					*tile.MustTileFromCode("2m"),
+					[3]tile.Tile{*tile.MustTileFromCode("2m"), *tile.MustTileFromCode("2m"), *tile.MustTileFromCode("2m")},
+					*playerid.MustPlayerID(2),
+				),
+				meld.MustConcealedKan(
+					[4]tile.Tile{*tile.MustTileFromCode("6p"), *tile.MustTileFromCode("6p"), *tile.MustTileFromCode("6p"), *tile.MustTileFromCode("6p")},
+				),
+				meld.MustPromotedKan(
+					*tile.MustTileFromCode("7p"),
+					[2]tile.Tile{*tile.MustTileFromCode("7p"), *tile.MustTileFromCode("7p")},
+					*tile.MustTileFromCode("7p"),
+					*playerid.MustPlayerID(2),
+				),
+			},
+			winningTile:   tile.MustTileFromCode("3p"),
+			prevalentWind: wind.East,
+			seatWind:      wind.South,
+			tsumo:         false,
+			riichi:        false,
+			event:         service.NoEvent,
+			want:          true,
+		},
+		{
+			name:          "only Honiisou concealed",
+			handCodes:     []string{"1m", "1m", "1m", "2m", "3m", "3m", "4m", "5m", "7m", "8m", "9m", "W", "W"},
+			melds:         nil,
+			winningTile:   tile.MustTileFromCode("1m"),
+			prevalentWind: wind.East,
+			seatWind:      wind.South,
+			tsumo:         false,
+			riichi:        false,
+			event:         service.NoEvent,
+			want:          true,
+		},
+		{
+			name:          "only Chiniisou concealed",
+			handCodes:     []string{"1m", "1m", "1m", "2m", "3m", "3m", "4m", "5m", "7m", "8m", "9m", "9m", "9m"},
+			melds:         nil,
+			winningTile:   tile.MustTileFromCode("1m"),
+			prevalentWind: wind.East,
+			seatWind:      wind.South,
+			tsumo:         false,
+			riichi:        false,
+			event:         service.NoEvent,
+			want:          true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			hand := hand.CodesToHand(tt.handCodes)
+			got := service.Has1Han(hand, tt.melds, tt.winningTile, tt.prevalentWind, tt.seatWind, tt.tsumo, tt.riichi, tt.event)
+			if got != tt.want {
+				t.Errorf("Has1Han() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
