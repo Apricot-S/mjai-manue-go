@@ -674,3 +674,40 @@ func TestCalculateFuHan(t *testing.T) {
 		})
 	}
 }
+
+func TestHas1Han(t *testing.T) {
+	tests := []struct {
+		name          string
+		handCodes     []string
+		melds         []meld.Meld
+		winningTile   *tile.Tile
+		prevalentWind wind.Wind
+		seatWind      wind.Wind
+		tsumo         bool
+		riichi        bool
+		event         service.WinEvent
+		want          bool
+	}{
+		{
+			name:          "chiitoitsu",
+			handCodes:     []string{"1m", "1m", "8m", "8m", "2p", "8p", "8p", "5s", "5s", "E", "E", "C"},
+			melds:         nil,
+			winningTile:   tile.MustTileFromCode("C"),
+			prevalentWind: wind.East,
+			seatWind:      wind.South,
+			tsumo:         false,
+			riichi:        false,
+			event:         service.NoEvent,
+			want:          true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			hand := hand.CodesToHand(tt.handCodes)
+			got := service.Has1Han(hand, tt.melds, tt.winningTile, tt.prevalentWind, tt.seatWind, tt.tsumo, tt.riichi, tt.event)
+			if got != tt.want {
+				t.Errorf("Has1Han() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
