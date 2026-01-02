@@ -556,10 +556,8 @@ func sanshokuDoukou(allBlocks []block.Block) int {
 	}
 
 	for _, b := range allBlocks {
-		if _, ok := b.(*block.Sequence); ok {
-			continue
-		}
-		if _, ok := b.(*block.Pair); ok {
+		switch b.(type) {
+		case *block.Sequence, *block.Pair:
 			continue
 		}
 
