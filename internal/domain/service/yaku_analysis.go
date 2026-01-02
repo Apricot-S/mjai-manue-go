@@ -191,6 +191,9 @@ func Has1Han(
 		if yakuhai(allBlocks, prevalentWind, seatWind) > 0 {
 			return true
 		}
+		if chantaiyao(allBlocks, isOpen) > 0 {
+			return true
+		}
 	}
 
 	return false
