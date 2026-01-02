@@ -178,6 +178,9 @@ func Has1Han(
 			allTiles = append(allTiles, allBlocks[i].ToTiles()...)
 		}
 
+		if iipeikou(allBlocks, isOpen) > 0 {
+			return true
+		}
 		if tanyao(allTiles) > 0 {
 			return true
 		}
