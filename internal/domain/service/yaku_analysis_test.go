@@ -967,6 +967,52 @@ func TestHas1Han(t *testing.T) {
 			event:         service.NoEvent,
 			want:          false,
 		},
+		{
+			name:      "only Sanshoku doukou",
+			handCodes: []string{"2p", "4p", "7s", "7s", "7s", "N", "N"},
+			melds: []meld.Meld{
+				meld.MustPon(
+					*tile.MustTileFromCode("7m"),
+					[2]tile.Tile{*tile.MustTileFromCode("7m"), *tile.MustTileFromCode("7m")},
+					*playerid.MustPlayerID(2),
+				),
+				meld.MustPon(
+					*tile.MustTileFromCode("7p"),
+					[2]tile.Tile{*tile.MustTileFromCode("7p"), *tile.MustTileFromCode("7p")},
+					*playerid.MustPlayerID(2),
+				),
+			},
+			winningTile:   tile.MustTileFromCode("3p"),
+			prevalentWind: wind.East,
+			seatWind:      wind.South,
+			tsumo:         false,
+			riichi:        false,
+			event:         service.NoEvent,
+			want:          true,
+		},
+		{
+			name:      "not Sanshoku doukou",
+			handCodes: []string{"2p", "4p", "7s", "7s", "N", "N", "N"},
+			melds: []meld.Meld{
+				meld.MustPon(
+					*tile.MustTileFromCode("7m"),
+					[2]tile.Tile{*tile.MustTileFromCode("7m"), *tile.MustTileFromCode("7m")},
+					*playerid.MustPlayerID(2),
+				),
+				meld.MustPon(
+					*tile.MustTileFromCode("7p"),
+					[2]tile.Tile{*tile.MustTileFromCode("7p"), *tile.MustTileFromCode("7p")},
+					*playerid.MustPlayerID(2),
+				),
+			},
+			winningTile:   tile.MustTileFromCode("3p"),
+			prevalentWind: wind.East,
+			seatWind:      wind.South,
+			tsumo:         false,
+			riichi:        false,
+			event:         service.NoEvent,
+			want:          false,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

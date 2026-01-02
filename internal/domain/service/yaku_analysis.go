@@ -206,6 +206,9 @@ func Has1Han(
 		if sanankou(goals[i].Blocks, melds, winningTile, tsumo) > 0 {
 			return true
 		}
+		if sanshokuDoukou(allBlocks) > 0 {
+			return true
+		}
 	}
 
 	return false
@@ -541,5 +544,36 @@ func sanankou(
 	if numAnkou >= 3 {
 		return 2
 	}
+	return 0
+}
+
+func sanshokuDoukou(allBlocks []block.Block) int {
+	colorNumMap := map[rune]map[int]bool{
+		tile.ManzuColor:  {},
+		tile.PinzuColor:  {},
+		tile.SouzuColor:  {},
+		tile.HonorsColor: {},
+	}
+
+	for _, b := range allBlocks {
+		if _, ok := b.(*block.Sequence); ok {
+			continue
+		}
+		if _, ok := b.(*block.Pair); ok {
+			continue
+		}
+
+		t := b.ToTiles()[0]
+		colorNumMap[t.Color()][t.Number()] = true
+	}
+
+	for n := 1; n <= 9; n++ {
+		if colorNumMap[tile.ManzuColor][n] &&
+			colorNumMap[tile.PinzuColor][n] &&
+			colorNumMap[tile.SouzuColor][n] {
+			return 2
+		}
+	}
+
 	return 0
 }
