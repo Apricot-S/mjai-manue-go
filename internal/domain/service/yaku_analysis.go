@@ -203,6 +203,9 @@ func Has1Han(
 		if toitoihou(allBlocks) > 0 {
 			return true
 		}
+		if sanankou(goals[i].Blocks, meldBlocks, winningTile, tsumo) > 0 {
+			return true
+		}
 	}
 
 	return false
@@ -507,4 +510,13 @@ func honiisou(allBlocks []block.Block, isOpen bool) int {
 		return 2
 	}
 	return 3
+}
+
+func sanankou(
+	handBlocks []block.Block,
+	meldBlocks []block.Block,
+	winningTile *tile.Tile,
+	tsumo bool,
+) int {
+	return 0
 }
