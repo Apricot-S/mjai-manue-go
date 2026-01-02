@@ -18,7 +18,6 @@ const (
 	RobbingAKan
 	AfterAKan
 	LastTile
-	FirstTile
 )
 
 // Note:
