@@ -194,6 +194,9 @@ func Has1Han(
 		if chantaiyao(allBlocks, isOpen) > 0 {
 			return true
 		}
+		if sanshokuDoujun(allBlocks, isOpen) > 0 {
+			return true
+		}
 	}
 
 	return false
