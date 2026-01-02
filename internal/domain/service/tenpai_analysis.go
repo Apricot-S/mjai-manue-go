@@ -15,7 +15,7 @@ func IsTenpaiAll(hand *hand.VisibleHand) bool {
 		return true
 	}
 
-	shanten = AnalyzeShantenChitoitsu(hand)
+	shanten = AnalyzeShantenChiitoitsu(hand)
 	if shanten <= 0 {
 		return true
 	}

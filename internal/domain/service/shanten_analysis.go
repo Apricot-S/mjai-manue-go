@@ -273,7 +273,7 @@ func makeNewBlocks(blocks []block.Block, newBlock block.Block) []block.Block {
 	return append(newBlocks, newBlock)
 }
 
-func AnalyzeShantenChitoitsu(hand *hand.VisibleHand) int {
+func AnalyzeShantenChiitoitsu(hand *hand.VisibleHand) int {
 	tc34 := hand.ToTileCounts34()
 
 	if tc34.NumTiles() < 13 {

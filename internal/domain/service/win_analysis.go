@@ -16,7 +16,7 @@ func IsWinningForm(hand *hand.VisibleHand) bool {
 
 	ret := isWinningFormGeneral(tc34)
 	if numTiles == 14 {
-		ret = ret || isWinningFormChitoitsu(tc34) || isWinningFormKokushimuso(tc34)
+		ret = ret || isWinningFormChiitoitsu(tc34) || isWinningFormKokushimuso(tc34)
 	}
 
 	return ret
@@ -33,9 +33,9 @@ func IsWinningFormGeneral(hand *hand.VisibleHand) bool {
 	return isWinningFormGeneral(tc34)
 }
 
-func IsWinningFormChitoitsu(hand *hand.VisibleHand) bool {
+func IsWinningFormChiitoitsu(hand *hand.VisibleHand) bool {
 	tc34 := hand.ToTileCounts34()
-	return isWinningFormChitoitsu(tc34)
+	return isWinningFormChiitoitsu(tc34)
 }
 
 func IsWinningFormKokushimuso(hand *hand.VisibleHand) bool {
@@ -137,7 +137,7 @@ func isSingleColorWinningFormWithPair(singleColorHand []int) bool {
 	return false
 }
 
-func isWinningFormChitoitsu(tc34 *tilecount.TileCounts34) bool {
+func isWinningFormChiitoitsu(tc34 *tilecount.TileCounts34) bool {
 	if tc34.NumTiles() != 14 {
 		return false
 	}

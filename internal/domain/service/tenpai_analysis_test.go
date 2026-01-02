@@ -19,7 +19,7 @@ func TestIsTenpaiGeneral(t *testing.T) {
 			want:  false,
 		},
 		{
-			name:  "chitoitsu",
+			name:  "chiitoitsu",
 			codes: []string{"1m", "1m", "8m", "8m", "2p", "8p", "8p", "5s", "5s", "E", "E", "C", "C"},
 			want:  false,
 		},
@@ -67,7 +67,7 @@ func TestIsTenpaiAll(t *testing.T) {
 			want:  false,
 		},
 		{
-			name:  "chitoitsu",
+			name:  "chiitoitsu",
 			codes: []string{"1m", "1m", "8m", "8m", "2p", "8p", "8p", "5s", "5s", "E", "E", "C", "C"},
 			want:  true,
 		},

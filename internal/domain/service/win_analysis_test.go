@@ -208,7 +208,7 @@ func Test_isSingleColorWinningFormWithPair(t *testing.T) {
 	}
 }
 
-func TestIsWinningFormChitoitsu(t *testing.T) {
+func TestIsWinningFormChiitoitsu(t *testing.T) {
 	tests := []struct {
 		name  string
 		codes []string
@@ -238,9 +238,9 @@ func TestIsWinningFormChitoitsu(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			h := hand.CodesToHand(tt.codes)
-			got := IsWinningFormChitoitsu(h)
+			got := IsWinningFormChiitoitsu(h)
 			if got != tt.want {
-				t.Errorf("IsWinningFormChitoitsu() = %v, want %v", got, tt.want)
+				t.Errorf("IsWinningFormChiitoitsu() = %v, want %v", got, tt.want)
 			}
 		})
 	}
