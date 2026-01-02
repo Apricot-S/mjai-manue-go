@@ -145,7 +145,7 @@ func Has1Han(
 		panic(err)
 	}
 
-	if IsWinningFormChiitoitsu(handWithWinningTile) {
+	if IsWinningFormChiitoitsu(handWithWinningTile) || IsWinningFormKokushimusou(handWithWinningTile) {
 		return true
 	}
 
