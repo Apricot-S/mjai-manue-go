@@ -238,7 +238,7 @@ func tanyao(allTiles []tile.Tile) int {
 
 // Note:
 // To reproduce the behavior of the original mjai-manue,
-// Honroutou is also judged as Chantaiyao.
+// Honroutou and Junchantaiyaochuu are also judged as Chantaiyao.
 func chantaiyao(allBlocks []block.Block, isOpen bool) int {
 	for _, b := range allBlocks {
 		isYaochuBlock := false
