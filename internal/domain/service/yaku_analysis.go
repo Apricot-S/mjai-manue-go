@@ -154,7 +154,12 @@ func Has1Han(
 		return false
 	}
 
+	isOpen := len(melds) > 0
+
 	if riichi {
+		return true
+	}
+	if !isOpen && tsumo {
 		return true
 	}
 
