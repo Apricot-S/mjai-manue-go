@@ -161,6 +161,9 @@ func Has1Han(
 	if !isOpen && tsumo {
 		return true
 	}
+	if event != NoEvent {
+		return true
+	}
 
 	return false
 }
