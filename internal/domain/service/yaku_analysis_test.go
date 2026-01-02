@@ -946,6 +946,27 @@ func TestHas1Han(t *testing.T) {
 			event:         service.NoEvent,
 			want:          true,
 		},
+		{
+			name:      "not Sanankou: 2 ankou",
+			handCodes: []string{"2p", "2p", "6p", "6p", "N", "N", "N"},
+			melds: []meld.Meld{
+				meld.MustChii(
+					*tile.MustTileFromCode("1m"),
+					[2]tile.Tile{*tile.MustTileFromCode("2m"), *tile.MustTileFromCode("3m")},
+					*playerid.MustPlayerID(2),
+				),
+				meld.MustConcealedKan(
+					[4]tile.Tile{*tile.MustTileFromCode("9s"), *tile.MustTileFromCode("9s"), *tile.MustTileFromCode("9s"), *tile.MustTileFromCode("9s")},
+				),
+			},
+			winningTile:   tile.MustTileFromCode("2p"),
+			prevalentWind: wind.East,
+			seatWind:      wind.South,
+			tsumo:         false,
+			riichi:        false,
+			event:         service.NoEvent,
+			want:          false,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
