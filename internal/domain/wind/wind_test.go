@@ -3,7 +3,7 @@ package wind_test
 import (
 	"testing"
 
-	"github.com/Apricot-S/mjai-manue-go/internal/domain/model/wind"
+	"github.com/Apricot-S/mjai-manue-go/internal/domain/wind"
 )
 
 func TestNewWind(t *testing.T) {

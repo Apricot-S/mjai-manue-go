@@ -1,9 +1,9 @@
 package service
 
 import (
-	"github.com/Apricot-S/mjai-manue-go/internal/domain/model/hand"
-	"github.com/Apricot-S/mjai-manue-go/internal/domain/model/tile"
-	"github.com/Apricot-S/mjai-manue-go/internal/domain/model/tilecount"
+	"github.com/Apricot-S/mjai-manue-go/internal/domain/hand"
+	"github.com/Apricot-S/mjai-manue-go/internal/domain/tile"
+	"github.com/Apricot-S/mjai-manue-go/internal/domain/tilecount"
 )
 
 func IsWinningForm(hand *hand.VisibleHand) bool {

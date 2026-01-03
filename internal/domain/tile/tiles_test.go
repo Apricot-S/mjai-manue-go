@@ -4,7 +4,7 @@ import (
 	"sort"
 	"testing"
 
-	"github.com/Apricot-S/mjai-manue-go/internal/domain/model/tile"
+	"github.com/Apricot-S/mjai-manue-go/internal/domain/tile"
 )
 
 func TestSortTiles(t *testing.T) {

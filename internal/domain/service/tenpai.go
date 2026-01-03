@@ -1,7 +1,7 @@
 package service
 
 import (
-	"github.com/Apricot-S/mjai-manue-go/internal/domain/model/hand"
+	"github.com/Apricot-S/mjai-manue-go/internal/domain/hand"
 )
 
 func IsTenpaiGeneral(hand *hand.VisibleHand) bool {

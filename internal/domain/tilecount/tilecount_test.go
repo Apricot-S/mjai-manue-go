@@ -4,8 +4,8 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/Apricot-S/mjai-manue-go/internal/domain/model/tile"
-	"github.com/Apricot-S/mjai-manue-go/internal/domain/model/tilecount"
+	"github.com/Apricot-S/mjai-manue-go/internal/domain/tile"
+	"github.com/Apricot-S/mjai-manue-go/internal/domain/tilecount"
 )
 
 func TestTileCounts34_ToTiles(t *testing.T) {

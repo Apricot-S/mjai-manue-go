@@ -4,9 +4,9 @@ import (
 	"math/rand/v2"
 	"testing"
 
-	"github.com/Apricot-S/mjai-manue-go/internal/domain/model/hand"
-	"github.com/Apricot-S/mjai-manue-go/internal/domain/model/tile"
+	"github.com/Apricot-S/mjai-manue-go/internal/domain/hand"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/service"
+	"github.com/Apricot-S/mjai-manue-go/internal/domain/tile"
 )
 
 var choices = [...]int{1, 2, 4, 5, 7, 8, 10, 11, 13, 14}

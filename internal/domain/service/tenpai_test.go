@@ -3,7 +3,7 @@ package service_test
 import (
 	"testing"
 
-	"github.com/Apricot-S/mjai-manue-go/internal/domain/model/hand"
+	"github.com/Apricot-S/mjai-manue-go/internal/domain/hand"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/service"
 )
 

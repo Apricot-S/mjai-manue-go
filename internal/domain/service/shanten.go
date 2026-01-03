@@ -4,10 +4,10 @@ import (
 	"math"
 	"slices"
 
-	"github.com/Apricot-S/mjai-manue-go/internal/domain/model/hand"
-	"github.com/Apricot-S/mjai-manue-go/internal/domain/model/tile"
-	"github.com/Apricot-S/mjai-manue-go/internal/domain/model/tilecount"
+	"github.com/Apricot-S/mjai-manue-go/internal/domain/hand"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/service/block"
+	"github.com/Apricot-S/mjai-manue-go/internal/domain/tile"
+	"github.com/Apricot-S/mjai-manue-go/internal/domain/tilecount"
 )
 
 // Goal represents a winning hand that can be transitioned from the current hand.

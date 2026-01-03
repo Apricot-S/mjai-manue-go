@@ -3,9 +3,9 @@ package hand
 import (
 	"fmt"
 
-	"github.com/Apricot-S/mjai-manue-go/internal/domain/model/meld"
-	"github.com/Apricot-S/mjai-manue-go/internal/domain/model/tile"
-	"github.com/Apricot-S/mjai-manue-go/internal/domain/model/tilecount"
+	"github.com/Apricot-S/mjai-manue-go/internal/domain/meld"
+	"github.com/Apricot-S/mjai-manue-go/internal/domain/tile"
+	"github.com/Apricot-S/mjai-manue-go/internal/domain/tilecount"
 )
 
 type VisibleHand struct {

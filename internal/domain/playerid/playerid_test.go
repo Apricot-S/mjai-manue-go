@@ -3,7 +3,7 @@ package playerid_test
 import (
 	"testing"
 
-	"github.com/Apricot-S/mjai-manue-go/internal/domain/model/playerid"
+	"github.com/Apricot-S/mjai-manue-go/internal/domain/playerid"
 )
 
 func TestNewPlayerID(t *testing.T) {

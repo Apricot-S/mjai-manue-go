@@ -1,7 +1,7 @@
 package hand
 
 import (
-	"github.com/Apricot-S/mjai-manue-go/internal/domain/model/tile"
+	"github.com/Apricot-S/mjai-manue-go/internal/domain/tile"
 )
 
 // For test only

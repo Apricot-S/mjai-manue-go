@@ -4,11 +4,11 @@ import (
 	"maps"
 	"slices"
 
-	"github.com/Apricot-S/mjai-manue-go/internal/domain/model/hand"
-	"github.com/Apricot-S/mjai-manue-go/internal/domain/model/meld"
-	"github.com/Apricot-S/mjai-manue-go/internal/domain/model/tile"
-	"github.com/Apricot-S/mjai-manue-go/internal/domain/model/wind"
+	"github.com/Apricot-S/mjai-manue-go/internal/domain/hand"
+	"github.com/Apricot-S/mjai-manue-go/internal/domain/meld"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/service/block"
+	"github.com/Apricot-S/mjai-manue-go/internal/domain/tile"
+	"github.com/Apricot-S/mjai-manue-go/internal/domain/wind"
 )
 
 type WinEvent int

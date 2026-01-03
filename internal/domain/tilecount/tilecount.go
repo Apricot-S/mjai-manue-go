@@ -1,6 +1,6 @@
 package tilecount
 
-import "github.com/Apricot-S/mjai-manue-go/internal/domain/model/tile"
+import "github.com/Apricot-S/mjai-manue-go/internal/domain/tile"
 
 type TileCounts34 [tile.NumTileType34]int
 
