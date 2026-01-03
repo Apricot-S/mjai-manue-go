@@ -5,18 +5,18 @@ import (
 	"slices"
 	"sort"
 
-	"github.com/Apricot-S/mjai-manue-go/internal/domain/playerid"
+	"github.com/Apricot-S/mjai-manue-go/internal/domain/player"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/tile"
 )
 
 type Pon struct {
 	taken    tile.Tile
 	consumed [2]tile.Tile
-	target   playerid.PlayerID
+	target   player.PlayerID
 	tiles    []tile.Tile
 }
 
-func NewPon(taken tile.Tile, consumed [2]tile.Tile, target playerid.PlayerID) (*Pon, error) {
+func NewPon(taken tile.Tile, consumed [2]tile.Tile, target player.PlayerID) (*Pon, error) {
 	tiles := tile.Tiles{taken, consumed[0], consumed[1]}
 	if slices.ContainsFunc(tiles, func(t tile.Tile) bool { return t.IsUnknown() }) {
 		return nil, fmt.Errorf("unknown tile cannot use for Pon")
@@ -41,7 +41,7 @@ func NewPon(taken tile.Tile, consumed [2]tile.Tile, target playerid.PlayerID) (*
 	}, nil
 }
 
-func MustPon(taken tile.Tile, consumed [2]tile.Tile, target playerid.PlayerID) *Pon {
+func MustPon(taken tile.Tile, consumed [2]tile.Tile, target player.PlayerID) *Pon {
 	p, err := NewPon(taken, consumed, target)
 	if err != nil {
 		panic(err)
@@ -57,7 +57,7 @@ func (p *Pon) Consumed() []tile.Tile {
 	return p.consumed[:]
 }
 
-func (p *Pon) Target() *playerid.PlayerID {
+func (p *Pon) Target() *player.PlayerID {
 	return &p.target
 }
 

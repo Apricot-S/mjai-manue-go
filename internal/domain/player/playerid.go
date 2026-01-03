@@ -1,4 +1,4 @@
-package playerid
+package player
 
 import "fmt"
 

@@ -5,18 +5,18 @@ import (
 	"slices"
 	"sort"
 
-	"github.com/Apricot-S/mjai-manue-go/internal/domain/playerid"
+	"github.com/Apricot-S/mjai-manue-go/internal/domain/player"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/tile"
 )
 
 type CalledKan struct {
 	taken    tile.Tile
 	consumed [3]tile.Tile
-	target   playerid.PlayerID
+	target   player.PlayerID
 	tiles    []tile.Tile
 }
 
-func NewCalledKan(taken tile.Tile, consumed [3]tile.Tile, target playerid.PlayerID) (*CalledKan, error) {
+func NewCalledKan(taken tile.Tile, consumed [3]tile.Tile, target player.PlayerID) (*CalledKan, error) {
 	tiles := tile.Tiles{taken, consumed[0], consumed[1], consumed[2]}
 	if slices.ContainsFunc(tiles, func(t tile.Tile) bool { return t.IsUnknown() }) {
 		return nil, fmt.Errorf("unknown tile cannot use for Called Kan")
@@ -41,7 +41,7 @@ func NewCalledKan(taken tile.Tile, consumed [3]tile.Tile, target playerid.Player
 	}, nil
 }
 
-func MustCalledKan(taken tile.Tile, consumed [3]tile.Tile, target playerid.PlayerID) *CalledKan {
+func MustCalledKan(taken tile.Tile, consumed [3]tile.Tile, target player.PlayerID) *CalledKan {
 	k, err := NewCalledKan(taken, consumed, target)
 	if err != nil {
 		panic(err)
@@ -57,7 +57,7 @@ func (k *CalledKan) Consumed() []tile.Tile {
 	return k.consumed[:]
 }
 
-func (k *CalledKan) Target() *playerid.PlayerID {
+func (k *CalledKan) Target() *player.PlayerID {
 	return &k.target
 }
 

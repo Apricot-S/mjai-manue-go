@@ -1,9 +1,9 @@
-package playerid_test
+package player_test
 
 import (
 	"testing"
 
-	"github.com/Apricot-S/mjai-manue-go/internal/domain/playerid"
+	"github.com/Apricot-S/mjai-manue-go/internal/domain/player"
 )
 
 func TestNewPlayerID(t *testing.T) {
@@ -40,7 +40,7 @@ func TestNewPlayerID(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, gotErr := playerid.NewPlayerID(tt.id)
+			got, gotErr := player.NewPlayerID(tt.id)
 			if gotErr != nil {
 				if !tt.wantErr {
 					t.Errorf("NewPlayerID() failed: %v", gotErr)

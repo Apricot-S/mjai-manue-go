@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/Apricot-S/mjai-manue-go/internal/domain/playerid"
+	"github.com/Apricot-S/mjai-manue-go/internal/domain/player"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/tile"
 )
 
@@ -17,7 +17,7 @@ type Meld interface {
 type OpenMeld interface {
 	Meld
 	Taken() *tile.Tile
-	Target() *playerid.PlayerID
+	Target() *player.PlayerID
 }
 
 type ChiiPon interface {
