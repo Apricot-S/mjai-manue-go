@@ -4,11 +4,11 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/Apricot-S/mjai-manue-go/internal/domain/model/block"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/model/tile"
+	"github.com/Apricot-S/mjai-manue-go/internal/domain/service/block"
 )
 
-func TestNewTriplet(t *testing.T) {
+func TestNewQuad(t *testing.T) {
 	tests := []struct {
 		name    string
 		tile    tile.Tile
@@ -16,19 +16,19 @@ func TestNewTriplet(t *testing.T) {
 		wantErr bool
 	}{
 		{
-			name:    "C triplet",
+			name:    "C quad",
 			tile:    *tile.MustTileFromCode("C"),
-			want:    []tile.Tile{*tile.MustTileFromCode("C"), *tile.MustTileFromCode("C"), *tile.MustTileFromCode("C")},
+			want:    []tile.Tile{*tile.MustTileFromCode("C"), *tile.MustTileFromCode("C"), *tile.MustTileFromCode("C"), *tile.MustTileFromCode("C")},
 			wantErr: false,
 		},
 		{
-			name:    "cannot create triplet from unknown tile",
+			name:    "cannot create quad from unknown tile",
 			tile:    *tile.MustTileFromCode("?"),
 			want:    nil,
 			wantErr: true,
 		},
 		{
-			name:    "cannot create triplet from red five",
+			name:    "cannot create quad from red five",
 			tile:    *tile.MustTileFromCode("5mr"),
 			want:    nil,
 			wantErr: true,
@@ -36,18 +36,18 @@ func TestNewTriplet(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, gotErr := block.NewTriplet(tt.tile)
+			got, gotErr := block.NewQuad(tt.tile)
 			if gotErr != nil {
 				if !tt.wantErr {
-					t.Errorf("NewTriplet() failed: %v", gotErr)
+					t.Errorf("NewQuad() failed: %v", gotErr)
 				}
 				return
 			}
 			if tt.wantErr {
-				t.Fatal("NewTriplet() succeeded unexpectedly")
+				t.Fatal("NewQuad() succeeded unexpectedly")
 			}
 			if !reflect.DeepEqual(got.ToTiles(), tt.want) {
-				t.Errorf("NewTriplet().ToTiles() = %v, want %v", got, tt.want)
+				t.Errorf("NewQuad().ToTiles() = %v, want %v", got, tt.want)
 			}
 		})
 	}
