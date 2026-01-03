@@ -17,7 +17,7 @@ type Meld interface {
 type OpenMeld interface {
 	Meld
 	Taken() *tile.Tile
-	Target() *player.PlayerID
+	Target() *player.ID
 }
 
 type ChiiPon interface {

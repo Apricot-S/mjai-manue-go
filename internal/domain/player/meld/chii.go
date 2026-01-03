@@ -20,12 +20,12 @@ const (
 type Chii struct {
 	taken    tile.Tile
 	consumed [2]tile.Tile
-	target   player.PlayerID
+	target   player.ID
 	tiles    []tile.Tile
 	ty       chiiType
 }
 
-func NewChii(taken tile.Tile, consumed [2]tile.Tile, target player.PlayerID) (*Chii, error) {
+func NewChii(taken tile.Tile, consumed [2]tile.Tile, target player.ID) (*Chii, error) {
 	tiles := tile.Tiles{taken, consumed[0], consumed[1]}
 	if slices.ContainsFunc(tiles, func(t tile.Tile) bool { return !t.IsSuits() }) {
 		return nil, fmt.Errorf("honors or unknown tile cannot use for Chii; taken: %+v, consumed: %+v", taken, consumed)
@@ -61,7 +61,7 @@ func NewChii(taken tile.Tile, consumed [2]tile.Tile, target player.PlayerID) (*C
 	}, nil
 }
 
-func MustChii(taken tile.Tile, consumed [2]tile.Tile, target player.PlayerID) *Chii {
+func MustChii(taken tile.Tile, consumed [2]tile.Tile, target player.ID) *Chii {
 	c, err := NewChii(taken, consumed, target)
 	if err != nil {
 		panic(err)
@@ -77,7 +77,7 @@ func (c *Chii) Consumed() []tile.Tile {
 	return c.consumed[:]
 }
 
-func (c *Chii) Target() *player.PlayerID {
+func (c *Chii) Target() *player.ID {
 	return &c.target
 }
 

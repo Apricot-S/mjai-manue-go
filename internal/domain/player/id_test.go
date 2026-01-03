@@ -6,7 +6,7 @@ import (
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/player"
 )
 
-func TestNewPlayerID(t *testing.T) {
+func TestNewID(t *testing.T) {
 	tests := []struct {
 		name      string
 		id        int
@@ -40,18 +40,18 @@ func TestNewPlayerID(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, gotErr := player.NewPlayerID(tt.id)
+			got, gotErr := player.NewID(tt.id)
 			if gotErr != nil {
 				if !tt.wantErr {
-					t.Errorf("NewPlayerID() failed: %v", gotErr)
+					t.Errorf("NewID() failed: %v", gotErr)
 				}
 				return
 			}
 			if tt.wantErr {
-				t.Fatal("NewPlayerID() succeeded unexpectedly")
+				t.Fatal("NewID() succeeded unexpectedly")
 			}
 			if got.Index() != tt.wantIndex {
-				t.Errorf("NewPlayerID().Index() = %v, want %v", got, tt.wantIndex)
+				t.Errorf("NewID().Index() = %v, want %v", got, tt.wantIndex)
 			}
 		})
 	}

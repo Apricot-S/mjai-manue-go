@@ -333,7 +333,7 @@ func TestVisibleHand_Call(t *testing.T) {
 			meld: meld.MustChii(
 				*tile.MustTileFromCode("1m"),
 				[2]tile.Tile{*tile.MustTileFromCode("2m"), *tile.MustTileFromCode("3m")},
-				*player.MustPlayerID(0),
+				*player.MustID(0),
 			),
 			wantTiles: []tile.Tile{},
 			wantErr:   false,
@@ -344,7 +344,7 @@ func TestVisibleHand_Call(t *testing.T) {
 			meld: meld.MustPon(
 				*tile.MustTileFromCode("1m"),
 				[2]tile.Tile{*tile.MustTileFromCode("1m"), *tile.MustTileFromCode("1m")},
-				*player.MustPlayerID(0),
+				*player.MustID(0),
 			),
 			wantTiles: []tile.Tile{},
 			wantErr:   false,
@@ -355,7 +355,7 @@ func TestVisibleHand_Call(t *testing.T) {
 			meld: meld.MustCalledKan(
 				*tile.MustTileFromCode("1m"),
 				[3]tile.Tile{*tile.MustTileFromCode("1m"), *tile.MustTileFromCode("1m"), *tile.MustTileFromCode("1m")},
-				*player.MustPlayerID(0),
+				*player.MustID(0),
 			),
 			wantTiles: []tile.Tile{},
 			wantErr:   false,
@@ -376,7 +376,7 @@ func TestVisibleHand_Call(t *testing.T) {
 				*tile.MustTileFromCode("5m"),
 				[2]tile.Tile{*tile.MustTileFromCode("5m"), *tile.MustTileFromCode("5m")},
 				*tile.MustTileFromCode("5mr"),
-				*player.MustPlayerID(0),
+				*player.MustID(0),
 			),
 			wantTiles: []tile.Tile{},
 			wantErr:   false,
@@ -387,7 +387,7 @@ func TestVisibleHand_Call(t *testing.T) {
 			meld: meld.MustChii(
 				*tile.MustTileFromCode("6m"),
 				[2]tile.Tile{*tile.MustTileFromCode("4m"), *tile.MustTileFromCode("5m")},
-				*player.MustPlayerID(0),
+				*player.MustID(0),
 			),
 			wantTiles: nil,
 			wantErr:   true,

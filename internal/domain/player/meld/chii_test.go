@@ -14,100 +14,100 @@ func TestNewChii(t *testing.T) {
 		name         string
 		taken        tile.Tile
 		consumed     [2]tile.Tile
-		target       player.PlayerID
+		target       player.ID
 		wantTaken    *tile.Tile
 		wantConsumed []tile.Tile
-		wantTarget   *player.PlayerID
+		wantTarget   *player.ID
 		wantErr      bool
 	}{
 		{
 			name:         "valid tiles: 8-79m",
 			taken:        *tile.MustTileFromCode("8m"),
 			consumed:     [2]tile.Tile{*tile.MustTileFromCode("7m"), *tile.MustTileFromCode("9m")},
-			target:       *player.MustPlayerID(0),
+			target:       *player.MustID(0),
 			wantTaken:    tile.MustTileFromCode("8m"),
 			wantConsumed: []tile.Tile{*tile.MustTileFromCode("7m"), *tile.MustTileFromCode("9m")},
-			wantTarget:   player.MustPlayerID(0),
+			wantTarget:   player.MustID(0),
 			wantErr:      false,
 		},
 		{
 			name:         "valid tiles: 5r-46m",
 			taken:        *tile.MustTileFromCode("5mr"),
 			consumed:     [2]tile.Tile{*tile.MustTileFromCode("4m"), *tile.MustTileFromCode("6m")},
-			target:       *player.MustPlayerID(0),
+			target:       *player.MustID(0),
 			wantTaken:    tile.MustTileFromCode("5mr"),
 			wantConsumed: []tile.Tile{*tile.MustTileFromCode("4m"), *tile.MustTileFromCode("6m")},
-			wantTarget:   player.MustPlayerID(0),
+			wantTarget:   player.MustID(0),
 			wantErr:      false,
 		},
 		{
 			name:         "invalid tiles: ?-??",
 			taken:        *tile.MustTileFromCode("?"),
 			consumed:     [2]tile.Tile{*tile.MustTileFromCode("?"), *tile.MustTileFromCode("?")},
-			target:       *player.MustPlayerID(0),
+			target:       *player.MustID(0),
 			wantTaken:    nil,
 			wantConsumed: nil,
-			wantTarget:   player.MustPlayerID(0),
+			wantTarget:   player.MustID(0),
 			wantErr:      true,
 		},
 		{
 			name:         "invalid tiles: E-SW",
 			taken:        *tile.MustTileFromCode("E"),
 			consumed:     [2]tile.Tile{*tile.MustTileFromCode("S"), *tile.MustTileFromCode("W")},
-			target:       *player.MustPlayerID(0),
+			target:       *player.MustID(0),
 			wantTaken:    nil,
 			wantConsumed: nil,
-			wantTarget:   player.MustPlayerID(0),
+			wantTarget:   player.MustID(0),
 			wantErr:      true,
 		},
 		{
 			name:         "invalid tiles: 8-9m1p",
 			taken:        *tile.MustTileFromCode("8m"),
 			consumed:     [2]tile.Tile{*tile.MustTileFromCode("9m"), *tile.MustTileFromCode("1p")},
-			target:       *player.MustPlayerID(0),
+			target:       *player.MustID(0),
 			wantTaken:    nil,
 			wantConsumed: nil,
-			wantTarget:   player.MustPlayerID(0),
+			wantTarget:   player.MustID(0),
 			wantErr:      true,
 		},
 		{
 			name:         "invalid tiles: 6-89m",
 			taken:        *tile.MustTileFromCode("6m"),
 			consumed:     [2]tile.Tile{*tile.MustTileFromCode("8m"), *tile.MustTileFromCode("9m")},
-			target:       *player.MustPlayerID(0),
+			target:       *player.MustID(0),
 			wantTaken:    nil,
 			wantConsumed: nil,
-			wantTarget:   player.MustPlayerID(0),
+			wantTarget:   player.MustID(0),
 			wantErr:      true,
 		},
 		{
 			name:         "invalid tiles: 6-79m",
 			taken:        *tile.MustTileFromCode("6m"),
 			consumed:     [2]tile.Tile{*tile.MustTileFromCode("7m"), *tile.MustTileFromCode("9m")},
-			target:       *player.MustPlayerID(0),
+			target:       *player.MustID(0),
 			wantTaken:    nil,
 			wantConsumed: nil,
-			wantTarget:   player.MustPlayerID(0),
+			wantTarget:   player.MustID(0),
 			wantErr:      true,
 		},
 		{
 			name:         "invalid tiles: 6-7m8p",
 			taken:        *tile.MustTileFromCode("6m"),
 			consumed:     [2]tile.Tile{*tile.MustTileFromCode("7m"), *tile.MustTileFromCode("8p")},
-			target:       *player.MustPlayerID(0),
+			target:       *player.MustID(0),
 			wantTaken:    nil,
 			wantConsumed: nil,
-			wantTarget:   player.MustPlayerID(0),
+			wantTarget:   player.MustID(0),
 			wantErr:      true,
 		},
 		{
 			name:         "sort tiles: 8-97s to 8-79s",
 			taken:        *tile.MustTileFromCode("8s"),
 			consumed:     [2]tile.Tile{*tile.MustTileFromCode("9s"), *tile.MustTileFromCode("7s")},
-			target:       *player.MustPlayerID(3),
+			target:       *player.MustID(3),
 			wantTaken:    tile.MustTileFromCode("8s"),
 			wantConsumed: []tile.Tile{*tile.MustTileFromCode("7s"), *tile.MustTileFromCode("9s")},
-			wantTarget:   player.MustPlayerID(3),
+			wantTarget:   player.MustID(3),
 			wantErr:      false,
 		},
 	}
@@ -141,28 +141,28 @@ func TestChii_ToTiles(t *testing.T) {
 		name     string
 		taken    tile.Tile
 		consumed [2]tile.Tile
-		target   player.PlayerID
+		target   player.ID
 		want     []tile.Tile
 	}{
 		{
 			name:     "1-23m",
 			taken:    *tile.MustTileFromCode("1m"),
 			consumed: [2]tile.Tile{*tile.MustTileFromCode("2m"), *tile.MustTileFromCode("3m")},
-			target:   *player.MustPlayerID(0),
+			target:   *player.MustID(0),
 			want:     []tile.Tile{*tile.MustTileFromCode("1m"), *tile.MustTileFromCode("2m"), *tile.MustTileFromCode("3m")},
 		},
 		{
 			name:     "5r-46p",
 			taken:    *tile.MustTileFromCode("5pr"),
 			consumed: [2]tile.Tile{*tile.MustTileFromCode("4p"), *tile.MustTileFromCode("6p")},
-			target:   *player.MustPlayerID(0),
+			target:   *player.MustID(0),
 			want:     []tile.Tile{*tile.MustTileFromCode("4p"), *tile.MustTileFromCode("5pr"), *tile.MustTileFromCode("6p")},
 		},
 		{
 			name:     "6-5r4p",
 			taken:    *tile.MustTileFromCode("6p"),
 			consumed: [2]tile.Tile{*tile.MustTileFromCode("5pr"), *tile.MustTileFromCode("4p")},
-			target:   *player.MustPlayerID(0),
+			target:   *player.MustID(0),
 			want:     []tile.Tile{*tile.MustTileFromCode("4p"), *tile.MustTileFromCode("5pr"), *tile.MustTileFromCode("6p")},
 		},
 	}
@@ -185,28 +185,28 @@ func TestChii_String(t *testing.T) {
 		name     string
 		taken    tile.Tile
 		consumed [2]tile.Tile
-		target   player.PlayerID
+		target   player.ID
 		want     string
 	}{
 		{
 			name:     "1-23m from 0",
 			taken:    *tile.MustTileFromCode("1m"),
 			consumed: [2]tile.Tile{*tile.MustTileFromCode("2m"), *tile.MustTileFromCode("3m")},
-			target:   *player.MustPlayerID(0),
+			target:   *player.MustID(0),
 			want:     "[1m(0)/2m 3m]",
 		},
 		{
 			name:     "5r-46s from 1",
 			taken:    *tile.MustTileFromCode("5sr"),
 			consumed: [2]tile.Tile{*tile.MustTileFromCode("4s"), *tile.MustTileFromCode("6s")},
-			target:   *player.MustPlayerID(1),
+			target:   *player.MustID(1),
 			want:     "[5sr(1)/4s 6s]",
 		},
 		{
 			name:     "6-45pr from 2",
 			taken:    *tile.MustTileFromCode("6p"),
 			consumed: [2]tile.Tile{*tile.MustTileFromCode("4p"), *tile.MustTileFromCode("5pr")},
-			target:   *player.MustPlayerID(2),
+			target:   *player.MustID(2),
 			want:     "[6p(2)/4p 5pr]",
 		},
 	}
@@ -229,98 +229,98 @@ func TestChii_SwapCallTiles(t *testing.T) {
 		name     string
 		taken    tile.Tile
 		consumed [2]tile.Tile
-		target   player.PlayerID
+		target   player.ID
 		want     []tile.Tile
 	}{
 		{
 			name:     "8-79m",
 			taken:    *tile.MustTileFromCode("8m"),
 			consumed: [2]tile.Tile{*tile.MustTileFromCode("7m"), *tile.MustTileFromCode("9m")},
-			target:   *player.MustPlayerID(0),
+			target:   *player.MustID(0),
 			want:     []tile.Tile{*tile.MustTileFromCode("8m")},
 		},
 		{
 			name:     "5-46m",
 			taken:    *tile.MustTileFromCode("5m"),
 			consumed: [2]tile.Tile{*tile.MustTileFromCode("4m"), *tile.MustTileFromCode("6m")},
-			target:   *player.MustPlayerID(0),
+			target:   *player.MustID(0),
 			want:     []tile.Tile{*tile.MustTileFromCode("5m"), *tile.MustTileFromCode("5mr")},
 		},
 		{
 			name:     "5r-46m",
 			taken:    *tile.MustTileFromCode("5mr"),
 			consumed: [2]tile.Tile{*tile.MustTileFromCode("4m"), *tile.MustTileFromCode("6m")},
-			target:   *player.MustPlayerID(0),
+			target:   *player.MustID(0),
 			want:     []tile.Tile{*tile.MustTileFromCode("5m"), *tile.MustTileFromCode("5mr")},
 		},
 		{
 			name:     "9-78m",
 			taken:    *tile.MustTileFromCode("9m"),
 			consumed: [2]tile.Tile{*tile.MustTileFromCode("7m"), *tile.MustTileFromCode("8m")},
-			target:   *player.MustPlayerID(0),
+			target:   *player.MustID(0),
 			want:     []tile.Tile{*tile.MustTileFromCode("6m"), *tile.MustTileFromCode("9m")},
 		},
 		{
 			name:     "5-34m",
 			taken:    *tile.MustTileFromCode("5m"),
 			consumed: [2]tile.Tile{*tile.MustTileFromCode("3m"), *tile.MustTileFromCode("4m")},
-			target:   *player.MustPlayerID(0),
+			target:   *player.MustID(0),
 			want:     []tile.Tile{*tile.MustTileFromCode("2m"), *tile.MustTileFromCode("5m"), *tile.MustTileFromCode("5mr")},
 		},
 		{
 			name:     "5r-34m",
 			taken:    *tile.MustTileFromCode("5mr"),
 			consumed: [2]tile.Tile{*tile.MustTileFromCode("3m"), *tile.MustTileFromCode("4m")},
-			target:   *player.MustPlayerID(0),
+			target:   *player.MustID(0),
 			want:     []tile.Tile{*tile.MustTileFromCode("2m"), *tile.MustTileFromCode("5m"), *tile.MustTileFromCode("5mr")},
 		},
 		{
 			name:     "8-67m",
 			taken:    *tile.MustTileFromCode("8m"),
 			consumed: [2]tile.Tile{*tile.MustTileFromCode("6m"), *tile.MustTileFromCode("7m")},
-			target:   *player.MustPlayerID(0),
+			target:   *player.MustID(0),
 			want:     []tile.Tile{*tile.MustTileFromCode("5m"), *tile.MustTileFromCode("5mr"), *tile.MustTileFromCode("8m")},
 		},
 		{
 			name:     "3-12m",
 			taken:    *tile.MustTileFromCode("3m"),
 			consumed: [2]tile.Tile{*tile.MustTileFromCode("1m"), *tile.MustTileFromCode("2m")},
-			target:   *player.MustPlayerID(0),
+			target:   *player.MustID(0),
 			want:     []tile.Tile{*tile.MustTileFromCode("3m")},
 		},
 		{
 			name:     "1-23m",
 			taken:    *tile.MustTileFromCode("1m"),
 			consumed: [2]tile.Tile{*tile.MustTileFromCode("2m"), *tile.MustTileFromCode("3m")},
-			target:   *player.MustPlayerID(0),
+			target:   *player.MustID(0),
 			want:     []tile.Tile{*tile.MustTileFromCode("1m"), *tile.MustTileFromCode("4m")},
 		},
 		{
 			name:     "2-34m",
 			taken:    *tile.MustTileFromCode("2m"),
 			consumed: [2]tile.Tile{*tile.MustTileFromCode("3m"), *tile.MustTileFromCode("4m")},
-			target:   *player.MustPlayerID(0),
+			target:   *player.MustID(0),
 			want:     []tile.Tile{*tile.MustTileFromCode("2m"), *tile.MustTileFromCode("5m"), *tile.MustTileFromCode("5mr")},
 		},
 		{
 			name:     "5-67m",
 			taken:    *tile.MustTileFromCode("5m"),
 			consumed: [2]tile.Tile{*tile.MustTileFromCode("6m"), *tile.MustTileFromCode("7m")},
-			target:   *player.MustPlayerID(0),
+			target:   *player.MustID(0),
 			want:     []tile.Tile{*tile.MustTileFromCode("5m"), *tile.MustTileFromCode("5mr"), *tile.MustTileFromCode("8m")},
 		},
 		{
 			name:     "5r-67m",
 			taken:    *tile.MustTileFromCode("5mr"),
 			consumed: [2]tile.Tile{*tile.MustTileFromCode("6m"), *tile.MustTileFromCode("7m")},
-			target:   *player.MustPlayerID(0),
+			target:   *player.MustID(0),
 			want:     []tile.Tile{*tile.MustTileFromCode("5m"), *tile.MustTileFromCode("5mr"), *tile.MustTileFromCode("8m")},
 		},
 		{
 			name:     "7-89m",
 			taken:    *tile.MustTileFromCode("7m"),
 			consumed: [2]tile.Tile{*tile.MustTileFromCode("8m"), *tile.MustTileFromCode("9m")},
-			target:   *player.MustPlayerID(0),
+			target:   *player.MustID(0),
 			want:     []tile.Tile{*tile.MustTileFromCode("7m")},
 		},
 	}

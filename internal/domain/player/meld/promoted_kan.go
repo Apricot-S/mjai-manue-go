@@ -13,7 +13,7 @@ type PromotedKan struct {
 	taken    tile.Tile
 	consumed [2]tile.Tile
 	added    tile.Tile
-	target   player.PlayerID
+	target   player.ID
 	tiles    []tile.Tile
 }
 
@@ -21,7 +21,7 @@ func NewPromotedKan(
 	taken tile.Tile,
 	consumed [2]tile.Tile,
 	added tile.Tile,
-	target player.PlayerID,
+	target player.ID,
 ) (*PromotedKan, error) {
 	tiles := tile.Tiles{taken, consumed[0], consumed[1], added}
 	if slices.ContainsFunc(tiles, func(t tile.Tile) bool { return t.IsUnknown() }) {
@@ -52,7 +52,7 @@ func MustPromotedKan(
 	taken tile.Tile,
 	consumed [2]tile.Tile,
 	added tile.Tile,
-	target player.PlayerID,
+	target player.ID,
 ) *PromotedKan {
 	k, err := NewPromotedKan(taken, consumed, added, target)
 	if err != nil {
@@ -73,7 +73,7 @@ func (k *PromotedKan) Added() *tile.Tile {
 	return &k.added
 }
 
-func (k *PromotedKan) Target() *player.PlayerID {
+func (k *PromotedKan) Target() *player.ID {
 	return &k.target
 }
 
