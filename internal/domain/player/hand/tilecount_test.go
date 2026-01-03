@@ -1,27 +1,27 @@
-package tilecount_test
+package hand_test
 
 import (
 	"reflect"
 	"testing"
 
+	"github.com/Apricot-S/mjai-manue-go/internal/domain/player/hand"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/tile"
-	"github.com/Apricot-S/mjai-manue-go/internal/domain/tilecount"
 )
 
 func TestTileCounts34_ToTiles(t *testing.T) {
 	tests := []struct {
 		name string
-		tc34 tilecount.TileCounts34
+		tc34 hand.TileCounts34
 		want []tile.Tile
 	}{
 		{
 			name: "empty tile counts 34",
-			tc34: tilecount.TileCounts34{},
+			tc34: hand.TileCounts34{},
 			want: []tile.Tile{},
 		},
 		{
 			name: "tile counts 34 can contain five identical tiles",
-			tc34: tilecount.TileCounts34{0: 5},
+			tc34: hand.TileCounts34{0: 5},
 			want: []tile.Tile{*tile.MustTileFromCode("1m"), *tile.MustTileFromCode("1m"), *tile.MustTileFromCode("1m"), *tile.MustTileFromCode("1m"), *tile.MustTileFromCode("1m")},
 		},
 	}
@@ -38,22 +38,22 @@ func TestTileCounts34_ToTiles(t *testing.T) {
 func TestTileCounts34_NumTiles(t *testing.T) {
 	tests := []struct {
 		name string
-		tc34 tilecount.TileCounts34
+		tc34 hand.TileCounts34
 		want int
 	}{
 		{
 			name: "empty tile counts 34",
-			tc34: tilecount.TileCounts34{},
+			tc34: hand.TileCounts34{},
 			want: 0,
 		},
 		{
 			name: "tile counts 34 can contain five identical tiles",
-			tc34: tilecount.TileCounts34{0: 5, 33: 1},
+			tc34: hand.TileCounts34{0: 5, 33: 1},
 			want: 6,
 		},
 		{
 			name: "tile counts 34 can contain negative count",
-			tc34: tilecount.TileCounts34{0: -1, 33: -1},
+			tc34: hand.TileCounts34{0: -1, 33: -1},
 			want: -2,
 		},
 	}

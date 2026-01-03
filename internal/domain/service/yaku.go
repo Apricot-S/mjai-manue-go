@@ -4,8 +4,8 @@ import (
 	"maps"
 	"slices"
 
-	"github.com/Apricot-S/mjai-manue-go/internal/domain/hand"
-	"github.com/Apricot-S/mjai-manue-go/internal/domain/meld"
+	"github.com/Apricot-S/mjai-manue-go/internal/domain/player/hand"
+	"github.com/Apricot-S/mjai-manue-go/internal/domain/player/meld"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/service/block"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/tile"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/wind"

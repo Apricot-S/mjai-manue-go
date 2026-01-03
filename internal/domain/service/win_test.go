@@ -4,7 +4,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/Apricot-S/mjai-manue-go/internal/domain/hand"
+	"github.com/Apricot-S/mjai-manue-go/internal/domain/player/hand"
 )
 
 func TestIsWinningForm(t *testing.T) {

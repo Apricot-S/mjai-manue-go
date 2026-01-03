@@ -4,10 +4,9 @@ import (
 	"math"
 	"slices"
 
-	"github.com/Apricot-S/mjai-manue-go/internal/domain/hand"
+	"github.com/Apricot-S/mjai-manue-go/internal/domain/player/hand"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/service/block"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/tile"
-	"github.com/Apricot-S/mjai-manue-go/internal/domain/tilecount"
 )
 
 // Goal represents a winning hand that can be transitioned from the current hand.
@@ -20,11 +19,11 @@ type Goal struct {
 	// Blocks is a list of blocks in the winning hand.
 	Blocks []block.Block
 	// CountVector is the number of each tile included in the winning hand.
-	CountVector tilecount.TileCounts34
+	CountVector hand.TileCounts34
 	// RequiredVector is the number of each tile required for the winning hand.
-	RequiredVector tilecount.TileCounts34
+	RequiredVector hand.TileCounts34
 	// ThrowableVector is the number of each tile not required for the winning hand.
-	ThrowableVector tilecount.TileCounts34
+	ThrowableVector hand.TileCounts34
 }
 
 const (
@@ -89,7 +88,7 @@ func UpperBound(n int) shantenOption {
 // AnalyzeShanten calculates the shanten number and the list of Goal for the given hand.
 // When the list of Goal is empty, `InfinityShanten` is returned as the shanten number.
 // It does not consider Seven Pairs or Thirteen Orphans.
-func AnalyzeShanten(hand *hand.VisibleHand, opts ...shantenOption) (int, []Goal) {
+func AnalyzeShanten(h *hand.VisibleHand, opts ...shantenOption) (int, []Goal) {
 	cfg := &shantenConfig{
 		allowedExtraTiles: 0,
 		upperBound:        MaxShantenNumber,
@@ -99,9 +98,9 @@ func AnalyzeShanten(hand *hand.VisibleHand, opts ...shantenOption) (int, []Goal)
 		opt(cfg)
 	}
 
-	tc34 := hand.ToTileCounts34()
+	tc34 := h.ToTileCounts34()
 
-	targetVector := tilecount.TileCounts34{}
+	targetVector := hand.TileCounts34{}
 	numRequiredMelds := min(tc34.NumTiles()/3, 4)
 	blocks := make([]block.Block, 0, numRequiredMelds+1) // +1 for the pair
 	allGoals := []Goal{}
@@ -142,8 +141,8 @@ func AnalyzeShanten(hand *hand.VisibleHand, opts ...shantenOption) (int, []Goal)
 // analyzeShantenInternal calculates the shanten number and
 // the set of nearest winning hands using pruning DFS.
 func analyzeShantenInternal(
-	currentVector *tilecount.TileCounts34,
-	targetVector *tilecount.TileCounts34,
+	currentVector *hand.TileCounts34,
+	targetVector *hand.TileCounts34,
 	currentShanten int,
 	numMeldsLeft int,
 	minMeldID int,

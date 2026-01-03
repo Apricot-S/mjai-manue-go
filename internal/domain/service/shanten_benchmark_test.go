@@ -4,7 +4,7 @@ import (
 	"math/rand/v2"
 	"testing"
 
-	"github.com/Apricot-S/mjai-manue-go/internal/domain/hand"
+	"github.com/Apricot-S/mjai-manue-go/internal/domain/player/hand"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/service"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/tile"
 )

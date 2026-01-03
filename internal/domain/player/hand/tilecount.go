@@ -1,4 +1,4 @@
-package tilecount
+package hand
 
 import "github.com/Apricot-S/mjai-manue-go/internal/domain/tile"
 

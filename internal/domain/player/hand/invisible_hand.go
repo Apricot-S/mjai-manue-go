@@ -3,7 +3,7 @@ package hand
 import (
 	"fmt"
 
-	"github.com/Apricot-S/mjai-manue-go/internal/domain/meld"
+	"github.com/Apricot-S/mjai-manue-go/internal/domain/player/meld"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/tile"
 )
 

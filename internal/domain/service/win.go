@@ -1,9 +1,8 @@
 package service
 
 import (
-	"github.com/Apricot-S/mjai-manue-go/internal/domain/hand"
+	"github.com/Apricot-S/mjai-manue-go/internal/domain/player/hand"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/tile"
-	"github.com/Apricot-S/mjai-manue-go/internal/domain/tilecount"
 )
 
 func IsWinningForm(hand *hand.VisibleHand) bool {
@@ -44,7 +43,7 @@ func IsWinningFormKokushimusou(hand *hand.VisibleHand) bool {
 }
 
 // Reference: https://qiita.com/tomohxx/items/20d886d1991ab89f5522
-func isWinningFormGeneral(tc34 *tilecount.TileCounts34) bool {
+func isWinningFormGeneral(tc34 *hand.TileCounts34) bool {
 	colorWithPair := -1
 
 	for i := range 3 {
@@ -137,7 +136,7 @@ func isSingleColorWinningFormWithPair(singleColorHand []int) bool {
 	return false
 }
 
-func isWinningFormChiitoitsu(tc34 *tilecount.TileCounts34) bool {
+func isWinningFormChiitoitsu(tc34 *hand.TileCounts34) bool {
 	if tc34.NumTiles() != 14 {
 		return false
 	}
@@ -152,7 +151,7 @@ func isWinningFormChiitoitsu(tc34 *tilecount.TileCounts34) bool {
 	return numPairs == 7
 }
 
-func isWinningFormKokushimusou(tc34 *tilecount.TileCounts34) bool {
+func isWinningFormKokushimusou(tc34 *hand.TileCounts34) bool {
 	if tc34.NumTiles() != 14 {
 		return false
 	}

@@ -1,7 +1,7 @@
 package block
 
 import (
-	"github.com/Apricot-S/mjai-manue-go/internal/domain/meld"
+	"github.com/Apricot-S/mjai-manue-go/internal/domain/player/meld"
 )
 
 func NewBlockFromMeld(m meld.Meld) Block {

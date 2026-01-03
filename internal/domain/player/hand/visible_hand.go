@@ -3,9 +3,8 @@ package hand
 import (
 	"fmt"
 
-	"github.com/Apricot-S/mjai-manue-go/internal/domain/meld"
+	"github.com/Apricot-S/mjai-manue-go/internal/domain/player/meld"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/tile"
-	"github.com/Apricot-S/mjai-manue-go/internal/domain/tilecount"
 )
 
 type VisibleHand struct {
@@ -58,8 +57,8 @@ func (h *VisibleHand) ToTiles() []tile.Tile {
 	return tiles
 }
 
-func (h *VisibleHand) ToTileCounts34() *tilecount.TileCounts34 {
-	tc := tilecount.TileCounts34(h.tileCounts[:34])
+func (h *VisibleHand) ToTileCounts34() *TileCounts34 {
+	tc := TileCounts34(h.tileCounts[:34])
 	tc[4] += h.tileCounts[34]
 	tc[13] += h.tileCounts[35]
 	tc[22] += h.tileCounts[36]

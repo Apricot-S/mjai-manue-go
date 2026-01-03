@@ -4,8 +4,8 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/Apricot-S/mjai-manue-go/internal/domain/hand"
-	"github.com/Apricot-S/mjai-manue-go/internal/domain/meld"
+	"github.com/Apricot-S/mjai-manue-go/internal/domain/player/hand"
+	"github.com/Apricot-S/mjai-manue-go/internal/domain/player/meld"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/playerid"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/tile"
 )
