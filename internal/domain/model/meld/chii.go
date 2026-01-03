@@ -124,7 +124,7 @@ func (c *Chii) SwapCallTiles() []tile.Tile {
 		default:
 			return []tile.Tile{*c.taken.Next(-3), c.taken}
 		}
+	default:
+		panic("unknown chii type")
 	}
-
-	panic("unreachable: Chii.SwapCallTiles()")
 }
