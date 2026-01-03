@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/Apricot-S/mjai-manue-go/internal/domain/model/block"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/model/playerid"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/model/tile"
 )
@@ -12,7 +11,6 @@ import (
 type Meld interface {
 	Consumed() []tile.Tile
 	ToTiles() []tile.Tile
-	ToBlock() block.Block
 	String() string
 }
 

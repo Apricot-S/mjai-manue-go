@@ -35,7 +35,7 @@ func CalculateFuHan(
 ) (fu int, han int, yakus map[string]int) {
 	meldBlocks := make([]block.Block, len(melds))
 	for i, m := range melds {
-		meldBlocks[i] = m.ToBlock()
+		meldBlocks[i] = block.NewBlockFromMeld(m)
 	}
 
 	allBlocks := slices.Concat(handBlocks, meldBlocks)
@@ -168,7 +168,7 @@ func Has1Han(
 
 	meldBlocks := make([]block.Block, len(melds))
 	for i, m := range melds {
-		meldBlocks[i] = m.ToBlock()
+		meldBlocks[i] = block.NewBlockFromMeld(m)
 	}
 
 	for i := range goals {

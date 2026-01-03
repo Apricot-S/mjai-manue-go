@@ -5,7 +5,6 @@ import (
 	"slices"
 	"sort"
 
-	"github.com/Apricot-S/mjai-manue-go/internal/domain/model/block"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/model/playerid"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/model/tile"
 )
@@ -84,10 +83,6 @@ func (c *Chii) Target() *playerid.PlayerID {
 
 func (c *Chii) ToTiles() []tile.Tile {
 	return c.tiles
-}
-
-func (c *Chii) ToBlock() block.Block {
-	return block.MustSequence(*c.tiles[0].RemoveRed())
 }
 
 func (c Chii) String() string {

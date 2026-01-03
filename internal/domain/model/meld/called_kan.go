@@ -5,7 +5,6 @@ import (
 	"slices"
 	"sort"
 
-	"github.com/Apricot-S/mjai-manue-go/internal/domain/model/block"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/model/playerid"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/model/tile"
 )
@@ -64,11 +63,6 @@ func (k *CalledKan) Target() *playerid.PlayerID {
 
 func (k *CalledKan) ToTiles() []tile.Tile {
 	return k.tiles
-}
-
-func (k *CalledKan) ToBlock() block.Block {
-	// Red five is sorted after normal, so RemoveRed() is not necessary.
-	return block.MustQuad(k.tiles[0])
 }
 
 func (k CalledKan) String() string {

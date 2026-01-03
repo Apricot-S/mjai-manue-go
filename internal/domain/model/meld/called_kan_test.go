@@ -4,7 +4,6 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/Apricot-S/mjai-manue-go/internal/domain/model/block"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/model/meld"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/model/playerid"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/model/tile"
@@ -196,50 +195,6 @@ func TestCalledKan_ToTiles(t *testing.T) {
 			got := k.ToTiles()
 			if !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("ToTiles() = %v, want %v", got, tt.want)
-			}
-		})
-	}
-}
-
-func TestCalledKan_ToBlock(t *testing.T) {
-	tests := []struct {
-		name     string
-		taken    tile.Tile
-		consumed [3]tile.Tile
-		target   playerid.PlayerID
-		want     block.Block
-	}{
-		{
-			name:     "1m-1m1m1m to 1m quad",
-			taken:    *tile.MustTileFromCode("1m"),
-			consumed: [3]tile.Tile{*tile.MustTileFromCode("1m"), *tile.MustTileFromCode("1m"), *tile.MustTileFromCode("1m")},
-			target:   *playerid.MustPlayerID(0),
-			want:     block.MustQuad(*tile.MustTileFromCode("1m")),
-		},
-		{
-			name:     "5sr-5s5s5s to 5s quad",
-			taken:    *tile.MustTileFromCode("5sr"),
-			consumed: [3]tile.Tile{*tile.MustTileFromCode("5s"), *tile.MustTileFromCode("5s"), *tile.MustTileFromCode("5s")},
-			target:   *playerid.MustPlayerID(0),
-			want:     block.MustQuad(*tile.MustTileFromCode("5s")),
-		},
-		{
-			name:     "5s-5s5s5sr to 5s quad",
-			taken:    *tile.MustTileFromCode("5s"),
-			consumed: [3]tile.Tile{*tile.MustTileFromCode("5s"), *tile.MustTileFromCode("5s"), *tile.MustTileFromCode("5sr")},
-			target:   *playerid.MustPlayerID(0),
-			want:     block.MustQuad(*tile.MustTileFromCode("5s")),
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			k, err := meld.NewCalledKan(tt.taken, tt.consumed, tt.target)
-			if err != nil {
-				t.Fatalf("could not construct receiver type: %v", err)
-			}
-			got := k.ToBlock()
-			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("ToBlock() = %v, want %v", got, tt.want)
 			}
 		})
 	}

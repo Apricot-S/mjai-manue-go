@@ -5,7 +5,6 @@ import (
 	"slices"
 	"sort"
 
-	"github.com/Apricot-S/mjai-manue-go/internal/domain/model/block"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/model/tile"
 )
 
@@ -46,11 +45,6 @@ func (k *ConcealedKan) Consumed() []tile.Tile {
 
 func (k *ConcealedKan) ToTiles() []tile.Tile {
 	return k.consumed[:]
-}
-
-func (k *ConcealedKan) ToBlock() block.Block {
-	// Red five is sorted after normal, so RemoveRed() is not necessary.
-	return block.MustQuad(k.consumed[0])
 }
 
 func (k ConcealedKan) String() string {

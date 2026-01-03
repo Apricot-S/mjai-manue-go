@@ -4,7 +4,6 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/Apricot-S/mjai-manue-go/internal/domain/model/block"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/model/meld"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/model/tile"
 )
@@ -133,37 +132,6 @@ func TestConcealedKan_ToTiles(t *testing.T) {
 			got := k.ToTiles()
 			if !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("ToTiles() = %v, want %v", got, tt.want)
-			}
-		})
-	}
-}
-
-func TestConcealedKan_ToBlock(t *testing.T) {
-	tests := []struct {
-		name     string
-		consumed [4]tile.Tile
-		want     block.Block
-	}{
-		{
-			name:     "1m1m1m1m to 1m quad",
-			consumed: [4]tile.Tile{*tile.MustTileFromCode("1m"), *tile.MustTileFromCode("1m"), *tile.MustTileFromCode("1m"), *tile.MustTileFromCode("1m")},
-			want:     block.MustQuad(*tile.MustTileFromCode("1m")),
-		},
-		{
-			name:     "5s5s5s5sr to 5s quad",
-			consumed: [4]tile.Tile{*tile.MustTileFromCode("5s"), *tile.MustTileFromCode("5s"), *tile.MustTileFromCode("5s"), *tile.MustTileFromCode("5sr")},
-			want:     block.MustQuad(*tile.MustTileFromCode("5s")),
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			k, err := meld.NewConcealedKan(tt.consumed)
-			if err != nil {
-				t.Fatalf("could not construct receiver type: %v", err)
-			}
-			got := k.ToBlock()
-			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("ToBlock() = %v, want %v", got, tt.want)
 			}
 		})
 	}

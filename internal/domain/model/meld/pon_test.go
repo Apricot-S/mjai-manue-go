@@ -4,7 +4,6 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/Apricot-S/mjai-manue-go/internal/domain/model/block"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/model/meld"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/model/playerid"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/model/tile"
@@ -196,50 +195,6 @@ func TestPon_ToTiles(t *testing.T) {
 			got := p.ToTiles()
 			if !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("ToTiles() = %v, want %v", got, tt.want)
-			}
-		})
-	}
-}
-
-func TestPon_ToBlock(t *testing.T) {
-	tests := []struct {
-		name     string
-		taken    tile.Tile
-		consumed [2]tile.Tile
-		target   playerid.PlayerID
-		want     block.Block
-	}{
-		{
-			name:     "1m-1m1m to 1m triplet",
-			taken:    *tile.MustTileFromCode("1m"),
-			consumed: [2]tile.Tile{*tile.MustTileFromCode("1m"), *tile.MustTileFromCode("1m")},
-			target:   *playerid.MustPlayerID(0),
-			want:     block.MustTriplet(*tile.MustTileFromCode("1m")),
-		},
-		{
-			name:     "5sr-5s5s to 5s triplet",
-			taken:    *tile.MustTileFromCode("5sr"),
-			consumed: [2]tile.Tile{*tile.MustTileFromCode("5s"), *tile.MustTileFromCode("5s")},
-			target:   *playerid.MustPlayerID(0),
-			want:     block.MustTriplet(*tile.MustTileFromCode("5s")),
-		},
-		{
-			name:     "5s-5s5sr to 5s triplet",
-			taken:    *tile.MustTileFromCode("5s"),
-			consumed: [2]tile.Tile{*tile.MustTileFromCode("5s"), *tile.MustTileFromCode("5sr")},
-			target:   *playerid.MustPlayerID(0),
-			want:     block.MustTriplet(*tile.MustTileFromCode("5s")),
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			p, err := meld.NewPon(tt.taken, tt.consumed, tt.target)
-			if err != nil {
-				t.Fatalf("could not construct receiver type: %v", err)
-			}
-			got := p.ToBlock()
-			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("ToBlock() = %v, want %v", got, tt.want)
 			}
 		})
 	}
