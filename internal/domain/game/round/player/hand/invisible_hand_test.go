@@ -5,8 +5,8 @@ import (
 	"testing"
 
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/id"
-	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/player/hand"
-	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/player/meld"
+	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/round/player/hand"
+	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/round/player/meld"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/tile"
 )
 

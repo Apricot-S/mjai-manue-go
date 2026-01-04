@@ -4,8 +4,8 @@ import (
 	"math/rand/v2"
 	"testing"
 
-	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/player/hand"
-	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/service"
+	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/round/player/hand"
+	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/round/service"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/tile"
 )
 

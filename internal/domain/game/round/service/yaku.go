@@ -4,9 +4,9 @@ import (
 	"maps"
 	"slices"
 
-	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/player/hand"
-	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/player/meld"
-	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/service/block"
+	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/round/player/hand"
+	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/round/player/meld"
+	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/round/service/block"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/tile"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/wind"
 )

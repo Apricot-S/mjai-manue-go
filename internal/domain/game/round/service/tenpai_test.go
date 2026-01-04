@@ -3,8 +3,8 @@ package service_test
 import (
 	"testing"
 
-	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/player/hand"
-	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/service"
+	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/round/player/hand"
+	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/round/service"
 )
 
 func TestIsTenpaiGeneral(t *testing.T) {

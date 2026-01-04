@@ -4,7 +4,7 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/service/block"
+	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/round/service/block"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/tile"
 )
 
