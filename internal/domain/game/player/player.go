@@ -43,8 +43,6 @@ type PlayerViewer interface {
 	// The index of the tile that was declared as riichi in the discarded tiles.
 	// It is -1 if the player has not declared riichi.
 	RiichiDiscardedTilesIndex() int
-	// Player score
-	Score() int
 	// Whether the player can discard a tile (打牌)
 	CanDiscard() bool
 	// Whether the player hand is concealed (門前)
@@ -72,9 +70,8 @@ type PlayerActor interface {
 	PromotedKan(k meld.PromotedKan) error
 
 	Riichi() error
-	RiichiAccepted(score *int) error
+	RiichiAccepted() error
 
-	UpdateScore(score int)
 	AddExtraSafeTiles(t tile.Tile)
 	TakeFromRiver(t tile.Tile) error
 }
