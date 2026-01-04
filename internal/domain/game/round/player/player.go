@@ -59,6 +59,14 @@ type VisiblePlayerViewer interface {
 	DrawnTile() *tile.Tile
 }
 
+type InvisiblePlayerViewer interface {
+	PlayerViewer
+	// Hand (手牌)
+	// It does not include the drawn tile (ツモ牌).
+	Hand() *hand.InvisibleHand
+	HasDrawnTile() bool
+}
+
 type PlayerActor interface {
 	Draw(t tile.Tile) error
 	Discard(t tile.Tile, tsumogiri bool) error
