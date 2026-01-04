@@ -1,6 +1,7 @@
 package player
 
 import (
+	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/player/hand"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/player/id"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/player/meld"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/tile"
@@ -23,7 +24,7 @@ const (
 	maxNumSutehais = 27
 )
 
-type Player interface {
+type PlayerViewer interface {
 	// Player ID
 	// 0: the dealer at the start of a game (起家)
 	// 1: the right next to the 0th seat (起家の下家)
@@ -57,4 +58,14 @@ type Player interface {
 	CanDiscard() bool
 	// Whether the player hand is concealed (門前)
 	IsConcealed() bool
+}
+
+type VisiblePlayerViewer interface {
+	PlayerViewer
+	// Hand (手牌)
+	// It does not include the drawn tile (ツモ牌).
+	Hand() *hand.VisibleHand
+	// Drawn tile (ツモ牌)
+	// It is `nil` if the player does not have the drawn tile.
+	DrawnTile() *tile.Tile
 }
