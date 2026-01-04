@@ -72,16 +72,20 @@ type VisiblePlayerViewer interface {
 
 type PlayerActor interface {
 	StartRound(h [initHandSize]tile.Tile, score *int) error
+
 	Draw(t tile.Tile) error
 	Discard(t tile.Tile, tsumogiri bool) error
+
 	Chii(c meld.Chii) error
 	Pon(p meld.Pon) error
 	CalledKan(k meld.CalledKan) error
 	ConcealedKan(k meld.ConcealedKan) error
 	PromotedKan(k meld.PromotedKan) error
+
 	Riichi() error
 	RiichiAccepted(score *int) error
 
 	UpdateScore(score int)
 	AddExtraSafeTiles(t tile.Tile)
+	TakeFromRiver(t tile.Tile) error
 }
