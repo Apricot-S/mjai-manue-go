@@ -1,7 +1,6 @@
 package player
 
 import (
-	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/id"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/player/hand"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/player/meld"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/tile"
@@ -25,14 +24,6 @@ const (
 )
 
 type PlayerViewer interface {
-	// Player ID
-	// 0: the dealer at the start of a game (起家)
-	// 1: the right next to the 0th seat (起家の下家)
-	// 2: the one across from the 0th seat (起家の対面)
-	// 3: the left next to the 0th seat (起家の上家)
-	ID() id.ID
-	// Player name
-	Name() string
 	// Melds (副露)
 	Melds() []meld.Meld
 	// River (河)
@@ -71,8 +62,6 @@ type VisiblePlayerViewer interface {
 }
 
 type PlayerActor interface {
-	StartRound(h [initHandSize]tile.Tile, score *int) error
-
 	Draw(t tile.Tile) error
 	Discard(t tile.Tile, tsumogiri bool) error
 
