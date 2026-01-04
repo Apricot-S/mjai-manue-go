@@ -4,7 +4,7 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/player"
+	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/player/id"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/player/meld"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/tile"
 )
@@ -14,120 +14,120 @@ func TestNewPon(t *testing.T) {
 		name         string
 		taken        tile.Tile
 		consumed     [2]tile.Tile
-		target       player.ID
+		target       id.ID
 		wantTaken    *tile.Tile
 		wantConsumed []tile.Tile
-		wantTarget   *player.ID
+		wantTarget   *id.ID
 		wantErr      bool
 	}{
 		{
 			name:         "valid tiles: 1m",
 			taken:        *tile.MustTileFromCode("1m"),
 			consumed:     [2]tile.Tile{*tile.MustTileFromCode("1m"), *tile.MustTileFromCode("1m")},
-			target:       *player.MustID(0),
+			target:       *id.MustID(0),
 			wantTaken:    tile.MustTileFromCode("1m"),
 			wantConsumed: []tile.Tile{*tile.MustTileFromCode("1m"), *tile.MustTileFromCode("1m")},
-			wantTarget:   player.MustID(0),
+			wantTarget:   id.MustID(0),
 			wantErr:      false,
 		},
 		{
 			name:         "valid tiles: C",
 			taken:        *tile.MustTileFromCode("C"),
 			consumed:     [2]tile.Tile{*tile.MustTileFromCode("C"), *tile.MustTileFromCode("C")},
-			target:       *player.MustID(0),
+			target:       *id.MustID(0),
 			wantTaken:    tile.MustTileFromCode("C"),
 			wantConsumed: []tile.Tile{*tile.MustTileFromCode("C"), *tile.MustTileFromCode("C")},
-			wantTarget:   player.MustID(0),
+			wantTarget:   id.MustID(0),
 			wantErr:      false,
 		},
 		{
 			name:         "valid tiles: 5s-5s5s",
 			taken:        *tile.MustTileFromCode("5s"),
 			consumed:     [2]tile.Tile{*tile.MustTileFromCode("5s"), *tile.MustTileFromCode("5s")},
-			target:       *player.MustID(0),
+			target:       *id.MustID(0),
 			wantTaken:    tile.MustTileFromCode("5s"),
 			wantConsumed: []tile.Tile{*tile.MustTileFromCode("5s"), *tile.MustTileFromCode("5s")},
-			wantTarget:   player.MustID(0),
+			wantTarget:   id.MustID(0),
 			wantErr:      false,
 		},
 		{
 			name:         "valid tiles: 5sr-5s5s",
 			taken:        *tile.MustTileFromCode("5sr"),
 			consumed:     [2]tile.Tile{*tile.MustTileFromCode("5s"), *tile.MustTileFromCode("5s")},
-			target:       *player.MustID(0),
+			target:       *id.MustID(0),
 			wantTaken:    tile.MustTileFromCode("5sr"),
 			wantConsumed: []tile.Tile{*tile.MustTileFromCode("5s"), *tile.MustTileFromCode("5s")},
-			wantTarget:   player.MustID(0),
+			wantTarget:   id.MustID(0),
 			wantErr:      false,
 		},
 		{
 			name:         "valid tiles: 5p-5p5pr",
 			taken:        *tile.MustTileFromCode("5p"),
 			consumed:     [2]tile.Tile{*tile.MustTileFromCode("5p"), *tile.MustTileFromCode("5pr")},
-			target:       *player.MustID(0),
+			target:       *id.MustID(0),
 			wantTaken:    tile.MustTileFromCode("5p"),
 			wantConsumed: []tile.Tile{*tile.MustTileFromCode("5p"), *tile.MustTileFromCode("5pr")},
-			wantTarget:   player.MustID(0),
+			wantTarget:   id.MustID(0),
 			wantErr:      false,
 		},
 		{
 			name:         "invalid tiles: 5pr-5p5pr",
 			taken:        *tile.MustTileFromCode("5pr"),
 			consumed:     [2]tile.Tile{*tile.MustTileFromCode("5p"), *tile.MustTileFromCode("5pr")},
-			target:       *player.MustID(0),
+			target:       *id.MustID(0),
 			wantTaken:    nil,
 			wantConsumed: nil,
-			wantTarget:   player.MustID(0),
+			wantTarget:   id.MustID(0),
 			wantErr:      true,
 		},
 		{
 			name:         "invalid tiles: 5p-5pr5pr",
 			taken:        *tile.MustTileFromCode("5p"),
 			consumed:     [2]tile.Tile{*tile.MustTileFromCode("5pr"), *tile.MustTileFromCode("5pr")},
-			target:       *player.MustID(0),
+			target:       *id.MustID(0),
 			wantTaken:    nil,
 			wantConsumed: nil,
-			wantTarget:   player.MustID(0),
+			wantTarget:   id.MustID(0),
 			wantErr:      true,
 		},
 		{
 			name:         "invalid tiles: ?",
 			taken:        *tile.MustTileFromCode("?"),
 			consumed:     [2]tile.Tile{*tile.MustTileFromCode("?"), *tile.MustTileFromCode("?")},
-			target:       *player.MustID(0),
+			target:       *id.MustID(0),
 			wantTaken:    nil,
 			wantConsumed: nil,
-			wantTarget:   player.MustID(0),
+			wantTarget:   id.MustID(0),
 			wantErr:      true,
 		},
 		{
 			name:         "taken and consumed do not match",
 			taken:        *tile.MustTileFromCode("1m"),
 			consumed:     [2]tile.Tile{*tile.MustTileFromCode("2m"), *tile.MustTileFromCode("2m")},
-			target:       *player.MustID(0),
+			target:       *id.MustID(0),
 			wantTaken:    nil,
 			wantConsumed: nil,
-			wantTarget:   player.MustID(0),
+			wantTarget:   id.MustID(0),
 			wantErr:      true,
 		},
 		{
 			name:         "consumed tiles do not match",
 			taken:        *tile.MustTileFromCode("1m"),
 			consumed:     [2]tile.Tile{*tile.MustTileFromCode("1m"), *tile.MustTileFromCode("2m")},
-			target:       *player.MustID(0),
+			target:       *id.MustID(0),
 			wantTaken:    nil,
 			wantConsumed: nil,
-			wantTarget:   player.MustID(0),
+			wantTarget:   id.MustID(0),
 			wantErr:      true,
 		},
 		{
 			name:         "sort tiles: 5m-5mr5m to 5m-5m5mr",
 			taken:        *tile.MustTileFromCode("5m"),
 			consumed:     [2]tile.Tile{*tile.MustTileFromCode("5mr"), *tile.MustTileFromCode("5m")},
-			target:       *player.MustID(0),
+			target:       *id.MustID(0),
 			wantTaken:    tile.MustTileFromCode("5m"),
 			wantConsumed: []tile.Tile{*tile.MustTileFromCode("5m"), *tile.MustTileFromCode("5mr")},
-			wantTarget:   player.MustID(0),
+			wantTarget:   id.MustID(0),
 			wantErr:      false,
 		},
 	}
@@ -161,28 +161,28 @@ func TestPon_ToTiles(t *testing.T) {
 		name     string
 		taken    tile.Tile
 		consumed [2]tile.Tile
-		target   player.ID
+		target   id.ID
 		want     []tile.Tile
 	}{
 		{
 			name:     "1m-1m1m",
 			taken:    *tile.MustTileFromCode("1m"),
 			consumed: [2]tile.Tile{*tile.MustTileFromCode("1m"), *tile.MustTileFromCode("1m")},
-			target:   *player.MustID(0),
+			target:   *id.MustID(0),
 			want:     []tile.Tile{*tile.MustTileFromCode("1m"), *tile.MustTileFromCode("1m"), *tile.MustTileFromCode("1m")},
 		},
 		{
 			name:     "sort tiles: 5m-5mr5m to 5m5m5mr",
 			taken:    *tile.MustTileFromCode("5m"),
 			consumed: [2]tile.Tile{*tile.MustTileFromCode("5mr"), *tile.MustTileFromCode("5m")},
-			target:   *player.MustID(2),
+			target:   *id.MustID(2),
 			want:     []tile.Tile{*tile.MustTileFromCode("5m"), *tile.MustTileFromCode("5m"), *tile.MustTileFromCode("5mr")},
 		},
 		{
 			name:     "sort tiles: 5mr-5m5m to 5m5m5mr",
 			taken:    *tile.MustTileFromCode("5mr"),
 			consumed: [2]tile.Tile{*tile.MustTileFromCode("5m"), *tile.MustTileFromCode("5m")},
-			target:   *player.MustID(2),
+			target:   *id.MustID(2),
 			want:     []tile.Tile{*tile.MustTileFromCode("5m"), *tile.MustTileFromCode("5m"), *tile.MustTileFromCode("5mr")},
 		},
 	}
@@ -205,28 +205,28 @@ func TestPon_String(t *testing.T) {
 		name     string
 		taken    tile.Tile
 		consumed [2]tile.Tile
-		target   player.ID
+		target   id.ID
 		want     string
 	}{
 		{
 			name:     "1m-1m1m from 1",
 			taken:    *tile.MustTileFromCode("1m"),
 			consumed: [2]tile.Tile{*tile.MustTileFromCode("1m"), *tile.MustTileFromCode("1m")},
-			target:   *player.MustID(1),
+			target:   *id.MustID(1),
 			want:     "[1m(1)/1m 1m]",
 		},
 		{
 			name:     "5sr-5s5s from 3",
 			taken:    *tile.MustTileFromCode("5sr"),
 			consumed: [2]tile.Tile{*tile.MustTileFromCode("5s"), *tile.MustTileFromCode("5s")},
-			target:   *player.MustID(3),
+			target:   *id.MustID(3),
 			want:     "[5sr(3)/5s 5s]",
 		},
 		{
 			name:     "5s-5s5sr from 3",
 			taken:    *tile.MustTileFromCode("5s"),
 			consumed: [2]tile.Tile{*tile.MustTileFromCode("5s"), *tile.MustTileFromCode("5sr")},
-			target:   *player.MustID(3),
+			target:   *id.MustID(3),
 			want:     "[5s(3)/5s 5sr]",
 		},
 	}
@@ -249,42 +249,42 @@ func TestPon_SwapCallTiles(t *testing.T) {
 		name     string
 		taken    tile.Tile
 		consumed [2]tile.Tile
-		target   player.ID
+		target   id.ID
 		want     []tile.Tile
 	}{
 		{
 			name:     "1m-1m1m",
 			taken:    *tile.MustTileFromCode("1m"),
 			consumed: [2]tile.Tile{*tile.MustTileFromCode("1m"), *tile.MustTileFromCode("1m")},
-			target:   *player.MustID(0),
+			target:   *id.MustID(0),
 			want:     []tile.Tile{*tile.MustTileFromCode("1m")},
 		},
 		{
 			name:     "P-PP",
 			taken:    *tile.MustTileFromCode("P"),
 			consumed: [2]tile.Tile{*tile.MustTileFromCode("P"), *tile.MustTileFromCode("P")},
-			target:   *player.MustID(0),
+			target:   *id.MustID(0),
 			want:     []tile.Tile{*tile.MustTileFromCode("P")},
 		},
 		{
 			name:     "5m-5m5m",
 			taken:    *tile.MustTileFromCode("5m"),
 			consumed: [2]tile.Tile{*tile.MustTileFromCode("5m"), *tile.MustTileFromCode("5m")},
-			target:   *player.MustID(2),
+			target:   *id.MustID(2),
 			want:     []tile.Tile{*tile.MustTileFromCode("5m"), *tile.MustTileFromCode("5mr")},
 		},
 		{
 			name:     "5m-5m5mr",
 			taken:    *tile.MustTileFromCode("5m"),
 			consumed: [2]tile.Tile{*tile.MustTileFromCode("5m"), *tile.MustTileFromCode("5mr")},
-			target:   *player.MustID(2),
+			target:   *id.MustID(2),
 			want:     []tile.Tile{*tile.MustTileFromCode("5m"), *tile.MustTileFromCode("5mr")},
 		},
 		{
 			name:     "5mr-5m5m",
 			taken:    *tile.MustTileFromCode("5mr"),
 			consumed: [2]tile.Tile{*tile.MustTileFromCode("5m"), *tile.MustTileFromCode("5m")},
-			target:   *player.MustID(2),
+			target:   *id.MustID(2),
 			want:     []tile.Tile{*tile.MustTileFromCode("5m"), *tile.MustTileFromCode("5mr")},
 		},
 	}

@@ -1,4 +1,4 @@
-package player
+package id
 
 import "fmt"
 
@@ -6,12 +6,12 @@ type ID struct {
 	value int
 }
 
-func NewID(id int) (*ID, error) {
-	if id < 0 || 3 < id {
-		return nil, fmt.Errorf("invalid player id: %d", id)
+func NewID(index int) (*ID, error) {
+	if index < 0 || 3 < index {
+		return nil, fmt.Errorf("invalid player id: %d", index)
 	}
 
-	return &ID{value: id}, nil
+	return &ID{value: index}, nil
 }
 
 func MustID(id int) *ID {
