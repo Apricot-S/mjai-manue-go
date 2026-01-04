@@ -1,8 +1,8 @@
 package player
 
 import (
+	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/id"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/player/hand"
-	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/player/id"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/player/meld"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/tile"
 )
