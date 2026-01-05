@@ -52,6 +52,18 @@ func TestNewVisiblePlayer(t *testing.T) {
 			wantHand: nil,
 			wantErr:  true,
 		},
+		{
+			name: "invalid: unknown tiles",
+			handTiles: []tile.Tile{
+				*tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"),
+				*tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"),
+				*tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"),
+				*tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"),
+				*tile.MustTileFromCode("?"),
+			},
+			wantHand: nil,
+			wantErr:  true,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

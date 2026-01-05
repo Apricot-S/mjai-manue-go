@@ -17,7 +17,11 @@ func NewVisiblePlayer(handTiles []tile.Tile) (*VisiblePlayer, error) {
 		return nil, fmt.Errorf("invalid number of hand tiles: got %d, want %d", len(handTiles), initHandSize)
 	}
 
-	h, _ := hand.NewVisibleHand(handTiles)
+	h, err := hand.NewVisibleHand(handTiles)
+	if err != nil {
+		return nil, err
+	}
+
 	return &VisiblePlayer{hand: *h}, nil
 }
 
