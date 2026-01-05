@@ -18,10 +18,16 @@ func TestNewVisiblePlayer(t *testing.T) {
 		wantErr   bool
 	}{
 		{
-			name:      "valid",
-			handTiles: []tile.Tile{},
-			wantHand:  hand.CodesToHand([]string{}),
-			wantErr:   false,
+			name: "valid",
+			handTiles: []tile.Tile{
+				*tile.MustTileFromCode("C"), *tile.MustTileFromCode("9s"), *tile.MustTileFromCode("4m"),
+				*tile.MustTileFromCode("2p"), *tile.MustTileFromCode("S"), *tile.MustTileFromCode("4p"),
+				*tile.MustTileFromCode("8s"), *tile.MustTileFromCode("6p"), *tile.MustTileFromCode("6s"),
+				*tile.MustTileFromCode("7m"), *tile.MustTileFromCode("9s"), *tile.MustTileFromCode("5pr"),
+				*tile.MustTileFromCode("5p"),
+			},
+			wantHand: hand.CodesToHand([]string{"4m", "7m", "2p", "4p", "5pr", "5p", "6p", "6s", "8s", "9s", "9s", "S", "C"}),
+			wantErr:  false,
 		},
 	}
 	for _, tt := range tests {
