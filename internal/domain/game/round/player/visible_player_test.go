@@ -96,8 +96,15 @@ func TestNewVisiblePlayer(t *testing.T) {
 			if got.DrawnTile() != nil {
 				t.Errorf("NewVisiblePlayer().DrawnTile() = %v, want %v", got.DrawnTile(), nil)
 			}
-			if !reflect.DeepEqual(got.Melds(), make([]meld.Meld, 0, 4)) {
-				t.Errorf("NewVisiblePlayer().Melds() = %v, want %v", got.Melds(), make([]meld.Meld, 0, 4))
+
+			melds := make([]meld.Meld, 0, 4)
+			if !reflect.DeepEqual(got.Melds(), melds) {
+				t.Errorf("NewVisiblePlayer().Melds() = %v, want %v", got.Melds(), melds)
+			}
+
+			river := make([]tile.Tile, 0, 24)
+			if !reflect.DeepEqual(got.River(), river) {
+				t.Errorf("NewVisiblePlayer().River() = %v, want %v", got.River(), river)
 			}
 		})
 	}

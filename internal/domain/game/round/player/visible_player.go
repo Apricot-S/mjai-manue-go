@@ -13,6 +13,7 @@ type VisiblePlayer struct {
 	hand      hand.VisibleHand
 	drawnTile *tile.Tile
 	melds     []meld.Meld
+	river     []tile.Tile
 }
 
 func NewVisiblePlayer(handTiles []tile.Tile) (*VisiblePlayer, error) {
@@ -29,6 +30,7 @@ func NewVisiblePlayer(handTiles []tile.Tile) (*VisiblePlayer, error) {
 		hand:      *h,
 		drawnTile: nil,
 		melds:     make([]meld.Meld, 0, maxNumMelds),
+		river:     make([]tile.Tile, 0, maxNumRiver),
 	}, nil
 }
 
@@ -48,4 +50,8 @@ func (p *VisiblePlayer) DrawnTile() *tile.Tile {
 
 func (p *VisiblePlayer) Melds() []meld.Meld {
 	return p.melds
+}
+
+func (p *VisiblePlayer) River() []tile.Tile {
+	return p.river
 }
