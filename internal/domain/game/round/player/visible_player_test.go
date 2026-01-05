@@ -26,8 +26,31 @@ func TestNewVisiblePlayer(t *testing.T) {
 				*tile.MustTileFromCode("7m"), *tile.MustTileFromCode("9s"), *tile.MustTileFromCode("5pr"),
 				*tile.MustTileFromCode("5p"),
 			},
-			wantHand: hand.CodesToHand([]string{"4m", "7m", "2p", "4p", "5pr", "5p", "6p", "6s", "8s", "9s", "9s", "S", "C"}),
+			wantHand: hand.CodesToHand([]string{"4m", "7m", "2p", "4p", "5p", "5pr", "6p", "6s", "8s", "9s", "9s", "S", "C"}),
 			wantErr:  false,
+		},
+		{
+			name: "invalid: 12 tiles",
+			handTiles: []tile.Tile{
+				*tile.MustTileFromCode("C"), *tile.MustTileFromCode("9s"), *tile.MustTileFromCode("4m"),
+				*tile.MustTileFromCode("2p"), *tile.MustTileFromCode("S"), *tile.MustTileFromCode("4p"),
+				*tile.MustTileFromCode("8s"), *tile.MustTileFromCode("6p"), *tile.MustTileFromCode("6s"),
+				*tile.MustTileFromCode("7m"), *tile.MustTileFromCode("9s"), *tile.MustTileFromCode("5pr"),
+			},
+			wantHand: nil,
+			wantErr:  true,
+		},
+		{
+			name: "invalid: 14 tiles",
+			handTiles: []tile.Tile{
+				*tile.MustTileFromCode("C"), *tile.MustTileFromCode("9s"), *tile.MustTileFromCode("4m"),
+				*tile.MustTileFromCode("2p"), *tile.MustTileFromCode("S"), *tile.MustTileFromCode("4p"),
+				*tile.MustTileFromCode("8s"), *tile.MustTileFromCode("6p"), *tile.MustTileFromCode("6s"),
+				*tile.MustTileFromCode("7m"), *tile.MustTileFromCode("9s"), *tile.MustTileFromCode("5pr"),
+				*tile.MustTileFromCode("5p"), *tile.MustTileFromCode("1m"),
+			},
+			wantHand: nil,
+			wantErr:  true,
 		},
 	}
 	for _, tt := range tests {

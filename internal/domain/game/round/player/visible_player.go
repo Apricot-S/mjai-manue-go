@@ -1,6 +1,7 @@
 package player
 
 import (
+	"fmt"
 	"sort"
 
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/round/player/hand"
@@ -12,6 +13,10 @@ type VisiblePlayer struct {
 }
 
 func NewVisiblePlayer(handTiles []tile.Tile) (*VisiblePlayer, error) {
+	if len(handTiles) != initHandSize {
+		return nil, fmt.Errorf("invalid number of hand tiles: got %d, want %d", len(handTiles), initHandSize)
+	}
+
 	h, _ := hand.NewVisibleHand(handTiles)
 	return &VisiblePlayer{hand: *h}, nil
 }
