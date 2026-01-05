@@ -70,7 +70,7 @@ func (h *VisibleHand) Count(tile *tile.Tile) int {
 		panic("visible hand cannot count unknown tiles")
 	}
 
-	panic("TODO")
+	return h.tileCounts[tile.ID()]
 }
 
 func (h *VisibleHand) Draw(tile *tile.Tile) (*VisibleHand, error) {

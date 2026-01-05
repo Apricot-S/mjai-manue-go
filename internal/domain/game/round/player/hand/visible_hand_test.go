@@ -173,6 +173,24 @@ func TestVisibleHand_Count(t *testing.T) {
 			t:     tile.MustTileFromCode("5m"),
 			want:  0,
 		},
+		{
+			name:  "has 1 tile",
+			tiles: []tile.Tile{*tile.MustTileFromCode("5m"), *tile.MustTileFromCode("5mr")},
+			t:     tile.MustTileFromCode("5m"),
+			want:  1,
+		},
+		{
+			name:  "has 2 tile",
+			tiles: []tile.Tile{*tile.MustTileFromCode("5m"), *tile.MustTileFromCode("5m"), *tile.MustTileFromCode("5mr")},
+			t:     tile.MustTileFromCode("5m"),
+			want:  2,
+		},
+		{
+			name:  "red tile",
+			tiles: []tile.Tile{*tile.MustTileFromCode("5m"), *tile.MustTileFromCode("5mr")},
+			t:     tile.MustTileFromCode("5mr"),
+			want:  1,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
