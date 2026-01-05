@@ -33,6 +33,7 @@ type PlayerViewer interface {
 	DrawnTile() *tile.Tile
 	// Melds (副露)
 	Melds() []meld.Meld
+
 	// River (河)
 	// It does not include the tiles that have been called.
 	River() []tile.Tile
@@ -42,6 +43,7 @@ type PlayerViewer interface {
 	// Extra safe tiles (安全牌)
 	// The tiles that are safe in the same turn and the tiles that are safe after riichi.
 	ExtraSafeTiles() []tile.Tile
+
 	// Riichi state
 	RiichiState() RiichiState
 	// The index of the tile that was declared as riichi in the river.
@@ -50,6 +52,7 @@ type PlayerViewer interface {
 	// The index of the tile that was declared as riichi in the discarded tiles.
 	// It is -1 if the player has not declared riichi.
 	RiichiDiscardedTilesIndex() int
+
 	// Whether the player can discard a tile (打牌)
 	CanDiscard() bool
 	// Whether the player hand is concealed (門前)
