@@ -22,6 +22,6 @@ func (p *VisiblePlayer) Hand() (*hand.VisibleHand, bool) {
 
 func (p *VisiblePlayer) HandTiles() []tile.Tile {
 	ts := tile.Tiles(p.hand.ToTiles())
-	sort.Sort(tile.Tiles(p.hand.ToTiles()))
+	sort.Sort(ts)
 	return ts
 }
