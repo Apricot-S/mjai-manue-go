@@ -97,3 +97,7 @@ func (p *VisiblePlayer) CanDiscard() bool {
 func (p *VisiblePlayer) IsConcealed() bool {
 	return p.isConcealed
 }
+
+func (p *VisiblePlayer) Draw(t tile.Tile) error {
+	return nil
+}

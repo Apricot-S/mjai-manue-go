@@ -2,6 +2,7 @@ package player_test
 
 import (
 	"reflect"
+	"slices"
 	"sort"
 	"testing"
 
@@ -134,5 +135,28 @@ func TestNewVisiblePlayer(t *testing.T) {
 				t.Errorf("NewVisiblePlayer().IsConcealed() = %v, want %v", got.IsConcealed(), true)
 			}
 		})
+	}
+}
+
+func TestVisiblePlayer_Draw_AddsTileToHand(t *testing.T) {
+	handTiles := []tile.Tile{
+		*tile.MustTileFromCode("C"), *tile.MustTileFromCode("9s"), *tile.MustTileFromCode("4m"),
+		*tile.MustTileFromCode("2p"), *tile.MustTileFromCode("S"), *tile.MustTileFromCode("4p"),
+		*tile.MustTileFromCode("8s"), *tile.MustTileFromCode("6p"), *tile.MustTileFromCode("6s"),
+		*tile.MustTileFromCode("7m"), *tile.MustTileFromCode("9s"), *tile.MustTileFromCode("5pr"),
+		*tile.MustTileFromCode("5p"),
+	}
+	p, err := player.NewVisiblePlayer(handTiles)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+
+	drawnTile := tile.MustTileFromCode("1m")
+	if err := p.Draw(*drawnTile); err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+
+	if h, _ := p.Hand(); !slices.Contains(h.ToTiles(), *drawnTile) {
+		t.Errorf("expected tile %v to be in hand, but it was not", drawnTile)
 	}
 }
