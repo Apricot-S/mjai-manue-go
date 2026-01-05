@@ -7,6 +7,7 @@ import (
 
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/round/player"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/round/player/hand"
+	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/round/player/meld"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/tile"
 )
 
@@ -94,6 +95,9 @@ func TestNewVisiblePlayer(t *testing.T) {
 
 			if got.DrawnTile() != nil {
 				t.Errorf("NewVisiblePlayer().DrawnTile() = %v, want %v", got.DrawnTile(), nil)
+			}
+			if !reflect.DeepEqual(got.Melds(), make([]meld.Meld, 0, 4)) {
+				t.Errorf("NewVisiblePlayer().Melds() = %v, want %v", got.Melds(), make([]meld.Meld, 0, 4))
 			}
 		})
 	}

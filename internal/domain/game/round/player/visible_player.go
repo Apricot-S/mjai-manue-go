@@ -5,12 +5,14 @@ import (
 	"sort"
 
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/round/player/hand"
+	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/round/player/meld"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/tile"
 )
 
 type VisiblePlayer struct {
 	hand      hand.VisibleHand
 	drawnTile *tile.Tile
+	melds     []meld.Meld
 }
 
 func NewVisiblePlayer(handTiles []tile.Tile) (*VisiblePlayer, error) {
@@ -23,7 +25,11 @@ func NewVisiblePlayer(handTiles []tile.Tile) (*VisiblePlayer, error) {
 		return nil, err
 	}
 
-	return &VisiblePlayer{hand: *h, drawnTile: nil}, nil
+	return &VisiblePlayer{
+		hand:      *h,
+		drawnTile: nil,
+		melds:     make([]meld.Meld, 0, maxNumMelds),
+	}, nil
 }
 
 func (p *VisiblePlayer) Hand() (*hand.VisibleHand, bool) {
@@ -38,4 +44,8 @@ func (p *VisiblePlayer) HandTiles() []tile.Tile {
 
 func (p *VisiblePlayer) DrawnTile() *tile.Tile {
 	return p.drawnTile
+}
+
+func (p *VisiblePlayer) Melds() []meld.Meld {
+	return p.melds
 }
