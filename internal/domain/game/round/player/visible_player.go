@@ -15,6 +15,7 @@ type VisiblePlayer struct {
 	melds          []meld.Meld
 	river          []tile.Tile
 	discardedTiles []tile.Tile
+	extraSafeTiles []tile.Tile
 }
 
 func NewVisiblePlayer(handTiles []tile.Tile) (*VisiblePlayer, error) {
@@ -33,6 +34,7 @@ func NewVisiblePlayer(handTiles []tile.Tile) (*VisiblePlayer, error) {
 		melds:          make([]meld.Meld, 0, maxNumMelds),
 		river:          make([]tile.Tile, 0, maxNumRiver),
 		discardedTiles: make([]tile.Tile, 0, maxNumDiscardedTiles),
+		extraSafeTiles: make([]tile.Tile, 0, 3),
 	}, nil
 }
 
@@ -60,4 +62,8 @@ func (p *VisiblePlayer) River() []tile.Tile {
 
 func (p *VisiblePlayer) DiscardedTiles() []tile.Tile {
 	return p.discardedTiles
+}
+
+func (p *VisiblePlayer) ExtraSafeTiles() []tile.Tile {
+	return p.extraSafeTiles
 }

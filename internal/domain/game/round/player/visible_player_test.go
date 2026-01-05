@@ -111,6 +111,11 @@ func TestNewVisiblePlayer(t *testing.T) {
 			if !reflect.DeepEqual(got.DiscardedTiles(), discardedTiles) {
 				t.Errorf("NewVisiblePlayer().DiscardedTiles() = %v, want %v", got.DiscardedTiles(), discardedTiles)
 			}
+
+			extraSafeTiles := make([]tile.Tile, 0, 3)
+			if !reflect.DeepEqual(got.ExtraSafeTiles(), extraSafeTiles) {
+				t.Errorf("NewVisiblePlayer().ExtraSafeTiles() = %v, want %v", got.ExtraSafeTiles(), extraSafeTiles)
+			}
 		})
 	}
 }
