@@ -160,6 +160,65 @@ func TestVisibleHand_ToTileCounts34_HandAndTileCountsAreIndependent(t *testing.T
 	}
 }
 
+func TestVisibleHand_Count(t *testing.T) {
+	tests := []struct {
+		name  string
+		tiles []tile.Tile
+		t     *tile.Tile
+		want  int
+	}{
+		{
+			name:  "empty hand",
+			tiles: nil,
+			t:     tile.MustTileFromCode("5m"),
+			want:  0,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			h, err := hand.NewVisibleHand(tt.tiles)
+			if err != nil {
+				t.Fatalf("could not construct receiver type: %v", err)
+			}
+			got := h.Count(tt.t)
+			if got != tt.want {
+				t.Errorf("Count() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestVisibleHand_Count_Panic(t *testing.T) {
+	tests := []struct {
+		name  string
+		tiles []tile.Tile
+	}{
+		{
+			name:  "empty hand",
+			tiles: nil,
+		},
+		{
+			name:  "non empty hand",
+			tiles: []tile.Tile{*tile.MustTileFromCode("C")},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			defer func() {
+				if r := recover(); r == nil {
+					t.Errorf("Expected panic for unknown tile, but did not panic")
+				}
+			}()
+
+			h, err := hand.NewVisibleHand(tt.tiles)
+			if err != nil {
+				t.Fatalf("could not construct receiver type: %v", err)
+			}
+			h.Count(tile.MustTileFromCode("?"))
+		})
+	}
+}
+
 func TestVisibleHand_Draw(t *testing.T) {
 	tests := []struct {
 		name      string
