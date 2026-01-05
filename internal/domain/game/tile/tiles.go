@@ -1,6 +1,10 @@
 package tile
 
-import "log"
+import (
+	"log"
+	"slices"
+	"sort"
+)
 
 var tileSortKeyTable = [NumTileType38]int{
 	0, 1, 2, 3, 4, 6, 7, 8, 9, // m
@@ -34,4 +38,23 @@ func (ts Tiles) Less(i, j int) bool {
 
 func (ts Tiles) Swap(i, j int) {
 	ts[i], ts[j] = ts[j], ts[i]
+}
+
+func (ts *Tiles) Distinct(exclude func(Tile) bool) Tiles {
+	ret := slices.Clone(*ts)
+	sort.Sort(ret)
+
+	ret = slices.CompactFunc(ret, func(a, b Tile) bool {
+		return a.ID() == b.ID()
+	})
+
+	if exclude == nil {
+		return ret
+	}
+
+	ret = slices.DeleteFunc(ret, func(p Tile) bool {
+		return exclude(p)
+	})
+
+	return ret
 }
