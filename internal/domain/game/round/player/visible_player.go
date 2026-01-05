@@ -99,5 +99,11 @@ func (p *VisiblePlayer) IsConcealed() bool {
 }
 
 func (p *VisiblePlayer) Draw(t tile.Tile) error {
+	newHand, err := p.hand.Draw(&t)
+	if err != nil {
+		return err
+	}
+
+	p.hand = *newHand
 	return nil
 }
