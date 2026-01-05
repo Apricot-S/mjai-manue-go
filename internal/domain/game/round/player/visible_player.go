@@ -16,6 +16,7 @@ type VisiblePlayer struct {
 	river          []tile.Tile
 	discardedTiles []tile.Tile
 	extraSafeTiles []tile.Tile
+	riichiState    RiichiState
 }
 
 func NewVisiblePlayer(handTiles []tile.Tile) (*VisiblePlayer, error) {
@@ -35,6 +36,7 @@ func NewVisiblePlayer(handTiles []tile.Tile) (*VisiblePlayer, error) {
 		river:          make([]tile.Tile, 0, maxNumRiver),
 		discardedTiles: make([]tile.Tile, 0, maxNumDiscardedTiles),
 		extraSafeTiles: make([]tile.Tile, 0, 3),
+		riichiState:    NotRiichi,
 	}, nil
 }
 
@@ -66,4 +68,8 @@ func (p *VisiblePlayer) DiscardedTiles() []tile.Tile {
 
 func (p *VisiblePlayer) ExtraSafeTiles() []tile.Tile {
 	return p.extraSafeTiles
+}
+
+func (p *VisiblePlayer) RiichiState() RiichiState {
+	return p.riichiState
 }

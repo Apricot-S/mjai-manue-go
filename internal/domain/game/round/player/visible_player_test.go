@@ -116,6 +116,10 @@ func TestNewVisiblePlayer(t *testing.T) {
 			if !reflect.DeepEqual(got.ExtraSafeTiles(), extraSafeTiles) {
 				t.Errorf("NewVisiblePlayer().ExtraSafeTiles() = %v, want %v", got.ExtraSafeTiles(), extraSafeTiles)
 			}
+
+			if got.RiichiState() != player.NotRiichi {
+				t.Errorf("NewVisiblePlayer().RiichiState() = %v, want %v", got.RiichiState(), player.NotRiichi)
+			}
 		})
 	}
 }
