@@ -24,6 +24,13 @@ const (
 )
 
 type PlayerViewer interface {
+	// Hand (手牌)
+	// It does not include the drawn tile (ツモ牌).
+	Hand() (*hand.VisibleHand, bool)
+	HandTiles() []tile.Tile
+	// Drawn tile (ツモ牌)
+	// It is `nil` if the player does not have the drawn tile.
+	DrawnTile() *tile.Tile
 	// Melds (副露)
 	Melds() []meld.Meld
 	// River (河)
@@ -49,24 +56,6 @@ type PlayerViewer interface {
 	IsConcealed() bool
 }
 
-type VisiblePlayerViewer interface {
-	PlayerViewer
-	// Hand (手牌)
-	// It does not include the drawn tile (ツモ牌).
-	Hand() *hand.VisibleHand
-	// Drawn tile (ツモ牌)
-	// It is `nil` if the player does not have the drawn tile.
-	DrawnTile() *tile.Tile
-}
-
-type InvisiblePlayerViewer interface {
-	PlayerViewer
-	// Hand (手牌)
-	// It does not include the drawn tile (ツモ牌).
-	Hand() *hand.InvisibleHand
-	HasDrawnTile() bool
-}
-
 type PlayerActor interface {
 	Draw(t tile.Tile) error
 	Discard(t tile.Tile, tsumogiri bool) error
@@ -82,4 +71,9 @@ type PlayerActor interface {
 
 	AddExtraSafeTiles(t tile.Tile)
 	TakeFromRiver(t tile.Tile) error
+}
+
+type Player interface {
+	PlayerViewer
+	PlayerActor
 }
