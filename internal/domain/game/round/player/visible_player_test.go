@@ -120,6 +120,9 @@ func TestNewVisiblePlayer(t *testing.T) {
 			if got.RiichiState() != player.NotRiichi {
 				t.Errorf("NewVisiblePlayer().RiichiState() = %v, want %v", got.RiichiState(), player.NotRiichi)
 			}
+			if got.RiichiRiverIndex() != -1 {
+				t.Errorf("NewVisiblePlayer().RiichiRiverIndex() = %v, want %v", got.RiichiRiverIndex(), -1)
+			}
 		})
 	}
 }
