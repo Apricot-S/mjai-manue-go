@@ -10,14 +10,15 @@ import (
 )
 
 type VisiblePlayer struct {
-	hand             hand.VisibleHand
-	drawnTile        *tile.Tile
-	melds            []meld.Meld
-	river            []tile.Tile
-	discardedTiles   []tile.Tile
-	extraSafeTiles   []tile.Tile
-	riichiState      RiichiState
-	riichiRiverIndex int
+	hand                      hand.VisibleHand
+	drawnTile                 *tile.Tile
+	melds                     []meld.Meld
+	river                     []tile.Tile
+	discardedTiles            []tile.Tile
+	extraSafeTiles            []tile.Tile
+	riichiState               RiichiState
+	riichiRiverIndex          int
+	riichiDiscardedTilesIndex int
 }
 
 func NewVisiblePlayer(handTiles []tile.Tile) (*VisiblePlayer, error) {
@@ -31,14 +32,15 @@ func NewVisiblePlayer(handTiles []tile.Tile) (*VisiblePlayer, error) {
 	}
 
 	return &VisiblePlayer{
-		hand:             *h,
-		drawnTile:        nil,
-		melds:            make([]meld.Meld, 0, maxNumMelds),
-		river:            make([]tile.Tile, 0, maxNumRiver),
-		discardedTiles:   make([]tile.Tile, 0, maxNumDiscardedTiles),
-		extraSafeTiles:   make([]tile.Tile, 0, 3),
-		riichiState:      NotRiichi,
-		riichiRiverIndex: -1,
+		hand:                      *h,
+		drawnTile:                 nil,
+		melds:                     make([]meld.Meld, 0, maxNumMelds),
+		river:                     make([]tile.Tile, 0, maxNumRiver),
+		discardedTiles:            make([]tile.Tile, 0, maxNumDiscardedTiles),
+		extraSafeTiles:            make([]tile.Tile, 0, 3),
+		riichiState:               NotRiichi,
+		riichiRiverIndex:          -1,
+		riichiDiscardedTilesIndex: -1,
 	}, nil
 }
 
@@ -78,4 +80,8 @@ func (p *VisiblePlayer) RiichiState() RiichiState {
 
 func (p *VisiblePlayer) RiichiRiverIndex() int {
 	return p.riichiRiverIndex
+}
+
+func (p *VisiblePlayer) RiichiDiscardedTilesIndex() int {
+	return p.riichiDiscardedTilesIndex
 }

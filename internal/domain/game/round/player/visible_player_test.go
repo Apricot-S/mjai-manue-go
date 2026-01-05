@@ -123,6 +123,9 @@ func TestNewVisiblePlayer(t *testing.T) {
 			if got.RiichiRiverIndex() != -1 {
 				t.Errorf("NewVisiblePlayer().RiichiRiverIndex() = %v, want %v", got.RiichiRiverIndex(), -1)
 			}
+			if got.RiichiDiscardedTilesIndex() != -1 {
+				t.Errorf("NewVisiblePlayer().RiichiDiscardedTilesIndex() = %v, want %v", got.RiichiDiscardedTilesIndex(), -1)
+			}
 		})
 	}
 }
