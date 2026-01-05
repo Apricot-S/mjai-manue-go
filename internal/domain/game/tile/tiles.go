@@ -52,8 +52,8 @@ func (ts *Tiles) Distinct(exclude func(Tile) bool) Tiles {
 		return ret
 	}
 
-	ret = slices.DeleteFunc(ret, func(p Tile) bool {
-		return exclude(p)
+	ret = slices.DeleteFunc(ret, func(t Tile) bool {
+		return exclude(t)
 	})
 
 	return ret
