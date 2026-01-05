@@ -126,6 +126,10 @@ func TestNewVisiblePlayer(t *testing.T) {
 			if got.RiichiDiscardedTilesIndex() != -1 {
 				t.Errorf("NewVisiblePlayer().RiichiDiscardedTilesIndex() = %v, want %v", got.RiichiDiscardedTilesIndex(), -1)
 			}
+
+			if got.CanDiscard() {
+				t.Errorf("NewVisiblePlayer().CanDiscard() = %v, want %v", got.CanDiscard(), false)
+			}
 		})
 	}
 }
