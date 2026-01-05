@@ -91,6 +91,10 @@ func TestNewVisiblePlayer(t *testing.T) {
 			if !reflect.DeepEqual(got.HandTiles(), []tile.Tile(ts)) {
 				t.Errorf("NewVisiblePlayer().HandTiles() = %v, want %v", got.HandTiles(), ts)
 			}
+
+			if got.DrawnTile() != nil {
+				t.Errorf("NewVisiblePlayer().DrawnTile() = %v, want %v", got.DrawnTile(), nil)
+			}
 		})
 	}
 }

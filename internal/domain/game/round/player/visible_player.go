@@ -9,7 +9,8 @@ import (
 )
 
 type VisiblePlayer struct {
-	hand hand.VisibleHand
+	hand      hand.VisibleHand
+	drawnTile *tile.Tile
 }
 
 func NewVisiblePlayer(handTiles []tile.Tile) (*VisiblePlayer, error) {
@@ -22,7 +23,7 @@ func NewVisiblePlayer(handTiles []tile.Tile) (*VisiblePlayer, error) {
 		return nil, err
 	}
 
-	return &VisiblePlayer{hand: *h}, nil
+	return &VisiblePlayer{hand: *h, drawnTile: nil}, nil
 }
 
 func (p *VisiblePlayer) Hand() (*hand.VisibleHand, bool) {
@@ -33,4 +34,8 @@ func (p *VisiblePlayer) HandTiles() []tile.Tile {
 	ts := tile.Tiles(p.hand.ToTiles())
 	sort.Sort(ts)
 	return ts
+}
+
+func (p *VisiblePlayer) DrawnTile() *tile.Tile {
+	return p.drawnTile
 }
