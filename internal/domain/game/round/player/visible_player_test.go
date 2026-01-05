@@ -130,6 +130,9 @@ func TestNewVisiblePlayer(t *testing.T) {
 			if got.CanDiscard() {
 				t.Errorf("NewVisiblePlayer().CanDiscard() = %v, want %v", got.CanDiscard(), false)
 			}
+			if !got.IsConcealed() {
+				t.Errorf("NewVisiblePlayer().IsConcealed() = %v, want %v", got.IsConcealed(), true)
+			}
 		})
 	}
 }

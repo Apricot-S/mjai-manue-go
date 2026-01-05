@@ -20,6 +20,7 @@ type VisiblePlayer struct {
 	riichiRiverIndex          int
 	riichiDiscardedTilesIndex int
 	canDiscard                bool
+	isConcealed               bool
 }
 
 func NewVisiblePlayer(handTiles []tile.Tile) (*VisiblePlayer, error) {
@@ -43,6 +44,7 @@ func NewVisiblePlayer(handTiles []tile.Tile) (*VisiblePlayer, error) {
 		riichiRiverIndex:          -1,
 		riichiDiscardedTilesIndex: -1,
 		canDiscard:                false,
+		isConcealed:               true,
 	}, nil
 }
 
@@ -90,4 +92,8 @@ func (p *VisiblePlayer) RiichiDiscardedTilesIndex() int {
 
 func (p *VisiblePlayer) CanDiscard() bool {
 	return p.canDiscard
+}
+
+func (p *VisiblePlayer) IsConcealed() bool {
+	return p.isConcealed
 }
