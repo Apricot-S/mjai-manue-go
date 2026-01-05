@@ -20,7 +20,7 @@ const (
 	// Reference: <https://note.com/daku_longyi/n/n51fe08566f1b>
 	maxNumRiver = 24
 	// Reference: <https://note.com/daku_longyi/n/n51fe08566f1b>
-	maxNumSutehais = 27
+	maxNumDiscardedTiles = 27
 )
 
 type PlayerViewer interface {

@@ -106,6 +106,11 @@ func TestNewVisiblePlayer(t *testing.T) {
 			if !reflect.DeepEqual(got.River(), river) {
 				t.Errorf("NewVisiblePlayer().River() = %v, want %v", got.River(), river)
 			}
+
+			discardedTiles := make([]tile.Tile, 0, 27)
+			if !reflect.DeepEqual(got.DiscardedTiles(), discardedTiles) {
+				t.Errorf("NewVisiblePlayer().DiscardedTiles() = %v, want %v", got.DiscardedTiles(), discardedTiles)
+			}
 		})
 	}
 }
