@@ -156,13 +156,13 @@ func TestVisiblePlayer_Draw_AddsTileToHand(t *testing.T) {
 	}
 
 	if h, _ := p.Hand(); *h != *hand.MustVisibleHand(handTiles) {
-		t.Errorf("")
+		t.Errorf("Hand() must remain unchanged after Draw(); got %+v", h)
 	}
 
 	sortedHandTiles := tile.Tiles(handTiles)
 	sort.Sort(sortedHandTiles)
 	if !reflect.DeepEqual(p.HandTiles(), []tile.Tile(sortedHandTiles)) {
-		t.Errorf("")
+		t.Errorf("HandTiles() must remain unchanged after Draw(); got %+v", p.HandTiles())
 	}
 }
 
