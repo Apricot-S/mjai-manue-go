@@ -242,12 +242,67 @@ func TestVisiblePlayer_Discard_TileInHand(t *testing.T) {
 
 	discardedTile := tile.MustTileFromCode("C")
 	if err := p.Discard(*discardedTile, false); err != nil {
-		t.Errorf("")
+		t.Errorf("unexpected error on Discard: %v", err)
 	}
 
 	afterHandTiles := tile.Tiles(append(handTiles, *drawnTile))
 	afterHandTiles = slices.DeleteFunc(afterHandTiles, func(t tile.Tile) bool { return t == *discardedTile })
 	afterHandTiles = tile.Tiles(afterHandTiles)
+	sort.Sort(afterHandTiles)
+	h := hand.MustVisibleHand(afterHandTiles)
+
+	if gotHand, _ := p.Hand(); *gotHand != *h {
+		t.Errorf("Hand() mismatch after Discard: got %v, want %v", gotHand, h)
+	}
+
+	if !reflect.DeepEqual(p.HandTiles(), []tile.Tile(afterHandTiles)) {
+		t.Errorf("HandTiles() mismatch after Discard: got %v, want %v", p.HandTiles(), afterHandTiles)
+	}
+
+	if p.DrawnTile() != nil {
+		t.Errorf("DrawnTile() should be nil after Discard; got %v", p.DrawnTile())
+	}
+
+	river := []tile.Tile{*discardedTile}
+
+	if !reflect.DeepEqual(p.River(), river) {
+		t.Errorf("River() mismatch after Discard: got %v, want %v", p.River(), river)
+	}
+
+	if !reflect.DeepEqual(p.DiscardedTiles(), river) {
+		t.Errorf("DiscardedTiles() mismatch after Discard: got %v, want %v", p.DiscardedTiles(), river)
+	}
+
+	if p.CanDiscard() {
+		t.Errorf("CanDiscard() should be false after Discard; got true")
+	}
+}
+
+func TestVisiblePlayer_Discard_DrawnTile(t *testing.T) {
+	handTiles := []tile.Tile{
+		*tile.MustTileFromCode("C"), *tile.MustTileFromCode("9s"), *tile.MustTileFromCode("4m"),
+		*tile.MustTileFromCode("2p"), *tile.MustTileFromCode("S"), *tile.MustTileFromCode("4p"),
+		*tile.MustTileFromCode("8s"), *tile.MustTileFromCode("6p"), *tile.MustTileFromCode("6s"),
+		*tile.MustTileFromCode("7m"), *tile.MustTileFromCode("9s"), *tile.MustTileFromCode("5pr"),
+		*tile.MustTileFromCode("5p"),
+	}
+
+	p, err := player.NewVisiblePlayer(handTiles)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+
+	drawnTile := tile.MustTileFromCode("1m")
+	if err := p.Draw(*drawnTile); err != nil {
+		t.Fatalf("unexpected error on Draw: %v", err)
+	}
+
+	discardedTile := tile.MustTileFromCode("1m")
+	if err := p.Discard(*discardedTile, true); err != nil {
+		t.Errorf("unexpected error on Discard: %v", err)
+	}
+
+	afterHandTiles := tile.Tiles(handTiles)
 	sort.Sort(afterHandTiles)
 	h := hand.MustVisibleHand(afterHandTiles)
 
