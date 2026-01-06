@@ -116,5 +116,11 @@ func (p *VisiblePlayer) Discard(t tile.Tile, tsumogiri bool) error {
 		return fmt.Errorf("cannot Discard: player is not in a discardable state")
 	}
 
-	panic("")
+	newHand, err := p.hand.Discard(&t)
+	if err != nil {
+		return err
+	}
+
+	p.hand = *newHand
+	return nil
 }
