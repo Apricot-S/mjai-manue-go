@@ -104,5 +104,6 @@ func (p *VisiblePlayer) Draw(t tile.Tile) error {
 	}
 
 	p.drawnTile = &t
+	p.canDiscard = true
 	return nil
 }

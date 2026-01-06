@@ -168,6 +168,10 @@ func TestVisiblePlayer_Draw_AddsTileToHand(t *testing.T) {
 	if *p.DrawnTile() != *drawnTile {
 		t.Errorf("DrawnTile() mismatch: expected %v but got %v", drawnTile, p.DrawnTile())
 	}
+
+	if !p.CanDiscard() {
+		t.Errorf("player must be able to discard after Draw; CanDiscard() returned false")
+	}
 }
 
 func TestVisiblePlayer_Draw_CantDrawUnknown(t *testing.T) {
