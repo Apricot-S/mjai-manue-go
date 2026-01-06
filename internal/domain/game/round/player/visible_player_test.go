@@ -2,6 +2,7 @@ package player_test
 
 import (
 	"reflect"
+	"slices"
 	"sort"
 	"testing"
 
@@ -217,6 +218,61 @@ func TestVisiblePlayer_Draw_CannotDrawTwice(t *testing.T) {
 	secondTile := tile.MustTileFromCode("2m")
 	if err := p.Draw(*secondTile); err == nil {
 		t.Errorf("Draw should fail when called twice without a discard; expected error but got nil")
+	}
+}
+
+func TestVisiblePlayer_Discard_TileInHand(t *testing.T) {
+	handTiles := []tile.Tile{
+		*tile.MustTileFromCode("C"), *tile.MustTileFromCode("9s"), *tile.MustTileFromCode("4m"),
+		*tile.MustTileFromCode("2p"), *tile.MustTileFromCode("S"), *tile.MustTileFromCode("4p"),
+		*tile.MustTileFromCode("8s"), *tile.MustTileFromCode("6p"), *tile.MustTileFromCode("6s"),
+		*tile.MustTileFromCode("7m"), *tile.MustTileFromCode("9s"), *tile.MustTileFromCode("5pr"),
+		*tile.MustTileFromCode("5p"),
+	}
+
+	p, err := player.NewVisiblePlayer(handTiles)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+
+	drawnTile := tile.MustTileFromCode("1m")
+	if err := p.Draw(*drawnTile); err != nil {
+		t.Fatalf("unexpected error on Draw: %v", err)
+	}
+
+	discardedTile := tile.MustTileFromCode("C")
+	if err := p.Discard(*discardedTile, false); err != nil {
+		t.Errorf("")
+	}
+
+	handTiles = append(handTiles, *drawnTile)
+	handTiles = slices.DeleteFunc(handTiles, func(t tile.Tile) bool { return t == *discardedTile })
+	h := hand.MustVisibleHand(handTiles)
+
+	if gotHand, _ := p.Hand(); *gotHand != *h {
+		t.Errorf("Hand() mismatch after Discard: got %v, want %v", gotHand, h)
+	}
+
+	if !reflect.DeepEqual(p.HandTiles(), handTiles) {
+		t.Errorf("HandTiles() mismatch after Discard: got %v, want %v", p.HandTiles(), handTiles)
+	}
+
+	if p.DrawnTile() != nil {
+		t.Errorf("DrawnTile() should be nil after Discard; got %v", p.DrawnTile())
+	}
+
+	river := []tile.Tile{*discardedTile}
+
+	if !reflect.DeepEqual(p.River(), river) {
+		t.Errorf("River() mismatch after Discard: got %v, want %v", p.River(), river)
+	}
+
+	if !reflect.DeepEqual(p.DiscardedTiles(), river) {
+		t.Errorf("DiscardedTiles() mismatch after Discard: got %v, want %v", p.DiscardedTiles(), river)
+	}
+
+	if p.CanDiscard() {
+		t.Errorf("CanDiscard() should be false after Discard; got true")
 	}
 }
 
