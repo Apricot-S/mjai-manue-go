@@ -165,3 +165,22 @@ func TestVisiblePlayer_Draw_AddsTileToHand(t *testing.T) {
 		t.Errorf("")
 	}
 }
+
+func TestVisiblePlayer_Draw_CantDrawUnknown(t *testing.T) {
+	handTiles := []tile.Tile{
+		*tile.MustTileFromCode("C"), *tile.MustTileFromCode("9s"), *tile.MustTileFromCode("4m"),
+		*tile.MustTileFromCode("2p"), *tile.MustTileFromCode("S"), *tile.MustTileFromCode("4p"),
+		*tile.MustTileFromCode("8s"), *tile.MustTileFromCode("6p"), *tile.MustTileFromCode("6s"),
+		*tile.MustTileFromCode("7m"), *tile.MustTileFromCode("9s"), *tile.MustTileFromCode("5pr"),
+		*tile.MustTileFromCode("5p"),
+	}
+	p, err := player.NewVisiblePlayer(handTiles)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+
+	drawnTile := tile.MustTileFromCode("?")
+	if err := p.Draw(*drawnTile); err == nil {
+		t.Errorf("Draw() succeeded unexpectedly")
+	}
+}
