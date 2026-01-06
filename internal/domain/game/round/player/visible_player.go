@@ -110,3 +110,11 @@ func (p *VisiblePlayer) Draw(t tile.Tile) error {
 	p.canDiscard = true
 	return nil
 }
+
+func (p *VisiblePlayer) Discard(t tile.Tile, tsumogiri bool) error {
+	if !p.CanDiscard() {
+		return fmt.Errorf("cannot Discard: player is not in a discardable state")
+	}
+
+	panic("")
+}
