@@ -245,16 +245,18 @@ func TestVisiblePlayer_Discard_TileInHand(t *testing.T) {
 		t.Errorf("")
 	}
 
-	handTiles = append(handTiles, *drawnTile)
-	handTiles = slices.DeleteFunc(handTiles, func(t tile.Tile) bool { return t == *discardedTile })
-	h := hand.MustVisibleHand(handTiles)
+	afterHandTiles := tile.Tiles(append(handTiles, *drawnTile))
+	afterHandTiles = slices.DeleteFunc(afterHandTiles, func(t tile.Tile) bool { return t == *discardedTile })
+	afterHandTiles = tile.Tiles(afterHandTiles)
+	sort.Sort(afterHandTiles)
+	h := hand.MustVisibleHand(afterHandTiles)
 
 	if gotHand, _ := p.Hand(); *gotHand != *h {
 		t.Errorf("Hand() mismatch after Discard: got %v, want %v", gotHand, h)
 	}
 
-	if !reflect.DeepEqual(p.HandTiles(), handTiles) {
-		t.Errorf("HandTiles() mismatch after Discard: got %v, want %v", p.HandTiles(), handTiles)
+	if !reflect.DeepEqual(p.HandTiles(), []tile.Tile(afterHandTiles)) {
+		t.Errorf("HandTiles() mismatch after Discard: got %v, want %v", p.HandTiles(), afterHandTiles)
 	}
 
 	if p.DrawnTile() != nil {

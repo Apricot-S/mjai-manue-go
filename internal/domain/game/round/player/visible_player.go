@@ -125,8 +125,15 @@ func (p *VisiblePlayer) Discard(t tile.Tile, tsumogiri bool) error {
 		if err != nil {
 			return err
 		}
+		if newHand, err = newHand.Draw(p.drawnTile); err != nil {
+			return err
+		}
 		p.hand = *newHand
 	}
 
+	p.drawnTile = nil
+	p.river = append(p.river, t)
+	p.discardedTiles = append(p.discardedTiles, t)
+	p.canDiscard = false
 	return nil
 }
