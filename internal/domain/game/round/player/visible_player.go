@@ -116,9 +116,11 @@ func (p *VisiblePlayer) Discard(t tile.Tile, tsumogiri bool) error {
 		return fmt.Errorf("cannot Discard: player is not in a discardable state")
 	}
 
+	// TODO: 立直後の打牌はツモ切り以外許可しない
+
 	if tsumogiri {
 		if t != *p.drawnTile {
-			return fmt.Errorf("")
+			return fmt.Errorf("cannot Discard: tsumogiri tile (%s) must equal the drawn tile (%s)", t, p.drawnTile)
 		}
 	} else {
 		newHand, err := p.hand.Discard(&t)
