@@ -145,6 +145,7 @@ func TestVisiblePlayer_Draw_Success(t *testing.T) {
 		*tile.MustTileFromCode("7m"), *tile.MustTileFromCode("9s"), *tile.MustTileFromCode("5pr"),
 		*tile.MustTileFromCode("5p"),
 	}
+
 	p, err := player.NewVisiblePlayer(handTiles)
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
@@ -174,7 +175,7 @@ func TestVisiblePlayer_Draw_Success(t *testing.T) {
 	}
 }
 
-func TestVisiblePlayer_Draw_CantDrawUnknown(t *testing.T) {
+func TestVisiblePlayer_Draw_CannotDrawUnknown(t *testing.T) {
 	handTiles := []tile.Tile{
 		*tile.MustTileFromCode("C"), *tile.MustTileFromCode("9s"), *tile.MustTileFromCode("4m"),
 		*tile.MustTileFromCode("2p"), *tile.MustTileFromCode("S"), *tile.MustTileFromCode("4p"),
@@ -182,6 +183,7 @@ func TestVisiblePlayer_Draw_CantDrawUnknown(t *testing.T) {
 		*tile.MustTileFromCode("7m"), *tile.MustTileFromCode("9s"), *tile.MustTileFromCode("5pr"),
 		*tile.MustTileFromCode("5p"),
 	}
+
 	p, err := player.NewVisiblePlayer(handTiles)
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
@@ -190,5 +192,30 @@ func TestVisiblePlayer_Draw_CantDrawUnknown(t *testing.T) {
 	drawnTile := tile.MustTileFromCode("?")
 	if err := p.Draw(*drawnTile); err == nil {
 		t.Errorf("Draw() succeeded unexpectedly")
+	}
+}
+
+func TestVisiblePlayer_Draw_CannotDrawTwice(t *testing.T) {
+	handTiles := []tile.Tile{
+		*tile.MustTileFromCode("C"), *tile.MustTileFromCode("9s"), *tile.MustTileFromCode("4m"),
+		*tile.MustTileFromCode("2p"), *tile.MustTileFromCode("S"), *tile.MustTileFromCode("4p"),
+		*tile.MustTileFromCode("8s"), *tile.MustTileFromCode("6p"), *tile.MustTileFromCode("6s"),
+		*tile.MustTileFromCode("7m"), *tile.MustTileFromCode("9s"), *tile.MustTileFromCode("5pr"),
+		*tile.MustTileFromCode("5p"),
+	}
+
+	p, err := player.NewVisiblePlayer(handTiles)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+
+	firstTile := tile.MustTileFromCode("1m")
+	if err := p.Draw(*firstTile); err != nil {
+		t.Fatalf("unexpected error on first Draw: %v", err)
+	}
+
+	secondTile := tile.MustTileFromCode("2m")
+	if err := p.Draw(*secondTile); err == nil {
+		t.Errorf("Draw should fail when called twice without a discard; expected error but got nil")
 	}
 }

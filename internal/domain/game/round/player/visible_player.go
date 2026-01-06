@@ -102,6 +102,9 @@ func (p *VisiblePlayer) Draw(t tile.Tile) error {
 	if t.IsUnknown() {
 		return fmt.Errorf("visible player cannot draw an unknown tile")
 	}
+	if p.CanDiscard() {
+		return fmt.Errorf("cannot Draw: player is already in a discardable state")
+	}
 
 	p.drawnTile = &t
 	p.canDiscard = true
