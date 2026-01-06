@@ -137,7 +137,7 @@ func TestNewVisiblePlayer(t *testing.T) {
 	}
 }
 
-func TestVisiblePlayer_Draw_AddsTileToHand(t *testing.T) {
+func TestVisiblePlayer_Draw_Success(t *testing.T) {
 	handTiles := []tile.Tile{
 		*tile.MustTileFromCode("C"), *tile.MustTileFromCode("9s"), *tile.MustTileFromCode("4m"),
 		*tile.MustTileFromCode("2p"), *tile.MustTileFromCode("S"), *tile.MustTileFromCode("4p"),
