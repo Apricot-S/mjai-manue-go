@@ -164,6 +164,10 @@ func TestVisiblePlayer_Draw_AddsTileToHand(t *testing.T) {
 	if !reflect.DeepEqual(p.HandTiles(), []tile.Tile(sortedHandTiles)) {
 		t.Errorf("HandTiles() must remain unchanged after Draw(); got %+v", p.HandTiles())
 	}
+
+	if *p.DrawnTile() != *drawnTile {
+		t.Errorf("DrawnTile() mismatch: expected %v but got %v", drawnTile, p.DrawnTile())
+	}
 }
 
 func TestVisiblePlayer_Draw_CantDrawUnknown(t *testing.T) {

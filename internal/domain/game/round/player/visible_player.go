@@ -103,5 +103,6 @@ func (p *VisiblePlayer) Draw(t tile.Tile) error {
 		return fmt.Errorf("visible player cannot draw an unknown tile")
 	}
 
+	p.drawnTile = &t
 	return nil
 }
