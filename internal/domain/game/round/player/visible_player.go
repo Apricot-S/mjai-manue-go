@@ -99,11 +99,9 @@ func (p *VisiblePlayer) IsConcealed() bool {
 }
 
 func (p *VisiblePlayer) Draw(t tile.Tile) error {
-	newHand, err := p.hand.Draw(&t)
-	if err != nil {
-		return err
+	if t.IsUnknown() {
+		return fmt.Errorf("visible player cannot draw an unknown tile")
 	}
 
-	p.hand = *newHand
 	return nil
 }

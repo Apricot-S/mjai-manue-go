@@ -155,7 +155,13 @@ func TestVisiblePlayer_Draw_AddsTileToHand(t *testing.T) {
 		t.Fatalf("unexpected error: %v", err)
 	}
 
-	if h, _ := p.Hand(); h.Count(drawnTile) != 1 {
-		t.Errorf("expected tile %v to be in hand, but it was not", drawnTile)
+	if h, _ := p.Hand(); *h != *hand.MustVisibleHand(handTiles) {
+		t.Errorf("")
+	}
+
+	sortedHandTiles := tile.Tiles(handTiles)
+	sort.Sort(sortedHandTiles)
+	if !reflect.DeepEqual(p.HandTiles(), []tile.Tile(sortedHandTiles)) {
+		t.Errorf("")
 	}
 }
