@@ -1,6 +1,7 @@
 package tile_test
 
 import (
+	"reflect"
 	"sort"
 	"testing"
 
@@ -36,5 +37,47 @@ func TestSortTiles(t *testing.T) {
 		if tiles[i].String() != sortedName {
 			t.Errorf("Expected %s but got %s", sortedName, tiles[i])
 		}
+	}
+}
+
+func TestTiles_Distinct(t *testing.T) {
+	tests := []struct {
+		name    string
+		tiles   tile.Tiles
+		exclude func(tile.Tile) bool
+		want    tile.Tiles
+	}{
+		{
+			name:    "nil tiles",
+			tiles:   nil,
+			exclude: nil,
+			want:    nil,
+		},
+		{
+			name:    "sort tiles",
+			tiles:   tile.Tiles{*tile.MustTileFromCode("5mr"), *tile.MustTileFromCode("5m")},
+			exclude: nil,
+			want:    tile.Tiles{*tile.MustTileFromCode("5m"), *tile.MustTileFromCode("5mr")},
+		},
+		{
+			name:    "remove duplicate tiles",
+			tiles:   tile.Tiles{*tile.MustTileFromCode("5m"), *tile.MustTileFromCode("5mr"), *tile.MustTileFromCode("5m")},
+			exclude: nil,
+			want:    tile.Tiles{*tile.MustTileFromCode("5m"), *tile.MustTileFromCode("5mr")},
+		},
+		{
+			name:    "exclude tiles",
+			tiles:   tile.Tiles{*tile.MustTileFromCode("5m"), *tile.MustTileFromCode("5mr"), *tile.MustTileFromCode("5m")},
+			exclude: func(t tile.Tile) bool { return t.IsRed() },
+			want:    tile.Tiles{*tile.MustTileFromCode("5m")},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := tt.tiles.Distinct(tt.exclude)
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("Distinct() = %v, want %v", got, tt.want)
+			}
+		})
 	}
 }
