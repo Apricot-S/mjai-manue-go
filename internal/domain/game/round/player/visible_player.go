@@ -106,6 +106,9 @@ func (p *VisiblePlayer) Draw(t tile.Tile) error {
 	if p.CanDiscard() {
 		return fmt.Errorf("cannot Draw: player is already in a discardable state")
 	}
+	if p.riichiState == RiichiDeclared {
+		return fmt.Errorf("cannot Draw: while declaring Riichi")
+	}
 
 	p.drawnTile = &t
 	p.canDiscard = true
@@ -168,4 +171,10 @@ func (p *VisiblePlayer) Riichi() error {
 
 	p.riichiState = RiichiDeclared
 	return nil
+}
+
+func (p *VisiblePlayer) RiichiAccepted() error {
+	// TODO: 立直宣言後かをチェックする
+	// TODO: 打牌直後なので !canDiscard() をチェックする
+	panic("")
 }
