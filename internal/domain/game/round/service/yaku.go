@@ -536,15 +536,34 @@ func sanankou(
 	tsumo bool,
 ) int {
 	numAnkou := 0
+	needCheckWait := false
 
 	// Count triplets in the hand
-	for _, m := range handBlocks {
-		if t, ok := m.(*block.Triplet); ok {
+	for _, b := range handBlocks {
+		if t, ok := b.(*block.Triplet); ok {
 			// In the case of Ron, exclude the triplet that contains the winning tile
 			if !tsumo && t.ToTiles()[0].HasSameSymbol(winningTile) {
+				needCheckWait = true
 				continue
 			}
 			numAnkou++
+		}
+	}
+
+	if needCheckWait {
+	OuterLoop:
+		for _, b := range handBlocks {
+			s, ok := b.(*block.Sequence)
+			if !ok {
+				continue
+			}
+
+			for _, t := range s.ToTiles() {
+				if t.HasSameSymbol(winningTile) {
+					numAnkou++
+					break OuterLoop
+				}
+			}
 		}
 	}
 

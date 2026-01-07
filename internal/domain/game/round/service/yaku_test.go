@@ -963,6 +963,18 @@ func TestHas1Han(t *testing.T) {
 			want:          true,
 		},
 		{
+			name:          "only Sanankou: tile of the open wait and concealed triplet is the same",
+			handCodes:     []string{"1m", "1m", "1m", "4p", "5p", "6p", "6p", "6p", "9s", "9s", "9s", "N", "N"},
+			melds:         nil,
+			winningTile:   tile.MustTileFromCode("6p"),
+			prevalentWind: wind.East,
+			seatWind:      wind.South,
+			tsumo:         false,
+			riichi:        false,
+			event:         service.NoEvent,
+			want:          true,
+		},
+		{
 			name:      "not Sanankou: 2 ankou",
 			handCodes: []string{"2p", "2p", "6p", "6p", "N", "N", "N"},
 			melds: []meld.Meld{
