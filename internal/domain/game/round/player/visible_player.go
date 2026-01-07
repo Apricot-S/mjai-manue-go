@@ -6,6 +6,7 @@ import (
 
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/round/player/hand"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/round/player/meld"
+	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/round/service"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/tile"
 )
 
@@ -148,9 +149,15 @@ func (p *VisiblePlayer) Riichi() error {
 	if !p.CanDiscard() {
 		return fmt.Errorf("cannot Riichi: player is not in a discardable state")
 	}
-
-	// TODO: 聴牌しているかチェックする
 	// TODO: 副露後は立直を許可しない
+
+	h, err := p.hand.Draw(p.drawnTile)
+	if err != nil {
+		return err
+	}
+	if !service.IsTenpaiAll(h) {
+		return fmt.Errorf("cannot Riichi: player is not tenpai")
+	}
 
 	p.riichiState = RiichiDeclared
 	return nil
