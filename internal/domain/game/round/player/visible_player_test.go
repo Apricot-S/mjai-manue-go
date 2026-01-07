@@ -636,10 +636,10 @@ func TestVisiblePlayer_RiichiAccepted_Success(t *testing.T) {
 		t.Errorf("RiichiState() = %v, want %v", p.RiichiState(), player.RiichiAccepted)
 	}
 	if p.RiichiRiverIndex() != 0 {
-		t.Errorf("RiichiRiverIndex() = %v, want %v", p.RiichiRiverIndex(), -1)
+		t.Errorf("RiichiRiverIndex() = %v, want %v", p.RiichiRiverIndex(), 0)
 	}
 	if p.RiichiDiscardedTilesIndex() != 0 {
-		t.Errorf("RiichiDiscardedTilesIndex() = %v, want %v", p.RiichiDiscardedTilesIndex(), -1)
+		t.Errorf("RiichiDiscardedTilesIndex() = %v, want %v", p.RiichiDiscardedTilesIndex(), 0)
 	}
 
 	secondTile := tile.MustTileFromCode("2m")
