@@ -599,3 +599,51 @@ func TestVisiblePlayer_Riichi_CannotDeclareNotTenpai(t *testing.T) {
 		t.Errorf("Riichi should fail when the player is not tenpai; expected error but got nil")
 	}
 }
+
+func TestVisiblePlayer_RiichiAccepted_Success(t *testing.T) {
+	handTiles := []tile.Tile{
+		*tile.MustTileFromCode("1m"), *tile.MustTileFromCode("2m"), *tile.MustTileFromCode("3m"),
+		*tile.MustTileFromCode("4p"), *tile.MustTileFromCode("5p"), *tile.MustTileFromCode("6p"),
+		*tile.MustTileFromCode("7s"), *tile.MustTileFromCode("8s"), *tile.MustTileFromCode("9s"),
+		*tile.MustTileFromCode("E"), *tile.MustTileFromCode("E"), *tile.MustTileFromCode("S"),
+		*tile.MustTileFromCode("W"),
+	}
+
+	p, err := player.NewVisiblePlayer(handTiles)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+
+	firstTile := tile.MustTileFromCode("S")
+	if err := p.Draw(*firstTile); err != nil {
+		t.Fatalf("unexpected error on first Draw: %v", err)
+	}
+
+	if err := p.Riichi(); err != nil {
+		t.Fatalf("unexpected error on Riichi: %v", err)
+	}
+
+	discardedTile := tile.MustTileFromCode("W")
+	if err := p.Discard(*discardedTile, false); err != nil {
+		t.Fatalf("unexpected error on Discard: %v", err)
+	}
+
+	if err := p.RiichiAccepted(); err != nil {
+		t.Errorf("RiichiAccepted() failed: %v", err)
+	}
+
+	if p.RiichiState() != player.RiichiAccepted {
+		t.Errorf("RiichiState() = %v, want %v", p.RiichiState(), player.RiichiAccepted)
+	}
+	if p.RiichiRiverIndex() != 0 {
+		t.Errorf("RiichiRiverIndex() = %v, want %v", p.RiichiRiverIndex(), -1)
+	}
+	if p.RiichiDiscardedTilesIndex() != 0 {
+		t.Errorf("RiichiDiscardedTilesIndex() = %v, want %v", p.RiichiDiscardedTilesIndex(), -1)
+	}
+
+	secondTile := tile.MustTileFromCode("2m")
+	if err := p.Draw(*secondTile); err != nil {
+		t.Errorf("Draw should succeed after riichi has been accepted; got error: %v", err)
+	}
+}

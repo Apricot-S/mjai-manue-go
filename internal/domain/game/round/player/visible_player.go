@@ -176,5 +176,5 @@ func (p *VisiblePlayer) Riichi() error {
 func (p *VisiblePlayer) RiichiAccepted() error {
 	// TODO: 立直宣言後かをチェックする
 	// TODO: 打牌直後なので !canDiscard() をチェックする
-	panic("")
+	return nil
 }
