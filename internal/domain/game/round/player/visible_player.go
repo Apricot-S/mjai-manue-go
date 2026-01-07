@@ -145,6 +145,9 @@ func (p *VisiblePlayer) Riichi() error {
 	if p.riichiState != NotRiichi {
 		return fmt.Errorf("cannot Riichi: player is already in riichi state (%v)", p.riichiState)
 	}
+	if !p.CanDiscard() {
+		return fmt.Errorf("cannot Riichi: player is not in a discardable state")
+	}
 
 	// TODO: 聴牌しているかチェックする
 	// TODO: 副露後は立直を許可しない
