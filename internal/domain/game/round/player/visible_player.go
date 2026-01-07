@@ -147,6 +147,8 @@ func (p *VisiblePlayer) Discard(t tile.Tile, tsumogiri bool) error {
 		p.hand = *newHand
 	}
 
+	// TODO: 立直でないときはextra safe tilesをリセットする
+
 	p.drawnTile = nil
 	p.river = append(p.river, t)
 	p.discardedTiles = append(p.discardedTiles, t)
