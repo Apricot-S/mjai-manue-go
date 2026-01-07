@@ -147,7 +147,9 @@ func (p *VisiblePlayer) Discard(t tile.Tile, tsumogiri bool) error {
 		p.hand = *newHand
 	}
 
-	// TODO: 立直でないときはextra safe tilesをリセットする
+	if p.riichiState != RiichiAccepted {
+		p.extraSafeTiles = make([]tile.Tile, 0, 3)
+	}
 
 	p.drawnTile = nil
 	p.river = append(p.river, t)
