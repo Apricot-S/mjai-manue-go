@@ -177,7 +177,6 @@ func (p *VisiblePlayer) RiichiAccepted() error {
 	if p.riichiState != RiichiDeclared {
 		return fmt.Errorf("Riichi cannot be accepted: invalid state (%v)", p.riichiState)
 	}
-	// TODO: 打牌直後なので !canDiscard() をチェックする
 
 	p.riichiState = RiichiAccepted
 	p.riichiRiverIndex = len(p.River()) - 1
