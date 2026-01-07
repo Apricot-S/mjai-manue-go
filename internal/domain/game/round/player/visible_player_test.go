@@ -82,7 +82,7 @@ func TestNewVisiblePlayer(t *testing.T) {
 
 			h, ok := got.Hand()
 			if !ok {
-				t.Errorf("NewVisiblePlayer() Hand() returned not ok")
+				t.Errorf("NewVisiblePlayer().Hand() returned not ok")
 			}
 			if *h != *tt.wantHand {
 				t.Errorf("NewVisiblePlayer().Hand() = %v, want %v", h, tt.wantHand)
@@ -754,5 +754,34 @@ func TestVisiblePlayer_RiichiAccepted_NotRiichi(t *testing.T) {
 
 	if err := p.RiichiAccepted(); err == nil {
 		t.Errorf("RiichiAccepted should fail when called before Riichi; expected error but got nil")
+	}
+}
+
+func TestVisiblePlayer_AddExtraSafeTiles(t *testing.T) {
+	handTiles := []tile.Tile{
+		*tile.MustTileFromCode("C"), *tile.MustTileFromCode("9s"), *tile.MustTileFromCode("4m"),
+		*tile.MustTileFromCode("2p"), *tile.MustTileFromCode("S"), *tile.MustTileFromCode("4p"),
+		*tile.MustTileFromCode("8s"), *tile.MustTileFromCode("6p"), *tile.MustTileFromCode("6s"),
+		*tile.MustTileFromCode("7m"), *tile.MustTileFromCode("9s"), *tile.MustTileFromCode("5pr"),
+		*tile.MustTileFromCode("5p"),
+	}
+
+	p, err := player.NewVisiblePlayer(handTiles)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+
+	p.AddExtraSafeTiles(*tile.MustTileFromCode("5s"))
+	got := p.ExtraSafeTiles()
+	want := []tile.Tile{*tile.MustTileFromCode("5s")}
+	if !reflect.DeepEqual(got, want) {
+		t.Errorf("ExtraSafeTiles() = %v, want %v", got, want)
+	}
+
+	p.AddExtraSafeTiles(*tile.MustTileFromCode("5sr"))
+	got = p.ExtraSafeTiles()
+	want = []tile.Tile{*tile.MustTileFromCode("5s"), *tile.MustTileFromCode("5sr")}
+	if !reflect.DeepEqual(got, want) {
+		t.Errorf("ExtraSafeTiles() = %v, want %v", got, want)
 	}
 }

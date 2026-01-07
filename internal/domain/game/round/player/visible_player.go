@@ -187,3 +187,7 @@ func (p *VisiblePlayer) RiichiAccepted() error {
 	p.riichiDiscardedTilesIndex = len(p.DiscardedTiles()) - 1
 	return nil
 }
+
+func (p *VisiblePlayer) AddExtraSafeTiles(t tile.Tile) {
+	p.extraSafeTiles = append(p.extraSafeTiles, t)
+}
