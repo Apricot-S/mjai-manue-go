@@ -6,6 +6,7 @@ import (
 
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/round/player/hand"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/round/player/meld"
+	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/round/service"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/tile"
 )
 
@@ -105,6 +106,9 @@ func (p *VisiblePlayer) Draw(t tile.Tile) error {
 	if p.CanDiscard() {
 		return fmt.Errorf("cannot Draw: player is already in a discardable state")
 	}
+	if p.riichiState == RiichiDeclared {
+		return fmt.Errorf("cannot Draw: while declaring Riichi")
+	}
 
 	p.drawnTile = &t
 	p.canDiscard = true
@@ -116,13 +120,18 @@ func (p *VisiblePlayer) Discard(t tile.Tile, tsumogiri bool) error {
 		return fmt.Errorf("cannot Discard: player is not in a discardable state")
 	}
 
-	// TODO: 立直後の打牌はツモ切り以外許可しない
-
 	if tsumogiri {
 		if t != *p.drawnTile {
 			return fmt.Errorf("cannot Discard: tsumogiri tile (%s) must equal the drawn tile (%s)", t, p.drawnTile)
 		}
+		if p.riichiState == RiichiDeclared && !service.IsTenpaiAll(&p.hand) {
+			return fmt.Errorf("cannot Discard: player is in riichi and discarding %s would break tenpai", t)
+		}
 	} else {
+		if p.riichiState == RiichiAccepted {
+			return fmt.Errorf("cannot Discard: player has accepted riichi and cannot discard a tile from hand: %s", t)
+		}
+
 		newHand, err := p.hand.Discard(&t)
 		if err != nil {
 			return err
@@ -130,12 +139,59 @@ func (p *VisiblePlayer) Discard(t tile.Tile, tsumogiri bool) error {
 		if newHand, err = newHand.Draw(p.drawnTile); err != nil {
 			return err
 		}
+
+		if p.riichiState == RiichiDeclared && !service.IsTenpaiAll(newHand) {
+			return fmt.Errorf("cannot Discard: player is in riichi and discarding %s would break tenpai", t)
+		}
+
 		p.hand = *newHand
 	}
+
+	// TODO: 立直でないときはextra safe tilesをリセットする
 
 	p.drawnTile = nil
 	p.river = append(p.river, t)
 	p.discardedTiles = append(p.discardedTiles, t)
 	p.canDiscard = false
 	return nil
+}
+
+func (p *VisiblePlayer) Riichi() error {
+	if p.riichiState != NotRiichi {
+		return fmt.Errorf("cannot Riichi: player is already in riichi state (%v)", p.riichiState)
+	}
+	if !p.CanDiscard() {
+		return fmt.Errorf("cannot Riichi: player is not in a discardable state")
+	}
+	// TODO: 副露後は立直を許可しない
+
+	h, err := p.hand.Draw(p.drawnTile)
+	if err != nil {
+		return err
+	}
+	if !service.IsTenpaiAll(h) {
+		return fmt.Errorf("cannot Riichi: player is not tenpai")
+	}
+
+	p.riichiState = RiichiDeclared
+	return nil
+}
+
+func (p *VisiblePlayer) RiichiAccepted() error {
+	if p.riichiState != RiichiDeclared {
+		return fmt.Errorf("Riichi cannot be accepted: invalid state (%v)", p.riichiState)
+	}
+
+	p.riichiState = RiichiAccepted
+	p.riichiRiverIndex = len(p.River()) - 1
+	p.riichiDiscardedTilesIndex = len(p.DiscardedTiles()) - 1
+	return nil
+}
+
+func (p *VisiblePlayer) AddExtraSafeTiles(t tile.Tile) {
+	if t.IsUnknown() {
+		panic("cannot add an unknown tile to extraSafeTiles")
+	}
+
+	p.extraSafeTiles = append(p.extraSafeTiles, t)
 }
