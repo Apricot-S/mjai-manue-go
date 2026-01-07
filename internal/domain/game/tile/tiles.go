@@ -1,7 +1,6 @@
 package tile
 
 import (
-	"log"
 	"slices"
 	"sort"
 )
@@ -23,7 +22,7 @@ func (t *Tile) sortKey() int {
 
 func (t *Tile) compareTo(other *Tile) int {
 	if other == nil {
-		log.Panic("Other tile is nil")
+		panic("Other tile is nil")
 	}
 	return t.sortKey() - other.sortKey()
 }
