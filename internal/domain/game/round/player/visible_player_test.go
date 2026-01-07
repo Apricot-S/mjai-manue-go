@@ -647,3 +647,69 @@ func TestVisiblePlayer_RiichiAccepted_Success(t *testing.T) {
 		t.Errorf("Draw should succeed after riichi has been accepted; got error: %v", err)
 	}
 }
+
+func TestVisiblePlayer_RiichiAccepted_CannotAcceptTwice(t *testing.T) {
+	handTiles := []tile.Tile{
+		*tile.MustTileFromCode("1m"), *tile.MustTileFromCode("2m"), *tile.MustTileFromCode("3m"),
+		*tile.MustTileFromCode("4p"), *tile.MustTileFromCode("5p"), *tile.MustTileFromCode("6p"),
+		*tile.MustTileFromCode("7s"), *tile.MustTileFromCode("8s"), *tile.MustTileFromCode("9s"),
+		*tile.MustTileFromCode("E"), *tile.MustTileFromCode("E"), *tile.MustTileFromCode("S"),
+		*tile.MustTileFromCode("W"),
+	}
+
+	p, err := player.NewVisiblePlayer(handTiles)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+
+	firstTile := tile.MustTileFromCode("S")
+	if err := p.Draw(*firstTile); err != nil {
+		t.Fatalf("unexpected error on first Draw: %v", err)
+	}
+
+	if err := p.Riichi(); err != nil {
+		t.Fatalf("unexpected error on Riichi: %v", err)
+	}
+
+	discardedTile := tile.MustTileFromCode("W")
+	if err := p.Discard(*discardedTile, false); err != nil {
+		t.Fatalf("unexpected error on Discard: %v", err)
+	}
+
+	if err := p.RiichiAccepted(); err != nil {
+		t.Fatalf("unexpected error on RiichiAccepted: %v", err)
+	}
+
+	if err := p.RiichiAccepted(); err == nil {
+		t.Errorf("RiichiAccepted should fail when called twice; expected error but got nil")
+	}
+}
+
+func TestVisiblePlayer_RiichiAccepted_NotRiichi(t *testing.T) {
+	handTiles := []tile.Tile{
+		*tile.MustTileFromCode("1m"), *tile.MustTileFromCode("2m"), *tile.MustTileFromCode("3m"),
+		*tile.MustTileFromCode("4p"), *tile.MustTileFromCode("5p"), *tile.MustTileFromCode("6p"),
+		*tile.MustTileFromCode("7s"), *tile.MustTileFromCode("8s"), *tile.MustTileFromCode("9s"),
+		*tile.MustTileFromCode("E"), *tile.MustTileFromCode("E"), *tile.MustTileFromCode("S"),
+		*tile.MustTileFromCode("W"),
+	}
+
+	p, err := player.NewVisiblePlayer(handTiles)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+
+	firstTile := tile.MustTileFromCode("S")
+	if err := p.Draw(*firstTile); err != nil {
+		t.Fatalf("unexpected error on first Draw: %v", err)
+	}
+
+	discardedTile := tile.MustTileFromCode("W")
+	if err := p.Discard(*discardedTile, false); err != nil {
+		t.Fatalf("unexpected error on Discard: %v", err)
+	}
+
+	if err := p.RiichiAccepted(); err == nil {
+		t.Errorf("RiichiAccepted should fail when called before Riichi; expected error but got nil")
+	}
+}
