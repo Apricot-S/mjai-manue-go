@@ -129,7 +129,7 @@ func (p *VisiblePlayer) Discard(t tile.Tile, tsumogiri bool) error {
 		}
 	} else {
 		if p.riichiState == RiichiAccepted {
-			return fmt.Errorf("")
+			return fmt.Errorf("cannot Discard: player has accepted riichi and cannot discard a tile from hand: %s", t)
 		}
 
 		newHand, err := p.hand.Discard(&t)
