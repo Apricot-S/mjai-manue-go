@@ -139,3 +139,8 @@ func (p *VisiblePlayer) Discard(t tile.Tile, tsumogiri bool) error {
 	p.canDiscard = false
 	return nil
 }
+
+func (p *VisiblePlayer) Riichi() error {
+	p.riichiState = RiichiDeclared
+	return nil
+}

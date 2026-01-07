@@ -427,3 +427,41 @@ func TestVisiblePlayer_Discard_CannotDiscardTileNotDrawnTile(t *testing.T) {
 		t.Errorf("Discard should fail when tsumogiri=true but a hand tile was specified; expected error but got nil")
 	}
 }
+
+func TestVisiblePlayer_Riichi_Success(t *testing.T) {
+	handTiles := []tile.Tile{
+		*tile.MustTileFromCode("1m"), *tile.MustTileFromCode("2m"), *tile.MustTileFromCode("3m"),
+		*tile.MustTileFromCode("4p"), *tile.MustTileFromCode("5p"), *tile.MustTileFromCode("6p"),
+		*tile.MustTileFromCode("7s"), *tile.MustTileFromCode("8p"), *tile.MustTileFromCode("9s"),
+		*tile.MustTileFromCode("E"), *tile.MustTileFromCode("E"), *tile.MustTileFromCode("S"),
+		*tile.MustTileFromCode("W"),
+	}
+
+	p, err := player.NewVisiblePlayer(handTiles)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+
+	drawnTile := tile.MustTileFromCode("S")
+	if err := p.Draw(*drawnTile); err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+
+	if err := p.Riichi(); err != nil {
+		t.Errorf("Riichi() failed: %v", err)
+	}
+
+	if p.RiichiState() != player.RiichiDeclared {
+		t.Errorf("RiichiState() = %v, want %v", p.RiichiState(), player.RiichiDeclared)
+	}
+	if p.RiichiRiverIndex() != -1 {
+		t.Errorf("RiichiRiverIndex() = %v, want %v", p.RiichiRiverIndex(), -1)
+	}
+	if p.RiichiDiscardedTilesIndex() != -1 {
+		t.Errorf("RiichiDiscardedTilesIndex() = %v, want %v", p.RiichiDiscardedTilesIndex(), -1)
+	}
+
+	if !p.CanDiscard() {
+		t.Errorf("player must be able to discard after Riichi; CanDiscard() returned false")
+	}
+}
