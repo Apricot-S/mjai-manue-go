@@ -117,12 +117,14 @@ func (p *VisiblePlayer) Discard(t tile.Tile, tsumogiri bool) error {
 		return fmt.Errorf("cannot Discard: player is not in a discardable state")
 	}
 
-	// TODO: 立直宣言後は立直可能打牌しか許可しない
 	// TODO: 立直後の打牌はツモ切り以外許可しない
 
 	if tsumogiri {
 		if t != *p.drawnTile {
 			return fmt.Errorf("cannot Discard: tsumogiri tile (%s) must equal the drawn tile (%s)", t, p.drawnTile)
+		}
+		if p.riichiState == RiichiDeclared && !service.IsTenpaiAll(&p.hand) {
+			return fmt.Errorf("cannot Discard: player is in riichi and discarding %s would break tenpai", t)
 		}
 	} else {
 		newHand, err := p.hand.Discard(&t)
@@ -132,6 +134,11 @@ func (p *VisiblePlayer) Discard(t tile.Tile, tsumogiri bool) error {
 		if newHand, err = newHand.Draw(p.drawnTile); err != nil {
 			return err
 		}
+
+		if p.riichiState == RiichiDeclared && !service.IsTenpaiAll(newHand) {
+			return fmt.Errorf("cannot Discard: player is in riichi and discarding %s would break tenpai", t)
+		}
+
 		p.hand = *newHand
 	}
 
