@@ -785,3 +785,28 @@ func TestVisiblePlayer_AddExtraSafeTiles(t *testing.T) {
 		t.Errorf("ExtraSafeTiles() = %v, want %v", got, want)
 	}
 }
+
+func TestVisiblePlayer_AddExtraSafeTiles_Panic(t *testing.T) {
+	handTiles := []tile.Tile{
+		*tile.MustTileFromCode("C"), *tile.MustTileFromCode("9s"), *tile.MustTileFromCode("4m"),
+		*tile.MustTileFromCode("2p"), *tile.MustTileFromCode("S"), *tile.MustTileFromCode("4p"),
+		*tile.MustTileFromCode("8s"), *tile.MustTileFromCode("6p"), *tile.MustTileFromCode("6s"),
+		*tile.MustTileFromCode("7m"), *tile.MustTileFromCode("9s"), *tile.MustTileFromCode("5pr"),
+		*tile.MustTileFromCode("5p"),
+	}
+
+	p, err := player.NewVisiblePlayer(handTiles)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+
+	t.Run("unknown tile", func(t *testing.T) {
+		defer func() {
+			if r := recover(); r == nil {
+				t.Errorf("Expected panic for unknown tile, but did not panic")
+			}
+		}()
+
+		p.AddExtraSafeTiles(*tile.MustTileFromCode("?"))
+	})
+}

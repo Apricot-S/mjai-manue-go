@@ -189,5 +189,9 @@ func (p *VisiblePlayer) RiichiAccepted() error {
 }
 
 func (p *VisiblePlayer) AddExtraSafeTiles(t tile.Tile) {
+	if t.IsUnknown() {
+		panic("cannot add an unknown tile to extraSafeTiles")
+	}
+
 	p.extraSafeTiles = append(p.extraSafeTiles, t)
 }
