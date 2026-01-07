@@ -465,3 +465,31 @@ func TestVisiblePlayer_Riichi_Success(t *testing.T) {
 		t.Errorf("player must be able to discard after Riichi; CanDiscard() returned false")
 	}
 }
+
+func TestVisiblePlayer_Riichi_CannotDeclareTwice(t *testing.T) {
+	handTiles := []tile.Tile{
+		*tile.MustTileFromCode("1m"), *tile.MustTileFromCode("2m"), *tile.MustTileFromCode("3m"),
+		*tile.MustTileFromCode("4p"), *tile.MustTileFromCode("5p"), *tile.MustTileFromCode("6p"),
+		*tile.MustTileFromCode("7s"), *tile.MustTileFromCode("8p"), *tile.MustTileFromCode("9s"),
+		*tile.MustTileFromCode("E"), *tile.MustTileFromCode("E"), *tile.MustTileFromCode("S"),
+		*tile.MustTileFromCode("W"),
+	}
+
+	p, err := player.NewVisiblePlayer(handTiles)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+
+	drawnTile := tile.MustTileFromCode("S")
+	if err := p.Draw(*drawnTile); err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+
+	if err := p.Riichi(); err != nil {
+		t.Fatalf("unexpected error on first Riichi: %v", err)
+	}
+
+	if err := p.Riichi(); err == nil {
+		t.Errorf("Riichi should fail when called twice; expected error but got nil")
+	}
+}

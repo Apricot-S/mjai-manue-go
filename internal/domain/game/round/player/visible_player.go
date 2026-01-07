@@ -116,6 +116,7 @@ func (p *VisiblePlayer) Discard(t tile.Tile, tsumogiri bool) error {
 		return fmt.Errorf("cannot Discard: player is not in a discardable state")
 	}
 
+	// TODO: 立直宣言後は立直可能打牌しか許可しない
 	// TODO: 立直後の打牌はツモ切り以外許可しない
 
 	if tsumogiri {
@@ -141,6 +142,13 @@ func (p *VisiblePlayer) Discard(t tile.Tile, tsumogiri bool) error {
 }
 
 func (p *VisiblePlayer) Riichi() error {
+	if p.riichiState != NotRiichi {
+		return fmt.Errorf("cannot Riichi: player is already in riichi state (%v)", p.riichiState)
+	}
+
+	// TODO: 聴牌しているかチェックする
+	// TODO: 副露後は立直を許可しない
+
 	p.riichiState = RiichiDeclared
 	return nil
 }
