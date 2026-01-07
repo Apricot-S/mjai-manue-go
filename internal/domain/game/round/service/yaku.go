@@ -154,7 +154,12 @@ func Has1Han(
 		return false
 	}
 
-	isOpen := len(melds) > 0
+	openMelds := slices.Clone(melds)
+	openMelds = slices.DeleteFunc(openMelds, func(m meld.Meld) bool {
+		_, ok := m.(*meld.ConcealedKan)
+		return ok
+	})
+	isOpen := len(openMelds) > 0
 
 	if riichi {
 		return true

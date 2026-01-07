@@ -749,6 +749,22 @@ func TestHas1Han(t *testing.T) {
 			want:          true,
 		},
 		{
+			name:      "only Menzenchin tsumohou with concealed kan",
+			handCodes: []string{"2p", "3p", "4p", "3s", "4s", "5s", "6s", "6s", "6s", "9s"},
+			melds: []meld.Meld{
+				meld.MustConcealedKan(
+					[4]tile.Tile{*tile.MustTileFromCode("1m"), *tile.MustTileFromCode("1m"), *tile.MustTileFromCode("1m"), *tile.MustTileFromCode("1m")},
+				),
+			},
+			winningTile:   tile.MustTileFromCode("9s"),
+			prevalentWind: wind.East,
+			seatWind:      wind.South,
+			tsumo:         true,
+			riichi:        false,
+			event:         service.NoEvent,
+			want:          true,
+		},
+		{
 			name:      "open tsumohou without yaku",
 			handCodes: []string{"2p", "3p", "4p", "3s", "4s", "5s", "6s", "6s", "6s", "9s"},
 			melds: []meld.Meld{
