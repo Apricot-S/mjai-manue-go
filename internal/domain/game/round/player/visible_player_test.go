@@ -661,6 +661,13 @@ func TestVisiblePlayer_Pon_Success(t *testing.T) {
 	if !reflect.DeepEqual(p.Melds(), wantMelds) {
 		t.Errorf("Hand() = %v, want %v", p.Melds(), wantMelds)
 	}
+
+	if !p.CanDiscard() {
+		t.Errorf("CanDiscard() = %v, want %v", p.CanDiscard(), true)
+	}
+	if p.IsConcealed() {
+		t.Errorf("IsConcealed() = %v, want %v", p.IsConcealed(), false)
+	}
 }
 
 func TestVisiblePlayer_Riichi_Success(t *testing.T) {
