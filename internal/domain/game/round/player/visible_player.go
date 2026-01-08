@@ -134,7 +134,7 @@ func (p *VisiblePlayer) Discard(t tile.Tile, tsumogiri bool) error {
 
 		for _, s := range p.swapCallTiles {
 			if t.HasSameSymbol(&s) {
-				return fmt.Errorf("")
+				return fmt.Errorf("cannot Discard: tile %s is forbidden due to swap-call", t)
 			}
 		}
 
