@@ -47,6 +47,12 @@ type PlayerViewer interface {
 	// RiichiState returns the riichi state.
 	RiichiState() RiichiState
 	// RiichiRiverIndex returns the index of the riichi declaration tile in the river.
+	//
+	// If the riichi declaration tile is called (melded) by another player,
+	// the index refers to the next tile in the river.
+	// If that tile is also called, the index advances further until it points to
+	// the first non-called tile after the riichi declaration.
+	//
 	// It returns -1 if the player has not declared riichi.
 	RiichiRiverIndex() int
 	// RiichiDiscardedTilesIndex returns the index of the riichi declaration tile in the discarded tiles.
