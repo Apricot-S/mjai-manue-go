@@ -46,10 +46,10 @@ type PlayerViewer interface {
 
 	// Riichi state
 	RiichiState() RiichiState
-	// The index of the tile that was declared as riichi in the river.
+	// The index of the riichi declaration tile in the river.
 	// It is -1 if the player has not declared riichi.
 	RiichiRiverIndex() int
-	// The index of the tile that was declared as riichi in the discarded tiles.
+	// The index of the riichi declaration tile in the discarded tiles.
 	// It is -1 if the player has not declared riichi.
 	RiichiDiscardedTilesIndex() int
 
