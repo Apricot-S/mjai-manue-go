@@ -162,6 +162,9 @@ func (p *VisiblePlayer) Discard(t tile.Tile, tsumogiri bool) error {
 }
 
 func (p *VisiblePlayer) Pon(pon meld.Pon) error {
+	p.melds = append(p.melds, &pon)
+	p.canDiscard = true
+	p.isConcealed = false
 	return nil
 }
 
