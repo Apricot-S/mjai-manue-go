@@ -180,6 +180,8 @@ func (p *VisiblePlayer) Chii(chii meld.Chii) error {
 		return err
 	}
 
+	// TODO: チー後に残る手牌が喰い替え対象のみの場合、チーは不可とする
+
 	p.hand = *h
 	p.melds = append(p.melds, &chii)
 	p.isConcealed = false
