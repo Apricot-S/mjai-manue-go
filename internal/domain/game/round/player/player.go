@@ -63,11 +63,11 @@ type PlayerActor interface {
 	Draw(t tile.Tile) error
 	Discard(t tile.Tile, tsumogiri bool) error
 
-	Chii(c meld.Chii) error
-	Pon(p meld.Pon) error
-	CalledKan(k meld.CalledKan) error
-	ConcealedKan(k meld.ConcealedKan) error
-	PromotedKan(k meld.PromotedKan) error
+	Chii(chii meld.Chii) error
+	Pon(pon meld.Pon) error
+	CalledKan(kan meld.CalledKan) error
+	ConcealedKan(kan meld.ConcealedKan) error
+	PromotedKan(kan meld.PromotedKan) error
 
 	Riichi() error
 	RiichiAccepted() error

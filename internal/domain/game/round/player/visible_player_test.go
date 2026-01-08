@@ -628,6 +628,8 @@ func TestVisiblePlayer_Discard_CannotDiscardFromHandAfterRiichi(t *testing.T) {
 	}
 }
 
+func TestVisiblePlayer_Pon_Success(t *testing.T) {}
+
 func TestVisiblePlayer_Riichi_Success(t *testing.T) {
 	handTiles := []tile.Tile{
 		*tile.MustTileFromCode("1m"), *tile.MustTileFromCode("2m"), *tile.MustTileFromCode("3m"),

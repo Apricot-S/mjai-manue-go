@@ -121,6 +121,8 @@ func (p *VisiblePlayer) Discard(t tile.Tile, tsumogiri bool) error {
 		return fmt.Errorf("cannot Discard: player is not in a discardable state")
 	}
 
+	// TODO: 喰い替え牌は打牌できないようにする
+
 	if tsumogiri {
 		if t != *p.drawnTile {
 			return fmt.Errorf("cannot Discard: tsumogiri tile (%s) must equal the drawn tile (%s)", t, p.drawnTile)
@@ -156,6 +158,10 @@ func (p *VisiblePlayer) Discard(t tile.Tile, tsumogiri bool) error {
 	p.river = append(p.river, t)
 	p.discardedTiles = append(p.discardedTiles, t)
 	p.canDiscard = false
+	return nil
+}
+
+func (p *VisiblePlayer) Pon(pon meld.Pon) error {
 	return nil
 }
 
