@@ -631,6 +631,35 @@ func TestVisiblePlayer_Discard_CannotDiscardFromHandAfterRiichi(t *testing.T) {
 	}
 }
 
+func TestVisiblePlayer_Discard_CannotDiscardSwapCallTiles(t *testing.T) {
+	handTiles := []tile.Tile{
+		*tile.MustTileFromCode("1m"), *tile.MustTileFromCode("2m"), *tile.MustTileFromCode("3m"),
+		*tile.MustTileFromCode("4p"), *tile.MustTileFromCode("5pr"), *tile.MustTileFromCode("6p"),
+		*tile.MustTileFromCode("7s"), *tile.MustTileFromCode("8s"), *tile.MustTileFromCode("9s"),
+		*tile.MustTileFromCode("5p"), *tile.MustTileFromCode("5p"), *tile.MustTileFromCode("S"),
+		*tile.MustTileFromCode("W"),
+	}
+
+	p, err := player.NewVisiblePlayer(handTiles)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+
+	pon := meld.MustPon(
+		*tile.MustTileFromCode("5p"),
+		[2]tile.Tile{*tile.MustTileFromCode("5p"), *tile.MustTileFromCode("5p")},
+		*id.MustID(0),
+	)
+	if err := p.Pon(*pon); err != nil {
+		t.Fatalf("unexpected error on Pon: %v", err)
+	}
+
+	discardedTile := tile.MustTileFromCode("5pr")
+	if err := p.Discard(*discardedTile, false); err == nil {
+		t.Errorf("Discard should fail when the player discards a swap call tile")
+	}
+}
+
 func TestVisiblePlayer_Pon_Success(t *testing.T) {
 	handTiles := []tile.Tile{
 		*tile.MustTileFromCode("1m"), *tile.MustTileFromCode("2m"), *tile.MustTileFromCode("3m"),

@@ -22,6 +22,7 @@ type VisiblePlayer struct {
 	riichiRiverIndex          int
 	riichiDiscardedTilesIndex int
 	isConcealed               bool
+	swapCallTiles             []tile.Tile
 
 	isAfterChiiPonBeforeDiscard bool
 }
@@ -47,6 +48,7 @@ func NewVisiblePlayer(handTiles []tile.Tile) (*VisiblePlayer, error) {
 		riichiRiverIndex:          -1,
 		riichiDiscardedTilesIndex: -1,
 		isConcealed:               true,
+		swapCallTiles:             nil,
 
 		isAfterChiiPonBeforeDiscard: false,
 	}, nil
@@ -122,8 +124,6 @@ func (p *VisiblePlayer) Discard(t tile.Tile, tsumogiri bool) error {
 		return fmt.Errorf("cannot Discard: player is not in a discardable state")
 	}
 
-	// TODO: 喰い替え牌は打牌できないようにする
-
 	if tsumogiri {
 		if t != *p.drawnTile {
 			return fmt.Errorf("cannot Discard: tsumogiri tile (%s) must equal the drawn tile (%s)", t, p.drawnTile)
@@ -134,6 +134,12 @@ func (p *VisiblePlayer) Discard(t tile.Tile, tsumogiri bool) error {
 	} else {
 		if p.riichiState == RiichiAccepted {
 			return fmt.Errorf("cannot Discard: player has accepted riichi and cannot discard a tile from hand: %s", t)
+		}
+
+		for _, s := range p.swapCallTiles {
+			if t.HasSameSymbol(&s) {
+				return fmt.Errorf("")
+			}
 		}
 
 		newHand, err := p.hand.Discard(&t)
@@ -161,6 +167,7 @@ func (p *VisiblePlayer) Discard(t tile.Tile, tsumogiri bool) error {
 	p.drawnTile = nil
 	p.river = append(p.river, t)
 	p.discardedTiles = append(p.discardedTiles, t)
+	p.swapCallTiles = nil
 	p.isAfterChiiPonBeforeDiscard = false
 	return nil
 }
@@ -181,6 +188,7 @@ func (p *VisiblePlayer) Pon(pon meld.Pon) error {
 	p.hand = *h
 	p.melds = append(p.melds, &pon)
 	p.isConcealed = false
+	p.swapCallTiles = pon.SwapCallTiles()
 	p.isAfterChiiPonBeforeDiscard = true
 	return nil
 }
