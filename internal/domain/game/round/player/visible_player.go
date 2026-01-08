@@ -165,6 +165,9 @@ func (p *VisiblePlayer) Discard(t tile.Tile, tsumogiri bool) error {
 }
 
 func (p *VisiblePlayer) Pon(pon meld.Pon) error {
+	if p.riichiState != NotRiichi {
+		return fmt.Errorf("cannot Pon: player is already in riichi state (%v)", p.riichiState)
+	}
 	if p.CanDiscard() {
 		return fmt.Errorf("cannot Pon: player is in a discardable state")
 	}
