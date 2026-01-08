@@ -162,6 +162,12 @@ func (p *VisiblePlayer) Discard(t tile.Tile, tsumogiri bool) error {
 }
 
 func (p *VisiblePlayer) Pon(pon meld.Pon) error {
+	h, err := p.hand.Call(&pon)
+	if err != nil {
+		return err
+	}
+
+	p.hand = *h
 	p.melds = append(p.melds, &pon)
 	p.canDiscard = true
 	p.isConcealed = false
