@@ -743,6 +743,48 @@ func TestVisiblePlayer_Pon_CannotAfterRiichi(t *testing.T) {
 	}
 }
 
+func TestVisiblePlayer_Pon_Cannot5thCall(t *testing.T) {
+	handTiles := []tile.Tile{
+		*tile.MustTileFromCode("E"), *tile.MustTileFromCode("E"),
+		*tile.MustTileFromCode("S"), *tile.MustTileFromCode("S"),
+		*tile.MustTileFromCode("W"), *tile.MustTileFromCode("W"),
+		*tile.MustTileFromCode("N"), *tile.MustTileFromCode("N"),
+		*tile.MustTileFromCode("P"), *tile.MustTileFromCode("P"),
+		*tile.MustTileFromCode("P"), *tile.MustTileFromCode("P"),
+		*tile.MustTileFromCode("C"),
+	}
+
+	p, err := player.NewVisiblePlayer(handTiles)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+
+	for _, wind := range []string{"E", "S", "W", "N"} {
+		pon := meld.MustPon(
+			*tile.MustTileFromCode(wind),
+			[2]tile.Tile{*tile.MustTileFromCode(wind), *tile.MustTileFromCode(wind)},
+			*id.MustID(0),
+		)
+		if err := p.Pon(*pon); err != nil {
+			t.Fatalf("unexpected error on Pon: %v", err)
+		}
+
+		discardedTile := tile.MustTileFromCode("P")
+		if err := p.Discard(*discardedTile, false); err != nil {
+			t.Fatalf("unexpected error on Discard: %v", err)
+		}
+	}
+
+	pon := meld.MustPon(
+		*tile.MustTileFromCode("C"),
+		[2]tile.Tile{*tile.MustTileFromCode("C"), *tile.MustTileFromCode("C")},
+		*id.MustID(0),
+	)
+	if err := p.Pon(*pon); err == nil {
+		t.Errorf("Pon should fail when the player has four melds")
+	}
+}
+
 func TestVisiblePlayer_Riichi_Success(t *testing.T) {
 	handTiles := []tile.Tile{
 		*tile.MustTileFromCode("1m"), *tile.MustTileFromCode("2m"), *tile.MustTileFromCode("3m"),
