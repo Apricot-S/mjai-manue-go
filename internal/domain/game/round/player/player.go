@@ -24,38 +24,38 @@ const (
 )
 
 type PlayerViewer interface {
-	// Hand (手牌)
+	// Hand returns the hand (手牌).
 	// It does not include the drawn tile (ツモ牌).
 	Hand() (*hand.VisibleHand, bool)
 	HandTiles() []tile.Tile
-	// Drawn tile (ツモ牌)
-	// It is `nil` if the player does not have the drawn tile.
+	// DrawnTile returns the drawn tile (ツモ牌).
+	// It returns `nil` if the player does not have the drawn tile.
 	DrawnTile() *tile.Tile
-	// Melds (副露)
+	// Melds returns the melds (副露).
 	Melds() []meld.Meld
 
-	// River (河)
+	// River returns the River (河).
 	// It does not include the tiles that have been called.
 	River() []tile.Tile
-	// Discarded tiles (捨て牌)
+	// DiscardedTiles returns the discarded tiles (捨て牌).
 	// It includes the tiles that have been called.
 	DiscardedTiles() []tile.Tile
-	// Extra safe tiles (安全牌)
+	// ExtraSafeTiles returns Extra safe tiles (安全牌).
 	// The tiles that are safe in the same turn and the tiles that are safe after riichi.
 	ExtraSafeTiles() []tile.Tile
 
-	// Riichi state
+	// RiichiState returns the riichi state.
 	RiichiState() RiichiState
-	// The index of the riichi declaration tile in the river.
-	// It is -1 if the player has not declared riichi.
+	// RiichiRiverIndex returns the index of the riichi declaration tile in the river.
+	// It returns -1 if the player has not declared riichi.
 	RiichiRiverIndex() int
-	// The index of the riichi declaration tile in the discarded tiles.
-	// It is -1 if the player has not declared riichi.
+	// RiichiDiscardedTilesIndex returns the index of the riichi declaration tile in the discarded tiles.
+	// It returns -1 if the player has not declared riichi.
 	RiichiDiscardedTilesIndex() int
 
-	// Whether the player can discard a tile (打牌)
+	// CanDiscard returns whether the player can discard a tile (打牌).
 	CanDiscard() bool
-	// Whether the player hand is concealed (門前)
+	// IsConcealed returns whether the player hand is concealed (門前).
 	IsConcealed() bool
 }
 
