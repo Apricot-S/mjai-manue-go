@@ -167,6 +167,26 @@ func (p *VisiblePlayer) Discard(t tile.Tile, tsumogiri bool) error {
 	return nil
 }
 
+func (p *VisiblePlayer) Chii(chii meld.Chii) error {
+	if p.riichiState != NotRiichi {
+		return fmt.Errorf("cannot Chii: player is already in riichi state (%v)", p.riichiState)
+	}
+	if p.CanDiscard() {
+		return fmt.Errorf("cannot Chii: player is in a discardable state")
+	}
+
+	h, err := p.hand.Call(&chii)
+	if err != nil {
+		return err
+	}
+
+	p.hand = *h
+	p.melds = append(p.melds, &chii)
+	p.isConcealed = false
+	p.swapCallTiles = chii.SwapCallTiles()
+	return nil
+}
+
 func (p *VisiblePlayer) Pon(pon meld.Pon) error {
 	if p.riichiState != NotRiichi {
 		return fmt.Errorf("cannot Pon: player is already in riichi state (%v)", p.riichiState)
