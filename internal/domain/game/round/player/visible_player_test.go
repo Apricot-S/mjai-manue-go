@@ -904,3 +904,44 @@ func TestVisiblePlayer_AddExtraSafeTiles_Panic(t *testing.T) {
 		p.AddExtraSafeTiles(*tile.MustTileFromCode("?"))
 	})
 }
+
+func TestVisiblePlayer_TakeFromRiver(t *testing.T) {
+	handTiles := []tile.Tile{
+		*tile.MustTileFromCode("C"), *tile.MustTileFromCode("9s"), *tile.MustTileFromCode("4m"),
+		*tile.MustTileFromCode("2p"), *tile.MustTileFromCode("S"), *tile.MustTileFromCode("4p"),
+		*tile.MustTileFromCode("8s"), *tile.MustTileFromCode("6p"), *tile.MustTileFromCode("6s"),
+		*tile.MustTileFromCode("7m"), *tile.MustTileFromCode("9s"), *tile.MustTileFromCode("5pr"),
+		*tile.MustTileFromCode("5p"),
+	}
+
+	p, err := player.NewVisiblePlayer(handTiles)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+
+	drawnTile := tile.MustTileFromCode("P")
+	if err := p.Draw(*drawnTile); err != nil {
+		t.Fatalf("unexpected error on Draw: %v", err)
+	}
+
+	discardedTile := tile.MustTileFromCode("2p")
+	if err := p.Discard(*discardedTile, false); err != nil {
+		t.Fatalf("unexpected error on Discard: %v", err)
+	}
+
+	if err := p.TakeFromRiver(*discardedTile); err != nil {
+		t.Errorf("TakeFromRiver() failed: %v", err)
+	}
+
+	gotRiver := p.River()
+	wantRiver := []tile.Tile{}
+	if !reflect.DeepEqual(gotRiver, wantRiver) {
+		t.Errorf("River() mismatch after TakeFromRiver: got %v, want %v", gotRiver, wantRiver)
+	}
+
+	gotDiscardedTiles := p.DiscardedTiles()
+	wantDiscardedTiles := []tile.Tile{*discardedTile}
+	if !reflect.DeepEqual(gotDiscardedTiles, wantDiscardedTiles) {
+		t.Errorf("DiscardedTiles() mismatch after TakeFromRiver: got %v, want %v", gotDiscardedTiles, wantDiscardedTiles)
+	}
+}

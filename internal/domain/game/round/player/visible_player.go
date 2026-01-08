@@ -2,6 +2,7 @@ package player
 
 import (
 	"fmt"
+	"slices"
 	"sort"
 
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/round/player/hand"
@@ -196,4 +197,10 @@ func (p *VisiblePlayer) AddExtraSafeTiles(t tile.Tile) {
 	}
 
 	p.extraSafeTiles = append(p.extraSafeTiles, t)
+}
+
+func (p *VisiblePlayer) TakeFromRiver(t tile.Tile) error {
+	numRiver := len(p.river)
+	p.river = slices.Delete(p.river, numRiver-1, numRiver)
+	return nil
 }
