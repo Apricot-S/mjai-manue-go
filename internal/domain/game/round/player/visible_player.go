@@ -201,6 +201,11 @@ func (p *VisiblePlayer) AddExtraSafeTiles(t tile.Tile) {
 
 func (p *VisiblePlayer) TakeFromRiver(t tile.Tile) error {
 	numRiver := len(p.river)
+
+	if t != p.river[numRiver-1] {
+		return fmt.Errorf("cannot take tile %s; last river tile is %s", t, p.river[numRiver-1])
+	}
+
 	p.river = slices.Delete(p.river, numRiver-1, numRiver)
 	return nil
 }
