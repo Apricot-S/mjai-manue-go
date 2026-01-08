@@ -139,8 +139,11 @@ func (p *VisiblePlayer) Discard(t tile.Tile, tsumogiri bool) error {
 		if err != nil {
 			return err
 		}
-		if newHand, err = newHand.Draw(p.drawnTile); err != nil {
-			return err
+
+		if p.drawnTile != nil {
+			if newHand, err = newHand.Draw(p.drawnTile); err != nil {
+				return err
+			}
 		}
 
 		if p.riichiState == RiichiDeclared && !service.IsTenpaiAll(newHand) {
