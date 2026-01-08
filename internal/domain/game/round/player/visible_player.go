@@ -213,7 +213,7 @@ func (p *VisiblePlayer) Riichi() error {
 	if p.riichiState != NotRiichi {
 		return fmt.Errorf("cannot Riichi: player is already in riichi state (%v)", p.riichiState)
 	}
-	if !p.CanDiscard() {
+	if p.drawnTile == nil {
 		return fmt.Errorf("cannot Riichi: player is not in a discardable state")
 	}
 	if !p.isConcealed {
