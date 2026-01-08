@@ -25,12 +25,8 @@ type VisiblePlayer struct {
 	swapCallTiles             []tile.Tile
 }
 
-func NewVisiblePlayer(handTiles []tile.Tile) (*VisiblePlayer, error) {
-	if len(handTiles) != initHandSize {
-		return nil, fmt.Errorf("invalid number of hand tiles: got %d, want %d", len(handTiles), initHandSize)
-	}
-
-	h, err := hand.NewVisibleHand(handTiles)
+func NewVisiblePlayer(handTiles [initHandSize]tile.Tile) (*VisiblePlayer, error) {
+	h, err := hand.NewVisibleHand(handTiles[:])
 	if err != nil {
 		return nil, err
 	}

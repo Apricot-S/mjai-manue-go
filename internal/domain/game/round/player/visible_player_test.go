@@ -15,13 +15,13 @@ import (
 func TestNewVisiblePlayer(t *testing.T) {
 	tests := []struct {
 		name      string
-		handTiles []tile.Tile
+		handTiles [13]tile.Tile
 		wantHand  *hand.VisibleHand
 		wantErr   bool
 	}{
 		{
 			name: "valid",
-			handTiles: []tile.Tile{
+			handTiles: [13]tile.Tile{
 				*tile.MustTileFromCode("C"), *tile.MustTileFromCode("9s"), *tile.MustTileFromCode("4m"),
 				*tile.MustTileFromCode("2p"), *tile.MustTileFromCode("S"), *tile.MustTileFromCode("4p"),
 				*tile.MustTileFromCode("8s"), *tile.MustTileFromCode("6p"), *tile.MustTileFromCode("6s"),
@@ -32,31 +32,8 @@ func TestNewVisiblePlayer(t *testing.T) {
 			wantErr:  false,
 		},
 		{
-			name: "invalid: 12 tiles",
-			handTiles: []tile.Tile{
-				*tile.MustTileFromCode("C"), *tile.MustTileFromCode("9s"), *tile.MustTileFromCode("4m"),
-				*tile.MustTileFromCode("2p"), *tile.MustTileFromCode("S"), *tile.MustTileFromCode("4p"),
-				*tile.MustTileFromCode("8s"), *tile.MustTileFromCode("6p"), *tile.MustTileFromCode("6s"),
-				*tile.MustTileFromCode("7m"), *tile.MustTileFromCode("9s"), *tile.MustTileFromCode("5pr"),
-			},
-			wantHand: nil,
-			wantErr:  true,
-		},
-		{
-			name: "invalid: 14 tiles",
-			handTiles: []tile.Tile{
-				*tile.MustTileFromCode("C"), *tile.MustTileFromCode("9s"), *tile.MustTileFromCode("4m"),
-				*tile.MustTileFromCode("2p"), *tile.MustTileFromCode("S"), *tile.MustTileFromCode("4p"),
-				*tile.MustTileFromCode("8s"), *tile.MustTileFromCode("6p"), *tile.MustTileFromCode("6s"),
-				*tile.MustTileFromCode("7m"), *tile.MustTileFromCode("9s"), *tile.MustTileFromCode("5pr"),
-				*tile.MustTileFromCode("5p"), *tile.MustTileFromCode("1m"),
-			},
-			wantHand: nil,
-			wantErr:  true,
-		},
-		{
 			name: "invalid: unknown tiles",
-			handTiles: []tile.Tile{
+			handTiles: [13]tile.Tile{
 				*tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"),
 				*tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"),
 				*tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"),
@@ -139,7 +116,7 @@ func TestNewVisiblePlayer(t *testing.T) {
 }
 
 func TestVisiblePlayer_Draw_Success(t *testing.T) {
-	handTiles := []tile.Tile{
+	handTiles := [13]tile.Tile{
 		*tile.MustTileFromCode("C"), *tile.MustTileFromCode("9s"), *tile.MustTileFromCode("4m"),
 		*tile.MustTileFromCode("2p"), *tile.MustTileFromCode("S"), *tile.MustTileFromCode("4p"),
 		*tile.MustTileFromCode("8s"), *tile.MustTileFromCode("6p"), *tile.MustTileFromCode("6s"),
@@ -157,11 +134,11 @@ func TestVisiblePlayer_Draw_Success(t *testing.T) {
 		t.Fatalf("unexpected error: %v", err)
 	}
 
-	if h, _ := p.Hand(); *h != *hand.MustVisibleHand(handTiles) {
+	if h, _ := p.Hand(); *h != *hand.MustVisibleHand(handTiles[:]) {
 		t.Errorf("Hand() must remain unchanged after Draw(); got %+v", h)
 	}
 
-	sortedHandTiles := tile.Tiles(handTiles)
+	sortedHandTiles := tile.Tiles(handTiles[:])
 	sort.Sort(sortedHandTiles)
 	if !reflect.DeepEqual(p.HandTiles(), []tile.Tile(sortedHandTiles)) {
 		t.Errorf("HandTiles() must remain unchanged after Draw(); got %+v", p.HandTiles())
@@ -177,7 +154,7 @@ func TestVisiblePlayer_Draw_Success(t *testing.T) {
 }
 
 func TestVisiblePlayer_Draw_CannotDrawUnknown(t *testing.T) {
-	handTiles := []tile.Tile{
+	handTiles := [13]tile.Tile{
 		*tile.MustTileFromCode("C"), *tile.MustTileFromCode("9s"), *tile.MustTileFromCode("4m"),
 		*tile.MustTileFromCode("2p"), *tile.MustTileFromCode("S"), *tile.MustTileFromCode("4p"),
 		*tile.MustTileFromCode("8s"), *tile.MustTileFromCode("6p"), *tile.MustTileFromCode("6s"),
@@ -197,7 +174,7 @@ func TestVisiblePlayer_Draw_CannotDrawUnknown(t *testing.T) {
 }
 
 func TestVisiblePlayer_Draw_CannotDrawTwice(t *testing.T) {
-	handTiles := []tile.Tile{
+	handTiles := [13]tile.Tile{
 		*tile.MustTileFromCode("C"), *tile.MustTileFromCode("9s"), *tile.MustTileFromCode("4m"),
 		*tile.MustTileFromCode("2p"), *tile.MustTileFromCode("S"), *tile.MustTileFromCode("4p"),
 		*tile.MustTileFromCode("8s"), *tile.MustTileFromCode("6p"), *tile.MustTileFromCode("6s"),
@@ -222,7 +199,7 @@ func TestVisiblePlayer_Draw_CannotDrawTwice(t *testing.T) {
 }
 
 func TestVisiblePlayer_Draw_CannotDrawBeforeRiichiAccepted(t *testing.T) {
-	handTiles := []tile.Tile{
+	handTiles := [13]tile.Tile{
 		*tile.MustTileFromCode("1m"), *tile.MustTileFromCode("2m"), *tile.MustTileFromCode("3m"),
 		*tile.MustTileFromCode("4p"), *tile.MustTileFromCode("5p"), *tile.MustTileFromCode("6p"),
 		*tile.MustTileFromCode("7s"), *tile.MustTileFromCode("8s"), *tile.MustTileFromCode("9s"),
@@ -256,7 +233,7 @@ func TestVisiblePlayer_Draw_CannotDrawBeforeRiichiAccepted(t *testing.T) {
 }
 
 func TestVisiblePlayer_Discard_TileInHand(t *testing.T) {
-	handTiles := []tile.Tile{
+	handTiles := [13]tile.Tile{
 		*tile.MustTileFromCode("C"), *tile.MustTileFromCode("9s"), *tile.MustTileFromCode("4m"),
 		*tile.MustTileFromCode("2p"), *tile.MustTileFromCode("S"), *tile.MustTileFromCode("4p"),
 		*tile.MustTileFromCode("8s"), *tile.MustTileFromCode("6p"), *tile.MustTileFromCode("6s"),
@@ -316,7 +293,7 @@ func TestVisiblePlayer_Discard_TileInHand(t *testing.T) {
 }
 
 func TestVisiblePlayer_Discard_DrawnTile(t *testing.T) {
-	handTiles := []tile.Tile{
+	handTiles := [13]tile.Tile{
 		*tile.MustTileFromCode("C"), *tile.MustTileFromCode("9s"), *tile.MustTileFromCode("4m"),
 		*tile.MustTileFromCode("2p"), *tile.MustTileFromCode("S"), *tile.MustTileFromCode("4p"),
 		*tile.MustTileFromCode("8s"), *tile.MustTileFromCode("6p"), *tile.MustTileFromCode("6s"),
@@ -339,7 +316,7 @@ func TestVisiblePlayer_Discard_DrawnTile(t *testing.T) {
 		t.Errorf("unexpected error on Discard: %v", err)
 	}
 
-	afterHandTiles := tile.Tiles(handTiles)
+	afterHandTiles := tile.Tiles(handTiles[:])
 	sort.Sort(afterHandTiles)
 	h := hand.MustVisibleHand(afterHandTiles)
 
@@ -371,7 +348,7 @@ func TestVisiblePlayer_Discard_DrawnTile(t *testing.T) {
 }
 
 func TestVisiblePlayer_Discard_ClearExtraSafeTiles(t *testing.T) {
-	handTiles := []tile.Tile{
+	handTiles := [13]tile.Tile{
 		*tile.MustTileFromCode("C"), *tile.MustTileFromCode("9s"), *tile.MustTileFromCode("4m"),
 		*tile.MustTileFromCode("2p"), *tile.MustTileFromCode("S"), *tile.MustTileFromCode("4p"),
 		*tile.MustTileFromCode("8s"), *tile.MustTileFromCode("6p"), *tile.MustTileFromCode("6s"),
@@ -410,7 +387,7 @@ func TestVisiblePlayer_Discard_ClearExtraSafeTiles(t *testing.T) {
 }
 
 func TestVisiblePlayer_Discard_NotClearExtraSafeTilesAfterRiichi(t *testing.T) {
-	handTiles := []tile.Tile{
+	handTiles := [13]tile.Tile{
 		*tile.MustTileFromCode("1m"), *tile.MustTileFromCode("2m"), *tile.MustTileFromCode("3m"),
 		*tile.MustTileFromCode("4p"), *tile.MustTileFromCode("5p"), *tile.MustTileFromCode("6p"),
 		*tile.MustTileFromCode("7s"), *tile.MustTileFromCode("8s"), *tile.MustTileFromCode("9s"),
@@ -465,7 +442,7 @@ func TestVisiblePlayer_Discard_NotClearExtraSafeTilesAfterRiichi(t *testing.T) {
 }
 
 func TestVisiblePlayer_Discard_CannotDiscardBeforeDraw(t *testing.T) {
-	handTiles := []tile.Tile{
+	handTiles := [13]tile.Tile{
 		*tile.MustTileFromCode("C"), *tile.MustTileFromCode("9s"), *tile.MustTileFromCode("4m"),
 		*tile.MustTileFromCode("2p"), *tile.MustTileFromCode("S"), *tile.MustTileFromCode("4p"),
 		*tile.MustTileFromCode("8s"), *tile.MustTileFromCode("6p"), *tile.MustTileFromCode("6s"),
@@ -485,7 +462,7 @@ func TestVisiblePlayer_Discard_CannotDiscardBeforeDraw(t *testing.T) {
 }
 
 func TestVisiblePlayer_Discard_CannotDiscardUnknown(t *testing.T) {
-	handTiles := []tile.Tile{
+	handTiles := [13]tile.Tile{
 		*tile.MustTileFromCode("C"), *tile.MustTileFromCode("9s"), *tile.MustTileFromCode("4m"),
 		*tile.MustTileFromCode("2p"), *tile.MustTileFromCode("S"), *tile.MustTileFromCode("4p"),
 		*tile.MustTileFromCode("8s"), *tile.MustTileFromCode("6p"), *tile.MustTileFromCode("6s"),
@@ -510,7 +487,7 @@ func TestVisiblePlayer_Discard_CannotDiscardUnknown(t *testing.T) {
 }
 
 func TestVisiblePlayer_Discard_CannotDiscardTileNotInHand(t *testing.T) {
-	handTiles := []tile.Tile{
+	handTiles := [13]tile.Tile{
 		*tile.MustTileFromCode("C"), *tile.MustTileFromCode("9s"), *tile.MustTileFromCode("4m"),
 		*tile.MustTileFromCode("2p"), *tile.MustTileFromCode("S"), *tile.MustTileFromCode("4p"),
 		*tile.MustTileFromCode("8s"), *tile.MustTileFromCode("6p"), *tile.MustTileFromCode("6s"),
@@ -535,7 +512,7 @@ func TestVisiblePlayer_Discard_CannotDiscardTileNotInHand(t *testing.T) {
 }
 
 func TestVisiblePlayer_Discard_CannotDiscardTileNotDrawnTile(t *testing.T) {
-	handTiles := []tile.Tile{
+	handTiles := [13]tile.Tile{
 		*tile.MustTileFromCode("C"), *tile.MustTileFromCode("9s"), *tile.MustTileFromCode("4m"),
 		*tile.MustTileFromCode("2p"), *tile.MustTileFromCode("S"), *tile.MustTileFromCode("4p"),
 		*tile.MustTileFromCode("8s"), *tile.MustTileFromCode("6p"), *tile.MustTileFromCode("6s"),
@@ -560,7 +537,7 @@ func TestVisiblePlayer_Discard_CannotDiscardTileNotDrawnTile(t *testing.T) {
 }
 
 func TestVisiblePlayer_Discard_CannotDiscardNotRiichiDeclarationTile(t *testing.T) {
-	handTiles := []tile.Tile{
+	handTiles := [13]tile.Tile{
 		*tile.MustTileFromCode("1m"), *tile.MustTileFromCode("2m"), *tile.MustTileFromCode("3m"),
 		*tile.MustTileFromCode("4p"), *tile.MustTileFromCode("5p"), *tile.MustTileFromCode("6p"),
 		*tile.MustTileFromCode("7s"), *tile.MustTileFromCode("8s"), *tile.MustTileFromCode("9s"),
@@ -589,7 +566,7 @@ func TestVisiblePlayer_Discard_CannotDiscardNotRiichiDeclarationTile(t *testing.
 }
 
 func TestVisiblePlayer_Discard_CannotDiscardFromHandAfterRiichi(t *testing.T) {
-	handTiles := []tile.Tile{
+	handTiles := [13]tile.Tile{
 		*tile.MustTileFromCode("1m"), *tile.MustTileFromCode("2m"), *tile.MustTileFromCode("3m"),
 		*tile.MustTileFromCode("4p"), *tile.MustTileFromCode("5p"), *tile.MustTileFromCode("6p"),
 		*tile.MustTileFromCode("7s"), *tile.MustTileFromCode("8s"), *tile.MustTileFromCode("9s"),
@@ -632,7 +609,7 @@ func TestVisiblePlayer_Discard_CannotDiscardFromHandAfterRiichi(t *testing.T) {
 }
 
 func TestVisiblePlayer_Discard_CannotDiscardSwapCallTiles(t *testing.T) {
-	handTiles := []tile.Tile{
+	handTiles := [13]tile.Tile{
 		*tile.MustTileFromCode("1m"), *tile.MustTileFromCode("2m"), *tile.MustTileFromCode("3m"),
 		*tile.MustTileFromCode("4p"), *tile.MustTileFromCode("5pr"), *tile.MustTileFromCode("6p"),
 		*tile.MustTileFromCode("7s"), *tile.MustTileFromCode("8s"), *tile.MustTileFromCode("9s"),
@@ -661,7 +638,7 @@ func TestVisiblePlayer_Discard_CannotDiscardSwapCallTiles(t *testing.T) {
 }
 
 func TestVisiblePlayer_Chii_Success(t *testing.T) {
-	handTiles := []tile.Tile{
+	handTiles := [13]tile.Tile{
 		*tile.MustTileFromCode("1m"), *tile.MustTileFromCode("2m"), *tile.MustTileFromCode("3m"),
 		*tile.MustTileFromCode("4p"), *tile.MustTileFromCode("5p"), *tile.MustTileFromCode("6p"),
 		*tile.MustTileFromCode("7s"), *tile.MustTileFromCode("8s"), *tile.MustTileFromCode("9s"),
@@ -702,7 +679,7 @@ func TestVisiblePlayer_Chii_Success(t *testing.T) {
 }
 
 func TestVisiblePlayer_Pon_Success(t *testing.T) {
-	handTiles := []tile.Tile{
+	handTiles := [13]tile.Tile{
 		*tile.MustTileFromCode("1m"), *tile.MustTileFromCode("2m"), *tile.MustTileFromCode("3m"),
 		*tile.MustTileFromCode("4p"), *tile.MustTileFromCode("5p"), *tile.MustTileFromCode("6p"),
 		*tile.MustTileFromCode("7s"), *tile.MustTileFromCode("8s"), *tile.MustTileFromCode("9s"),
@@ -743,7 +720,7 @@ func TestVisiblePlayer_Pon_Success(t *testing.T) {
 }
 
 func TestVisiblePlayer_Pon_CannotAfterDraw(t *testing.T) {
-	handTiles := []tile.Tile{
+	handTiles := [13]tile.Tile{
 		*tile.MustTileFromCode("1m"), *tile.MustTileFromCode("2m"), *tile.MustTileFromCode("3m"),
 		*tile.MustTileFromCode("4p"), *tile.MustTileFromCode("5p"), *tile.MustTileFromCode("6p"),
 		*tile.MustTileFromCode("7s"), *tile.MustTileFromCode("8s"), *tile.MustTileFromCode("9s"),
@@ -772,7 +749,7 @@ func TestVisiblePlayer_Pon_CannotAfterDraw(t *testing.T) {
 }
 
 func TestVisiblePlayer_Pon_CannotAfterRiichi(t *testing.T) {
-	handTiles := []tile.Tile{
+	handTiles := [13]tile.Tile{
 		*tile.MustTileFromCode("1m"), *tile.MustTileFromCode("2m"), *tile.MustTileFromCode("3m"),
 		*tile.MustTileFromCode("4p"), *tile.MustTileFromCode("5p"), *tile.MustTileFromCode("6p"),
 		*tile.MustTileFromCode("7s"), *tile.MustTileFromCode("8s"), *tile.MustTileFromCode("9s"),
@@ -814,7 +791,7 @@ func TestVisiblePlayer_Pon_CannotAfterRiichi(t *testing.T) {
 }
 
 func TestVisiblePlayer_Pon_Cannot5thCall(t *testing.T) {
-	handTiles := []tile.Tile{
+	handTiles := [13]tile.Tile{
 		*tile.MustTileFromCode("E"), *tile.MustTileFromCode("E"),
 		*tile.MustTileFromCode("S"), *tile.MustTileFromCode("S"),
 		*tile.MustTileFromCode("W"), *tile.MustTileFromCode("W"),
@@ -856,7 +833,7 @@ func TestVisiblePlayer_Pon_Cannot5thCall(t *testing.T) {
 }
 
 func TestVisiblePlayer_Riichi_Success(t *testing.T) {
-	handTiles := []tile.Tile{
+	handTiles := [13]tile.Tile{
 		*tile.MustTileFromCode("1m"), *tile.MustTileFromCode("2m"), *tile.MustTileFromCode("3m"),
 		*tile.MustTileFromCode("4p"), *tile.MustTileFromCode("5p"), *tile.MustTileFromCode("6p"),
 		*tile.MustTileFromCode("7s"), *tile.MustTileFromCode("8s"), *tile.MustTileFromCode("9s"),
@@ -894,7 +871,7 @@ func TestVisiblePlayer_Riichi_Success(t *testing.T) {
 }
 
 func TestVisiblePlayer_Riichi_CannotDeclareTwice(t *testing.T) {
-	handTiles := []tile.Tile{
+	handTiles := [13]tile.Tile{
 		*tile.MustTileFromCode("1m"), *tile.MustTileFromCode("2m"), *tile.MustTileFromCode("3m"),
 		*tile.MustTileFromCode("4p"), *tile.MustTileFromCode("5p"), *tile.MustTileFromCode("6p"),
 		*tile.MustTileFromCode("7s"), *tile.MustTileFromCode("8s"), *tile.MustTileFromCode("9s"),
@@ -922,7 +899,7 @@ func TestVisiblePlayer_Riichi_CannotDeclareTwice(t *testing.T) {
 }
 
 func TestVisiblePlayer_Riichi_CannotDeclareBeforeDraw(t *testing.T) {
-	handTiles := []tile.Tile{
+	handTiles := [13]tile.Tile{
 		*tile.MustTileFromCode("1m"), *tile.MustTileFromCode("2m"), *tile.MustTileFromCode("3m"),
 		*tile.MustTileFromCode("4p"), *tile.MustTileFromCode("5p"), *tile.MustTileFromCode("6p"),
 		*tile.MustTileFromCode("7s"), *tile.MustTileFromCode("8s"), *tile.MustTileFromCode("9s"),
@@ -941,7 +918,7 @@ func TestVisiblePlayer_Riichi_CannotDeclareBeforeDraw(t *testing.T) {
 }
 
 func TestVisiblePlayer_Riichi_CannotDeclareWithOpenMeld(t *testing.T) {
-	handTiles := []tile.Tile{
+	handTiles := [13]tile.Tile{
 		*tile.MustTileFromCode("1m"), *tile.MustTileFromCode("2m"), *tile.MustTileFromCode("3m"),
 		*tile.MustTileFromCode("4p"), *tile.MustTileFromCode("5p"), *tile.MustTileFromCode("6p"),
 		*tile.MustTileFromCode("7s"), *tile.MustTileFromCode("8s"), *tile.MustTileFromCode("9s"),
@@ -979,7 +956,7 @@ func TestVisiblePlayer_Riichi_CannotDeclareWithOpenMeld(t *testing.T) {
 }
 
 func TestVisiblePlayer_Riichi_CannotDeclareNotTenpai(t *testing.T) {
-	handTiles := []tile.Tile{
+	handTiles := [13]tile.Tile{
 		*tile.MustTileFromCode("1m"), *tile.MustTileFromCode("2m"), *tile.MustTileFromCode("3m"),
 		*tile.MustTileFromCode("4p"), *tile.MustTileFromCode("5p"), *tile.MustTileFromCode("6p"),
 		*tile.MustTileFromCode("7s"), *tile.MustTileFromCode("8s"), *tile.MustTileFromCode("9s"),
@@ -1003,7 +980,7 @@ func TestVisiblePlayer_Riichi_CannotDeclareNotTenpai(t *testing.T) {
 }
 
 func TestVisiblePlayer_RiichiAccepted_Success(t *testing.T) {
-	handTiles := []tile.Tile{
+	handTiles := [13]tile.Tile{
 		*tile.MustTileFromCode("1m"), *tile.MustTileFromCode("2m"), *tile.MustTileFromCode("3m"),
 		*tile.MustTileFromCode("4p"), *tile.MustTileFromCode("5p"), *tile.MustTileFromCode("6p"),
 		*tile.MustTileFromCode("7s"), *tile.MustTileFromCode("8s"), *tile.MustTileFromCode("9s"),
@@ -1051,7 +1028,7 @@ func TestVisiblePlayer_RiichiAccepted_Success(t *testing.T) {
 }
 
 func TestVisiblePlayer_RiichiAccepted_CannotAcceptTwice(t *testing.T) {
-	handTiles := []tile.Tile{
+	handTiles := [13]tile.Tile{
 		*tile.MustTileFromCode("1m"), *tile.MustTileFromCode("2m"), *tile.MustTileFromCode("3m"),
 		*tile.MustTileFromCode("4p"), *tile.MustTileFromCode("5p"), *tile.MustTileFromCode("6p"),
 		*tile.MustTileFromCode("7s"), *tile.MustTileFromCode("8s"), *tile.MustTileFromCode("9s"),
@@ -1088,7 +1065,7 @@ func TestVisiblePlayer_RiichiAccepted_CannotAcceptTwice(t *testing.T) {
 }
 
 func TestVisiblePlayer_RiichiAccepted_NotRiichi(t *testing.T) {
-	handTiles := []tile.Tile{
+	handTiles := [13]tile.Tile{
 		*tile.MustTileFromCode("1m"), *tile.MustTileFromCode("2m"), *tile.MustTileFromCode("3m"),
 		*tile.MustTileFromCode("4p"), *tile.MustTileFromCode("5p"), *tile.MustTileFromCode("6p"),
 		*tile.MustTileFromCode("7s"), *tile.MustTileFromCode("8s"), *tile.MustTileFromCode("9s"),
@@ -1117,7 +1094,7 @@ func TestVisiblePlayer_RiichiAccepted_NotRiichi(t *testing.T) {
 }
 
 func TestVisiblePlayer_AddExtraSafeTiles(t *testing.T) {
-	handTiles := []tile.Tile{
+	handTiles := [13]tile.Tile{
 		*tile.MustTileFromCode("C"), *tile.MustTileFromCode("9s"), *tile.MustTileFromCode("4m"),
 		*tile.MustTileFromCode("2p"), *tile.MustTileFromCode("S"), *tile.MustTileFromCode("4p"),
 		*tile.MustTileFromCode("8s"), *tile.MustTileFromCode("6p"), *tile.MustTileFromCode("6s"),
@@ -1146,7 +1123,7 @@ func TestVisiblePlayer_AddExtraSafeTiles(t *testing.T) {
 }
 
 func TestVisiblePlayer_AddExtraSafeTiles_Panic(t *testing.T) {
-	handTiles := []tile.Tile{
+	handTiles := [13]tile.Tile{
 		*tile.MustTileFromCode("C"), *tile.MustTileFromCode("9s"), *tile.MustTileFromCode("4m"),
 		*tile.MustTileFromCode("2p"), *tile.MustTileFromCode("S"), *tile.MustTileFromCode("4p"),
 		*tile.MustTileFromCode("8s"), *tile.MustTileFromCode("6p"), *tile.MustTileFromCode("6s"),
@@ -1171,7 +1148,7 @@ func TestVisiblePlayer_AddExtraSafeTiles_Panic(t *testing.T) {
 }
 
 func TestVisiblePlayer_TakeFromRiver(t *testing.T) {
-	handTiles := []tile.Tile{
+	handTiles := [13]tile.Tile{
 		*tile.MustTileFromCode("C"), *tile.MustTileFromCode("9s"), *tile.MustTileFromCode("4m"),
 		*tile.MustTileFromCode("2p"), *tile.MustTileFromCode("S"), *tile.MustTileFromCode("4p"),
 		*tile.MustTileFromCode("8s"), *tile.MustTileFromCode("6p"), *tile.MustTileFromCode("6s"),
@@ -1212,7 +1189,7 @@ func TestVisiblePlayer_TakeFromRiver(t *testing.T) {
 }
 
 func TestVisiblePlayer_TakeFromRiver_Mismatch(t *testing.T) {
-	handTiles := []tile.Tile{
+	handTiles := [13]tile.Tile{
 		*tile.MustTileFromCode("C"), *tile.MustTileFromCode("9s"), *tile.MustTileFromCode("4m"),
 		*tile.MustTileFromCode("2p"), *tile.MustTileFromCode("S"), *tile.MustTileFromCode("4p"),
 		*tile.MustTileFromCode("8s"), *tile.MustTileFromCode("6p"), *tile.MustTileFromCode("6s"),
@@ -1242,7 +1219,7 @@ func TestVisiblePlayer_TakeFromRiver_Mismatch(t *testing.T) {
 }
 
 func TestVisiblePlayer_TakeFromRiver_Unknown(t *testing.T) {
-	handTiles := []tile.Tile{
+	handTiles := [13]tile.Tile{
 		*tile.MustTileFromCode("C"), *tile.MustTileFromCode("9s"), *tile.MustTileFromCode("4m"),
 		*tile.MustTileFromCode("2p"), *tile.MustTileFromCode("S"), *tile.MustTileFromCode("4p"),
 		*tile.MustTileFromCode("8s"), *tile.MustTileFromCode("6p"), *tile.MustTileFromCode("6s"),
