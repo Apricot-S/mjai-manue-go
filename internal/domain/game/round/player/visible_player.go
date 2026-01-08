@@ -162,6 +162,10 @@ func (p *VisiblePlayer) Discard(t tile.Tile, tsumogiri bool) error {
 }
 
 func (p *VisiblePlayer) Pon(pon meld.Pon) error {
+	if p.CanDiscard() {
+		return fmt.Errorf("cannot Pon: player is in a discardable state")
+	}
+
 	h, err := p.hand.Call(&pon)
 	if err != nil {
 		return err
