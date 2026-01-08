@@ -188,7 +188,9 @@ func (p *VisiblePlayer) Riichi() error {
 	if !p.CanDiscard() {
 		return fmt.Errorf("cannot Riichi: player is not in a discardable state")
 	}
-	// TODO: 副露後は立直を許可しない
+	if !p.isConcealed {
+		return fmt.Errorf("cannot Riichi: player hand is not concealed")
+	}
 
 	h, err := p.hand.Draw(p.drawnTile)
 	if err != nil {
