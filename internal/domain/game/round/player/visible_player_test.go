@@ -6,6 +6,7 @@ import (
 	"sort"
 	"testing"
 
+	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/id"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/round/player"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/round/player/hand"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/round/player/meld"
@@ -628,7 +629,39 @@ func TestVisiblePlayer_Discard_CannotDiscardFromHandAfterRiichi(t *testing.T) {
 	}
 }
 
-func TestVisiblePlayer_Pon_Success(t *testing.T) {}
+func TestVisiblePlayer_Pon_Success(t *testing.T) {
+	handTiles := []tile.Tile{
+		*tile.MustTileFromCode("1m"), *tile.MustTileFromCode("2m"), *tile.MustTileFromCode("3m"),
+		*tile.MustTileFromCode("4p"), *tile.MustTileFromCode("5p"), *tile.MustTileFromCode("6p"),
+		*tile.MustTileFromCode("7s"), *tile.MustTileFromCode("8s"), *tile.MustTileFromCode("9s"),
+		*tile.MustTileFromCode("E"), *tile.MustTileFromCode("E"), *tile.MustTileFromCode("S"),
+		*tile.MustTileFromCode("W"),
+	}
+
+	p, err := player.NewVisiblePlayer(handTiles)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+
+	pon := meld.MustPon(
+		*tile.MustTileFromCode("E"),
+		[2]tile.Tile{*tile.MustTileFromCode("E"), *tile.MustTileFromCode("E")},
+		*id.MustID(0),
+	)
+	if err := p.Pon(*pon); err != nil {
+		t.Errorf("Pon() failed: %v", err)
+	}
+
+	wantHand := hand.CodesToHand([]string{"1m", "2m", "3m", "4p", "5p", "6p", "7s", "8s", "9s", "S", "W"})
+	if h, _ := p.Hand(); *h != *wantHand {
+		t.Errorf("Hand() = %v, want %v", h, wantHand)
+	}
+
+	wantMelds := []meld.Meld{pon}
+	if !reflect.DeepEqual(p.Melds(), wantMelds) {
+		t.Errorf("Hand() = %v, want %v", p.Melds(), wantMelds)
+	}
+}
 
 func TestVisiblePlayer_Riichi_Success(t *testing.T) {
 	handTiles := []tile.Tile{
