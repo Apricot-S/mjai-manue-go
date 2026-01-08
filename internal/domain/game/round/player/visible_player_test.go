@@ -2,7 +2,6 @@ package player_test
 
 import (
 	"reflect"
-	"slices"
 	"sort"
 	"testing"
 
@@ -280,10 +279,13 @@ func TestVisiblePlayer_Discard_TileInHand(t *testing.T) {
 		t.Errorf("unexpected error on Discard: %v", err)
 	}
 
-	afterHandTiles := tile.Tiles(append(handTiles, *drawnTile))
-	afterHandTiles = slices.DeleteFunc(afterHandTiles, func(t tile.Tile) bool { return t == *discardedTile })
-	afterHandTiles = tile.Tiles(afterHandTiles)
-	sort.Sort(afterHandTiles)
+	afterHandTiles := []tile.Tile{
+		*tile.MustTileFromCode("1m"), *tile.MustTileFromCode("4m"), *tile.MustTileFromCode("7m"),
+		*tile.MustTileFromCode("2p"), *tile.MustTileFromCode("4p"), *tile.MustTileFromCode("5p"),
+		*tile.MustTileFromCode("5pr"), *tile.MustTileFromCode("6p"), *tile.MustTileFromCode("6s"),
+		*tile.MustTileFromCode("8s"), *tile.MustTileFromCode("9s"), *tile.MustTileFromCode("9s"),
+		*tile.MustTileFromCode("S"),
+	}
 	h := hand.MustVisibleHand(afterHandTiles)
 
 	if gotHand, _ := p.Hand(); *gotHand != *h {
