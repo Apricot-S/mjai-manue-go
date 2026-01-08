@@ -21,8 +21,9 @@ type VisiblePlayer struct {
 	riichiState               RiichiState
 	riichiRiverIndex          int
 	riichiDiscardedTilesIndex int
-	canDiscard                bool
 	isConcealed               bool
+
+	isAfterChiiPonBeforeDiscard bool
 }
 
 func NewVisiblePlayer(handTiles []tile.Tile) (*VisiblePlayer, error) {
@@ -45,8 +46,9 @@ func NewVisiblePlayer(handTiles []tile.Tile) (*VisiblePlayer, error) {
 		riichiState:               NotRiichi,
 		riichiRiverIndex:          -1,
 		riichiDiscardedTilesIndex: -1,
-		canDiscard:                false,
 		isConcealed:               true,
+
+		isAfterChiiPonBeforeDiscard: false,
 	}, nil
 }
 
@@ -93,7 +95,7 @@ func (p *VisiblePlayer) RiichiDiscardedTilesIndex() int {
 }
 
 func (p *VisiblePlayer) CanDiscard() bool {
-	return p.canDiscard
+	return p.drawnTile != nil || p.isAfterChiiPonBeforeDiscard
 }
 
 func (p *VisiblePlayer) IsConcealed() bool {
@@ -112,7 +114,6 @@ func (p *VisiblePlayer) Draw(t tile.Tile) error {
 	}
 
 	p.drawnTile = &t
-	p.canDiscard = true
 	return nil
 }
 
@@ -160,7 +161,7 @@ func (p *VisiblePlayer) Discard(t tile.Tile, tsumogiri bool) error {
 	p.drawnTile = nil
 	p.river = append(p.river, t)
 	p.discardedTiles = append(p.discardedTiles, t)
-	p.canDiscard = false
+	p.isAfterChiiPonBeforeDiscard = false
 	return nil
 }
 
@@ -179,8 +180,8 @@ func (p *VisiblePlayer) Pon(pon meld.Pon) error {
 
 	p.hand = *h
 	p.melds = append(p.melds, &pon)
-	p.canDiscard = true
 	p.isConcealed = false
+	p.isAfterChiiPonBeforeDiscard = true
 	return nil
 }
 
