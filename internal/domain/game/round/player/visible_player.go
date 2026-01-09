@@ -225,6 +225,10 @@ func (p *VisiblePlayer) Pon(pon meld.Pon) error {
 }
 
 func (p *VisiblePlayer) CalledKan(kan meld.CalledKan) error {
+	if p.CanDiscard() {
+		return fmt.Errorf("cannot CalledKan: player is in a discardable state")
+	}
+
 	h, err := p.hand.Call(&kan)
 	if err != nil {
 		return err
