@@ -93,7 +93,7 @@ func (p *VisiblePlayer) CanDiscard() bool {
 }
 
 func (p *VisiblePlayer) CanChiiPonKan() bool {
-	return !p.CanDiscard()
+	return !p.CanDiscard() && len(p.Melds()) < 4
 }
 
 func (p *VisiblePlayer) IsConcealed() bool {
