@@ -61,6 +61,8 @@ type PlayerViewer interface {
 
 	// CanDiscard returns whether the player can discard a tile (打牌).
 	CanDiscard() bool
+	// CanChiiPonKan returns whether the player can chii/pon/called kan.
+	CanChiiPonKan() bool
 	// IsConcealed returns whether the player hand is concealed (門前).
 	IsConcealed() bool
 }

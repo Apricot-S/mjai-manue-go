@@ -92,6 +92,10 @@ func (p *VisiblePlayer) CanDiscard() bool {
 	return p.drawnTile != nil || p.swapCallTiles != nil
 }
 
+func (p *VisiblePlayer) CanChiiPonKan() bool {
+	return !p.CanDiscard()
+}
+
 func (p *VisiblePlayer) IsConcealed() bool {
 	return p.isConcealed
 }
@@ -167,7 +171,7 @@ func (p *VisiblePlayer) Chii(chii meld.Chii) error {
 	if p.riichiState != NotRiichi {
 		return fmt.Errorf("cannot Chii: player is already in riichi state (%v)", p.riichiState)
 	}
-	if p.CanDiscard() {
+	if !p.CanChiiPonKan() {
 		return fmt.Errorf("cannot Chii: player is in a discardable state")
 	}
 
@@ -208,7 +212,7 @@ func (p *VisiblePlayer) Pon(pon meld.Pon) error {
 	if p.riichiState != NotRiichi {
 		return fmt.Errorf("cannot Pon: player is already in riichi state (%v)", p.riichiState)
 	}
-	if p.CanDiscard() {
+	if !p.CanChiiPonKan() {
 		return fmt.Errorf("cannot Pon: player is in a discardable state")
 	}
 
@@ -228,7 +232,7 @@ func (p *VisiblePlayer) CalledKan(kan meld.CalledKan) error {
 	if p.riichiState != NotRiichi {
 		return fmt.Errorf("cannot CalledKan: player is already in riichi state (%v)", p.riichiState)
 	}
-	if p.CanDiscard() {
+	if !p.CanChiiPonKan() {
 		return fmt.Errorf("cannot CalledKan: player is in a discardable state")
 	}
 
