@@ -154,6 +154,9 @@ func TestVisiblePlayer_Draw_Success(t *testing.T) {
 	if !p.CanDiscard() {
 		t.Errorf("player must be able to discard after Draw; CanDiscard() returned false")
 	}
+	if p.CanChiiPonKan() {
+		t.Errorf("player must not be able to call after Draw; CanChiiPonKan() returned true")
+	}
 }
 
 func TestVisiblePlayer_Draw_CannotDrawUnknown(t *testing.T) {
@@ -293,6 +296,9 @@ func TestVisiblePlayer_Discard_TileInHand(t *testing.T) {
 	if p.CanDiscard() {
 		t.Errorf("CanDiscard() should be false after Discard; got true")
 	}
+	if !p.CanChiiPonKan() {
+		t.Errorf("CanChiiPonKan() should be true after Discard; got false")
+	}
 }
 
 func TestVisiblePlayer_Discard_DrawnTile(t *testing.T) {
@@ -347,6 +353,9 @@ func TestVisiblePlayer_Discard_DrawnTile(t *testing.T) {
 
 	if p.CanDiscard() {
 		t.Errorf("CanDiscard() should be false after Discard; got true")
+	}
+	if !p.CanChiiPonKan() {
+		t.Errorf("CanChiiPonKan() should be true after Discard; got false")
 	}
 }
 
@@ -676,6 +685,9 @@ func TestVisiblePlayer_Chii_Success(t *testing.T) {
 	if !p.CanDiscard() {
 		t.Errorf("CanDiscard() = %v, want %v", p.CanDiscard(), true)
 	}
+	if p.CanChiiPonKan() {
+		t.Errorf("CanChiiPonKan() = %v, want %v", p.CanChiiPonKan(), false)
+	}
 	if p.IsConcealed() {
 		t.Errorf("IsConcealed() = %v, want %v", p.IsConcealed(), false)
 	}
@@ -878,6 +890,9 @@ func TestVisiblePlayer_Pon_Success(t *testing.T) {
 	if !p.CanDiscard() {
 		t.Errorf("CanDiscard() = %v, want %v", p.CanDiscard(), true)
 	}
+	if p.CanChiiPonKan() {
+		t.Errorf("CanChiiPonKan() = %v, want %v", p.CanChiiPonKan(), false)
+	}
 	if p.IsConcealed() {
 		t.Errorf("IsConcealed() = %v, want %v", p.IsConcealed(), false)
 	}
@@ -1031,6 +1046,9 @@ func TestVisiblePlayer_CalledKan_Success(t *testing.T) {
 
 	if p.CanDiscard() {
 		t.Errorf("CanDiscard() = %v, want %v", p.CanDiscard(), false)
+	}
+	if p.CanChiiPonKan() {
+		t.Errorf("CanChiiPonKan() = %v, want %v", p.CanChiiPonKan(), false)
 	}
 	if p.IsConcealed() {
 		t.Errorf("IsConcealed() = %v, want %v", p.IsConcealed(), false)
