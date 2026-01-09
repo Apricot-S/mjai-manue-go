@@ -752,6 +752,39 @@ func TestVisiblePlayer_Chii_CannotAfterRiichi(t *testing.T) {
 	}
 }
 
+func TestVisiblePlayer_Chii_CannotAfterKan(t *testing.T) {
+	handTiles := [13]tile.Tile{
+		*tile.MustTileFromCode("1m"), *tile.MustTileFromCode("2m"), *tile.MustTileFromCode("3m"),
+		*tile.MustTileFromCode("4p"), *tile.MustTileFromCode("5p"), *tile.MustTileFromCode("6p"),
+		*tile.MustTileFromCode("7s"), *tile.MustTileFromCode("8s"), *tile.MustTileFromCode("9s"),
+		*tile.MustTileFromCode("E"), *tile.MustTileFromCode("E"), *tile.MustTileFromCode("E"),
+		*tile.MustTileFromCode("W"),
+	}
+
+	p, err := player.NewVisiblePlayer(handTiles)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+
+	kan := meld.MustCalledKan(
+		*tile.MustTileFromCode("E"),
+		[3]tile.Tile{*tile.MustTileFromCode("E"), *tile.MustTileFromCode("E"), *tile.MustTileFromCode("E")},
+		*id.MustID(0),
+	)
+	if err := p.CalledKan(*kan); err != nil {
+		t.Fatalf("unexpected error on CalledKan: %v", err)
+	}
+
+	chii := meld.MustChii(
+		*tile.MustTileFromCode("4m"),
+		[2]tile.Tile{*tile.MustTileFromCode("2m"), *tile.MustTileFromCode("3m")},
+		*id.MustID(0),
+	)
+	if err := p.Chii(*chii); err == nil {
+		t.Errorf("Chii should fail when the player is in after kan state")
+	}
+}
+
 func TestVisiblePlayer_Chii_CannotWhenRemainingIsOnlySwapCallTiles(t *testing.T) {
 	handTiles := [13]tile.Tile{
 		*tile.MustTileFromCode("2m"), *tile.MustTileFromCode("2m"), *tile.MustTileFromCode("2m"),

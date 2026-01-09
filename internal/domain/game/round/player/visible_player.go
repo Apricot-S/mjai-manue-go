@@ -23,6 +23,7 @@ type VisiblePlayer struct {
 	riichiDiscardedTilesIndex int
 	isConcealed               bool
 	swapCallTiles             []tile.Tile
+	needsDeadWallDraw         bool
 }
 
 func NewVisiblePlayer(handTiles [initHandSize]tile.Tile) (*VisiblePlayer, error) {
@@ -43,6 +44,7 @@ func NewVisiblePlayer(handTiles [initHandSize]tile.Tile) (*VisiblePlayer, error)
 		riichiDiscardedTilesIndex: -1,
 		isConcealed:               true,
 		swapCallTiles:             nil,
+		needsDeadWallDraw:         false,
 	}, nil
 }
 
@@ -89,11 +91,11 @@ func (p *VisiblePlayer) RiichiDiscardedTilesIndex() int {
 }
 
 func (p *VisiblePlayer) CanDiscard() bool {
-	return p.drawnTile != nil || p.swapCallTiles != nil
+	return !p.needsDeadWallDraw && p.drawnTile != nil || p.swapCallTiles != nil
 }
 
 func (p *VisiblePlayer) CanChiiPonKan() bool {
-	return !p.CanDiscard() && len(p.Melds()) < 4
+	return !p.needsDeadWallDraw && !p.CanDiscard() && len(p.Melds()) < 4
 }
 
 func (p *VisiblePlayer) IsConcealed() bool {
@@ -112,6 +114,7 @@ func (p *VisiblePlayer) Draw(t tile.Tile) error {
 	}
 
 	p.drawnTile = &t
+	p.needsDeadWallDraw = false
 	return nil
 }
 
@@ -244,6 +247,7 @@ func (p *VisiblePlayer) CalledKan(kan meld.CalledKan) error {
 	p.hand = *h
 	p.melds = append(p.melds, &kan)
 	p.isConcealed = false
+	p.needsDeadWallDraw = true
 	return nil
 }
 
