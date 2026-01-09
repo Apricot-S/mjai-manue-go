@@ -224,6 +224,18 @@ func (p *VisiblePlayer) Pon(pon meld.Pon) error {
 	return nil
 }
 
+func (p *VisiblePlayer) CalledKan(kan meld.CalledKan) error {
+	h, err := p.hand.Call(&kan)
+	if err != nil {
+		return err
+	}
+
+	p.hand = *h
+	p.melds = append(p.melds, &kan)
+	p.isConcealed = false
+	return nil
+}
+
 func (p *VisiblePlayer) Riichi() error {
 	if p.riichiState != NotRiichi {
 		return fmt.Errorf("cannot Riichi: player is already in riichi state (%v)", p.riichiState)

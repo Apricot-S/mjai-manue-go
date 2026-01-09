@@ -960,6 +960,47 @@ func TestVisiblePlayer_Pon_Cannot5thCall(t *testing.T) {
 	}
 }
 
+func TestVisiblePlayer_CalledKan_Success(t *testing.T) {
+	handTiles := [13]tile.Tile{
+		*tile.MustTileFromCode("1m"), *tile.MustTileFromCode("2m"), *tile.MustTileFromCode("3m"),
+		*tile.MustTileFromCode("4p"), *tile.MustTileFromCode("5p"), *tile.MustTileFromCode("6p"),
+		*tile.MustTileFromCode("7s"), *tile.MustTileFromCode("8s"), *tile.MustTileFromCode("9s"),
+		*tile.MustTileFromCode("E"), *tile.MustTileFromCode("E"), *tile.MustTileFromCode("E"),
+		*tile.MustTileFromCode("W"),
+	}
+
+	p, err := player.NewVisiblePlayer(handTiles)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+
+	kan := meld.MustCalledKan(
+		*tile.MustTileFromCode("E"),
+		[3]tile.Tile{*tile.MustTileFromCode("E"), *tile.MustTileFromCode("E"), *tile.MustTileFromCode("E")},
+		*id.MustID(0),
+	)
+	if err := p.CalledKan(*kan); err != nil {
+		t.Errorf("CalledKan() failed: %v", err)
+	}
+
+	wantHand := hand.CodesToHand([]string{"1m", "2m", "3m", "4p", "5p", "6p", "7s", "8s", "9s", "W"})
+	if h, _ := p.Hand(); *h != *wantHand {
+		t.Errorf("Hand() = %v, want %v", h, wantHand)
+	}
+
+	wantMelds := []meld.Meld{kan}
+	if !reflect.DeepEqual(p.Melds(), wantMelds) {
+		t.Errorf("Hand() = %v, want %v", p.Melds(), wantMelds)
+	}
+
+	if p.CanDiscard() {
+		t.Errorf("CanDiscard() = %v, want %v", p.CanDiscard(), false)
+	}
+	if p.IsConcealed() {
+		t.Errorf("IsConcealed() = %v, want %v", p.IsConcealed(), false)
+	}
+}
+
 func TestVisiblePlayer_Riichi_Success(t *testing.T) {
 	handTiles := [13]tile.Tile{
 		*tile.MustTileFromCode("1m"), *tile.MustTileFromCode("2m"), *tile.MustTileFromCode("3m"),
