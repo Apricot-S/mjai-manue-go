@@ -749,6 +749,63 @@ func TestVisiblePlayer_Chii_CannotAfterRiichi(t *testing.T) {
 	}
 }
 
+func TestVisiblePlayer_Chii_CannotWhenRemainingIsOnlySwapCallTiles(t *testing.T) {
+	handTiles := [13]tile.Tile{
+		*tile.MustTileFromCode("2m"), *tile.MustTileFromCode("2m"), *tile.MustTileFromCode("2m"),
+		*tile.MustTileFromCode("3m"), *tile.MustTileFromCode("4m"), *tile.MustTileFromCode("5m"),
+		*tile.MustTileFromCode("5mr"),
+		*tile.MustTileFromCode("1p"), *tile.MustTileFromCode("2p"), *tile.MustTileFromCode("E"),
+		*tile.MustTileFromCode("4p"), *tile.MustTileFromCode("5p"), *tile.MustTileFromCode("S"),
+	}
+
+	p, err := player.NewVisiblePlayer(handTiles)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+
+	chii1 := meld.MustChii(
+		*tile.MustTileFromCode("3p"),
+		[2]tile.Tile{*tile.MustTileFromCode("1p"), *tile.MustTileFromCode("2p")},
+		*id.MustID(0),
+	)
+	if err := p.Chii(*chii1); err != nil {
+		t.Fatalf("unexpected error on Chii: %v", err)
+	}
+
+	discardedTile1 := tile.MustTileFromCode("E")
+	if err := p.Discard(*discardedTile1, false); err != nil {
+		t.Fatalf("unexpected error on Discard: %v", err)
+	}
+
+	chii2 := meld.MustChii(
+		*tile.MustTileFromCode("6p"),
+		[2]tile.Tile{*tile.MustTileFromCode("4p"), *tile.MustTileFromCode("5p")},
+		*id.MustID(0),
+	)
+	if err := p.Chii(*chii2); err != nil {
+		t.Fatalf("unexpected error on Chii: %v", err)
+	}
+
+	discardedTile2 := tile.MustTileFromCode("S")
+	if err := p.Discard(*discardedTile2, false); err != nil {
+		t.Fatalf("unexpected error on Discard: %v", err)
+	}
+
+	wantHand := hand.CodesToHand([]string{"2m", "2m", "2m", "3m", "4m", "5m", "5mr"})
+	if h, _ := p.Hand(); *h != *wantHand {
+		t.Fatalf("unexpected hand after setup: got %v, want %v", h, wantHand)
+	}
+
+	chii := meld.MustChii(
+		*tile.MustTileFromCode("2m"),
+		[2]tile.Tile{*tile.MustTileFromCode("3m"), *tile.MustTileFromCode("4m")},
+		*id.MustID(0),
+	)
+	if err := p.Chii(*chii); err == nil {
+		t.Errorf("Chii should fail when the remaining hand after chii would be only swap-call tiles")
+	}
+}
+
 func TestVisiblePlayer_Pon_Success(t *testing.T) {
 	handTiles := [13]tile.Tile{
 		*tile.MustTileFromCode("1m"), *tile.MustTileFromCode("2m"), *tile.MustTileFromCode("3m"),
