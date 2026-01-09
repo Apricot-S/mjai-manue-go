@@ -225,6 +225,9 @@ func (p *VisiblePlayer) Pon(pon meld.Pon) error {
 }
 
 func (p *VisiblePlayer) CalledKan(kan meld.CalledKan) error {
+	if p.riichiState != NotRiichi {
+		return fmt.Errorf("cannot CalledKan: player is already in riichi state (%v)", p.riichiState)
+	}
 	if p.CanDiscard() {
 		return fmt.Errorf("cannot CalledKan: player is in a discardable state")
 	}
