@@ -176,13 +176,13 @@ func (p *VisiblePlayer) Chii(chii meld.Chii) error {
 		return err
 	}
 
-	// チー後に残る手牌が喰い替え対象（打牌禁止になるタイル）だけの場合、チーは不可とする
-	p.swapCallTiles = chii.SwapCallTiles()
+	// If the only tiles remaining after chii are swap-call tiles, chii is not allowed.
+	swapCallTiles := chii.SwapCallTiles()
 	remaining := tile.Tiles(h.ToTiles())
 	allSwap := true
 	for _, rt := range remaining.Distinct(nil) {
 		found := false
-		for _, s := range p.swapCallTiles {
+		for _, s := range swapCallTiles {
 			if rt.HasSameSymbol(&s) {
 				found = true
 				break
@@ -200,6 +200,7 @@ func (p *VisiblePlayer) Chii(chii meld.Chii) error {
 	p.hand = *h
 	p.melds = append(p.melds, &chii)
 	p.isConcealed = false
+	p.swapCallTiles = swapCallTiles
 	return nil
 }
 
