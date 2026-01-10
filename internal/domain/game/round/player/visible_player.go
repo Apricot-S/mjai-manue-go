@@ -251,6 +251,24 @@ func (p *VisiblePlayer) CalledKan(kan meld.CalledKan) error {
 	return nil
 }
 
+func (p *VisiblePlayer) ConcealedKan(kan meld.ConcealedKan) error {
+	newHand, err := p.hand.Draw(p.drawnTile)
+	if err != nil {
+		return err
+	}
+
+	h, err := newHand.Call(&kan)
+	if err != nil {
+		return err
+	}
+
+	p.hand = *h
+	p.drawnTile = nil
+	p.melds = append(p.melds, &kan)
+	p.needsDeadWallDraw = true
+	return nil
+}
+
 func (p *VisiblePlayer) Riichi() error {
 	if p.riichiState != NotRiichi {
 		return fmt.Errorf("cannot Riichi: player is already in riichi state (%v)", p.riichiState)
