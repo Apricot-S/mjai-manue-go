@@ -252,6 +252,10 @@ func (p *VisiblePlayer) CalledKan(kan meld.CalledKan) error {
 }
 
 func (p *VisiblePlayer) ConcealedKan(kan meld.ConcealedKan) error {
+	if !p.CanDiscard() {
+		return fmt.Errorf("cannot ConcealedKan: player is not in a discardable state")
+	}
+
 	newHand, err := p.hand.Draw(p.drawnTile)
 	if err != nil {
 		return err

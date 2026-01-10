@@ -1173,6 +1173,28 @@ func TestVisiblePlayer_ConcealedKan_Success(t *testing.T) {
 	}
 }
 
+func TestVisiblePlayer_ConcealedKan_CannotBeforeDraw(t *testing.T) {
+	handTiles := [13]tile.Tile{
+		*tile.MustTileFromCode("1m"), *tile.MustTileFromCode("2m"), *tile.MustTileFromCode("3m"),
+		*tile.MustTileFromCode("4p"), *tile.MustTileFromCode("5p"), *tile.MustTileFromCode("6p"),
+		*tile.MustTileFromCode("7s"), *tile.MustTileFromCode("8s"), *tile.MustTileFromCode("9s"),
+		*tile.MustTileFromCode("E"), *tile.MustTileFromCode("E"), *tile.MustTileFromCode("E"),
+		*tile.MustTileFromCode("E"),
+	}
+
+	p, err := player.NewVisiblePlayer(handTiles)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+
+	kan := meld.MustConcealedKan(
+		[4]tile.Tile{*tile.MustTileFromCode("E"), *tile.MustTileFromCode("E"), *tile.MustTileFromCode("E"), *tile.MustTileFromCode("E")},
+	)
+	if err := p.ConcealedKan(*kan); err == nil {
+		t.Errorf("ConcealedKan should fail when called before draw; expected error but got nil")
+	}
+}
+
 func TestVisiblePlayer_Riichi_Success(t *testing.T) {
 	handTiles := [13]tile.Tile{
 		*tile.MustTileFromCode("1m"), *tile.MustTileFromCode("2m"), *tile.MustTileFromCode("3m"),
