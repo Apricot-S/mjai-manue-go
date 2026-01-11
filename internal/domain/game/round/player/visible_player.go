@@ -2,6 +2,7 @@ package player
 
 import (
 	"fmt"
+	"slices"
 	"sort"
 
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/round/player/hand"
@@ -20,16 +21,13 @@ type VisiblePlayer struct {
 	riichiState               RiichiState
 	riichiRiverIndex          int
 	riichiDiscardedTilesIndex int
-	canDiscard                bool
 	isConcealed               bool
+	swapCallTiles             []tile.Tile
+	needsDeadWallDraw         bool
 }
 
-func NewVisiblePlayer(handTiles []tile.Tile) (*VisiblePlayer, error) {
-	if len(handTiles) != initHandSize {
-		return nil, fmt.Errorf("invalid number of hand tiles: got %d, want %d", len(handTiles), initHandSize)
-	}
-
-	h, err := hand.NewVisibleHand(handTiles)
+func NewVisiblePlayer(handTiles [initHandSize]tile.Tile) (*VisiblePlayer, error) {
+	h, err := hand.NewVisibleHand(handTiles[:])
 	if err != nil {
 		return nil, err
 	}
@@ -44,8 +42,9 @@ func NewVisiblePlayer(handTiles []tile.Tile) (*VisiblePlayer, error) {
 		riichiState:               NotRiichi,
 		riichiRiverIndex:          -1,
 		riichiDiscardedTilesIndex: -1,
-		canDiscard:                false,
 		isConcealed:               true,
+		swapCallTiles:             nil,
+		needsDeadWallDraw:         false,
 	}, nil
 }
 
@@ -92,7 +91,11 @@ func (p *VisiblePlayer) RiichiDiscardedTilesIndex() int {
 }
 
 func (p *VisiblePlayer) CanDiscard() bool {
-	return p.canDiscard
+	return !p.needsDeadWallDraw && p.drawnTile != nil || p.swapCallTiles != nil
+}
+
+func (p *VisiblePlayer) CanChiiPonKan() bool {
+	return !p.needsDeadWallDraw && !p.CanDiscard() && len(p.Melds()) < 4
 }
 
 func (p *VisiblePlayer) IsConcealed() bool {
@@ -111,7 +114,7 @@ func (p *VisiblePlayer) Draw(t tile.Tile) error {
 	}
 
 	p.drawnTile = &t
-	p.canDiscard = true
+	p.needsDeadWallDraw = false
 	return nil
 }
 
@@ -132,12 +135,21 @@ func (p *VisiblePlayer) Discard(t tile.Tile, tsumogiri bool) error {
 			return fmt.Errorf("cannot Discard: player has accepted riichi and cannot discard a tile from hand: %s", t)
 		}
 
+		for _, s := range p.swapCallTiles {
+			if t.HasSameSymbol(&s) {
+				return fmt.Errorf("cannot Discard: tile %s is forbidden due to swap-call", t)
+			}
+		}
+
 		newHand, err := p.hand.Discard(&t)
 		if err != nil {
 			return err
 		}
-		if newHand, err = newHand.Draw(p.drawnTile); err != nil {
-			return err
+
+		if p.drawnTile != nil {
+			if newHand, err = newHand.Draw(p.drawnTile); err != nil {
+				return err
+			}
 		}
 
 		if p.riichiState == RiichiDeclared && !service.IsTenpaiAll(newHand) {
@@ -147,12 +159,151 @@ func (p *VisiblePlayer) Discard(t tile.Tile, tsumogiri bool) error {
 		p.hand = *newHand
 	}
 
-	// TODO: 立直でないときはextra safe tilesをリセットする
+	if p.riichiState != RiichiAccepted {
+		p.extraSafeTiles = make([]tile.Tile, 0, 3)
+	}
 
 	p.drawnTile = nil
 	p.river = append(p.river, t)
 	p.discardedTiles = append(p.discardedTiles, t)
-	p.canDiscard = false
+	p.swapCallTiles = nil
+	return nil
+}
+
+func (p *VisiblePlayer) Chii(chii meld.Chii) error {
+	if p.riichiState != NotRiichi {
+		return fmt.Errorf("cannot Chii: player is already in riichi state (%v)", p.riichiState)
+	}
+	if !p.CanChiiPonKan() {
+		return fmt.Errorf("cannot Chii: player is in a discardable state")
+	}
+
+	h, err := p.hand.Call(&chii)
+	if err != nil {
+		return err
+	}
+
+	// If the only tiles remaining after chii are swap-call tiles, chii is not allowed.
+	swapCallTiles := chii.SwapCallTiles()
+	remaining := tile.Tiles(h.ToTiles())
+	allSwap := true
+	for _, rt := range remaining.Distinct(nil) {
+		found := false
+		for _, s := range swapCallTiles {
+			if rt.HasSameSymbol(&s) {
+				found = true
+				break
+			}
+		}
+		if !found {
+			allSwap = false
+			break
+		}
+	}
+	if allSwap {
+		return fmt.Errorf("cannot Chii: remaining hand would contain only swap-call tiles")
+	}
+
+	p.hand = *h
+	p.melds = append(p.melds, &chii)
+	p.isConcealed = false
+	p.swapCallTiles = swapCallTiles
+	return nil
+}
+
+func (p *VisiblePlayer) Pon(pon meld.Pon) error {
+	if p.riichiState != NotRiichi {
+		return fmt.Errorf("cannot Pon: player is already in riichi state (%v)", p.riichiState)
+	}
+	if !p.CanChiiPonKan() {
+		return fmt.Errorf("cannot Pon: player is in a discardable state")
+	}
+
+	h, err := p.hand.Call(&pon)
+	if err != nil {
+		return err
+	}
+
+	p.hand = *h
+	p.melds = append(p.melds, &pon)
+	p.isConcealed = false
+	p.swapCallTiles = pon.SwapCallTiles()
+	return nil
+}
+
+func (p *VisiblePlayer) CalledKan(kan meld.CalledKan) error {
+	if p.riichiState != NotRiichi {
+		return fmt.Errorf("cannot CalledKan: player is already in riichi state (%v)", p.riichiState)
+	}
+	if !p.CanChiiPonKan() {
+		return fmt.Errorf("cannot CalledKan: player is in a discardable state")
+	}
+
+	h, err := p.hand.Call(&kan)
+	if err != nil {
+		return err
+	}
+
+	p.hand = *h
+	p.melds = append(p.melds, &kan)
+	p.isConcealed = false
+	p.needsDeadWallDraw = true
+	return nil
+}
+
+func (p *VisiblePlayer) ConcealedKan(kan meld.ConcealedKan) error {
+	if !p.CanDiscard() {
+		return fmt.Errorf("cannot ConcealedKan: player is not in a discardable state")
+	}
+
+	newHand, err := p.hand.Draw(p.drawnTile)
+	if err != nil {
+		return err
+	}
+
+	h, err := newHand.Call(&kan)
+	if err != nil {
+		return err
+	}
+
+	p.hand = *h
+	p.drawnTile = nil
+	p.melds = append(p.melds, &kan)
+	p.needsDeadWallDraw = true
+	return nil
+}
+
+func (p *VisiblePlayer) PromotedKan(kan meld.PromotedKan) error {
+	if !p.CanDiscard() {
+		return fmt.Errorf("cannot PromotedKan: player is not in a discardable state")
+	}
+
+	melds := p.Melds()
+	ponIndex := slices.IndexFunc(melds, func(m meld.Meld) bool {
+		pon, isPon := m.(*meld.Pon)
+		if !isPon {
+			return false
+		}
+		return *pon.Taken() == *kan.Taken()
+	})
+	if ponIndex == -1 {
+		return fmt.Errorf("cannot PromotedKan: failed to find pon for promoted kan: %v", melds)
+	}
+
+	newHand, err := p.hand.Draw(p.drawnTile)
+	if err != nil {
+		return err
+	}
+
+	h, err := newHand.Call(&kan)
+	if err != nil {
+		return err
+	}
+
+	p.hand = *h
+	p.drawnTile = nil
+	melds[ponIndex] = &kan
+	p.needsDeadWallDraw = true
 	return nil
 }
 
@@ -160,10 +311,12 @@ func (p *VisiblePlayer) Riichi() error {
 	if p.riichiState != NotRiichi {
 		return fmt.Errorf("cannot Riichi: player is already in riichi state (%v)", p.riichiState)
 	}
-	if !p.CanDiscard() {
+	if p.drawnTile == nil {
 		return fmt.Errorf("cannot Riichi: player is not in a discardable state")
 	}
-	// TODO: 副露後は立直を許可しない
+	if !p.isConcealed {
+		return fmt.Errorf("cannot Riichi: player hand is not concealed")
+	}
 
 	h, err := p.hand.Draw(p.drawnTile)
 	if err != nil {
@@ -194,4 +347,15 @@ func (p *VisiblePlayer) AddExtraSafeTiles(t tile.Tile) {
 	}
 
 	p.extraSafeTiles = append(p.extraSafeTiles, t)
+}
+
+func (p *VisiblePlayer) TakeFromRiver(t tile.Tile) error {
+	numRiver := len(p.river)
+
+	if t != p.river[numRiver-1] {
+		return fmt.Errorf("cannot take tile %s; last river tile is %s", t, p.river[numRiver-1])
+	}
+
+	p.river = slices.Delete(p.river, numRiver-1, numRiver)
+	return nil
 }
