@@ -286,6 +286,9 @@ func (p *VisiblePlayer) PromotedKan(kan meld.PromotedKan) error {
 		}
 		return *pon.Taken() == *kan.Taken()
 	})
+	if ponIndex == -1 {
+		return fmt.Errorf("cannot PromotedKan: failed to find pon for promoted kan: %v", melds)
+	}
 
 	newHand, err := p.hand.Draw(p.drawnTile)
 	if err != nil {
