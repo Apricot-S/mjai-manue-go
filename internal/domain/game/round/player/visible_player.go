@@ -274,6 +274,10 @@ func (p *VisiblePlayer) ConcealedKan(kan meld.ConcealedKan) error {
 }
 
 func (p *VisiblePlayer) PromotedKan(kan meld.PromotedKan) error {
+	if !p.CanDiscard() {
+		return fmt.Errorf("cannot PromotedKan: player is not in a discardable state")
+	}
+
 	melds := p.Melds()
 	ponIndex := slices.IndexFunc(melds, func(m meld.Meld) bool {
 		pon, isPon := m.(*meld.Pon)
