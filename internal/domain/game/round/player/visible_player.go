@@ -283,6 +283,17 @@ func (p *VisiblePlayer) PromotedKan(kan meld.PromotedKan) error {
 		return *pon.Taken() == *kan.Taken()
 	})
 
+	newHand, err := p.hand.Draw(p.drawnTile)
+	if err != nil {
+		return err
+	}
+
+	h, err := newHand.Call(&kan)
+	if err != nil {
+		return err
+	}
+
+	p.hand = *h
 	p.drawnTile = nil
 	melds[ponIndex] = &kan
 	p.needsDeadWallDraw = true
