@@ -273,6 +273,11 @@ func (p *VisiblePlayer) ConcealedKan(kan meld.ConcealedKan) error {
 	return nil
 }
 
+func (p *VisiblePlayer) PromotedKan(kan meld.PromotedKan) error {
+	p.needsDeadWallDraw = true
+	return nil
+}
+
 func (p *VisiblePlayer) Riichi() error {
 	if p.riichiState != NotRiichi {
 		return fmt.Errorf("cannot Riichi: player is already in riichi state (%v)", p.riichiState)

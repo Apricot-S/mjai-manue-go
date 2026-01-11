@@ -1195,6 +1195,70 @@ func TestVisiblePlayer_ConcealedKan_CannotBeforeDraw(t *testing.T) {
 	}
 }
 
+func TestVisiblePlayer_PromotedKan_Success(t *testing.T) {
+	handTiles := [13]tile.Tile{
+		*tile.MustTileFromCode("1m"), *tile.MustTileFromCode("2m"), *tile.MustTileFromCode("3m"),
+		*tile.MustTileFromCode("4p"), *tile.MustTileFromCode("5p"), *tile.MustTileFromCode("6p"),
+		*tile.MustTileFromCode("7s"), *tile.MustTileFromCode("8s"), *tile.MustTileFromCode("9s"),
+		*tile.MustTileFromCode("E"), *tile.MustTileFromCode("E"), *tile.MustTileFromCode("S"),
+		*tile.MustTileFromCode("W"),
+	}
+
+	p, err := player.NewVisiblePlayer(handTiles)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+
+	pon := meld.MustPon(
+		*tile.MustTileFromCode("E"),
+		[2]tile.Tile{*tile.MustTileFromCode("E"), *tile.MustTileFromCode("E")},
+		*id.MustID(0),
+	)
+	if err := p.Pon(*pon); err != nil {
+		t.Fatalf("unexpected error on Pon: %v", err)
+	}
+
+	discardedTile := tile.MustTileFromCode("S")
+	if err := p.Discard(*discardedTile, false); err != nil {
+		t.Fatalf("unexpected error on Discard: %v", err)
+	}
+
+	drawnTile := tile.MustTileFromCode("E")
+	if err := p.Draw(*drawnTile); err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+
+	kan := meld.MustPromotedKan(
+		*tile.MustTileFromCode("E"),
+		[2]tile.Tile{*tile.MustTileFromCode("E"), *tile.MustTileFromCode("E")},
+		*tile.MustTileFromCode("E"),
+		*id.MustID(0),
+	)
+	if err := p.PromotedKan(*kan); err != nil {
+		t.Errorf("ConcealedKan() failed: %v", err)
+	}
+
+	wantHand := hand.CodesToHand([]string{"1m", "2m", "3m", "4p", "5p", "6p", "7s", "8s", "9s", "W"})
+	if h, _ := p.Hand(); *h != *wantHand {
+		t.Errorf("Hand() = %v, want %v", h, wantHand)
+	}
+
+	wantMelds := []meld.Meld{kan}
+	if !reflect.DeepEqual(p.Melds(), wantMelds) {
+		t.Errorf("Melds() = %v, want %v", p.Melds(), wantMelds)
+	}
+
+	if p.CanDiscard() {
+		t.Errorf("CanDiscard() = %v, want %v", p.CanDiscard(), false)
+	}
+	if p.CanChiiPonKan() {
+		t.Errorf("CanChiiPonKan() = %v, want %v", p.CanChiiPonKan(), false)
+	}
+	if p.IsConcealed() {
+		t.Errorf("IsConcealed() = %v, want %v", p.IsConcealed(), false)
+	}
+}
+
 func TestVisiblePlayer_Riichi_Success(t *testing.T) {
 	handTiles := [13]tile.Tile{
 		*tile.MustTileFromCode("1m"), *tile.MustTileFromCode("2m"), *tile.MustTileFromCode("3m"),
