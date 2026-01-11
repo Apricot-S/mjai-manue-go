@@ -1279,7 +1279,7 @@ func TestVisiblePlayer_PromotedKan_Success(t *testing.T) {
 	}
 }
 
-func TestVisiblePlayer_PromotedKan_CannotBeforeDraw(t *testing.T) {
+func TestVisiblePlayer_PromotedKan_NoMatchingPonInMelds(t *testing.T) {
 	handTiles := [13]tile.Tile{
 		*tile.MustTileFromCode("1m"), *tile.MustTileFromCode("2m"), *tile.MustTileFromCode("3m"),
 		*tile.MustTileFromCode("4p"), *tile.MustTileFromCode("5p"), *tile.MustTileFromCode("6p"),
@@ -1319,17 +1319,17 @@ func TestVisiblePlayer_PromotedKan_CannotBeforeDraw(t *testing.T) {
 		*id.MustID(0),
 	)
 	if err := p.PromotedKan(*kan); err == nil {
-		t.Errorf("PromotedKan should fail when called before draw; expected error but got nil")
+		t.Errorf("PromotedKan should fail when no matching Pon exists in melds; expected error but got nil")
 	}
 }
 
-func TestVisiblePlayer_PromotedKan_CannotNotPon(t *testing.T) {
+func TestVisiblePlayer_PromotedKan_CannotBeforeDraw(t *testing.T) {
 	handTiles := [13]tile.Tile{
 		*tile.MustTileFromCode("1m"), *tile.MustTileFromCode("2m"), *tile.MustTileFromCode("3m"),
 		*tile.MustTileFromCode("4p"), *tile.MustTileFromCode("5p"), *tile.MustTileFromCode("6p"),
 		*tile.MustTileFromCode("7s"), *tile.MustTileFromCode("8s"), *tile.MustTileFromCode("9s"),
-		*tile.MustTileFromCode("E"), *tile.MustTileFromCode("E"), *tile.MustTileFromCode("S"),
-		*tile.MustTileFromCode("W"),
+		*tile.MustTileFromCode("E"), *tile.MustTileFromCode("E"), *tile.MustTileFromCode("E"),
+		*tile.MustTileFromCode("S"),
 	}
 
 	p, err := player.NewVisiblePlayer(handTiles)
