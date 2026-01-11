@@ -105,3 +105,65 @@ func TestNewInvisiblePlayer(t *testing.T) {
 		})
 	}
 }
+
+func TestInvisiblePlayer_Draw_Unknown(t *testing.T) {
+	handTiles := [13]tile.Tile{
+		*tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"),
+		*tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"),
+		*tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"),
+		*tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"),
+		*tile.MustTileFromCode("?"),
+	}
+
+	p, err := player.NewInvisiblePlayer(handTiles)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+
+	drawnTile := tile.MustTileFromCode("?")
+	if err := p.Draw(*drawnTile); err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+
+	if *p.DrawnTile() != *drawnTile {
+		t.Errorf("DrawnTile() mismatch: expected %v but got %v", drawnTile, p.DrawnTile())
+	}
+
+	if !p.CanDiscard() {
+		t.Errorf("player must be able to discard after Draw; CanDiscard() returned false")
+	}
+	if p.CanChiiPonKan() {
+		t.Errorf("player must not be able to call after Draw; CanChiiPonKan() returned true")
+	}
+}
+
+func TestInvisiblePlayer_Draw_Visible(t *testing.T) {
+	handTiles := [13]tile.Tile{
+		*tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"),
+		*tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"),
+		*tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"),
+		*tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"),
+		*tile.MustTileFromCode("?"),
+	}
+
+	p, err := player.NewInvisiblePlayer(handTiles)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+
+	drawnTile := tile.MustTileFromCode("1m")
+	if err := p.Draw(*drawnTile); err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+
+	if *p.DrawnTile() != *drawnTile {
+		t.Errorf("DrawnTile() mismatch: expected %v but got %v", drawnTile, p.DrawnTile())
+	}
+
+	if !p.CanDiscard() {
+		t.Errorf("player must be able to discard after Draw; CanDiscard() returned false")
+	}
+	if p.CanChiiPonKan() {
+		t.Errorf("player must not be able to call after Draw; CanChiiPonKan() returned true")
+	}
+}
