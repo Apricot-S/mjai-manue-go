@@ -274,6 +274,17 @@ func (p *VisiblePlayer) ConcealedKan(kan meld.ConcealedKan) error {
 }
 
 func (p *VisiblePlayer) PromotedKan(kan meld.PromotedKan) error {
+	melds := p.Melds()
+	ponIndex := slices.IndexFunc(melds, func(m meld.Meld) bool {
+		pon, isPon := m.(*meld.Pon)
+		if !isPon {
+			return false
+		}
+		return *pon.Taken() == *kan.Taken()
+	})
+
+	p.drawnTile = nil
+	melds[ponIndex] = &kan
 	p.needsDeadWallDraw = true
 	return nil
 }

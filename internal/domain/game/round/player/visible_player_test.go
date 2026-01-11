@@ -677,6 +677,10 @@ func TestVisiblePlayer_Chii_Success(t *testing.T) {
 		t.Errorf("Hand() = %v, want %v", h, wantHand)
 	}
 
+	if p.DrawnTile() != nil {
+		t.Errorf("DrawnTile() should be nil after Chii; got %v", p.DrawnTile())
+	}
+
 	wantMelds := []meld.Meld{chii}
 	if !reflect.DeepEqual(p.Melds(), wantMelds) {
 		t.Errorf("Melds() = %v, want %v", p.Melds(), wantMelds)
@@ -882,6 +886,10 @@ func TestVisiblePlayer_Pon_Success(t *testing.T) {
 		t.Errorf("Hand() = %v, want %v", h, wantHand)
 	}
 
+	if p.DrawnTile() != nil {
+		t.Errorf("DrawnTile() should be nil after Pon; got %v", p.DrawnTile())
+	}
+
 	wantMelds := []meld.Meld{pon}
 	if !reflect.DeepEqual(p.Melds(), wantMelds) {
 		t.Errorf("Melds() = %v, want %v", p.Melds(), wantMelds)
@@ -1039,6 +1047,10 @@ func TestVisiblePlayer_CalledKan_Success(t *testing.T) {
 		t.Errorf("Hand() = %v, want %v", h, wantHand)
 	}
 
+	if p.DrawnTile() != nil {
+		t.Errorf("DrawnTile() should be nil after CalledKan; got %v", p.DrawnTile())
+	}
+
 	wantMelds := []meld.Meld{kan}
 	if !reflect.DeepEqual(p.Melds(), wantMelds) {
 		t.Errorf("Melds() = %v, want %v", p.Melds(), wantMelds)
@@ -1157,6 +1169,10 @@ func TestVisiblePlayer_ConcealedKan_Success(t *testing.T) {
 		t.Errorf("Hand() = %v, want %v", h, wantHand)
 	}
 
+	if p.DrawnTile() != nil {
+		t.Errorf("DrawnTile() should be nil after ConcealedKan; got %v", p.DrawnTile())
+	}
+
 	wantMelds := []meld.Meld{kan}
 	if !reflect.DeepEqual(p.Melds(), wantMelds) {
 		t.Errorf("Melds() = %v, want %v", p.Melds(), wantMelds)
@@ -1241,6 +1257,10 @@ func TestVisiblePlayer_PromotedKan_Success(t *testing.T) {
 	wantHand := hand.CodesToHand([]string{"1m", "2m", "3m", "4p", "5p", "6p", "7s", "8s", "9s", "W"})
 	if h, _ := p.Hand(); *h != *wantHand {
 		t.Errorf("Hand() = %v, want %v", h, wantHand)
+	}
+
+	if p.DrawnTile() != nil {
+		t.Errorf("DrawnTile() should be nil after PromotedKan; got %v", p.DrawnTile())
 	}
 
 	wantMelds := []meld.Meld{kan}
