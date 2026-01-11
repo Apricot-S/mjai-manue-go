@@ -167,3 +167,28 @@ func TestInvisiblePlayer_Draw_Visible(t *testing.T) {
 		t.Errorf("player must not be able to call after Draw; CanChiiPonKan() returned true")
 	}
 }
+
+func TestInvisiblePlayer_Draw_CannotDrawTwice(t *testing.T) {
+	handTiles := [13]tile.Tile{
+		*tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"),
+		*tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"),
+		*tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"),
+		*tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"),
+		*tile.MustTileFromCode("?"),
+	}
+
+	p, err := player.NewInvisiblePlayer(handTiles)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+
+	firstTile := tile.MustTileFromCode("?")
+	if err := p.Draw(*firstTile); err != nil {
+		t.Fatalf("unexpected error on first Draw: %v", err)
+	}
+
+	secondTile := tile.MustTileFromCode("?")
+	if err := p.Draw(*secondTile); err == nil {
+		t.Errorf("Draw should fail when called twice without a discard; expected error but got nil")
+	}
+}
