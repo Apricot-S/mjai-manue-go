@@ -16,7 +16,7 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
     --mount=type=cache,target=/var/lib/apt,sharing=locked \
     apt-get update && \
     DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
-        libboost-system-dev
+        libboost-system1.88-dev
 
 RUN mkdir -p /app && \
     chown -R appuser /app
@@ -54,6 +54,7 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
     echo 'Binary::apt::APT::Keep-Downloaded-Packages "true";' > /etc/apt/apt.conf.d/keep-cache && \
     apt-get update && \
     DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+        libboost-system1.88.0 \
         libgomp1 && \
     mkdir -p /app && \
     chown -R appuser /app
