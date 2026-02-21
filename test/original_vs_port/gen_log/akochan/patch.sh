@@ -1,10 +1,15 @@
 #!/usr/bin/env bash
 
-# Replace removed boost::asio::io_service with boost::asio::io_context
+# Insert `#include <cstdint>`.
+# `json11.cpp` depends on `<cstdint>` but does not include it,
+# which causes build errors with newer versions of GCC.
+sed -i "s/#include <cmath>/#include <cmath>\n#include <cstdint>/" share/json11.cpp
+
+# Replace removed `boost::asio::io_service` with `boost::asio::io_context`
 # https://www.boost.org/doc/libs/release/doc/html/boost_asio/history.html
 sed -i 's/boost::asio::io_service/boost::asio::io_context/' mjai_client.hpp
 
-# Replace removed boost::asio::buffer_cast with static_cast and data()
+# Replace removed `boost::asio::buffer_cast` with `static_cast and data()`
 # https://www.boost.org/doc/libs/release/doc/html/boost_asio/history.html
 sed -i 's/boost::asio::buffer_cast<const char \*>(buffer\.data())/static_cast<const char *>(buffer.data().data())/' mjai_client.cpp
 
