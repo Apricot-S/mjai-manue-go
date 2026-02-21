@@ -13,7 +13,7 @@ cd /app/mjai-manue/coffee
 for i in $(seq 1 "$NUM_GAMES"); do
     echo "$i/$NUM_GAMES games"
 
-    coffee main.coffee mjsonp://$HOST:$PORT/$ROOM
+    coffee main.coffee mjsonp://$HOST:$PORT/$ROOM > /dev/null 2>&1
 
     echo "finished game $i"
 done
