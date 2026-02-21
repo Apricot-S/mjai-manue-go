@@ -11,3 +11,9 @@ sed -i 's/s\.add_dependency("sass", \["\([0-9.]*\)"\])/s.add_dependency("sass", 
 
 # Replace removed `URI.decode` with `URI.decode_www_form_component`
 sed -i 's/URI\.decode/URI\.decode_www_form_component/' lib/mjai/tenhou_archive.rb
+
+# Ruby 4 removed the 3-argument form of `ERB.new`, so this call is updated to keyword arguments
+sed -i '
+/html = ERB\.new(File\.read("#{res_dir}\/views\/archive_player\.erb"), nil, "<>")\./c\
+html = ERB.new(File.read("#{res_dir}/views/archive_player.erb"), trim_mode: "<>").
+' lib/mjai/file_converter.rb
