@@ -20,7 +20,7 @@ FROM ruby:${RUBY_VERSION}-slim-${OS_VERSION} AS final
 ARG UID=10001
 RUN useradd \
     --uid "${UID}" \
-    --shell "/sbin/nologin" \
+    --shell "/usr/sbin/nologin" \
     --create-home \
     appuser
 
