@@ -21,7 +21,8 @@ ARG UID=10001
 RUN useradd \
     --uid "${UID}" \
     --shell "/usr/sbin/nologin" \
-    --create-home \
+    --home-dir "/nonexistent" \
+    --no-create-home \
     appuser
 
 COPY --from=builder /usr/local/bundle /usr/local/bundle
