@@ -3,6 +3,7 @@ package round
 import (
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/round/player"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/tile"
+	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/wind"
 )
 
 const (
@@ -18,5 +19,12 @@ const (
 )
 
 type StateViewer interface {
+	RoundWind() wind.Wind
+	RoundNumber() int
+	Honba() int
+	RiichiDeposit() int
+	Scores() [NumPlayers]int
+
 	Players() *[NumPlayers]player.Player
+	NumLeftTiles() int
 }
