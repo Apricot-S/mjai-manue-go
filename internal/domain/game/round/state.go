@@ -25,6 +25,8 @@ type StateViewer interface {
 	RiichiDeposit() int
 	Scores() [NumPlayers]int
 
-	Players() *[NumPlayers]player.Player
+	DoraIndicators() tile.Tiles
 	NumLeftTiles() int
+
+	Players() *[NumPlayers]player.Player
 }
