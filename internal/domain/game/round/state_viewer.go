@@ -70,6 +70,6 @@ func (s *State) NumLeftTiles() int {
 	return s.numLeftTiles
 }
 
-func (s *State) Players(playerID id.ID) player.PlayerViewer {
+func (s *State) Player(playerID id.ID) player.PlayerViewer {
 	return s.players[playerID.Index()]
 }
