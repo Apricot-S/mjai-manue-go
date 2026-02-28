@@ -29,12 +29,7 @@ type DerivedStateViewer interface {
 	SafeTiles(playerID id.ID) tile.Tiles
 }
 
-type ActionStateViewer interface {
-	CanAct(playerID id.ID) bool
-}
-
 type StateViewer interface {
 	RawStateViewer
 	DerivedStateViewer
-	ActionStateViewer
 }
