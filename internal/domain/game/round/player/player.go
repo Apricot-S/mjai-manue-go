@@ -40,7 +40,7 @@ type PlayerViewer interface {
 	// DiscardedTiles returns the discarded tiles (捨て牌).
 	// It includes the tiles that have been called.
 	DiscardedTiles() []tile.Tile
-	// ExtraSafeTiles returns Extra safe tiles (安全牌).
+	// ExtraSafeTiles returns extra safe tiles (安全牌).
 	// The tiles that are safe in the same turn and the tiles that are safe after riichi.
 	ExtraSafeTiles() []tile.Tile
 
