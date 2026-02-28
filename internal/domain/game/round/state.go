@@ -29,5 +29,5 @@ type State struct {
 	startingDealer id.ID
 	doraIndicators tile.Tiles
 	numLeftTiles   int
-	players        *[NumPlayers]player.PlayerViewer
+	players        [NumPlayers]player.Player
 }

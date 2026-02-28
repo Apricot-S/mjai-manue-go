@@ -17,7 +17,7 @@ type RawStateViewer interface {
 	StartingDealer() id.ID
 	DoraIndicators() tile.Tiles
 	NumLeftTiles() int
-	Players() *[NumPlayers]player.PlayerViewer
+	Player(playerID id.ID) player.PlayerViewer
 }
 
 type DerivedStateViewer interface {
@@ -32,4 +32,44 @@ type DerivedStateViewer interface {
 type StateViewer interface {
 	RawStateViewer
 	DerivedStateViewer
+}
+
+func (s *State) RoundWind() wind.Wind {
+	return s.roundWind
+}
+
+func (s *State) RoundNumber() int {
+	return s.roundNumber
+}
+
+func (s *State) Honba() int {
+	return s.honba
+}
+
+func (s *State) RiichiDeposit() int {
+	return s.riichiDeposit
+}
+
+func (s *State) Scores() [NumPlayers]int {
+	return s.scores
+}
+
+func (s *State) Dealer() id.ID {
+	return s.dealer
+}
+
+func (s *State) StartingDealer() id.ID {
+	return s.startingDealer
+}
+
+func (s *State) DoraIndicators() tile.Tiles {
+	return s.doraIndicators
+}
+
+func (s *State) NumLeftTiles() int {
+	return s.numLeftTiles
+}
+
+func (s *State) Players(playerID id.ID) player.PlayerViewer {
+	return s.players[playerID.Index()]
 }
