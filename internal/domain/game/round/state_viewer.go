@@ -22,11 +22,11 @@ type RawStateViewer interface {
 }
 
 type DerivedStateViewer interface {
+	NextRound() (wind.Wind, int)
 	Doras() tile.Tiles
 	SeatWind(playerID id.ID) wind.Wind
 	VisibleTiles(playerID id.ID) tile.Tiles
 	SafeTiles(playerID id.ID) tile.Tiles
-	NextRound() (wind.Wind, int)
 }
 
 type ActionStateViewer interface {
