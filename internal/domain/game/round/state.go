@@ -30,7 +30,7 @@ type RawStateViewer interface {
 	DoraIndicators() tile.Tiles
 	NumLeftTiles() int
 	Turn() float64
-	Players() *[NumPlayers]player.Player
+	Players() *[NumPlayers]player.PlayerViewer
 }
 
 type DerivedStateViewer interface {
