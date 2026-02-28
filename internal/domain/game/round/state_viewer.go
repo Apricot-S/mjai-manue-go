@@ -17,13 +17,13 @@ type RawStateViewer interface {
 	StartingDealer() id.ID
 	DoraIndicators() tile.Tiles
 	NumLeftTiles() int
-	Turn() float64
 	Players() *[NumPlayers]player.PlayerViewer
 }
 
 type DerivedStateViewer interface {
 	NextRound() (wind.Wind, int)
 	Doras() tile.Tiles
+	Turn() float64
 	SeatWind(playerID id.ID) wind.Wind
 	VisibleTiles(playerID id.ID) tile.Tiles
 	SafeTiles(playerID id.ID) tile.Tiles
