@@ -99,3 +99,40 @@ func TestWind_String(t *testing.T) {
 		})
 	}
 }
+
+func TestWind_Next(t *testing.T) {
+	tests := []struct {
+		name string
+		w    wind.Wind
+		want wind.Wind
+	}{
+		{
+			name: "East -> South",
+			w:    wind.East,
+			want: wind.South,
+		},
+		{
+			name: "South -> West",
+			w:    wind.South,
+			want: wind.West,
+		},
+		{
+			name: "West -> North",
+			w:    wind.West,
+			want: wind.North,
+		},
+		{
+			name: "North -> East",
+			w:    wind.North,
+			want: wind.East,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := tt.w.Next()
+			if got != tt.want {
+				t.Errorf("Next() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}

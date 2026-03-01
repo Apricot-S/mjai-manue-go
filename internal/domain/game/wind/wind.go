@@ -50,3 +50,18 @@ func (w Wind) String() string {
 		panic(fmt.Sprintf("wind: invalid value %d", w))
 	}
 }
+
+func (w Wind) Next() Wind {
+	switch w {
+	case East:
+		return South
+	case South:
+		return West
+	case West:
+		return North
+	case North:
+		return East
+	default:
+		panic(fmt.Sprintf("wind: invalid value %d", w))
+	}
+}
