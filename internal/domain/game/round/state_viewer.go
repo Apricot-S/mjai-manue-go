@@ -75,5 +75,8 @@ func (s *State) Player(playerID id.ID) player.PlayerViewer {
 }
 
 func (s *State) NextRound() (wind.Wind, int) {
-	return wind.East, 2
+	if s.RoundNumber() == 4 {
+		return s.RoundWind(), 1
+	}
+	return s.RoundWind(), s.RoundNumber() + 1
 }

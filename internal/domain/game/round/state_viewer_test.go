@@ -41,6 +41,48 @@ func TestState_NextRound(t *testing.T) {
 			wantWind:      wind.East,
 			wantNumber:    2,
 		},
+		{
+			name:          "E4 -> S1",
+			currentWind:   wind.East,
+			currentNumber: 4,
+			wantWind:      wind.South,
+			wantNumber:    1,
+		},
+		{
+			name:          "S2 -> S3",
+			currentWind:   wind.South,
+			currentNumber: 2,
+			wantWind:      wind.South,
+			wantNumber:    3,
+		},
+		{
+			name:          "S4 -> W1",
+			currentWind:   wind.South,
+			currentNumber: 4,
+			wantWind:      wind.West,
+			wantNumber:    1,
+		},
+		{
+			name:          "W3 -> W4",
+			currentWind:   wind.West,
+			currentNumber: 3,
+			wantWind:      wind.West,
+			wantNumber:    4,
+		},
+		{
+			name:          "W4 -> N1",
+			currentWind:   wind.West,
+			currentNumber: 4,
+			wantWind:      wind.North,
+			wantNumber:    1,
+		},
+		{
+			name:          "N4 -> E1",
+			currentWind:   wind.North,
+			currentNumber: 4,
+			wantWind:      wind.East,
+			wantNumber:    1,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
