@@ -73,3 +73,7 @@ func (s *State) NumLeftTiles() int {
 func (s *State) Player(playerID id.ID) player.PlayerViewer {
 	return s.players[playerID.Index()]
 }
+
+func (s *State) NextRound() (wind.Wind, int) {
+	return wind.East, 2
+}
