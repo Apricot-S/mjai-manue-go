@@ -232,6 +232,18 @@ func TestState_SeatWind(t *testing.T) {
 			playerID:      *id.MustID(1),
 			want:          wind.South,
 		},
+		{
+			name:          "E1 p2 -> W",
+			currentNumber: 1,
+			playerID:      *id.MustID(2),
+			want:          wind.West,
+		},
+		{
+			name:          "E1 p3 -> N",
+			currentNumber: 1,
+			playerID:      *id.MustID(3),
+			want:          wind.North,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
