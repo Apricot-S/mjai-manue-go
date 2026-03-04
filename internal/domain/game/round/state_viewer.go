@@ -92,3 +92,7 @@ func (s *State) Doras() tile.Tiles {
 func (s *State) Turn() float64 {
 	return float64(NumInitWall-s.NumLeftTiles()) / float64(NumPlayers)
 }
+
+func (s *State) SeatWind(playerID id.ID) wind.Wind {
+	return wind.East
+}

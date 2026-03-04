@@ -196,3 +196,50 @@ func TestState_Turn(t *testing.T) {
 		})
 	}
 }
+
+func TestState_SeatWind(t *testing.T) {
+	newInitStateForTest := func(roundNumber int) round.State {
+		players := [4]player.Player{}
+		return round.NewStateForTest(
+			wind.East,
+			roundNumber,
+			0,
+			0,
+			[4]int{25000, 25000, 25000, 25000},
+			*id.MustID(0),
+			*id.MustID(0),
+			tile.Tiles{*tile.MustTileFromCode("1m")},
+			round.NumInitWall,
+			players,
+		)
+	}
+
+	tests := []struct {
+		name          string
+		currentNumber int
+		playerID      id.ID
+		want          wind.Wind
+	}{
+		{
+			name:          "E1 p0 -> E",
+			currentNumber: 1,
+			playerID:      *id.MustID(0),
+			want:          wind.East,
+		},
+		{
+			name:          "E1 p1 -> S",
+			currentNumber: 1,
+			playerID:      *id.MustID(1),
+			want:          wind.South,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			s := newInitStateForTest(tt.currentNumber)
+			got := s.SeatWind(tt.playerID)
+			if got != tt.want {
+				t.Errorf("SeatWind() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
