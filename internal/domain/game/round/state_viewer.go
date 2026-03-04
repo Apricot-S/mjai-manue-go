@@ -94,5 +94,5 @@ func (s *State) Turn() float64 {
 }
 
 func (s *State) SeatWind(playerID id.ID) wind.Wind {
-	return wind.East
+	return wind.Wind(playerID.Index() + 1)
 }
