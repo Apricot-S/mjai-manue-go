@@ -1,6 +1,7 @@
 package round_test
 
 import (
+	"reflect"
 	"testing"
 
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/id"
@@ -93,6 +94,55 @@ func TestState_NextRound(t *testing.T) {
 			}
 			if gotNumber != tt.wantNumber {
 				t.Errorf("NextRound() = %v, want %v", gotNumber, tt.wantNumber)
+			}
+		})
+	}
+}
+
+func TestState_Doras(t *testing.T) {
+	newInitStateForTest := func(doraIndicators tile.Tiles) round.State {
+		players := [4]player.Player{}
+		return round.NewStateForTest(
+			wind.East,
+			1,
+			0,
+			0,
+			[4]int{25000, 25000, 25000, 25000},
+			*id.MustID(0),
+			*id.MustID(0),
+			doraIndicators,
+			round.NumInitWall,
+			players,
+		)
+	}
+
+	tests := []struct {
+		name           string
+		doraIndicators tile.Tiles
+		want           tile.Tiles
+	}{
+		{
+			name:           "empty",
+			doraIndicators: tile.Tiles{},
+			want:           tile.Tiles{},
+		},
+		{
+			name:           "single dora",
+			doraIndicators: tile.Tiles{*tile.MustTileFromCode("1m")},
+			want:           tile.Tiles{*tile.MustTileFromCode("2m")},
+		},
+		{
+			name:           "double dora",
+			doraIndicators: tile.Tiles{*tile.MustTileFromCode("5mr"), *tile.MustTileFromCode("S")},
+			want:           tile.Tiles{*tile.MustTileFromCode("6m"), *tile.MustTileFromCode("W")},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			s := newInitStateForTest(tt.doraIndicators)
+			got := s.Doras()
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("Doras() = %v, want %v", got, tt.want)
 			}
 		})
 	}
