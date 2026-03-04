@@ -88,3 +88,7 @@ func (s *State) Doras() tile.Tiles {
 	}
 	return doras
 }
+
+func (s *State) Turn() float64 {
+	return float64(NumInitWall-s.NumLeftTiles()) / float64(NumPlayers)
+}

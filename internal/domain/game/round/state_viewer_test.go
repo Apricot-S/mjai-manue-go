@@ -147,3 +147,52 @@ func TestState_Doras(t *testing.T) {
 		})
 	}
 }
+
+func TestState_Turn(t *testing.T) {
+	newInitStateForTest := func(numLeftTiles int) round.State {
+		players := [4]player.Player{}
+		return round.NewStateForTest(
+			wind.East,
+			1,
+			0,
+			0,
+			[4]int{25000, 25000, 25000, 25000},
+			*id.MustID(0),
+			*id.MustID(0),
+			nil,
+			numLeftTiles,
+			players,
+		)
+	}
+
+	tests := []struct {
+		name         string
+		numLeftTiles int
+		want         float64
+	}{
+		{
+			name:         "before first draw",
+			numLeftTiles: round.NumInitWall,
+			want:         0.0,
+		},
+		{
+			name:         "after first draw",
+			numLeftTiles: round.NumInitWall - 1,
+			want:         0.25,
+		},
+		{
+			name:         "after last draw",
+			numLeftTiles: 0,
+			want:         17.5,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			s := newInitStateForTest(tt.numLeftTiles)
+			got := s.Turn()
+			if got != tt.want {
+				t.Errorf("Turn() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
