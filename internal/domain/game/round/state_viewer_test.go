@@ -198,7 +198,7 @@ func TestState_Turn(t *testing.T) {
 }
 
 func TestState_SeatWind(t *testing.T) {
-	newInitStateForTest := func(roundNumber int) round.State {
+	newInitStateForTest := func(roundNumber int, dealer id.ID) round.State {
 		players := [4]player.Player{}
 		return round.NewStateForTest(
 			wind.East,
@@ -206,7 +206,7 @@ func TestState_SeatWind(t *testing.T) {
 			0,
 			0,
 			[4]int{25000, 25000, 25000, 25000},
-			*id.MustID(0),
+			dealer,
 			*id.MustID(0),
 			tile.Tiles{*tile.MustTileFromCode("1m")},
 			round.NumInitWall,
@@ -217,37 +217,126 @@ func TestState_SeatWind(t *testing.T) {
 	tests := []struct {
 		name          string
 		currentNumber int
+		currentDealer id.ID
 		playerID      id.ID
 		want          wind.Wind
 	}{
 		{
 			name:          "E1 p0 -> E",
 			currentNumber: 1,
+			currentDealer: *id.MustID(0),
 			playerID:      *id.MustID(0),
 			want:          wind.East,
 		},
 		{
 			name:          "E1 p1 -> S",
 			currentNumber: 1,
+			currentDealer: *id.MustID(0),
 			playerID:      *id.MustID(1),
 			want:          wind.South,
 		},
 		{
 			name:          "E1 p2 -> W",
 			currentNumber: 1,
+			currentDealer: *id.MustID(0),
 			playerID:      *id.MustID(2),
 			want:          wind.West,
 		},
 		{
 			name:          "E1 p3 -> N",
 			currentNumber: 1,
+			currentDealer: *id.MustID(0),
 			playerID:      *id.MustID(3),
 			want:          wind.North,
+		},
+		{
+			name:          "E2 p0 -> N",
+			currentNumber: 2,
+			currentDealer: *id.MustID(1),
+			playerID:      *id.MustID(0),
+			want:          wind.North,
+		},
+		{
+			name:          "E2 p1 -> E",
+			currentNumber: 2,
+			currentDealer: *id.MustID(1),
+			playerID:      *id.MustID(1),
+			want:          wind.East,
+		},
+		{
+			name:          "E2 p2 -> S",
+			currentNumber: 2,
+			currentDealer: *id.MustID(1),
+			playerID:      *id.MustID(2),
+			want:          wind.South,
+		},
+		{
+			name:          "E2 p3 -> W",
+			currentNumber: 2,
+			currentDealer: *id.MustID(1),
+			playerID:      *id.MustID(3),
+			want:          wind.West,
+		},
+		{
+			name:          "E3 p0 -> W",
+			currentNumber: 3,
+			currentDealer: *id.MustID(2),
+			playerID:      *id.MustID(0),
+			want:          wind.West,
+		},
+		{
+			name:          "E3 p1 -> N",
+			currentNumber: 3,
+			currentDealer: *id.MustID(2),
+			playerID:      *id.MustID(1),
+			want:          wind.North,
+		},
+		{
+			name:          "E3 p2 -> E",
+			currentNumber: 3,
+			currentDealer: *id.MustID(2),
+			playerID:      *id.MustID(2),
+			want:          wind.East,
+		},
+		{
+			name:          "E3 p3 -> S",
+			currentNumber: 3,
+			currentDealer: *id.MustID(2),
+			playerID:      *id.MustID(3),
+			want:          wind.South,
+		},
+		{
+			name:          "E4 p0 -> S",
+			currentNumber: 4,
+			currentDealer: *id.MustID(3),
+			playerID:      *id.MustID(0),
+			want:          wind.South,
+		},
+		{
+			name:          "E4 p1 -> W",
+			currentNumber: 4,
+			currentDealer: *id.MustID(3),
+			playerID:      *id.MustID(1),
+			want:          wind.West,
+		},
+		{
+			name:          "E4 p2 -> N",
+			currentNumber: 4,
+			currentDealer: *id.MustID(3),
+			playerID:      *id.MustID(2),
+			want:          wind.North,
+		},
+		{
+			name:          "E4 p3 -> E",
+			currentNumber: 4,
+			currentDealer: *id.MustID(3),
+			playerID:      *id.MustID(3),
+			want:          wind.East,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			s := newInitStateForTest(tt.currentNumber)
+			s := newInitStateForTest(tt.currentNumber, tt.currentDealer)
 			got := s.SeatWind(tt.playerID)
 			if got != tt.want {
 				t.Errorf("SeatWind() = %v, want %v", got, tt.want)
