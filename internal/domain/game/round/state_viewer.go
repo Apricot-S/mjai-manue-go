@@ -1,6 +1,8 @@
 package round
 
 import (
+	"slices"
+
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/id"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/round/player"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/tile"
@@ -95,4 +97,9 @@ func (s *State) Turn() float64 {
 
 func (s *State) SeatWind(playerID id.ID) wind.Wind {
 	return wind.Wind((playerID.Index()+1-s.RoundNumber()+4)%4 + 1)
+}
+
+func (s *State) SafeTiles(playerID id.ID) tile.Tiles {
+	p := s.Player(playerID)
+	return slices.Concat(p.DiscardedTiles(), p.ExtraSafeTiles())
 }
