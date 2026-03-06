@@ -24,8 +24,15 @@ type InvisiblePlayer struct {
 	needsDeadWallDraw         bool
 }
 
-func NewInvisiblePlayer(handTiles [initHandSize]tile.Tile) (*InvisiblePlayer, error) {
-	h, err := hand.NewInvisibleHand(handTiles[:])
+var initInvisibleHand tile.Tiles = tile.Tiles{
+	*tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"),
+	*tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"),
+	*tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"),
+	*tile.MustTileFromCode("?"),
+}
+
+func NewInvisiblePlayer() (*InvisiblePlayer, error) {
+	h, err := hand.NewInvisibleHand(initInvisibleHand)
 	if err != nil {
 		return nil, err
 	}

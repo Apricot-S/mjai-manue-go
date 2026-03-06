@@ -11,112 +11,67 @@ import (
 )
 
 func TestNewInvisiblePlayer(t *testing.T) {
-	tests := []struct {
-		name      string
-		handTiles [13]tile.Tile
-		wantErr   bool
-	}{
-		{
-			name: "from visible tiles",
-			handTiles: [13]tile.Tile{
-				*tile.MustTileFromCode("C"), *tile.MustTileFromCode("9s"), *tile.MustTileFromCode("4m"),
-				*tile.MustTileFromCode("2p"), *tile.MustTileFromCode("S"), *tile.MustTileFromCode("4p"),
-				*tile.MustTileFromCode("8s"), *tile.MustTileFromCode("6p"), *tile.MustTileFromCode("6s"),
-				*tile.MustTileFromCode("7m"), *tile.MustTileFromCode("9s"), *tile.MustTileFromCode("5pr"),
-				*tile.MustTileFromCode("5p"),
-			},
-			wantErr: false,
-		},
-		{
-			name: "from unknown tiles",
-			handTiles: [13]tile.Tile{
-				*tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"),
-				*tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"),
-				*tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"),
-				*tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"),
-				*tile.MustTileFromCode("?"),
-			},
-			wantErr: false,
-		},
+	got, gotErr := player.NewInvisiblePlayer()
+	if gotErr != nil {
+		t.Errorf("NewVisiblePlayer() failed: %v", gotErr)
+		return
 	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			got, gotErr := player.NewInvisiblePlayer(tt.handTiles)
-			if gotErr != nil {
-				if !tt.wantErr {
-					t.Errorf("NewVisiblePlayer() failed: %v", gotErr)
-				}
-				return
-			}
-			if tt.wantErr {
-				t.Fatal("NewVisiblePlayer() succeeded unexpectedly")
-			}
 
-			h, ok := got.Hand()
-			if ok {
-				t.Errorf("NewVisiblePlayer().Hand() returned ok")
-			}
-			if h != nil {
-				t.Errorf("NewVisiblePlayer().Hand() = %v, want %v", h, nil)
-			}
+	h, ok := got.Hand()
+	if ok {
+		t.Errorf("NewVisiblePlayer().Hand() returned ok")
+	}
+	if h != nil {
+		t.Errorf("NewVisiblePlayer().Hand() = %v, want %v", h, nil)
+	}
 
-			if got.DrawnTile() != nil {
-				t.Errorf("NewVisiblePlayer().DrawnTile() = %v, want %v", got.DrawnTile(), nil)
-			}
+	if got.DrawnTile() != nil {
+		t.Errorf("NewVisiblePlayer().DrawnTile() = %v, want %v", got.DrawnTile(), nil)
+	}
 
-			melds := make([]meld.Meld, 0, 4)
-			if !reflect.DeepEqual(got.Melds(), melds) {
-				t.Errorf("NewVisiblePlayer().Melds() = %v, want %v", got.Melds(), melds)
-			}
+	melds := make([]meld.Meld, 0, 4)
+	if !reflect.DeepEqual(got.Melds(), melds) {
+		t.Errorf("NewVisiblePlayer().Melds() = %v, want %v", got.Melds(), melds)
+	}
 
-			river := make([]tile.Tile, 0, 24)
-			if !reflect.DeepEqual(got.River(), river) {
-				t.Errorf("NewVisiblePlayer().River() = %v, want %v", got.River(), river)
-			}
+	river := make([]tile.Tile, 0, 24)
+	if !reflect.DeepEqual(got.River(), river) {
+		t.Errorf("NewVisiblePlayer().River() = %v, want %v", got.River(), river)
+	}
 
-			discardedTiles := make([]tile.Tile, 0, 27)
-			if !reflect.DeepEqual(got.DiscardedTiles(), discardedTiles) {
-				t.Errorf("NewVisiblePlayer().DiscardedTiles() = %v, want %v", got.DiscardedTiles(), discardedTiles)
-			}
+	discardedTiles := make([]tile.Tile, 0, 27)
+	if !reflect.DeepEqual(got.DiscardedTiles(), discardedTiles) {
+		t.Errorf("NewVisiblePlayer().DiscardedTiles() = %v, want %v", got.DiscardedTiles(), discardedTiles)
+	}
 
-			extraSafeTiles := make([]tile.Tile, 0, 3)
-			if !reflect.DeepEqual(got.ExtraSafeTiles(), extraSafeTiles) {
-				t.Errorf("NewVisiblePlayer().ExtraSafeTiles() = %v, want %v", got.ExtraSafeTiles(), extraSafeTiles)
-			}
+	extraSafeTiles := make([]tile.Tile, 0, 3)
+	if !reflect.DeepEqual(got.ExtraSafeTiles(), extraSafeTiles) {
+		t.Errorf("NewVisiblePlayer().ExtraSafeTiles() = %v, want %v", got.ExtraSafeTiles(), extraSafeTiles)
+	}
 
-			if got.RiichiState() != player.NotRiichi {
-				t.Errorf("NewVisiblePlayer().RiichiState() = %v, want %v", got.RiichiState(), player.NotRiichi)
-			}
-			if got.RiichiRiverIndex() != -1 {
-				t.Errorf("NewVisiblePlayer().RiichiRiverIndex() = %v, want %v", got.RiichiRiverIndex(), -1)
-			}
-			if got.RiichiDiscardedTilesIndex() != -1 {
-				t.Errorf("NewVisiblePlayer().RiichiDiscardedTilesIndex() = %v, want %v", got.RiichiDiscardedTilesIndex(), -1)
-			}
+	if got.RiichiState() != player.NotRiichi {
+		t.Errorf("NewVisiblePlayer().RiichiState() = %v, want %v", got.RiichiState(), player.NotRiichi)
+	}
+	if got.RiichiRiverIndex() != -1 {
+		t.Errorf("NewVisiblePlayer().RiichiRiverIndex() = %v, want %v", got.RiichiRiverIndex(), -1)
+	}
+	if got.RiichiDiscardedTilesIndex() != -1 {
+		t.Errorf("NewVisiblePlayer().RiichiDiscardedTilesIndex() = %v, want %v", got.RiichiDiscardedTilesIndex(), -1)
+	}
 
-			if got.CanDiscard() {
-				t.Errorf("NewVisiblePlayer().CanDiscard() = %v, want %v", got.CanDiscard(), false)
-			}
-			if !got.CanChiiPonKan() {
-				t.Errorf("NewVisiblePlayer().CanChiiPonKan() = %v, want %v", got.CanChiiPonKan(), true)
-			}
-			if !got.IsConcealed() {
-				t.Errorf("NewVisiblePlayer().IsConcealed() = %v, want %v", got.IsConcealed(), true)
-			}
-		})
+	if got.CanDiscard() {
+		t.Errorf("NewVisiblePlayer().CanDiscard() = %v, want %v", got.CanDiscard(), false)
+	}
+	if !got.CanChiiPonKan() {
+		t.Errorf("NewVisiblePlayer().CanChiiPonKan() = %v, want %v", got.CanChiiPonKan(), true)
+	}
+	if !got.IsConcealed() {
+		t.Errorf("NewVisiblePlayer().IsConcealed() = %v, want %v", got.IsConcealed(), true)
 	}
 }
 
 func TestInvisiblePlayer_Draw_Unknown(t *testing.T) {
-	handTiles := [13]tile.Tile{
-		*tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"),
-		*tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"),
-		*tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"),
-		*tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"),
-		*tile.MustTileFromCode("?"),
-	}
-
-	p, err := player.NewInvisiblePlayer(handTiles)
+	p, err := player.NewInvisiblePlayer()
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
@@ -139,15 +94,7 @@ func TestInvisiblePlayer_Draw_Unknown(t *testing.T) {
 }
 
 func TestInvisiblePlayer_Draw_Visible(t *testing.T) {
-	handTiles := [13]tile.Tile{
-		*tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"),
-		*tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"),
-		*tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"),
-		*tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"),
-		*tile.MustTileFromCode("?"),
-	}
-
-	p, err := player.NewInvisiblePlayer(handTiles)
+	p, err := player.NewInvisiblePlayer()
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
@@ -170,15 +117,7 @@ func TestInvisiblePlayer_Draw_Visible(t *testing.T) {
 }
 
 func TestInvisiblePlayer_Draw_CannotDrawTwice(t *testing.T) {
-	handTiles := [13]tile.Tile{
-		*tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"),
-		*tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"),
-		*tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"),
-		*tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"),
-		*tile.MustTileFromCode("?"),
-	}
-
-	p, err := player.NewInvisiblePlayer(handTiles)
+	p, err := player.NewInvisiblePlayer()
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
@@ -195,15 +134,7 @@ func TestInvisiblePlayer_Draw_CannotDrawTwice(t *testing.T) {
 }
 
 func TestInvisiblePlayer_Draw_CannotDrawBeforeRiichiAccepted(t *testing.T) {
-	handTiles := [13]tile.Tile{
-		*tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"),
-		*tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"),
-		*tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"),
-		*tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"),
-		*tile.MustTileFromCode("?"),
-	}
-
-	p, err := player.NewInvisiblePlayer(handTiles)
+	p, err := player.NewInvisiblePlayer()
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
@@ -229,15 +160,7 @@ func TestInvisiblePlayer_Draw_CannotDrawBeforeRiichiAccepted(t *testing.T) {
 }
 
 func TestInvisiblePlayer_Discard_TileInHand(t *testing.T) {
-	handTiles := [13]tile.Tile{
-		*tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"),
-		*tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"),
-		*tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"),
-		*tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"),
-		*tile.MustTileFromCode("?"),
-	}
-
-	p, err := player.NewInvisiblePlayer(handTiles)
+	p, err := player.NewInvisiblePlayer()
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
@@ -279,15 +202,7 @@ func TestInvisiblePlayer_Discard_TileInHand(t *testing.T) {
 }
 
 func TestInvisiblePlayer_Discard_DrawnTile(t *testing.T) {
-	handTiles := [13]tile.Tile{
-		*tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"),
-		*tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"),
-		*tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"),
-		*tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"),
-		*tile.MustTileFromCode("?"),
-	}
-
-	p, err := player.NewInvisiblePlayer(handTiles)
+	p, err := player.NewInvisiblePlayer()
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
@@ -329,15 +244,7 @@ func TestInvisiblePlayer_Discard_DrawnTile(t *testing.T) {
 }
 
 func TestInvisiblePlayer_Discard_ClearExtraSafeTiles(t *testing.T) {
-	handTiles := [13]tile.Tile{
-		*tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"),
-		*tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"),
-		*tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"),
-		*tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"),
-		*tile.MustTileFromCode("?"),
-	}
-
-	p, err := player.NewInvisiblePlayer(handTiles)
+	p, err := player.NewInvisiblePlayer()
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
@@ -368,15 +275,7 @@ func TestInvisiblePlayer_Discard_ClearExtraSafeTiles(t *testing.T) {
 }
 
 func TestInvisiblePlayer_Discard_NotClearExtraSafeTilesAfterRiichi(t *testing.T) {
-	handTiles := [13]tile.Tile{
-		*tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"),
-		*tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"),
-		*tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"),
-		*tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"),
-		*tile.MustTileFromCode("?"),
-	}
-
-	p, err := player.NewInvisiblePlayer(handTiles)
+	p, err := player.NewInvisiblePlayer()
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
@@ -423,15 +322,7 @@ func TestInvisiblePlayer_Discard_NotClearExtraSafeTilesAfterRiichi(t *testing.T)
 }
 
 func TestInvisiblePlayer_Discard_CannotDiscardBeforeDraw(t *testing.T) {
-	handTiles := [13]tile.Tile{
-		*tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"),
-		*tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"),
-		*tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"),
-		*tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"),
-		*tile.MustTileFromCode("?"),
-	}
-
-	p, err := player.NewInvisiblePlayer(handTiles)
+	p, err := player.NewInvisiblePlayer()
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
@@ -443,15 +334,7 @@ func TestInvisiblePlayer_Discard_CannotDiscardBeforeDraw(t *testing.T) {
 }
 
 func TestInvisiblePlayer_Discard_CannotDiscardUnknown(t *testing.T) {
-	handTiles := [13]tile.Tile{
-		*tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"),
-		*tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"),
-		*tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"),
-		*tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"),
-		*tile.MustTileFromCode("?"),
-	}
-
-	p, err := player.NewInvisiblePlayer(handTiles)
+	p, err := player.NewInvisiblePlayer()
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
@@ -468,15 +351,7 @@ func TestInvisiblePlayer_Discard_CannotDiscardUnknown(t *testing.T) {
 }
 
 func TestInvisiblePlayer_Discard_CannotDiscardFromHandAfterRiichi(t *testing.T) {
-	handTiles := [13]tile.Tile{
-		*tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"),
-		*tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"),
-		*tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"),
-		*tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"),
-		*tile.MustTileFromCode("?"),
-	}
-
-	p, err := player.NewInvisiblePlayer(handTiles)
+	p, err := player.NewInvisiblePlayer()
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
@@ -511,15 +386,7 @@ func TestInvisiblePlayer_Discard_CannotDiscardFromHandAfterRiichi(t *testing.T) 
 }
 
 func TestInvisiblePlayer_Discard_CannotDiscardSwapCallTiles(t *testing.T) {
-	handTiles := [13]tile.Tile{
-		*tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"),
-		*tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"),
-		*tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"),
-		*tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"),
-		*tile.MustTileFromCode("?"),
-	}
-
-	p, err := player.NewInvisiblePlayer(handTiles)
+	p, err := player.NewInvisiblePlayer()
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
@@ -540,15 +407,7 @@ func TestInvisiblePlayer_Discard_CannotDiscardSwapCallTiles(t *testing.T) {
 }
 
 func TestInvisiblePlayer_Chii_Success(t *testing.T) {
-	handTiles := [13]tile.Tile{
-		*tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"),
-		*tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"),
-		*tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"),
-		*tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"),
-		*tile.MustTileFromCode("?"),
-	}
-
-	p, err := player.NewInvisiblePlayer(handTiles)
+	p, err := player.NewInvisiblePlayer()
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
@@ -587,15 +446,7 @@ func TestInvisiblePlayer_Chii_Success(t *testing.T) {
 }
 
 func TestInvisiblePlayer_Chii_CannotAfterDraw(t *testing.T) {
-	handTiles := [13]tile.Tile{
-		*tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"),
-		*tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"),
-		*tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"),
-		*tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"),
-		*tile.MustTileFromCode("?"),
-	}
-
-	p, err := player.NewInvisiblePlayer(handTiles)
+	p, err := player.NewInvisiblePlayer()
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
@@ -616,15 +467,7 @@ func TestInvisiblePlayer_Chii_CannotAfterDraw(t *testing.T) {
 }
 
 func TestInvisiblePlayer_Chii_CannotAfterRiichi(t *testing.T) {
-	handTiles := [13]tile.Tile{
-		*tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"),
-		*tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"),
-		*tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"),
-		*tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"),
-		*tile.MustTileFromCode("?"),
-	}
-
-	p, err := player.NewInvisiblePlayer(handTiles)
+	p, err := player.NewInvisiblePlayer()
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
@@ -658,15 +501,7 @@ func TestInvisiblePlayer_Chii_CannotAfterRiichi(t *testing.T) {
 }
 
 func TestInvisiblePlayer_Chii_CannotAfterKan(t *testing.T) {
-	handTiles := [13]tile.Tile{
-		*tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"),
-		*tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"),
-		*tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"),
-		*tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"),
-		*tile.MustTileFromCode("?"),
-	}
-
-	p, err := player.NewInvisiblePlayer(handTiles)
+	p, err := player.NewInvisiblePlayer()
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
@@ -691,15 +526,7 @@ func TestInvisiblePlayer_Chii_CannotAfterKan(t *testing.T) {
 }
 
 func TestInvisiblePlayer_Pon_Success(t *testing.T) {
-	handTiles := [13]tile.Tile{
-		*tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"),
-		*tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"),
-		*tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"),
-		*tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"),
-		*tile.MustTileFromCode("?"),
-	}
-
-	p, err := player.NewInvisiblePlayer(handTiles)
+	p, err := player.NewInvisiblePlayer()
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
@@ -738,15 +565,7 @@ func TestInvisiblePlayer_Pon_Success(t *testing.T) {
 }
 
 func TestInvisiblePlayer_Pon_CannotAfterDraw(t *testing.T) {
-	handTiles := [13]tile.Tile{
-		*tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"),
-		*tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"),
-		*tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"),
-		*tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"),
-		*tile.MustTileFromCode("?"),
-	}
-
-	p, err := player.NewInvisiblePlayer(handTiles)
+	p, err := player.NewInvisiblePlayer()
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
@@ -767,15 +586,7 @@ func TestInvisiblePlayer_Pon_CannotAfterDraw(t *testing.T) {
 }
 
 func TestInvisiblePlayer_Pon_CannotAfterRiichi(t *testing.T) {
-	handTiles := [13]tile.Tile{
-		*tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"),
-		*tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"),
-		*tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"),
-		*tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"),
-		*tile.MustTileFromCode("?"),
-	}
-
-	p, err := player.NewInvisiblePlayer(handTiles)
+	p, err := player.NewInvisiblePlayer()
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
@@ -809,15 +620,7 @@ func TestInvisiblePlayer_Pon_CannotAfterRiichi(t *testing.T) {
 }
 
 func TestInvisiblePlayer_Pon_Cannot5thCall(t *testing.T) {
-	handTiles := [13]tile.Tile{
-		*tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"),
-		*tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"),
-		*tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"),
-		*tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"),
-		*tile.MustTileFromCode("?"),
-	}
-
-	p, err := player.NewInvisiblePlayer(handTiles)
+	p, err := player.NewInvisiblePlayer()
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
@@ -849,15 +652,7 @@ func TestInvisiblePlayer_Pon_Cannot5thCall(t *testing.T) {
 }
 
 func TestInvisiblePlayer_CalledKan_Success(t *testing.T) {
-	handTiles := [13]tile.Tile{
-		*tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"),
-		*tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"),
-		*tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"),
-		*tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"),
-		*tile.MustTileFromCode("?"),
-	}
-
-	p, err := player.NewInvisiblePlayer(handTiles)
+	p, err := player.NewInvisiblePlayer()
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
@@ -896,15 +691,7 @@ func TestInvisiblePlayer_CalledKan_Success(t *testing.T) {
 }
 
 func TestInvisiblePlayer_CalledKan_CannotAfterDraw(t *testing.T) {
-	handTiles := [13]tile.Tile{
-		*tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"),
-		*tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"),
-		*tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"),
-		*tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"),
-		*tile.MustTileFromCode("?"),
-	}
-
-	p, err := player.NewInvisiblePlayer(handTiles)
+	p, err := player.NewInvisiblePlayer()
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
@@ -925,15 +712,7 @@ func TestInvisiblePlayer_CalledKan_CannotAfterDraw(t *testing.T) {
 }
 
 func TestInvisiblePlayer_CalledKan_CannotAfterRiichi(t *testing.T) {
-	handTiles := [13]tile.Tile{
-		*tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"),
-		*tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"),
-		*tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"),
-		*tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"),
-		*tile.MustTileFromCode("?"),
-	}
-
-	p, err := player.NewInvisiblePlayer(handTiles)
+	p, err := player.NewInvisiblePlayer()
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
@@ -967,15 +746,7 @@ func TestInvisiblePlayer_CalledKan_CannotAfterRiichi(t *testing.T) {
 }
 
 func TestInvisiblePlayer_ConcealedKan_Success(t *testing.T) {
-	handTiles := [13]tile.Tile{
-		*tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"),
-		*tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"),
-		*tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"),
-		*tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"),
-		*tile.MustTileFromCode("?"),
-	}
-
-	p, err := player.NewInvisiblePlayer(handTiles)
+	p, err := player.NewInvisiblePlayer()
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
@@ -1017,15 +788,7 @@ func TestInvisiblePlayer_ConcealedKan_Success(t *testing.T) {
 }
 
 func TestInvisiblePlayer_ConcealedKan_CannotBeforeDraw(t *testing.T) {
-	handTiles := [13]tile.Tile{
-		*tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"),
-		*tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"),
-		*tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"),
-		*tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"),
-		*tile.MustTileFromCode("?"),
-	}
-
-	p, err := player.NewInvisiblePlayer(handTiles)
+	p, err := player.NewInvisiblePlayer()
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
@@ -1039,15 +802,7 @@ func TestInvisiblePlayer_ConcealedKan_CannotBeforeDraw(t *testing.T) {
 }
 
 func TestInvisiblePlayer_PromotedKan_Success(t *testing.T) {
-	handTiles := [13]tile.Tile{
-		*tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"),
-		*tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"),
-		*tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"),
-		*tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"),
-		*tile.MustTileFromCode("?"),
-	}
-
-	p, err := player.NewInvisiblePlayer(handTiles)
+	p, err := player.NewInvisiblePlayer()
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
@@ -1106,15 +861,7 @@ func TestInvisiblePlayer_PromotedKan_Success(t *testing.T) {
 }
 
 func TestInvisiblePlayer_PromotedKan_NoMatchingPonInMelds(t *testing.T) {
-	handTiles := [13]tile.Tile{
-		*tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"),
-		*tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"),
-		*tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"),
-		*tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"),
-		*tile.MustTileFromCode("?"),
-	}
-
-	p, err := player.NewInvisiblePlayer(handTiles)
+	p, err := player.NewInvisiblePlayer()
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
@@ -1150,15 +897,7 @@ func TestInvisiblePlayer_PromotedKan_NoMatchingPonInMelds(t *testing.T) {
 }
 
 func TestInvisiblePlayer_PromotedKan_CannotBeforeDraw(t *testing.T) {
-	handTiles := [13]tile.Tile{
-		*tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"),
-		*tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"),
-		*tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"),
-		*tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"),
-		*tile.MustTileFromCode("?"),
-	}
-
-	p, err := player.NewInvisiblePlayer(handTiles)
+	p, err := player.NewInvisiblePlayer()
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
@@ -1189,15 +928,7 @@ func TestInvisiblePlayer_PromotedKan_CannotBeforeDraw(t *testing.T) {
 }
 
 func TestInvisiblePlayer_Riichi_Success(t *testing.T) {
-	handTiles := [13]tile.Tile{
-		*tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"),
-		*tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"),
-		*tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"),
-		*tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"),
-		*tile.MustTileFromCode("?"),
-	}
-
-	p, err := player.NewInvisiblePlayer(handTiles)
+	p, err := player.NewInvisiblePlayer()
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
@@ -1227,15 +958,7 @@ func TestInvisiblePlayer_Riichi_Success(t *testing.T) {
 }
 
 func TestInvisiblePlayer_Riichi_CannotDeclareTwice(t *testing.T) {
-	handTiles := [13]tile.Tile{
-		*tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"),
-		*tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"),
-		*tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"),
-		*tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"),
-		*tile.MustTileFromCode("?"),
-	}
-
-	p, err := player.NewInvisiblePlayer(handTiles)
+	p, err := player.NewInvisiblePlayer()
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
@@ -1255,15 +978,7 @@ func TestInvisiblePlayer_Riichi_CannotDeclareTwice(t *testing.T) {
 }
 
 func TestInvisiblePlayer_Riichi_CannotDeclareBeforeDraw(t *testing.T) {
-	handTiles := [13]tile.Tile{
-		*tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"),
-		*tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"),
-		*tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"),
-		*tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"),
-		*tile.MustTileFromCode("?"),
-	}
-
-	p, err := player.NewInvisiblePlayer(handTiles)
+	p, err := player.NewInvisiblePlayer()
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
@@ -1274,15 +989,7 @@ func TestInvisiblePlayer_Riichi_CannotDeclareBeforeDraw(t *testing.T) {
 }
 
 func TestInvisiblePlayer_Riichi_CannotDeclareWithOpenMeld(t *testing.T) {
-	handTiles := [13]tile.Tile{
-		*tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"),
-		*tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"),
-		*tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"),
-		*tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"),
-		*tile.MustTileFromCode("?"),
-	}
-
-	p, err := player.NewInvisiblePlayer(handTiles)
+	p, err := player.NewInvisiblePlayer()
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
@@ -1312,15 +1019,7 @@ func TestInvisiblePlayer_Riichi_CannotDeclareWithOpenMeld(t *testing.T) {
 }
 
 func TestInvisiblePlayer_RiichiAccepted_Success(t *testing.T) {
-	handTiles := [13]tile.Tile{
-		*tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"),
-		*tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"),
-		*tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"),
-		*tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"),
-		*tile.MustTileFromCode("?"),
-	}
-
-	p, err := player.NewInvisiblePlayer(handTiles)
+	p, err := player.NewInvisiblePlayer()
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
@@ -1360,15 +1059,7 @@ func TestInvisiblePlayer_RiichiAccepted_Success(t *testing.T) {
 }
 
 func TestInvisiblePlayer_RiichiAccepted_CannotAcceptTwice(t *testing.T) {
-	handTiles := [13]tile.Tile{
-		*tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"),
-		*tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"),
-		*tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"),
-		*tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"),
-		*tile.MustTileFromCode("?"),
-	}
-
-	p, err := player.NewInvisiblePlayer(handTiles)
+	p, err := player.NewInvisiblePlayer()
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
@@ -1397,15 +1088,7 @@ func TestInvisiblePlayer_RiichiAccepted_CannotAcceptTwice(t *testing.T) {
 }
 
 func TestInvisiblePlayer_RiichiAccepted_NotRiichi(t *testing.T) {
-	handTiles := [13]tile.Tile{
-		*tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"),
-		*tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"),
-		*tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"),
-		*tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"),
-		*tile.MustTileFromCode("?"),
-	}
-
-	p, err := player.NewInvisiblePlayer(handTiles)
+	p, err := player.NewInvisiblePlayer()
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
@@ -1426,15 +1109,7 @@ func TestInvisiblePlayer_RiichiAccepted_NotRiichi(t *testing.T) {
 }
 
 func TestInvisiblePlayer_AddExtraSafeTiles(t *testing.T) {
-	handTiles := [13]tile.Tile{
-		*tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"),
-		*tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"),
-		*tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"),
-		*tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"),
-		*tile.MustTileFromCode("?"),
-	}
-
-	p, err := player.NewInvisiblePlayer(handTiles)
+	p, err := player.NewInvisiblePlayer()
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
@@ -1455,15 +1130,7 @@ func TestInvisiblePlayer_AddExtraSafeTiles(t *testing.T) {
 }
 
 func TestInvisiblePlayer_AddExtraSafeTiles_Panic(t *testing.T) {
-	handTiles := [13]tile.Tile{
-		*tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"),
-		*tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"),
-		*tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"),
-		*tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"),
-		*tile.MustTileFromCode("?"),
-	}
-
-	p, err := player.NewInvisiblePlayer(handTiles)
+	p, err := player.NewInvisiblePlayer()
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
@@ -1480,15 +1147,7 @@ func TestInvisiblePlayer_AddExtraSafeTiles_Panic(t *testing.T) {
 }
 
 func TestInvisiblePlayer_TakeFromRiver(t *testing.T) {
-	handTiles := [13]tile.Tile{
-		*tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"),
-		*tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"),
-		*tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"),
-		*tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"),
-		*tile.MustTileFromCode("?"),
-	}
-
-	p, err := player.NewInvisiblePlayer(handTiles)
+	p, err := player.NewInvisiblePlayer()
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
@@ -1521,15 +1180,7 @@ func TestInvisiblePlayer_TakeFromRiver(t *testing.T) {
 }
 
 func TestInvisiblePlayer_TakeFromRiver_Mismatch(t *testing.T) {
-	handTiles := [13]tile.Tile{
-		*tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"),
-		*tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"),
-		*tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"),
-		*tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"),
-		*tile.MustTileFromCode("?"),
-	}
-
-	p, err := player.NewInvisiblePlayer(handTiles)
+	p, err := player.NewInvisiblePlayer()
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
@@ -1551,15 +1202,7 @@ func TestInvisiblePlayer_TakeFromRiver_Mismatch(t *testing.T) {
 }
 
 func TestInvisiblePlayer_TakeFromRiver_Unknown(t *testing.T) {
-	handTiles := [13]tile.Tile{
-		*tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"),
-		*tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"),
-		*tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"),
-		*tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"),
-		*tile.MustTileFromCode("?"),
-	}
-
-	p, err := player.NewInvisiblePlayer(handTiles)
+	p, err := player.NewInvisiblePlayer()
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
