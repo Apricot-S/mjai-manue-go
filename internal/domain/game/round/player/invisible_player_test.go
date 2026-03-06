@@ -11,11 +11,7 @@ import (
 )
 
 func TestNewInvisiblePlayer(t *testing.T) {
-	got, gotErr := player.NewInvisiblePlayer()
-	if gotErr != nil {
-		t.Errorf("NewVisiblePlayer() failed: %v", gotErr)
-		return
-	}
+	got := player.NewInvisiblePlayer()
 
 	h, ok := got.Hand()
 	if ok {
@@ -71,10 +67,7 @@ func TestNewInvisiblePlayer(t *testing.T) {
 }
 
 func TestInvisiblePlayer_Draw_Unknown(t *testing.T) {
-	p, err := player.NewInvisiblePlayer()
-	if err != nil {
-		t.Fatalf("unexpected error: %v", err)
-	}
+	p := player.NewInvisiblePlayer()
 
 	drawnTile := tile.MustTileFromCode("?")
 	if err := p.Draw(*drawnTile); err != nil {
@@ -94,10 +87,7 @@ func TestInvisiblePlayer_Draw_Unknown(t *testing.T) {
 }
 
 func TestInvisiblePlayer_Draw_Visible(t *testing.T) {
-	p, err := player.NewInvisiblePlayer()
-	if err != nil {
-		t.Fatalf("unexpected error: %v", err)
-	}
+	p := player.NewInvisiblePlayer()
 
 	drawnTile := tile.MustTileFromCode("1m")
 	if err := p.Draw(*drawnTile); err != nil {
@@ -117,10 +107,7 @@ func TestInvisiblePlayer_Draw_Visible(t *testing.T) {
 }
 
 func TestInvisiblePlayer_Draw_CannotDrawTwice(t *testing.T) {
-	p, err := player.NewInvisiblePlayer()
-	if err != nil {
-		t.Fatalf("unexpected error: %v", err)
-	}
+	p := player.NewInvisiblePlayer()
 
 	firstTile := tile.MustTileFromCode("?")
 	if err := p.Draw(*firstTile); err != nil {
@@ -134,10 +121,7 @@ func TestInvisiblePlayer_Draw_CannotDrawTwice(t *testing.T) {
 }
 
 func TestInvisiblePlayer_Draw_CannotDrawBeforeRiichiAccepted(t *testing.T) {
-	p, err := player.NewInvisiblePlayer()
-	if err != nil {
-		t.Fatalf("unexpected error: %v", err)
-	}
+	p := player.NewInvisiblePlayer()
 
 	firstTile := tile.MustTileFromCode("S")
 	if err := p.Draw(*firstTile); err != nil {
@@ -160,10 +144,7 @@ func TestInvisiblePlayer_Draw_CannotDrawBeforeRiichiAccepted(t *testing.T) {
 }
 
 func TestInvisiblePlayer_Discard_TileInHand(t *testing.T) {
-	p, err := player.NewInvisiblePlayer()
-	if err != nil {
-		t.Fatalf("unexpected error: %v", err)
-	}
+	p := player.NewInvisiblePlayer()
 
 	drawnTile := tile.MustTileFromCode("1m")
 	if err := p.Draw(*drawnTile); err != nil {
@@ -202,10 +183,7 @@ func TestInvisiblePlayer_Discard_TileInHand(t *testing.T) {
 }
 
 func TestInvisiblePlayer_Discard_DrawnTile(t *testing.T) {
-	p, err := player.NewInvisiblePlayer()
-	if err != nil {
-		t.Fatalf("unexpected error: %v", err)
-	}
+	p := player.NewInvisiblePlayer()
 
 	drawnTile := tile.MustTileFromCode("1m")
 	if err := p.Draw(*drawnTile); err != nil {
@@ -244,10 +222,7 @@ func TestInvisiblePlayer_Discard_DrawnTile(t *testing.T) {
 }
 
 func TestInvisiblePlayer_Discard_ClearExtraSafeTiles(t *testing.T) {
-	p, err := player.NewInvisiblePlayer()
-	if err != nil {
-		t.Fatalf("unexpected error: %v", err)
-	}
+	p := player.NewInvisiblePlayer()
 
 	p.AddExtraSafeTiles(*tile.MustTileFromCode("1m"))
 	p.AddExtraSafeTiles(*tile.MustTileFromCode("2m"))
@@ -275,10 +250,7 @@ func TestInvisiblePlayer_Discard_ClearExtraSafeTiles(t *testing.T) {
 }
 
 func TestInvisiblePlayer_Discard_NotClearExtraSafeTilesAfterRiichi(t *testing.T) {
-	p, err := player.NewInvisiblePlayer()
-	if err != nil {
-		t.Fatalf("unexpected error: %v", err)
-	}
+	p := player.NewInvisiblePlayer()
 
 	drawnTile := tile.MustTileFromCode("S")
 	if err := p.Draw(*drawnTile); err != nil {
@@ -322,10 +294,7 @@ func TestInvisiblePlayer_Discard_NotClearExtraSafeTilesAfterRiichi(t *testing.T)
 }
 
 func TestInvisiblePlayer_Discard_CannotDiscardBeforeDraw(t *testing.T) {
-	p, err := player.NewInvisiblePlayer()
-	if err != nil {
-		t.Fatalf("unexpected error: %v", err)
-	}
+	p := player.NewInvisiblePlayer()
 
 	discardedTile := tile.MustTileFromCode("C")
 	if err := p.Discard(*discardedTile, false); err == nil {
@@ -334,10 +303,7 @@ func TestInvisiblePlayer_Discard_CannotDiscardBeforeDraw(t *testing.T) {
 }
 
 func TestInvisiblePlayer_Discard_CannotDiscardUnknown(t *testing.T) {
-	p, err := player.NewInvisiblePlayer()
-	if err != nil {
-		t.Fatalf("unexpected error: %v", err)
-	}
+	p := player.NewInvisiblePlayer()
 
 	drawnTile := tile.MustTileFromCode("1m")
 	if err := p.Draw(*drawnTile); err != nil {
@@ -351,10 +317,7 @@ func TestInvisiblePlayer_Discard_CannotDiscardUnknown(t *testing.T) {
 }
 
 func TestInvisiblePlayer_Discard_CannotDiscardFromHandAfterRiichi(t *testing.T) {
-	p, err := player.NewInvisiblePlayer()
-	if err != nil {
-		t.Fatalf("unexpected error: %v", err)
-	}
+	p := player.NewInvisiblePlayer()
 
 	drawnTile := tile.MustTileFromCode("S")
 	if err := p.Draw(*drawnTile); err != nil {
@@ -386,10 +349,7 @@ func TestInvisiblePlayer_Discard_CannotDiscardFromHandAfterRiichi(t *testing.T) 
 }
 
 func TestInvisiblePlayer_Discard_CannotDiscardSwapCallTiles(t *testing.T) {
-	p, err := player.NewInvisiblePlayer()
-	if err != nil {
-		t.Fatalf("unexpected error: %v", err)
-	}
+	p := player.NewInvisiblePlayer()
 
 	pon := meld.MustPon(
 		*tile.MustTileFromCode("5p"),
@@ -407,10 +367,7 @@ func TestInvisiblePlayer_Discard_CannotDiscardSwapCallTiles(t *testing.T) {
 }
 
 func TestInvisiblePlayer_Chii_Success(t *testing.T) {
-	p, err := player.NewInvisiblePlayer()
-	if err != nil {
-		t.Fatalf("unexpected error: %v", err)
-	}
+	p := player.NewInvisiblePlayer()
 
 	chii := meld.MustChii(
 		*tile.MustTileFromCode("4m"),
@@ -446,10 +403,7 @@ func TestInvisiblePlayer_Chii_Success(t *testing.T) {
 }
 
 func TestInvisiblePlayer_Chii_CannotAfterDraw(t *testing.T) {
-	p, err := player.NewInvisiblePlayer()
-	if err != nil {
-		t.Fatalf("unexpected error: %v", err)
-	}
+	p := player.NewInvisiblePlayer()
 
 	drawnTile := tile.MustTileFromCode("S")
 	if err := p.Draw(*drawnTile); err != nil {
@@ -467,10 +421,7 @@ func TestInvisiblePlayer_Chii_CannotAfterDraw(t *testing.T) {
 }
 
 func TestInvisiblePlayer_Chii_CannotAfterRiichi(t *testing.T) {
-	p, err := player.NewInvisiblePlayer()
-	if err != nil {
-		t.Fatalf("unexpected error: %v", err)
-	}
+	p := player.NewInvisiblePlayer()
 
 	drawnTile := tile.MustTileFromCode("S")
 	if err := p.Draw(*drawnTile); err != nil {
@@ -501,10 +452,7 @@ func TestInvisiblePlayer_Chii_CannotAfterRiichi(t *testing.T) {
 }
 
 func TestInvisiblePlayer_Chii_CannotAfterKan(t *testing.T) {
-	p, err := player.NewInvisiblePlayer()
-	if err != nil {
-		t.Fatalf("unexpected error: %v", err)
-	}
+	p := player.NewInvisiblePlayer()
 
 	kan := meld.MustCalledKan(
 		*tile.MustTileFromCode("E"),
@@ -526,10 +474,7 @@ func TestInvisiblePlayer_Chii_CannotAfterKan(t *testing.T) {
 }
 
 func TestInvisiblePlayer_Pon_Success(t *testing.T) {
-	p, err := player.NewInvisiblePlayer()
-	if err != nil {
-		t.Fatalf("unexpected error: %v", err)
-	}
+	p := player.NewInvisiblePlayer()
 
 	pon := meld.MustPon(
 		*tile.MustTileFromCode("E"),
@@ -565,10 +510,7 @@ func TestInvisiblePlayer_Pon_Success(t *testing.T) {
 }
 
 func TestInvisiblePlayer_Pon_CannotAfterDraw(t *testing.T) {
-	p, err := player.NewInvisiblePlayer()
-	if err != nil {
-		t.Fatalf("unexpected error: %v", err)
-	}
+	p := player.NewInvisiblePlayer()
 
 	drawnTile := tile.MustTileFromCode("S")
 	if err := p.Draw(*drawnTile); err != nil {
@@ -586,10 +528,7 @@ func TestInvisiblePlayer_Pon_CannotAfterDraw(t *testing.T) {
 }
 
 func TestInvisiblePlayer_Pon_CannotAfterRiichi(t *testing.T) {
-	p, err := player.NewInvisiblePlayer()
-	if err != nil {
-		t.Fatalf("unexpected error: %v", err)
-	}
+	p := player.NewInvisiblePlayer()
 
 	drawnTile := tile.MustTileFromCode("S")
 	if err := p.Draw(*drawnTile); err != nil {
@@ -620,10 +559,7 @@ func TestInvisiblePlayer_Pon_CannotAfterRiichi(t *testing.T) {
 }
 
 func TestInvisiblePlayer_Pon_Cannot5thCall(t *testing.T) {
-	p, err := player.NewInvisiblePlayer()
-	if err != nil {
-		t.Fatalf("unexpected error: %v", err)
-	}
+	p := player.NewInvisiblePlayer()
 
 	for _, wind := range []string{"E", "S", "W", "N"} {
 		pon := meld.MustPon(
@@ -652,10 +588,7 @@ func TestInvisiblePlayer_Pon_Cannot5thCall(t *testing.T) {
 }
 
 func TestInvisiblePlayer_CalledKan_Success(t *testing.T) {
-	p, err := player.NewInvisiblePlayer()
-	if err != nil {
-		t.Fatalf("unexpected error: %v", err)
-	}
+	p := player.NewInvisiblePlayer()
 
 	kan := meld.MustCalledKan(
 		*tile.MustTileFromCode("E"),
@@ -691,10 +624,7 @@ func TestInvisiblePlayer_CalledKan_Success(t *testing.T) {
 }
 
 func TestInvisiblePlayer_CalledKan_CannotAfterDraw(t *testing.T) {
-	p, err := player.NewInvisiblePlayer()
-	if err != nil {
-		t.Fatalf("unexpected error: %v", err)
-	}
+	p := player.NewInvisiblePlayer()
 
 	drawnTile := tile.MustTileFromCode("S")
 	if err := p.Draw(*drawnTile); err != nil {
@@ -712,10 +642,7 @@ func TestInvisiblePlayer_CalledKan_CannotAfterDraw(t *testing.T) {
 }
 
 func TestInvisiblePlayer_CalledKan_CannotAfterRiichi(t *testing.T) {
-	p, err := player.NewInvisiblePlayer()
-	if err != nil {
-		t.Fatalf("unexpected error: %v", err)
-	}
+	p := player.NewInvisiblePlayer()
 
 	drawnTile := tile.MustTileFromCode("E")
 	if err := p.Draw(*drawnTile); err != nil {
@@ -746,10 +673,7 @@ func TestInvisiblePlayer_CalledKan_CannotAfterRiichi(t *testing.T) {
 }
 
 func TestInvisiblePlayer_ConcealedKan_Success(t *testing.T) {
-	p, err := player.NewInvisiblePlayer()
-	if err != nil {
-		t.Fatalf("unexpected error: %v", err)
-	}
+	p := player.NewInvisiblePlayer()
 
 	drawnTile := tile.MustTileFromCode("E")
 	if err := p.Draw(*drawnTile); err != nil {
@@ -788,10 +712,7 @@ func TestInvisiblePlayer_ConcealedKan_Success(t *testing.T) {
 }
 
 func TestInvisiblePlayer_ConcealedKan_CannotBeforeDraw(t *testing.T) {
-	p, err := player.NewInvisiblePlayer()
-	if err != nil {
-		t.Fatalf("unexpected error: %v", err)
-	}
+	p := player.NewInvisiblePlayer()
 
 	kan := meld.MustConcealedKan(
 		[4]tile.Tile{*tile.MustTileFromCode("E"), *tile.MustTileFromCode("E"), *tile.MustTileFromCode("E"), *tile.MustTileFromCode("E")},
@@ -802,10 +723,7 @@ func TestInvisiblePlayer_ConcealedKan_CannotBeforeDraw(t *testing.T) {
 }
 
 func TestInvisiblePlayer_PromotedKan_Success(t *testing.T) {
-	p, err := player.NewInvisiblePlayer()
-	if err != nil {
-		t.Fatalf("unexpected error: %v", err)
-	}
+	p := player.NewInvisiblePlayer()
 
 	pon := meld.MustPon(
 		*tile.MustTileFromCode("E"),
@@ -861,10 +779,7 @@ func TestInvisiblePlayer_PromotedKan_Success(t *testing.T) {
 }
 
 func TestInvisiblePlayer_PromotedKan_NoMatchingPonInMelds(t *testing.T) {
-	p, err := player.NewInvisiblePlayer()
-	if err != nil {
-		t.Fatalf("unexpected error: %v", err)
-	}
+	p := player.NewInvisiblePlayer()
 
 	pon := meld.MustPon(
 		*tile.MustTileFromCode("E"),
@@ -897,10 +812,7 @@ func TestInvisiblePlayer_PromotedKan_NoMatchingPonInMelds(t *testing.T) {
 }
 
 func TestInvisiblePlayer_PromotedKan_CannotBeforeDraw(t *testing.T) {
-	p, err := player.NewInvisiblePlayer()
-	if err != nil {
-		t.Fatalf("unexpected error: %v", err)
-	}
+	p := player.NewInvisiblePlayer()
 
 	pon := meld.MustPon(
 		*tile.MustTileFromCode("E"),
@@ -928,10 +840,7 @@ func TestInvisiblePlayer_PromotedKan_CannotBeforeDraw(t *testing.T) {
 }
 
 func TestInvisiblePlayer_Riichi_Success(t *testing.T) {
-	p, err := player.NewInvisiblePlayer()
-	if err != nil {
-		t.Fatalf("unexpected error: %v", err)
-	}
+	p := player.NewInvisiblePlayer()
 
 	drawnTile := tile.MustTileFromCode("S")
 	if err := p.Draw(*drawnTile); err != nil {
@@ -958,10 +867,7 @@ func TestInvisiblePlayer_Riichi_Success(t *testing.T) {
 }
 
 func TestInvisiblePlayer_Riichi_CannotDeclareTwice(t *testing.T) {
-	p, err := player.NewInvisiblePlayer()
-	if err != nil {
-		t.Fatalf("unexpected error: %v", err)
-	}
+	p := player.NewInvisiblePlayer()
 
 	drawnTile := tile.MustTileFromCode("S")
 	if err := p.Draw(*drawnTile); err != nil {
@@ -978,10 +884,7 @@ func TestInvisiblePlayer_Riichi_CannotDeclareTwice(t *testing.T) {
 }
 
 func TestInvisiblePlayer_Riichi_CannotDeclareBeforeDraw(t *testing.T) {
-	p, err := player.NewInvisiblePlayer()
-	if err != nil {
-		t.Fatalf("unexpected error: %v", err)
-	}
+	p := player.NewInvisiblePlayer()
 
 	if err := p.Riichi(); err == nil {
 		t.Errorf("Riichi should fail when called before Draw; expected error but got nil")
@@ -989,10 +892,7 @@ func TestInvisiblePlayer_Riichi_CannotDeclareBeforeDraw(t *testing.T) {
 }
 
 func TestInvisiblePlayer_Riichi_CannotDeclareWithOpenMeld(t *testing.T) {
-	p, err := player.NewInvisiblePlayer()
-	if err != nil {
-		t.Fatalf("unexpected error: %v", err)
-	}
+	p := player.NewInvisiblePlayer()
 
 	pon := meld.MustPon(
 		*tile.MustTileFromCode("E"),
@@ -1019,10 +919,7 @@ func TestInvisiblePlayer_Riichi_CannotDeclareWithOpenMeld(t *testing.T) {
 }
 
 func TestInvisiblePlayer_RiichiAccepted_Success(t *testing.T) {
-	p, err := player.NewInvisiblePlayer()
-	if err != nil {
-		t.Fatalf("unexpected error: %v", err)
-	}
+	p := player.NewInvisiblePlayer()
 
 	firstTile := tile.MustTileFromCode("S")
 	if err := p.Draw(*firstTile); err != nil {
@@ -1059,10 +956,7 @@ func TestInvisiblePlayer_RiichiAccepted_Success(t *testing.T) {
 }
 
 func TestInvisiblePlayer_RiichiAccepted_CannotAcceptTwice(t *testing.T) {
-	p, err := player.NewInvisiblePlayer()
-	if err != nil {
-		t.Fatalf("unexpected error: %v", err)
-	}
+	p := player.NewInvisiblePlayer()
 
 	firstTile := tile.MustTileFromCode("S")
 	if err := p.Draw(*firstTile); err != nil {
@@ -1088,10 +982,7 @@ func TestInvisiblePlayer_RiichiAccepted_CannotAcceptTwice(t *testing.T) {
 }
 
 func TestInvisiblePlayer_RiichiAccepted_NotRiichi(t *testing.T) {
-	p, err := player.NewInvisiblePlayer()
-	if err != nil {
-		t.Fatalf("unexpected error: %v", err)
-	}
+	p := player.NewInvisiblePlayer()
 
 	firstTile := tile.MustTileFromCode("S")
 	if err := p.Draw(*firstTile); err != nil {
@@ -1109,10 +1000,7 @@ func TestInvisiblePlayer_RiichiAccepted_NotRiichi(t *testing.T) {
 }
 
 func TestInvisiblePlayer_AddExtraSafeTiles(t *testing.T) {
-	p, err := player.NewInvisiblePlayer()
-	if err != nil {
-		t.Fatalf("unexpected error: %v", err)
-	}
+	p := player.NewInvisiblePlayer()
 
 	p.AddExtraSafeTiles(*tile.MustTileFromCode("5s"))
 	got := p.ExtraSafeTiles()
@@ -1130,10 +1018,7 @@ func TestInvisiblePlayer_AddExtraSafeTiles(t *testing.T) {
 }
 
 func TestInvisiblePlayer_AddExtraSafeTiles_Panic(t *testing.T) {
-	p, err := player.NewInvisiblePlayer()
-	if err != nil {
-		t.Fatalf("unexpected error: %v", err)
-	}
+	p := player.NewInvisiblePlayer()
 
 	t.Run("unknown tile", func(t *testing.T) {
 		defer func() {
@@ -1147,10 +1032,7 @@ func TestInvisiblePlayer_AddExtraSafeTiles_Panic(t *testing.T) {
 }
 
 func TestInvisiblePlayer_TakeFromRiver(t *testing.T) {
-	p, err := player.NewInvisiblePlayer()
-	if err != nil {
-		t.Fatalf("unexpected error: %v", err)
-	}
+	p := player.NewInvisiblePlayer()
 
 	drawnTile := tile.MustTileFromCode("P")
 	if err := p.Draw(*drawnTile); err != nil {
@@ -1180,10 +1062,7 @@ func TestInvisiblePlayer_TakeFromRiver(t *testing.T) {
 }
 
 func TestInvisiblePlayer_TakeFromRiver_Mismatch(t *testing.T) {
-	p, err := player.NewInvisiblePlayer()
-	if err != nil {
-		t.Fatalf("unexpected error: %v", err)
-	}
+	p := player.NewInvisiblePlayer()
 
 	drawnTile := tile.MustTileFromCode("P")
 	if err := p.Draw(*drawnTile); err != nil {
@@ -1202,10 +1081,7 @@ func TestInvisiblePlayer_TakeFromRiver_Mismatch(t *testing.T) {
 }
 
 func TestInvisiblePlayer_TakeFromRiver_Unknown(t *testing.T) {
-	p, err := player.NewInvisiblePlayer()
-	if err != nil {
-		t.Fatalf("unexpected error: %v", err)
-	}
+	p := player.NewInvisiblePlayer()
 
 	drawnTile := tile.MustTileFromCode("P")
 	if err := p.Draw(*drawnTile); err != nil {

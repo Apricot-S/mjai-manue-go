@@ -24,21 +24,17 @@ type InvisiblePlayer struct {
 	needsDeadWallDraw         bool
 }
 
-var initInvisibleHand tile.Tiles = tile.Tiles{
+var initInvisibleHandTiles tile.Tiles = tile.Tiles{
 	*tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"),
 	*tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"),
 	*tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"),
 	*tile.MustTileFromCode("?"),
 }
+var initInvisibleHand hand.InvisibleHand = *hand.MustInvisibleHand(initInvisibleHandTiles)
 
-func NewInvisiblePlayer() (*InvisiblePlayer, error) {
-	h, err := hand.NewInvisibleHand(initInvisibleHand)
-	if err != nil {
-		return nil, err
-	}
-
+func NewInvisiblePlayer() *InvisiblePlayer {
 	return &InvisiblePlayer{
-		hand:                      *h,
+		hand:                      initInvisibleHand,
 		drawnTile:                 nil,
 		melds:                     make([]meld.Meld, 0, maxNumMelds),
 		river:                     make([]tile.Tile, 0, maxNumRiver),
@@ -50,7 +46,7 @@ func NewInvisiblePlayer() (*InvisiblePlayer, error) {
 		isConcealed:               true,
 		swapCallTiles:             nil,
 		needsDeadWallDraw:         false,
-	}, nil
+	}
 }
 
 func (p *InvisiblePlayer) Hand() (*hand.VisibleHand, bool) {
