@@ -7,6 +7,7 @@ import (
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/id"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/round"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/round/player"
+	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/round/player/meld"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/tile"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/wind"
 )
@@ -375,7 +376,12 @@ func TestState_VisibleTiles(t *testing.T) {
 
 	player0.Draw(*tile.MustTileFromCode("5m"))
 	player0.Discard(*tile.MustTileFromCode("1m"), false)
-	player1.Draw(*tile.MustTileFromCode("5p"))
+	player1.Chii(*meld.MustChii(
+		*tile.MustTileFromCode("1m"),
+		[2]tile.Tile{*tile.MustTileFromCode("2m"), *tile.MustTileFromCode("3m")},
+		*id.MustID(0),
+	))
+	player0.TakeFromRiver(*tile.MustTileFromCode("1m"))
 	player1.Discard(*tile.MustTileFromCode("5p"), false)
 
 	tests := []struct {
@@ -389,8 +395,8 @@ func TestState_VisibleTiles(t *testing.T) {
 			players:  [4]player.Player{player0, player1, player2, player3},
 			playerID: *id.MustID(0),
 			want: []tile.Tile{
-				*tile.MustTileFromCode("1m"),
 				*tile.MustTileFromCode("5p"),
+				*tile.MustTileFromCode("1m"), *tile.MustTileFromCode("2m"), *tile.MustTileFromCode("3m"),
 				*tile.MustTileFromCode("5mr"),
 				*tile.MustTileFromCode("2m"), *tile.MustTileFromCode("3m"), *tile.MustTileFromCode("4m"), *tile.MustTileFromCode("5m"),
 				*tile.MustTileFromCode("1p"), *tile.MustTileFromCode("2p"), *tile.MustTileFromCode("3p"), *tile.MustTileFromCode("4p"),

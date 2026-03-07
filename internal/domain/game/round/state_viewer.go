@@ -106,7 +106,9 @@ func (s *State) VisibleTiles(playerID id.ID) tile.Tiles {
 		p := s.players[i]
 		visibleTiles = slices.Concat(visibleTiles, p.River())
 
-		// TODO: Add melds
+		for _, m := range p.Melds() {
+			visibleTiles = slices.Concat(visibleTiles, m.ToTiles())
+		}
 	}
 
 	var handTiles tile.Tiles
