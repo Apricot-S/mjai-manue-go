@@ -102,7 +102,7 @@ func (s *State) SeatWind(playerID id.ID) wind.Wind {
 func (s *State) VisibleTiles(playerID id.ID) tile.Tiles {
 	var visibleTiles tile.Tiles
 
-	for i := range 4 {
+	for i := range NumPlayers {
 		p := s.players[i]
 		visibleTiles = slices.Concat(visibleTiles, p.River())
 
