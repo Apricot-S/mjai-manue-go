@@ -99,6 +99,24 @@ func (s *State) SeatWind(playerID id.ID) wind.Wind {
 	return wind.Wind((playerID.Index()+1-s.RoundNumber()+4)%4 + 1)
 }
 
+func (s *State) VisibleTiles(playerID id.ID) tile.Tiles {
+	var visibleTiles tile.Tiles
+
+	for i := range 4 {
+		p := s.players[i]
+		visibleTiles = slices.Concat(visibleTiles, p.River())
+
+		// TODO: Add melds
+	}
+
+	var handTiles tile.Tiles
+	if h, isVisible := s.Player(playerID).Hand(); isVisible {
+		handTiles = h.ToTiles()
+	}
+
+	return slices.Concat(visibleTiles, s.DoraIndicators(), handTiles)
+}
+
 func (s *State) SafeTiles(playerID id.ID) tile.Tiles {
 	p := s.Player(playerID)
 	return slices.Concat(p.DiscardedTiles(), p.ExtraSafeTiles())

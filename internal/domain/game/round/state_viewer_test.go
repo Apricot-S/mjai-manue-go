@@ -345,6 +345,71 @@ func TestState_SeatWind(t *testing.T) {
 	}
 }
 
+func TestState_VisibleTiles(t *testing.T) {
+	newInitStateForTest := func(players [4]player.Player) round.State {
+		return round.NewStateForTest(
+			wind.East,
+			1,
+			0,
+			0,
+			[4]int{25000, 25000, 25000, 25000},
+			*id.MustID(0),
+			*id.MustID(0),
+			tile.Tiles{*tile.MustTileFromCode("5mr")},
+			round.NumInitWall,
+			players,
+		)
+	}
+
+	player0, _ := player.NewVisiblePlayer(
+		[13]tile.Tile{
+			*tile.MustTileFromCode("1m"), *tile.MustTileFromCode("2m"), *tile.MustTileFromCode("3m"), *tile.MustTileFromCode("4m"),
+			*tile.MustTileFromCode("1p"), *tile.MustTileFromCode("2p"), *tile.MustTileFromCode("3p"), *tile.MustTileFromCode("4p"),
+			*tile.MustTileFromCode("1s"), *tile.MustTileFromCode("2s"), *tile.MustTileFromCode("3s"), *tile.MustTileFromCode("4s"),
+			*tile.MustTileFromCode("E"),
+		},
+	)
+	player1 := player.NewInvisiblePlayer()
+	player2 := player.NewInvisiblePlayer()
+	player3 := player.NewInvisiblePlayer()
+
+	player0.Draw(*tile.MustTileFromCode("5m"))
+	player0.Discard(*tile.MustTileFromCode("1m"), false)
+	player1.Draw(*tile.MustTileFromCode("5p"))
+	player1.Discard(*tile.MustTileFromCode("5p"), false)
+
+	tests := []struct {
+		name     string
+		players  [4]player.Player
+		playerID id.ID
+		want     tile.Tiles
+	}{
+		{
+			name:     "player0",
+			players:  [4]player.Player{player0, player1, player2, player3},
+			playerID: *id.MustID(0),
+			want: []tile.Tile{
+				*tile.MustTileFromCode("1m"),
+				*tile.MustTileFromCode("5p"),
+				*tile.MustTileFromCode("5mr"),
+				*tile.MustTileFromCode("2m"), *tile.MustTileFromCode("3m"), *tile.MustTileFromCode("4m"), *tile.MustTileFromCode("5m"),
+				*tile.MustTileFromCode("1p"), *tile.MustTileFromCode("2p"), *tile.MustTileFromCode("3p"), *tile.MustTileFromCode("4p"),
+				*tile.MustTileFromCode("1s"), *tile.MustTileFromCode("2s"), *tile.MustTileFromCode("3s"), *tile.MustTileFromCode("4s"),
+				*tile.MustTileFromCode("E"),
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			s := newInitStateForTest(tt.players)
+			got := s.VisibleTiles(tt.playerID)
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("VisibleTiles() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
 func TestState_SafeTiles(t *testing.T) {
 	newInitStateForTest := func(players [4]player.Player) round.State {
 		return round.NewStateForTest(
