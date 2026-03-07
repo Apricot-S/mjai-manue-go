@@ -404,6 +404,16 @@ func TestState_VisibleTiles(t *testing.T) {
 				*tile.MustTileFromCode("E"),
 			},
 		},
+		{
+			name:     "player1",
+			players:  [4]player.Player{player0, player1, player2, player3},
+			playerID: *id.MustID(1),
+			want: []tile.Tile{
+				*tile.MustTileFromCode("5p"),
+				*tile.MustTileFromCode("1m"), *tile.MustTileFromCode("2m"), *tile.MustTileFromCode("3m"),
+				*tile.MustTileFromCode("5mr"),
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
