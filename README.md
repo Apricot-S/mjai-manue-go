@@ -38,7 +38,7 @@ Decisions such as "whether to call or not" and "whether to declare Riichi or not
 
 This project (including all tools under [tools/](tools/)) requires:
 
-- [Go 1.25 or later](https://go.dev/dl/)
+- [Go 1.26 or later](https://go.dev/dl/)
 - Environment variable `GOEXPERIMENT=jsonv2` enabled when building, installing or running with `go run`
 
 ## Installation
