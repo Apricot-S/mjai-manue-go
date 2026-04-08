@@ -1,0 +1,295 @@
+# mjai-manue-go 設計書 (Draft)
+
+作成日: 2026-04-09  
+対象: `mjai-manue-go` (CoffeeScript版 `mjai-manue` の Go rewrite)
+
+## 1. 背景
+
+- 本プロジェクトは https://github.com/gimite/mjai-manue (CoffeeScript版) を Go に移植する。
+- 設計・開発では Eric Evans / Vaughn Vernon の DDD の考え方と、t-wada の TDD を取り入れる。
+- 利用形態は CLI。
+- 外部通信は以下をサポート対象とする。
+  - mjai オリジナルプロトコル (TCP: `mjsonp://...`)
+  - stdio (pipe)
+  - RiichiLab リニューアル後プロトコル (https://riichi.dev/docs/protocol) は **Python ブリッジスクリプト**で対応（WebSocket ↔ pipe 変換 + token 付与）
+
+## 2. ゴール / 非ゴール
+
+### 2.1 ゴール (機能)
+
+- **移植のゴール精度**: CoffeeScript版と「同一入力 → 同一出力」を目指す。
+  - ただし乱数生成の差は許容する（テストのために seed 固定は可能にする）。
+- mjai サーバの固定ルール: **天鳳四人東南喰赤**（固定。ルール切替はしない）。
+- バイナリは別コマンド:
+  - `mjai-manue`: 本体（将来的に CoffeeScript版ロジック移植）
+  - `mjai-tsumogiri`: モック / 最小AI（常にツモ切り）
+
+### 2.2 非ゴール (今回の設計範囲外)
+
+- `tools/` 配下の各種統計生成ツールの設計・実装詳細
+- `test/` 配下の original-vs-port 比較フレームワークの設計・運用詳細（必要時にのみ実行する想定）
+
+## 3. 品質特性 (NFR)
+
+- **堅牢性**: 入力が空行・不正 JSON の場合はエラー終了する（継続しない）。
+- **I/O 安全性**: stdout はプロトコル出力に使うため、ログやエラーは stderr に出す。
+- **決定性**: `--seed` 指定時は乱数を決定的にし、ゴールデンテスト等で再現性を担保する。
+- **透過性**: 送信はメッセージ単位で必ず flush する。
+
+## 4. アーキテクチャ方針 (DDD + Clean/Hexagonal)
+
+### 4.1 依存方向
+
+依存は内側へ向ける（外側が内側に依存する）。
+
+- `domain` は純粋なビジネスルール（麻雀状態/判定/意思決定の核）。I/O や外部仕様に依存しない。
+- `application` はユースケース（入力を処理し、必要なら `domain` を呼び出して結果を返す）。
+- `infrastructure` は外部通信や永続化、具体的な I/O 実装（TCP/stdio/WS、JSON コーデックなど）。
+- `cmd` は CLI のエントリポイント。フラグ解析と `application` 起動のみ。
+
+### 4.2 コンテキスト境界
+
+プロトコル差分をドメインに漏らさないため、外部プロトコルは Anti-Corruption Layer (ACL) で吸収する。
+
+```mermaid
+flowchart LR
+  subgraph External["外部"]
+    MJAI["mjai (TCP mjsonp)"]
+    PIPE["stdio (pipe)"]
+    RL["riichi.dev (WebSocket)"]
+  end
+
+  subgraph Infra["infrastructure"]
+    T1["transport: tcp/stdio/ws"]
+    C1["codec: mjai"]
+  end
+
+  subgraph Scripts["scripts/riichilab (Python)"]
+    B1["bridge: ws <-> pipe + auth"]
+  end
+
+  subgraph App["application"]
+    U1["GameLoop / BotRunner"]
+  end
+
+  subgraph Dom["domain"]
+    D1["GameState / RoundState"]
+    D2["AI Strategy"]
+  end
+
+  MJAI --> T1 --> C1 --> U1 --> D1
+  PIPE --> T1 --> C1 --> U1
+  RL --> B1 --> PIPE
+  U1 --> D2
+  D2 --> D1
+```
+
+## 5. 現状コードの把握 (参考)
+
+現状のリポジトリには以下が存在する（2026-04-09 時点）。
+
+- `internal/domain/game/` に麻雀の基礎ドメイン（牌、風、局、手牌、役/和了/向聴など）が実装され、単体テストも存在する。
+- `internal/application/` と `internal/infrastructure/` はディレクトリはあるが中身は未実装。
+- `cmd/` は README のみで、`package main` 実装はまだ無い。
+- `configs/` は JSON を build 時 embed して読み出す実装がある（`encoding/json/v2` 前提）。
+
+本設計書は、上記の既存資産を「ドメイン側は活用しつつ、周辺（application/infra/cmd）は作り直せる」前提で進める。
+
+## 6. ユースケース
+
+### 6.1 BotRunner (共通)
+
+入力（外部メッセージ）を逐次処理して内部状態を更新し、意思決定要求が来たら AI に問い合わせ、外部へアクションを返す。
+
+1. transport から 1メッセージ受信
+2. codec で「プロトコル固有メッセージ → 内部イベント」へ変換
+3. application が domain state に適用（状態更新）
+4. 状態更新後に「今アクションを返すべき actor 群」を State へ問い合わせる（例: `PendingActors()`）
+5. 自身の playerID が含まれるなら、`LegalActions(selfID)` で **合法手（集合）**を取得する（打牌に対して最大3人が同時に候補を持つ等）
+6. AI Strategy が合法手の中から Action を選択する（評価値は合法手列挙に含めない）
+7. codec で「内部アクション → プロトコル固有メッセージ」へ変換
+8. transport で送信（flush）
+
+## 7. CLI 設計
+
+### 7.1 共通フラグ
+
+- `--name <PLAYER_NAME>`: プレイヤー名
+- `--seed <INT>`: 乱数 seed（未指定時は非決定的）
+- `--url <URL>`: 接続先 URL
+
+### 7.2 モード判定（優先順位）
+
+1. `--url` あり → TCP クライアント（`mjsonp://...` のみ許容）
+2. それ以外 → stdio (pipe)
+
+> [!NOTE]
+> RiichiLab (riichi.dev) の WebSocket 接続は `mjai-manue` 本体では扱わず、`scripts/riichilab/` 配下の Python スクリプトで対応する。
+
+### 7.3 終了コード（一般的な分類）
+
+- `0`: 正常終了（例: `end_game` 受領後に EOF / 正常クローズ）
+- `1`: 実行時エラー（I/O、接続切断、プロトコル違反、JSON 不正等）
+- `2`: CLI 利用エラー（フラグ不足/不正、URL スキーム不正等）
+- `130`: ユーザー割り込み（SIGINT 等。OS により変わる可能性あり）
+
+※ 「切断時は即終了」とするが、**正常なゲーム終了**（`end_game` を観測できた）と **異常切断**（途中切断）は区別し、前者は `0`、後者は `1` を推奨する。
+
+### 7.4 エラー出力
+
+- stderr に出す（複数行可、固定 prefix 不要）。
+- stdout はプロトコル出力専用。
+
+## 8. 外部通信 (Ports & Adapters)
+
+### 8.1 共通仕様
+
+- stdio / TCP(mjson) は **1行 1 JSON**。
+  - 入力の改行は `\n`/`\r\n` を許容。
+  - 空行はエラー終了（exit `1`）。
+  - 不正 JSON はエラー終了（exit `1`）。
+- 送信はメッセージ単位で必ず flush。
+
+### 8.2 mjai (TCP: `mjsonp://...`)
+
+- URL 形式は `mjsonp://host:port/room` のみを許容。
+- 再接続はしない。
+- 切断時は即終了。
+
+### 8.3 stdio (pipe)
+
+- `--url` 無指定時は stdin を入力、stdout を出力とする。
+- mjai.app 提出型は廃止したため、提出 zip 生成はスコープ外。
+
+### 8.4 RiichiLab (riichi.dev, WebSocket)
+
+- Go 本体ではなく、`scripts/riichilab/` 配下の Python スクリプトが担当する。
+  - WebSocket endpoint に接続し、bot token を **Authorization header** に付与する（riichi.dev の記載に従う）。
+  - WebSocket メッセージを stdio (JSON Lines) に変換して `mjai-manue` / `mjai-tsumogiri` を子プロセスとして起動し、双方向に中継する。
+  - 再接続はしない。切断時は即終了する。
+  - 変換の責務（プロトコル差分吸収）は Python 側に集約し、Go 側は mjai オリジナル相当の JSON Lines を扱う前提とする。
+  - **`request_action` は riichi.dev 側の拡張要素**であり、Go 側（エージェント）には転送しない。
+    - Python 側は `request_action` を「エージェントの出力（action）を riichi.dev に返すタイミング調整」にのみ使用する。
+    - エージェント（Go）は入力メッセージで更新された **State を見て**「今返すべき action があるか」を判断する（`request_action` を受信して起動されない）。
+    - Python 側は必要に応じて、エージェントからの出力をバッファし、`request_action` 受領時に riichi.dev へ送信する。
+
+## 9. ドメインモデル (概要)
+
+既存の `internal/domain/game/` を核として利用する。
+
+### 9.1 主要な概念
+
+- **Match（対局）**: 対局全体を通した状態（点数、局の進行、現在の局など）
+- **Round（1局）**: 1局内の状態（ドラ表示、残り牌山、プレイヤーの手牌/河/副露など）
+  - Round は局ごとに生成され、局終了で破棄される（`Match` が所有する）
+- **Player / Hand / Meld** 等の状態（Round 内のエンティティ）
+- **Event**: 外部入力を内部イベントへ変換したもの（ドメイン状態更新の入力）
+  - `request_action` のような「出力タイミング調整用イベント」は domain に持ち込まない（ブリッジ側/adapter側の責務）
+- **Action**: Bot が返すべき行動（打牌、鳴き、立直等）
+
+プロトコルの牌表現（赤5の 0 表記など）は domain に持ち込まず、codec 側で吸収する。
+
+### 9.2 Aggregate 設計（DDD観点の提案）
+
+#### Aggregate Root
+
+- `Match` を Aggregate Root とし、`Round` をその内部に保持する。
+  - 理由: ライフサイクルが「局開始→局終了で破棄」なため、Round 単体を外に晒すより `Match` の責務として管理した方が境界が明確になる。
+
+#### `game.State` / `round.State` の分離
+
+ユーザー構想どおり、**対局全体（Match）と局内（Round）を分離する**のは妥当。
+
+- `game.State`（現状: 対局の点数など）＝ `Match` 相当
+- `round.State`（現状: 局内状態）＝ `Round` 相当
+
+命名はユビキタス言語に合わせ、将来的に `game.State` を `match.State` や `game.Match` といった名前へ寄せることを推奨する（ただし初期は大変更可能なため、今の package 構造のままでもよい）。
+
+### 9.3 StateUpdater / legal actions の責務分担（再検討）
+
+#### 結論
+
+- `StateUpdater` は「外部イベントを適用して Round/Match を遷移させる」ドメインの中核なので、早い段階で設計を固めるのが良い。
+- `request_action` を受け取れない前提（オリジナル mjai 相当）では、エージェントは **State から legal actions を計算**し、さらに「今 action を返すべき局面か」も State から判断する必要がある。
+
+#### 推奨インタフェース（案）
+
+Go では read-only を型で保証しづらいので、Strategy には「参照用 interface」を渡し、更新は Aggregate のメソッドに閉じ込める。
+
+例（概念）:
+
+```go
+// Match は対局全体を管理する Aggregate Root。
+type Match interface {
+    Apply(ev Event) error // 状態更新
+    Viewer() MatchViewer
+}
+
+// Round は局内状態（Matchが所有）。
+type Round interface {
+    Apply(ev Event) error
+    PendingActors() []ID // 今 action を返し得る actor 群（空なら無し）
+    LegalActions(playerID ID) ([]Action, error) // 合法手の列挙（集合）。情報不足なら error
+    Viewer() RoundViewer
+}
+
+type Decision struct {
+    Actor ID
+    Options []Action // legal actions（合法手の列挙のみ。評価/優先度/理由は含めない）
+    // 必要なら「種別（自摸後/他家打牌後の鳴き等）」を入れる（ただし Options は常に合法手の集合）
+}
+```
+
+- `LegalActions` は「行動候補の列挙」であり、**選択（どれを選ぶか）は Strategy の責務**。
+- `PendingActors` は「いつ action を返すか」を State から判断するための API。これがあると application 層が単純になる。
+- 将来的に tools で「4人全員の合法手」を観測したい場合、`LegalActions(playerID)` を 0..3 で呼び出せばよい（必要なら `LegalActionsAll()` を追加する）。
+- `Pass`（見送り）は **副露・和了が可能な局面に限って** `LegalActions` に含める（常に含めない）。
+
+#### どこで legal actions を計算するか（DDD的な置き場）
+
+- 最初は `round.State` のメソッド（もしくは `round` package のドメインサービス）として実装するのが現実的。
+- 後で複雑化したら「`LegalActionCalculator` ドメインサービス」へ切り出す（Round が依存するのではなく、application がサービスを呼ぶ形にすると依存方向が自然）。
+
+## 10. AI (Strategy) 設計
+
+### 10.1 Strategy インタフェース（案）
+
+- 入力: 現在の game/round state と意思決定要求
+- 出力: 選択した Action
+- 乱数は Strategy に直接持たせず、`Random` インタフェース（または `*rand.Rand`）を注入してテスト可能にする。
+
+### 10.2 実装フェーズ
+
+1. `mjai-tsumogiri`: 最小AI（常にツモ切り、鳴き/立直はしない等の単純方針）
+2. `mjai-manue`: CoffeeScript版のロジックを移植し、入力→出力一致を狙う
+
+## 11. 設定ファイル (embed 固定)
+
+- `configs/` にある JSON は build 時に embed する。
+- 実行時にパス差し替えはしない（ただし開発中に差し替えたい場合はビルド前に置換）。
+
+## 12. テスト戦略 (TDD)
+
+### 12.1 単体テスト
+
+- `domain` の純粋ロジック（牌/向聴/役/点数等）はテーブル駆動で単体テストする。
+- ランダムが絡む場合は `--seed` と同等の seed 固定で決定的にする。
+
+### 12.2 ゴールデンテスト（プロトコル入出力）
+
+- 入力は mjai オリジナルと同様に **mjsonp ストリーム**（JSON Lines）を使用する。
+- 期待値は **action のみ**を比較する（評価値等の細部は比較しない）。
+  - 比較単位は「意思決定が必要な局面（エージェントが action を出力した時点）」とする。
+
+### 12.3 original-vs-port 比較
+
+- CI には組み込まない。
+- 必要時のみ、差分の根拠確認として実行する。
+
+## 13. 実装計画 (ロードマップ案)
+
+1. `cmd/` に `mjai-tsumogiri` / `mjai-manue` のエントリポイントを追加（フラグ・モード判定・終了コード）
+2. `infrastructure` に transport/codec を実装（stdio/TCP → mjai、WS → riichilab）
+3. `application` に BotRunner を実装し、最小 Strategy (`tsumogiri`) で動作確認
+4. ゴールデンテスト基盤を追加（mjson 入力→action 期待値）
+5. CoffeeScript版ロジックの段階的移植（差分が出たら最小単位で詰める）
