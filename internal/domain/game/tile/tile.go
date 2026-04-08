@@ -68,6 +68,15 @@ var tileIsReds = [NumTileType38]bool{
 	false,
 }
 
+var doraIndicatorToDora = [NumTileType38]int{
+	1, 2, 3, 4, 5, 6, 7, 8, 0,
+	10, 11, 12, 13, 14, 15, 16, 17, 9,
+	19, 20, 21, 22, 23, 24, 25, 26, 18,
+	28, 29, 30, 27, 32, 33, 31,
+	5, 13, 22,
+	37,
+}
+
 type Tile struct {
 	id     int
 	color  rune
@@ -166,33 +175,7 @@ func (t *Tile) Next(n int) *Tile {
 }
 
 func (t *Tile) NextForDora() *Tile {
-	if t.IsUnknown() {
-		return t
-	}
-
-	n := t.Number()
-
-	if t.IsSuits() {
-		if n == 9 {
-			// 9 -> 1
-			return MustTileFromID(t.ID() - 8)
-		}
-		if t.IsRed() {
-			// 5r -> 6
-			return MustTileFromID(t.RemoveRed().ID() + 1)
-		}
-	} else {
-		if n == 4 {
-			// N -> E
-			return MustTileFromID(t.ID() - 3)
-		}
-		if n == 7 {
-			// C -> P
-			return MustTileFromID(t.ID() - 2)
-		}
-	}
-
-	return MustTileFromID(t.ID() + 1)
+	return MustTileFromID(doraIndicatorToDora[t.ID()])
 }
 
 func (t *Tile) AddRed() *Tile {
