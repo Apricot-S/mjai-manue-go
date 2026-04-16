@@ -5,6 +5,11 @@
 
 ## 1. 背景
 
+### 1.1 参照資料
+
+- `docs/protocols.md`: mjai / stdio / RiichiLab 各プロトコルのメッセージ仕様（本リポジトリ内の一次資料）
+  - 本設計書では仕様詳細を重複記載せず、必要箇所から参照する。
+
 - 本プロジェクトは https://github.com/gimite/mjai-manue (CoffeeScript版) を Go に移植する。
 - 設計・開発では Eric Evans / Vaughn Vernon の DDD の考え方と、t-wada の TDD を取り入れる。
 - 利用形態は CLI。
@@ -12,6 +17,7 @@
   - mjai オリジナルプロトコル (TCP: `mjsonp://...`)
   - stdio (pipe)
   - RiichiLab リニューアル後プロトコル (https://riichi.dev/docs/protocol) は **Python ブリッジスクリプト**で対応（WebSocket ↔ pipe 変換 + token 付与）
+- メッセージ仕様の詳細は `docs/protocols.md` に集約する。
 
 ## 2. ゴール / 非ゴール
 
@@ -172,6 +178,9 @@ flowchart LR
     - Python 側は `request_action` を「エージェントの出力（action）を riichi.dev に返すタイミング調整」にのみ使用する。
     - エージェント（Go）は入力メッセージで更新された **State を見て**「今返すべき action があるか」を判断する（`request_action` を受信して起動されない）。
     - Python 側は必要に応じて、エージェントからの出力をバッファし、`request_action` 受領時に riichi.dev へ送信する。
+  - `possible_actions` は **RiichiLab 互換性のため存在しないものとして扱う**（入力に含まれていても無視する）。
+    - `docs/protocols.md` には例として登場しうるが、Go 側は `possible_actions` を信頼しない。
+    - 合法手（`LegalActions`）は常に State から算出する（`possible_actions` に依存しない）。
 
 ## 9. ドメインモデル (概要)
 
@@ -211,6 +220,7 @@ flowchart LR
 
 - `StateUpdater` は「外部イベントを適用して Round/Match を遷移させる」ドメインの中核なので、早い段階で設計を固めるのが良い。
 - `request_action` を受け取れない前提（オリジナル mjai 相当）では、エージェントは **State から legal actions を計算**し、さらに「今 action を返すべき局面か」も State から判断する必要がある。
+- `possible_actions` は存在しないものとして扱い、意思決定の根拠にしない（RiichiLab 互換性のため）。
 
 #### 推奨インタフェース（案）
 
@@ -278,6 +288,7 @@ type Decision struct {
 ### 12.2 ゴールデンテスト（プロトコル入出力）
 
 - 入力は mjai オリジナルと同様に **mjsonp ストリーム**（JSON Lines）を使用する。
+- メッセージ種別や必須フィールド等の仕様は `docs/protocols.md` を参照する。
 - 期待値は **action のみ**を比較する（評価値等の細部は比較しない）。
   - 比較単位は「意思決定が必要な局面（エージェントが action を出力した時点）」とする。
 
