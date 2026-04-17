@@ -1,4 +1,5 @@
-Note: 本ファイルは https://github.com/gotodeploy/mjai-server/blob/master/docs/protocols.md をコピーしたものです。rewriteブランチをmain/developする前に忘れずに必ず削除すること！
+> [!NOTE]
+> 本ファイルは https://github.com/gotodeploy/mjai-server/blob/master/docs/protocols.md をコピーしたものです。rewriteブランチをmain/developする前に忘れずに必ず削除すること！
 
 # プロトコル
 
