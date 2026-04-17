@@ -3,8 +3,8 @@ package round
 import (
 	"slices"
 
-	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/id"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/round/player"
+	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/seat"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/tile"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/wind"
 )
@@ -15,20 +15,20 @@ type RawStateViewer interface {
 	Honba() int
 	RiichiDeposit() int
 	Scores() [NumPlayers]int
-	Dealer() id.ID
-	StartingDealer() id.ID
+	Dealer() seat.Seat
+	StartingDealer() seat.Seat
 	DoraIndicators() tile.Tiles
 	NumLeftTiles() int
-	Player(playerID id.ID) player.PlayerViewer
+	Player(playerSeat seat.Seat) player.PlayerViewer
 }
 
 type DerivedStateViewer interface {
 	NextRound() (wind.Wind, int)
 	Doras() tile.Tiles
 	Turn() float64
-	SeatWind(playerID id.ID) wind.Wind
-	VisibleTiles(playerID id.ID) tile.Tiles
-	SafeTiles(playerID id.ID) tile.Tiles
+	SeatWind(playerSeat seat.Seat) wind.Wind
+	VisibleTiles(playerSeat seat.Seat) tile.Tiles
+	SafeTiles(playerSeat seat.Seat) tile.Tiles
 }
 
 type StateViewer interface {
@@ -56,11 +56,11 @@ func (s *State) Scores() [NumPlayers]int {
 	return s.scores
 }
 
-func (s *State) Dealer() id.ID {
+func (s *State) Dealer() seat.Seat {
 	return s.dealer
 }
 
-func (s *State) StartingDealer() id.ID {
+func (s *State) StartingDealer() seat.Seat {
 	return s.startingDealer
 }
 
@@ -72,8 +72,8 @@ func (s *State) NumLeftTiles() int {
 	return s.numLeftTiles
 }
 
-func (s *State) Player(playerID id.ID) player.PlayerViewer {
-	return s.players[playerID.Index()]
+func (s *State) Player(playerSeat seat.Seat) player.PlayerViewer {
+	return s.players[playerSeat.Index()]
 }
 
 func (s *State) NextRound() (wind.Wind, int) {
@@ -95,11 +95,11 @@ func (s *State) Turn() float64 {
 	return float64(NumInitWall-s.NumLeftTiles()) / float64(NumPlayers)
 }
 
-func (s *State) SeatWind(playerID id.ID) wind.Wind {
-	return wind.Wind((playerID.Index()+1-s.RoundNumber()+4)%4 + 1)
+func (s *State) SeatWind(playerSeat seat.Seat) wind.Wind {
+	return wind.Wind((playerSeat.Index()+1-s.RoundNumber()+4)%4 + 1)
 }
 
-func (s *State) VisibleTiles(playerID id.ID) tile.Tiles {
+func (s *State) VisibleTiles(playerSeat seat.Seat) tile.Tiles {
 	var visibleTiles tile.Tiles
 
 	for i := range NumPlayers {
@@ -112,14 +112,14 @@ func (s *State) VisibleTiles(playerID id.ID) tile.Tiles {
 	}
 
 	var handTiles tile.Tiles
-	if h, isVisible := s.Player(playerID).Hand(); isVisible {
+	if h, isVisible := s.Player(playerSeat).Hand(); isVisible {
 		handTiles = h.ToTiles()
 	}
 
 	return slices.Concat(visibleTiles, s.DoraIndicators(), handTiles)
 }
 
-func (s *State) SafeTiles(playerID id.ID) tile.Tiles {
-	p := s.Player(playerID)
+func (s *State) SafeTiles(playerSeat seat.Seat) tile.Tiles {
+	p := s.Player(playerSeat)
 	return slices.Concat(p.DiscardedTiles(), p.ExtraSafeTiles())
 }

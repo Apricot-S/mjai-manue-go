@@ -4,9 +4,9 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/id"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/round/player/hand"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/round/player/meld"
+	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/seat"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/tile"
 )
 
@@ -410,7 +410,7 @@ func TestVisibleHand_Call(t *testing.T) {
 			meld: meld.MustChii(
 				*tile.MustTileFromCode("1m"),
 				[2]tile.Tile{*tile.MustTileFromCode("2m"), *tile.MustTileFromCode("3m")},
-				*id.MustID(0),
+				*seat.MustSeat(0),
 			),
 			wantTiles: []tile.Tile{},
 			wantErr:   false,
@@ -421,7 +421,7 @@ func TestVisibleHand_Call(t *testing.T) {
 			meld: meld.MustPon(
 				*tile.MustTileFromCode("1m"),
 				[2]tile.Tile{*tile.MustTileFromCode("1m"), *tile.MustTileFromCode("1m")},
-				*id.MustID(0),
+				*seat.MustSeat(0),
 			),
 			wantTiles: []tile.Tile{},
 			wantErr:   false,
@@ -432,7 +432,7 @@ func TestVisibleHand_Call(t *testing.T) {
 			meld: meld.MustCalledKan(
 				*tile.MustTileFromCode("1m"),
 				[3]tile.Tile{*tile.MustTileFromCode("1m"), *tile.MustTileFromCode("1m"), *tile.MustTileFromCode("1m")},
-				*id.MustID(0),
+				*seat.MustSeat(0),
 			),
 			wantTiles: []tile.Tile{},
 			wantErr:   false,
@@ -453,7 +453,7 @@ func TestVisibleHand_Call(t *testing.T) {
 				*tile.MustTileFromCode("5m"),
 				[2]tile.Tile{*tile.MustTileFromCode("5m"), *tile.MustTileFromCode("5m")},
 				*tile.MustTileFromCode("5mr"),
-				*id.MustID(0),
+				*seat.MustSeat(0),
 			),
 			wantTiles: []tile.Tile{},
 			wantErr:   false,
@@ -464,7 +464,7 @@ func TestVisibleHand_Call(t *testing.T) {
 			meld: meld.MustChii(
 				*tile.MustTileFromCode("6m"),
 				[2]tile.Tile{*tile.MustTileFromCode("4m"), *tile.MustTileFromCode("5m")},
-				*id.MustID(0),
+				*seat.MustSeat(0),
 			),
 			wantTiles: nil,
 			wantErr:   true,

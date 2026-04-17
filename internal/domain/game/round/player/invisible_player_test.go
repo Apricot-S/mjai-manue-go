@@ -4,9 +4,9 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/id"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/round/player"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/round/player/meld"
+	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/seat"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/tile"
 )
 
@@ -354,7 +354,7 @@ func TestInvisiblePlayer_Discard_CannotDiscardSwapCallTiles(t *testing.T) {
 	pon := meld.MustPon(
 		*tile.MustTileFromCode("5p"),
 		[2]tile.Tile{*tile.MustTileFromCode("5p"), *tile.MustTileFromCode("5p")},
-		*id.MustID(0),
+		*seat.MustSeat(0),
 	)
 	if err := p.Pon(*pon); err != nil {
 		t.Fatalf("unexpected error on Pon: %v", err)
@@ -372,7 +372,7 @@ func TestInvisiblePlayer_Chii_Success(t *testing.T) {
 	chii := meld.MustChii(
 		*tile.MustTileFromCode("4m"),
 		[2]tile.Tile{*tile.MustTileFromCode("2m"), *tile.MustTileFromCode("3m")},
-		*id.MustID(0),
+		*seat.MustSeat(0),
 	)
 	if err := p.Chii(*chii); err != nil {
 		t.Errorf("Chii() failed: %v", err)
@@ -413,7 +413,7 @@ func TestInvisiblePlayer_Chii_CannotAfterDraw(t *testing.T) {
 	chii := meld.MustChii(
 		*tile.MustTileFromCode("4m"),
 		[2]tile.Tile{*tile.MustTileFromCode("2m"), *tile.MustTileFromCode("3m")},
-		*id.MustID(0),
+		*seat.MustSeat(0),
 	)
 	if err := p.Chii(*chii); err == nil {
 		t.Errorf("Chii should fail when the player has a drawn tile")
@@ -444,7 +444,7 @@ func TestInvisiblePlayer_Chii_CannotAfterRiichi(t *testing.T) {
 	chii := meld.MustChii(
 		*tile.MustTileFromCode("4m"),
 		[2]tile.Tile{*tile.MustTileFromCode("2m"), *tile.MustTileFromCode("3m")},
-		*id.MustID(0),
+		*seat.MustSeat(0),
 	)
 	if err := p.Chii(*chii); err == nil {
 		t.Errorf("Chii should fail when the player is already in riichi state")
@@ -457,7 +457,7 @@ func TestInvisiblePlayer_Chii_CannotAfterKan(t *testing.T) {
 	kan := meld.MustCalledKan(
 		*tile.MustTileFromCode("E"),
 		[3]tile.Tile{*tile.MustTileFromCode("E"), *tile.MustTileFromCode("E"), *tile.MustTileFromCode("E")},
-		*id.MustID(0),
+		*seat.MustSeat(0),
 	)
 	if err := p.CalledKan(*kan); err != nil {
 		t.Fatalf("unexpected error on CalledKan: %v", err)
@@ -466,7 +466,7 @@ func TestInvisiblePlayer_Chii_CannotAfterKan(t *testing.T) {
 	chii := meld.MustChii(
 		*tile.MustTileFromCode("4m"),
 		[2]tile.Tile{*tile.MustTileFromCode("2m"), *tile.MustTileFromCode("3m")},
-		*id.MustID(0),
+		*seat.MustSeat(0),
 	)
 	if err := p.Chii(*chii); err == nil {
 		t.Errorf("Chii should fail when the player is in after kan state")
@@ -479,7 +479,7 @@ func TestInvisiblePlayer_Pon_Success(t *testing.T) {
 	pon := meld.MustPon(
 		*tile.MustTileFromCode("E"),
 		[2]tile.Tile{*tile.MustTileFromCode("E"), *tile.MustTileFromCode("E")},
-		*id.MustID(0),
+		*seat.MustSeat(0),
 	)
 	if err := p.Pon(*pon); err != nil {
 		t.Errorf("Pon() failed: %v", err)
@@ -520,7 +520,7 @@ func TestInvisiblePlayer_Pon_CannotAfterDraw(t *testing.T) {
 	pon := meld.MustPon(
 		*tile.MustTileFromCode("E"),
 		[2]tile.Tile{*tile.MustTileFromCode("E"), *tile.MustTileFromCode("E")},
-		*id.MustID(0),
+		*seat.MustSeat(0),
 	)
 	if err := p.Pon(*pon); err == nil {
 		t.Errorf("Pon should fail when the player has a drawn tile")
@@ -551,7 +551,7 @@ func TestInvisiblePlayer_Pon_CannotAfterRiichi(t *testing.T) {
 	pon := meld.MustPon(
 		*tile.MustTileFromCode("E"),
 		[2]tile.Tile{*tile.MustTileFromCode("E"), *tile.MustTileFromCode("E")},
-		*id.MustID(0),
+		*seat.MustSeat(0),
 	)
 	if err := p.Pon(*pon); err == nil {
 		t.Errorf("Pon should fail when the player is already in riichi state")
@@ -565,7 +565,7 @@ func TestInvisiblePlayer_Pon_Cannot5thCall(t *testing.T) {
 		pon := meld.MustPon(
 			*tile.MustTileFromCode(wind),
 			[2]tile.Tile{*tile.MustTileFromCode(wind), *tile.MustTileFromCode(wind)},
-			*id.MustID(0),
+			*seat.MustSeat(0),
 		)
 		if err := p.Pon(*pon); err != nil {
 			t.Fatalf("unexpected error on Pon: %v", err)
@@ -580,7 +580,7 @@ func TestInvisiblePlayer_Pon_Cannot5thCall(t *testing.T) {
 	pon := meld.MustPon(
 		*tile.MustTileFromCode("C"),
 		[2]tile.Tile{*tile.MustTileFromCode("C"), *tile.MustTileFromCode("C")},
-		*id.MustID(0),
+		*seat.MustSeat(0),
 	)
 	if err := p.Pon(*pon); err == nil {
 		t.Errorf("Pon should fail when the player has four melds")
@@ -593,7 +593,7 @@ func TestInvisiblePlayer_CalledKan_Success(t *testing.T) {
 	kan := meld.MustCalledKan(
 		*tile.MustTileFromCode("E"),
 		[3]tile.Tile{*tile.MustTileFromCode("E"), *tile.MustTileFromCode("E"), *tile.MustTileFromCode("E")},
-		*id.MustID(0),
+		*seat.MustSeat(0),
 	)
 	if err := p.CalledKan(*kan); err != nil {
 		t.Errorf("CalledKan() failed: %v", err)
@@ -634,7 +634,7 @@ func TestInvisiblePlayer_CalledKan_CannotAfterDraw(t *testing.T) {
 	kan := meld.MustCalledKan(
 		*tile.MustTileFromCode("E"),
 		[3]tile.Tile{*tile.MustTileFromCode("E"), *tile.MustTileFromCode("E"), *tile.MustTileFromCode("E")},
-		*id.MustID(0),
+		*seat.MustSeat(0),
 	)
 	if err := p.CalledKan(*kan); err == nil {
 		t.Errorf("CalledKan should fail when the player has a drawn tile")
@@ -665,7 +665,7 @@ func TestInvisiblePlayer_CalledKan_CannotAfterRiichi(t *testing.T) {
 	kan := meld.MustCalledKan(
 		*tile.MustTileFromCode("E"),
 		[3]tile.Tile{*tile.MustTileFromCode("E"), *tile.MustTileFromCode("E"), *tile.MustTileFromCode("E")},
-		*id.MustID(0),
+		*seat.MustSeat(0),
 	)
 	if err := p.CalledKan(*kan); err == nil {
 		t.Errorf("CalledKan should fail when the player is already in riichi state")
@@ -728,7 +728,7 @@ func TestInvisiblePlayer_PromotedKan_Success(t *testing.T) {
 	pon := meld.MustPon(
 		*tile.MustTileFromCode("E"),
 		[2]tile.Tile{*tile.MustTileFromCode("E"), *tile.MustTileFromCode("E")},
-		*id.MustID(0),
+		*seat.MustSeat(0),
 	)
 	if err := p.Pon(*pon); err != nil {
 		t.Fatalf("unexpected error on Pon: %v", err)
@@ -748,7 +748,7 @@ func TestInvisiblePlayer_PromotedKan_Success(t *testing.T) {
 		*tile.MustTileFromCode("E"),
 		[2]tile.Tile{*tile.MustTileFromCode("E"), *tile.MustTileFromCode("E")},
 		*tile.MustTileFromCode("E"),
-		*id.MustID(0),
+		*seat.MustSeat(0),
 	)
 	if err := p.PromotedKan(*kan); err != nil {
 		t.Errorf("ConcealedKan() failed: %v", err)
@@ -784,7 +784,7 @@ func TestInvisiblePlayer_PromotedKan_NoMatchingPonInMelds(t *testing.T) {
 	pon := meld.MustPon(
 		*tile.MustTileFromCode("E"),
 		[2]tile.Tile{*tile.MustTileFromCode("E"), *tile.MustTileFromCode("E")},
-		*id.MustID(0),
+		*seat.MustSeat(0),
 	)
 	if err := p.Pon(*pon); err != nil {
 		t.Fatalf("unexpected error on Pon: %v", err)
@@ -804,7 +804,7 @@ func TestInvisiblePlayer_PromotedKan_NoMatchingPonInMelds(t *testing.T) {
 		*tile.MustTileFromCode("9s"),
 		[2]tile.Tile{*tile.MustTileFromCode("9s"), *tile.MustTileFromCode("9s")},
 		*tile.MustTileFromCode("9s"),
-		*id.MustID(0),
+		*seat.MustSeat(0),
 	)
 	if err := p.PromotedKan(*kan); err == nil {
 		t.Errorf("PromotedKan should fail when no matching Pon exists in melds; expected error but got nil")
@@ -817,7 +817,7 @@ func TestInvisiblePlayer_PromotedKan_CannotBeforeDraw(t *testing.T) {
 	pon := meld.MustPon(
 		*tile.MustTileFromCode("E"),
 		[2]tile.Tile{*tile.MustTileFromCode("E"), *tile.MustTileFromCode("E")},
-		*id.MustID(0),
+		*seat.MustSeat(0),
 	)
 	if err := p.Pon(*pon); err != nil {
 		t.Fatalf("unexpected error on Pon: %v", err)
@@ -832,7 +832,7 @@ func TestInvisiblePlayer_PromotedKan_CannotBeforeDraw(t *testing.T) {
 		*tile.MustTileFromCode("E"),
 		[2]tile.Tile{*tile.MustTileFromCode("E"), *tile.MustTileFromCode("E")},
 		*tile.MustTileFromCode("E"),
-		*id.MustID(0),
+		*seat.MustSeat(0),
 	)
 	if err := p.PromotedKan(*kan); err == nil {
 		t.Errorf("PromotedKan should fail when called before draw; expected error but got nil")
@@ -897,7 +897,7 @@ func TestInvisiblePlayer_Riichi_CannotDeclareWithOpenMeld(t *testing.T) {
 	pon := meld.MustPon(
 		*tile.MustTileFromCode("E"),
 		[2]tile.Tile{*tile.MustTileFromCode("E"), *tile.MustTileFromCode("E")},
-		*id.MustID(0),
+		*seat.MustSeat(0),
 	)
 	if err := p.Pon(*pon); err != nil {
 		t.Fatalf("unexpected error on Pon: %v", err)

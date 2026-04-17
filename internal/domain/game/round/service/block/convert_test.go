@@ -4,9 +4,9 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/id"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/round/player/meld"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/round/service/block"
+	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/seat"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/tile"
 )
 
@@ -21,7 +21,7 @@ func TestNewBlockFromMeld(t *testing.T) {
 			m: meld.MustChii(
 				*tile.MustTileFromCode("1m"),
 				[2]tile.Tile{*tile.MustTileFromCode("2m"), *tile.MustTileFromCode("3m")},
-				*id.MustID(0),
+				*seat.MustSeat(0),
 			),
 			want: block.MustSequence(*tile.MustTileFromCode("1m")),
 		},
@@ -30,7 +30,7 @@ func TestNewBlockFromMeld(t *testing.T) {
 			m: meld.MustChii(
 				*tile.MustTileFromCode("5pr"),
 				[2]tile.Tile{*tile.MustTileFromCode("4p"), *tile.MustTileFromCode("6p")},
-				*id.MustID(0),
+				*seat.MustSeat(0),
 			),
 			want: block.MustSequence(*tile.MustTileFromCode("4p")),
 		},
@@ -39,7 +39,7 @@ func TestNewBlockFromMeld(t *testing.T) {
 			m: meld.MustChii(
 				*tile.MustTileFromCode("6p"),
 				[2]tile.Tile{*tile.MustTileFromCode("5pr"), *tile.MustTileFromCode("4p")},
-				*id.MustID(0),
+				*seat.MustSeat(0),
 			),
 			want: block.MustSequence(*tile.MustTileFromCode("4p")),
 		},
@@ -48,7 +48,7 @@ func TestNewBlockFromMeld(t *testing.T) {
 			m: meld.MustChii(
 				*tile.MustTileFromCode("7s"),
 				[2]tile.Tile{*tile.MustTileFromCode("5sr"), *tile.MustTileFromCode("6s")},
-				*id.MustID(0),
+				*seat.MustSeat(0),
 			),
 			want: block.MustSequence(*tile.MustTileFromCode("5s")),
 		},
@@ -57,7 +57,7 @@ func TestNewBlockFromMeld(t *testing.T) {
 			m: meld.MustPon(
 				*tile.MustTileFromCode("1m"),
 				[2]tile.Tile{*tile.MustTileFromCode("1m"), *tile.MustTileFromCode("1m")},
-				*id.MustID(0),
+				*seat.MustSeat(0),
 			),
 			want: block.MustTriplet(*tile.MustTileFromCode("1m")),
 		},
@@ -66,7 +66,7 @@ func TestNewBlockFromMeld(t *testing.T) {
 			m: meld.MustPon(
 				*tile.MustTileFromCode("5sr"),
 				[2]tile.Tile{*tile.MustTileFromCode("5s"), *tile.MustTileFromCode("5s")},
-				*id.MustID(0),
+				*seat.MustSeat(0),
 			),
 			want: block.MustTriplet(*tile.MustTileFromCode("5s")),
 		},
@@ -75,7 +75,7 @@ func TestNewBlockFromMeld(t *testing.T) {
 			m: meld.MustPon(
 				*tile.MustTileFromCode("5s"),
 				[2]tile.Tile{*tile.MustTileFromCode("5s"), *tile.MustTileFromCode("5sr")},
-				*id.MustID(0),
+				*seat.MustSeat(0),
 			),
 			want: block.MustTriplet(*tile.MustTileFromCode("5s")),
 		},
@@ -84,7 +84,7 @@ func TestNewBlockFromMeld(t *testing.T) {
 			m: meld.MustCalledKan(
 				*tile.MustTileFromCode("1m"),
 				[3]tile.Tile{*tile.MustTileFromCode("1m"), *tile.MustTileFromCode("1m"), *tile.MustTileFromCode("1m")},
-				*id.MustID(0),
+				*seat.MustSeat(0),
 			),
 			want: block.MustQuad(*tile.MustTileFromCode("1m")),
 		},
@@ -93,7 +93,7 @@ func TestNewBlockFromMeld(t *testing.T) {
 			m: meld.MustCalledKan(
 				*tile.MustTileFromCode("5sr"),
 				[3]tile.Tile{*tile.MustTileFromCode("5s"), *tile.MustTileFromCode("5s"), *tile.MustTileFromCode("5s")},
-				*id.MustID(0),
+				*seat.MustSeat(0),
 			),
 			want: block.MustQuad(*tile.MustTileFromCode("5s")),
 		},
@@ -102,7 +102,7 @@ func TestNewBlockFromMeld(t *testing.T) {
 			m: meld.MustCalledKan(
 				*tile.MustTileFromCode("5s"),
 				[3]tile.Tile{*tile.MustTileFromCode("5s"), *tile.MustTileFromCode("5s"), *tile.MustTileFromCode("5sr")},
-				*id.MustID(0),
+				*seat.MustSeat(0),
 			),
 			want: block.MustQuad(*tile.MustTileFromCode("5s")),
 		},
@@ -126,7 +126,7 @@ func TestNewBlockFromMeld(t *testing.T) {
 				*tile.MustTileFromCode("1p"),
 				[2]tile.Tile{*tile.MustTileFromCode("1p"), *tile.MustTileFromCode("1p")},
 				*tile.MustTileFromCode("1p"),
-				*id.MustID(0),
+				*seat.MustSeat(0),
 			),
 			want: block.MustQuad(*tile.MustTileFromCode("1p")),
 		},
@@ -136,7 +136,7 @@ func TestNewBlockFromMeld(t *testing.T) {
 				*tile.MustTileFromCode("5p"),
 				[2]tile.Tile{*tile.MustTileFromCode("5p"), *tile.MustTileFromCode("5p")},
 				*tile.MustTileFromCode("5pr"),
-				*id.MustID(0),
+				*seat.MustSeat(0),
 			),
 			want: block.MustQuad(*tile.MustTileFromCode("5p")),
 		},
@@ -146,7 +146,7 @@ func TestNewBlockFromMeld(t *testing.T) {
 				*tile.MustTileFromCode("5pr"),
 				[2]tile.Tile{*tile.MustTileFromCode("5p"), *tile.MustTileFromCode("5p")},
 				*tile.MustTileFromCode("5p"),
-				*id.MustID(0),
+				*seat.MustSeat(0),
 			),
 			want: block.MustQuad(*tile.MustTileFromCode("5p")),
 		},
@@ -156,7 +156,7 @@ func TestNewBlockFromMeld(t *testing.T) {
 				*tile.MustTileFromCode("5p"),
 				[2]tile.Tile{*tile.MustTileFromCode("5p"), *tile.MustTileFromCode("5pr")},
 				*tile.MustTileFromCode("5p"),
-				*id.MustID(0),
+				*seat.MustSeat(0),
 			),
 			want: block.MustQuad(*tile.MustTileFromCode("5p")),
 		},

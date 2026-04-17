@@ -4,10 +4,10 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/id"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/round"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/round/player"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/round/player/meld"
+	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/seat"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/tile"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/wind"
 )
@@ -21,8 +21,8 @@ func TestState_NextRound(t *testing.T) {
 			0,
 			0,
 			[4]int{25000, 25000, 25000, 25000},
-			*id.MustID(0),
-			*id.MustID(0),
+			*seat.MustSeat(0),
+			*seat.MustSeat(0),
 			tile.Tiles{*tile.MustTileFromCode("1m")},
 			round.NumInitWall,
 			players,
@@ -109,8 +109,8 @@ func TestState_Doras(t *testing.T) {
 			0,
 			0,
 			[4]int{25000, 25000, 25000, 25000},
-			*id.MustID(0),
-			*id.MustID(0),
+			*seat.MustSeat(0),
+			*seat.MustSeat(0),
 			doraIndicators,
 			round.NumInitWall,
 			players,
@@ -158,8 +158,8 @@ func TestState_Turn(t *testing.T) {
 			0,
 			0,
 			[4]int{25000, 25000, 25000, 25000},
-			*id.MustID(0),
-			*id.MustID(0),
+			*seat.MustSeat(0),
+			*seat.MustSeat(0),
 			nil,
 			numLeftTiles,
 			players,
@@ -199,7 +199,7 @@ func TestState_Turn(t *testing.T) {
 }
 
 func TestState_SeatWind(t *testing.T) {
-	newInitStateForTest := func(roundNumber int, dealer id.ID) round.State {
+	newInitStateForTest := func(roundNumber int, dealer seat.Seat) round.State {
 		players := [4]player.Player{}
 		return round.NewStateForTest(
 			wind.East,
@@ -208,7 +208,7 @@ func TestState_SeatWind(t *testing.T) {
 			0,
 			[4]int{25000, 25000, 25000, 25000},
 			dealer,
-			*id.MustID(0),
+			*seat.MustSeat(0),
 			tile.Tiles{*tile.MustTileFromCode("1m")},
 			round.NumInitWall,
 			players,
@@ -218,120 +218,120 @@ func TestState_SeatWind(t *testing.T) {
 	tests := []struct {
 		name          string
 		currentNumber int
-		currentDealer id.ID
-		playerID      id.ID
+		currentDealer seat.Seat
+		playerID      seat.Seat
 		want          wind.Wind
 	}{
 		{
 			name:          "E1 p0 -> E",
 			currentNumber: 1,
-			currentDealer: *id.MustID(0),
-			playerID:      *id.MustID(0),
+			currentDealer: *seat.MustSeat(0),
+			playerID:      *seat.MustSeat(0),
 			want:          wind.East,
 		},
 		{
 			name:          "E1 p1 -> S",
 			currentNumber: 1,
-			currentDealer: *id.MustID(0),
-			playerID:      *id.MustID(1),
+			currentDealer: *seat.MustSeat(0),
+			playerID:      *seat.MustSeat(1),
 			want:          wind.South,
 		},
 		{
 			name:          "E1 p2 -> W",
 			currentNumber: 1,
-			currentDealer: *id.MustID(0),
-			playerID:      *id.MustID(2),
+			currentDealer: *seat.MustSeat(0),
+			playerID:      *seat.MustSeat(2),
 			want:          wind.West,
 		},
 		{
 			name:          "E1 p3 -> N",
 			currentNumber: 1,
-			currentDealer: *id.MustID(0),
-			playerID:      *id.MustID(3),
+			currentDealer: *seat.MustSeat(0),
+			playerID:      *seat.MustSeat(3),
 			want:          wind.North,
 		},
 		{
 			name:          "E2 p0 -> N",
 			currentNumber: 2,
-			currentDealer: *id.MustID(1),
-			playerID:      *id.MustID(0),
+			currentDealer: *seat.MustSeat(1),
+			playerID:      *seat.MustSeat(0),
 			want:          wind.North,
 		},
 		{
 			name:          "E2 p1 -> E",
 			currentNumber: 2,
-			currentDealer: *id.MustID(1),
-			playerID:      *id.MustID(1),
+			currentDealer: *seat.MustSeat(1),
+			playerID:      *seat.MustSeat(1),
 			want:          wind.East,
 		},
 		{
 			name:          "E2 p2 -> S",
 			currentNumber: 2,
-			currentDealer: *id.MustID(1),
-			playerID:      *id.MustID(2),
+			currentDealer: *seat.MustSeat(1),
+			playerID:      *seat.MustSeat(2),
 			want:          wind.South,
 		},
 		{
 			name:          "E2 p3 -> W",
 			currentNumber: 2,
-			currentDealer: *id.MustID(1),
-			playerID:      *id.MustID(3),
+			currentDealer: *seat.MustSeat(1),
+			playerID:      *seat.MustSeat(3),
 			want:          wind.West,
 		},
 		{
 			name:          "E3 p0 -> W",
 			currentNumber: 3,
-			currentDealer: *id.MustID(2),
-			playerID:      *id.MustID(0),
+			currentDealer: *seat.MustSeat(2),
+			playerID:      *seat.MustSeat(0),
 			want:          wind.West,
 		},
 		{
 			name:          "E3 p1 -> N",
 			currentNumber: 3,
-			currentDealer: *id.MustID(2),
-			playerID:      *id.MustID(1),
+			currentDealer: *seat.MustSeat(2),
+			playerID:      *seat.MustSeat(1),
 			want:          wind.North,
 		},
 		{
 			name:          "E3 p2 -> E",
 			currentNumber: 3,
-			currentDealer: *id.MustID(2),
-			playerID:      *id.MustID(2),
+			currentDealer: *seat.MustSeat(2),
+			playerID:      *seat.MustSeat(2),
 			want:          wind.East,
 		},
 		{
 			name:          "E3 p3 -> S",
 			currentNumber: 3,
-			currentDealer: *id.MustID(2),
-			playerID:      *id.MustID(3),
+			currentDealer: *seat.MustSeat(2),
+			playerID:      *seat.MustSeat(3),
 			want:          wind.South,
 		},
 		{
 			name:          "E4 p0 -> S",
 			currentNumber: 4,
-			currentDealer: *id.MustID(3),
-			playerID:      *id.MustID(0),
+			currentDealer: *seat.MustSeat(3),
+			playerID:      *seat.MustSeat(0),
 			want:          wind.South,
 		},
 		{
 			name:          "E4 p1 -> W",
 			currentNumber: 4,
-			currentDealer: *id.MustID(3),
-			playerID:      *id.MustID(1),
+			currentDealer: *seat.MustSeat(3),
+			playerID:      *seat.MustSeat(1),
 			want:          wind.West,
 		},
 		{
 			name:          "E4 p2 -> N",
 			currentNumber: 4,
-			currentDealer: *id.MustID(3),
-			playerID:      *id.MustID(2),
+			currentDealer: *seat.MustSeat(3),
+			playerID:      *seat.MustSeat(2),
 			want:          wind.North,
 		},
 		{
 			name:          "E4 p3 -> E",
 			currentNumber: 4,
-			currentDealer: *id.MustID(3),
-			playerID:      *id.MustID(3),
+			currentDealer: *seat.MustSeat(3),
+			playerID:      *seat.MustSeat(3),
 			want:          wind.East,
 		},
 	}
@@ -354,8 +354,8 @@ func TestState_VisibleTiles(t *testing.T) {
 			0,
 			0,
 			[4]int{25000, 25000, 25000, 25000},
-			*id.MustID(0),
-			*id.MustID(0),
+			*seat.MustSeat(0),
+			*seat.MustSeat(0),
 			tile.Tiles{*tile.MustTileFromCode("5mr")},
 			round.NumInitWall,
 			players,
@@ -379,7 +379,7 @@ func TestState_VisibleTiles(t *testing.T) {
 	player1.Chii(*meld.MustChii(
 		*tile.MustTileFromCode("1m"),
 		[2]tile.Tile{*tile.MustTileFromCode("2m"), *tile.MustTileFromCode("3m")},
-		*id.MustID(0),
+		*seat.MustSeat(0),
 	))
 	player0.TakeFromRiver(*tile.MustTileFromCode("1m"))
 	player1.Discard(*tile.MustTileFromCode("5p"), false)
@@ -387,13 +387,13 @@ func TestState_VisibleTiles(t *testing.T) {
 	tests := []struct {
 		name     string
 		players  [4]player.Player
-		playerID id.ID
+		playerID seat.Seat
 		want     tile.Tiles
 	}{
 		{
 			name:     "player0",
 			players:  [4]player.Player{player0, player1, player2, player3},
-			playerID: *id.MustID(0),
+			playerID: *seat.MustSeat(0),
 			want: []tile.Tile{
 				*tile.MustTileFromCode("5p"),
 				*tile.MustTileFromCode("1m"), *tile.MustTileFromCode("2m"), *tile.MustTileFromCode("3m"),
@@ -407,7 +407,7 @@ func TestState_VisibleTiles(t *testing.T) {
 		{
 			name:     "player1",
 			players:  [4]player.Player{player0, player1, player2, player3},
-			playerID: *id.MustID(1),
+			playerID: *seat.MustSeat(1),
 			want: []tile.Tile{
 				*tile.MustTileFromCode("5p"),
 				*tile.MustTileFromCode("1m"), *tile.MustTileFromCode("2m"), *tile.MustTileFromCode("3m"),
@@ -434,8 +434,8 @@ func TestState_SafeTiles(t *testing.T) {
 			0,
 			0,
 			[4]int{25000, 25000, 25000, 25000},
-			*id.MustID(0),
-			*id.MustID(0),
+			*seat.MustSeat(0),
+			*seat.MustSeat(0),
 			tile.Tiles{*tile.MustTileFromCode("1m")},
 			round.NumInitWall,
 			players,
@@ -445,7 +445,7 @@ func TestState_SafeTiles(t *testing.T) {
 	type testCase struct {
 		name     string
 		players  [4]player.Player
-		playerID id.ID
+		playerID seat.Seat
 		want     tile.Tiles
 	}
 	var tests []testCase
@@ -460,7 +460,7 @@ func TestState_SafeTiles(t *testing.T) {
 				player.NewInvisiblePlayer(),
 				player.NewInvisiblePlayer(),
 			},
-			playerID: *id.MustID(0),
+			playerID: *seat.MustSeat(0),
 			want:     nil,
 		},
 	)
@@ -478,7 +478,7 @@ func TestState_SafeTiles(t *testing.T) {
 				player.NewInvisiblePlayer(),
 				player.NewInvisiblePlayer(),
 			},
-			playerID: *id.MustID(1),
+			playerID: *seat.MustSeat(1),
 			want:     tile.Tiles{*tile.MustTileFromCode("1p")},
 		},
 	)
@@ -492,7 +492,7 @@ func TestState_SafeTiles(t *testing.T) {
 				player.NewInvisiblePlayer(),
 				player.NewInvisiblePlayer(),
 			},
-			playerID: *id.MustID(2),
+			playerID: *seat.MustSeat(2),
 			want:     nil,
 		},
 	)
@@ -511,7 +511,7 @@ func TestState_SafeTiles(t *testing.T) {
 				player.NewInvisiblePlayer(),
 				player.NewInvisiblePlayer(),
 			},
-			playerID: *id.MustID(0),
+			playerID: *seat.MustSeat(0),
 			want:     tile.Tiles{*tile.MustTileFromCode("1p"), *tile.MustTileFromCode("1m")},
 		},
 	)

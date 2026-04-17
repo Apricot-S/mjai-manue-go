@@ -5,7 +5,7 @@ import (
 	"slices"
 	"sort"
 
-	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/id"
+	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/seat"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/tile"
 )
 
@@ -20,12 +20,12 @@ const (
 type Chii struct {
 	taken    tile.Tile
 	consumed [2]tile.Tile
-	target   id.ID
+	target   seat.Seat
 	tiles    []tile.Tile
 	ty       chiiType
 }
 
-func NewChii(taken tile.Tile, consumed [2]tile.Tile, target id.ID) (*Chii, error) {
+func NewChii(taken tile.Tile, consumed [2]tile.Tile, target seat.Seat) (*Chii, error) {
 	tiles := tile.Tiles{taken, consumed[0], consumed[1]}
 	if slices.ContainsFunc(tiles, func(t tile.Tile) bool { return !t.IsSuits() }) {
 		return nil, fmt.Errorf("honors or unknown tile cannot use for Chii; taken: %+v, consumed: %+v", taken, consumed)
@@ -61,7 +61,7 @@ func NewChii(taken tile.Tile, consumed [2]tile.Tile, target id.ID) (*Chii, error
 	}, nil
 }
 
-func MustChii(taken tile.Tile, consumed [2]tile.Tile, target id.ID) *Chii {
+func MustChii(taken tile.Tile, consumed [2]tile.Tile, target seat.Seat) *Chii {
 	c, err := NewChii(taken, consumed, target)
 	if err != nil {
 		panic(err)
@@ -77,7 +77,7 @@ func (c *Chii) Consumed() []tile.Tile {
 	return c.consumed[:]
 }
 
-func (c *Chii) Target() *id.ID {
+func (c *Chii) Target() *seat.Seat {
 	return &c.target
 }
 

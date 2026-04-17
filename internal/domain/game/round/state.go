@@ -1,8 +1,8 @@
 package round
 
 import (
-	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/id"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/round/player"
+	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/seat"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/tile"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/wind"
 )
@@ -25,8 +25,8 @@ type State struct {
 	honba          int
 	riichiDeposit  int
 	scores         [NumPlayers]int
-	dealer         id.ID
-	startingDealer id.ID
+	dealer         seat.Seat
+	startingDealer seat.Seat
 	doraIndicators tile.Tiles
 	numLeftTiles   int
 	players        [NumPlayers]player.Player
