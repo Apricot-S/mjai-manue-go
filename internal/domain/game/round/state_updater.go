@@ -12,8 +12,8 @@ type StateUpdater interface {
 
 func (s *State) Update(ev event.Event) error {
 	switch ev.(type) {
-	case event.EndRound:
-	case event.EndGame:
+	case *event.EndRound:
+	case *event.EndGame:
 	}
 	return fmt.Errorf("unknown event type: %s", ev.EventType())
 }
