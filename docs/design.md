@@ -214,11 +214,11 @@ flowchart LR
 
 命名はユビキタス言語に合わせ、将来的に `game.State` を `match.State` や `game.Match` といった名前へ寄せることを推奨する（ただし初期は大変更可能なため、今の package 構造のままでもよい）。
 
-### 9.3 StateUpdater / legal actions の責務分担（再検討）
+### 9.3 EventApplier / legal actions の責務分担（再検討）
 
 #### 結論
 
-- `StateUpdater` は「外部イベントを適用して Round/Match を遷移させる」ドメインの中核なので、早い段階で設計を固めるのが良い。
+- `EventApplier` は「外部イベントを適用して Round/Match を遷移させる」ドメインの中核なので、早い段階で設計を固めるのが良い。
 - `request_action` を受け取れない前提（オリジナル mjai 相当）では、エージェントは **State から legal actions を計算**し、さらに「今 action を返すべき局面か」も State から判断する必要がある。
 - `possible_actions` は存在しないものとして扱い、意思決定の根拠にしない（RiichiLab 互換性のため）。
 
