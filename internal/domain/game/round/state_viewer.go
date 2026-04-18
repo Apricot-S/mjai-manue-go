@@ -3,6 +3,7 @@ package round
 import (
 	"slices"
 
+	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/common"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/round/player"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/seat"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/tile"
@@ -14,7 +15,7 @@ type RawStateViewer interface {
 	RoundNumber() int
 	Honba() int
 	RiichiDeposit() int
-	Scores() [NumPlayers]int
+	Scores() [common.NumPlayers]int
 	Dealer() seat.Seat
 	StartingDealer() seat.Seat
 	DoraIndicators() tile.Tiles
@@ -52,7 +53,7 @@ func (s *State) RiichiDeposit() int {
 	return s.riichiDeposit
 }
 
-func (s *State) Scores() [NumPlayers]int {
+func (s *State) Scores() [common.NumPlayers]int {
 	return s.scores
 }
 
@@ -92,7 +93,7 @@ func (s *State) Doras() tile.Tiles {
 }
 
 func (s *State) Turn() float64 {
-	return float64(NumInitWall-s.NumLeftTiles()) / float64(NumPlayers)
+	return float64(NumInitWall-s.NumLeftTiles()) / float64(common.NumPlayers)
 }
 
 func (s *State) SeatWind(playerSeat seat.Seat) wind.Wind {
@@ -102,7 +103,7 @@ func (s *State) SeatWind(playerSeat seat.Seat) wind.Wind {
 func (s *State) VisibleTiles(playerSeat seat.Seat) tile.Tiles {
 	var visibleTiles tile.Tiles
 
-	for i := range NumPlayers {
+	for i := range common.NumPlayers {
 		p := s.players[i]
 		visibleTiles = slices.Concat(visibleTiles, p.River())
 

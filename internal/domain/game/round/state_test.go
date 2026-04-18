@@ -1,6 +1,7 @@
 package round
 
 import (
+	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/common"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/round/player"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/seat"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/tile"
@@ -12,12 +13,12 @@ func NewStateForTest(
 	roundNumber int,
 	honba int,
 	riichiDeposit int,
-	scores [NumPlayers]int,
+	scores [common.NumPlayers]int,
 	dealer seat.Seat,
 	startingDealer seat.Seat,
 	doraIndicators tile.Tiles,
 	numLeftTiles int,
-	players [NumPlayers]player.Player,
+	players [common.NumPlayers]player.Player,
 ) State {
 	return State{
 		roundWind,

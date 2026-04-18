@@ -1,11 +1,11 @@
 package game
 
-const NumPlayers = 4
+import "github.com/Apricot-S/mjai-manue-go/internal/domain/game/common"
 
 type StateViewer interface {
-	Scores() [NumPlayers]int
+	Scores() [common.NumPlayers]int
 }
 
 type State struct {
-	scores [NumPlayers]int
+	scores [common.NumPlayers]int
 }

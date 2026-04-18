@@ -1,6 +1,7 @@
 package round
 
 import (
+	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/common"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/round/player"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/seat"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/tile"
@@ -8,10 +9,9 @@ import (
 )
 
 const (
-	NumPlayers           = 4
 	MaxNumDoraIndicators = 5
-	NumInitWall          = tile.NumTileType34*4 - 13*NumPlayers - 14
-	FinalTurn            = float64(NumInitWall) / float64(NumPlayers)
+	NumInitWall          = tile.NumTileType34*4 - 13*common.NumPlayers - 14
+	FinalTurn            = float64(NumInitWall) / float64(common.NumPlayers)
 
 	maxNumKan = 4
 	// Indicates that no action has been taken by anyone.
@@ -24,10 +24,10 @@ type State struct {
 	roundNumber    int
 	honba          int
 	riichiDeposit  int
-	scores         [NumPlayers]int
+	scores         [common.NumPlayers]int
 	dealer         seat.Seat
 	startingDealer seat.Seat
 	doraIndicators tile.Tiles
 	numLeftTiles   int
-	players        [NumPlayers]player.Player
+	players        [common.NumPlayers]player.Player
 }
