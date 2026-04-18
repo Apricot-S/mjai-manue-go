@@ -15,11 +15,11 @@ func NewSeat(index int) (*Seat, error) {
 }
 
 func MustSeat(id int) *Seat {
-	pid, err := NewSeat(id)
+	s, err := NewSeat(id)
 	if err != nil {
 		panic(err)
 	}
-	return pid
+	return s
 }
 
 func (seat *Seat) Index() int {
