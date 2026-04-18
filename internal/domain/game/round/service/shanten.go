@@ -123,8 +123,9 @@ func AnalyzeShanten(h *hand.VisibleHand, opts ...shantenOption) (int, []Goal) {
 	for _, goal := range allGoals {
 		if goal.Shanten <= newUpperbound {
 			for pid := range tile.NumTileType34 {
-				goal.RequiredVector[pid] = max(goal.CountVector[pid]-tc34[pid], 0)
-				goal.ThrowableVector[pid] = max(tc34[pid]-goal.CountVector[pid], 0)
+				diff := goal.CountVector[pid] - tc34[pid]
+				goal.RequiredVector[pid] = max(diff, 0)
+				goal.ThrowableVector[pid] = max(-diff, 0)
 			}
 			goals = append(goals, goal)
 		}
