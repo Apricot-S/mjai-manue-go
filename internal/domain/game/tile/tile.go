@@ -79,8 +79,8 @@ var doraIndicatorToDora = [NumTileType38]int{
 
 type Tile struct {
 	id     int
-	color  rune
 	number int
+	color  rune
 	isRed  bool
 }
 
