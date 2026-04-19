@@ -68,3 +68,39 @@ func NewStartRound(
 }
 
 func (*StartRound) isEvent() {}
+
+func (s *StartRound) RoundWind() wind.Wind {
+	return s.roundWind
+}
+
+func (s *StartRound) RoundNumber() int {
+	return s.roundNumber
+}
+
+func (s *StartRound) Honba() int {
+	return s.honba
+}
+
+func (s *StartRound) RiichiDeposit() int {
+	return s.riichiDeposit
+}
+
+func (s *StartRound) Dealer() *seat.Seat {
+	return &s.dealer
+}
+
+func (s *StartRound) StartingDealer() *seat.Seat {
+	return &s.startingDealer
+}
+
+func (s *StartRound) DoraIndicator() *tile.Tile {
+	return &s.doraIndicator
+}
+
+func (s *StartRound) Scores() *[common.NumPlayers]int {
+	return s.scores
+}
+
+func (s *StartRound) Hands() [common.NumPlayers][initHandSize]tile.Tile {
+	return s.hands
+}

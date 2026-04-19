@@ -177,3 +177,53 @@ func TestNewStartRound(t *testing.T) {
 		})
 	}
 }
+
+func TestStartRoundAccessors(t *testing.T) {
+	validDealer := *seat.MustSeat(1)
+	validStartingDealer := *seat.MustSeat(0)
+	validDora := *tile.MustTileFromCode("1m")
+	validHands := newValidHands()
+	validScores := &[common.NumPlayers]int{25000, 25000, 25000, 25000}
+
+	got, err := event.NewStartRound(
+		wind.South,
+		2,
+		1,
+		2,
+		validDealer,
+		validStartingDealer,
+		validDora,
+		validScores,
+		validHands,
+	)
+	if err != nil {
+		t.Fatalf("NewStartRound() failed: %v", err)
+	}
+	if got.RoundWind() != wind.South {
+		t.Fatalf("RoundWind() = %v, want %v", got.RoundWind(), wind.South)
+	}
+	if got.RoundNumber() != 2 {
+		t.Fatalf("RoundNumber() = %d, want %d", got.RoundNumber(), 2)
+	}
+	if got.Honba() != 1 {
+		t.Fatalf("Honba() = %d, want %d", got.Honba(), 1)
+	}
+	if got.RiichiDeposit() != 2 {
+		t.Fatalf("RiichiDeposit() = %d, want %d", got.RiichiDeposit(), 2)
+	}
+	if got.Dealer().Index() != validDealer.Index() {
+		t.Fatalf("Dealer() = %v, want %v", got.Dealer(), validDealer)
+	}
+	if got.StartingDealer().Index() != validStartingDealer.Index() {
+		t.Fatalf("StartingDealer() = %v, want %v", got.StartingDealer(), validStartingDealer)
+	}
+	if got.DoraIndicator().ID() != validDora.ID() {
+		t.Fatalf("DoraIndicator() = %v, want %v", got.DoraIndicator(), validDora)
+	}
+	if got.Scores() != validScores {
+		t.Fatalf("Scores() = %v, want %v", got.Scores(), validScores)
+	}
+	if got.Hands() != validHands {
+		t.Fatalf("Hands() = %v, want %v", got.Hands(), validHands)
+	}
+}
