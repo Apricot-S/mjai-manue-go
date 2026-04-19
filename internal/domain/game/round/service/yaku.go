@@ -95,7 +95,7 @@ func CalculateFuHan(
 func countDoras(doraIndicators []tile.Tile, allTiles []tile.Tile) int {
 	doras := make([]tile.Tile, len(doraIndicators))
 	for i := range doras {
-		doras[i] = *doraIndicators[i].NextForDora()
+		doras[i] = doraIndicators[i].NextForDora()
 	}
 
 	numDoras := 0

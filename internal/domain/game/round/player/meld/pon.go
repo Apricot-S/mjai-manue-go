@@ -72,7 +72,7 @@ func (p Pon) String() string {
 func (p *Pon) SwapCallTiles() []tile.Tile {
 	// Red five is sorted after normal, so RemoveRed() is not necessary.
 	if p.taken.IsSuits() && p.taken.Number() == 5 {
-		return []tile.Tile{p.tiles[0], *p.tiles[0].AddRed()}
+		return []tile.Tile{p.tiles[0], p.tiles[0].AddRed()}
 	}
 	return []tile.Tile{p.tiles[0]}
 }

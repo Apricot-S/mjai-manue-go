@@ -7,7 +7,7 @@ import (
 func NewBlockFromMeld(m meld.Meld) Block {
 	switch m.(type) {
 	case *meld.Chii:
-		return MustSequence(*m.ToTiles()[0].RemoveRed())
+		return MustSequence(m.ToTiles()[0].RemoveRed())
 	case *meld.Pon:
 		// Red five is sorted after normal, so RemoveRed() is not necessary.
 		return MustTriplet(m.ToTiles()[0])

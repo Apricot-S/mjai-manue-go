@@ -98,17 +98,17 @@ func (c *Chii) SwapCallTiles() []tile.Tile {
 		case 7:
 			return []tile.Tile{c.taken}
 		case 5:
-			return []tile.Tile{*c.taken.RemoveRed(), *c.taken.AddRed(), *c.taken.Next(3)}
+			return []tile.Tile{c.taken.RemoveRed(), c.taken.AddRed(), *c.taken.Next(3)}
 		case 2:
 			next := c.taken.Next(3)
-			return []tile.Tile{c.taken, *next, *next.AddRed()}
+			return []tile.Tile{c.taken, *next, next.AddRed()}
 		default:
 			return []tile.Tile{c.taken, *c.taken.Next(3)}
 		}
 	case chiiTypeMiddle:
 		switch n {
 		case 5:
-			return []tile.Tile{*c.taken.RemoveRed(), *c.taken.AddRed()}
+			return []tile.Tile{c.taken.RemoveRed(), c.taken.AddRed()}
 		default:
 			return []tile.Tile{c.taken}
 		}
@@ -117,10 +117,10 @@ func (c *Chii) SwapCallTiles() []tile.Tile {
 		case 3:
 			return []tile.Tile{c.taken}
 		case 5:
-			return []tile.Tile{*c.taken.Next(-3), *c.taken.RemoveRed(), *c.taken.AddRed()}
+			return []tile.Tile{*c.taken.Next(-3), c.taken.RemoveRed(), c.taken.AddRed()}
 		case 8:
 			prev := c.taken.Next(-3)
-			return []tile.Tile{*prev, *prev.AddRed(), c.taken}
+			return []tile.Tile{*prev, prev.AddRed(), c.taken}
 		default:
 			return []tile.Tile{*c.taken.Next(-3), c.taken}
 		}

@@ -124,7 +124,7 @@ func MustTileFromCode(code string) *Tile {
 	return MustTileFromID(id)
 }
 
-func (t *Tile) ID() int {
+func (t Tile) ID() int {
 	return t.id
 }
 
@@ -132,35 +132,35 @@ func (t Tile) String() string {
 	return tileCodes[t.id]
 }
 
-func (t *Tile) Color() rune {
+func (t Tile) Color() rune {
 	return t.color
 }
 
-func (t *Tile) Number() int {
+func (t Tile) Number() int {
 	return t.number
 }
 
-func (t *Tile) IsRed() bool {
+func (t Tile) IsRed() bool {
 	return t.isRed
 }
 
-func (t *Tile) IsSuits() bool {
+func (t Tile) IsSuits() bool {
 	return !t.IsHonors() && !t.IsUnknown()
 }
 
-func (t *Tile) IsHonors() bool {
+func (t Tile) IsHonors() bool {
 	return t.Color() == HonorsColor
 }
 
-func (t *Tile) IsYaochu() bool {
+func (t Tile) IsYaochu() bool {
 	return slices.Contains(YaochuhaiIDs[:], t.ID())
 }
 
-func (t *Tile) IsUnknown() bool {
+func (t Tile) IsUnknown() bool {
 	return t.id == unknownID
 }
 
-func (t *Tile) Next(n int) *Tile {
+func (t Tile) Next(n int) *Tile {
 	if t.IsUnknown() || t.IsHonors() {
 		return nil
 	}
@@ -174,36 +174,36 @@ func (t *Tile) Next(n int) *Tile {
 	return MustTileFromID(nextID)
 }
 
-func (t *Tile) NextForDora() *Tile {
-	return MustTileFromID(doraIndicatorToDora[t.ID()])
+func (t Tile) NextForDora() Tile {
+	return *MustTileFromID(doraIndicatorToDora[t.ID()])
 }
 
-func (t *Tile) AddRed() *Tile {
+func (t Tile) AddRed() Tile {
 	switch t.ID() {
 	case 4:
-		return MustTileFromID(minRedID)
+		return *MustTileFromID(minRedID)
 	case 13:
-		return MustTileFromID(minRedID + 1)
+		return *MustTileFromID(minRedID + 1)
 	case 22:
-		return MustTileFromID(minRedID + 2)
+		return *MustTileFromID(minRedID + 2)
 	default:
 		return t
 	}
 }
 
-func (t *Tile) RemoveRed() *Tile {
+func (t Tile) RemoveRed() Tile {
 	switch t.ID() {
 	case minRedID:
-		return MustTileFromID(4)
+		return *MustTileFromID(4)
 	case minRedID + 1:
-		return MustTileFromID(13)
+		return *MustTileFromID(13)
 	case minRedID + 2:
-		return MustTileFromID(22)
+		return *MustTileFromID(22)
 	default:
 		return t
 	}
 }
 
-func (t *Tile) HasSameSymbol(other *Tile) bool {
+func (t Tile) HasSameSymbol(other *Tile) bool {
 	return t.Number() == other.Number() && t.Color() == other.Color()
 }
