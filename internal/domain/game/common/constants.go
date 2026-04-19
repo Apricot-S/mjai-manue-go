@@ -1,3 +1,6 @@
 package common
 
-const NumPlayers = 4
+const (
+	NumPlayers   = 4
+	InitHandSize = 13
+)

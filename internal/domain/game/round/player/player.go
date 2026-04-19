@@ -15,8 +15,7 @@ const (
 )
 
 const (
-	initHandSize = 13
-	maxNumMelds  = 4
+	maxNumMelds = 4
 	// Reference: <https://note.com/daku_longyi/n/n51fe08566f1b>
 	maxNumRiver = 24
 	// Reference: <https://note.com/daku_longyi/n/n51fe08566f1b>

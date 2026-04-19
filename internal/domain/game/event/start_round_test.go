@@ -10,13 +10,11 @@ import (
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/wind"
 )
 
-const initHandSize = 13
-
-func newValidHands() [common.NumPlayers][initHandSize]tile.Tile {
-	var hands [common.NumPlayers][initHandSize]tile.Tile
+func newValidHands() [common.NumPlayers][common.InitHandSize]tile.Tile {
+	var hands [common.NumPlayers][common.InitHandSize]tile.Tile
 	base := tile.MustTileFromCode("1m")
 	for player := range common.NumPlayers {
-		for i := range initHandSize {
+		for i := range common.InitHandSize {
 			hands[player][i] = *base
 		}
 	}
@@ -40,7 +38,7 @@ func TestNewStartRound(t *testing.T) {
 		startingDealer seat.Seat
 		doraIndicator  tile.Tile
 		scores         *[common.NumPlayers]int
-		hands          [common.NumPlayers][initHandSize]tile.Tile
+		hands          [common.NumPlayers][common.InitHandSize]tile.Tile
 		wantErr        bool
 	}{
 		{

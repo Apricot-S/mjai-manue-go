@@ -5,6 +5,7 @@ import (
 	"slices"
 	"sort"
 
+	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/common"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/round/player/hand"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/round/player/meld"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/round/service"
@@ -26,7 +27,7 @@ type VisiblePlayer struct {
 	needsDeadWallDraw         bool
 }
 
-func NewVisiblePlayer(handTiles [initHandSize]tile.Tile) (*VisiblePlayer, error) {
+func NewVisiblePlayer(handTiles [common.InitHandSize]tile.Tile) (*VisiblePlayer, error) {
 	h, err := hand.NewVisibleHand(handTiles[:])
 	if err != nil {
 		return nil, err

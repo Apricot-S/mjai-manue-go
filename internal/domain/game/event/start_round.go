@@ -12,7 +12,6 @@ import (
 const (
 	minRoundNumber = 1
 	maxRoundNumber = 4
-	initHandSize   = 13
 )
 
 type StartRound struct {
@@ -24,7 +23,7 @@ type StartRound struct {
 	startingDealer seat.Seat
 	doraIndicator  tile.Tile
 	scores         *[common.NumPlayers]int
-	hands          [common.NumPlayers][initHandSize]tile.Tile
+	hands          [common.NumPlayers][common.InitHandSize]tile.Tile
 }
 
 func NewStartRound(
@@ -36,7 +35,7 @@ func NewStartRound(
 	startingDealer seat.Seat,
 	doraIndicator tile.Tile,
 	scores *[common.NumPlayers]int,
-	hands [common.NumPlayers][initHandSize]tile.Tile,
+	hands [common.NumPlayers][common.InitHandSize]tile.Tile,
 ) (*StartRound, error) {
 	if roundWind < wind.East || wind.North < roundWind {
 		return nil, fmt.Errorf("invalid round wind: %v", roundWind)
@@ -101,6 +100,6 @@ func (s *StartRound) Scores() *[common.NumPlayers]int {
 	return s.scores
 }
 
-func (s *StartRound) Hands() [common.NumPlayers][initHandSize]tile.Tile {
+func (s *StartRound) Hands() [common.NumPlayers][common.InitHandSize]tile.Tile {
 	return s.hands
 }

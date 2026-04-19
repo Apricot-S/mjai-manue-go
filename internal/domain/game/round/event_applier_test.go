@@ -12,9 +12,9 @@ import (
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/wind"
 )
 
-func newValidHands() [common.NumPlayers][initHandSize]tile.Tile {
-	handCodes := [initHandSize]string{"1m", "1p", "1s", "2m", "2p", "2s", "3m", "3p", "3s", "4m", "4p", "4s", "5m"}
-	var hands [common.NumPlayers][initHandSize]tile.Tile
+func newValidHands() [common.NumPlayers][common.InitHandSize]tile.Tile {
+	handCodes := [common.InitHandSize]string{"1m", "1p", "1s", "2m", "2p", "2s", "3m", "3p", "3s", "4m", "4p", "4s", "5m"}
+	var hands [common.NumPlayers][common.InitHandSize]tile.Tile
 	for player := range common.NumPlayers {
 		for i, code := range handCodes {
 			hands[player][i] = *tile.MustTileFromCode(code)
@@ -81,8 +81,8 @@ func TestApplyStartRound(t *testing.T) {
 	for i := range common.NumPlayers {
 		playerSeat := *seat.MustSeat(i)
 		handTiles := s.Player(playerSeat).HandTiles()
-		if len(handTiles) != initHandSize {
-			t.Fatalf("player %d hand size = %d, want %d", i, len(handTiles), initHandSize)
+		if len(handTiles) != common.InitHandSize {
+			t.Fatalf("player %d hand size = %d, want %d", i, len(handTiles), common.InitHandSize)
 		}
 
 		expectedHand, err := hand.NewVisibleHand(validHands[i][:])

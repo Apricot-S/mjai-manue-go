@@ -4,12 +4,11 @@ import (
 	"fmt"
 	"slices"
 
+	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/common"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/event"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/round/player"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/tile"
 )
-
-const initHandSize = 13
 
 type EventApplier interface {
 	Apply(ev event.Event) error
@@ -50,7 +49,7 @@ func (s *State) applyStartRound(ev *event.StartRound) error {
 	return nil
 }
 
-func (s *State) newPlayerFromHand(handTiles *[initHandSize]tile.Tile) (player.Player, error) {
+func (s *State) newPlayerFromHand(handTiles *[common.InitHandSize]tile.Tile) (player.Player, error) {
 	if isUnknownHand(handTiles) {
 		return player.NewInvisiblePlayer(), nil
 	}
@@ -62,7 +61,7 @@ func (s *State) newPlayerFromHand(handTiles *[initHandSize]tile.Tile) (player.Pl
 	return visiblePlayer, nil
 }
 
-func isUnknownHand(handTiles *[initHandSize]tile.Tile) bool {
+func isUnknownHand(handTiles *[common.InitHandSize]tile.Tile) bool {
 	return slices.IndexFunc(handTiles[:], func(t tile.Tile) bool {
 		return !t.IsUnknown()
 	}) == -1
