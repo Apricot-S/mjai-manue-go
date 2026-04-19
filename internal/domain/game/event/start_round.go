@@ -85,16 +85,16 @@ func (s *StartRound) RiichiDeposit() int {
 	return s.riichiDeposit
 }
 
-func (s *StartRound) Dealer() *seat.Seat {
-	return &s.dealer
+func (s *StartRound) Dealer() seat.Seat {
+	return s.dealer
 }
 
-func (s *StartRound) StartingDealer() *seat.Seat {
-	return &s.startingDealer
+func (s *StartRound) StartingDealer() seat.Seat {
+	return s.startingDealer
 }
 
-func (s *StartRound) DoraIndicator() *tile.Tile {
-	return &s.doraIndicator
+func (s *StartRound) DoraIndicator() tile.Tile {
+	return s.doraIndicator
 }
 
 func (s *StartRound) Scores() *[common.NumPlayers]int {
