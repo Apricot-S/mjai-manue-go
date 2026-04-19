@@ -22,6 +22,6 @@ func MustSeat(id int) *Seat {
 	return s
 }
 
-func (seat *Seat) Index() int {
+func (seat Seat) Index() int {
 	return seat.index
 }
