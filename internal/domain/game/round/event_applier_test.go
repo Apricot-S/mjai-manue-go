@@ -85,7 +85,7 @@ func TestApplyStartRound(t *testing.T) {
 			t.Fatalf("player %d hand size = %d, want %d", i, len(handTiles), initHandSize)
 		}
 
-		expectedHand, err := hand.NewVisibleHand(handTiles)
+		expectedHand, err := hand.NewVisibleHand(validHands[i][:])
 		if err != nil {
 			t.Fatalf("NewVisibleHand() failed for expected hand: %v", err)
 		}
