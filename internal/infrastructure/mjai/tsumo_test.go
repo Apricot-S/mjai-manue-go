@@ -62,8 +62,8 @@ func TestParseTsumo(t *testing.T) {
 			if got.Actor() != *tt.wantActor {
 				t.Errorf("Actor() = %v, want %v", got, tt.wantActor)
 			}
-			if got.DrawnTile() != *tt.wantTile {
-				t.Errorf("DrawnTile() = %v, want %v", got, tt.wantTile)
+			if got.Tile() != *tt.wantTile {
+				t.Errorf("Tile() = %v, want %v", got, tt.wantTile)
 			}
 		})
 	}

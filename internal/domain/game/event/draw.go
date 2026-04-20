@@ -20,6 +20,6 @@ func (d *Draw) Actor() seat.Seat {
 	return d.actor
 }
 
-func (d *Draw) DrawnTile() tile.Tile {
+func (d *Draw) Tile() tile.Tile {
 	return d.drawnTile
 }
