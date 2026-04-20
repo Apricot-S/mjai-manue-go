@@ -1,7 +1,11 @@
 package round
 
 import (
+	"fmt"
+	"slices"
+
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/common"
+	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/event"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/round/player"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/seat"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/tile"
@@ -30,4 +34,51 @@ type State struct {
 	doraIndicators tile.Tiles
 	numLeftTiles   int
 	players        [common.NumPlayers]player.Player
+}
+
+func NewState(ev *event.StartRound, previousScores [common.NumPlayers]int) (*State, error) {
+	s := &State{}
+
+	s.roundWind = ev.RoundWind()
+	s.roundNumber = ev.RoundNumber()
+	s.honba = ev.Honba()
+	s.riichiDeposit = ev.RiichiDeposit()
+	s.dealer = ev.Dealer()
+	s.startingDealer = *seat.MustSeat(0)
+	s.doraIndicators = tile.Tiles{ev.DoraIndicator()}
+	s.numLeftTiles = NumInitWall
+
+	if ev.Scores() != nil {
+		s.scores = *ev.Scores()
+	} else {
+		s.scores = previousScores
+	}
+
+	for i, handTiles := range ev.Hands() {
+		p, err := s.newPlayerFromHand(&handTiles)
+		if err != nil {
+			return nil, fmt.Errorf("failed to initialize player %d: %w", i, err)
+		}
+		s.players[i] = p
+	}
+
+	return s, nil
+}
+
+func (s *State) newPlayerFromHand(handTiles *[common.InitHandSize]tile.Tile) (player.Player, error) {
+	if isUnknownHand(handTiles) {
+		return player.NewInvisiblePlayer(), nil
+	}
+
+	visiblePlayer, err := player.NewVisiblePlayer(*handTiles)
+	if err != nil {
+		return nil, err
+	}
+	return visiblePlayer, nil
+}
+
+func isUnknownHand(handTiles *[common.InitHandSize]tile.Tile) bool {
+	return slices.IndexFunc(handTiles[:], func(t tile.Tile) bool {
+		return !t.IsUnknown()
+	}) == -1
 }

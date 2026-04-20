@@ -43,9 +43,9 @@ func TestApplyStartRound(t *testing.T) {
 		t.Fatalf("NewStartRound() failed: %v", err)
 	}
 
-	var s State
-	if err := s.Apply(ev); err != nil {
-		t.Fatalf("State.Apply() failed: %v", err)
+	s, err := NewState(ev, *validScores)
+	if err != nil {
+		t.Fatalf("NewState() failed: %v", err)
 	}
 
 	if got := s.RoundWind(); got != wind.South {
@@ -119,10 +119,9 @@ func TestApplyStartRoundWithNilScores(t *testing.T) {
 	}
 
 	scoresBefore := [common.NumPlayers]int{10000, 20000, 30000, 40000}
-	var s State
-	s.scores = scoresBefore
-	if err := s.Apply(ev); err != nil {
-		t.Fatalf("State.Apply() failed: %v", err)
+	s, err := NewState(ev, scoresBefore)
+	if err != nil {
+		t.Fatalf("NewState() failed: %v", err)
 	}
 
 	if got := s.Scores(); got != scoresBefore {
@@ -152,9 +151,9 @@ func TestApplyStartRoundFallsBackToInvisiblePlayer(t *testing.T) {
 		t.Fatalf("NewStartRound() failed: %v", err)
 	}
 
-	var s State
-	if err := s.Apply(ev); err != nil {
-		t.Fatalf("State.Apply() failed: %v", err)
+	s, err := NewState(ev, [common.NumPlayers]int{25000, 25000, 25000, 25000})
+	if err != nil {
+		t.Fatalf("NewState() failed: %v", err)
 	}
 
 	firstSeat := *seat.MustSeat(0)
@@ -192,8 +191,8 @@ func TestApplyStartRoundErrorsOnInvalidVisibleHand(t *testing.T) {
 		t.Fatalf("NewStartRound() failed: %v", err)
 	}
 
-	var s State
-	if err := s.Apply(ev); err == nil {
-		t.Fatal("State.Apply() succeeded unexpectedly")
+	_, err = NewState(ev, [common.NumPlayers]int{25000, 25000, 25000, 25000})
+	if err == nil {
+		t.Fatal("NewState() succeeded unexpectedly")
 	}
 }
