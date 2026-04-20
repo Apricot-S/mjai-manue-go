@@ -25,7 +25,6 @@ func newValidHands() [common.NumPlayers][common.InitHandSize]tile.Tile {
 
 func TestApplyStartRound(t *testing.T) {
 	validDealer := *seat.MustSeat(1)
-	validStartingDealer := *seat.MustSeat(0)
 	validDora := *tile.MustTileFromCode("1m")
 	validHands := newValidHands()
 	validScores := &[common.NumPlayers]int{25000, 25000, 25000, 25000}
@@ -36,7 +35,6 @@ func TestApplyStartRound(t *testing.T) {
 		1,
 		2,
 		validDealer,
-		validStartingDealer,
 		validDora,
 		validScores,
 		validHands,
@@ -65,8 +63,8 @@ func TestApplyStartRound(t *testing.T) {
 	if got := s.Dealer().Index(); got != validDealer.Index() {
 		t.Fatalf("Dealer() = %d, want %d", got, validDealer.Index())
 	}
-	if got := s.StartingDealer().Index(); got != validStartingDealer.Index() {
-		t.Fatalf("StartingDealer() = %d, want %d", got, validStartingDealer.Index())
+	if got := s.StartingDealer().Index(); got != 0 {
+		t.Fatalf("StartingDealer() = %d, want %d", got, 0)
 	}
 	if got := s.DoraIndicators(); got.Len() != 1 || got[0].ID() != validDora.ID() {
 		t.Fatalf("DoraIndicators() = %v, want [%v]", got, validDora)
@@ -103,7 +101,6 @@ func TestApplyStartRound(t *testing.T) {
 
 func TestApplyStartRoundWithNilScores(t *testing.T) {
 	validDealer := *seat.MustSeat(1)
-	validStartingDealer := *seat.MustSeat(0)
 	validDora := *tile.MustTileFromCode("1m")
 	validHands := newValidHands()
 
@@ -113,7 +110,6 @@ func TestApplyStartRoundWithNilScores(t *testing.T) {
 		0,
 		0,
 		validDealer,
-		validStartingDealer,
 		validDora,
 		nil,
 		validHands,
@@ -136,7 +132,6 @@ func TestApplyStartRoundWithNilScores(t *testing.T) {
 
 func TestApplyStartRoundFallsBackToInvisiblePlayer(t *testing.T) {
 	validDealer := *seat.MustSeat(1)
-	validStartingDealer := *seat.MustSeat(0)
 	validDora := *tile.MustTileFromCode("1m")
 	unknownHands := newValidHands()
 	for i := range unknownHands[0] {
@@ -149,7 +144,6 @@ func TestApplyStartRoundFallsBackToInvisiblePlayer(t *testing.T) {
 		0,
 		0,
 		validDealer,
-		validStartingDealer,
 		validDora,
 		&[common.NumPlayers]int{25000, 25000, 25000, 25000},
 		unknownHands,
@@ -178,7 +172,6 @@ func TestApplyStartRoundFallsBackToInvisiblePlayer(t *testing.T) {
 
 func TestApplyStartRoundErrorsOnInvalidVisibleHand(t *testing.T) {
 	validDealer := *seat.MustSeat(1)
-	validStartingDealer := *seat.MustSeat(0)
 	validDora := *tile.MustTileFromCode("1m")
 	invalidHands := newValidHands()
 	for i := range 5 {
@@ -191,7 +184,6 @@ func TestApplyStartRoundErrorsOnInvalidVisibleHand(t *testing.T) {
 		0,
 		0,
 		validDealer,
-		validStartingDealer,
 		validDora,
 		&[common.NumPlayers]int{25000, 25000, 25000, 25000},
 		invalidHands,

@@ -58,9 +58,6 @@ func TestParseStartKyoku_Valid(t *testing.T) {
 	if got.Dealer().Index() != 2 {
 		t.Fatalf("Dealer() = %d, want 2", got.Dealer().Index())
 	}
-	if got.StartingDealer().Index() != 2 {
-		t.Fatalf("StartingDealer() = %d, want 2", got.StartingDealer().Index())
-	}
 	if got.DoraIndicator().String() != "5mr" {
 		t.Fatalf("DoraIndicator() = %v, want 5mr", got.DoraIndicator())
 	}

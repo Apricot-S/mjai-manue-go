@@ -15,15 +15,14 @@ const (
 )
 
 type StartRound struct {
-	roundWind      wind.Wind
-	roundNumber    int
-	honba          int
-	riichiDeposit  int
-	dealer         seat.Seat
-	startingDealer seat.Seat
-	doraIndicator  tile.Tile
-	scores         *[common.NumPlayers]int
-	hands          [common.NumPlayers][common.InitHandSize]tile.Tile
+	roundWind     wind.Wind
+	roundNumber   int
+	honba         int
+	riichiDeposit int
+	dealer        seat.Seat
+	doraIndicator tile.Tile
+	scores        *[common.NumPlayers]int
+	hands         [common.NumPlayers][common.InitHandSize]tile.Tile
 }
 
 func NewStartRound(
@@ -32,7 +31,6 @@ func NewStartRound(
 	honba int,
 	riichiDeposit int,
 	dealer seat.Seat,
-	startingDealer seat.Seat,
 	doraIndicator tile.Tile,
 	scores *[common.NumPlayers]int,
 	hands [common.NumPlayers][common.InitHandSize]tile.Tile,
@@ -59,7 +57,6 @@ func NewStartRound(
 		honba,
 		riichiDeposit,
 		dealer,
-		startingDealer,
 		doraIndicator,
 		scores,
 		hands,
@@ -86,10 +83,6 @@ func (s *StartRound) RiichiDeposit() int {
 
 func (s *StartRound) Dealer() seat.Seat {
 	return s.dealer
-}
-
-func (s *StartRound) StartingDealer() seat.Seat {
-	return s.startingDealer
 }
 
 func (s *StartRound) DoraIndicator() tile.Tile {

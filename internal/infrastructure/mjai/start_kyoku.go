@@ -90,7 +90,6 @@ func (m *StartKyoku) ToEvent() (*event.StartRound, error) {
 		m.Honba,
 		m.Kyotaku,
 		*dealerSeat,
-		*dealerSeat,
 		*doraIndicator,
 		scoresPtr,
 		hands,

@@ -30,7 +30,6 @@ func (s *State) applyStartRound(ev *event.StartRound) error {
 	s.honba = ev.Honba()
 	s.riichiDeposit = ev.RiichiDeposit()
 	s.dealer = ev.Dealer()
-	s.startingDealer = ev.StartingDealer()
 	s.doraIndicators = tile.Tiles{ev.DoraIndicator()}
 	s.numLeftTiles = NumInitWall
 

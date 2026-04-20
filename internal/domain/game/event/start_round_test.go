@@ -23,127 +23,117 @@ func newValidHands() [common.NumPlayers][common.InitHandSize]tile.Tile {
 
 func TestNewStartRound(t *testing.T) {
 	validDealer := *seat.MustSeat(1)
-	validStartingDealer := *seat.MustSeat(0)
 	validDora := *tile.MustTileFromCode("1m")
 	validHands := newValidHands()
 	validScores := &[common.NumPlayers]int{25000, 25000, 25000, 25000}
 
 	tests := []struct {
-		name           string
-		roundWind      wind.Wind
-		roundNumber    int
-		honba          int
-		riichiDeposit  int
-		dealer         seat.Seat
-		startingDealer seat.Seat
-		doraIndicator  tile.Tile
-		scores         *[common.NumPlayers]int
-		hands          [common.NumPlayers][common.InitHandSize]tile.Tile
-		wantErr        bool
+		name          string
+		roundWind     wind.Wind
+		roundNumber   int
+		honba         int
+		riichiDeposit int
+		dealer        seat.Seat
+		doraIndicator tile.Tile
+		scores        *[common.NumPlayers]int
+		hands         [common.NumPlayers][common.InitHandSize]tile.Tile
+		wantErr       bool
 	}{
 		{
-			name:           "valid parameters",
-			roundWind:      wind.East,
-			roundNumber:    1,
-			honba:          0,
-			riichiDeposit:  0,
-			dealer:         validDealer,
-			startingDealer: validStartingDealer,
-			doraIndicator:  validDora,
-			scores:         validScores,
-			hands:          validHands,
-			wantErr:        false,
+			name:          "valid parameters",
+			roundWind:     wind.East,
+			roundNumber:   1,
+			honba:         0,
+			riichiDeposit: 0,
+			dealer:        validDealer,
+			doraIndicator: validDora,
+			scores:        validScores,
+			hands:         validHands,
+			wantErr:       false,
 		},
 		{
-			name:           "nil scores allowed",
-			roundWind:      wind.East,
-			roundNumber:    1,
-			honba:          0,
-			riichiDeposit:  0,
-			dealer:         validDealer,
-			startingDealer: validStartingDealer,
-			doraIndicator:  validDora,
-			scores:         nil,
-			hands:          validHands,
-			wantErr:        false,
+			name:          "nil scores allowed",
+			roundWind:     wind.East,
+			roundNumber:   1,
+			honba:         0,
+			riichiDeposit: 0,
+			dealer:        validDealer,
+			doraIndicator: validDora,
+			scores:        nil,
+			hands:         validHands,
+			wantErr:       false,
 		},
 		{
-			name:           "invalid round wind",
-			roundWind:      wind.Wind(0),
-			roundNumber:    1,
-			honba:          0,
-			riichiDeposit:  0,
-			dealer:         validDealer,
-			startingDealer: validStartingDealer,
-			doraIndicator:  validDora,
-			scores:         validScores,
-			hands:          validHands,
-			wantErr:        true,
+			name:          "invalid round wind",
+			roundWind:     wind.Wind(0),
+			roundNumber:   1,
+			honba:         0,
+			riichiDeposit: 0,
+			dealer:        validDealer,
+			doraIndicator: validDora,
+			scores:        validScores,
+			hands:         validHands,
+			wantErr:       true,
 		},
 		{
-			name:           "invalid round number 0",
-			roundWind:      wind.East,
-			roundNumber:    0,
-			honba:          0,
-			riichiDeposit:  0,
-			dealer:         validDealer,
-			startingDealer: validStartingDealer,
-			doraIndicator:  validDora,
-			scores:         validScores,
-			hands:          validHands,
-			wantErr:        true,
+			name:          "invalid round number 0",
+			roundWind:     wind.East,
+			roundNumber:   0,
+			honba:         0,
+			riichiDeposit: 0,
+			dealer:        validDealer,
+			doraIndicator: validDora,
+			scores:        validScores,
+			hands:         validHands,
+			wantErr:       true,
 		},
 		{
-			name:           "invalid round number 5",
-			roundWind:      wind.East,
-			roundNumber:    5,
-			honba:          0,
-			riichiDeposit:  0,
-			dealer:         validDealer,
-			startingDealer: validStartingDealer,
-			doraIndicator:  validDora,
-			scores:         validScores,
-			hands:          validHands,
-			wantErr:        true,
+			name:          "invalid round number 5",
+			roundWind:     wind.East,
+			roundNumber:   5,
+			honba:         0,
+			riichiDeposit: 0,
+			dealer:        validDealer,
+			doraIndicator: validDora,
+			scores:        validScores,
+			hands:         validHands,
+			wantErr:       true,
 		},
 		{
-			name:           "negative honba",
-			roundWind:      wind.East,
-			roundNumber:    1,
-			honba:          -1,
-			riichiDeposit:  0,
-			dealer:         validDealer,
-			startingDealer: validStartingDealer,
-			doraIndicator:  validDora,
-			scores:         validScores,
-			hands:          validHands,
-			wantErr:        true,
+			name:          "negative honba",
+			roundWind:     wind.East,
+			roundNumber:   1,
+			honba:         -1,
+			riichiDeposit: 0,
+			dealer:        validDealer,
+			doraIndicator: validDora,
+			scores:        validScores,
+			hands:         validHands,
+			wantErr:       true,
 		},
 		{
-			name:           "negative riichi deposit",
-			roundWind:      wind.East,
-			roundNumber:    1,
-			honba:          0,
-			riichiDeposit:  -1,
-			dealer:         validDealer,
-			startingDealer: validStartingDealer,
-			doraIndicator:  validDora,
-			scores:         validScores,
-			hands:          validHands,
-			wantErr:        true,
+			name:          "negative riichi deposit",
+			roundWind:     wind.East,
+			roundNumber:   1,
+			honba:         0,
+			riichiDeposit: -1,
+			dealer:        validDealer,
+			doraIndicator: validDora,
+			scores:        validScores,
+			hands:         validHands,
+			wantErr:       true,
 		},
 		{
-			name:           "unknown dora indicator",
-			roundWind:      wind.East,
-			roundNumber:    1,
-			honba:          0,
-			riichiDeposit:  0,
-			dealer:         validDealer,
-			startingDealer: validStartingDealer,
-			doraIndicator:  *tile.MustTileFromCode("?"),
-			scores:         validScores,
-			hands:          validHands,
-			wantErr:        true,
+			name:          "unknown dora indicator",
+			roundWind:     wind.East,
+			roundNumber:   1,
+			honba:         0,
+			riichiDeposit: 0,
+			dealer:        validDealer,
+			doraIndicator: *tile.MustTileFromCode("?"),
+			scores:        validScores,
+			hands:         validHands,
+			wantErr:       true,
 		},
 	}
 
@@ -155,7 +145,6 @@ func TestNewStartRound(t *testing.T) {
 				tt.honba,
 				tt.riichiDeposit,
 				tt.dealer,
-				tt.startingDealer,
 				tt.doraIndicator,
 				tt.scores,
 				tt.hands,
@@ -178,7 +167,6 @@ func TestNewStartRound(t *testing.T) {
 
 func TestStartRoundAccessors(t *testing.T) {
 	validDealer := *seat.MustSeat(1)
-	validStartingDealer := *seat.MustSeat(0)
 	validDora := *tile.MustTileFromCode("1m")
 	validHands := newValidHands()
 	validScores := &[common.NumPlayers]int{25000, 25000, 25000, 25000}
@@ -189,7 +177,6 @@ func TestStartRoundAccessors(t *testing.T) {
 		1,
 		2,
 		validDealer,
-		validStartingDealer,
 		validDora,
 		validScores,
 		validHands,
@@ -211,9 +198,6 @@ func TestStartRoundAccessors(t *testing.T) {
 	}
 	if got.Dealer().Index() != validDealer.Index() {
 		t.Fatalf("Dealer() = %v, want %v", got.Dealer(), validDealer)
-	}
-	if got.StartingDealer().Index() != validStartingDealer.Index() {
-		t.Fatalf("StartingDealer() = %v, want %v", got.StartingDealer(), validStartingDealer)
 	}
 	if got.DoraIndicator().ID() != validDora.ID() {
 		t.Fatalf("DoraIndicator() = %v, want %v", got.DoraIndicator(), validDora)
