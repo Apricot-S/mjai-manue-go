@@ -43,28 +43,28 @@ func TestParseStartKyoku_Valid(t *testing.T) {
 		t.Fatalf("ParseStartKyoku() failed: %v", err)
 	}
 	if got.RoundWind() != wind.East {
-		t.Fatalf("RoundWind() = %v, want %v", got.RoundWind(), wind.East)
+		t.Errorf("RoundWind() = %v, want %v", got.RoundWind(), wind.East)
 	}
 	if got.RoundNumber() != 1 {
-		t.Fatalf("RoundNumber() = %d, want 1", got.RoundNumber())
+		t.Errorf("RoundNumber() = %d, want 1", got.RoundNumber())
 	}
 	if got.Honba() != 0 {
-		t.Fatalf("Honba() = %d, want 0", got.Honba())
+		t.Errorf("Honba() = %d, want 0", got.Honba())
 	}
 	if got.RiichiDeposit() != 1 {
-		t.Fatalf("RiichiDeposit() = %d, want 1", got.RiichiDeposit())
+		t.Errorf("RiichiDeposit() = %d, want 1", got.RiichiDeposit())
 	}
 	if got.Dealer().Index() != 2 {
-		t.Fatalf("Dealer() = %d, want 2", got.Dealer().Index())
+		t.Errorf("Dealer() = %d, want 2", got.Dealer().Index())
 	}
 	if got.DoraIndicator().String() != "5mr" {
-		t.Fatalf("DoraIndicator() = %v, want 5mr", got.DoraIndicator())
+		t.Errorf("DoraIndicator() = %v, want 5mr", got.DoraIndicator())
 	}
 	if got.Scores() == nil {
 		t.Fatal("scores must not be nil")
 	}
 	if got.Scores()[0] != 25000 {
-		t.Fatalf("Scores()[0] = %d, want 25000", got.Scores()[0])
+		t.Errorf("Scores()[0] = %d, want 25000", got.Scores()[0])
 	}
 }
 
@@ -89,7 +89,7 @@ func TestParseStartKyoku_NoScores(t *testing.T) {
 		t.Fatalf("ParseStartKyoku() failed: %v", err)
 	}
 	if got.Scores() != nil {
-		t.Fatalf("Scores() = %v, want nil", got.Scores())
+		t.Errorf("Scores() = %v, want nil", got.Scores())
 	}
 }
 

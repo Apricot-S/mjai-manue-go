@@ -151,7 +151,7 @@ func TestNewStartRound(t *testing.T) {
 			)
 			if err != nil {
 				if !tt.wantErr {
-					t.Fatalf("NewStartRound() failed: %v", err)
+					t.Errorf("NewStartRound() failed: %v", err)
 				}
 				return
 			}
@@ -159,7 +159,7 @@ func TestNewStartRound(t *testing.T) {
 				t.Fatal("NewStartRound() succeeded unexpectedly")
 			}
 			if got == nil {
-				t.Fatal("NewStartRound() returned nil without error")
+				t.Error("NewStartRound() returned nil without error")
 			}
 		})
 	}
@@ -185,27 +185,27 @@ func TestStartRoundAccessors(t *testing.T) {
 		t.Fatalf("NewStartRound() failed: %v", err)
 	}
 	if got.RoundWind() != wind.South {
-		t.Fatalf("RoundWind() = %v, want %v", got.RoundWind(), wind.South)
+		t.Errorf("RoundWind() = %v, want %v", got.RoundWind(), wind.South)
 	}
 	if got.RoundNumber() != 2 {
-		t.Fatalf("RoundNumber() = %d, want %d", got.RoundNumber(), 2)
+		t.Errorf("RoundNumber() = %d, want %d", got.RoundNumber(), 2)
 	}
 	if got.Honba() != 1 {
-		t.Fatalf("Honba() = %d, want %d", got.Honba(), 1)
+		t.Errorf("Honba() = %d, want %d", got.Honba(), 1)
 	}
 	if got.RiichiDeposit() != 2 {
-		t.Fatalf("RiichiDeposit() = %d, want %d", got.RiichiDeposit(), 2)
+		t.Errorf("RiichiDeposit() = %d, want %d", got.RiichiDeposit(), 2)
 	}
 	if got.Dealer().Index() != validDealer.Index() {
-		t.Fatalf("Dealer() = %v, want %v", got.Dealer(), validDealer)
+		t.Errorf("Dealer() = %v, want %v", got.Dealer(), validDealer)
 	}
 	if got.DoraIndicator().ID() != validDora.ID() {
-		t.Fatalf("DoraIndicator() = %v, want %v", got.DoraIndicator(), validDora)
+		t.Errorf("DoraIndicator() = %v, want %v", got.DoraIndicator(), validDora)
 	}
 	if got.Scores() != validScores {
-		t.Fatalf("Scores() = %v, want %v", got.Scores(), validScores)
+		t.Errorf("Scores() = %v, want %v", got.Scores(), validScores)
 	}
 	if got.Hands() != validHands {
-		t.Fatalf("Hands() = %v, want %v", got.Hands(), validHands)
+		t.Errorf("Hands() = %v, want %v", got.Hands(), validHands)
 	}
 }
