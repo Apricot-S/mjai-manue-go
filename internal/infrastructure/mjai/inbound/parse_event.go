@@ -8,9 +8,9 @@ import (
 )
 
 var parseEventByType = map[string]func([]byte) (event.Event, error){
-	"start_kyoku": parseToEvent[StartKyoku, *event.StartRound](),
-	"tsumo":       parseToEvent[Tsumo, *event.Draw](),
-	"dahai":       parseToEvent[Dahai, *event.Discard](),
+	"start_kyoku": parseToEvent[*StartKyoku](),
+	"tsumo":       parseToEvent[*Tsumo](),
+	"dahai":       parseToEvent[*Dahai](),
 }
 
 // ParseEvent converts a single mjai inbound message (one JSON object) into a domain event.
@@ -42,16 +42,13 @@ type ToEventer[E event.Event] interface {
 	ToEvent() (E, error)
 }
 
-func parseToEvent[S any, E event.Event, P interface {
-	*S
-	ToEventer[E]
-}]() func([]byte) (event.Event, error) {
+func parseToEvent[M ToEventer[E], E event.Event]() func([]byte) (event.Event, error) {
 	return func(b []byte) (event.Event, error) {
-		var msg S
+		var msg M
 		if err := json.Unmarshal(b, &msg); err != nil {
 			return nil, err
 		}
-		ev, err := P(&msg).ToEvent()
+		ev, err := msg.ToEvent()
 		if err != nil {
 			return nil, err
 		}
