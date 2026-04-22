@@ -12,7 +12,7 @@ type EventApplier interface {
 
 func (s *State) Apply(ev event.Event) error {
 	switch ev := ev.(type) {
-	case *event.EndRound:
+	case *event.Draw:
 		return fmt.Errorf("unimplemented event: %T", ev)
 	}
 	return fmt.Errorf("unknown event: %T", ev)
