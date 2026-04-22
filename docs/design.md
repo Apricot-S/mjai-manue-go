@@ -199,6 +199,8 @@ flowchart LR
 プロトコルの牌表現（赤5の 0 表記など）は domain に持ち込まず、codec 側で吸収する。
 また codec は方向（外部→内部 / 内部→外部）で責務が割れるため、`internal/infrastructure/mjai/inbound`（外部メッセージ → domain event）と `internal/infrastructure/mjai/outbound`（domain action → 外部メッセージ）に分離する。
 
+この分離は「event（事実）と action（意図）を同じ構造体で扱わない」ためのものでもある。たとえば `hora` のように、outbound は宣言に近い一方、inbound は結果（点数や精算など）を含み得るため、同一型にすると `omitempty` や `nil` の多用で不変条件が曖昧になり、誤って出してはいけないフィールドを送信する事故が起きやすい。
+
 ### 9.2 Aggregate 設計（DDD観点の提案）
 
 #### Aggregate Root
