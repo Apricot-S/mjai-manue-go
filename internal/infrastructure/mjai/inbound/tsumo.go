@@ -1,7 +1,6 @@
 package inbound
 
 import (
-	"encoding/json/v2"
 	"fmt"
 
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/event"
@@ -13,14 +12,6 @@ type Tsumo struct {
 	Type  string `json:"type"`
 	Actor int    `json:"actor"`
 	Pai   string `json:"pai"`
-}
-
-func ParseTsumo(b []byte) (*event.Draw, error) {
-	var msg Tsumo
-	if err := json.Unmarshal(b, &msg); err != nil {
-		return nil, err
-	}
-	return msg.ToEvent()
 }
 
 func (m *Tsumo) ToEvent() (*event.Draw, error) {

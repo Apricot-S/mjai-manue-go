@@ -3,12 +3,13 @@ package inbound_test
 import (
 	"testing"
 
+	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/event"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/seat"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/tile"
 	"github.com/Apricot-S/mjai-manue-go/internal/infrastructure/mjai/inbound"
 )
 
-func TestParseDahai(t *testing.T) {
+func TestParseEvent_Dahai(t *testing.T) {
 	tests := []struct {
 		name          string
 		b             []byte
@@ -60,26 +61,31 @@ func TestParseDahai(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := inbound.ParseDahai(tt.b)
+			got, err := inbound.ParseEvent(tt.b)
 			if err != nil {
 				if !tt.wantErr {
-					t.Errorf("ParseDahai() failed: %v", err)
+					t.Errorf("ParseEvent() failed: %v", err)
 				}
 				return
 			}
 			if tt.wantErr {
-				t.Error("ParseDahai() succeeded unexpectedly")
+				t.Error("ParseEvent() succeeded unexpectedly")
 				return
 			}
 
-			if got.Actor() != *tt.wantActor {
-				t.Errorf("Actor() = %v, want %v", got.Actor(), *tt.wantActor)
+			discard, ok := got.(*event.Discard)
+			if !ok {
+				t.Fatalf("ParseEvent() = %T, want *event.Discard", got)
 			}
-			if got.Tile() != *tt.wantTile {
-				t.Errorf("Tile() = %v, want %v", got.Tile(), *tt.wantTile)
+
+			if discard.Actor() != *tt.wantActor {
+				t.Errorf("Actor() = %v, want %v", discard.Actor(), *tt.wantActor)
 			}
-			if got.Tsumogiri() != tt.wantTsumogiri {
-				t.Errorf("Tsumogiri() = %v, want %v", got.Tsumogiri(), tt.wantTsumogiri)
+			if discard.Tile() != *tt.wantTile {
+				t.Errorf("Tile() = %v, want %v", discard.Tile(), *tt.wantTile)
+			}
+			if discard.Tsumogiri() != tt.wantTsumogiri {
+				t.Errorf("Tsumogiri() = %v, want %v", discard.Tsumogiri(), tt.wantTsumogiri)
 			}
 		})
 	}

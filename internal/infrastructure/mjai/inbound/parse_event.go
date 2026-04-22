@@ -7,6 +7,12 @@ import (
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/event"
 )
 
+var parseEventByType = map[string]func([]byte) (event.Event, error){
+	"start_kyoku": parseToEvent[StartKyoku, *event.StartRound](),
+	"tsumo":       parseToEvent[Tsumo, *event.Draw](),
+	"dahai":       parseToEvent[Dahai, *event.Discard](),
+}
+
 // ParseEvent converts a single mjai inbound message (one JSON object) into a domain event.
 //
 // It dispatches by the "type" field. Unknown message types return an error.
@@ -25,14 +31,30 @@ func ParseEvent(b []byte) (event.Event, error) {
 		return nil, fmt.Errorf("message type is missing")
 	}
 
-	switch header.Type {
-	case "start_kyoku":
-		return ParseStartKyoku(b)
-	case "tsumo":
-		return ParseTsumo(b)
-	case "dahai":
-		return ParseDahai(b)
-	default:
+	parser, ok := parseEventByType[header.Type]
+	if !ok {
 		return nil, fmt.Errorf("unsupported message type: %q", header.Type)
+	}
+	return parser(b)
+}
+
+type ToEventer[E event.Event] interface {
+	ToEvent() (E, error)
+}
+
+func parseToEvent[S any, E event.Event, P interface {
+	*S
+	ToEventer[E]
+}]() func([]byte) (event.Event, error) {
+	return func(b []byte) (event.Event, error) {
+		var msg S
+		if err := json.Unmarshal(b, &msg); err != nil {
+			return nil, err
+		}
+		ev, err := P(&msg).ToEvent()
+		if err != nil {
+			return nil, err
+		}
+		return ev, nil
 	}
 }

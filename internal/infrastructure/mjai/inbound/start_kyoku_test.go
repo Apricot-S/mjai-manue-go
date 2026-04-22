@@ -4,6 +4,7 @@ import (
 	"encoding/json/v2"
 	"testing"
 
+	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/event"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/wind"
 	"github.com/Apricot-S/mjai-manue-go/internal/infrastructure/mjai/inbound"
 )
@@ -21,7 +22,7 @@ func toJSONHand(hand []string) string {
 	return string(data)
 }
 
-func TestParseStartKyoku_Valid(t *testing.T) {
+func TestParseEvent_StartKyoku_Valid(t *testing.T) {
 	payload := `{
 		"type":"start_kyoku",
 		"bakaze":"E",
@@ -38,9 +39,13 @@ func TestParseStartKyoku_Valid(t *testing.T) {
 	"scores":[25000,25000,25000,25000]
 	}`
 
-	got, err := inbound.ParseStartKyoku([]byte(payload))
+	parsed, err := inbound.ParseEvent([]byte(payload))
 	if err != nil {
-		t.Fatalf("ParseStartKyoku() failed: %v", err)
+		t.Fatalf("ParseEvent() failed: %v", err)
+	}
+	got, ok := parsed.(*event.StartRound)
+	if !ok {
+		t.Fatalf("ParseEvent() = %T, want *event.StartRound", parsed)
 	}
 	if got.RoundWind() != wind.East {
 		t.Errorf("RoundWind() = %v, want %v", got.RoundWind(), wind.East)
@@ -68,7 +73,7 @@ func TestParseStartKyoku_Valid(t *testing.T) {
 	}
 }
 
-func TestParseStartKyoku_NoScores(t *testing.T) {
+func TestParseEvent_StartKyoku_NoScores(t *testing.T) {
 	payload := `{
 		"type":"start_kyoku",
 		"bakaze":"E",
@@ -84,16 +89,20 @@ func TestParseStartKyoku_NoScores(t *testing.T) {
 		toJSONHand(unknownHand()) + `]
 	}`
 
-	got, err := inbound.ParseStartKyoku([]byte(payload))
+	parsed, err := inbound.ParseEvent([]byte(payload))
 	if err != nil {
-		t.Fatalf("ParseStartKyoku() failed: %v", err)
+		t.Fatalf("ParseEvent() failed: %v", err)
+	}
+	got, ok := parsed.(*event.StartRound)
+	if !ok {
+		t.Fatalf("ParseEvent() = %T, want *event.StartRound", parsed)
 	}
 	if got.Scores() != nil {
 		t.Errorf("Scores() = %v, want nil", got.Scores())
 	}
 }
 
-func TestParseStartKyoku_InvalidType(t *testing.T) {
+func TestParseEvent_UnsupportedType(t *testing.T) {
 	payload := `{
 		"type":"start_game",
 		"bakaze":"E",
@@ -109,12 +118,12 @@ func TestParseStartKyoku_InvalidType(t *testing.T) {
 		toJSONHand(unknownHand()) + `]
 	}`
 
-	if _, err := inbound.ParseStartKyoku([]byte(payload)); err == nil {
-		t.Fatal("ParseStartKyoku() succeeded unexpectedly")
+	if _, err := inbound.ParseEvent([]byte(payload)); err == nil {
+		t.Fatal("ParseEvent() succeeded unexpectedly")
 	}
 }
 
-func TestParseStartKyoku_InvalidDoraMarker(t *testing.T) {
+func TestParseEvent_StartKyoku_InvalidDoraMarker(t *testing.T) {
 	payload := `{
 		"type":"start_kyoku",
 		"bakaze":"E",
@@ -130,12 +139,12 @@ func TestParseStartKyoku_InvalidDoraMarker(t *testing.T) {
 		toJSONHand(unknownHand()) + `]
 	}`
 
-	if _, err := inbound.ParseStartKyoku([]byte(payload)); err == nil {
-		t.Fatal("ParseStartKyoku() succeeded unexpectedly")
+	if _, err := inbound.ParseEvent([]byte(payload)); err == nil {
+		t.Fatal("ParseEvent() succeeded unexpectedly")
 	}
 }
 
-func TestParseStartKyoku_InvalidTehaisLength(t *testing.T) {
+func TestParseEvent_StartKyoku_InvalidTehaisLength(t *testing.T) {
 	payload := `{
 		"type":"start_kyoku",
 		"bakaze":"E",
@@ -150,7 +159,7 @@ func TestParseStartKyoku_InvalidTehaisLength(t *testing.T) {
 		toJSONHand(unknownHand()) + `]
 	}`
 
-	if _, err := inbound.ParseStartKyoku([]byte(payload)); err == nil {
-		t.Fatal("ParseStartKyoku() succeeded unexpectedly")
+	if _, err := inbound.ParseEvent([]byte(payload)); err == nil {
+		t.Fatal("ParseEvent() succeeded unexpectedly")
 	}
 }

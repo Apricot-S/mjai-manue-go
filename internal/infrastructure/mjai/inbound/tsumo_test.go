@@ -3,12 +3,13 @@ package inbound_test
 import (
 	"testing"
 
+	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/event"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/seat"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/tile"
 	"github.com/Apricot-S/mjai-manue-go/internal/infrastructure/mjai/inbound"
 )
 
-func TestParseTsumo(t *testing.T) {
+func TestParseEvent_Tsumo(t *testing.T) {
 	tests := []struct {
 		name      string
 		b         []byte
@@ -47,21 +48,26 @@ func TestParseTsumo(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, gotErr := inbound.ParseTsumo(tt.b)
+			got, gotErr := inbound.ParseEvent(tt.b)
 			if gotErr != nil {
 				if !tt.wantErr {
-					t.Errorf("ParseTsumo() failed: %v", gotErr)
+					t.Errorf("ParseEvent() failed: %v", gotErr)
 				}
 				return
 			}
 			if tt.wantErr {
-				t.Fatal("ParseTsumo() succeeded unexpectedly")
+				t.Fatal("ParseEvent() succeeded unexpectedly")
 			}
-			if got.Actor() != *tt.wantActor {
-				t.Errorf("Actor() = %v, want %v", got, tt.wantActor)
+
+			draw, ok := got.(*event.Draw)
+			if !ok {
+				t.Fatalf("ParseEvent() = %T, want *event.Draw", got)
 			}
-			if got.Tile() != *tt.wantTile {
-				t.Errorf("Tile() = %v, want %v", got, tt.wantTile)
+			if draw.Actor() != *tt.wantActor {
+				t.Errorf("Actor() = %v, want %v", draw.Actor(), *tt.wantActor)
+			}
+			if draw.Tile() != *tt.wantTile {
+				t.Errorf("Tile() = %v, want %v", draw.Tile(), *tt.wantTile)
 			}
 		})
 	}

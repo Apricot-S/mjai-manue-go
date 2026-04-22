@@ -1,7 +1,6 @@
 package inbound
 
 import (
-	"encoding/json/v2"
 	"fmt"
 
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/event"
@@ -14,14 +13,6 @@ type Dahai struct {
 	Actor     int    `json:"actor"`
 	Pai       string `json:"pai"`
 	Tsumogiri bool   `json:"tsumogiri"`
-}
-
-func ParseDahai(b []byte) (*event.Discard, error) {
-	var msg Dahai
-	if err := json.Unmarshal(b, &msg); err != nil {
-		return nil, err
-	}
-	return msg.ToEvent()
 }
 
 func (m *Dahai) ToEvent() (*event.Discard, error) {

@@ -1,7 +1,6 @@
 package inbound
 
 import (
-	"encoding/json/v2"
 	"fmt"
 
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/common"
@@ -21,14 +20,6 @@ type StartKyoku struct {
 	DoraMarker string     `json:"dora_marker"`
 	Tehais     [][]string `json:"tehais"`
 	Scores     *[]int     `json:"scores,omitempty"`
-}
-
-func ParseStartKyoku(b []byte) (*event.StartRound, error) {
-	var msg StartKyoku
-	if err := json.Unmarshal(b, &msg); err != nil {
-		return nil, err
-	}
-	return msg.ToEvent()
 }
 
 func (m *StartKyoku) ToEvent() (*event.StartRound, error) {
