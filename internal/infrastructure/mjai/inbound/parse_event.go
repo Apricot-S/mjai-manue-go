@@ -30,6 +30,8 @@ func ParseEvent(b []byte) (event.Event, error) {
 		return ParseStartKyoku(b)
 	case "tsumo":
 		return ParseTsumo(b)
+	case "dahai":
+		return ParseDahai(b)
 	default:
 		return nil, fmt.Errorf("unsupported message type: %q", header.Type)
 	}

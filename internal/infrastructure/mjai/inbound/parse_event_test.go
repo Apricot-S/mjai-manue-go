@@ -43,6 +43,16 @@ func TestParseEvent_Dispatch(t *testing.T) {
 		}
 	})
 
+	t.Run("dahai", func(t *testing.T) {
+		got, err := inbound.ParseEvent([]byte(`{"type":"dahai","actor":1,"pai":"W","tsumogiri":false}`))
+		if err != nil {
+			t.Fatalf("ParseEvent() failed: %v", err)
+		}
+		if _, ok := got.(*event.Discard); !ok {
+			t.Fatalf("ParseEvent() = %T, want *event.Discard", got)
+		}
+	})
+
 	t.Run("unknown type", func(t *testing.T) {
 		if _, err := inbound.ParseEvent([]byte(`{"type":"nope"}`)); err == nil {
 			t.Fatal("ParseEvent() succeeded unexpectedly")
