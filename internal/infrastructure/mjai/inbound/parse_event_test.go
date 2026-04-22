@@ -1,7 +1,6 @@
 package inbound_test
 
 import (
-	"strings"
 	"testing"
 
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/event"
@@ -25,7 +24,7 @@ func TestParseEvent_Dispatch(t *testing.T) {
 			toJSONHand(unknownHand()) + `]
 		}`
 
-		got, err := inbound.ParseEvent(strings.NewReader(payload))
+		got, err := inbound.ParseEvent([]byte(payload))
 		if err != nil {
 			t.Fatalf("ParseEvent() failed: %v", err)
 		}
@@ -35,7 +34,7 @@ func TestParseEvent_Dispatch(t *testing.T) {
 	})
 
 	t.Run("tsumo", func(t *testing.T) {
-		got, err := inbound.ParseEvent(strings.NewReader(`{"type":"tsumo","actor":1,"pai":"E"}`))
+		got, err := inbound.ParseEvent([]byte(`{"type":"tsumo","actor":1,"pai":"E"}`))
 		if err != nil {
 			t.Fatalf("ParseEvent() failed: %v", err)
 		}
@@ -45,13 +44,13 @@ func TestParseEvent_Dispatch(t *testing.T) {
 	})
 
 	t.Run("unknown type", func(t *testing.T) {
-		if _, err := inbound.ParseEvent(strings.NewReader(`{"type":"nope"}`)); err == nil {
+		if _, err := inbound.ParseEvent([]byte(`{"type":"nope"}`)); err == nil {
 			t.Fatal("ParseEvent() succeeded unexpectedly")
 		}
 	})
 
 	t.Run("missing type", func(t *testing.T) {
-		if _, err := inbound.ParseEvent(strings.NewReader(`{"actor":1,"pai":"E"}`)); err == nil {
+		if _, err := inbound.ParseEvent([]byte(`{"actor":1,"pai":"E"}`)); err == nil {
 			t.Fatal("ParseEvent() succeeded unexpectedly")
 		}
 	})

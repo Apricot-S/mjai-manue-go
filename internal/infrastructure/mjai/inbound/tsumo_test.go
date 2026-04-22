@@ -1,8 +1,6 @@
 package inbound_test
 
 import (
-	"io"
-	"strings"
 	"testing"
 
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/seat"
@@ -13,35 +11,35 @@ import (
 func TestParseTsumo(t *testing.T) {
 	tests := []struct {
 		name      string
-		r         io.Reader
+		b         []byte
 		wantActor *seat.Seat
 		wantTile  *tile.Tile
 		wantErr   bool
 	}{
 		{
 			name:      "valid",
-			r:         strings.NewReader(`{"type":"tsumo","actor":1,"pai":"E","possible_actions":[]}`),
+			b:         []byte(`{"type":"tsumo","actor":1,"pai":"E","possible_actions":[]}`),
 			wantActor: seat.MustSeat(1),
 			wantTile:  tile.MustTileFromCode("E"),
 			wantErr:   false,
 		},
 		{
 			name:      "allow unknown",
-			r:         strings.NewReader(`{"type":"tsumo","actor":0,"pai":"?"}`),
+			b:         []byte(`{"type":"tsumo","actor":0,"pai":"?"}`),
 			wantActor: seat.MustSeat(0),
 			wantTile:  tile.MustTileFromCode("?"),
 			wantErr:   false,
 		},
 		{
 			name:      "invalid actor",
-			r:         strings.NewReader(`{"type":"tsumo","actor":5,"pai":"?"}`),
+			b:         []byte(`{"type":"tsumo","actor":5,"pai":"?"}`),
 			wantActor: nil,
 			wantTile:  nil,
 			wantErr:   true,
 		},
 		{
 			name:      "invalid tile",
-			r:         strings.NewReader(`{"type":"tsumo","actor":0,"pai":"1z"}`),
+			b:         []byte(`{"type":"tsumo","actor":0,"pai":"1z"}`),
 			wantActor: nil,
 			wantTile:  nil,
 			wantErr:   true,
@@ -49,7 +47,7 @@ func TestParseTsumo(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, gotErr := inbound.ParseTsumo(tt.r)
+			got, gotErr := inbound.ParseTsumo(tt.b)
 			if gotErr != nil {
 				if !tt.wantErr {
 					t.Errorf("ParseTsumo() failed: %v", gotErr)

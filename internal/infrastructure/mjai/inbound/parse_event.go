@@ -3,7 +3,6 @@ package inbound
 import (
 	"encoding/json/v2"
 	"fmt"
-	"io"
 
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/event"
 )
@@ -11,12 +10,11 @@ import (
 // ParseEvent converts a single mjai inbound message (one JSON object) into a domain event.
 //
 // It dispatches by the "type" field. Unknown message types return an error.
-func ParseEvent(r io.Reader) (event.Event, error) {
-	b, err := io.ReadAll(r)
-	if err != nil {
-		return nil, err
-	}
-
+//
+// This function is intentionally pure with respect to I/O: it does not read from
+// any stream and only depends on the given bytes. Framing (e.g. JSON Lines) is a
+// transport concern.
+func ParseEvent(b []byte) (event.Event, error) {
 	var header struct {
 		Type string `json:"type"`
 	}
@@ -29,9 +27,9 @@ func ParseEvent(r io.Reader) (event.Event, error) {
 
 	switch header.Type {
 	case "start_kyoku":
-		return parseStartKyokuBytes(b)
+		return ParseStartKyoku(b)
 	case "tsumo":
-		return parseTsumoBytes(b)
+		return ParseTsumo(b)
 	default:
 		return nil, fmt.Errorf("unsupported message type: %q", header.Type)
 	}

@@ -3,7 +3,6 @@ package inbound
 import (
 	"encoding/json/v2"
 	"fmt"
-	"io"
 
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/common"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/event"
@@ -24,15 +23,7 @@ type StartKyoku struct {
 	Scores     *[]int     `json:"scores,omitempty"`
 }
 
-func ParseStartKyoku(r io.Reader) (*event.StartRound, error) {
-	b, err := io.ReadAll(r)
-	if err != nil {
-		return nil, err
-	}
-	return parseStartKyokuBytes(b)
-}
-
-func parseStartKyokuBytes(b []byte) (*event.StartRound, error) {
+func ParseStartKyoku(b []byte) (*event.StartRound, error) {
 	var msg StartKyoku
 	if err := json.Unmarshal(b, &msg); err != nil {
 		return nil, err
