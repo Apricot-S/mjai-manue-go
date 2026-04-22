@@ -30,5 +30,6 @@
 
 - `domain` の純粋ロジックはテーブル駆動で単体テスト（TDD）。
 - プロトコル入出力はゴールデンテストで「action のみ」を比較（詳細は `docs/design.md` のテスト章を参照）。
+- `encoding/json/v2` を使うテストを実行する際は、実験機能のため `GOEXPERIMENT=jsonv2` を有効化する（例: PowerShell なら `$env:GOEXPERIMENT='jsonv2'; go test ./...`）。
 - `t.Fatal/t.Fatalf` は「この時点でテスト継続が不可能」なケース（前提条件の破綻、初期化エラー、`nil` により以降がパニックする等）に限定する。
 - 値の不一致など「継続して他の差分も報告できる」ケースは `t.Error/t.Errorf` を優先し、常に `Fatal` を使う書き方は避ける。
