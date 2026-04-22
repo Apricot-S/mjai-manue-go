@@ -1,7 +1,6 @@
 package inbound
 
 import (
-	"encoding/json/jsontext"
 	"encoding/json/v2"
 	"fmt"
 	"io"
@@ -26,9 +25,16 @@ type StartKyoku struct {
 }
 
 func ParseStartKyoku(r io.Reader) (*event.StartRound, error) {
+	b, err := io.ReadAll(r)
+	if err != nil {
+		return nil, err
+	}
+	return parseStartKyokuBytes(b)
+}
+
+func parseStartKyokuBytes(b []byte) (*event.StartRound, error) {
 	var msg StartKyoku
-	dec := jsontext.NewDecoder(r)
-	if err := json.UnmarshalDecode(dec, &msg); err != nil {
+	if err := json.Unmarshal(b, &msg); err != nil {
 		return nil, err
 	}
 	return msg.ToEvent()

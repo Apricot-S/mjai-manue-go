@@ -1,7 +1,6 @@
 package inbound
 
 import (
-	"encoding/json/jsontext"
 	"encoding/json/v2"
 	"fmt"
 	"io"
@@ -18,9 +17,16 @@ type Tsumo struct {
 }
 
 func ParseTsumo(r io.Reader) (*event.Draw, error) {
+	b, err := io.ReadAll(r)
+	if err != nil {
+		return nil, err
+	}
+	return parseTsumoBytes(b)
+}
+
+func parseTsumoBytes(b []byte) (*event.Draw, error) {
 	var msg Tsumo
-	dec := jsontext.NewDecoder(r)
-	if err := json.UnmarshalDecode(dec, &msg); err != nil {
+	if err := json.Unmarshal(b, &msg); err != nil {
 		return nil, err
 	}
 	return msg.ToEvent()
