@@ -108,12 +108,12 @@ flowchart LR
 入力（外部メッセージ）を逐次処理して内部状態を更新し、意思決定要求が来たら AI に問い合わせ、外部へアクションを返す。
 
 1. transport から 1メッセージ受信
-2. codec で「プロトコル固有メッセージ → 内部イベント」へ変換
+2. codec（`inbound`）で「プロトコル固有メッセージ → 内部イベント」へ変換
 3. application が domain state に適用（状態更新）
 4. 状態更新後に「今アクションを返すべき actor 群」を State へ問い合わせる（例: `PendingActors()`）
 5. 自身の playerID が含まれるなら、`LegalActions(selfID)` で **合法手（集合）**を取得する（打牌に対して最大3人が同時に候補を持つ等）
 6. AI Strategy が合法手の中から Action を選択する（評価値は合法手列挙に含めない）
-7. codec で「内部アクション → プロトコル固有メッセージ」へ変換
+7. codec（`outbound`）で「内部アクション → プロトコル固有メッセージ」へ変換
 8. transport で送信（flush）
 
 ## 7. CLI 設計
@@ -197,6 +197,7 @@ flowchart LR
 - **Action**: Bot が返すべき行動（打牌、鳴き、立直等）
 
 プロトコルの牌表現（赤5の 0 表記など）は domain に持ち込まず、codec 側で吸収する。
+また codec は方向（外部→内部 / 内部→外部）で責務が割れるため、`internal/infrastructure/mjai/inbound`（外部メッセージ → domain event）と `internal/infrastructure/mjai/outbound`（domain action → 外部メッセージ）に分離する。
 
 ### 9.2 Aggregate 設計（DDD観点の提案）
 

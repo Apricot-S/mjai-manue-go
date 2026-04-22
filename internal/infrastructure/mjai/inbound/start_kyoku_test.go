@@ -1,4 +1,4 @@
-package mjai_test
+package inbound_test
 
 import (
 	"encoding/json/v2"
@@ -6,7 +6,7 @@ import (
 	"testing"
 
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/wind"
-	"github.com/Apricot-S/mjai-manue-go/internal/infrastructure/mjai"
+	"github.com/Apricot-S/mjai-manue-go/internal/infrastructure/mjai/inbound"
 )
 
 func unknownHand() []string {
@@ -39,7 +39,7 @@ func TestParseStartKyoku_Valid(t *testing.T) {
 		"scores":[25000,25000,25000,25000]
 	}`
 
-	got, err := mjai.ParseStartKyoku(strings.NewReader(payload))
+	got, err := inbound.ParseStartKyoku(strings.NewReader(payload))
 	if err != nil {
 		t.Fatalf("ParseStartKyoku() failed: %v", err)
 	}
@@ -85,7 +85,7 @@ func TestParseStartKyoku_NoScores(t *testing.T) {
 		toJSONHand(unknownHand()) + `]
 	}`
 
-	got, err := mjai.ParseStartKyoku(strings.NewReader(payload))
+	got, err := inbound.ParseStartKyoku(strings.NewReader(payload))
 	if err != nil {
 		t.Fatalf("ParseStartKyoku() failed: %v", err)
 	}
@@ -110,7 +110,7 @@ func TestParseStartKyoku_InvalidType(t *testing.T) {
 		toJSONHand(unknownHand()) + `]
 	}`
 
-	if _, err := mjai.ParseStartKyoku(strings.NewReader(payload)); err == nil {
+	if _, err := inbound.ParseStartKyoku(strings.NewReader(payload)); err == nil {
 		t.Fatal("ParseStartKyoku() succeeded unexpectedly")
 	}
 }
@@ -131,7 +131,7 @@ func TestParseStartKyoku_InvalidDoraMarker(t *testing.T) {
 		toJSONHand(unknownHand()) + `]
 	}`
 
-	if _, err := mjai.ParseStartKyoku(strings.NewReader(payload)); err == nil {
+	if _, err := inbound.ParseStartKyoku(strings.NewReader(payload)); err == nil {
 		t.Fatal("ParseStartKyoku() succeeded unexpectedly")
 	}
 }
@@ -151,7 +151,7 @@ func TestParseStartKyoku_InvalidTehaisLength(t *testing.T) {
 		toJSONHand(unknownHand()) + `]
 	}`
 
-	if _, err := mjai.ParseStartKyoku(strings.NewReader(payload)); err == nil {
+	if _, err := inbound.ParseStartKyoku(strings.NewReader(payload)); err == nil {
 		t.Fatal("ParseStartKyoku() succeeded unexpectedly")
 	}
 }

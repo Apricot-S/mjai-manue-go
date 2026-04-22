@@ -1,4 +1,4 @@
-package mjai_test
+package inbound_test
 
 import (
 	"io"
@@ -7,7 +7,7 @@ import (
 
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/seat"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/tile"
-	"github.com/Apricot-S/mjai-manue-go/internal/infrastructure/mjai"
+	"github.com/Apricot-S/mjai-manue-go/internal/infrastructure/mjai/inbound"
 )
 
 func TestParseTsumo(t *testing.T) {
@@ -49,7 +49,7 @@ func TestParseTsumo(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, gotErr := mjai.ParseTsumo(tt.r)
+			got, gotErr := inbound.ParseTsumo(tt.r)
 			if gotErr != nil {
 				if !tt.wantErr {
 					t.Errorf("ParseTsumo() failed: %v", gotErr)

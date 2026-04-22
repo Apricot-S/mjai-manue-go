@@ -1,4 +1,4 @@
-package mjai
+package inbound
 
 import (
 	"encoding/json/jsontext"
