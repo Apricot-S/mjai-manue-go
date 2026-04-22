@@ -1,6 +1,7 @@
 # mjai-manue-go 設計書 (Draft)
 
 作成日: 2026-04-09  
+更新日: 2026-04-22  
 対象: `mjai-manue-go` (CoffeeScript版 `mjai-manue` の Go rewrite)
 
 ## 1. 背景
@@ -92,10 +93,12 @@ flowchart LR
 
 ## 5. 現状コードの把握 (参考)
 
-現状のリポジトリには以下が存在する（2026-04-09 時点）。
+現状のリポジトリには以下が存在する（2026-04-22 時点）。
 
 - `internal/domain/game/` に麻雀の基礎ドメイン（牌、風、局、手牌、役/和了/向聴など）が実装され、単体テストも存在する。
-- `internal/application/` と `internal/infrastructure/` はディレクトリはあるが中身は未実装。
+- `internal/infrastructure/mjai/inbound/` に、mjai メッセージ（JSON）を domain event へ変換する codec と単体テストが存在する（例: `ParseEvent` / `start_kyoku` / `tsumo` / `dahai`）。
+- `internal/infrastructure/mjai/outbound/` はディレクトリのみで、domain action → mjai メッセージの変換は未実装。
+- `internal/application/` はディレクトリのみで、ユースケース実装は未実装。
 - `cmd/` は README のみで、`package main` 実装はまだ無い。
 - `configs/` は JSON を build 時 embed して読み出す実装がある（`encoding/json/v2` 前提）。
 
@@ -122,11 +125,11 @@ flowchart LR
 
 - `--name <PLAYER_NAME>`: プレイヤー名
 - `--seed <INT>`: 乱数 seed（未指定時は非決定的）
-- `--url <URL>`: 接続先 URL
+- `[<URL>]`: 接続先 URL（省略時は stdio）
 
 ### 7.2 モード判定（優先順位）
 
-1. `--url` あり → TCP クライアント（`mjsonp://...` のみ許容）
+1. URL 引数あり → TCP クライアント（`mjsonp://...` のみ許容）
 2. それ以外 → stdio (pipe)
 
 > [!NOTE]
@@ -164,7 +167,7 @@ flowchart LR
 
 ### 8.3 stdio (pipe)
 
-- `--url` 無指定時は stdin を入力、stdout を出力とする。
+- URL 引数を省略した場合は stdin を入力、stdout を出力とする。
 - mjai.app 提出型は廃止したため、提出 zip 生成はスコープ外。
 
 ### 8.4 RiichiLab (riichi.dev, WebSocket)
@@ -196,7 +199,8 @@ flowchart LR
   - `request_action` のような「出力タイミング調整用イベント」は domain に持ち込まない（ブリッジ側/adapter側の責務）
 - **Action**: Bot が返すべき行動（打牌、鳴き、立直等）
 
-プロトコルの牌表現（赤5の 0 表記など）は domain に持ち込まず、codec 側で吸収する。
+本プロジェクトでは、domain 側の `tile` は mjai の牌コード表現（例: 赤5は `5mr`/`5pr`/`5sr`）をそのまま採用する。
+外部プロトコル（例: RiichiLab）側で別表現が必要な場合は、codec 側で変換して domain へ渡す。
 また codec は方向（外部→内部 / 内部→外部）で責務が割れるため、`internal/infrastructure/mjai/inbound`（外部メッセージ → domain event）と `internal/infrastructure/mjai/outbound`（domain action → 外部メッセージ）に分離する。
 inbound 側は最終的に「JSON の `type` を見て domain の `event.Event` へ変換するディスパッチ関数（例: `ParseEvent`）」を提供し、application からは「1メッセージ入力 → 1イベント出力」として扱えるようにする。
 ここでの「1メッセージ」は transport がフレーミング（例: JSON Lines の 1行）して `[]byte` として codec に渡すことを想定し、codec 自体は I/O を持たず変換に専念する。
@@ -224,6 +228,7 @@ inbound 側は最終的に「JSON の `type` を見て domain の `event.Event` 
 #### 結論
 
 - `EventApplier` は「外部イベントを適用して Round/Match を遷移させる」ドメインの中核なので、早い段階で設計を固めるのが良い。
+- 現状の実装では `round.State` が `Apply(ev event.Event) error` を持ち、イベント適用の入り口になっている（実装済みイベントは限定的）。
 - `request_action` を受け取れない前提（オリジナル mjai 相当）では、エージェントは **State から legal actions を計算**し、さらに「今 action を返すべき局面か」も State から判断する必要がある。
 - `possible_actions` は存在しないものとして扱い、意思決定の根拠にしない（RiichiLab 互換性のため）。
 
@@ -278,6 +283,8 @@ type Decision struct {
 1. `mjai-tsumogiri`: 最小AI（常にツモ切り、鳴き/立直はしない等の単純方針）
 2. `mjai-manue`: CoffeeScript版のロジックを移植し、入力→出力一致を狙う
 
+現状、`internal/domain/ai/` は未実装のため、Strategy はこれから追加する。
+
 ## 11. 設定ファイル (embed 固定)
 
 - `configs/` にある JSON は build 時に embed する。
@@ -289,6 +296,7 @@ type Decision struct {
 
 - `domain` の純粋ロジック（牌/向聴/役/点数等）はテーブル駆動で単体テストする。
 - ランダムが絡む場合は `--seed` と同等の seed 固定で決定的にする。
+- `encoding/json/v2` を使うテスト（例: `infrastructure/mjai/inbound` や `configs`）を実行する際は、実験機能のため `GOEXPERIMENT=jsonv2` を有効化する。
 
 ### 12.2 ゴールデンテスト（プロトコル入出力）
 
@@ -305,7 +313,8 @@ type Decision struct {
 ## 13. 実装計画 (ロードマップ案)
 
 1. `cmd/` に `mjai-tsumogiri` / `mjai-manue` のエントリポイントを追加（フラグ・モード判定・終了コード）
-2. `infrastructure` に transport/codec を実装（stdio/TCP → mjai、WS → riichilab）
-3. `application` に BotRunner を実装し、最小 Strategy (`tsumogiri`) で動作確認
-4. ゴールデンテスト基盤を追加（mjson 入力→action 期待値）
-5. CoffeeScript版ロジックの段階的移植（差分が出たら最小単位で詰める）
+2. `application` に BotRunner を実装し、最小 Strategy (`tsumogiri`) で動作確認
+3. `infrastructure` に transport/codec を実装（stdio/TCP のフレーミング + outbound codec を追加）
+4. inbound/outbound と domain の event/action 対応を拡充（未対応 message type を段階的に減らす）
+5. ゴールデンテスト基盤を追加（mjson 入力→action 期待値）
+6. CoffeeScript版ロジックの段階的移植（差分が出たら最小単位で詰める）
