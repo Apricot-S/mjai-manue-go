@@ -200,3 +200,141 @@ func TestState_Apply_Draw(t *testing.T) {
 		}
 	})
 }
+
+func TestState_Apply_Discard(t *testing.T) {
+	t.Run("visible tsumogiri success", func(t *testing.T) {
+		s := mustNewRoundStateForTest(t, newValidHands())
+		actor := *seat.MustSeat(0)
+		discardedTile := *tile.MustTileFromCode("6m")
+
+		if err := s.Apply(event.NewDraw(actor, discardedTile)); err != nil {
+			t.Fatalf("Apply(Draw) failed: %v", err)
+		}
+		before := s.NumLeftTiles()
+
+		ev, err := event.NewDiscard(actor, discardedTile, true)
+		if err != nil {
+			t.Fatalf("event.NewDiscard() failed: %v", err)
+		}
+		if err := s.Apply(ev); err != nil {
+			t.Fatalf("Apply(Discard) failed: %v", err)
+		}
+
+		if got := s.NumLeftTiles(); got != before {
+			t.Errorf("NumLeftTiles() = %d, want %d", got, before)
+		}
+		if got := s.Player(actor).DrawnTile(); got != nil {
+			t.Fatalf("DrawnTile() = %v, want nil", got)
+		}
+		if s.Player(actor).CanDiscard() {
+			t.Fatal("CanDiscard() = true, want false")
+		}
+		if got := s.Player(actor).River(); len(got) != 1 || got[0].ID() != discardedTile.ID() {
+			t.Fatalf("River() = %v, want [%v]", got, discardedTile)
+		}
+		if got := s.Player(actor).DiscardedTiles(); len(got) != 1 || got[0].ID() != discardedTile.ID() {
+			t.Fatalf("DiscardedTiles() = %v, want [%v]", got, discardedTile)
+		}
+	})
+
+	t.Run("visible hand discard success", func(t *testing.T) {
+		s := mustNewRoundStateForTest(t, newValidHands())
+		actor := *seat.MustSeat(0)
+		drawnTile := *tile.MustTileFromCode("6m")
+		discardedTile := newValidHands()[0][0]
+
+		if err := s.Apply(event.NewDraw(actor, drawnTile)); err != nil {
+			t.Fatalf("Apply(Draw) failed: %v", err)
+		}
+		ev, err := event.NewDiscard(actor, discardedTile, false)
+		if err != nil {
+			t.Fatalf("event.NewDiscard() failed: %v", err)
+		}
+		if err := s.Apply(ev); err != nil {
+			t.Fatalf("Apply(Discard) failed: %v", err)
+		}
+
+		if got := s.Player(actor).DrawnTile(); got != nil {
+			t.Fatalf("DrawnTile() = %v, want nil", got)
+		}
+		if got := s.Player(actor).River(); len(got) != 1 || got[0].ID() != discardedTile.ID() {
+			t.Fatalf("River() = %v, want [%v]", got, discardedTile)
+		}
+		handTiles := s.Player(actor).HandTiles()
+		foundDrawnTile := false
+		foundDiscardedTile := false
+		for _, handTile := range handTiles {
+			if handTile.ID() == drawnTile.ID() {
+				foundDrawnTile = true
+			}
+			if handTile.ID() == discardedTile.ID() {
+				foundDiscardedTile = true
+			}
+		}
+		if !foundDrawnTile {
+			t.Fatalf("HandTiles() = %v, want drawn tile %v", handTiles, drawnTile)
+		}
+		if foundDiscardedTile {
+			t.Fatalf("HandTiles() = %v, must not contain discarded tile %v", handTiles, discardedTile)
+		}
+	})
+
+	t.Run("invisible success", func(t *testing.T) {
+		hands := [4][13]tile.Tile{}
+		for p := range common.NumPlayers {
+			for i := range common.InitHandSize {
+				hands[p][i] = *tile.MustTileFromCode("?")
+			}
+		}
+		s := mustNewRoundStateForTest(t, hands)
+		actor := *seat.MustSeat(2)
+		drawnTile := *tile.MustTileFromCode("?")
+		discardedTile := *tile.MustTileFromCode("E")
+
+		if err := s.Apply(event.NewDraw(actor, drawnTile)); err != nil {
+			t.Fatalf("Apply(Draw) failed: %v", err)
+		}
+		ev, err := event.NewDiscard(actor, discardedTile, true)
+		if err != nil {
+			t.Fatalf("event.NewDiscard() failed: %v", err)
+		}
+		if err := s.Apply(ev); err != nil {
+			t.Fatalf("Apply(Discard) failed: %v", err)
+		}
+
+		if got := s.Player(actor).DrawnTile(); got != nil {
+			t.Fatalf("DrawnTile() = %v, want nil", got)
+		}
+		if got := s.Player(actor).River(); len(got) != 1 || got[0].ID() != discardedTile.ID() {
+			t.Fatalf("River() = %v, want [%v]", got, discardedTile)
+		}
+	})
+
+	t.Run("failure does not partially apply", func(t *testing.T) {
+		s := mustNewRoundStateForTest(t, newValidHands())
+		actor := *seat.MustSeat(0)
+		drawnTile := *tile.MustTileFromCode("6m")
+		wrongDiscardedTile := *tile.MustTileFromCode("7m")
+
+		if err := s.Apply(event.NewDraw(actor, drawnTile)); err != nil {
+			t.Fatalf("Apply(Draw) failed: %v", err)
+		}
+		ev, err := event.NewDiscard(actor, wrongDiscardedTile, true)
+		if err != nil {
+			t.Fatalf("event.NewDiscard() failed: %v", err)
+		}
+		if err := s.Apply(ev); err == nil {
+			t.Fatal("Apply(Discard) succeeded unexpectedly")
+		}
+
+		if got := s.Player(actor).DrawnTile(); got == nil || got.ID() != drawnTile.ID() {
+			t.Fatalf("DrawnTile() = %v, want %v", got, drawnTile)
+		}
+		if got := s.Player(actor).River(); len(got) != 0 {
+			t.Fatalf("River() = %v, want empty", got)
+		}
+		if got := s.Player(actor).DiscardedTiles(); len(got) != 0 {
+			t.Fatalf("DiscardedTiles() = %v, want empty", got)
+		}
+	})
+}
