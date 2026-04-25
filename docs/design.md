@@ -1,7 +1,7 @@
 # mjai-manue-go 設計書 (Draft)
 
 作成日: 2026-04-09  
-更新日: 2026-04-22  
+更新日: 2026-04-25  
 対象: `mjai-manue-go` (CoffeeScript版 `mjai-manue` の Go rewrite)
 
 ## 1. 背景
@@ -109,6 +109,12 @@ flowchart LR
 ### 6.1 BotRunner (共通)
 
 入力（外部メッセージ）を逐次処理して内部状態を更新し、意思決定要求が来たら AI に問い合わせ、外部へアクションを返す。
+ここでの「アクションを返す」は、全入力に対して必ず出力するという意味ではない。application の処理結果は、少なくとも以下を区別する。
+
+- `NoResponse`: 状態更新のみで、エージェントとして返すべき意思決定がない。
+- `Action`: 打牌、立直、副露、和了、見送り（`Pass`）など、エージェントが選択した行動。
+
+mjai プロトコル上の `{"type":"none"}` は、行動機会がない入力への同期応答にも、副露・和了などを明示的に見送る行動にも使われる。そのため、内部表現では `NoResponse` と `Pass` を必ず区別する。`Pass` は合法手集合に含まれる action であり、`NoResponse` は action ではない。
 
 1. transport から 1メッセージ受信
 2. codec（`inbound`）で「プロトコル固有メッセージ → 内部イベント」へ変換
@@ -117,7 +123,7 @@ flowchart LR
 5. 自身の playerID が含まれるなら、`LegalActions(selfID)` で **合法手（集合）**を取得する（打牌に対して最大3人が同時に候補を持つ等）
 6. AI Strategy が合法手の中から Action を選択する（評価値は合法手列挙に含めない）
 7. codec（`outbound`）で「内部アクション → プロトコル固有メッセージ」へ変換
-8. transport で送信（flush）
+8. action がある場合は transport で送信（flush）。`NoResponse` の扱いは adapter ごとに決める。
 
 ## 7. CLI 設計
 
@@ -157,17 +163,22 @@ flowchart LR
   - 入力の改行は `\n`/`\r\n` を許容。
   - 空行はエラー終了（exit `1`）。
   - 不正 JSON はエラー終了（exit `1`）。
-- 送信はメッセージ単位で必ず flush。
+- 送信する場合はメッセージ単位で必ず flush。
 
 ### 8.2 mjai (TCP: `mjsonp://...`)
 
 - URL 形式は `mjsonp://host:port/room` のみを許容。
 - 再接続はしない。
 - 切断時は即終了。
+- mjai サーバーは 1 入力に対する 1 応答を期待するため、application が `NoResponse` を返した場合も adapter が `{"type":"none"}` を送信する。
+- application が `Pass` action を返した場合も wire format は `{"type":"none"}` になるが、これは「副露・和了等を見送る」という意思決定であり、`NoResponse` とは区別する。
 
 ### 8.3 stdio (pipe)
 
 - URL 引数を省略した場合は stdin を入力、stdout を出力とする。
+- stdio は JSON Lines の入力を読み進め、application が action を返したタイミングでのみ stdout へ 1 行出力する。
+- application が `NoResponse` を返した場合は何も出力せず、次の入力行を読む。
+- application が `Pass` action を返した場合は `{"type":"none"}` を出力する。これは行動機会に対する明示的な見送りであり、行動機会がないことを表す `NoResponse` ではない。
 - mjai.app 提出型は廃止したため、提出 zip 生成はスコープ外。
 
 ### 8.4 RiichiLab (riichi.dev, WebSocket)
@@ -181,6 +192,7 @@ flowchart LR
     - Python 側は `request_action` を「エージェントの出力（action）を riichi.dev に返すタイミング調整」にのみ使用する。
     - エージェント（Go）は入力メッセージで更新された **State を見て**「今返すべき action があるか」を判断する（`request_action` を受信して起動されない）。
     - Python 側は必要に応じて、エージェントからの出力をバッファし、`request_action` 受領時に riichi.dev へ送信する。
+    - Go 側の stdio 出力は sparse output（action がある時だけ出力）を前提とする。`{"type":"none"}` が出力された場合は、行動機会がない入力への ack ではなく、行動機会に対する `Pass` action として扱う。
   - `possible_actions` は **RiichiLab 互換性のため存在しないものとして扱う**（入力に含まれていても無視する）。
     - `docs/protocols.md` には例として登場しうるが、Go 側は `possible_actions` を信頼しない。
     - 合法手（`LegalActions`）は常に State から算出する（`possible_actions` に依存しない）。
@@ -197,7 +209,9 @@ flowchart LR
 - **Player / Hand / Meld** 等の状態（Round 内のエンティティ）
 - **Event**: 外部入力を内部イベントへ変換したもの（ドメイン状態更新の入力）
   - `request_action` のような「出力タイミング調整用イベント」は domain に持ち込まない（ブリッジ側/adapter側の責務）
-- **Action**: Bot が返すべき行動（打牌、鳴き、立直等）
+- **Action**: Bot が返すべき行動（打牌、鳴き、立直、見送り等）
+  - `Pass`（見送り）は action の一種。mjai outbound では `{"type":"none"}` に変換される。
+  - `NoResponse`（返すべき行動なし）は action ではない。mjsonp adapter では同期応答として `{"type":"none"}` に変換され得るが、domain/application 上は `Pass` と同一視しない。
 
 本プロジェクトでは、domain 側の `tile` は mjai の牌コード表現（例: 赤5は `5mr`/`5pr`/`5sr`）をそのまま採用する。
 外部プロトコル（例: RiichiLab）側で別表現が必要な場合は、codec 側で変換して domain へ渡す。
