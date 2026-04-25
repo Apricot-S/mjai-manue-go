@@ -15,6 +15,8 @@ type Dahai struct {
 	Tsumogiri bool   `json:"tsumogiri"`
 }
 
+func (*Dahai) inboundMessage() {}
+
 func (m *Dahai) ToEvent() (*event.Discard, error) {
 	if m == nil {
 		return nil, fmt.Errorf("dahai message is nil")

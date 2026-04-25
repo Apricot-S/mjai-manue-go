@@ -61,7 +61,15 @@ func TestParseEvent_Dahai(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := inbound.ParseEvent(tt.b)
+			msg, err := inbound.ParseMessage(tt.b)
+			if err != nil {
+				if !tt.wantErr {
+					t.Errorf("ParseMessage() failed: %v", err)
+				}
+				return
+			}
+
+			got, err := inbound.ParseEvent(msg)
 			if err != nil {
 				if !tt.wantErr {
 					t.Errorf("ParseEvent() failed: %v", err)

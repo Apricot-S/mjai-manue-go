@@ -19,8 +19,10 @@ type StartKyoku struct {
 	Oya        int        `json:"oya"`
 	DoraMarker string     `json:"dora_marker"`
 	Tehais     [][]string `json:"tehais"`
-	Scores     *[]int     `json:"scores,omitempty"`
+	Scores     []int      `json:"scores,omitempty"`
 }
+
+func (*StartKyoku) inboundMessage() {}
 
 func (m *StartKyoku) ToEvent() (*event.StartRound, error) {
 	if m == nil {
@@ -49,11 +51,11 @@ func (m *StartKyoku) ToEvent() (*event.StartRound, error) {
 
 	var scoresPtr *[common.NumPlayers]int
 	if m.Scores != nil {
-		if len(*m.Scores) != common.NumPlayers {
-			return nil, fmt.Errorf("invalid scores length: %d", len(*m.Scores))
+		if len(m.Scores) != common.NumPlayers {
+			return nil, fmt.Errorf("invalid scores length: %d", len(m.Scores))
 		}
 		var scores [common.NumPlayers]int
-		copy(scores[:], *m.Scores)
+		copy(scores[:], m.Scores)
 		scoresPtr = &scores
 	}
 

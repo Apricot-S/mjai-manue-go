@@ -7,6 +7,26 @@ import (
 	"github.com/Apricot-S/mjai-manue-go/internal/infrastructure/mjai/inbound"
 )
 
+func TestParseEvent_FromMessage(t *testing.T) {
+	got, err := inbound.ParseEvent(&inbound.Tsumo{
+		Type:  "tsumo",
+		Actor: 1,
+		Pai:   "E",
+	})
+	if err != nil {
+		t.Fatalf("ParseEvent() failed: %v", err)
+	}
+	if _, ok := got.(*event.Draw); !ok {
+		t.Fatalf("ParseEvent() = %T, want *event.Draw", got)
+	}
+}
+
+func TestParseEvent_NonEventMessage(t *testing.T) {
+	if _, err := inbound.ParseEvent(&inbound.Hello{Type: "hello"}); err == nil {
+		t.Fatal("ParseEvent() succeeded unexpectedly")
+	}
+}
+
 func TestParseEvent_Dispatch(t *testing.T) {
 	t.Run("start_kyoku", func(t *testing.T) {
 		payload := `{
@@ -24,7 +44,11 @@ func TestParseEvent_Dispatch(t *testing.T) {
 			toJSONHand(unknownHand()) + `]
 		}`
 
-		got, err := inbound.ParseEvent([]byte(payload))
+		msg, err := inbound.ParseMessage([]byte(payload))
+		if err != nil {
+			t.Fatalf("ParseMessage() failed: %v", err)
+		}
+		got, err := inbound.ParseEvent(msg)
 		if err != nil {
 			t.Fatalf("ParseEvent() failed: %v", err)
 		}
@@ -34,7 +58,11 @@ func TestParseEvent_Dispatch(t *testing.T) {
 	})
 
 	t.Run("tsumo", func(t *testing.T) {
-		got, err := inbound.ParseEvent([]byte(`{"type":"tsumo","actor":1,"pai":"E"}`))
+		msg, err := inbound.ParseMessage([]byte(`{"type":"tsumo","actor":1,"pai":"E"}`))
+		if err != nil {
+			t.Fatalf("ParseMessage() failed: %v", err)
+		}
+		got, err := inbound.ParseEvent(msg)
 		if err != nil {
 			t.Fatalf("ParseEvent() failed: %v", err)
 		}
@@ -44,24 +72,16 @@ func TestParseEvent_Dispatch(t *testing.T) {
 	})
 
 	t.Run("dahai", func(t *testing.T) {
-		got, err := inbound.ParseEvent([]byte(`{"type":"dahai","actor":1,"pai":"W","tsumogiri":false}`))
+		msg, err := inbound.ParseMessage([]byte(`{"type":"dahai","actor":1,"pai":"W","tsumogiri":false}`))
+		if err != nil {
+			t.Fatalf("ParseMessage() failed: %v", err)
+		}
+		got, err := inbound.ParseEvent(msg)
 		if err != nil {
 			t.Fatalf("ParseEvent() failed: %v", err)
 		}
 		if _, ok := got.(*event.Discard); !ok {
 			t.Fatalf("ParseEvent() = %T, want *event.Discard", got)
-		}
-	})
-
-	t.Run("unknown type", func(t *testing.T) {
-		if _, err := inbound.ParseEvent([]byte(`{"type":"nope"}`)); err == nil {
-			t.Fatal("ParseEvent() succeeded unexpectedly")
-		}
-	})
-
-	t.Run("missing type", func(t *testing.T) {
-		if _, err := inbound.ParseEvent([]byte(`{"actor":1,"pai":"E"}`)); err == nil {
-			t.Fatal("ParseEvent() succeeded unexpectedly")
 		}
 	})
 }

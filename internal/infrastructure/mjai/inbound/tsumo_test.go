@@ -48,7 +48,11 @@ func TestParseEvent_Tsumo(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, gotErr := inbound.ParseEvent(tt.b)
+			msg, gotErr := inbound.ParseMessage(tt.b)
+			var got event.Event
+			if gotErr == nil {
+				got, gotErr = inbound.ParseEvent(msg)
+			}
 			if gotErr != nil {
 				if !tt.wantErr {
 					t.Errorf("ParseEvent() failed: %v", gotErr)

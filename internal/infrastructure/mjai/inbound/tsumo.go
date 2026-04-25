@@ -14,6 +14,8 @@ type Tsumo struct {
 	Pai   string `json:"pai"`
 }
 
+func (*Tsumo) inboundMessage() {}
+
 func (m *Tsumo) ToEvent() (*event.Draw, error) {
 	if m == nil {
 		return nil, fmt.Errorf("tsumo message is nil")

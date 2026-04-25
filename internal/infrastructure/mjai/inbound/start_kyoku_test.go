@@ -39,7 +39,11 @@ func TestParseEvent_StartKyoku_Valid(t *testing.T) {
 	"scores":[25000,25000,25000,25000]
 	}`
 
-	parsed, err := inbound.ParseEvent([]byte(payload))
+	msg, err := inbound.ParseMessage([]byte(payload))
+	if err != nil {
+		t.Fatalf("ParseMessage() failed: %v", err)
+	}
+	parsed, err := inbound.ParseEvent(msg)
 	if err != nil {
 		t.Fatalf("ParseEvent() failed: %v", err)
 	}
@@ -89,7 +93,11 @@ func TestParseEvent_StartKyoku_NoScores(t *testing.T) {
 		toJSONHand(unknownHand()) + `]
 	}`
 
-	parsed, err := inbound.ParseEvent([]byte(payload))
+	msg, err := inbound.ParseMessage([]byte(payload))
+	if err != nil {
+		t.Fatalf("ParseMessage() failed: %v", err)
+	}
+	parsed, err := inbound.ParseEvent(msg)
 	if err != nil {
 		t.Fatalf("ParseEvent() failed: %v", err)
 	}
@@ -118,7 +126,11 @@ func TestParseEvent_UnsupportedType(t *testing.T) {
 		toJSONHand(unknownHand()) + `]
 	}`
 
-	if _, err := inbound.ParseEvent([]byte(payload)); err == nil {
+	msg, err := inbound.ParseMessage([]byte(payload))
+	if err != nil {
+		t.Fatalf("ParseMessage() failed: %v", err)
+	}
+	if _, err := inbound.ParseEvent(msg); err == nil {
 		t.Fatal("ParseEvent() succeeded unexpectedly")
 	}
 }
@@ -139,7 +151,11 @@ func TestParseEvent_StartKyoku_InvalidDoraMarker(t *testing.T) {
 		toJSONHand(unknownHand()) + `]
 	}`
 
-	if _, err := inbound.ParseEvent([]byte(payload)); err == nil {
+	msg, err := inbound.ParseMessage([]byte(payload))
+	if err != nil {
+		t.Fatalf("ParseMessage() failed: %v", err)
+	}
+	if _, err := inbound.ParseEvent(msg); err == nil {
 		t.Fatal("ParseEvent() succeeded unexpectedly")
 	}
 }
@@ -159,7 +175,11 @@ func TestParseEvent_StartKyoku_InvalidTehaisLength(t *testing.T) {
 		toJSONHand(unknownHand()) + `]
 	}`
 
-	if _, err := inbound.ParseEvent([]byte(payload)); err == nil {
+	msg, err := inbound.ParseMessage([]byte(payload))
+	if err != nil {
+		t.Fatalf("ParseMessage() failed: %v", err)
+	}
+	if _, err := inbound.ParseEvent(msg); err == nil {
 		t.Fatal("ParseEvent() succeeded unexpectedly")
 	}
 }
