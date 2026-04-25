@@ -8,6 +8,9 @@ Go port of [mjai-manue](https://github.com/gimite/mjai-manue) — a Mahjong AI f
 
 ## Differences from Original
 
+> [!NOTE]
+> The original project includes an older version written in Ruby and a newer version written in CoffeeScript. This project ports only the new version.
+
 ### Pipe Mode Support
 
 - Adds standard input/output support for JSON Lines streams.
@@ -21,10 +24,6 @@ Go port of [mjai-manue](https://github.com/gimite/mjai-manue) — a Mahjong AI f
 - Log more detailed information about the game state.
 - Improved error handling to more reliably reject invalid or anomalous input.
 - Refactored the code for better readability and maintainability.
-
-### Target Version
-
-The original project includes an older version written in Ruby and a newer version written in CoffeeScript. This project ports only the new version.
 
 ## How It Works
 
