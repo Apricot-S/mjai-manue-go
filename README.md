@@ -17,6 +17,12 @@ Go port of [mjai-manue](https://github.com/gimite/mjai-manue) — a Mahjong AI f
 - In pipe mode, the bot reads input line by line and emits an action only when the current state requires a decision.
 - `{"type":"none"}` emitted in pipe mode means an explicit pass, such as skipping a call or win. Inputs that do not require a decision produce no output.
 
+### No `possible_actions` Dependency
+
+In mjai protocol messages, `possible_actions` may be attached to events such as `tsumo` and `dahai` to tell the bot which responses are currently legal. This project does not require that field to be present. Instead, it updates the game state from the event stream and derives available decisions from that state.
+
+This makes the bot usable with inputs that contain the game events but omit server-provided action candidates, including mjson game logs and tools that do not provide `possible_actions`, such as [riichienv](https://github.com/smly/RiichiEnv).
+
 ### Architecture Improvements
 
 - Embed configuration files at build time instead of loading them at runtime.
