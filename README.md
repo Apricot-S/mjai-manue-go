@@ -8,10 +8,11 @@ Go port of [mjai-manue](https://github.com/gimite/mjai-manue) — a Mahjong AI f
 
 ## Differences from Original
 
-### Extended Protocol Support
+### Pipe Mode Support
 
-- Supports [Gimite's original Mjai protocol](https://gimite.net/pukiwiki/index.php?Mjai%20%E9%BA%BB%E9%9B%80AI%E5%AF%BE%E6%88%A6%E3%82%B5%E3%83%BC%E3%83%90).
-- Additionally supports [a minor modified version of the Mjai protocol used by RiichiLab](https://mjai.app/docs/mjai-protocol).
+- Adds standard input/output support for JSON Lines streams.
+- In pipe mode, the bot reads input line by line and emits an action only when the current state requires a decision.
+- `{"type":"none"}` emitted in pipe mode means an explicit pass, such as skipping a call or win. Inputs that do not require a decision produce no output.
 
 ### Architecture Improvements
 
@@ -23,8 +24,7 @@ Go port of [mjai-manue](https://github.com/gimite/mjai-manue) — a Mahjong AI f
 
 ### Target Version
 
-> [!NOTE]
-> The original project includes an older version written in Ruby and a newer version written in CoffeeScript. This project ports only the new version.
+The original project includes an older version written in Ruby and a newer version written in CoffeeScript. This project ports only the new version.
 
 ## How It Works
 
@@ -49,26 +49,23 @@ go install github.com/Apricot-S/mjai-manue-go/cmd/mjai-manue@latest
 
 ## Usage
 
-### For TCP/IP (e.g., [mjai](https://github.com/gimite/mjai))
+### TCP/IP (mjsonp)
 
 ```sh
 mjai-manue mjsonp://example.com:11600/default
 ```
 
-### For Standard I/O (e.g., [mjai.app](https://github.com/smly/mjai.app))
+Use this mode with an [mjai server](https://github.com/gimite/mjai) that expects one response for each input message. When the bot has no action to take, the TCP adapter sends `{"type":"none"}` as the protocol response.
+
+### Pipe (JSON Lines)
 
 ```sh
 mjai-manue
 ```
 
+When no URL is provided, `mjai-manue` reads JSON Lines from stdin and writes protocol messages to stdout. Output is sparse: the bot writes a line only when it chooses an action. A written `{"type":"none"}` is an explicit pass, not a generic acknowledgement.
+
 For more information, see [cmd/](cmd/).
-
-> [!NOTE]
-> In practice, `mjai.app` runs `bot.py` in the submission `.zip` file.
-> You need to call the above command from within `bot.py` and pipe the standard input and output.
-
-> [!TIP]
-> See [scripts/mjai.app/](scripts/mjai.app/) for how to generate a submission file for `mjai.app`.
 
 > [!TIP]
 > To customize the AI's strategic behavior, replace the following configuration files before building `mjai-manue`:
