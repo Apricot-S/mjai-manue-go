@@ -17,6 +17,8 @@ func ParseEvent(msg Message) (event.Event, error) {
 		return m.ToEvent()
 	case *Dahai:
 		return m.ToEvent()
+	case *EndKyoku:
+		return m.ToEvent()
 	default:
 		return nil, fmt.Errorf("message cannot be converted to event: %T", msg)
 	}

@@ -84,4 +84,18 @@ func TestParseEvent_Dispatch(t *testing.T) {
 			t.Fatalf("ParseEvent() = %T, want *event.Discard", got)
 		}
 	})
+
+	t.Run("end_kyoku", func(t *testing.T) {
+		msg, err := inbound.ParseMessage([]byte(`{"type":"end_kyoku"}`))
+		if err != nil {
+			t.Fatalf("ParseMessage() failed: %v", err)
+		}
+		got, err := inbound.ParseEvent(msg)
+		if err != nil {
+			t.Fatalf("ParseEvent() failed: %v", err)
+		}
+		if _, ok := got.(*event.EndRound); !ok {
+			t.Fatalf("ParseEvent() = %T, want *event.EndRound", got)
+		}
+	})
 }

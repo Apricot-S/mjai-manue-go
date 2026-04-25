@@ -21,6 +21,7 @@ var parseMessageByType = map[string]func([]byte) (Message, error){
 	"start_kyoku": parseAs[*StartKyoku],
 	"tsumo":       parseAs[*Tsumo],
 	"dahai":       parseAs[*Dahai],
+	"end_kyoku":   parseAs[*EndKyoku],
 }
 
 // ParseMessage decodes a single mjai inbound JSON message into an inbound.Message.
