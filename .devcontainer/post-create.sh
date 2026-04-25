@@ -20,5 +20,3 @@ sudo apt-get clean
 sudo rm -rf /var/lib/apt/lists/*
 
 export UV_LINK_MODE=copy
-uv venv --python 3.12 --clear
-uv pip install mjai
