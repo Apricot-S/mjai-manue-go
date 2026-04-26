@@ -17,6 +17,7 @@ var parseMessageByType = map[string]func([]byte) (Message, error){
 	"hello":      parseAs[*Hello],
 	"start_game": parseAs[*StartGame],
 	"end_game":   parseAs[*EndGame],
+	"error":      parseAs[*Error],
 
 	"start_kyoku": parseAs[*StartKyoku],
 	"tsumo":       parseAs[*Tsumo],
