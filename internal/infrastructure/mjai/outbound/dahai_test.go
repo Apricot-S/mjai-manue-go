@@ -84,7 +84,7 @@ func TestToMessage_Dahai_Log(t *testing.T) {
 		t.Fatalf("NewDiscard() failed: %v", err)
 	}
 
-	msg, err := outbound.ToMessage(discard, "selected by strategy")
+	msg, err := outbound.ToMessage(discard, "selected by agent")
 	if err != nil {
 		t.Fatalf("ToMessage() failed: %v", err)
 	}
@@ -92,7 +92,7 @@ func TestToMessage_Dahai_Log(t *testing.T) {
 	if !ok {
 		t.Fatalf("ToMessage() = %T, want *outbound.Dahai", msg)
 	}
-	if got.Log != "selected by strategy" {
-		t.Errorf("Log = %q, want selected by strategy", got.Log)
+	if got.Log != "selected by agent" {
+		t.Errorf("Log = %q, want selected by agent", got.Log)
 	}
 }
