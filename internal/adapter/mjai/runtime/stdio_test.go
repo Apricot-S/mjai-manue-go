@@ -44,3 +44,25 @@ func TestRunStdio_EmptyLine(t *testing.T) {
 		t.Fatal("RunStdio() succeeded unexpectedly")
 	}
 }
+
+func TestRunStdio_EndGameStopsReading(t *testing.T) {
+	in := strings.NewReader(
+		`{"type":"end_game","scores":[25000,25000,25000,25000]}` + "\n" +
+			"\n",
+	)
+	var out strings.Builder
+
+	err := mjairuntime.RunStdio(mjairuntime.StdioConfig{
+		Name:  "tsumogiri",
+		Room:  "default",
+		Agent: ai.NewTsumogiriAgent(),
+		In:    in,
+		Out:   &out,
+	})
+	if err != nil {
+		t.Fatalf("RunStdio() failed: %v", err)
+	}
+	if out.String() != "" {
+		t.Errorf("output = %q, want empty", out.String())
+	}
+}

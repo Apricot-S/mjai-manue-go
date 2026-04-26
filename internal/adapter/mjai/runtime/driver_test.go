@@ -40,6 +40,21 @@ func TestDriver_HandleStartGameCreatesBotWithoutOutput(t *testing.T) {
 	}
 }
 
+func TestDriver_HandleEndGameMarksEnded(t *testing.T) {
+	driver := mjairuntime.NewDriver("tsumogiri", "default", ai.NewTsumogiriAgent())
+
+	msg, err := driver.Handle(&inbound.EndGame{Type: "end_game"})
+	if err != nil {
+		t.Fatalf("Handle() failed: %v", err)
+	}
+	if msg != nil {
+		t.Errorf("Handle() = %T, want nil", msg)
+	}
+	if !driver.Ended() {
+		t.Error("Ended() = false, want true")
+	}
+}
+
 func TestDriver_HandleEventBeforeStartGame(t *testing.T) {
 	driver := mjairuntime.NewDriver("tsumogiri", "default", ai.NewTsumogiriAgent())
 

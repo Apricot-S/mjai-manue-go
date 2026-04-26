@@ -15,6 +15,7 @@ type Driver struct {
 	room  string
 	agent ai.Agent
 	bot   *application.Bot
+	ended bool
 }
 
 func NewDriver(name string, room string, agent ai.Agent) *Driver {
@@ -37,6 +38,7 @@ func (d *Driver) Handle(msg inbound.Message) (outbound.Message, error) {
 		d.bot = application.NewBot(*self, d.agent)
 		return nil, nil
 	case *inbound.EndGame:
+		d.ended = true
 		return nil, nil
 	case *inbound.Error:
 		return nil, fmt.Errorf("server error: %s", msg.Message)
@@ -57,4 +59,8 @@ func (d *Driver) Handle(msg inbound.Message) (outbound.Message, error) {
 		}
 		return outbound.ToMessage(reaction.Action(), reaction.Log())
 	}
+}
+
+func (d *Driver) Ended() bool {
+	return d.ended
 }
