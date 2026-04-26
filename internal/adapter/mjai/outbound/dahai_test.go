@@ -3,10 +3,10 @@ package outbound_test
 import (
 	"testing"
 
+	"github.com/Apricot-S/mjai-manue-go/internal/adapter/mjai/outbound"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/action"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/seat"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/tile"
-	"github.com/Apricot-S/mjai-manue-go/internal/infrastructure/mjai/outbound"
 )
 
 func TestMarshalMessage_Dahai(t *testing.T) {

@@ -3,7 +3,7 @@ package inbound_test
 import (
 	"testing"
 
-	"github.com/Apricot-S/mjai-manue-go/internal/infrastructure/mjai/inbound"
+	"github.com/Apricot-S/mjai-manue-go/internal/adapter/mjai/inbound"
 )
 
 func TestParseMessage_Hello(t *testing.T) {

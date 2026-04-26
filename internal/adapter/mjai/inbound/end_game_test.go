@@ -4,7 +4,7 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/Apricot-S/mjai-manue-go/internal/infrastructure/mjai/inbound"
+	"github.com/Apricot-S/mjai-manue-go/internal/adapter/mjai/inbound"
 )
 
 func TestParseMessage_EndGame(t *testing.T) {

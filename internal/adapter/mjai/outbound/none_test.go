@@ -3,7 +3,7 @@ package outbound_test
 import (
 	"testing"
 
-	"github.com/Apricot-S/mjai-manue-go/internal/infrastructure/mjai/outbound"
+	"github.com/Apricot-S/mjai-manue-go/internal/adapter/mjai/outbound"
 )
 
 func TestMarshalMessage_None(t *testing.T) {

@@ -3,8 +3,8 @@ package inbound_test
 import (
 	"testing"
 
+	"github.com/Apricot-S/mjai-manue-go/internal/adapter/mjai/inbound"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/event"
-	"github.com/Apricot-S/mjai-manue-go/internal/infrastructure/mjai/inbound"
 )
 
 func TestParseEvent_FromMessage(t *testing.T) {

@@ -4,9 +4,9 @@ import (
 	"encoding/json/v2"
 	"testing"
 
+	"github.com/Apricot-S/mjai-manue-go/internal/adapter/mjai/inbound"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/event"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/wind"
-	"github.com/Apricot-S/mjai-manue-go/internal/infrastructure/mjai/inbound"
 )
 
 func unknownHand() []string {
