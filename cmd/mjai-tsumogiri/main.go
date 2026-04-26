@@ -28,13 +28,14 @@ func run(args []string, in io.Reader, out io.Writer, errOut io.Writer) int {
 		return 2
 	}
 
-	if err := runtime.RunStdio(runtime.StdioConfig{
+	err := runtime.RunStdio(runtime.StdioConfig{
 		Name:  *name,
 		Room:  "default",
 		Agent: ai.NewTsumogiriAgent(),
 		In:    in,
 		Out:   out,
-	}); err != nil {
+	})
+	if err != nil {
 		fmt.Fprintln(errOut, err)
 		return 1
 	}
