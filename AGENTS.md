@@ -13,7 +13,7 @@
 - 依存方向は内側へ（外側→内側）。`domain` は I/O や外部仕様に依存しない。
   - `internal/domain/`: ビジネスルール（状態/判定/意思決定の核）
   - `internal/application/`: ユースケース（受信→状態適用→意思決定→送信のオーケストレーション）
-  - `internal/infrastructure/`: 具体 I/O（TCP/stdio/WS、JSON codec 等）。外部プロトコル差分は ACL で吸収する。
+  - `internal/adapter/`: 具体 I/O（TCP/stdio/WS、JSON codec 等）。外部プロトコル差分は ACL で吸収する。
   - `cmd/`: CLI エントリ。フラグ解析と `application` 起動のみ。
 - stdout は **プロトコル出力専用**。ログ/エラーは stderr（`docs/design.md` の I/O 安全性）。
 - 入力が空行・不正 JSON の場合は **エラー終了**（継続しない）。
