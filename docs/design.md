@@ -1,7 +1,7 @@
 # mjai-manue-go 設計書 (Draft)
 
 作成日: 2026-04-09  
-更新日: 2026-04-26  
+更新日: 2026-04-28  
 対象: `mjai-manue-go` (CoffeeScript版 `mjai-manue` の Go rewrite)
 
 ## 1. 背景
@@ -93,15 +93,15 @@ flowchart LR
 
 ## 5. 現状コードの把握 (参考)
 
-現状のリポジトリには以下が存在する（2026-04-22 時点）。
+現状のリポジトリには以下が存在する（2026-04-28 時点）。
 
 - `internal/domain/game/` に麻雀の基礎ドメイン（牌、風、局、手牌、役/和了/向聴など）が実装され、単体テストも存在する。
 - `internal/adapter/mjai/inbound/` に、mjai メッセージ（JSON）を domain event へ変換する codec と単体テストが存在する（例: `ParseEvent` / `start_kyoku` / `tsumo` / `dahai`）。
 - `internal/adapter/mjai/outbound/` に、`join` と最小 action（`Pass` / 打牌）を mjai メッセージへ変換する codec と単体テストが存在する。
-- `internal/adapter/mjai/runtime/` に、stdio/TCP などの transport loop と、transport 間で共有する mjai `Driver`（`hello` / `start_game` / event / action 変換の振り分け）を置く。
+- `internal/adapter/mjai/runtime/` に、stdio/TCP の transport loop と、transport 間で共有する mjai `Driver`（`hello` / `start_game` / event / action 変換の振り分け）が存在する。
 - `internal/application/` に、最小 Bot と入力への反応（`NoReaction` / `Action`）が実装されている。
 - `internal/domain/ai/` に、Agent インタフェースとツモ切り Agent が実装されている。
-- `cmd/` は README のみで、`package main` 実装はまだ無い。
+- `cmd/mjai-tsumogiri/` に、stdio / TCP(mjsonp) を切り替えて最小AIを起動する `package main` 実装が存在する。
 - `configs/` は JSON を build 時 embed して読み出す実装がある（`encoding/json/v2` 前提）。
 
 本設計書は、上記の既存資産を「ドメイン側は活用しつつ、周辺（application/infra/cmd）は作り直せる」前提で進める。

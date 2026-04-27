@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	"flag"
 	"fmt"
 	"io"
@@ -23,20 +24,33 @@ func run(args []string, in io.Reader, out io.Writer, errOut io.Writer) int {
 	if err := flags.Parse(args); err != nil {
 		return 2
 	}
-	if flags.NArg() > 0 {
-		fmt.Fprintln(errOut, "URL mode is not implemented yet")
+	if flags.NArg() > 1 {
+		fmt.Fprintln(errOut, "too many arguments")
 		return 2
 	}
 
-	err := runtime.RunStdio(runtime.StdioConfig{
-		Name:  *name,
-		Room:  "default",
-		Agent: ai.NewTsumogiriAgent(),
-		In:    in,
-		Out:   out,
-	})
+	agent := ai.NewTsumogiriAgent()
+	var err error
+	if flags.NArg() == 1 {
+		err = runtime.RunTCP(runtime.TCPConfig{
+			Name:  *name,
+			URL:   flags.Arg(0),
+			Agent: agent,
+		})
+	} else {
+		err = runtime.RunStdio(runtime.StdioConfig{
+			Name:  *name,
+			Room:  "default",
+			Agent: agent,
+			In:    in,
+			Out:   out,
+		})
+	}
 	if err != nil {
 		fmt.Fprintln(errOut, err)
+		if _, ok := errors.AsType[*runtime.UsageError](err); ok {
+			return 2
+		}
 		return 1
 	}
 	return 0
