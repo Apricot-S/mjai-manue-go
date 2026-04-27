@@ -11,7 +11,13 @@ import (
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/ai"
 )
 
-const defaultName = "tsumogiri"
+const (
+	defaultName = "tsumogiri"
+
+	exitOK           = 0
+	exitRuntimeError = 1
+	exitUsageError   = 2
+)
 
 func main() {
 	os.Exit(run(os.Args[1:], os.Stdin, os.Stdout, os.Stderr))
@@ -22,11 +28,11 @@ func run(args []string, in io.Reader, out io.Writer, errOut io.Writer) int {
 	flags.SetOutput(errOut)
 	name := flags.String("name", defaultName, "player name")
 	if err := flags.Parse(args); err != nil {
-		return 2
+		return exitUsageError
 	}
 	if flags.NArg() > 1 {
 		fmt.Fprintln(errOut, "too many arguments")
-		return 2
+		return exitUsageError
 	}
 
 	agent := ai.NewTsumogiriAgent()
@@ -49,9 +55,9 @@ func run(args []string, in io.Reader, out io.Writer, errOut io.Writer) int {
 	if err != nil {
 		fmt.Fprintln(errOut, err)
 		if _, ok := errors.AsType[*runtime.UsageError](err); ok {
-			return 2
+			return exitUsageError
 		}
-		return 1
+		return exitRuntimeError
 	}
-	return 0
+	return exitOK
 }

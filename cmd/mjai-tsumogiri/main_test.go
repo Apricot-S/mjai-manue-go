@@ -10,8 +10,8 @@ func TestRun_InvalidURLReturnsUsageError(t *testing.T) {
 	var stderr strings.Builder
 
 	code := run([]string{"stdio://127.0.0.1:11600/room"}, strings.NewReader(""), &stdout, &stderr)
-	if code != 2 {
-		t.Errorf("run() = %d, want 2", code)
+	if code != exitUsageError {
+		t.Errorf("run() = %d, want %d", code, exitUsageError)
 	}
 	if stdout.String() != "" {
 		t.Errorf("stdout = %q, want empty", stdout.String())
@@ -26,7 +26,7 @@ func TestRun_TooManyArgumentsReturnsUsageError(t *testing.T) {
 	var stderr strings.Builder
 
 	code := run([]string{"mjsonp://127.0.0.1:11600/room", "extra"}, strings.NewReader(""), &stdout, &stderr)
-	if code != 2 {
-		t.Errorf("run() = %d, want 2", code)
+	if code != exitUsageError {
+		t.Errorf("run() = %d, want %d", code, exitUsageError)
 	}
 }
