@@ -93,15 +93,59 @@ func TestRunTCP_RespondsToEachServerMessage(t *testing.T) {
 }
 
 func TestRunTCP_InvalidURLIsUsageError(t *testing.T) {
-	err := mjairuntime.RunTCP(mjairuntime.TCPConfig{
-		Name:  "tsumogiri",
-		URL:   "stdio://127.0.0.1:11600/room",
-		Agent: ai.NewTsumogiriAgent(),
-	})
-	if err == nil {
-		t.Fatal("RunTCP() succeeded unexpectedly")
+	tests := []struct {
+		name    string
+		url     string
+		wantErr string
+	}{
+		{
+			name:    "invalid URL",
+			url:     "://",
+			wantErr: "missing protocol scheme",
+		},
+		{
+			name:    "unsupported scheme",
+			url:     "stdio://127.0.0.1:11600/room",
+			wantErr: `unsupported URL scheme "stdio"`,
+		},
+		{
+			name:    "missing host",
+			url:     "mjsonp:///room",
+			wantErr: "mjsonp URL requires host:port",
+		},
+		{
+			name:    "missing port",
+			url:     "mjsonp://127.0.0.1/room",
+			wantErr: "mjsonp URL requires port",
+		},
+		{
+			name:    "missing room",
+			url:     "mjsonp://127.0.0.1:11600",
+			wantErr: "mjsonp URL requires room path",
+		},
+		{
+			name:    "nested room path",
+			url:     "mjsonp://127.0.0.1:11600/room/extra",
+			wantErr: "mjsonp URL requires room path",
+		},
 	}
-	if _, ok := errors.AsType[*mjairuntime.UsageError](err); !ok {
-		t.Errorf("errors.AsType[*UsageError](%v) = false, want true", err)
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			err := mjairuntime.RunTCP(mjairuntime.TCPConfig{
+				Name:  "tsumogiri",
+				URL:   tt.url,
+				Agent: ai.NewTsumogiriAgent(),
+			})
+			if err == nil {
+				t.Fatal("RunTCP() succeeded unexpectedly")
+			}
+			if _, ok := errors.AsType[*mjairuntime.UsageError](err); !ok {
+				t.Errorf("errors.AsType[*UsageError](%v) = false, want true", err)
+			}
+			if !strings.Contains(err.Error(), tt.wantErr) {
+				t.Errorf("error = %q, want to contain %q", err.Error(), tt.wantErr)
+			}
+		})
 	}
 }
