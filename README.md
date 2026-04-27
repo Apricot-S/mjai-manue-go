@@ -13,9 +13,9 @@ Go port of [mjai-manue](https://github.com/gimite/mjai-manue) — a Mahjong AI f
 
 ### Pipe Mode Support
 
-- Adds standard input/output support for JSON Lines streams.
-- In pipe mode, the bot reads input line by line and emits an action only when the current state requires a decision.
-- `{"type":"none"}` emitted in pipe mode means an explicit pass, such as skipping a call or win. Inputs that do not require a decision produce no output.
+This project adds standard input/output support for JSON Lines streams, following the same style as [Akochan](https://github.com/critter-mj/akochan) and [Mortal](https://github.com/Equim-chan/Mortal). In pipe mode, the bot reads input line by line and emits an action only when the current state requires a decision.
+
+`{"type":"none"}` emitted in pipe mode means an explicit pass, such as skipping a call or win. Inputs that do not require a decision produce no output.
 
 ### No `possible_actions` Dependency
 
