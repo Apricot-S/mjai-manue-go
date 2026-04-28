@@ -15,8 +15,6 @@ Go port of [mjai-manue](https://github.com/gimite/mjai-manue) — a Mahjong AI f
 
 This project adds standard input/output support for JSON Lines streams, following the same style as [Akochan](https://github.com/critter-mj/akochan) and [Mortal](https://github.com/Equim-chan/Mortal). In stdio mode, the bot reads input line by line and emits an action only when the current state requires a decision.
 
-`{"type":"none"}` emitted in stdio mode means an explicit pass, such as skipping a call or win. Inputs that do not require a decision produce no output.
-
 ### No `possible_actions` Dependency
 
 In mjai protocol messages, `possible_actions` may be attached to events such as `tsumo` and `dahai` to tell the bot which responses are currently legal. This project does not require that field to be present. Instead, it updates the game state from the event stream and derives available decisions from that state.
@@ -54,23 +52,11 @@ go install github.com/Apricot-S/mjai-manue-go/cmd/mjai-manue@latest
 
 ## Usage
 
-### mjsonp TCP client
-
 ```sh
-mjai-manue mjsonp://example.com:11600/default
+mjai-manue [--name <PLAYER_NAME>] [--seed <INT>] [<URL>]
 ```
 
-Use this mode with an [mjai server](https://github.com/gimite/mjai) that expects one response for each input message. When the bot has no action to take, the mjsonp TCP client adapter sends `{"type":"none"}` as the protocol response.
-
-### stdio (JSON Lines)
-
-```sh
-mjai-manue
-```
-
-When no URL is provided, `mjai-manue` reads JSON Lines from stdin and writes protocol messages to stdout. Output is sparse: the bot writes a line only when it chooses an action. A written `{"type":"none"}` is an explicit pass, not a generic acknowledgement.
-
-For more information, see [cmd/](cmd/).
+See [cmd/](cmd/) for more information.
 
 > [!TIP]
 > To customize the AI's strategic behavior, replace the following configuration files before building `mjai-manue`:
