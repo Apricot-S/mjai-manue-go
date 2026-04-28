@@ -22,11 +22,13 @@ mjai-manue [--name <PLAYER_NAME>] [--seed <INT>] mjsonp://example.com:11600/defa
 
 The default player name is `"Manue030"`.
 
-## Deterministic seed
+## Random seed
 
-`--seed <INT>` fixes the random seed. Use it when reproducible decisions are required, such as golden tests or comparisons with a fixed input stream.
+`--seed <INT>` changes the random seed. Use it when reproducible decisions with a non-default seed are required, such as golden tests or comparisons with a fixed input stream.
 
-When `--seed` is omitted, randomness is non-deterministic.
+When `--seed` is omitted, the default seed is `0`.
+
+The random sequence is deterministic, but it does not match the original CoffeeScript implementation.
 
 ## Configuration files
 
