@@ -50,7 +50,7 @@ When `<URL>` is provided, it must be an `mjsonp://host:port/room` URL.
 
 mjsonp TCP client mode is synchronous with the mjai server. The application sends one response for each input message that expects a response. If the application has no action to take, it sends `{"type":"none"}`.
 
-When mjsonp TCP client mode receives `end_game`, it sends no response, disconnects, and exits.
+When mjsonp TCP client mode receives `end_game`, it disconnects and exits without sending a response.
 
 ## I/O rules
 
