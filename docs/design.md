@@ -176,7 +176,7 @@ stdio と TCP/IP は mjai message の意味解釈を共有するため、`Driver
 - 切断時は即終了。
 - mjai サーバーは 1 入力に対する 1 応答を期待するため、application が `NoReaction` を返した場合も adapter が `{"type":"none"}` を送信する。
 - application が `Pass` action を返した場合も wire format は `{"type":"none"}` になるが、これは「副露・和了等を見送る」という意思決定であり、`NoReaction` とは区別する。
-- `end_game` 受領時は、最後に Bot へ終了イベントを通して局面ログ等の後処理を実行してから終了する。このとき protocol response は送信しない。
+- `end_game` 受領時は protocol response を送信せず正常終了する。`end_game` は Bot へ渡さず、局面ログ等の後処理も実行しない。最終局面のログは直前の `end_kyoku` までに出力する。
 
 ### 8.3 stdio (pipe)
 

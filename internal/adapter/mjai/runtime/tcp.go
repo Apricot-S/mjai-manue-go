@@ -95,9 +95,6 @@ func runTCPConn(name string, room string, agent ai.Agent, conn net.Conn) error {
 			return err
 		}
 		if driver.Ended() {
-			if err := driver.FinalizeEndGame(); err != nil {
-				return err
-			}
 			return nil
 		}
 		if outMsg == nil {
