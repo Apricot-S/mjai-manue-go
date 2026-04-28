@@ -25,32 +25,32 @@ go install github.com/Apricot-S/mjai-manue-go/cmd/mjai-tsumogiri@latest
 # Basic format
 <APP_NAME> [--name <PLAYER_NAME>] [<URL>]
 
-# Pipe mode (standard I/O)
+# stdio mode
 mjai-manue
 mjai-tsumogiri --name "SimpleBot"
 
-# TCP/IP client mode
+# mjsonp TCP client mode
 mjai-manue --name "ManueGo" mjsonp://example.com:11600/default
 mjai-tsumogiri mjsonp://example.com:11600/room
 ```
 
 ## Modes
 
-### Pipe mode
+### stdio mode
 
 When `<URL>` is omitted, the application reads JSON Lines from stdin and writes protocol messages to stdout.
 
 Output is sparse. The application writes one line only when it chooses an action. If it writes `{"type":"none"}`, that is an explicit pass for an available action opportunity, not a generic acknowledgement for every input message.
 
-Receiving `end_game` does not terminate the process in pipe mode. The application keeps reading until EOF, so the same process can play multiple games by receiving another `start_game` after `end_game`.
+Receiving `end_game` does not terminate the process in stdio mode. The application keeps reading until EOF, so the same process can play multiple games by receiving another `start_game` after `end_game`.
 
-### TCP/IP client mode
+### mjsonp TCP client mode
 
 When `<URL>` is provided, it must be an `mjsonp://host:port/room` URL.
 
-TCP mode is synchronous with the mjai server. The application sends one response for each input message that expects a response. If the application has no action to take, it sends `{"type":"none"}`.
+mjsonp TCP client mode is synchronous with the mjai server. The application sends one response for each input message that expects a response. If the application has no action to take, it sends `{"type":"none"}`.
 
-When TCP mode receives `end_game`, it sends no response, disconnects, and exits.
+When mjsonp TCP client mode receives `end_game`, it sends no response, disconnects, and exits.
 
 ## I/O rules
 

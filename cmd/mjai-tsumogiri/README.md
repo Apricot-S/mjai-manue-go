@@ -13,10 +13,10 @@ go install github.com/Apricot-S/mjai-manue-go/cmd/mjai-tsumogiri@latest
 Run:
 
 ```sh
-# Pipe mode
+# stdio mode
 mjai-tsumogiri [--name <PLAYER_NAME>]
 
-# TCP/IP client mode
+# mjsonp TCP client mode
 mjai-tsumogiri [--name <PLAYER_NAME>] mjsonp://example.com:11600/default
 ```
 

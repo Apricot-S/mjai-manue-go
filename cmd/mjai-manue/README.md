@@ -13,10 +13,10 @@ go install github.com/Apricot-S/mjai-manue-go/cmd/mjai-manue@latest
 Run:
 
 ```sh
-# Pipe mode
+# stdio mode
 mjai-manue [--name <PLAYER_NAME>] [--seed <INT>]
 
-# TCP/IP client mode
+# mjsonp TCP client mode
 mjai-manue [--name <PLAYER_NAME>] [--seed <INT>] mjsonp://example.com:11600/default
 ```
 

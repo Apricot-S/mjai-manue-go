@@ -11,11 +11,11 @@ Go port of [mjai-manue](https://github.com/gimite/mjai-manue) — a Mahjong AI f
 > [!NOTE]
 > The original project includes an older version written in Ruby and a newer version written in CoffeeScript. This project ports only the new version.
 
-### Pipe Mode Support
+### stdio Mode Support
 
-This project adds standard input/output support for JSON Lines streams, following the same style as [Akochan](https://github.com/critter-mj/akochan) and [Mortal](https://github.com/Equim-chan/Mortal). In pipe mode, the bot reads input line by line and emits an action only when the current state requires a decision.
+This project adds standard input/output support for JSON Lines streams, following the same style as [Akochan](https://github.com/critter-mj/akochan) and [Mortal](https://github.com/Equim-chan/Mortal). In stdio mode, the bot reads input line by line and emits an action only when the current state requires a decision.
 
-`{"type":"none"}` emitted in pipe mode means an explicit pass, such as skipping a call or win. Inputs that do not require a decision produce no output.
+`{"type":"none"}` emitted in stdio mode means an explicit pass, such as skipping a call or win. Inputs that do not require a decision produce no output.
 
 ### No `possible_actions` Dependency
 
@@ -54,15 +54,15 @@ go install github.com/Apricot-S/mjai-manue-go/cmd/mjai-manue@latest
 
 ## Usage
 
-### TCP/IP (mjsonp)
+### mjsonp TCP client
 
 ```sh
 mjai-manue mjsonp://example.com:11600/default
 ```
 
-Use this mode with an [mjai server](https://github.com/gimite/mjai) that expects one response for each input message. When the bot has no action to take, the TCP adapter sends `{"type":"none"}` as the protocol response.
+Use this mode with an [mjai server](https://github.com/gimite/mjai) that expects one response for each input message. When the bot has no action to take, the mjsonp TCP client adapter sends `{"type":"none"}` as the protocol response.
 
-### Pipe (JSON Lines)
+### stdio (JSON Lines)
 
 ```sh
 mjai-manue
