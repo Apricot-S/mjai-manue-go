@@ -38,13 +38,13 @@ func run(args []string, in io.Reader, out io.Writer, errOut io.Writer) int {
 	agent := ai.NewTsumogiriAgent()
 	var err error
 	if flags.NArg() == 1 {
-		err = runtime.RunTCP(runtime.TCPConfig{
+		err = mjairuntime.RunTCP(mjairuntime.TCPConfig{
 			Name:  *name,
 			URL:   flags.Arg(0),
 			Agent: agent,
 		})
 	} else {
-		err = runtime.RunStdio(runtime.StdioConfig{
+		err = mjairuntime.RunStdio(mjairuntime.StdioConfig{
 			Name:  *name,
 			Room:  "default",
 			Agent: agent,
@@ -54,7 +54,7 @@ func run(args []string, in io.Reader, out io.Writer, errOut io.Writer) int {
 	}
 	if err != nil {
 		fmt.Fprintln(errOut, err)
-		if _, ok := errors.AsType[*runtime.UsageError](err); ok {
+		if _, ok := errors.AsType[*mjairuntime.UsageError](err); ok {
 			return exitUsageError
 		}
 		return exitRuntimeError

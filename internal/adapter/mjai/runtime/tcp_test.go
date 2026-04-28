@@ -1,4 +1,4 @@
-package runtime_test
+package mjairuntime_test
 
 import (
 	"bufio"
@@ -8,7 +8,7 @@ import (
 	"strings"
 	"testing"
 
-	mjairuntime "github.com/Apricot-S/mjai-manue-go/internal/adapter/mjai/runtime"
+	"github.com/Apricot-S/mjai-manue-go/internal/adapter/mjai/runtime"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/ai"
 )
 

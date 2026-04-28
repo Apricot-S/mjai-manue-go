@@ -1,11 +1,11 @@
-package runtime_test
+package mjairuntime_test
 
 import (
 	"testing"
 
 	"github.com/Apricot-S/mjai-manue-go/internal/adapter/mjai/inbound"
 	"github.com/Apricot-S/mjai-manue-go/internal/adapter/mjai/outbound"
-	mjairuntime "github.com/Apricot-S/mjai-manue-go/internal/adapter/mjai/runtime"
+	"github.com/Apricot-S/mjai-manue-go/internal/adapter/mjai/runtime"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/ai"
 )
 
