@@ -17,7 +17,7 @@ This project adds standard input/output support for JSON Lines streams, followin
 
 ### No `possible_actions` Dependency
 
-In mjai protocol messages, `possible_actions` may be attached to events such as `tsumo` and `dahai` to tell the bot which responses are currently legal. This project does not require that field to be present. Instead, it updates the game state from the event stream and derives available decisions from that state.
+In mjai protocol messages, `possible_actions` may be attached to events such as `tsumo` and `dahai` to tell the bot which responses are currently legal. Unlike the original project, this project does not require that field to be present. Instead, it updates the game state from the event stream and derives available decisions from that state.
 
 This makes the bot usable with inputs that contain the game events but omit server-provided action candidates, including mjson game logs and environments that do not provide `possible_actions`, such as [RiichiEnv](https://github.com/smly/RiichiEnv).
 
