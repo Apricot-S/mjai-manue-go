@@ -45,7 +45,7 @@ func TestRunStdio_EmptyLine(t *testing.T) {
 	}
 }
 
-func TestRunStdio_EndGameStopsReading(t *testing.T) {
+func TestRunStdio_EndGameContinuesReadingUntilEOF(t *testing.T) {
 	in := strings.NewReader(
 		`{"type":"end_game","scores":[25000,25000,25000,25000]}` + "\n" +
 			"\n",
@@ -59,8 +59,8 @@ func TestRunStdio_EndGameStopsReading(t *testing.T) {
 		In:    in,
 		Out:   &out,
 	})
-	if err != nil {
-		t.Fatalf("RunStdio() failed: %v", err)
+	if err == nil {
+		t.Fatal("RunStdio() succeeded unexpectedly")
 	}
 	if out.String() != "" {
 		t.Errorf("output = %q, want empty", out.String())

@@ -7,6 +7,7 @@ import (
 	"github.com/Apricot-S/mjai-manue-go/internal/adapter/mjai/outbound"
 	"github.com/Apricot-S/mjai-manue-go/internal/application"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/ai"
+	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/event"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/seat"
 )
 
@@ -63,4 +64,12 @@ func (d *Driver) Handle(msg inbound.Message) (outbound.Message, error) {
 
 func (d *Driver) Ended() bool {
 	return d.ended
+}
+
+func (d *Driver) FinalizeEndGame() error {
+	if d.bot == nil {
+		return nil
+	}
+	_, err := d.bot.Process(event.NewEndRound())
+	return err
 }

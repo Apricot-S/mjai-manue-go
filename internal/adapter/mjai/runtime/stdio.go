@@ -38,9 +38,6 @@ func RunStdio(cfg StdioConfig) error {
 		if err != nil {
 			return err
 		}
-		if driver.Ended() {
-			return nil
-		}
 		if outMsg == nil {
 			continue
 		}

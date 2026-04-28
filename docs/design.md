@@ -147,7 +147,7 @@ stdio と TCP/IP は mjai message の意味解釈を共有するため、`Driver
 
 ### 7.3 終了コード（一般的な分類）
 
-- `0`: 正常終了（例: `end_game` 受領後に EOF / 正常クローズ）
+- `0`: 正常終了（例: stdio は `end_game` 受領後の EOF、TCP は `end_game` 受領後の正常クローズ）
 - `1`: 実行時エラー（I/O、接続切断、プロトコル違反、JSON 不正等）
 - `2`: CLI 利用エラー（フラグ不足/不正、URL スキーム不正等）
 - `130`: ユーザー割り込み（SIGINT 等。OS により変わる可能性あり）
@@ -176,6 +176,7 @@ stdio と TCP/IP は mjai message の意味解釈を共有するため、`Driver
 - 切断時は即終了。
 - mjai サーバーは 1 入力に対する 1 応答を期待するため、application が `NoReaction` を返した場合も adapter が `{"type":"none"}` を送信する。
 - application が `Pass` action を返した場合も wire format は `{"type":"none"}` になるが、これは「副露・和了等を見送る」という意思決定であり、`NoReaction` とは区別する。
+- `end_game` 受領時は、最後に Bot へ終了イベントを通して局面ログ等の後処理を実行してから終了する。このとき protocol response は送信しない。
 
 ### 8.3 stdio (pipe)
 
@@ -183,6 +184,7 @@ stdio と TCP/IP は mjai message の意味解釈を共有するため、`Driver
 - stdio は JSON Lines の入力を読み進め、application が action を返したタイミングでのみ stdout へ 1 行出力する。
 - application が `NoReaction` を返した場合は何も出力せず、次の入力行を読む。
 - application が `Pass` action を返した場合は `{"type":"none"}` を出力する。これは行動機会に対する明示的な見送りであり、行動機会がないことを表す `NoReaction` ではない。
+- `end_game` を受領しても即終了せず、EOF まで入力を読み続ける。これにより子プロセスとして扱う側は stdin close でプロセス寿命を制御できる。
 - mjai.app 提出型は廃止したため、提出 zip 生成はスコープ外。
 
 ### 8.4 RiichiLab (riichi.dev, WebSocket)
