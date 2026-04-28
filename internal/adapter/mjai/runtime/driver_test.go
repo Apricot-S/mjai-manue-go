@@ -55,6 +55,48 @@ func TestDriver_HandleEndGameMarksEnded(t *testing.T) {
 	}
 }
 
+func TestDriver_Ended(t *testing.T) {
+	driver := mjairuntime.NewDriver("tsumogiri", "default", ai.NewTsumogiriAgent())
+	if driver.Ended() {
+		t.Error("Ended() = true before start_game, want false")
+	}
+
+	if _, err := driver.Handle(&inbound.StartGame{Type: "start_game", ID: 0}); err != nil {
+		t.Fatalf("Handle(start_game) failed: %v", err)
+	}
+	if driver.Ended() {
+		t.Error("Ended() = true after start_game, want false")
+	}
+
+	if _, err := driver.Handle(&inbound.EndGame{Type: "end_game"}); err != nil {
+		t.Fatalf("Handle(end_game) failed: %v", err)
+	}
+	if !driver.Ended() {
+		t.Error("Ended() = false after end_game, want true")
+	}
+
+	if _, err := driver.Handle(&inbound.StartGame{Type: "start_game", ID: 0}); err != nil {
+		t.Fatalf("Handle(second start_game) failed: %v", err)
+	}
+	if driver.Ended() {
+		t.Error("Ended() = true after second start_game, want false")
+	}
+}
+
+func TestDriver_HandleEventAfterEndGame(t *testing.T) {
+	driver := mjairuntime.NewDriver("tsumogiri", "default", ai.NewTsumogiriAgent())
+	if _, err := driver.Handle(&inbound.StartGame{Type: "start_game", ID: 0}); err != nil {
+		t.Fatalf("Handle(start_game) failed: %v", err)
+	}
+	if _, err := driver.Handle(&inbound.EndGame{Type: "end_game"}); err != nil {
+		t.Fatalf("Handle(end_game) failed: %v", err)
+	}
+
+	if _, err := driver.Handle(&inbound.Tsumo{Type: "tsumo", Actor: 0, Pai: "6m"}); err == nil {
+		t.Error("Handle(tsumo) succeeded unexpectedly")
+	}
+}
+
 func TestDriver_HandleEventBeforeStartGame(t *testing.T) {
 	driver := mjairuntime.NewDriver("tsumogiri", "default", ai.NewTsumogiriAgent())
 

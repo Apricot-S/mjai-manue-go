@@ -36,8 +36,10 @@ func (d *Driver) Handle(msg inbound.Message) (outbound.Message, error) {
 			return nil, err
 		}
 		d.bot = application.NewBot(*self, d.agent)
+		d.ended = false
 		return nil, nil
 	case *inbound.EndGame:
+		d.bot = nil
 		d.ended = true
 		return nil, nil
 	case *inbound.Error:
