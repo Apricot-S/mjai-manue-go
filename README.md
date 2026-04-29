@@ -21,13 +21,16 @@ In mjai protocol messages, `possible_actions` may be attached to events such as 
 
 This makes the bot usable with inputs that contain the game events but omit server-provided action candidates, including mjson game logs and environments that do not provide `possible_actions`, such as [RiichiEnv](https://github.com/smly/RiichiEnv).
 
-### Architecture Improvements
+### Embedded Configuration
 
-- Embed configuration files at build time instead of loading them at runtime.
+Unlike the original project, this project embeds configuration files at build time. The installed binary can run on its own without depending on files in the repository checkout.
+
+### Other Differences
+
+- Ported the AI logic from the original implementation while reimplementing the rest in Go.
+- Treats malformed or unexpected input more strictly than the original implementation.
 - Fixed an incorrect shanten number calculation when a hand contains four identical tiles.
-- Log more detailed information about the game state.
-- Improved error handling to more reliably reject invalid or anomalous input.
-- Refactored the code for better readability and maintainability.
+- Logs more detailed information about the game state.
 
 ## How It Works
 
