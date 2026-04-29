@@ -127,10 +127,8 @@ func (p *InvisiblePlayer) Discard(t tile.Tile, tsumogiri bool) error {
 			return fmt.Errorf("cannot Discard: player has accepted riichi and cannot discard a tile from hand: %s", t)
 		}
 
-		for _, s := range p.swapCallTiles {
-			if t.HasSameSymbol(&s) {
-				return fmt.Errorf("cannot Discard: tile %s is forbidden due to swap-call", t)
-			}
+		if isSwapCallTile(t, p.swapCallTiles) {
+			return fmt.Errorf("cannot Discard: tile %s is forbidden due to swap-call", t)
 		}
 
 		newHand, err := p.hand.Discard(&t)

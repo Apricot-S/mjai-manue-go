@@ -249,14 +249,7 @@ func tanyao(allTiles []tile.Tile) int {
 // Honroutou and Junchantaiyaochuu are also judged as Chantaiyao.
 func chantaiyao(allBlocks []block.Block, isOpen bool) int {
 	for _, b := range allBlocks {
-		isYaochuBlock := false
-		for _, p := range b.ToTiles() {
-			if p.IsYaochu() {
-				isYaochuBlock = true
-				break
-			}
-		}
-		if !isYaochuBlock {
+		if !slices.ContainsFunc(b.ToTiles(), func(p tile.Tile) bool { return p.IsYaochu() }) {
 			return 0
 		}
 	}
@@ -551,18 +544,15 @@ func sanankou(
 	}
 
 	if needCheckWait {
-	OuterLoop:
 		for _, b := range handBlocks {
 			s, ok := b.(*block.Sequence)
 			if !ok {
 				continue
 			}
 
-			for _, t := range s.ToTiles() {
-				if t.HasSameSymbol(winningTile) {
-					numAnkou++
-					break OuterLoop
-				}
+			if slices.ContainsFunc(s.ToTiles(), func(t tile.Tile) bool { return t.HasSameSymbol(winningTile) }) {
+				numAnkou++
+				break
 			}
 		}
 	}

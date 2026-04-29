@@ -135,10 +135,8 @@ func (p *VisiblePlayer) Discard(t tile.Tile, tsumogiri bool) error {
 			return fmt.Errorf("cannot Discard: player has accepted riichi and cannot discard a tile from hand: %s", t)
 		}
 
-		for _, s := range p.swapCallTiles {
-			if t.HasSameSymbol(&s) {
-				return fmt.Errorf("cannot Discard: tile %s is forbidden due to swap-call", t)
-			}
+		if isSwapCallTile(t, p.swapCallTiles) {
+			return fmt.Errorf("cannot Discard: tile %s is forbidden due to swap-call", t)
 		}
 
 		newHand, err := p.hand.Discard(&t)
@@ -186,20 +184,9 @@ func (p *VisiblePlayer) Chii(chii meld.Chii) error {
 	// If the only tiles remaining after chii are swap-call tiles, chii is not allowed.
 	swapCallTiles := chii.SwapCallTiles()
 	remaining := tile.Tiles(h.ToTiles())
-	allSwap := true
-	for _, rt := range remaining.Distinct(nil) {
-		found := false
-		for _, s := range swapCallTiles {
-			if rt.HasSameSymbol(&s) {
-				found = true
-				break
-			}
-		}
-		if !found {
-			allSwap = false
-			break
-		}
-	}
+	allSwap := !slices.ContainsFunc(remaining.Distinct(nil), func(rt tile.Tile) bool {
+		return !isSwapCallTile(rt, swapCallTiles)
+	})
 	if allSwap {
 		return fmt.Errorf("cannot Chii: remaining hand would contain only swap-call tiles")
 	}
