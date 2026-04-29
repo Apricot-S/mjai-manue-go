@@ -3,7 +3,6 @@ package player
 import (
 	"fmt"
 	"slices"
-	"sort"
 
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/common"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/round/player/hand"
@@ -55,7 +54,7 @@ func (p *VisiblePlayer) Hand() (*hand.VisibleHand, bool) {
 
 func (p *VisiblePlayer) HandTiles() []tile.Tile {
 	ts := tile.Tiles(p.hand.ToTiles())
-	sort.Sort(ts)
+	ts.Sort()
 	return ts
 }
 

@@ -93,7 +93,7 @@ func TestNewState(t *testing.T) {
 	if got := s.StartingDealer().Index(); got != 0 {
 		t.Fatalf("StartingDealer() = %d, want %d", got, 0)
 	}
-	if got := s.DoraIndicators(); got.Len() != 1 || got[0].ID() != validDora.ID() {
+	if got := s.DoraIndicators(); len(got) != 1 || got[0].ID() != validDora.ID() {
 		t.Fatalf("DoraIndicators() = %v, want [%v]", got, validDora)
 	}
 	if got := s.NumLeftTiles(); got != NumInitWall {

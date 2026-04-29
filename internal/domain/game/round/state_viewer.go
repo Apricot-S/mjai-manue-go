@@ -85,9 +85,10 @@ func (s *State) NextRound() (wind.Wind, int) {
 }
 
 func (s *State) Doras() tile.Tiles {
-	doras := make([]tile.Tile, s.DoraIndicators().Len())
+	doraIndicators := s.DoraIndicators()
+	doras := make([]tile.Tile, len(doraIndicators))
 	for i := range doras {
-		doras[i] = s.doraIndicators[i].NextForDora()
+		doras[i] = doraIndicators[i].NextForDora()
 	}
 	return doras
 }

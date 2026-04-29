@@ -3,7 +3,6 @@ package meld
 import (
 	"fmt"
 	"slices"
-	"sort"
 
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/seat"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/tile"
@@ -28,10 +27,10 @@ func NewCalledKan(taken tile.Tile, consumed [3]tile.Tile, target seat.Seat) (*Ca
 		return nil, fmt.Errorf("must contain a red five for Called Kan of 5; taken: %+v, consumed: %+v", taken, consumed)
 	}
 
-	sort.Sort(tiles)
+	tiles.Sort()
 
 	csm := tile.Tiles(consumed[:])
-	sort.Sort(csm)
+	csm.Sort()
 
 	return &CalledKan{
 		taken:    taken,

@@ -3,7 +3,6 @@ package meld
 import (
 	"fmt"
 	"slices"
-	"sort"
 
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/seat"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/tile"
@@ -34,10 +33,10 @@ func NewPromotedKan(
 		return nil, fmt.Errorf("must contain a red five for Promoted Kan of 5; taken: %+v, consumed: %+v, added: %+v", taken, consumed, added)
 	}
 
-	sort.Sort(tiles)
+	tiles.Sort()
 
 	csm := tile.Tiles(consumed[:])
-	sort.Sort(csm)
+	csm.Sort()
 
 	return &PromotedKan{
 		taken:    taken,

@@ -3,7 +3,6 @@ package meld
 import (
 	"fmt"
 	"slices"
-	"sort"
 
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/tile"
 )
@@ -26,7 +25,7 @@ func NewConcealedKan(consumed [4]tile.Tile) (*ConcealedKan, error) {
 		return nil, fmt.Errorf("must contain a red five for Concealed Kan of 5; consumed: %+v", consumed)
 	}
 
-	sort.Sort(csm)
+	csm.Sort()
 
 	return &ConcealedKan{consumed: [4]tile.Tile(csm)}, nil
 }

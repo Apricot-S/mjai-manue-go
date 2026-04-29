@@ -2,7 +2,6 @@ package tile
 
 import (
 	"slices"
-	"sort"
 )
 
 var tileSortKeyTable = [NumTileType38]int{
@@ -27,21 +26,15 @@ func (t *Tile) compareTo(other *Tile) int {
 	return t.sortKey() - other.sortKey()
 }
 
-func (ts Tiles) Len() int {
-	return len(ts)
-}
-
-func (ts Tiles) Less(i, j int) bool {
-	return ts[i].compareTo(&ts[j]) < 0
-}
-
-func (ts Tiles) Swap(i, j int) {
-	ts[i], ts[j] = ts[j], ts[i]
+func (ts Tiles) Sort() {
+	slices.SortFunc(ts, func(a, b Tile) int {
+		return a.compareTo(&b)
+	})
 }
 
 func (ts *Tiles) Distinct(exclude func(Tile) bool) Tiles {
 	ret := slices.Clone(*ts)
-	sort.Sort(ret)
+	ret.Sort()
 
 	ret = slices.CompactFunc(ret, func(a, b Tile) bool {
 		return a.ID() == b.ID()
@@ -51,9 +44,5 @@ func (ts *Tiles) Distinct(exclude func(Tile) bool) Tiles {
 		return ret
 	}
 
-	ret = slices.DeleteFunc(ret, func(t Tile) bool {
-		return exclude(t)
-	})
-
-	return ret
+	return slices.DeleteFunc(ret, exclude)
 }

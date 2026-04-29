@@ -2,7 +2,6 @@ package player_test
 
 import (
 	"reflect"
-	"sort"
 	"testing"
 
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/round/player"
@@ -66,7 +65,7 @@ func TestNewVisiblePlayer(t *testing.T) {
 			}
 
 			ts := tile.Tiles(tt.wantHand.ToTiles())
-			sort.Sort(ts)
+			ts.Sort()
 			if !reflect.DeepEqual(got.HandTiles(), []tile.Tile(ts)) {
 				t.Errorf("NewVisiblePlayer().HandTiles() = %v, want %v", got.HandTiles(), ts)
 			}
@@ -142,7 +141,7 @@ func TestVisiblePlayer_Draw_Success(t *testing.T) {
 	}
 
 	sortedHandTiles := tile.Tiles(handTiles[:])
-	sort.Sort(sortedHandTiles)
+	sortedHandTiles.Sort()
 	if !reflect.DeepEqual(p.HandTiles(), []tile.Tile(sortedHandTiles)) {
 		t.Errorf("HandTiles() must remain unchanged after Draw(); got %+v", p.HandTiles())
 	}
@@ -326,7 +325,7 @@ func TestVisiblePlayer_Discard_DrawnTile(t *testing.T) {
 	}
 
 	afterHandTiles := tile.Tiles(handTiles[:])
-	sort.Sort(afterHandTiles)
+	afterHandTiles.Sort()
 	h := hand.MustVisibleHand(afterHandTiles)
 
 	if gotHand, _ := p.Hand(); *gotHand != *h {

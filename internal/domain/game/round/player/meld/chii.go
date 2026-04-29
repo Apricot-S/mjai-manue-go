@@ -3,7 +3,6 @@ package meld
 import (
 	"fmt"
 	"slices"
-	"sort"
 
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/seat"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/tile"
@@ -31,7 +30,7 @@ func NewChii(taken tile.Tile, consumed [2]tile.Tile, target seat.Seat) (*Chii, e
 		return nil, fmt.Errorf("honors or unknown tile cannot use for Chii; taken: %+v, consumed: %+v", taken, consumed)
 	}
 
-	sort.Sort(tiles)
+	tiles.Sort()
 	if tiles[0].Number() > 7 {
 		return nil, fmt.Errorf("Chii cannot start with 8 or 9; taken: %+v, consumed: %+v", taken, consumed)
 	}
@@ -40,7 +39,7 @@ func NewChii(taken tile.Tile, consumed [2]tile.Tile, target seat.Seat) (*Chii, e
 	}
 
 	csm := tile.Tiles(consumed[:])
-	sort.Sort(csm)
+	csm.Sort()
 
 	var ty chiiType
 	switch {

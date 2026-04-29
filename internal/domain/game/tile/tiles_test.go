@@ -2,7 +2,6 @@ package tile_test
 
 import (
 	"reflect"
-	"sort"
 	"testing"
 
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/tile"
@@ -23,7 +22,7 @@ func TestSortTiles(t *testing.T) {
 		t := tile.MustTileFromCode(name)
 		tiles = append(tiles, *t)
 	}
-	sort.Sort(tiles)
+	tiles.Sort()
 
 	sortedNames := [...]string{
 		"1m", "2m", "3m", "4m", "5m", "5mr", "6m", "7m", "8m", "9m",

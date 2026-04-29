@@ -3,7 +3,6 @@ package meld
 import (
 	"fmt"
 	"slices"
-	"sort"
 
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/seat"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/tile"
@@ -28,10 +27,10 @@ func NewPon(taken tile.Tile, consumed [2]tile.Tile, target seat.Seat) (*Pon, err
 		return nil, fmt.Errorf("cannot use 2 or more red fives for Pon; taken: %+v, consumed: %+v", taken, consumed)
 	}
 
-	sort.Sort(tiles)
+	tiles.Sort()
 
 	csm := tile.Tiles(consumed[:])
-	sort.Sort(csm)
+	csm.Sort()
 
 	return &Pon{
 		taken:    taken,
