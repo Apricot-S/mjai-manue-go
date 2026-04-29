@@ -42,6 +42,7 @@ func run(args []string, in io.Reader, out io.Writer, errOut io.Writer) int {
 			Name:  *name,
 			URL:   flags.Arg(0),
 			Agent: agent,
+			Log:   errOut,
 		})
 	} else {
 		err = mjairuntime.RunStdio(mjairuntime.StdioConfig{
@@ -50,6 +51,7 @@ func run(args []string, in io.Reader, out io.Writer, errOut io.Writer) int {
 			Agent: agent,
 			In:    in,
 			Out:   out,
+			Log:   errOut,
 		})
 	}
 	if err != nil {

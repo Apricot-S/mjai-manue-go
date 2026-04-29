@@ -29,6 +29,30 @@ func TestRunStdio_HelloWritesJoin(t *testing.T) {
 	}
 }
 
+func TestRunStdio_TraceWritesReceivedAndSentJSON(t *testing.T) {
+	in := strings.NewReader(`{"type":"hello","protocol":"mjsonp","protocol_version":3}` + "\n")
+	var out strings.Builder
+	var log strings.Builder
+
+	err := mjairuntime.RunStdio(mjairuntime.StdioConfig{
+		Name:  "tsumogiri",
+		Room:  "default",
+		Agent: ai.NewTsumogiriAgent(),
+		In:    in,
+		Out:   &out,
+		Log:   &log,
+	})
+	if err != nil {
+		t.Fatalf("RunStdio() failed: %v", err)
+	}
+
+	want := "<-\t" + `{"type":"hello","protocol":"mjsonp","protocol_version":3}` + "\n" +
+		"->\t" + `{"type":"join","name":"tsumogiri","room":"default"}` + "\n"
+	if log.String() != want {
+		t.Errorf("log = %q, want %q", log.String(), want)
+	}
+}
+
 func TestRunStdio_EmptyLine(t *testing.T) {
 	in := strings.NewReader("\n")
 	var out strings.Builder

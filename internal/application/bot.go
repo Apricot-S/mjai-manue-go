@@ -15,12 +15,18 @@ type Bot struct {
 	agent        ai.Agent
 	gameState    *game.State
 	currentRound *round.State
+	reporter     RoundStateReporter
 }
 
-func NewBot(self seat.Seat, agent ai.Agent) *Bot {
+type RoundStateReporter interface {
+	ReportRoundState(state round.BoardRenderer) error
+}
+
+func NewBot(self seat.Seat, agent ai.Agent, reporter RoundStateReporter) *Bot {
 	return &Bot{
 		self:      self,
 		agent:     agent,
+		reporter:  reporter,
 		gameState: game.NewDefaultState(),
 	}
 }
@@ -43,6 +49,9 @@ func (b *Bot) processStartRound(ev *event.StartRound) (Reaction, error) {
 	}
 	b.currentRound = currentRound
 	b.gameState.UpdateScores(currentRound.Scores())
+	if err := b.reportRoundState(); err != nil {
+		return Reaction{}, err
+	}
 	return NewNoReaction(), nil
 }
 
@@ -51,6 +60,9 @@ func (b *Bot) processRoundEvent(ev event.Event) (Reaction, error) {
 		return Reaction{}, fmt.Errorf("cannot process %T: round has not started", ev)
 	}
 	if err := b.currentRound.Apply(ev); err != nil {
+		return Reaction{}, err
+	}
+	if err := b.reportRoundState(); err != nil {
 		return Reaction{}, err
 	}
 
@@ -72,8 +84,18 @@ func (b *Bot) processRoundEvent(ev event.Event) (Reaction, error) {
 
 func (b *Bot) processEndRound() (Reaction, error) {
 	if b.currentRound != nil {
+		if err := b.reportRoundState(); err != nil {
+			return Reaction{}, err
+		}
 		b.gameState.UpdateScores(b.currentRound.Scores())
 	}
 	b.currentRound = nil
 	return NewNoReaction(), nil
+}
+
+func (b *Bot) reportRoundState() error {
+	if b.reporter == nil || b.currentRound == nil {
+		return nil
+	}
+	return b.reporter.ReportRoundState(b.currentRound)
 }

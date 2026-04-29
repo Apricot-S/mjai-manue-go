@@ -10,7 +10,7 @@ import (
 )
 
 func TestDriver_HandleHello(t *testing.T) {
-	driver := mjairuntime.NewDriver("tsumogiri", "default", ai.NewTsumogiriAgent())
+	driver := mjairuntime.NewDriver("tsumogiri", "default", ai.NewTsumogiriAgent(), nil)
 
 	msg, err := driver.Handle(&inbound.Hello{Type: "hello"})
 	if err != nil {
@@ -29,7 +29,7 @@ func TestDriver_HandleHello(t *testing.T) {
 }
 
 func TestDriver_HandleStartGameCreatesBotWithoutOutput(t *testing.T) {
-	driver := mjairuntime.NewDriver("tsumogiri", "default", ai.NewTsumogiriAgent())
+	driver := mjairuntime.NewDriver("tsumogiri", "default", ai.NewTsumogiriAgent(), nil)
 
 	msg, err := driver.Handle(&inbound.StartGame{Type: "start_game", ID: 0})
 	if err != nil {
@@ -41,7 +41,7 @@ func TestDriver_HandleStartGameCreatesBotWithoutOutput(t *testing.T) {
 }
 
 func TestDriver_HandleEndGameMarksEnded(t *testing.T) {
-	driver := mjairuntime.NewDriver("tsumogiri", "default", ai.NewTsumogiriAgent())
+	driver := mjairuntime.NewDriver("tsumogiri", "default", ai.NewTsumogiriAgent(), nil)
 
 	msg, err := driver.Handle(&inbound.EndGame{Type: "end_game"})
 	if err != nil {
@@ -56,7 +56,7 @@ func TestDriver_HandleEndGameMarksEnded(t *testing.T) {
 }
 
 func TestDriver_Ended(t *testing.T) {
-	driver := mjairuntime.NewDriver("tsumogiri", "default", ai.NewTsumogiriAgent())
+	driver := mjairuntime.NewDriver("tsumogiri", "default", ai.NewTsumogiriAgent(), nil)
 	if driver.Ended() {
 		t.Error("Ended() = true before start_game, want false")
 	}
@@ -84,7 +84,7 @@ func TestDriver_Ended(t *testing.T) {
 }
 
 func TestDriver_HandleEventAfterEndGame(t *testing.T) {
-	driver := mjairuntime.NewDriver("tsumogiri", "default", ai.NewTsumogiriAgent())
+	driver := mjairuntime.NewDriver("tsumogiri", "default", ai.NewTsumogiriAgent(), nil)
 	if _, err := driver.Handle(&inbound.StartGame{Type: "start_game", ID: 0}); err != nil {
 		t.Fatalf("Handle(start_game) failed: %v", err)
 	}
@@ -98,7 +98,7 @@ func TestDriver_HandleEventAfterEndGame(t *testing.T) {
 }
 
 func TestDriver_HandleEventBeforeStartGame(t *testing.T) {
-	driver := mjairuntime.NewDriver("tsumogiri", "default", ai.NewTsumogiriAgent())
+	driver := mjairuntime.NewDriver("tsumogiri", "default", ai.NewTsumogiriAgent(), nil)
 
 	if _, err := driver.Handle(&inbound.Tsumo{Type: "tsumo", Actor: 0, Pai: "6m"}); err == nil {
 		t.Fatal("Handle() succeeded unexpectedly")

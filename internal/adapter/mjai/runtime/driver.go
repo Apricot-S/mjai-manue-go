@@ -2,6 +2,7 @@ package mjairuntime
 
 import (
 	"fmt"
+	"io"
 
 	"github.com/Apricot-S/mjai-manue-go/internal/adapter/mjai/inbound"
 	"github.com/Apricot-S/mjai-manue-go/internal/adapter/mjai/outbound"
@@ -16,13 +17,15 @@ type Driver struct {
 	agent ai.Agent
 	bot   *application.Bot
 	ended bool
+	log   io.Writer
 }
 
-func NewDriver(name string, room string, agent ai.Agent) *Driver {
+func NewDriver(name string, room string, agent ai.Agent, log io.Writer) *Driver {
 	return &Driver{
 		name:  name,
 		room:  room,
 		agent: agent,
+		log:   log,
 	}
 }
 
@@ -35,7 +38,7 @@ func (d *Driver) Handle(msg inbound.Message) (outbound.Message, error) {
 		if err != nil {
 			return nil, err
 		}
-		d.bot = application.NewBot(*self, d.agent)
+		d.bot = application.NewBot(*self, d.agent, newRoundStateReporter(d.log))
 		d.ended = false
 		return nil, nil
 	case *inbound.EndGame:

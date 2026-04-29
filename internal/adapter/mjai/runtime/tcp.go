@@ -3,6 +3,7 @@ package mjairuntime
 import (
 	"bufio"
 	"fmt"
+	"io"
 	"net"
 	"net/url"
 	"strings"
@@ -16,6 +17,7 @@ type TCPConfig struct {
 	Name  string
 	URL   string
 	Agent ai.Agent
+	Log   io.Writer
 }
 
 type UsageError struct {
@@ -42,7 +44,7 @@ func RunTCP(cfg TCPConfig) error {
 	}
 	defer conn.Close()
 
-	return runTCPConn(cfg.Name, endpoint.room, cfg.Agent, conn)
+	return runTCPConn(cfg.Name, endpoint.room, cfg.Agent, conn, cfg.Log)
 }
 
 type mjsonpEndpoint struct {
@@ -74,14 +76,17 @@ func parseMjsonpURL(rawURL string) (*mjsonpEndpoint, error) {
 	}, nil
 }
 
-func runTCPConn(name string, room string, agent ai.Agent, conn net.Conn) error {
+func runTCPConn(name string, room string, agent ai.Agent, conn net.Conn, log io.Writer) error {
 	r := bufio.NewScanner(conn)
 	w := bufio.NewWriter(conn)
 	defer w.Flush()
 
-	driver := NewDriver(name, room, agent)
+	driver := NewDriver(name, room, agent, log)
 	for r.Scan() {
 		line := r.Bytes()
+		if err := traceLine(log, "<-", line); err != nil {
+			return err
+		}
 		if len(line) == 0 {
 			return fmt.Errorf("empty input line")
 		}
@@ -100,7 +105,7 @@ func runTCPConn(name string, room string, agent ai.Agent, conn net.Conn) error {
 		if outMsg == nil {
 			outMsg = outbound.NewNone("")
 		}
-		if err := writeMessage(w, outMsg); err != nil {
+		if err := writeMessageWithTrace(w, outMsg, log); err != nil {
 			return err
 		}
 	}

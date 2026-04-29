@@ -16,6 +16,7 @@ type StdioConfig struct {
 	Agent ai.Agent
 	In    io.Reader
 	Out   io.Writer
+	Log   io.Writer
 }
 
 func RunStdio(cfg StdioConfig) error {
@@ -23,9 +24,12 @@ func RunStdio(cfg StdioConfig) error {
 	w := bufio.NewWriter(cfg.Out)
 	defer w.Flush()
 
-	driver := NewDriver(cfg.Name, cfg.Room, cfg.Agent)
+	driver := NewDriver(cfg.Name, cfg.Room, cfg.Agent, cfg.Log)
 	for r.Scan() {
 		line := r.Bytes()
+		if err := traceLine(cfg.Log, "<-", line); err != nil {
+			return err
+		}
 		if len(line) == 0 {
 			return fmt.Errorf("empty input line")
 		}
@@ -41,7 +45,7 @@ func RunStdio(cfg StdioConfig) error {
 		if outMsg == nil {
 			continue
 		}
-		if err := writeMessage(w, outMsg); err != nil {
+		if err := writeMessageWithTrace(w, outMsg, cfg.Log); err != nil {
 			return err
 		}
 	}
@@ -51,9 +55,12 @@ func RunStdio(cfg StdioConfig) error {
 	return nil
 }
 
-func writeMessage(w *bufio.Writer, msg outbound.Message) error {
+func writeMessageWithTrace(w *bufio.Writer, msg outbound.Message, log io.Writer) error {
 	b, err := outbound.MarshalMessage(msg)
 	if err != nil {
+		return err
+	}
+	if err := traceLine(log, "->", b); err != nil {
 		return err
 	}
 	if _, err := w.Write(b); err != nil {
@@ -63,4 +70,12 @@ func writeMessage(w *bufio.Writer, msg outbound.Message) error {
 		return err
 	}
 	return w.Flush()
+}
+
+func traceLine(log io.Writer, direction string, line []byte) error {
+	if log == nil {
+		return nil
+	}
+	_, err := fmt.Fprintf(log, "%s\t%s\n", direction, string(line))
+	return err
 }

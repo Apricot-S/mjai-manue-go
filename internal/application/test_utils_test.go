@@ -15,7 +15,11 @@ import (
 func mustNewBotForTest(t *testing.T, self seat.Seat) *application.Bot {
 	t.Helper()
 
-	return application.NewBot(self, ai.NewTsumogiriAgent())
+	return application.NewBot(self, newTsumogiriAgentForTest(), nil)
+}
+
+func newTsumogiriAgentForTest() ai.Agent {
+	return ai.NewTsumogiriAgent()
 }
 
 func mustNewStartRoundForTest(t *testing.T, hands [common.NumPlayers][common.InitHandSize]tile.Tile) *event.StartRound {
