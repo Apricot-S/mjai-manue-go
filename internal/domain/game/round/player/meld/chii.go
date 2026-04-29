@@ -36,7 +36,7 @@ func NewChii(taken tile.Tile, consumed [2]tile.Tile, target seat.Seat) (*Chii, e
 		return nil, fmt.Errorf("Chii cannot start with 8 or 9; taken: %+v, consumed: %+v", taken, consumed)
 	}
 	if !tiles[0].Next(1).HasSameSymbol(&tiles[1]) || !tiles[0].Next(2).HasSameSymbol(&tiles[2]) {
-		return nil, fmt.Errorf("")
+		return nil, fmt.Errorf("Chii tiles must form a sequence; taken: %+v, consumed: %+v", taken, consumed)
 	}
 
 	csm := tile.Tiles(consumed[:])
