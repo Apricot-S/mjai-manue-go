@@ -1,15 +1,18 @@
 # mjai-manue-go 設計書 (Draft)
 
 作成日: 2026-04-09  
-更新日: 2026-04-28  
+更新日: 2026-04-29  
 対象: `mjai-manue-go` (CoffeeScript版 `mjai-manue` の Go rewrite)
 
 ## 1. 背景
 
 ### 1.1 参照資料
 
+- `docs/README.md`: docs 配下の文書の役割と分割方針。
 - `docs/protocols.md`: mjai / stdio / RiichiLab 各プロトコルのメッセージ仕様（本リポジトリ内の一次資料）
   - 本設計書では仕様詳細を重複記載せず、必要箇所から参照する。
+- `docs/board-state-output.md`: 盤面状態出力の実装計画と Ruby 版 `mjai` の参照抜粋。
+- `docs/terminology-en.md`: CoffeeScript 版 `mjai-manue` 由来の英語用語集。
 
 - 本プロジェクトは https://github.com/gimite/mjai-manue (CoffeeScript版) を Go に移植する。
 - 設計・開発では Eric Evans / Vaughn Vernon の DDD の考え方と、t-wada の TDD を取り入れる。
