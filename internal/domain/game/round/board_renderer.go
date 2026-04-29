@@ -15,6 +15,7 @@ type BoardRenderer interface {
 	RenderBoard() string
 }
 
+// RenderBoard returns a formatted board state string ported from Ruby mjai's Game.render_board.
 func (s *State) RenderBoard() string {
 	var b strings.Builder
 
