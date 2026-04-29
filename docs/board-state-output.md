@@ -1,7 +1,5 @@
 # Board State Output Plan
 
-作成日: 2026-04-29
-
 ## 目的
 
 Ruby版 `mjai` の `Game.render_board()` 相当として、状態更新後の局面を stderr へ出力できるようにする。
