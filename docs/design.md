@@ -97,10 +97,10 @@ flowchart LR
 現状のリポジトリには以下が存在する（2026-04-30 時点）。
 
 - `internal/domain/game/` に麻雀の基礎ドメイン（牌、風、席、対局点数、局、手牌、河、副露、役/和了/点数/聴牌/向聴など）が実装され、単体テストも存在する。
-- `round.State` は `start_kyoku` から局状態を生成し、現状は `tsumo` / `dahai` の適用を実装している。`end_kyoku` は `application.Bot` 側で局終了として扱い、`round.State.Apply` には渡さない。
+- `round.State` は `start_kyoku` から局状態を生成し、`tsumo` / `dahai` / `reach` / `reach_accepted` / 副露・カン / `dora` / 和了（domain `Win`）/ 流局（domain `DrawRound`）の適用を実装している。`end_kyoku` は `application.Bot` 側で局終了として扱い、`round.State.Apply` には渡さない。
 - `round.State.RenderBoard()` は Ruby 版 `mjai` の `Game.render_board()` 相当の最小フォーマットを pure method として実装済み。runtime から stderr に出力できる。
-- `internal/adapter/mjai/inbound/` に、mjai メッセージ（JSON）を decode する codec と単体テストが存在する。現状の decode 対応は `hello` / `start_game` / `end_game` / `error` / `start_kyoku` / `tsumo` / `dahai` / `end_kyoku`。
-- `inbound.ParseEvent` が domain event へ変換するのは `start_kyoku` / `tsumo` / `dahai` / `end_kyoku`。`possible_actions` は decode・意思決定ともに使わない。
+- `internal/adapter/mjai/inbound/` に、mjai メッセージ（JSON）を decode する codec と単体テストが存在する。現状の decode 対応は `hello` / `start_game` / `end_game` / `error` / `start_kyoku` / `tsumo` / `dahai` / `reach` / `reach_accepted` / `pon` / `chi` / `ankan` / `kakan` / `daiminkan` / `dora` / `hora` / `ryukyoku` / `end_kyoku`。
+- `inbound.ParseEvent` が domain event へ変換するのは `start_kyoku` / `tsumo` / `dahai` / `reach` / `reach_accepted` / `pon` / `chi` / `ankan` / `kakan` / `daiminkan` / `dora` / `hora` / `ryukyoku` / `end_kyoku`。mjai の `hora` は domain `Win`、`ryukyoku` は domain `DrawRound` へ変換する。`possible_actions` は decode・意思決定ともに使わない。
 - `internal/adapter/mjai/outbound/` に、`join` / `none` / `dahai` の outbound codec と単体テストが存在する。domain action からの変換は `Pass` → `none`、`Discard` → `dahai`。
 - `internal/adapter/mjai/runtime/` に、stdio / mjsonp TCP client の runtime loop と、transport 間で共有する mjai `Driver` が存在する。`Driver` は `hello` で `join`、`start_game` で Bot 生成、`end_game` で終了状態、通常メッセージで event 適用と action 変換を行う。
 - `internal/application/` に Bot と入力への反応（`NoReaction` / `Action`）が実装されている。現状の action 判定は暫定で、自家 `tsumo` の直後のみ Agent に問い合わせる。`PendingActors` / `LegalActions` は未実装。
@@ -225,6 +225,8 @@ RiichiLab bridge は未実装。実装時は Go 側に bridge コマンド（仮
 - **Player / Hand / Meld** 等の状態（Round 内のエンティティ）
 - **Event**: 外部入力を内部イベントへ変換したもの（ドメイン状態更新の入力）
   - `request_action` のような「出力タイミング調整用イベント」は domain に持ち込まない（ブリッジ側/adapter側の責務）
+  - event は観測した事実を typed に保持する薄いオブジェクトとし、局面依存の正当性や値オブジェクトと重複する詳細 validation は持たない。
+  - JSON の形状・必須フィールド・配列長・牌コード/席番号などのプロトコル入力検証は inbound codec が担い、状態遷移としての正当性は `round.State.Apply` / `round.NewState` / `player` / `meld` などの domain object が担う。
 - **Action**: Bot が返すべき行動（打牌、鳴き、立直、見送り等）
   - `Pass`（見送り）は action の一種。mjai outbound では `{"type":"none"}` に変換される。
   - `NoReaction`（返すべき行動なし）は action ではない。mjsonp adapter では同期応答として `{"type":"none"}` に変換され得るが、domain/application 上は `Pass` と同一視しない。
@@ -361,7 +363,8 @@ type Decision struct {
 
 - `mjai-tsumogiri` の CLI、stdio / mjsonp TCP client runtime、mjai inbound/outbound codec の最小系は実装済み。
 - `application.Bot`、`Reaction`、`domain/ai.Agent`、`TsumogiriAgent` は実装済み。
-- `round.State` の開始、`tsumo` / `dahai` 適用、盤面状態出力は実装済み。
+- `round.State` の開始、`tsumo` / `dahai` / `reach` / `reach_accepted` / 副露・カン / `dora` / 和了（`Win`）/ 流局（`DrawRound`）適用、盤面状態出力は実装中。
+- mjai inbound event は、局進行メッセージの domain event 化と `round.State.Apply` の受け入れを実装済み。
 - 牌・手牌・副露・向聴・聴牌・和了・役・点数など、`mjai-manue` の判断に使う基礎ドメインサービスは一部実装済み。
 - `configs/` の JSON embed と `encoding/json/v2` 前提のテスト運用は実装済み。
 
@@ -371,10 +374,10 @@ type Decision struct {
    - `README.md` / `cmd/README.md` / `cmd/mjai-manue/README.md` が `mjai-manue` 実装済みのように読める箇所を、実装状況に合わせて修正する。
    - `mjai-tsumogiri` の現行仕様（`--name`、URL 省略時 stdio、mjsonp URL 指定時 TCP、stderr trace/盤面出力）を docs とテストで固定する。
 
-2. **mjai inbound event の拡充**
-   - `reach` / `reach_accepted` / `pon` / `chi` / `ankan` / `kakan` / `daiminkan` / `dora` / `hora` / `ryukyoku` など、`docs/protocols.md` にある局進行メッセージを段階的に domain event 化する。
-   - `round.State.Apply` は状態遷移に必要な event を順に受け入れる。`end_kyoku` / `end_game` のような lifecycle message は application/runtime で扱い、局内状態に不要な情報は domain に持ち込まない。
-   - 各 message type は inbound codec の単体テストを先に追加し、未知 type / 不正 field は明確に error にする。
+2. **mjai inbound event の拡充（完了）**
+   - `reach` / `reach_accepted` / `pon` / `chi` / `ankan` / `kakan` / `daiminkan` / `dora` / `hora` / `ryukyoku` を domain event 化し、`round.State.Apply` で状態遷移に反映する。domain event 名は `hora` を `Win`、`ryukyoku` を `DrawRound` とする。
+   - `end_kyoku` / `end_game` のような lifecycle message は application/runtime で扱い、局内状態に不要な情報は domain に持ち込まない。
+   - 各 message type は inbound codec の単体テストで固定し、未知 type / 不正 field は error にする。
 
 3. **Action timing と合法手列挙**
    - `round.State` もしくは domain service に `PendingActors()` と `LegalActions(playerID)` 相当を追加する。
