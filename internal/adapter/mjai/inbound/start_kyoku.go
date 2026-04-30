@@ -5,7 +5,6 @@ import (
 
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/common"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/event"
-	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/seat"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/tile"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/wind"
 )
@@ -49,14 +48,9 @@ func (m *StartKyoku) ToEvent() (*event.StartRound, error) {
 		}
 	}
 
-	var scoresPtr *[common.NumPlayers]int
-	if m.Scores != nil {
-		if len(m.Scores) != common.NumPlayers {
-			return nil, fmt.Errorf("invalid scores length: %d", len(m.Scores))
-		}
-		var scores [common.NumPlayers]int
-		copy(scores[:], m.Scores)
-		scoresPtr = &scores
+	scores, err := parseOptionalScoresField("scores", m.Scores)
+	if err != nil {
+		return nil, err
 	}
 
 	roundWind, err := wind.NewWind(m.Bakaze)
@@ -64,9 +58,9 @@ func (m *StartKyoku) ToEvent() (*event.StartRound, error) {
 		return nil, fmt.Errorf("invalid bakaze: %w", err)
 	}
 
-	dealerSeat, err := seat.NewSeat(m.Oya)
+	dealerSeat, err := parseSeatField("oya", m.Oya)
 	if err != nil {
-		return nil, fmt.Errorf("invalid oya: %w", err)
+		return nil, err
 	}
 
 	doraIndicator, err := parseKnownTileField("dora_marker", m.DoraMarker)
@@ -81,7 +75,7 @@ func (m *StartKyoku) ToEvent() (*event.StartRound, error) {
 		m.Kyotaku,
 		*dealerSeat,
 		*doraIndicator,
-		scoresPtr,
+		scores,
 		hands,
 	), nil
 }
