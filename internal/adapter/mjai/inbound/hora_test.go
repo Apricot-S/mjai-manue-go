@@ -73,6 +73,7 @@ func TestParseEvent_HoraInvalidFields(t *testing.T) {
 		`{"type":"hora","actor":4,"target":3}`,
 		`{"type":"hora","actor":2,"target":4}`,
 		`{"type":"hora","actor":2,"target":3,"pai":"1z"}`,
+		`{"type":"hora","actor":2,"target":3,"pai":"?"}`,
 		`{"type":"hora","actor":2,"target":3,"deltas":[0,0,10300]}`,
 		`{"type":"hora","actor":2,"target":3,"scores":[25000,30800,34700,34700,34700]}`,
 	}

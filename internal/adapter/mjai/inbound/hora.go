@@ -43,7 +43,7 @@ func (m *Hora) ToEvent() (*event.Win, error) {
 	}
 	var winningTile *tile.Tile
 	if m.Pai != "" {
-		winningTile, err = parseTileField("pai", m.Pai)
+		winningTile, err = parseKnownTileField("pai", m.Pai)
 		if err != nil {
 			return nil, err
 		}
