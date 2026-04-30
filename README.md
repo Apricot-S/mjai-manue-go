@@ -53,14 +53,6 @@ This project (including all tools under [tools/](tools/)) requires:
 go install github.com/Apricot-S/mjai-manue-go/cmd/mjai-manue@latest
 ```
 
-## Usage
-
-```sh
-mjai-manue [--name <PLAYER_NAME>] [--seed <INT>] [<URL>]
-```
-
-See [cmd/](cmd/) for more information.
-
 > [!TIP]
 > To customize the AI's strategic behavior, replace the following configuration files before building `mjai-manue`:
 >
@@ -69,6 +61,14 @@ See [cmd/](cmd/) for more information.
 > - `configs/light_game_stats.json`
 >
 > See [tools/](tools/) for instructions on how to generate these files.
+
+## Usage
+
+```sh
+mjai-manue [--name <PLAYER_NAME>] [--seed <INT>] [<URL>]
+```
+
+See [cmd/](cmd/) for more information.
 
 ## Credits
 
