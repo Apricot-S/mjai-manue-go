@@ -358,7 +358,7 @@ id2がtarget3から8mをポン
 ```
 
 ```json
-{"type":"daiminkai","actor":1,"target":3,"pai":"4s","consumed":["4s","4s","4s"]}
+{"type":"daiminkan","actor":1,"target":3,"pai":"4s","consumed":["4s","4s","4s"]}
 ```
 
 新ドラがめくれた時
