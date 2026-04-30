@@ -56,7 +56,7 @@ func TestNewState(t *testing.T) {
 	validHands := newValidHands()
 	validScores := &[common.NumPlayers]int{25000, 25000, 25000, 25000}
 
-	ev, err := event.NewStartRound(
+	ev := event.NewStartRound(
 		wind.South,
 		2,
 		1,
@@ -66,9 +66,6 @@ func TestNewState(t *testing.T) {
 		validScores,
 		validHands,
 	)
-	if err != nil {
-		t.Fatalf("NewStartRound() failed: %v", err)
-	}
 
 	s, err := NewState(ev, *validScores)
 	if err != nil {
@@ -126,12 +123,96 @@ func TestNewState(t *testing.T) {
 	}
 }
 
+func TestNewStateRejectsInvalidStartRound(t *testing.T) {
+	validDealer := *seat.MustSeat(1)
+	validDora := *tile.MustTileFromCode("1m")
+	validHands := newValidHands()
+	validScores := &[common.NumPlayers]int{25000, 25000, 25000, 25000}
+
+	tests := []struct {
+		name          string
+		roundWind     wind.Wind
+		roundNumber   int
+		honba         int
+		riichiDeposit int
+		doraIndicator tile.Tile
+	}{
+		{
+			name:          "invalid round wind",
+			roundWind:     wind.Wind(0),
+			roundNumber:   1,
+			honba:         0,
+			riichiDeposit: 0,
+			doraIndicator: validDora,
+		},
+		{
+			name:          "invalid round number 0",
+			roundWind:     wind.East,
+			roundNumber:   0,
+			honba:         0,
+			riichiDeposit: 0,
+			doraIndicator: validDora,
+		},
+		{
+			name:          "invalid round number 5",
+			roundWind:     wind.East,
+			roundNumber:   5,
+			honba:         0,
+			riichiDeposit: 0,
+			doraIndicator: validDora,
+		},
+		{
+			name:          "negative honba",
+			roundWind:     wind.East,
+			roundNumber:   1,
+			honba:         -1,
+			riichiDeposit: 0,
+			doraIndicator: validDora,
+		},
+		{
+			name:          "negative riichi deposit",
+			roundWind:     wind.East,
+			roundNumber:   1,
+			honba:         0,
+			riichiDeposit: -1,
+			doraIndicator: validDora,
+		},
+		{
+			name:          "unknown dora indicator",
+			roundWind:     wind.East,
+			roundNumber:   1,
+			honba:         0,
+			riichiDeposit: 0,
+			doraIndicator: *tile.MustTileFromCode("?"),
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			ev := event.NewStartRound(
+				tt.roundWind,
+				tt.roundNumber,
+				tt.honba,
+				tt.riichiDeposit,
+				validDealer,
+				tt.doraIndicator,
+				validScores,
+				validHands,
+			)
+
+			if _, err := NewState(ev, *validScores); err == nil {
+				t.Fatal("NewState() succeeded unexpectedly")
+			}
+		})
+	}
+}
+
 func TestNewStateWithNilScores(t *testing.T) {
 	validDealer := *seat.MustSeat(1)
 	validDora := *tile.MustTileFromCode("1m")
 	validHands := newValidHands()
 
-	ev, err := event.NewStartRound(
+	ev := event.NewStartRound(
 		wind.East,
 		1,
 		0,
@@ -141,9 +222,6 @@ func TestNewStateWithNilScores(t *testing.T) {
 		nil,
 		validHands,
 	)
-	if err != nil {
-		t.Fatalf("NewStartRound() failed: %v", err)
-	}
 
 	scoresBefore := [common.NumPlayers]int{10000, 20000, 30000, 40000}
 	s, err := NewState(ev, scoresBefore)
@@ -164,7 +242,7 @@ func TestNewStateFallsBackToInvisiblePlayer(t *testing.T) {
 		unknownHands[0][i] = *tile.MustTileFromCode("?")
 	}
 
-	ev, err := event.NewStartRound(
+	ev := event.NewStartRound(
 		wind.East,
 		1,
 		0,
@@ -174,9 +252,6 @@ func TestNewStateFallsBackToInvisiblePlayer(t *testing.T) {
 		&[common.NumPlayers]int{25000, 25000, 25000, 25000},
 		unknownHands,
 	)
-	if err != nil {
-		t.Fatalf("NewStartRound() failed: %v", err)
-	}
 
 	s, err := NewState(ev, [common.NumPlayers]int{25000, 25000, 25000, 25000})
 	if err != nil {
@@ -204,7 +279,7 @@ func TestNewStateErrorsOnInvalidVisibleHand(t *testing.T) {
 		invalidHands[0][i] = *tile.MustTileFromCode("1m")
 	}
 
-	ev, err := event.NewStartRound(
+	ev := event.NewStartRound(
 		wind.East,
 		1,
 		0,
@@ -214,11 +289,8 @@ func TestNewStateErrorsOnInvalidVisibleHand(t *testing.T) {
 		&[common.NumPlayers]int{25000, 25000, 25000, 25000},
 		invalidHands,
 	)
-	if err != nil {
-		t.Fatalf("NewStartRound() failed: %v", err)
-	}
 
-	_, err = NewState(ev, [common.NumPlayers]int{25000, 25000, 25000, 25000})
+	_, err := NewState(ev, [common.NumPlayers]int{25000, 25000, 25000, 25000})
 	if err == nil {
 		t.Fatal("NewState() succeeded unexpectedly")
 	}

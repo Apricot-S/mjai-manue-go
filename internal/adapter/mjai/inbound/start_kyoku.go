@@ -83,5 +83,5 @@ func (m *StartKyoku) ToEvent() (*event.StartRound, error) {
 		*doraIndicator,
 		scoresPtr,
 		hands,
-	)
+	), nil
 }

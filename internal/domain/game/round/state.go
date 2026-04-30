@@ -17,7 +17,9 @@ const (
 	NumInitWall          = tile.NumTileType34*4 - 13*common.NumPlayers - 14
 	FinalTurn            = float64(NumInitWall) / float64(common.NumPlayers)
 
-	maxNumKan = 4
+	minRoundNumber = 1
+	maxRoundNumber = 4
+	maxNumKan      = 4
 	// Indicates that no action has been taken by anyone.
 	noActor                 = -1
 	kanPlayerStatusMultiple = 4
@@ -37,6 +39,22 @@ type State struct {
 }
 
 func NewState(ev *event.StartRound, previousScores [common.NumPlayers]int) (*State, error) {
+	if ev.RoundWind() < wind.East || wind.North < ev.RoundWind() {
+		return nil, fmt.Errorf("invalid round wind: %v", ev.RoundWind())
+	}
+	if ev.RoundNumber() < minRoundNumber || maxRoundNumber < ev.RoundNumber() {
+		return nil, fmt.Errorf("invalid round number: %d", ev.RoundNumber())
+	}
+	if ev.Honba() < 0 {
+		return nil, fmt.Errorf("invalid honba: %d", ev.Honba())
+	}
+	if ev.RiichiDeposit() < 0 {
+		return nil, fmt.Errorf("invalid riichi deposit: %d", ev.RiichiDeposit())
+	}
+	if ev.DoraIndicator().IsUnknown() {
+		return nil, fmt.Errorf("invalid dora indicator: %v", ev.DoraIndicator())
+	}
+
 	s := &State{}
 
 	s.roundWind = ev.RoundWind()

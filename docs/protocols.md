@@ -180,6 +180,7 @@ id1が聴牌
 {"type":"reach_accepted","actor":1,"deltas":[0,-1000,0,0],"scores":[25000,29800,34700,9500]}
 ```
 リーチ宣言が認められたため、点数状況を表示
+`deltas` / `scores` が省略される実装もあり、その場合は `actor` から 1000 点を引く。
 
 * To server
 

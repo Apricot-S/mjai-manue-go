@@ -1,8 +1,6 @@
 package event
 
 import (
-	"fmt"
-
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/seat"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/tile"
 )
@@ -13,15 +11,12 @@ type Discard struct {
 	tsumogiri bool
 }
 
-func NewDiscard(actor seat.Seat, discardedTile tile.Tile, tsumogiri bool) (*Discard, error) {
-	if discardedTile.IsUnknown() {
-		return nil, fmt.Errorf("unknown tile is not allowed for Discard: %s", discardedTile)
-	}
+func NewDiscard(actor seat.Seat, discardedTile tile.Tile, tsumogiri bool) *Discard {
 	return &Discard{
 		actor:     actor,
 		tile:      discardedTile,
 		tsumogiri: tsumogiri,
-	}, nil
+	}
 }
 
 func (*Discard) isEvent() {}
