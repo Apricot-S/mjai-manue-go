@@ -63,7 +63,8 @@ func NewState(ev *event.StartRound, previousScores [common.NumPlayers]int) (*Sta
 	s.riichiDeposit = ev.RiichiDeposit()
 	s.dealer = ev.Dealer()
 	s.startingDealer = *seat.MustSeat(0)
-	s.doraIndicators = tile.Tiles{ev.DoraIndicator()}
+	s.doraIndicators = make(tile.Tiles, 0, MaxNumDoraIndicators)
+	s.doraIndicators = append(s.doraIndicators, ev.DoraIndicator())
 	s.numLeftTiles = NumInitWall
 
 	if ev.Scores() != nil {
