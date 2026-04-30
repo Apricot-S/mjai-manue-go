@@ -24,7 +24,19 @@ func (m *Chi) ToEvent() (*event.Chii, error) {
 		return nil, fmt.Errorf("unexpected message type: %q", m.Type)
 	}
 
-	actor, target, taken, consumed, err := parseOpenCallFields(m.Actor, m.Target, m.Pai, m.Consumed)
+	actor, err := parseSeatField("actor", m.Actor)
+	if err != nil {
+		return nil, err
+	}
+	target, err := parseSeatField("target", m.Target)
+	if err != nil {
+		return nil, err
+	}
+	taken, err := parseTileField("pai", m.Pai)
+	if err != nil {
+		return nil, err
+	}
+	consumed, err := parseConsumed2(m.Consumed)
 	if err != nil {
 		return nil, err
 	}
