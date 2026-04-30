@@ -69,9 +69,9 @@ func (m *StartKyoku) ToEvent() (*event.StartRound, error) {
 		return nil, fmt.Errorf("invalid oya: %w", err)
 	}
 
-	doraIndicator, err := tile.NewTileFromCode(m.DoraMarker)
+	doraIndicator, err := parseKnownTileField("dora_marker", m.DoraMarker)
 	if err != nil {
-		return nil, fmt.Errorf("invalid dora marker: %w", err)
+		return nil, err
 	}
 
 	return event.NewStartRound(

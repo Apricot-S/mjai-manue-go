@@ -27,7 +27,7 @@ func (m *Kakan) ToEvent() (*event.PromotedKan, error) {
 	if err != nil {
 		return nil, err
 	}
-	added, err := parseTileField("pai", m.Pai)
+	added, err := parseKnownTileField("pai", m.Pai)
 	if err != nil {
 		return nil, err
 	}

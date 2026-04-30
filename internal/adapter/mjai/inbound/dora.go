@@ -21,7 +21,7 @@ func (m *Dora) ToEvent() (*event.Dora, error) {
 		return nil, fmt.Errorf("unexpected message type: %q", m.Type)
 	}
 
-	indicator, err := parseTileField("dora_marker", m.DoraMarker)
+	indicator, err := parseKnownTileField("dora_marker", m.DoraMarker)
 	if err != nil {
 		return nil, err
 	}

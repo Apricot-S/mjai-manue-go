@@ -136,27 +136,39 @@ func TestParseEvent_UnsupportedType(t *testing.T) {
 }
 
 func TestParseEvent_StartKyoku_InvalidDoraMarker(t *testing.T) {
-	payload := `{
-		"type":"start_kyoku",
-		"bakaze":"E",
-		"kyoku":1,
-		"honba":0,
-		"kyotaku":0,
-		"oya":0,
-		"dora_marker":"invalid",
-		"tehais":[` +
-		toJSONHand(unknownHand()) + "," +
-		toJSONHand(unknownHand()) + "," +
-		toJSONHand(unknownHand()) + "," +
-		toJSONHand(unknownHand()) + `]
-	}`
-
-	msg, err := inbound.ParseMessage([]byte(payload))
-	if err != nil {
-		t.Fatalf("ParseMessage() failed: %v", err)
+	tests := []struct {
+		name       string
+		doraMarker string
+	}{
+		{name: "invalid code", doraMarker: "invalid"},
+		{name: "unknown", doraMarker: "?"},
 	}
-	if _, err := inbound.ParseEvent(msg); err == nil {
-		t.Fatal("ParseEvent() succeeded unexpectedly")
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			payload := `{
+				"type":"start_kyoku",
+				"bakaze":"E",
+				"kyoku":1,
+				"honba":0,
+				"kyotaku":0,
+				"oya":0,
+				"dora_marker":"` + tt.doraMarker + `",
+				"tehais":[` +
+				toJSONHand(unknownHand()) + "," +
+				toJSONHand(unknownHand()) + "," +
+				toJSONHand(unknownHand()) + "," +
+				toJSONHand(unknownHand()) + `]
+			}`
+
+			msg, err := inbound.ParseMessage([]byte(payload))
+			if err != nil {
+				t.Fatalf("ParseMessage() failed: %v", err)
+			}
+			if _, err := inbound.ParseEvent(msg); err == nil {
+				t.Fatal("ParseEvent() succeeded unexpectedly")
+			}
+		})
 	}
 }
 

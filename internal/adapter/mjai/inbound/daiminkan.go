@@ -32,7 +32,7 @@ func (m *Daiminkan) ToEvent() (*event.CalledKan, error) {
 	if err != nil {
 		return nil, err
 	}
-	taken, err := parseTileField("pai", m.Pai)
+	taken, err := parseKnownTileField("pai", m.Pai)
 	if err != nil {
 		return nil, err
 	}
