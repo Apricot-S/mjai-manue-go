@@ -4,8 +4,6 @@ import (
 	"fmt"
 
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/event"
-	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/seat"
-	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/tile"
 )
 
 type Tsumo struct {
@@ -24,14 +22,14 @@ func (m *Tsumo) ToEvent() (*event.Draw, error) {
 		return nil, fmt.Errorf("unexpected message type: %q", m.Type)
 	}
 
-	actor, err := seat.NewSeat(m.Actor)
+	actor, err := parseSeatField("actor", m.Actor)
 	if err != nil {
-		return nil, fmt.Errorf("invalid actor: %w", err)
+		return nil, err
 	}
 
-	pai, err := tile.NewTileFromCode(m.Pai)
+	pai, err := parseTileField("pai", m.Pai)
 	if err != nil {
-		return nil, fmt.Errorf("invalid pai: %w", err)
+		return nil, err
 	}
 
 	return event.NewDraw(*actor, *pai), nil
