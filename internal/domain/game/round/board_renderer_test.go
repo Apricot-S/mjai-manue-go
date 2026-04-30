@@ -11,7 +11,7 @@ import (
 
 func TestState_RenderBoard(t *testing.T) {
 	hands := newValidHands()
-	ev, err := event.NewStartRound(
+	ev := event.NewStartRound(
 		wind.East,
 		1,
 		0,
@@ -21,9 +21,6 @@ func TestState_RenderBoard(t *testing.T) {
 		&[4]int{25000, 25000, 25000, 25000},
 		hands,
 	)
-	if err != nil {
-		t.Fatalf("event.NewStartRound() failed: %v", err)
-	}
 
 	s, err := NewState(ev, [4]int{25000, 25000, 25000, 25000})
 	if err != nil {

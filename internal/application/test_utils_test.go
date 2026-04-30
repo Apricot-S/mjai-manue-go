@@ -25,7 +25,7 @@ func newTsumogiriAgentForTest() ai.Agent {
 func mustNewStartRoundForTest(t *testing.T, hands [common.NumPlayers][common.InitHandSize]tile.Tile) *event.StartRound {
 	t.Helper()
 
-	ev, err := event.NewStartRound(
+	return event.NewStartRound(
 		wind.East,
 		1,
 		0,
@@ -35,10 +35,6 @@ func mustNewStartRoundForTest(t *testing.T, hands [common.NumPlayers][common.Ini
 		&[common.NumPlayers]int{25000, 25000, 25000, 25000},
 		hands,
 	)
-	if err != nil {
-		t.Fatalf("event.NewStartRound() failed: %v", err)
-	}
-	return ev
 }
 
 func newValidHands() [common.NumPlayers][common.InitHandSize]tile.Tile {

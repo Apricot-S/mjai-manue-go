@@ -62,7 +62,7 @@ func TestTsumogiriAgent_Decide_NoDrawnTile(t *testing.T) {
 func mustNewRoundStateForTest(t *testing.T, hands [common.NumPlayers][common.InitHandSize]tile.Tile) *round.State {
 	t.Helper()
 
-	ev, err := event.NewStartRound(
+	ev := event.NewStartRound(
 		wind.East,
 		1,
 		0,
@@ -72,9 +72,6 @@ func mustNewRoundStateForTest(t *testing.T, hands [common.NumPlayers][common.Ini
 		&[common.NumPlayers]int{25000, 25000, 25000, 25000},
 		hands,
 	)
-	if err != nil {
-		t.Fatalf("event.NewStartRound() failed: %v", err)
-	}
 
 	s, err := round.NewState(ev, [common.NumPlayers]int{25000, 25000, 25000, 25000})
 	if err != nil {

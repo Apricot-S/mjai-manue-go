@@ -82,10 +82,7 @@ func TestBot_Process_Discard(t *testing.T) {
 	if _, err := bot.Process(event.NewDraw(self, drawnTile)); err != nil {
 		t.Fatalf("Process(Draw) failed: %v", err)
 	}
-	discard, err := event.NewDiscard(self, drawnTile, true)
-	if err != nil {
-		t.Fatalf("event.NewDiscard() failed: %v", err)
-	}
+	discard := event.NewDiscard(self, drawnTile, true)
 
 	got, err := bot.Process(discard)
 	if err != nil {
