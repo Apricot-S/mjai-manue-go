@@ -4,8 +4,6 @@ import (
 	"fmt"
 
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/event"
-	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/seat"
-	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/tile"
 )
 
 type Dahai struct {
@@ -25,14 +23,14 @@ func (m *Dahai) ToEvent() (*event.Discard, error) {
 		return nil, fmt.Errorf("unexpected message type: %q", m.Type)
 	}
 
-	actor, err := seat.NewSeat(m.Actor)
+	actor, err := parseSeatField("actor", m.Actor)
 	if err != nil {
-		return nil, fmt.Errorf("invalid actor: %w", err)
+		return nil, err
 	}
 
-	pai, err := tile.NewTileFromCode(m.Pai)
+	pai, err := parseKnownTileField("pai", m.Pai)
 	if err != nil {
-		return nil, fmt.Errorf("invalid pai: %w", err)
+		return nil, err
 	}
 
 	return event.NewDiscard(*actor, *pai, m.Tsumogiri), nil
