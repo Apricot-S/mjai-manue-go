@@ -17,6 +17,26 @@ func ParseEvent(msg Message) (event.Event, error) {
 		return m.ToEvent()
 	case *Dahai:
 		return m.ToEvent()
+	case *Chi:
+		return m.ToEvent()
+	case *Pon:
+		return m.ToEvent()
+	case *Daiminkan:
+		return m.ToEvent()
+	case *Ankan:
+		return m.ToEvent()
+	case *Kakan:
+		return m.ToEvent()
+	case *Dora:
+		return m.ToEvent()
+	case *Reach:
+		return m.ToEvent()
+	case *ReachAccepted:
+		return m.ToEvent()
+	case *Hora:
+		return m.ToEvent()
+	case *Ryukyoku:
+		return m.ToEvent()
 	case *EndKyoku:
 		return m.ToEvent()
 	default:

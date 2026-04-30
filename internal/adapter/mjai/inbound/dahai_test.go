@@ -35,12 +35,12 @@ func TestParseEvent_Dahai(t *testing.T) {
 			wantErr:       false,
 		},
 		{
-			name:          "unknown tile not allowed",
+			name:          "unknown tile allowed at event boundary",
 			b:             []byte(`{"type":"dahai","actor":0,"pai":"?","tsumogiri":false}`),
-			wantActor:     nil,
-			wantTile:      nil,
+			wantActor:     seat.MustSeat(0),
+			wantTile:      tile.MustTileFromCode("?"),
 			wantTsumogiri: false,
-			wantErr:       true,
+			wantErr:       false,
 		},
 		{
 			name:          "invalid actor",

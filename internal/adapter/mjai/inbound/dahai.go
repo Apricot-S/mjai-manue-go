@@ -35,5 +35,5 @@ func (m *Dahai) ToEvent() (*event.Discard, error) {
 		return nil, fmt.Errorf("invalid pai: %w", err)
 	}
 
-	return event.NewDiscard(*actor, *pai, m.Tsumogiri)
+	return event.NewDiscard(*actor, *pai, m.Tsumogiri), nil
 }

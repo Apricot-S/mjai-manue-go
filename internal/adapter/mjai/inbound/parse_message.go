@@ -19,10 +19,20 @@ var parseMessageByType = map[string]func([]byte) (Message, error){
 	"end_game":   parseAs[*EndGame],
 	"error":      parseAs[*Error],
 
-	"start_kyoku": parseAs[*StartKyoku],
-	"tsumo":       parseAs[*Tsumo],
-	"dahai":       parseAs[*Dahai],
-	"end_kyoku":   parseAs[*EndKyoku],
+	"start_kyoku":    parseAs[*StartKyoku],
+	"tsumo":          parseAs[*Tsumo],
+	"dahai":          parseAs[*Dahai],
+	"chi":            parseAs[*Chi],
+	"pon":            parseAs[*Pon],
+	"daiminkan":      parseAs[*Daiminkan],
+	"ankan":          parseAs[*Ankan],
+	"kakan":          parseAs[*Kakan],
+	"dora":           parseAs[*Dora],
+	"reach":          parseAs[*Reach],
+	"reach_accepted": parseAs[*ReachAccepted],
+	"hora":           parseAs[*Hora],
+	"ryukyoku":       parseAs[*Ryukyoku],
+	"end_kyoku":      parseAs[*EndKyoku],
 }
 
 // ParseMessage decodes a single mjai inbound JSON message into an inbound.Message.
