@@ -7,15 +7,15 @@ import (
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/tile"
 )
 
-func TestState_Apply_Dora(t *testing.T) {
+func TestState_Apply_Dora_ReturnsErrorBeforeKan(t *testing.T) {
 	s := mustNewRoundStateForTest(t, newValidHands())
 	doraIndicator := *tile.MustTileFromCode("6p")
 
-	if err := s.Apply(event.NewDora(doraIndicator)); err != nil {
-		t.Fatalf("Apply(Dora) failed: %v", err)
+	if err := s.Apply(event.NewDora(doraIndicator)); err == nil {
+		t.Fatal("Apply(Dora) succeeded unexpectedly")
 	}
 
-	if got := s.DoraIndicators(); len(got) != 2 || got[1] != doraIndicator {
-		t.Fatalf("DoraIndicators() = %v, want appended %v", got, doraIndicator)
+	if got := s.DoraIndicators(); len(got) != 1 {
+		t.Fatalf("DoraIndicators() = %v, want unchanged initial indicator only", got)
 	}
 }

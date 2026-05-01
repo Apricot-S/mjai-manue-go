@@ -26,16 +26,16 @@ func NewStateForTest(
 	players [common.NumPlayers]player.Player,
 ) State {
 	return State{
-		roundWind,
-		roundNumber,
-		honba,
-		riichiDeposit,
-		scores,
-		dealer,
-		startingDealer,
-		doraIndicators,
-		numLeftTiles,
-		players,
+		roundWind:      roundWind,
+		roundNumber:    roundNumber,
+		honba:          honba,
+		riichiDeposit:  riichiDeposit,
+		scores:         scores,
+		dealer:         dealer,
+		startingDealer: startingDealer,
+		doraIndicators: doraIndicators,
+		numLeftTiles:   numLeftTiles,
+		players:        players,
 	}
 }
 

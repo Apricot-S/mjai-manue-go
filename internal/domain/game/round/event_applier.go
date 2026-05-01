@@ -92,9 +92,13 @@ func (s *State) applyCalledKan(ev *event.CalledKan) error {
 	if err != nil {
 		return err
 	}
-	return s.applyOpenCall(ev.Target(), ev.Taken(), func() error {
+	if err := s.applyOpenCall(ev.Target(), ev.Taken(), func() error {
 		return s.players[ev.Actor().Index()].CalledKan(*kan)
-	})
+	}); err != nil {
+		return err
+	}
+	s.pendingDoraReveal = true
+	return nil
 }
 
 func (s *State) applyConcealedKan(ev *event.ConcealedKan) error {
@@ -102,7 +106,11 @@ func (s *State) applyConcealedKan(ev *event.ConcealedKan) error {
 	if err != nil {
 		return err
 	}
-	return s.players[ev.Actor().Index()].ConcealedKan(*kan)
+	if err := s.players[ev.Actor().Index()].ConcealedKan(*kan); err != nil {
+		return err
+	}
+	s.pendingDoraReveal = true
+	return nil
 }
 
 func (s *State) applyPromotedKan(ev *event.PromotedKan) error {
@@ -121,17 +129,25 @@ func (s *State) applyPromotedKan(ev *event.PromotedKan) error {
 	if err != nil {
 		return err
 	}
-	return actor.PromotedKan(*kan)
+	if err := actor.PromotedKan(*kan); err != nil {
+		return err
+	}
+	s.pendingDoraReveal = true
+	return nil
 }
 
 func (s *State) applyDora(ev *event.Dora) error {
+	if !s.pendingDoraReveal {
+		return fmt.Errorf("cannot reveal dora indicator: not after kan")
+	}
 	if ev.Indicator().IsUnknown() {
-		return fmt.Errorf("cannot add unknown dora indicator")
+		return fmt.Errorf("cannot reveal unknown dora indicator")
 	}
 	if len(s.doraIndicators) >= MaxNumDoraIndicators {
-		return fmt.Errorf("cannot add dora indicator: already have %d indicators", len(s.doraIndicators))
+		return fmt.Errorf("cannot reveal dora indicator: already have %d indicators", len(s.doraIndicators))
 	}
 	s.doraIndicators = append(s.doraIndicators, ev.Indicator())
+	s.pendingDoraReveal = false
 	return nil
 }
 
@@ -157,6 +173,9 @@ func (s *State) applyRiichiAcceptedScoreUpdate(ev *event.RiichiAccepted) {
 }
 
 func (s *State) applyWin(ev *event.Win) error {
+	if s.players[ev.Actor().Index()].DrawnTile() == nil {
+		return fmt.Errorf("cannot Win: actor has no drawn tile")
+	}
 	s.applyScoreUpdate(ev.Scores(), ev.Deltas())
 	return nil
 }

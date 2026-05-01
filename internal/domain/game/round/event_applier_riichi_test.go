@@ -39,34 +39,63 @@ func TestState_Apply_Riichi(t *testing.T) {
 }
 
 func TestState_Apply_RiichiAccepted(t *testing.T) {
-	hands := newValidHands()
-	hands[0] = riichiReadyHandForTest()
-	s := mustNewRoundStateForTest(t, hands)
-	actor := *seat.MustSeat(0)
+	tests := []struct {
+		name       string
+		deltas     *[common.NumPlayers]int
+		scores     *[common.NumPlayers]int
+		wantScores [common.NumPlayers]int
+	}{
+		{
+			name:       "scores",
+			scores:     &[common.NumPlayers]int{24000, 25000, 25000, 25000},
+			wantScores: [common.NumPlayers]int{24000, 25000, 25000, 25000},
+		},
+		{
+			name:       "deltas",
+			deltas:     &[common.NumPlayers]int{-1000, 0, 0, 0},
+			wantScores: [common.NumPlayers]int{24000, 25000, 25000, 25000},
+		},
+		{
+			name:       "scores take precedence over deltas",
+			deltas:     &[common.NumPlayers]int{1, 2, 3, 4},
+			scores:     &[common.NumPlayers]int{24000, 25000, 25000, 25000},
+			wantScores: [common.NumPlayers]int{24000, 25000, 25000, 25000},
+		},
+		{
+			name:       "no scores or deltas",
+			wantScores: [common.NumPlayers]int{24000, 25000, 25000, 25000},
+		},
+	}
 
-	if err := s.Apply(event.NewDraw(actor, *tile.MustTileFromCode("S"))); err != nil {
-		t.Fatalf("Apply(Draw) failed: %v", err)
-	}
-	if err := s.Apply(event.NewRiichi(actor)); err != nil {
-		t.Fatalf("Apply(Riichi) failed: %v", err)
-	}
-	if err := s.Apply(event.NewDiscard(actor, *tile.MustTileFromCode("W"), false)); err != nil {
-		t.Fatalf("Apply(Discard) failed: %v", err)
-	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			hands := newValidHands()
+			hands[0] = riichiReadyHandForTest()
+			s := mustNewRoundStateForTest(t, hands)
+			actor := *seat.MustSeat(0)
 
-	scores := [common.NumPlayers]int{24000, 25000, 25000, 25000}
-	deltas := [common.NumPlayers]int{-1000, 0, 0, 0}
-	if err := s.Apply(event.NewRiichiAccepted(actor, &deltas, &scores)); err != nil {
-		t.Fatalf("Apply(RiichiAccepted) failed: %v", err)
-	}
+			if err := s.Apply(event.NewDraw(actor, *tile.MustTileFromCode("S"))); err != nil {
+				t.Fatalf("Apply(Draw) failed: %v", err)
+			}
+			if err := s.Apply(event.NewRiichi(actor)); err != nil {
+				t.Fatalf("Apply(Riichi) failed: %v", err)
+			}
+			if err := s.Apply(event.NewDiscard(actor, *tile.MustTileFromCode("W"), false)); err != nil {
+				t.Fatalf("Apply(Discard) failed: %v", err)
+			}
+			if err := s.Apply(event.NewRiichiAccepted(actor, tt.deltas, tt.scores)); err != nil {
+				t.Fatalf("Apply(RiichiAccepted) failed: %v", err)
+			}
 
-	if got := s.Player(actor).RiichiState(); got != player.RiichiAccepted {
-		t.Errorf("RiichiState() = %v, want %v", got, player.RiichiAccepted)
-	}
-	if got := s.RiichiDeposit(); got != 1 {
-		t.Errorf("RiichiDeposit() = %d, want 1", got)
-	}
-	if got := s.Scores(); got != scores {
-		t.Errorf("Scores() = %v, want %v", got, scores)
+			if got := s.Player(actor).RiichiState(); got != player.RiichiAccepted {
+				t.Errorf("RiichiState() = %v, want %v", got, player.RiichiAccepted)
+			}
+			if got := s.RiichiDeposit(); got != 1 {
+				t.Errorf("RiichiDeposit() = %d, want 1", got)
+			}
+			if got := s.Scores(); got != tt.wantScores {
+				t.Errorf("Scores() = %v, want %v", got, tt.wantScores)
+			}
+		})
 	}
 }
