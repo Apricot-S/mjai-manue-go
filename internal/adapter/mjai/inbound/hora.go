@@ -8,9 +8,11 @@ import (
 )
 
 type Hora struct {
-	Type           string   `json:"type"`
-	Actor          int      `json:"actor"`
-	Target         int      `json:"target"`
+	Type   string `json:"type"`
+	Actor  int    `json:"actor"`
+	Target int    `json:"target"`
+	// Pai is omitted by some server implementations and logs.
+	// When absent, domain timing validation cannot compare the winning tile.
 	Pai            string   `json:"pai,omitempty"`
 	UradoraMarkers []string `json:"uradora_markers,omitempty"`
 	UraMarkers     []string `json:"ura_markers,omitempty"`

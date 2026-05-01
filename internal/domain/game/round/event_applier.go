@@ -173,11 +173,34 @@ func (s *State) applyRiichiAcceptedScoreUpdate(ev *event.RiichiAccepted) {
 }
 
 func (s *State) applyWin(ev *event.Win) error {
-	if s.players[ev.Actor().Index()].DrawnTile() == nil {
-		return fmt.Errorf("cannot Win: actor has no drawn tile")
+	if !s.canApplyWin(ev) {
+		return fmt.Errorf("cannot Win: invalid timing")
 	}
 	s.applyScoreUpdate(ev.Scores(), ev.Deltas())
 	return nil
+}
+
+func (s *State) canApplyWin(ev *event.Win) bool {
+	if ev.Actor() == ev.Target() {
+		drawnTile := s.players[ev.Actor().Index()].DrawnTile()
+		return drawnTile != nil && isTileMatchKnownEnough(drawnTile, ev.WinningTile())
+	}
+
+	targetRiver := s.players[ev.Target().Index()].River()
+	return len(targetRiver) > 0 && isTileMatchKnownEnough(&targetRiver[len(targetRiver)-1], ev.WinningTile())
+}
+
+func isTileMatchKnownEnough(stateTile *tile.Tile, eventTile *tile.Tile) bool {
+	if eventTile == nil {
+		return true
+	}
+	// Invisible players draw "?", while visible players cannot draw "?" by invariant.
+	// Therefore an unknown state tile means the event tile cannot be verified here,
+	// but a visible player's known tile is still compared strictly.
+	if stateTile.IsUnknown() {
+		return true
+	}
+	return *stateTile == *eventTile
 }
 
 func (s *State) applyDrawRound(ev *event.DrawRound) error {

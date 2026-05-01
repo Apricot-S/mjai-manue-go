@@ -84,3 +84,89 @@ func TestState_Apply_Win_ReturnsErrorBeforeFirstDraw(t *testing.T) {
 		t.Errorf("Scores() = %v, want unchanged initial scores", got)
 	}
 }
+
+func TestState_Apply_Win_Renhou(t *testing.T) {
+	s := mustNewRoundStateForTest(t, newValidHands())
+	actor := *seat.MustSeat(1)
+	target := *seat.MustSeat(0)
+	winningTile := *tile.MustTileFromCode("6m")
+	scores := [common.NumPlayers]int{57000, -7000, 25000, 25000}
+
+	if err := s.Apply(event.NewDraw(target, winningTile)); err != nil {
+		t.Fatalf("Apply(Draw) failed: %v", err)
+	}
+	if err := s.Apply(event.NewDiscard(target, winningTile, true)); err != nil {
+		t.Fatalf("Apply(Discard) failed: %v", err)
+	}
+	if err := s.Apply(event.NewWin(
+		actor,
+		target,
+		&winningTile,
+		32000,
+		nil,
+		&scores,
+	)); err != nil {
+		t.Fatalf("Apply(Win) failed: %v", err)
+	}
+
+	if got := s.Scores(); got != scores {
+		t.Errorf("Scores() = %v, want %v", got, scores)
+	}
+}
+
+func TestState_Apply_Win_TsumoWithoutWinningTile(t *testing.T) {
+	s := mustNewRoundStateForTest(t, newValidHands())
+	actor := *seat.MustSeat(0)
+	drawnTile := *tile.MustTileFromCode("6m")
+	scores := [common.NumPlayers]int{73000, 9000, 9000, 9000}
+
+	if err := s.Apply(event.NewDraw(actor, drawnTile)); err != nil {
+		t.Fatalf("Apply(Draw) failed: %v", err)
+	}
+	if err := s.Apply(event.NewWin(
+		actor,
+		actor,
+		nil,
+		48000,
+		nil,
+		&scores,
+	)); err != nil {
+		t.Fatalf("Apply(Win) failed: %v", err)
+	}
+
+	if got := s.Scores(); got != scores {
+		t.Errorf("Scores() = %v, want %v", got, scores)
+	}
+}
+
+func TestState_Apply_Win_InvisibleTsumo(t *testing.T) {
+	hands := [common.NumPlayers][common.InitHandSize]tile.Tile{}
+	for p := range common.NumPlayers {
+		for i := range common.InitHandSize {
+			hands[p][i] = *tile.MustTileFromCode("?")
+		}
+	}
+	s := mustNewRoundStateForTest(t, hands)
+	actor := *seat.MustSeat(2)
+	unknownDrawnTile := *tile.MustTileFromCode("?")
+	winningTile := *tile.MustTileFromCode("6m")
+	scores := [common.NumPlayers]int{9000, 9000, 73000, 9000}
+
+	if err := s.Apply(event.NewDraw(actor, unknownDrawnTile)); err != nil {
+		t.Fatalf("Apply(Draw) failed: %v", err)
+	}
+	if err := s.Apply(event.NewWin(
+		actor,
+		actor,
+		&winningTile,
+		48000,
+		nil,
+		&scores,
+	)); err != nil {
+		t.Fatalf("Apply(Win) failed: %v", err)
+	}
+
+	if got := s.Scores(); got != scores {
+		t.Errorf("Scores() = %v, want %v", got, scores)
+	}
+}

@@ -7,8 +7,10 @@ import (
 )
 
 type Win struct {
-	actor         seat.Seat
-	target        seat.Seat
+	actor  seat.Seat
+	target seat.Seat
+	// winningTile is optional because some hora messages/logs omit pai.
+	// When nil, round state validation skips tile equality checks.
 	winningTile   *tile.Tile
 	winningPoints int
 	deltas        *[common.NumPlayers]int
