@@ -39,4 +39,7 @@ func TestState_Apply_Pon(t *testing.T) {
 	if !s.Player(actor).CanDiscard() {
 		t.Error("actor CanDiscard() = false, want true after Pon")
 	}
+	if s.Player(actor).IsConcealed() {
+		t.Error("actor IsConcealed() = true, want false after Pon")
+	}
 }
