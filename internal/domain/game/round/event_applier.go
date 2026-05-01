@@ -72,7 +72,7 @@ func (s *State) applyChii(ev *event.Chii) error {
 	if err != nil {
 		return err
 	}
-	return s.applyOpenCall(ev.Target(), ev.Taken(), func() error {
+	return s.applyOpenCall(ev.Actor(), ev.Target(), ev.Taken(), func() error {
 		return s.players[ev.Actor().Index()].Chii(*chii)
 	})
 }
@@ -82,7 +82,7 @@ func (s *State) applyPon(ev *event.Pon) error {
 	if err != nil {
 		return err
 	}
-	return s.applyOpenCall(ev.Target(), ev.Taken(), func() error {
+	return s.applyOpenCall(ev.Actor(), ev.Target(), ev.Taken(), func() error {
 		return s.players[ev.Actor().Index()].Pon(*pon)
 	})
 }
@@ -92,7 +92,7 @@ func (s *State) applyCalledKan(ev *event.CalledKan) error {
 	if err != nil {
 		return err
 	}
-	if err := s.applyOpenCall(ev.Target(), ev.Taken(), func() error {
+	if err := s.applyOpenCall(ev.Actor(), ev.Target(), ev.Taken(), func() error {
 		return s.players[ev.Actor().Index()].CalledKan(*kan)
 	}); err != nil {
 		return err
@@ -220,7 +220,14 @@ func (s *State) applyScoreUpdate(scores *[common.NumPlayers]int, deltas *[common
 	}
 }
 
-func (s *State) applyOpenCall(targetSeat seat.Seat, taken tile.Tile, applyActor func() error) error {
+func (s *State) applyOpenCall(actorSeat, targetSeat seat.Seat, taken tile.Tile, applyActor func() error) error {
+	if actorSeat == targetSeat {
+		return fmt.Errorf("cannot call %s from self", taken)
+	}
+	if s.numLeftTiles <= 0 {
+		return fmt.Errorf("cannot call %s: no tiles left", taken)
+	}
+
 	target := s.players[targetSeat.Index()]
 	river := target.River()
 	if len(river) == 0 {

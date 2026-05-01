@@ -5,6 +5,7 @@ import (
 
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/common"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/event"
+	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/round/player"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/seat"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/tile"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/wind"
@@ -33,4 +34,18 @@ func mustNewRoundStateForTest(t *testing.T, hands [common.NumPlayers][common.Ini
 		t.Fatalf("round.NewState() failed: %v", err)
 	}
 	return s
+}
+
+func newVisiblePlayersForTest(t *testing.T, hands [common.NumPlayers][common.InitHandSize]tile.Tile) [common.NumPlayers]player.Player {
+	t.Helper()
+
+	var players [common.NumPlayers]player.Player
+	for i, handTiles := range hands {
+		p, err := player.NewVisiblePlayer(handTiles)
+		if err != nil {
+			t.Fatalf("player.NewVisiblePlayer(%d) failed: %v", i, err)
+		}
+		players[i] = p
+	}
+	return players
 }
