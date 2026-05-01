@@ -10,10 +10,10 @@ import (
 
 func TestState_Apply_Pon(t *testing.T) {
 	hands := newValidHands()
-	hands[0][1] = *tile.MustTileFromCode("1s")
+	hands[3][1] = *tile.MustTileFromCode("1s")
 	s := mustNewRoundStateForTest(t, hands)
-	actor := *seat.MustSeat(0)
-	target := *seat.MustSeat(3)
+	actor := *seat.MustSeat(3)
+	target := *seat.MustSeat(0)
 	taken := *tile.MustTileFromCode("1s")
 
 	if err := s.Apply(event.NewDraw(target, taken)); err != nil {
