@@ -20,9 +20,6 @@ const (
 	minRoundNumber = 1
 	maxRoundNumber = 4
 	maxNumKan      = 4
-	// Indicates that no action has been taken by anyone.
-	noActor                 = -1
-	kanPlayerStatusMultiple = 4
 )
 
 type kanProgress int
