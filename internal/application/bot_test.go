@@ -61,6 +61,13 @@ func TestBot_Process_DrawOther(t *testing.T) {
 	if _, err := bot.Process(mustNewStartRoundForTest(t, newValidHands())); err != nil {
 		t.Fatalf("Process(StartRound) failed: %v", err)
 	}
+	drawnTile := *tile.MustTileFromCode("6m")
+	if _, err := bot.Process(event.NewDraw(self, drawnTile)); err != nil {
+		t.Fatalf("Process(self Draw) failed: %v", err)
+	}
+	if _, err := bot.Process(event.NewDiscard(self, drawnTile, true)); err != nil {
+		t.Fatalf("Process(self Discard) failed: %v", err)
+	}
 
 	got, err := bot.Process(event.NewDraw(other, *tile.MustTileFromCode("6m")))
 	if err != nil {
