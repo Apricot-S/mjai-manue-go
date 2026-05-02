@@ -39,6 +39,7 @@ type State struct {
 	nextDraw                seat.Seat
 	pendingDiscard          *seat.Seat
 	pendingRiichiAcceptance *seat.Seat
+	lastActor               *seat.Seat
 	players                 [common.NumPlayers]player.Player
 }
 

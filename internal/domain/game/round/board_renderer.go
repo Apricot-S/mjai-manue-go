@@ -27,12 +27,17 @@ func (s *State) RenderBoard() string {
 	for i := range common.NumPlayers {
 		playerSeat := *seat.MustSeat(i)
 		p := s.Player(playerSeat)
-		// TODO: Track the current actor in round.State and render "*" for that player.
+
 		actorMarker := " "
+		if s.lastActor != nil && playerSeat == *s.lastActor {
+			actorMarker = "*"
+		}
+
 		leftBracket, rightBracket := "[", "]"
 		if playerSeat == s.Dealer() {
 			leftBracket, rightBracket = "{", "}"
 		}
+
 		fmt.Fprintf(&b, "%s%s%d%s tehai: %s %s\n",
 			actorMarker, leftBracket, i, rightBracket, formatHand(p.HandTiles(), p.DrawnTile()), formatMelds(p.Melds()))
 		fmt.Fprintf(&b, "     ho:    %s\n", formatRiver(p.River(), p.RiichiRiverIndex()))

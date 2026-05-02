@@ -63,6 +63,7 @@ func (s *State) applyDraw(ev *event.Draw) error {
 
 	s.numLeftTiles--
 	s.pendingDiscard = &actorSeat
+	s.lastActor = &actorSeat
 	return nil
 }
 
@@ -80,6 +81,7 @@ func (s *State) applyDiscard(ev *event.Discard) error {
 	}
 	s.pendingDiscard = nil
 	s.nextDraw = *seat.MustSeat((actorSeat.Index() + 1) % common.NumPlayers)
+	s.lastActor = &actorSeat
 	return nil
 }
 
@@ -178,7 +180,12 @@ func (s *State) applyRiichi(ev *event.Riichi) error {
 	if s.numLeftTiles < common.NumPlayers {
 		return fmt.Errorf("cannot Riichi: no next draw turn remains")
 	}
-	return s.players[ev.Actor().Index()].Riichi()
+	if err := s.players[ev.Actor().Index()].Riichi(); err != nil {
+		return err
+	}
+	actorSeat := ev.Actor()
+	s.lastActor = &actorSeat
+	return nil
 }
 
 func (s *State) applyRiichiAccepted(ev *event.RiichiAccepted) error {
@@ -191,6 +198,8 @@ func (s *State) applyRiichiAccepted(ev *event.RiichiAccepted) error {
 	s.applyRiichiAcceptedScoreUpdate(ev)
 	s.riichiDeposit++
 	s.pendingRiichiAcceptance = nil
+	actorSeat := ev.Actor()
+	s.lastActor = &actorSeat
 	return nil
 }
 
@@ -207,6 +216,8 @@ func (s *State) applyWin(ev *event.Win) error {
 		return fmt.Errorf("cannot Win: invalid timing")
 	}
 	s.applyScoreUpdate(ev.Scores(), ev.Deltas())
+	actorSeat := ev.Actor()
+	s.lastActor = &actorSeat
 	return nil
 }
 
@@ -274,5 +285,6 @@ func (s *State) applyOpenCall(actorSeat, targetSeat seat.Seat, taken tile.Tile, 
 		return err
 	}
 	s.pendingDiscard = &actorSeat
+	s.lastActor = &actorSeat
 	return nil
 }
