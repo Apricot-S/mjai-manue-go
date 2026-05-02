@@ -68,6 +68,10 @@ func (s *State) applyDiscard(ev *event.Discard) error {
 }
 
 func (s *State) applyChii(ev *event.Chii) error {
+	if !ev.Actor().IsShimochaOf(ev.Target()) {
+		return fmt.Errorf("cannot Chii: actor %d is not shimocha of target %d", ev.Actor().Index(), ev.Target().Index())
+	}
+
 	chii, err := meld.NewChii(ev.Taken(), ev.Consumed(), ev.Target())
 	if err != nil {
 		return err

@@ -25,3 +25,8 @@ func MustSeat(id int) *Seat {
 func (seat Seat) Index() int {
 	return seat.index
 }
+
+// IsShimochaOf reports whether seat is the player to the left of target.
+func (seat Seat) IsShimochaOf(target Seat) bool {
+	return seat.index == (target.index+1)%4
+}

@@ -56,3 +56,45 @@ func TestNewSeat(t *testing.T) {
 		})
 	}
 }
+
+func TestSeat_IsShimochaOf(t *testing.T) {
+	tests := []struct {
+		name   string
+		seat   seat.Seat
+		target seat.Seat
+		want   bool
+	}{
+		{
+			name:   "1 is shimocha of 0",
+			seat:   *seat.MustSeat(1),
+			target: *seat.MustSeat(0),
+			want:   true,
+		},
+		{
+			name:   "0 is shimocha of 3",
+			seat:   *seat.MustSeat(0),
+			target: *seat.MustSeat(3),
+			want:   true,
+		},
+		{
+			name:   "2 is not shimocha of 0",
+			seat:   *seat.MustSeat(2),
+			target: *seat.MustSeat(0),
+			want:   false,
+		},
+		{
+			name:   "same seat is not shimocha",
+			seat:   *seat.MustSeat(0),
+			target: *seat.MustSeat(0),
+			want:   false,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := tt.seat.IsShimochaOf(tt.target); got != tt.want {
+				t.Errorf("IsShimochaOf() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
