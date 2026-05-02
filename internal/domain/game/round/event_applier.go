@@ -109,9 +109,14 @@ func (s *State) applyChii(ev *event.Chii) error {
 	if err != nil {
 		return err
 	}
-	return s.applyOpenCall(ev.Actor(), ev.Target(), ev.Taken(), true, func() error {
-		return s.players[ev.Actor().Index()].Chii(*chii)
-	})
+	actorSeat := ev.Actor()
+	if err := s.applyOpenCall(actorSeat, ev.Target(), ev.Taken(), func() error {
+		return s.players[actorSeat.Index()].Chii(*chii)
+	}); err != nil {
+		return err
+	}
+	s.pendingDiscard = &actorSeat
+	return nil
 }
 
 func (s *State) applyPon(ev *event.Pon) error {
@@ -119,9 +124,14 @@ func (s *State) applyPon(ev *event.Pon) error {
 	if err != nil {
 		return err
 	}
-	return s.applyOpenCall(ev.Actor(), ev.Target(), ev.Taken(), true, func() error {
-		return s.players[ev.Actor().Index()].Pon(*pon)
-	})
+	actorSeat := ev.Actor()
+	if err := s.applyOpenCall(actorSeat, ev.Target(), ev.Taken(), func() error {
+		return s.players[actorSeat.Index()].Pon(*pon)
+	}); err != nil {
+		return err
+	}
+	s.pendingDiscard = &actorSeat
+	return nil
 }
 
 func (s *State) applyCalledKan(ev *event.CalledKan) error {
@@ -132,12 +142,12 @@ func (s *State) applyCalledKan(ev *event.CalledKan) error {
 	if err != nil {
 		return err
 	}
-	if err := s.applyOpenCall(ev.Actor(), ev.Target(), ev.Taken(), false, func() error {
-		return s.players[ev.Actor().Index()].CalledKan(*kan)
+	actorSeat := ev.Actor()
+	if err := s.applyOpenCall(actorSeat, ev.Target(), ev.Taken(), func() error {
+		return s.players[actorSeat.Index()].CalledKan(*kan)
 	}); err != nil {
 		return err
 	}
-	actorSeat := ev.Actor()
 	s.numKans++
 	s.pendingKanActor = &actorSeat
 	s.kanProgress = waitingReplacementBeforeDora
@@ -322,7 +332,7 @@ func (s *State) applyScoreUpdate(scores *[common.NumPlayers]int, deltas *[common
 	}
 }
 
-func (s *State) applyOpenCall(actorSeat, targetSeat seat.Seat, taken tile.Tile, discardAfterCall bool, applyActor func() error) error {
+func (s *State) applyOpenCall(actorSeat, targetSeat seat.Seat, taken tile.Tile, applyActor func() error) error {
 	if actorSeat == targetSeat {
 		return fmt.Errorf("cannot call %s from self", taken)
 	}
@@ -344,9 +354,6 @@ func (s *State) applyOpenCall(actorSeat, targetSeat seat.Seat, taken tile.Tile, 
 	}
 	if err := target.TakeFromRiver(taken); err != nil {
 		return err
-	}
-	if discardAfterCall {
-		s.pendingDiscard = &actorSeat
 	}
 	s.lastActor = &actorSeat
 	return nil
