@@ -48,10 +48,13 @@ func (s *State) Apply(ev event.Event) error {
 }
 
 func (s *State) applyDraw(ev *event.Draw) error {
+	if s.kanProgress == waitingDoraAfterReplacement || s.kanProgress == waitingDoraBeforeReplacement {
+		return fmt.Errorf("cannot Draw: dora indicator must be revealed first")
+	}
 	if ev.Actor() != s.nextDraw {
 		return fmt.Errorf("cannot Draw: actor %d is not next draw player %d", ev.Actor().Index(), s.nextDraw.Index())
 	}
-	isReplacementTileDraw := s.pendingReplacementTile != nil && *s.pendingReplacementTile == ev.Actor()
+	isReplacementTileDraw := s.isWaitingReplacementTileDraw(ev.Actor())
 	if s.numLeftTiles <= 0 {
 		return fmt.Errorf("cannot Draw: no tiles left")
 	}
@@ -64,9 +67,14 @@ func (s *State) applyDraw(ev *event.Draw) error {
 
 	s.numLeftTiles--
 	if isReplacementTileDraw {
-		s.pendingReplacementTile = nil
-		s.pendingDoraReveal = true
-		s.pendingDoraRevealActor = &actorSeat
+		switch s.kanProgress {
+		case waitingReplacementBeforeDora:
+			s.kanProgress = waitingDoraAfterReplacement
+		case waitingReplacementAfterDora:
+			s.kanProgress = noKanProgress
+			s.pendingKanActor = nil
+			s.pendingDiscard = &actorSeat
+		}
 	} else {
 		s.pendingDiscard = &actorSeat
 	}
@@ -131,8 +139,10 @@ func (s *State) applyCalledKan(ev *event.CalledKan) error {
 	}
 	actorSeat := ev.Actor()
 	s.numKans++
-	s.pendingReplacementTile = &actorSeat
+	s.pendingKanActor = &actorSeat
+	s.kanProgress = waitingReplacementBeforeDora
 	s.nextDraw = actorSeat
+	s.pendingDiscard = nil
 	return nil
 }
 
@@ -148,7 +158,11 @@ func (s *State) applyConcealedKan(ev *event.ConcealedKan) error {
 		return err
 	}
 	s.numKans++
-	s.pendingDoraReveal = true
+	actorSeat := ev.Actor()
+	s.pendingKanActor = &actorSeat
+	s.kanProgress = waitingDoraBeforeReplacement
+	s.pendingDiscard = nil
+	s.lastActor = &actorSeat
 	return nil
 }
 
@@ -175,7 +189,12 @@ func (s *State) applyPromotedKan(ev *event.PromotedKan) error {
 		return err
 	}
 	s.numKans++
-	s.pendingDoraReveal = true
+	actorSeat := ev.Actor()
+	s.pendingKanActor = &actorSeat
+	s.kanProgress = waitingReplacementBeforeDora
+	s.nextDraw = actorSeat
+	s.pendingDiscard = nil
+	s.lastActor = &actorSeat
 	return nil
 }
 
@@ -184,7 +203,7 @@ func (s *State) canApplyKan() bool {
 }
 
 func (s *State) applyDora(ev *event.Dora) error {
-	if !s.pendingDoraReveal {
+	if s.kanProgress != waitingDoraAfterReplacement && s.kanProgress != waitingDoraBeforeReplacement {
 		return fmt.Errorf("cannot reveal dora indicator: not after kan")
 	}
 	if ev.Indicator().IsUnknown() {
@@ -194,12 +213,25 @@ func (s *State) applyDora(ev *event.Dora) error {
 		return fmt.Errorf("cannot reveal dora indicator: already have %d indicators", len(s.doraIndicators))
 	}
 	s.doraIndicators = append(s.doraIndicators, ev.Indicator())
-	s.pendingDoraReveal = false
-	if s.pendingDoraRevealActor != nil {
-		s.pendingDiscard = s.pendingDoraRevealActor
-		s.pendingDoraRevealActor = nil
+	if s.pendingKanActor != nil {
+		switch s.kanProgress {
+		case waitingDoraAfterReplacement:
+			s.pendingDiscard = s.pendingKanActor
+			s.pendingKanActor = nil
+			s.kanProgress = noKanProgress
+		case waitingDoraBeforeReplacement:
+			s.nextDraw = *s.pendingKanActor
+			s.kanProgress = waitingReplacementAfterDora
+		}
 	}
 	return nil
+}
+
+func (s *State) isWaitingReplacementTileDraw(actor seat.Seat) bool {
+	if s.pendingKanActor == nil || *s.pendingKanActor != actor {
+		return false
+	}
+	return s.kanProgress == waitingReplacementBeforeDora || s.kanProgress == waitingReplacementAfterDora
 }
 
 func (s *State) applyRiichi(ev *event.Riichi) error {

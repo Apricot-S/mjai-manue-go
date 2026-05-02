@@ -25,6 +25,20 @@ const (
 	kanPlayerStatusMultiple = 4
 )
 
+type kanProgress int
+
+const (
+	noKanProgress kanProgress = iota
+	// waitingReplacementBeforeDora is used after daiminkan/kakan and waits for the kan actor's replacement tile draw.
+	waitingReplacementBeforeDora
+	// waitingDoraAfterReplacement is used after daiminkan/kakan replacement tile draw and waits for the dora reveal.
+	waitingDoraAfterReplacement
+	// waitingDoraBeforeReplacement is used after ankan and waits for the dora reveal before replacement tile draw.
+	waitingDoraBeforeReplacement
+	// waitingReplacementAfterDora is used after ankan dora reveal and waits for the kan actor's replacement tile draw.
+	waitingReplacementAfterDora
+)
+
 type State struct {
 	roundWind               wind.Wind
 	roundNumber             int
@@ -36,9 +50,8 @@ type State struct {
 	doraIndicators          tile.Tiles
 	numLeftTiles            int
 	numKans                 int
-	pendingDoraReveal       bool
-	pendingDoraRevealActor  *seat.Seat
-	pendingReplacementTile  *seat.Seat
+	kanProgress             kanProgress
+	pendingKanActor         *seat.Seat
 	nextDraw                seat.Seat
 	pendingDiscard          *seat.Seat
 	pendingRiichiAcceptance *seat.Seat
