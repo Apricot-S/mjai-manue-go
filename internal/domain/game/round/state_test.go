@@ -40,6 +40,11 @@ func NewStateForTest(
 	}
 }
 
+func newStateForTestWithNumKans(s *State, numKans int) *State {
+	s.numKans = numKans
+	return s
+}
+
 func newValidHands() [common.NumPlayers][common.InitHandSize]tile.Tile {
 	handCodes := [common.InitHandSize]string{"1m", "1p", "1s", "2m", "2p", "2s", "3m", "3p", "3s", "4m", "4p", "4s", "5m"}
 	var hands [common.NumPlayers][common.InitHandSize]tile.Tile

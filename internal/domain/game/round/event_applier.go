@@ -51,6 +51,7 @@ func (s *State) applyDraw(ev *event.Draw) error {
 	if ev.Actor() != s.nextDraw {
 		return fmt.Errorf("cannot Draw: actor %d is not next draw player %d", ev.Actor().Index(), s.nextDraw.Index())
 	}
+	isReplacementTileDraw := s.pendingReplacementTile != nil && *s.pendingReplacementTile == ev.Actor()
 	if s.numLeftTiles <= 0 {
 		return fmt.Errorf("cannot Draw: no tiles left")
 	}
@@ -62,7 +63,13 @@ func (s *State) applyDraw(ev *event.Draw) error {
 	}
 
 	s.numLeftTiles--
-	s.pendingDiscard = &actorSeat
+	if isReplacementTileDraw {
+		s.pendingReplacementTile = nil
+		s.pendingDoraReveal = true
+		s.pendingDoraRevealActor = &actorSeat
+	} else {
+		s.pendingDiscard = &actorSeat
+	}
 	s.lastActor = &actorSeat
 	return nil
 }
@@ -94,7 +101,7 @@ func (s *State) applyChii(ev *event.Chii) error {
 	if err != nil {
 		return err
 	}
-	return s.applyOpenCall(ev.Actor(), ev.Target(), ev.Taken(), func() error {
+	return s.applyOpenCall(ev.Actor(), ev.Target(), ev.Taken(), true, func() error {
 		return s.players[ev.Actor().Index()].Chii(*chii)
 	})
 }
@@ -104,26 +111,35 @@ func (s *State) applyPon(ev *event.Pon) error {
 	if err != nil {
 		return err
 	}
-	return s.applyOpenCall(ev.Actor(), ev.Target(), ev.Taken(), func() error {
+	return s.applyOpenCall(ev.Actor(), ev.Target(), ev.Taken(), true, func() error {
 		return s.players[ev.Actor().Index()].Pon(*pon)
 	})
 }
 
 func (s *State) applyCalledKan(ev *event.CalledKan) error {
+	if !s.canApplyKan() {
+		return fmt.Errorf("cannot CalledKan: already have %d kans", s.numKans)
+	}
 	kan, err := meld.NewCalledKan(ev.Taken(), ev.Consumed(), ev.Target())
 	if err != nil {
 		return err
 	}
-	if err := s.applyOpenCall(ev.Actor(), ev.Target(), ev.Taken(), func() error {
+	if err := s.applyOpenCall(ev.Actor(), ev.Target(), ev.Taken(), false, func() error {
 		return s.players[ev.Actor().Index()].CalledKan(*kan)
 	}); err != nil {
 		return err
 	}
-	s.pendingDoraReveal = true
+	actorSeat := ev.Actor()
+	s.numKans++
+	s.pendingReplacementTile = &actorSeat
+	s.nextDraw = actorSeat
 	return nil
 }
 
 func (s *State) applyConcealedKan(ev *event.ConcealedKan) error {
+	if !s.canApplyKan() {
+		return fmt.Errorf("cannot ConcealedKan: already have %d kans", s.numKans)
+	}
 	kan, err := meld.NewConcealedKan(ev.Consumed())
 	if err != nil {
 		return err
@@ -131,11 +147,15 @@ func (s *State) applyConcealedKan(ev *event.ConcealedKan) error {
 	if err := s.players[ev.Actor().Index()].ConcealedKan(*kan); err != nil {
 		return err
 	}
+	s.numKans++
 	s.pendingDoraReveal = true
 	return nil
 }
 
 func (s *State) applyPromotedKan(ev *event.PromotedKan) error {
+	if !s.canApplyKan() {
+		return fmt.Errorf("cannot PromotedKan: already have %d kans", s.numKans)
+	}
 	actor := s.players[ev.Actor().Index()]
 	added := ev.Added()
 	ponIndex := slices.IndexFunc(actor.Melds(), func(m meld.Meld) bool {
@@ -154,8 +174,13 @@ func (s *State) applyPromotedKan(ev *event.PromotedKan) error {
 	if err := actor.PromotedKan(*kan); err != nil {
 		return err
 	}
+	s.numKans++
 	s.pendingDoraReveal = true
 	return nil
+}
+
+func (s *State) canApplyKan() bool {
+	return s.numKans < maxNumKan
 }
 
 func (s *State) applyDora(ev *event.Dora) error {
@@ -170,6 +195,10 @@ func (s *State) applyDora(ev *event.Dora) error {
 	}
 	s.doraIndicators = append(s.doraIndicators, ev.Indicator())
 	s.pendingDoraReveal = false
+	if s.pendingDoraRevealActor != nil {
+		s.pendingDiscard = s.pendingDoraRevealActor
+		s.pendingDoraRevealActor = nil
+	}
 	return nil
 }
 
@@ -261,7 +290,7 @@ func (s *State) applyScoreUpdate(scores *[common.NumPlayers]int, deltas *[common
 	}
 }
 
-func (s *State) applyOpenCall(actorSeat, targetSeat seat.Seat, taken tile.Tile, applyActor func() error) error {
+func (s *State) applyOpenCall(actorSeat, targetSeat seat.Seat, taken tile.Tile, discardAfterCall bool, applyActor func() error) error {
 	if actorSeat == targetSeat {
 		return fmt.Errorf("cannot call %s from self", taken)
 	}
@@ -284,7 +313,9 @@ func (s *State) applyOpenCall(actorSeat, targetSeat seat.Seat, taken tile.Tile, 
 	if err := target.TakeFromRiver(taken); err != nil {
 		return err
 	}
-	s.pendingDiscard = &actorSeat
+	if discardAfterCall {
+		s.pendingDiscard = &actorSeat
+	}
 	s.lastActor = &actorSeat
 	return nil
 }

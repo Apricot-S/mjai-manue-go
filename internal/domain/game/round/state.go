@@ -35,7 +35,10 @@ type State struct {
 	startingDealer          seat.Seat
 	doraIndicators          tile.Tiles
 	numLeftTiles            int
+	numKans                 int
 	pendingDoraReveal       bool
+	pendingDoraRevealActor  *seat.Seat
+	pendingReplacementTile  *seat.Seat
 	nextDraw                seat.Seat
 	pendingDiscard          *seat.Seat
 	pendingRiichiAcceptance *seat.Seat
