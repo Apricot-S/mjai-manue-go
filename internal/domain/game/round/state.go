@@ -26,19 +26,20 @@ const (
 )
 
 type State struct {
-	roundWind         wind.Wind
-	roundNumber       int
-	honba             int
-	riichiDeposit     int
-	scores            [common.NumPlayers]int
-	dealer            seat.Seat
-	startingDealer    seat.Seat
-	doraIndicators    tile.Tiles
-	numLeftTiles      int
-	pendingDoraReveal bool
-	nextDraw          seat.Seat
-	pendingDiscard    *seat.Seat
-	players           [common.NumPlayers]player.Player
+	roundWind               wind.Wind
+	roundNumber             int
+	honba                   int
+	riichiDeposit           int
+	scores                  [common.NumPlayers]int
+	dealer                  seat.Seat
+	startingDealer          seat.Seat
+	doraIndicators          tile.Tiles
+	numLeftTiles            int
+	pendingDoraReveal       bool
+	nextDraw                seat.Seat
+	pendingDiscard          *seat.Seat
+	pendingRiichiAcceptance *seat.Seat
+	players                 [common.NumPlayers]player.Player
 }
 
 func NewState(ev *event.StartRound, previousScores [common.NumPlayers]int) (*State, error) {

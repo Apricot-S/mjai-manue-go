@@ -72,6 +72,52 @@ func TestState_Apply_Riichi_ReturnsErrorWithoutNextDrawTurn(t *testing.T) {
 	}
 }
 
+func TestState_Apply_Riichi_ReturnsErrorWhenActorIsNotPendingDiscardPlayer(t *testing.T) {
+	hands := newValidHands()
+	hands[0] = riichiReadyHandForTest()
+	s := mustNewRoundStateForTest(t, hands)
+	drawActor := *seat.MustSeat(0)
+	riichiActor := *seat.MustSeat(1)
+
+	if err := s.Apply(event.NewDraw(drawActor, *tile.MustTileFromCode("S"))); err != nil {
+		t.Fatalf("Apply(Draw) failed: %v", err)
+	}
+	if err := s.Apply(event.NewRiichi(riichiActor)); err == nil {
+		t.Fatal("Apply(Riichi) succeeded unexpectedly")
+	}
+
+	if got := s.Player(riichiActor).RiichiState(); got != player.NotRiichi {
+		t.Fatalf("RiichiState() = %v, want %v", got, player.NotRiichi)
+	}
+}
+
+func TestState_Apply_DiscardAfterRiichi_ReturnsErrorWhenActorIsNotPendingDiscardPlayer(t *testing.T) {
+	hands := newValidHands()
+	hands[0] = riichiReadyHandForTest()
+	s := mustNewRoundStateForTest(t, hands)
+	drawActor := *seat.MustSeat(0)
+	discardActor := *seat.MustSeat(1)
+	drawnTile := *tile.MustTileFromCode("S")
+	discardedTile := *tile.MustTileFromCode("W")
+
+	if err := s.Apply(event.NewDraw(drawActor, drawnTile)); err != nil {
+		t.Fatalf("Apply(Draw) failed: %v", err)
+	}
+	if err := s.Apply(event.NewRiichi(drawActor)); err != nil {
+		t.Fatalf("Apply(Riichi) failed: %v", err)
+	}
+	if err := s.Apply(event.NewDiscard(discardActor, discardedTile, false)); err == nil {
+		t.Fatal("Apply(Discard) succeeded unexpectedly")
+	}
+
+	if got := s.Player(drawActor).RiichiState(); got != player.RiichiDeclared {
+		t.Fatalf("draw actor RiichiState() = %v, want %v", got, player.RiichiDeclared)
+	}
+	if got := s.Player(discardActor).River(); len(got) != 0 {
+		t.Fatalf("discard actor River() = %v, want empty", got)
+	}
+}
+
 func TestState_Apply_RiichiAccepted(t *testing.T) {
 	tests := []struct {
 		name       string
@@ -131,5 +177,72 @@ func TestState_Apply_RiichiAccepted(t *testing.T) {
 				t.Errorf("Scores() = %v, want %v", got, tt.wantScores)
 			}
 		})
+	}
+}
+
+func TestState_Apply_RiichiAccepted_ReturnsErrorWhenActorIsNotPendingRiichiAcceptancePlayer(t *testing.T) {
+	hands := newValidHands()
+	hands[0] = riichiReadyHandForTest()
+	s := mustNewRoundStateForTest(t, hands)
+	riichiActor := *seat.MustSeat(0)
+	wrongActor := *seat.MustSeat(1)
+
+	if err := s.Apply(event.NewDraw(riichiActor, *tile.MustTileFromCode("S"))); err != nil {
+		t.Fatalf("Apply(Draw) failed: %v", err)
+	}
+	if err := s.Apply(event.NewRiichi(riichiActor)); err != nil {
+		t.Fatalf("Apply(Riichi) failed: %v", err)
+	}
+	if err := s.Apply(event.NewDiscard(riichiActor, *tile.MustTileFromCode("W"), false)); err != nil {
+		t.Fatalf("Apply(Discard) failed: %v", err)
+	}
+
+	if err := s.Apply(event.NewRiichiAccepted(wrongActor, nil, nil)); err == nil {
+		t.Fatal("Apply(RiichiAccepted) succeeded unexpectedly")
+	}
+
+	if got := s.Player(riichiActor).RiichiState(); got != player.RiichiDeclared {
+		t.Fatalf("RiichiState() = %v, want %v", got, player.RiichiDeclared)
+	}
+	if got := s.RiichiDeposit(); got != 0 {
+		t.Fatalf("RiichiDeposit() = %d, want 0", got)
+	}
+}
+
+func TestState_Apply_RiichiAccepted_AfterDeclarationTileCalled(t *testing.T) {
+	hands := newValidHands()
+	hands[0] = riichiReadyHandForTest()
+	hands[3][0] = *tile.MustTileFromCode("W")
+	hands[3][1] = *tile.MustTileFromCode("W")
+	s := mustNewRoundStateForTest(t, hands)
+	riichiActor := *seat.MustSeat(0)
+	callActor := *seat.MustSeat(3)
+	declarationTile := *tile.MustTileFromCode("W")
+
+	if err := s.Apply(event.NewDraw(riichiActor, *tile.MustTileFromCode("S"))); err != nil {
+		t.Fatalf("Apply(Draw) failed: %v", err)
+	}
+	if err := s.Apply(event.NewRiichi(riichiActor)); err != nil {
+		t.Fatalf("Apply(Riichi) failed: %v", err)
+	}
+	if err := s.Apply(event.NewDiscard(riichiActor, declarationTile, false)); err != nil {
+		t.Fatalf("Apply(Discard) failed: %v", err)
+	}
+	if err := s.Apply(event.NewPon(callActor, riichiActor, declarationTile, [2]tile.Tile{declarationTile, declarationTile})); err != nil {
+		t.Fatalf("Apply(Pon) failed: %v", err)
+	}
+	if got := s.Player(riichiActor).River(); len(got) != 0 {
+		t.Fatalf("riichi actor River() = %v, want empty after Pon", got)
+	}
+
+	if err := s.Apply(event.NewRiichiAccepted(riichiActor, nil, nil)); err != nil {
+		t.Fatalf("Apply(RiichiAccepted) failed: %v", err)
+	}
+
+	if got := s.Player(riichiActor).RiichiState(); got != player.RiichiAccepted {
+		t.Fatalf("RiichiState() = %v, want %v", got, player.RiichiAccepted)
+	}
+	if got := s.RiichiDeposit(); got != 1 {
+		t.Fatalf("RiichiDeposit() = %d, want 1", got)
 	}
 }

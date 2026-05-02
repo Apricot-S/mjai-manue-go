@@ -6,6 +6,7 @@ import (
 
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/common"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/event"
+	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/round/player"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/round/player/meld"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/seat"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/tile"
@@ -73,6 +74,9 @@ func (s *State) applyDiscard(ev *event.Discard) error {
 	p := s.players[actorSeat.Index()]
 	if err := p.Discard(ev.Tile(), ev.Tsumogiri()); err != nil {
 		return err
+	}
+	if p.RiichiState() == player.RiichiDeclared {
+		s.pendingRiichiAcceptance = &actorSeat
 	}
 	s.pendingDiscard = nil
 	s.nextDraw = *seat.MustSeat((actorSeat.Index() + 1) % common.NumPlayers)
@@ -168,6 +172,9 @@ func (s *State) applyDora(ev *event.Dora) error {
 }
 
 func (s *State) applyRiichi(ev *event.Riichi) error {
+	if s.pendingDiscard == nil || *s.pendingDiscard != ev.Actor() {
+		return fmt.Errorf("cannot Riichi: actor %d is not pending discard player", ev.Actor().Index())
+	}
 	if s.numLeftTiles < common.NumPlayers {
 		return fmt.Errorf("cannot Riichi: no next draw turn remains")
 	}
@@ -175,11 +182,15 @@ func (s *State) applyRiichi(ev *event.Riichi) error {
 }
 
 func (s *State) applyRiichiAccepted(ev *event.RiichiAccepted) error {
+	if s.pendingRiichiAcceptance == nil || *s.pendingRiichiAcceptance != ev.Actor() {
+		return fmt.Errorf("cannot accept Riichi: actor %d is not pending riichi acceptance player", ev.Actor().Index())
+	}
 	if err := s.players[ev.Actor().Index()].RiichiAccepted(); err != nil {
 		return err
 	}
 	s.applyRiichiAcceptedScoreUpdate(ev)
 	s.riichiDeposit++
+	s.pendingRiichiAcceptance = nil
 	return nil
 }
 
