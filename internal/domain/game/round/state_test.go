@@ -35,6 +35,7 @@ func NewStateForTest(
 		startingDealer: startingDealer,
 		doraIndicators: doraIndicators,
 		numLeftTiles:   numLeftTiles,
+		nextDraw:       dealer,
 		players:        players,
 	}
 }

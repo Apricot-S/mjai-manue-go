@@ -47,6 +47,9 @@ func (s *State) Apply(ev event.Event) error {
 }
 
 func (s *State) applyDraw(ev *event.Draw) error {
+	if ev.Actor() != s.nextDraw {
+		return fmt.Errorf("cannot Draw: actor %d is not next draw player %d", ev.Actor().Index(), s.nextDraw.Index())
+	}
 	if s.numLeftTiles <= 0 {
 		return fmt.Errorf("cannot Draw: no tiles left")
 	}
@@ -58,13 +61,22 @@ func (s *State) applyDraw(ev *event.Draw) error {
 	}
 
 	s.numLeftTiles--
+	s.pendingDiscard = &actorSeat
 	return nil
 }
 
 func (s *State) applyDiscard(ev *event.Discard) error {
 	actorSeat := ev.Actor()
+	if s.pendingDiscard == nil || *s.pendingDiscard != actorSeat {
+		return fmt.Errorf("cannot Discard: actor %d is not pending discard player", actorSeat.Index())
+	}
 	p := s.players[actorSeat.Index()]
-	return p.Discard(ev.Tile(), ev.Tsumogiri())
+	if err := p.Discard(ev.Tile(), ev.Tsumogiri()); err != nil {
+		return err
+	}
+	s.pendingDiscard = nil
+	s.nextDraw = *seat.MustSeat((actorSeat.Index() + 1) % common.NumPlayers)
+	return nil
 }
 
 func (s *State) applyChii(ev *event.Chii) error {
@@ -244,5 +256,9 @@ func (s *State) applyOpenCall(actorSeat, targetSeat seat.Seat, taken tile.Tile, 
 	if err := applyActor(); err != nil {
 		return err
 	}
-	return target.TakeFromRiver(taken)
+	if err := target.TakeFromRiver(taken); err != nil {
+		return err
+	}
+	s.pendingDiscard = &actorSeat
+	return nil
 }

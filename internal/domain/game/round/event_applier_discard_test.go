@@ -40,6 +40,28 @@ func TestState_Apply_Discard(t *testing.T) {
 	}
 }
 
+func TestState_Apply_Discard_ReturnsErrorWhenActorIsNotPendingDiscardPlayer(t *testing.T) {
+	s := mustNewRoundStateForTest(t, newValidHands())
+	drawActor := *seat.MustSeat(0)
+	discardActor := *seat.MustSeat(1)
+	drawnTile := *tile.MustTileFromCode("6m")
+
+	if err := s.Apply(event.NewDraw(drawActor, drawnTile)); err != nil {
+		t.Fatalf("Apply(Draw) failed: %v", err)
+	}
+
+	if err := s.Apply(event.NewDiscard(discardActor, drawnTile, true)); err == nil {
+		t.Fatal("Apply(Discard) succeeded unexpectedly")
+	}
+
+	if got := s.Player(drawActor).DrawnTile(); got == nil || got.ID() != drawnTile.ID() {
+		t.Fatalf("draw actor DrawnTile() = %v, want %v", got, drawnTile)
+	}
+	if got := s.Player(discardActor).River(); len(got) != 0 {
+		t.Fatalf("discard actor River() = %v, want empty", got)
+	}
+}
+
 func TestState_Apply_Discard_ReturnsErrorForSwapCallTileAfterPon(t *testing.T) {
 	hands := newValidHands()
 	hands[3] = [common.InitHandSize]tile.Tile{

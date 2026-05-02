@@ -147,10 +147,10 @@ func TestState_Apply_Win_InvisibleTsumo(t *testing.T) {
 		}
 	}
 	s := mustNewRoundStateForTest(t, hands)
-	actor := *seat.MustSeat(2)
+	actor := *seat.MustSeat(0)
 	unknownDrawnTile := *tile.MustTileFromCode("?")
 	winningTile := *tile.MustTileFromCode("6m")
-	scores := [common.NumPlayers]int{9000, 9000, 73000, 9000}
+	scores := [common.NumPlayers]int{73000, 9000, 9000, 9000}
 
 	if err := s.Apply(event.NewDraw(actor, unknownDrawnTile)); err != nil {
 		t.Fatalf("Apply(Draw) failed: %v", err)

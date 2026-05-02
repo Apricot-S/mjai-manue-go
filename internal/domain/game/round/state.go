@@ -36,6 +36,8 @@ type State struct {
 	doraIndicators    tile.Tiles
 	numLeftTiles      int
 	pendingDoraReveal bool
+	nextDraw          seat.Seat
+	pendingDiscard    *seat.Seat
 	players           [common.NumPlayers]player.Player
 }
 
@@ -67,6 +69,7 @@ func NewState(ev *event.StartRound, previousScores [common.NumPlayers]int) (*Sta
 	s.doraIndicators = make(tile.Tiles, 0, MaxNumDoraIndicators)
 	s.doraIndicators = append(s.doraIndicators, ev.DoraIndicator())
 	s.numLeftTiles = NumInitWall
+	s.nextDraw = ev.Dealer()
 
 	if ev.Scores() != nil {
 		s.scores = *ev.Scores()

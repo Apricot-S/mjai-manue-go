@@ -39,6 +39,23 @@ func TestState_Apply_Draw(t *testing.T) {
 	}
 }
 
+func TestState_Apply_Draw_ReturnsErrorWhenActorIsNotDealerAtRoundStart(t *testing.T) {
+	s := mustNewRoundStateForTest(t, newValidHands())
+	actor := *seat.MustSeat(1)
+	drawnTile := *tile.MustTileFromCode("6m")
+
+	if err := s.Apply(event.NewDraw(actor, drawnTile)); err == nil {
+		t.Fatal("Apply(Draw) succeeded unexpectedly")
+	}
+
+	if got := s.NumLeftTiles(); got != NumInitWall {
+		t.Errorf("NumLeftTiles() = %d, want %d", got, NumInitWall)
+	}
+	if got := s.Player(actor).DrawnTile(); got != nil {
+		t.Fatalf("DrawnTile() = %v, want nil", got)
+	}
+}
+
 func TestState_Apply_Draw_ReturnsErrorWhenNoTilesLeft(t *testing.T) {
 	actorPlayer, err := player.NewVisiblePlayer(newValidHands()[0])
 	if err != nil {
