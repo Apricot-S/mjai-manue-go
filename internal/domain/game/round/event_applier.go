@@ -168,6 +168,9 @@ func (s *State) applyDora(ev *event.Dora) error {
 }
 
 func (s *State) applyRiichi(ev *event.Riichi) error {
+	if s.numLeftTiles < common.NumPlayers {
+		return fmt.Errorf("cannot Riichi: no next draw turn remains")
+	}
 	return s.players[ev.Actor().Index()].Riichi()
 }
 

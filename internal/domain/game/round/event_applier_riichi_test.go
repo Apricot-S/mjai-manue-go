@@ -8,6 +8,7 @@ import (
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/round/player"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/seat"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/tile"
+	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/wind"
 )
 
 func riichiReadyHandForTest() [common.InitHandSize]tile.Tile {
@@ -35,6 +36,39 @@ func TestState_Apply_Riichi(t *testing.T) {
 
 	if got := s.Player(actor).RiichiState(); got != player.RiichiDeclared {
 		t.Fatalf("RiichiState() = %v, want %v", got, player.RiichiDeclared)
+	}
+}
+
+func TestState_Apply_Riichi_ReturnsErrorWithoutNextDrawTurn(t *testing.T) {
+	hands := newValidHands()
+	hands[0] = riichiReadyHandForTest()
+	s := NewStateForTest(
+		wind.East,
+		1,
+		0,
+		0,
+		[common.NumPlayers]int{25000, 25000, 25000, 25000},
+		*seat.MustSeat(0),
+		*seat.MustSeat(0),
+		tile.Tiles{*tile.MustTileFromCode("E")},
+		common.NumPlayers,
+		newVisiblePlayersForTest(t, hands),
+	)
+	actor := *seat.MustSeat(0)
+
+	if err := s.Apply(event.NewDraw(actor, *tile.MustTileFromCode("S"))); err != nil {
+		t.Fatalf("Apply(Draw) failed: %v", err)
+	}
+	if got := s.NumLeftTiles(); got != common.NumPlayers-1 {
+		t.Fatalf("NumLeftTiles() = %d, want %d", got, common.NumPlayers-1)
+	}
+
+	if err := s.Apply(event.NewRiichi(actor)); err == nil {
+		t.Fatal("Apply(Riichi) succeeded unexpectedly")
+	}
+
+	if got := s.Player(actor).RiichiState(); got != player.NotRiichi {
+		t.Fatalf("RiichiState() = %v, want %v", got, player.NotRiichi)
 	}
 }
 
