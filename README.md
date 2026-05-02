@@ -30,7 +30,7 @@ Unlike the original project, this project embeds configuration files at build ti
 - Ported the AI logic from the original implementation while reimplementing the rest in Go.
 - Treats malformed or unexpected input more strictly than the original implementation.
 - Fixed an incorrect shanten number calculation when a hand contains four identical tiles.
-- Logs more detailed information about the game state.
+- Logs more detailed game-state information using mjai's board-state format.
 
 ## How It Works
 
