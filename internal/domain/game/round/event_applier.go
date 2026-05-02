@@ -135,7 +135,7 @@ func (s *State) applyPon(ev *event.Pon) error {
 }
 
 func (s *State) applyCalledKan(ev *event.CalledKan) error {
-	if !s.canApplyKan() {
+	if s.numKans >= maxNumKan {
 		return fmt.Errorf("cannot CalledKan: already have %d kans", s.numKans)
 	}
 	kan, err := meld.NewCalledKan(ev.Taken(), ev.Consumed(), ev.Target())
@@ -157,8 +157,11 @@ func (s *State) applyCalledKan(ev *event.CalledKan) error {
 }
 
 func (s *State) applyConcealedKan(ev *event.ConcealedKan) error {
-	if !s.canApplyKan() {
+	if s.numKans >= maxNumKan {
 		return fmt.Errorf("cannot ConcealedKan: already have %d kans", s.numKans)
+	}
+	if s.numLeftTiles <= 0 {
+		return fmt.Errorf("cannot ConcealedKan: no replacement tile left")
 	}
 	kan, err := meld.NewConcealedKan(ev.Consumed())
 	if err != nil {
@@ -177,8 +180,11 @@ func (s *State) applyConcealedKan(ev *event.ConcealedKan) error {
 }
 
 func (s *State) applyPromotedKan(ev *event.PromotedKan) error {
-	if !s.canApplyKan() {
+	if s.numKans >= maxNumKan {
 		return fmt.Errorf("cannot PromotedKan: already have %d kans", s.numKans)
+	}
+	if s.numLeftTiles <= 0 {
+		return fmt.Errorf("cannot PromotedKan: no replacement tile left")
 	}
 	actor := s.players[ev.Actor().Index()]
 	added := ev.Added()
@@ -206,10 +212,6 @@ func (s *State) applyPromotedKan(ev *event.PromotedKan) error {
 	s.pendingDiscard = nil
 	s.lastActor = &actorSeat
 	return nil
-}
-
-func (s *State) canApplyKan() bool {
-	return s.numKans < maxNumKan
 }
 
 func (s *State) applyDora(ev *event.Dora) error {

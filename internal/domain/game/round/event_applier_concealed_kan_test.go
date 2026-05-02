@@ -102,6 +102,44 @@ func TestState_Apply_ConcealedKan_RequiresDoraBeforeReplacementTile(t *testing.T
 	}
 }
 
+func TestState_Apply_ConcealedKan_ReturnsErrorWhenNoReplacementTileLeft(t *testing.T) {
+	hands := newValidHands()
+	hands[0] = concealedKanHandForTest()
+	s := NewStateForTest(
+		wind.East,
+		1,
+		0,
+		0,
+		[common.NumPlayers]int{25000, 25000, 25000, 25000},
+		*seat.MustSeat(0),
+		*seat.MustSeat(0),
+		tile.Tiles{*tile.MustTileFromCode("E")},
+		1,
+		newVisiblePlayersForTest(t, hands),
+	)
+	actor := *seat.MustSeat(0)
+	kanTile := *tile.MustTileFromCode("E")
+	consumed := [4]tile.Tile{kanTile, kanTile, kanTile, kanTile}
+
+	if err := s.Apply(event.NewDraw(actor, kanTile)); err != nil {
+		t.Fatalf("Apply(Draw) failed: %v", err)
+	}
+	if got := s.NumLeftTiles(); got != 0 {
+		t.Fatalf("NumLeftTiles() = %d, want 0", got)
+	}
+
+	if err := s.Apply(event.NewConcealedKan(actor, consumed)); err == nil {
+		t.Fatal("Apply(ConcealedKan) succeeded unexpectedly")
+	}
+
+	if got := s.Player(actor).Melds(); len(got) != 0 {
+		t.Fatalf("Melds() length = %d, want 0", len(got))
+	}
+	if got := s.Player(actor).DrawnTile(); got == nil || *got != kanTile {
+		t.Fatalf("DrawnTile() = %v, want %v", got, kanTile)
+	}
+}
+
 func TestState_Apply_ConcealedKan_AllowsReplacementTileAfterDora(t *testing.T) {
 	hands := newValidHands()
 	hands[0] = concealedKanHandForTest()
