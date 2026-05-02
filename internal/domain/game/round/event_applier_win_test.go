@@ -114,6 +114,62 @@ func TestState_Apply_Win_Renhou(t *testing.T) {
 	}
 }
 
+func TestState_Apply_Win_RobbingKan(t *testing.T) {
+	s := newStateBeforePromotedKanForTest(t, 10, 0)
+	actor := *seat.MustSeat(1)
+	target := *seat.MustSeat(3)
+	added := *tile.MustTileFromCode("E")
+	scores := [common.NumPlayers]int{25000, 57000, 25000, -7000}
+
+	if err := s.Apply(event.NewPromotedKan(target, added, [3]tile.Tile{added, added, added})); err != nil {
+		t.Fatalf("Apply(PromotedKan) failed: %v", err)
+	}
+	if err := s.Apply(event.NewWin(
+		actor,
+		target,
+		&added,
+		32000,
+		nil,
+		&scores,
+	)); err != nil {
+		t.Fatalf("Apply(Win) failed: %v", err)
+	}
+
+	if got := s.Scores(); got != scores {
+		t.Errorf("Scores() = %v, want %v", got, scores)
+	}
+}
+
+func TestState_Apply_Win_ReturnsErrorDuringRobbingKanWithDifferentWinningTile(t *testing.T) {
+	s := newStateBeforePromotedKanForTest(t, 10, 0)
+	actor := *seat.MustSeat(1)
+	target := *seat.MustSeat(3)
+	added := *tile.MustTileFromCode("E")
+	winningTile := *tile.MustTileFromCode("S")
+	scores := [common.NumPlayers]int{25000, 57000, 25000, -7000}
+
+	if got := s.Player(target).River(); len(got) != 1 || got[0] != winningTile {
+		t.Fatalf("target River() = %v, want [%v]", got, winningTile)
+	}
+	if err := s.Apply(event.NewPromotedKan(target, added, [3]tile.Tile{added, added, added})); err != nil {
+		t.Fatalf("Apply(PromotedKan) failed: %v", err)
+	}
+	if err := s.Apply(event.NewWin(
+		actor,
+		target,
+		&winningTile,
+		32000,
+		nil,
+		&scores,
+	)); err == nil {
+		t.Fatal("Apply(Win) succeeded unexpectedly")
+	}
+
+	if got := s.Scores(); got != [common.NumPlayers]int{25000, 25000, 25000, 25000} {
+		t.Errorf("Scores() = %v, want unchanged initial scores", got)
+	}
+}
+
 func TestState_Apply_Win_TsumoWithoutWinningTile(t *testing.T) {
 	s := mustNewRoundStateForTest(t, newValidHands())
 	actor := *seat.MustSeat(0)

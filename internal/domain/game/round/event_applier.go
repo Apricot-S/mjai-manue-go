@@ -67,6 +67,7 @@ func (s *State) applyDraw(ev *event.Draw) error {
 
 	s.numLeftTiles--
 	if isReplacementTileDraw {
+		s.pendingRobbedKanTile = nil
 		switch s.kanProgress {
 		case waitingReplacementBeforeDora:
 			s.kanProgress = waitingDoraAfterReplacement
@@ -208,6 +209,7 @@ func (s *State) applyPromotedKan(ev *event.PromotedKan) error {
 	actorSeat := ev.Actor()
 	s.pendingKanActor = &actorSeat
 	s.kanProgress = waitingReplacementBeforeDora
+	s.pendingRobbedKanTile = &added
 	s.nextDraw = actorSeat
 	s.pendingDiscard = nil
 	s.lastActor = &actorSeat
@@ -295,6 +297,10 @@ func (s *State) applyWin(ev *event.Win) error {
 }
 
 func (s *State) canApplyWin(ev *event.Win) bool {
+	if s.pendingRobbedKanTile != nil {
+		return s.canApplyRobbingKan(ev)
+	}
+
 	if ev.Actor() == ev.Target() {
 		drawnTile := s.players[ev.Actor().Index()].DrawnTile()
 		return drawnTile != nil && isTileMatchKnownEnough(drawnTile, ev.WinningTile())
@@ -302,6 +308,16 @@ func (s *State) canApplyWin(ev *event.Win) bool {
 
 	targetRiver := s.players[ev.Target().Index()].River()
 	return len(targetRiver) > 0 && isTileMatchKnownEnough(&targetRiver[len(targetRiver)-1], ev.WinningTile())
+}
+
+func (s *State) canApplyRobbingKan(ev *event.Win) bool {
+	if s.pendingKanActor == nil || *s.pendingKanActor != ev.Target() {
+		return false
+	}
+	if s.kanProgress != waitingReplacementBeforeDora || s.pendingRobbedKanTile == nil {
+		return false
+	}
+	return isTileMatchKnownEnough(s.pendingRobbedKanTile, ev.WinningTile())
 }
 
 func isTileMatchKnownEnough(stateTile *tile.Tile, eventTile *tile.Tile) bool {

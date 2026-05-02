@@ -49,6 +49,7 @@ type State struct {
 	numKans                 int
 	kanProgress             kanProgress
 	pendingKanActor         *seat.Seat
+	pendingRobbedKanTile    *tile.Tile
 	nextDraw                seat.Seat
 	pendingDiscard          *seat.Seat
 	pendingRiichiAcceptance *seat.Seat
