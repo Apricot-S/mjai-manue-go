@@ -1,6 +1,8 @@
 # syntax=docker/dockerfile:1
 
-FROM gcc:15-trixie AS builder
+ARG OS_VERSION=trixie
+
+FROM gcc:15-${OS_VERSION} AS builder
 
 ARG UID=10001
 RUN useradd \
@@ -38,7 +40,7 @@ RUN --mount=type=bind,source=patch.sh,target=patch.sh \
     cp libai.so system.exe setup_match.json setup_mjai.json ../build && \
     cp -r params ../build
 
-FROM debian:trixie-slim AS final
+FROM debian:${OS_VERSION}-slim AS final
 
 ARG UID=10001
 RUN useradd \

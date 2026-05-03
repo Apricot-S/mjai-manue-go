@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:1
 
-ARG RUBY_VERSION=4.0.1
+ARG RUBY_VERSION=4.0
 ARG OS_VERSION=trixie
 
 FROM ruby:${RUBY_VERSION}-${OS_VERSION} AS builder
