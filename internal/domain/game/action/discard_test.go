@@ -32,7 +32,23 @@ func TestNewDiscard_UnknownTile(t *testing.T) {
 	actor := *seat.MustSeat(1)
 	unknownTile := *tile.MustTileFromCode("?")
 
-	if _, err := action.NewDiscard(actor, unknownTile, true); err == nil {
-		t.Fatal("NewDiscard() succeeded unexpectedly")
+	tests := []struct {
+		name          string
+		discardedTile tile.Tile
+		tsumogiri     bool
+	}{
+		{
+			name:          "discarded tile",
+			discardedTile: unknownTile,
+			tsumogiri:     true,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if _, err := action.NewDiscard(actor, tt.discardedTile, tt.tsumogiri); err == nil {
+				t.Error("NewDiscard() succeeded unexpectedly")
+			}
+		})
 	}
 }
