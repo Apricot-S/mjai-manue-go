@@ -27,12 +27,9 @@ type kanProgress int
 const (
 	noKanProgress kanProgress = iota
 	// waitingReplacementBeforeDora is used after daiminkan/kakan and waits for the kan actor's replacement tile draw.
+	// Dora reveals are tracked separately because logs may reveal those kan dora after later consecutive kan events.
 	waitingReplacementBeforeDora
-	// waitingDoraAfterReplacement is used after daiminkan/kakan replacement tile draw and waits for the dora reveal.
-	waitingDoraAfterReplacement
-	// waitingDoraBeforeReplacement is used after ankan and waits for the dora reveal before replacement tile draw.
-	waitingDoraBeforeReplacement
-	// waitingReplacementAfterDora is used after ankan dora reveal and waits for the kan actor's replacement tile draw.
+	// waitingReplacementAfterDora is used after ankan and waits for pending dora reveals before the replacement tile draw.
 	waitingReplacementAfterDora
 )
 
@@ -49,6 +46,7 @@ type State struct {
 	numKans                 int
 	kanProgress             kanProgress
 	pendingKanActor         *seat.Seat
+	pendingDoraReveals      int
 	pendingRobbedKanTile    *tile.Tile
 	nextDraw                seat.Seat
 	pendingDiscard          *seat.Seat
