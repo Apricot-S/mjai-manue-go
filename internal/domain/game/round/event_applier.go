@@ -315,6 +315,9 @@ func (s *State) canApplyRobbingKan(ev *event.Win) bool {
 	if s.pendingKanActor == nil || *s.pendingKanActor != ev.Target() {
 		return false
 	}
+	// This currently covers robbing a promoted kan. MahjongSoul's Kokushi Musou
+	// robbing-a-concealed-kan rule is not supported because concealed kan does
+	// not expose a pendingRobbedKanTile.
 	if s.pendingRobbedKanTile == nil {
 		return false
 	}
