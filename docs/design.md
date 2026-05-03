@@ -379,16 +379,17 @@ type Decision struct {
    - `end_kyoku` / `end_game` のような lifecycle message は application/runtime で扱い、局内状態に不要な情報は domain に持ち込まない。
    - 各 message type は inbound codec の単体テストで固定し、未知 type / 不正 field は error にする。
 
-3. **Action timing と合法手列挙**
+3. **outbound action の拡充**
+   - domain action と outbound codec に `pass` / `reach` / `hora` / `pon` / `chi` / 各種 kan などを追加する。
+   - `none` は同期応答専用（`type` のみ）とし、明示見送りの `Pass` は actor を持つ別 outbound 型として wire type `none` へ変換する。
+   - `log` は application の decision metadata として扱い、mjai 固有の JSON field へは outbound codec で反映する。
+   - mjsonp runtime は `NoReaction` を同期応答 `none` に変換し、stdio は sparse output のままにする。
+
+4. **Action timing と合法手列挙**
    - `round.State` もしくは domain service に `PendingActors()` と `LegalActions(playerID)` 相当を追加する。
    - 自摸後の打牌/リーチ/ツモ和了、他家打牌後のロン/ポン/チー/カン/見送りを、`possible_actions` に依存せず State から算出する。
    - `application.Bot` の暫定条件（自家 `tsumo` の直後だけ Agent 呼び出し）を削除し、State 由来の action opportunity で Agent を呼ぶ。
    - `Pass` は行動機会がある場合だけ合法手に含める。`NoReaction` とは引き続き分離する。
-
-4. **outbound action の拡充**
-   - domain action と outbound codec に `reach` / `hora` / `pon` / `chi` / 各種 kan などを追加する。
-   - `log` は application の decision metadata として扱い、mjai 固有の JSON field へは outbound codec で反映する。
-   - mjsonp runtime は `NoReaction` を同期応答 `none` に変換し、stdio は sparse output のままにする。
 
 5. **ゴールデンテスト基盤**
    - mjson / JSON Lines 入力から「出力 action のみ」を比較するテスト基盤を追加する。

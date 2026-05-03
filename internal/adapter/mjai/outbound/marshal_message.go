@@ -17,6 +17,20 @@ func ToMessage(a action.Action, log string) (Message, error) {
 		return NewPass(a, log), nil
 	case *action.Discard:
 		return NewDahai(a, log), nil
+	case *action.Chii:
+		return NewChi(a, log), nil
+	case *action.Pon:
+		return NewPon(a, log), nil
+	case *action.CalledKan:
+		return NewDaiminkan(a, log), nil
+	case *action.ConcealedKan:
+		return NewAnkan(a, log), nil
+	case *action.PromotedKan:
+		return NewKakan(a, log), nil
+	case *action.Riichi:
+		return NewReach(a, log), nil
+	case *action.Win:
+		return NewHora(a, log), nil
 	default:
 		return nil, fmt.Errorf("unsupported action type: %T", a)
 	}
