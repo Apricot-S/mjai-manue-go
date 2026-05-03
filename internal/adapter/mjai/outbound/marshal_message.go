@@ -14,7 +14,7 @@ func MarshalMessage(msg Message) ([]byte, error) {
 func ToMessage(a action.Action, log string) (Message, error) {
 	switch a := a.(type) {
 	case *action.Pass:
-		return NewNone(log), nil
+		return NewPass(a, log), nil
 	case *action.Discard:
 		return NewDahai(a, log), nil
 	default:

@@ -2,13 +2,11 @@ package outbound
 
 type None struct {
 	Type string `json:"type"`
-	Log  string `json:"log,omitempty"`
 }
 
-func NewNone(log string) *None {
+func NewNone() *None {
 	return &None{
 		Type: "none",
-		Log:  log,
 	}
 }
 

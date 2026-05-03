@@ -7,21 +7,11 @@ import (
 )
 
 func TestMarshalMessage_None(t *testing.T) {
-	got, err := outbound.MarshalMessage(outbound.NewNone(""))
+	got, err := outbound.MarshalMessage(outbound.NewNone())
 	if err != nil {
 		t.Fatalf("MarshalMessage() failed: %v", err)
 	}
 	if want := `{"type":"none"}`; string(got) != want {
-		t.Errorf("MarshalMessage() = %s, want %s", got, want)
-	}
-}
-
-func TestMarshalMessage_None_Log(t *testing.T) {
-	got, err := outbound.MarshalMessage(outbound.NewNone("decline call"))
-	if err != nil {
-		t.Fatalf("MarshalMessage() failed: %v", err)
-	}
-	if want := `{"type":"none","log":"decline call"}`; string(got) != want {
 		t.Errorf("MarshalMessage() = %s, want %s", got, want)
 	}
 }

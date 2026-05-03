@@ -3,6 +3,15 @@
 
 # プロトコル
 
+## none / pass の扱い
+
+`{"type":"none"}` は、mjai サーバーへの同期応答として「この入力に対する action はない」ことを表す場合と、副露・和了などの行動機会に対する明示的な見送りを表す場合がある。
+
+この Go 実装では両者を内部型で分離する。
+
+- 同期応答用 `none`: `{"type":"none"}` のみ。`actor` / `log` は付けない。
+- 明示見送り用 `pass`: wire 上の `type` は `none` のまま、`actor` と任意の `log` を付けて `{"type":"none","actor":0}` または `{"type":"none","actor":0,"log":"..."}` として送信する。
+
 ## 接続時
 
 * From server

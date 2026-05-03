@@ -103,7 +103,7 @@ func runTCPConn(name string, room string, agent ai.Agent, conn net.Conn, log io.
 			return nil
 		}
 		if outMsg == nil {
-			outMsg = outbound.NewNone("")
+			outMsg = outbound.NewNone()
 		}
 		if err := writeMessageWithTrace(w, outMsg, log); err != nil {
 			return err

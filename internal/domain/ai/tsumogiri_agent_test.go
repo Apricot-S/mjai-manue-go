@@ -54,8 +54,12 @@ func TestTsumogiriAgent_Decide_NoDrawnTile(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Decide() failed: %v", err)
 	}
-	if _, ok := got.Action.(*action.Pass); !ok {
+	pass, ok := got.Action.(*action.Pass)
+	if !ok {
 		t.Fatalf("Action = %T, want *action.Pass", got.Action)
+	}
+	if pass.Actor() != self {
+		t.Errorf("Actor() = %v, want %v", pass.Actor(), self)
 	}
 }
 
