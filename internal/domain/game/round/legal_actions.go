@@ -5,6 +5,7 @@ import (
 	"slices"
 
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/action"
+	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/common"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/round/player"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/round/service"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/seat"
@@ -89,7 +90,36 @@ func (s *State) legalDiscardActions(playerSeat seat.Seat, p *player.VisiblePlaye
 		}
 	}
 
+	if s.canRiichi(p) {
+		actions = append(actions, action.NewRiichi(playerSeat))
+	}
+
 	return actions, nil
+}
+
+func (s *State) canRiichi(p *player.VisiblePlayer) bool {
+	if p.RiichiState() != player.NotRiichi {
+		return false
+	}
+	if p.DrawnTile() == nil {
+		return false
+	}
+	if !p.IsConcealed() {
+		return false
+	}
+	if s.numLeftTiles < common.NumPlayers {
+		return false
+	}
+
+	handBeforeRiichi, ok := p.Hand()
+	if !ok {
+		return false
+	}
+	handAfterDraw, err := handBeforeRiichi.Draw(p.DrawnTile())
+	if err != nil {
+		return false
+	}
+	return service.IsTenpaiAll(handAfterDraw)
 }
 
 func canDiscardAsRiichiDeclarationTile(p player.Player, discardTile tile.Tile, tsumogiri bool) bool {

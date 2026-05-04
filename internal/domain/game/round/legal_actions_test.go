@@ -65,7 +65,7 @@ func TestState_LegalActions_NotPendingActor(t *testing.T) {
 func TestState_LegalActions_PendingDiscard(t *testing.T) {
 	s := mustNewRoundStateForTest(t, newValidHands())
 	actor := *seat.MustSeat(0)
-	drawnTile := *tile.MustTileFromCode("6m")
+	drawnTile := *tile.MustTileFromCode("E")
 	if err := s.Apply(event.NewDraw(actor, drawnTile)); err != nil {
 		t.Fatalf("Apply(Draw) failed: %v", err)
 	}
@@ -89,7 +89,7 @@ func TestState_LegalActions_PendingDiscard(t *testing.T) {
 		"4p:false": false,
 		"4s:false": false,
 		"5m:false": false,
-		"6m:true":  false,
+		"E:true":   false,
 	}
 	if len(got) != len(want) {
 		t.Fatalf("LegalActions() length = %d, want %d: %v", len(got), len(want), got)
@@ -113,6 +113,111 @@ func TestState_LegalActions_PendingDiscard(t *testing.T) {
 		if !found {
 			t.Errorf("missing discard action: %s", key)
 		}
+	}
+}
+
+func TestState_LegalActions_IncludesRiichi(t *testing.T) {
+	hands := newValidHands()
+	hands[0] = riichiReadyHandForTest()
+	s := mustNewRoundStateForTest(t, hands)
+	actor := *seat.MustSeat(0)
+	if err := s.Apply(event.NewDraw(actor, *tile.MustTileFromCode("S"))); err != nil {
+		t.Fatalf("Apply(Draw) failed: %v", err)
+	}
+
+	got, err := s.LegalActions(actor)
+	if err != nil {
+		t.Fatalf("LegalActions() failed: %v", err)
+	}
+	if !containsRiichi(got, actor) {
+		t.Error("LegalActions() does not contain Riichi, want Riichi for concealed tenpai hand")
+	}
+}
+
+func TestState_LegalActions_ExcludesRiichi(t *testing.T) {
+	tests := []struct {
+		name  string
+		setup func(t *testing.T) (*State, seat.Seat)
+	}{
+		{
+			name: "not tenpai",
+			setup: func(t *testing.T) (*State, seat.Seat) {
+				t.Helper()
+				s := mustNewRoundStateForTest(t, newValidHands())
+				actor := *seat.MustSeat(0)
+				if err := s.Apply(event.NewDraw(actor, *tile.MustTileFromCode("E"))); err != nil {
+					t.Fatalf("Apply(Draw) failed: %v", err)
+				}
+				return s, actor
+			},
+		},
+		{
+			name: "no next draw turn remains",
+			setup: func(t *testing.T) (*State, seat.Seat) {
+				t.Helper()
+				hands := newValidHands()
+				hands[0] = riichiReadyHandForTest()
+				s := mustNewRoundStateForTest(t, hands)
+				actor := *seat.MustSeat(0)
+				if err := s.Apply(event.NewDraw(actor, *tile.MustTileFromCode("S"))); err != nil {
+					t.Fatalf("Apply(Draw) failed: %v", err)
+				}
+				s.numLeftTiles = common.NumPlayers - 1
+				return s, actor
+			},
+		},
+		{
+			name: "open hand",
+			setup: func(t *testing.T) (*State, seat.Seat) {
+				t.Helper()
+				hands := newValidHands()
+				hands[1] = [common.InitHandSize]tile.Tile{
+					*tile.MustTileFromCode("2m"),
+					*tile.MustTileFromCode("3m"),
+					*tile.MustTileFromCode("4m"),
+					*tile.MustTileFromCode("5m"),
+					*tile.MustTileFromCode("5mr"),
+					*tile.MustTileFromCode("1p"),
+					*tile.MustTileFromCode("2p"),
+					*tile.MustTileFromCode("3p"),
+					*tile.MustTileFromCode("4p"),
+					*tile.MustTileFromCode("5p"),
+					*tile.MustTileFromCode("6p"),
+					*tile.MustTileFromCode("7s"),
+					*tile.MustTileFromCode("8s"),
+				}
+				s := mustNewRoundStateForTest(t, hands)
+				target := *seat.MustSeat(0)
+				actor := *seat.MustSeat(1)
+				taken := *tile.MustTileFromCode("2m")
+				if err := s.Apply(event.NewDraw(target, taken)); err != nil {
+					t.Fatalf("Apply(Draw) failed: %v", err)
+				}
+				if err := s.Apply(event.NewDiscard(target, taken, true)); err != nil {
+					t.Fatalf("Apply(Discard) failed: %v", err)
+				}
+				if err := s.Apply(event.NewChii(actor, target, taken, [2]tile.Tile{
+					*tile.MustTileFromCode("3m"),
+					*tile.MustTileFromCode("4m"),
+				})); err != nil {
+					t.Fatalf("Apply(Chii) failed: %v", err)
+				}
+				return s, actor
+			},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			s, actor := tt.setup(t)
+			got, err := s.LegalActions(actor)
+			if err != nil {
+				t.Fatalf("LegalActions() failed: %v", err)
+			}
+			if containsRiichi(got, actor) {
+				t.Error("LegalActions() contains Riichi unexpectedly")
+			}
+		})
 	}
 }
 
@@ -302,6 +407,19 @@ func containsDiscard(actions []action.Action, tileCode string, tsumogiri bool) b
 			continue
 		}
 		if discard.Tile().String() == tileCode && discard.Tsumogiri() == tsumogiri {
+			return true
+		}
+	}
+	return false
+}
+
+func containsRiichi(actions []action.Action, actor seat.Seat) bool {
+	for _, a := range actions {
+		riichi, ok := a.(*action.Riichi)
+		if !ok {
+			continue
+		}
+		if riichi.Actor() == actor {
 			return true
 		}
 	}
