@@ -40,10 +40,10 @@ func (s *State) calculateLegalActions(playerSeat seat.Seat) ([]action.Action, er
 		return nil, nil
 	}
 
-	return s.legalDiscardActions(playerSeat, visiblePlayer)
+	return s.legalActionsOnSelfDraw(playerSeat, visiblePlayer)
 }
 
-func (s *State) legalDiscardActions(playerSeat seat.Seat, p *player.VisiblePlayer) ([]action.Action, error) {
+func (s *State) legalActionsOnSelfDraw(playerSeat seat.Seat, p *player.VisiblePlayer) ([]action.Action, error) {
 	if !p.CanDiscard() {
 		return nil, fmt.Errorf("cannot list discard actions: player %d cannot discard", playerSeat.Index())
 	}
