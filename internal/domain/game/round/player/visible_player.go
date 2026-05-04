@@ -184,10 +184,10 @@ func (p *VisiblePlayer) Chii(chii meld.Chii) error {
 	// If the only tiles remaining after chii are swap-call tiles, chii is not allowed.
 	swapCallTiles := chii.SwapCallTiles()
 	remaining := tile.Tiles(h.ToTiles())
-	allSwap := !slices.ContainsFunc(remaining.Distinct(nil), func(rt tile.Tile) bool {
+	hasNonSwapCallTile := slices.ContainsFunc(remaining.Distinct(nil), func(rt tile.Tile) bool {
 		return !isSwapCallTile(rt, swapCallTiles)
 	})
-	if allSwap {
+	if !hasNonSwapCallTile {
 		return fmt.Errorf("cannot Chii: remaining hand would contain only swap-call tiles")
 	}
 
