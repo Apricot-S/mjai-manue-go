@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/action"
+	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/common"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/event"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/seat"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/tile"
@@ -19,6 +20,30 @@ func TestState_LegalActions_NoPendingAction(t *testing.T) {
 	}
 	if len(got) != 0 {
 		t.Fatalf("LegalActions() = %v, want empty", got)
+	}
+}
+
+func TestState_LegalActions_ReturnsErrorForInvisiblePlayerWithoutPendingAction(t *testing.T) {
+	hands := newValidHands()
+	hands[0] = unknownHandForLegalActionsTest()
+	s := mustNewRoundStateForTest(t, hands)
+
+	if _, err := s.LegalActions(*seat.MustSeat(0)); err == nil {
+		t.Fatal("LegalActions() succeeded unexpectedly")
+	}
+}
+
+func TestState_LegalActions_ReturnsErrorForPendingInvisiblePlayer(t *testing.T) {
+	hands := newValidHands()
+	hands[0] = unknownHandForLegalActionsTest()
+	s := mustNewRoundStateForTest(t, hands)
+	actor := *seat.MustSeat(0)
+	if err := s.Apply(event.NewDraw(actor, *tile.MustTileFromCode("6m"))); err != nil {
+		t.Fatalf("Apply(Draw) failed: %v", err)
+	}
+
+	if _, err := s.LegalActions(actor); err == nil {
+		t.Fatal("LegalActions() succeeded unexpectedly")
 	}
 }
 
@@ -233,4 +258,12 @@ func containsDiscard(actions []action.Action, tileCode string, tsumogiri bool) b
 		}
 	}
 	return false
+}
+
+func unknownHandForLegalActionsTest() [common.InitHandSize]tile.Tile {
+	var hand [common.InitHandSize]tile.Tile
+	for i := range hand {
+		hand[i] = *tile.MustTileFromCode("?")
+	}
+	return hand
 }

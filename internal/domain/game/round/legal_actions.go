@@ -28,15 +28,19 @@ func (s *State) LegalActions(playerSeat seat.Seat) ([]action.Action, error) {
 }
 
 func (s *State) calculateLegalActions(playerSeat seat.Seat) ([]action.Action, error) {
+	visiblePlayer, ok := s.players[playerSeat.Index()].(*player.VisiblePlayer)
+	if !ok {
+		return nil, fmt.Errorf("cannot list legal actions: player %d is invisible", playerSeat.Index())
+	}
+
 	if s.pendingDiscard == nil || *s.pendingDiscard != playerSeat {
 		return nil, nil
 	}
 
-	return s.legalDiscardActions(playerSeat)
+	return s.legalDiscardActions(playerSeat, visiblePlayer)
 }
 
-func (s *State) legalDiscardActions(playerSeat seat.Seat) ([]action.Action, error) {
-	p := s.players[playerSeat.Index()]
+func (s *State) legalDiscardActions(playerSeat seat.Seat, p *player.VisiblePlayer) ([]action.Action, error) {
 	if !p.CanDiscard() {
 		return nil, fmt.Errorf("cannot list discard actions: player %d cannot discard", playerSeat.Index())
 	}
