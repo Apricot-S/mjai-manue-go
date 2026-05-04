@@ -84,28 +84,27 @@ type Tile struct {
 	isRed  bool
 }
 
-func NewTileFromID(id int) (*Tile, error) {
-	if id < minTileID || id >= NumTileType38 {
-		return nil, fmt.Errorf("invalid tile id: %d", id)
-	}
+func newTileFromValidID(id int) *Tile {
 	return &Tile{
 		id:     id,
 		color:  tileColors[id],
 		number: tileNumbers[id],
 		isRed:  tileIsReds[id],
-	}, nil
+	}
+}
+
+func NewTileFromID(id int) (*Tile, error) {
+	if id < minTileID || id >= NumTileType38 {
+		return nil, fmt.Errorf("invalid tile id: %d", id)
+	}
+	return newTileFromValidID(id), nil
 }
 
 func MustTileFromID(id int) *Tile {
 	if id < minTileID || id >= NumTileType38 {
 		panic(fmt.Sprintf("invalid tile id: %d", id))
 	}
-	return &Tile{
-		id:     id,
-		color:  tileColors[id],
-		number: tileNumbers[id],
-		isRed:  tileIsReds[id],
-	}
+	return newTileFromValidID(id)
 }
 
 func NewTileFromCode(code string) (*Tile, error) {
