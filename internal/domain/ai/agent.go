@@ -8,7 +8,7 @@ import (
 
 type Request struct {
 	Self  seat.Seat
-	Round round.StateViewer
+	Round round.ActionStateViewer
 }
 
 type Decision struct {

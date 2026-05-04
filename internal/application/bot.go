@@ -66,9 +66,11 @@ func (b *Bot) processRoundEvent(ev event.Event) (Reaction, error) {
 		return Reaction{}, err
 	}
 
-	// TODO: Replace this temporary actionability check with proper turn/action availability rules.
-	draw, ok := ev.(*event.Draw)
-	if !ok || draw.Actor() != b.self {
+	legalActions, err := b.currentRound.LegalActions(b.self)
+	if err != nil {
+		return Reaction{}, err
+	}
+	if len(legalActions) == 0 {
 		return NewNoReaction(), nil
 	}
 

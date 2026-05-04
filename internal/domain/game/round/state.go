@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"slices"
 
+	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/action"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/common"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/event"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/round/player"
@@ -53,6 +54,7 @@ type State struct {
 	pendingRiichiAcceptance *seat.Seat
 	lastActor               *seat.Seat
 	players                 [common.NumPlayers]player.Player
+	legalActionsCache       map[seat.Seat][]action.Action
 }
 
 func NewState(ev *event.StartRound, previousScores [common.NumPlayers]int) (*State, error) {

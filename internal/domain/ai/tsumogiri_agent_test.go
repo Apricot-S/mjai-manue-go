@@ -43,23 +43,15 @@ func TestTsumogiriAgent_Decide(t *testing.T) {
 	}
 }
 
-func TestTsumogiriAgent_Decide_NoDrawnTile(t *testing.T) {
+func TestTsumogiriAgent_Decide_NoLegalActions(t *testing.T) {
 	self := *seat.MustSeat(0)
 	roundState := mustNewRoundStateForTest(t, newValidHands())
 
-	got, err := ai.NewTsumogiriAgent().Decide(ai.Request{
+	if _, err := ai.NewTsumogiriAgent().Decide(ai.Request{
 		Self:  self,
 		Round: roundState,
-	})
-	if err != nil {
-		t.Fatalf("Decide() failed: %v", err)
-	}
-	pass, ok := got.Action.(*action.Pass)
-	if !ok {
-		t.Fatalf("Action = %T, want *action.Pass", got.Action)
-	}
-	if pass.Actor() != self {
-		t.Errorf("Actor() = %v, want %v", pass.Actor(), self)
+	}); err == nil {
+		t.Fatal("Decide() succeeded unexpectedly")
 	}
 }
 

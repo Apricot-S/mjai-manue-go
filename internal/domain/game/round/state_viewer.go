@@ -3,6 +3,7 @@ package round
 import (
 	"slices"
 
+	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/action"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/common"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/round/player"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/seat"
@@ -35,6 +36,15 @@ type DerivedStateViewer interface {
 type StateViewer interface {
 	RawStateViewer
 	DerivedStateViewer
+}
+
+type ActionOpportunityViewer interface {
+	LegalActions(playerSeat seat.Seat) ([]action.Action, error)
+}
+
+type ActionStateViewer interface {
+	StateViewer
+	ActionOpportunityViewer
 }
 
 func (s *State) RoundWind() wind.Wind {

@@ -17,34 +17,42 @@ type EventApplier interface {
 }
 
 func (s *State) Apply(ev event.Event) error {
+	var err error
 	switch ev := ev.(type) {
 	case *event.Draw:
-		return s.applyDraw(ev)
+		err = s.applyDraw(ev)
 	case *event.Discard:
-		return s.applyDiscard(ev)
+		err = s.applyDiscard(ev)
 	case *event.Chii:
-		return s.applyChii(ev)
+		err = s.applyChii(ev)
 	case *event.Pon:
-		return s.applyPon(ev)
+		err = s.applyPon(ev)
 	case *event.CalledKan:
-		return s.applyCalledKan(ev)
+		err = s.applyCalledKan(ev)
 	case *event.ConcealedKan:
-		return s.applyConcealedKan(ev)
+		err = s.applyConcealedKan(ev)
 	case *event.PromotedKan:
-		return s.applyPromotedKan(ev)
+		err = s.applyPromotedKan(ev)
 	case *event.Dora:
-		return s.applyDora(ev)
+		err = s.applyDora(ev)
 	case *event.Riichi:
-		return s.applyRiichi(ev)
+		err = s.applyRiichi(ev)
 	case *event.RiichiAccepted:
-		return s.applyRiichiAccepted(ev)
+		err = s.applyRiichiAccepted(ev)
 	case *event.Win:
-		return s.applyWin(ev)
+		err = s.applyWin(ev)
 	case *event.DrawRound:
-		return s.applyDrawRound(ev)
+		err = s.applyDrawRound(ev)
 	default:
-		return fmt.Errorf("unknown event: %T", ev)
+		err = fmt.Errorf("unknown event: %T", ev)
 	}
+
+	if err != nil {
+		return err
+	}
+
+	s.legalActionsCache = nil
+	return nil
 }
 
 func (s *State) applyDraw(ev *event.Draw) error {
