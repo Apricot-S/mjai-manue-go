@@ -101,6 +101,10 @@ func (p *InvisiblePlayer) IsConcealed() bool {
 	return p.isConcealed
 }
 
+func (p *InvisiblePlayer) SwapCallTiles() []tile.Tile {
+	return p.swapCallTiles
+}
+
 func (p *InvisiblePlayer) Draw(t tile.Tile) error {
 	if p.CanDiscard() {
 		return fmt.Errorf("cannot Draw: player is already in a discardable state")

@@ -64,6 +64,8 @@ type PlayerViewer interface {
 	CanChiiPonKan() bool
 	// IsConcealed returns whether the player hand is concealed (門前).
 	IsConcealed() bool
+	// SwapCallTiles returns tiles forbidden as immediate discard after a call (喰い替え).
+	SwapCallTiles() []tile.Tile
 }
 
 type PlayerActor interface {

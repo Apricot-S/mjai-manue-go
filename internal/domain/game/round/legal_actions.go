@@ -67,6 +67,9 @@ func (s *State) legalDiscardActions(playerSeat seat.Seat, p *player.VisiblePlaye
 	}
 
 	for _, handTile := range tile.Tiles(p.HandTiles()).Distinct(nil) {
+		if isSwapCallTile(handTile, p.SwapCallTiles()) {
+			continue
+		}
 		if p.RiichiState() == player.RiichiDeclared && !canDiscardAsRiichiDeclarationTile(p, handTile, false) {
 			continue
 		}
@@ -107,4 +110,10 @@ func canDiscardAsRiichiDeclarationTile(p player.Player, discardTile tile.Tile, t
 		}
 	}
 	return service.IsTenpaiAll(handAfterDiscard)
+}
+
+func isSwapCallTile(t tile.Tile, swapCallTiles []tile.Tile) bool {
+	return slices.ContainsFunc(swapCallTiles, func(s tile.Tile) bool {
+		return t.HasSameSymbol(&s)
+	})
 }

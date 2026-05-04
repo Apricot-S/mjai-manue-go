@@ -102,6 +102,10 @@ func (p *VisiblePlayer) IsConcealed() bool {
 	return p.isConcealed
 }
 
+func (p *VisiblePlayer) SwapCallTiles() []tile.Tile {
+	return p.swapCallTiles
+}
+
 func (p *VisiblePlayer) Draw(t tile.Tile) error {
 	if t.IsUnknown() {
 		return fmt.Errorf("visible player cannot draw an unknown tile")

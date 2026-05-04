@@ -195,6 +195,54 @@ func TestState_LegalActions_RiichiDeclarationTileKeepsTenpai(t *testing.T) {
 	}
 }
 
+func TestState_LegalActions_AfterChiiExcludesSwapCallTiles(t *testing.T) {
+	hands := newValidHands()
+	hands[1] = [common.InitHandSize]tile.Tile{
+		*tile.MustTileFromCode("2m"),
+		*tile.MustTileFromCode("3m"),
+		*tile.MustTileFromCode("4m"),
+		*tile.MustTileFromCode("5m"),
+		*tile.MustTileFromCode("5mr"),
+		*tile.MustTileFromCode("1p"),
+		*tile.MustTileFromCode("2p"),
+		*tile.MustTileFromCode("3p"),
+		*tile.MustTileFromCode("4p"),
+		*tile.MustTileFromCode("5p"),
+		*tile.MustTileFromCode("6p"),
+		*tile.MustTileFromCode("7s"),
+		*tile.MustTileFromCode("8s"),
+	}
+	s := mustNewRoundStateForTest(t, hands)
+	target := *seat.MustSeat(0)
+	actor := *seat.MustSeat(1)
+	taken := *tile.MustTileFromCode("2m")
+	if err := s.Apply(event.NewDraw(target, taken)); err != nil {
+		t.Fatalf("Apply(Draw) failed: %v", err)
+	}
+	if err := s.Apply(event.NewDiscard(target, taken, true)); err != nil {
+		t.Fatalf("Apply(Discard) failed: %v", err)
+	}
+	if err := s.Apply(event.NewChii(actor, target, taken, [2]tile.Tile{
+		*tile.MustTileFromCode("3m"),
+		*tile.MustTileFromCode("4m"),
+	})); err != nil {
+		t.Fatalf("Apply(Chii) failed: %v", err)
+	}
+
+	got, err := s.LegalActions(actor)
+	if err != nil {
+		t.Fatalf("LegalActions() failed: %v", err)
+	}
+	for _, code := range []string{"2m", "5m", "5mr"} {
+		if containsDiscard(got, code, false) {
+			t.Errorf("LegalActions() contains %s hand discard, want swap-call tile excluded", code)
+		}
+	}
+	if !containsDiscard(got, "1p", false) {
+		t.Error("LegalActions() does not contain 1p hand discard, want non-swap-call tile")
+	}
+}
+
 func TestState_LegalActions_InvalidatesCacheAfterApply(t *testing.T) {
 	s := mustNewRoundStateForTest(t, newValidHands())
 	actor := *seat.MustSeat(0)
