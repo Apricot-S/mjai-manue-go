@@ -91,6 +91,61 @@ func TestState_LegalActions_PendingDiscard(t *testing.T) {
 	}
 }
 
+func TestState_LegalActions_AfterRiichiAcceptedAllowsOnlyTsumogiri(t *testing.T) {
+	hands := newValidHands()
+	hands[0] = riichiReadyHandForTest()
+	s := mustNewRoundStateForTest(t, hands)
+	actor := *seat.MustSeat(0)
+	firstDraw := *tile.MustTileFromCode("S")
+	firstDiscard := *tile.MustTileFromCode("W")
+	if err := s.Apply(event.NewDraw(actor, firstDraw)); err != nil {
+		t.Fatalf("Apply(first Draw) failed: %v", err)
+	}
+	if err := s.Apply(event.NewRiichi(actor)); err != nil {
+		t.Fatalf("Apply(Riichi) failed: %v", err)
+	}
+	if err := s.Apply(event.NewDiscard(actor, firstDiscard, false)); err != nil {
+		t.Fatalf("Apply(first Discard) failed: %v", err)
+	}
+	if err := s.Apply(event.NewRiichiAccepted(actor, nil, nil)); err != nil {
+		t.Fatalf("Apply(RiichiAccepted) failed: %v", err)
+	}
+
+	for i := 1; i < 4; i++ {
+		other := *seat.MustSeat(i)
+		drawnTile := *tile.MustTileFromCode("6m")
+		if err := s.Apply(event.NewDraw(other, drawnTile)); err != nil {
+			t.Fatalf("Apply(other Draw %d) failed: %v", i, err)
+		}
+		if err := s.Apply(event.NewDiscard(other, drawnTile, true)); err != nil {
+			t.Fatalf("Apply(other Discard %d) failed: %v", i, err)
+		}
+	}
+
+	secondDraw := *tile.MustTileFromCode("7m")
+	if err := s.Apply(event.NewDraw(actor, secondDraw)); err != nil {
+		t.Fatalf("Apply(second Draw) failed: %v", err)
+	}
+
+	got, err := s.LegalActions(actor)
+	if err != nil {
+		t.Fatalf("LegalActions() failed: %v", err)
+	}
+	if len(got) != 1 {
+		t.Fatalf("LegalActions() length = %d, want 1: %v", len(got), got)
+	}
+	discard, ok := got[0].(*action.Discard)
+	if !ok {
+		t.Fatalf("LegalActions()[0] = %T, want *action.Discard", got[0])
+	}
+	if discard.Tile() != secondDraw {
+		t.Errorf("Discard.Tile() = %v, want %v", discard.Tile(), secondDraw)
+	}
+	if !discard.Tsumogiri() {
+		t.Error("Discard.Tsumogiri() = false, want true")
+	}
+}
+
 func TestState_LegalActions_InvalidatesCacheAfterApply(t *testing.T) {
 	s := mustNewRoundStateForTest(t, newValidHands())
 	actor := *seat.MustSeat(0)

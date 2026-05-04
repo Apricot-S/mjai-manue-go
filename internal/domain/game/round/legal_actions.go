@@ -5,6 +5,7 @@ import (
 	"slices"
 
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/action"
+	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/round/player"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/seat"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/tile"
 )
@@ -47,6 +48,17 @@ func (s *State) legalDiscardActions(playerSeat seat.Seat) ([]action.Action, erro
 		}
 		actions = append(actions, a)
 		return nil
+	}
+
+	if p.RiichiState() == player.RiichiAccepted {
+		drawnTile := p.DrawnTile()
+		if drawnTile == nil {
+			return nil, fmt.Errorf("cannot list discard actions: riichi player %d has no drawn tile", playerSeat.Index())
+		}
+		if err := addDiscard(*drawnTile, true); err != nil {
+			return nil, err
+		}
+		return actions, nil
 	}
 
 	for _, handTile := range tile.Tiles(p.HandTiles()).Distinct(nil) {
