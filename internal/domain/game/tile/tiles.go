@@ -38,8 +38,8 @@ func (ts Tiles) ContainsUnknown() bool {
 	})
 }
 
-func (ts *Tiles) Distinct(exclude func(Tile) bool) Tiles {
-	ret := slices.Clone(*ts)
+func (ts Tiles) Distinct(exclude func(Tile) bool) Tiles {
+	ret := slices.Clone(ts)
 	ret.Sort()
 
 	ret = slices.CompactFunc(ret, func(a, b Tile) bool {
