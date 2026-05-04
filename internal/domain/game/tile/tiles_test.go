@@ -39,6 +39,51 @@ func TestSortTiles(t *testing.T) {
 	}
 }
 
+func TestTiles_ContainsUnknown(t *testing.T) {
+	tests := []struct {
+		name  string
+		tiles tile.Tiles
+		want  bool
+	}{
+		{
+			name:  "nil tiles",
+			tiles: nil,
+			want:  false,
+		},
+		{
+			name:  "empty tiles",
+			tiles: tile.Tiles{},
+			want:  false,
+		},
+		{
+			name: "no unknown",
+			tiles: tile.Tiles{
+				*tile.MustTileFromCode("1m"),
+				*tile.MustTileFromCode("5mr"),
+				*tile.MustTileFromCode("E"),
+			},
+			want: false,
+		},
+		{
+			name: "contains unknown",
+			tiles: tile.Tiles{
+				*tile.MustTileFromCode("1m"),
+				*tile.MustTileFromCode("?"),
+				*tile.MustTileFromCode("E"),
+			},
+			want: true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := tt.tiles.ContainsUnknown()
+			if got != tt.want {
+				t.Errorf("ContainsUnknown() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
 func TestTiles_Distinct(t *testing.T) {
 	tests := []struct {
 		name    string

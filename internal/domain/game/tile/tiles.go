@@ -32,6 +32,12 @@ func (ts Tiles) Sort() {
 	})
 }
 
+func (ts Tiles) ContainsUnknown() bool {
+	return slices.ContainsFunc(ts, func(t Tile) bool {
+		return t.IsUnknown()
+	})
+}
+
 func (ts *Tiles) Distinct(exclude func(Tile) bool) Tiles {
 	ret := slices.Clone(*ts)
 	ret.Sort()

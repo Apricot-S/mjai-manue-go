@@ -18,7 +18,7 @@ func NewPon(actor, target seat.Seat, taken tile.Tile, consumed [2]tile.Tile) (*P
 	if taken.IsUnknown() {
 		return nil, fmt.Errorf("unknown tile is not allowed for Pon action taken tile: %s", taken)
 	}
-	if hasUnknownTile(consumed[:]) {
+	if tile.Tiles(consumed[:]).ContainsUnknown() {
 		return nil, fmt.Errorf("unknown tile is not allowed for Pon action consumed tiles: %v", consumed)
 	}
 	return &Pon{actor: actor, target: target, taken: taken, consumed: consumed}, nil

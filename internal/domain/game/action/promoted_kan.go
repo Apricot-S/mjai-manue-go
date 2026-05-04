@@ -17,7 +17,7 @@ func NewPromotedKan(actor seat.Seat, added tile.Tile, consumed [3]tile.Tile) (*P
 	if added.IsUnknown() {
 		return nil, fmt.Errorf("unknown tile is not allowed for PromotedKan action added tile: %s", added)
 	}
-	if hasUnknownTile(consumed[:]) {
+	if tile.Tiles(consumed[:]).ContainsUnknown() {
 		return nil, fmt.Errorf("unknown tile is not allowed for PromotedKan action consumed tiles: %v", consumed)
 	}
 	return &PromotedKan{actor: actor, added: added, consumed: consumed}, nil

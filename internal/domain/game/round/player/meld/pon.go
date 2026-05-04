@@ -17,7 +17,7 @@ type Pon struct {
 
 func NewPon(taken tile.Tile, consumed [2]tile.Tile, target seat.Seat) (*Pon, error) {
 	tiles := tile.Tiles{taken, consumed[0], consumed[1]}
-	if slices.ContainsFunc(tiles, func(t tile.Tile) bool { return t.IsUnknown() }) {
+	if tiles.ContainsUnknown() {
 		return nil, fmt.Errorf("unknown tile cannot use for Pon")
 	}
 	if slices.ContainsFunc(tiles, func(t tile.Tile) bool { return !taken.HasSameSymbol(&t) }) {

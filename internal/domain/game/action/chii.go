@@ -18,7 +18,7 @@ func NewChii(actor, target seat.Seat, taken tile.Tile, consumed [2]tile.Tile) (*
 	if taken.IsUnknown() {
 		return nil, fmt.Errorf("unknown tile is not allowed for Chii action taken tile: %s", taken)
 	}
-	if hasUnknownTile(consumed[:]) {
+	if tile.Tiles(consumed[:]).ContainsUnknown() {
 		return nil, fmt.Errorf("unknown tile is not allowed for Chii action consumed tiles: %v", consumed)
 	}
 	return &Chii{actor: actor, target: target, taken: taken, consumed: consumed}, nil

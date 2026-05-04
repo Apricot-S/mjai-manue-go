@@ -13,7 +13,7 @@ type ConcealedKan struct {
 }
 
 func NewConcealedKan(actor seat.Seat, consumed [4]tile.Tile) (*ConcealedKan, error) {
-	if hasUnknownTile(consumed[:]) {
+	if tile.Tiles(consumed[:]).ContainsUnknown() {
 		return nil, fmt.Errorf("unknown tile is not allowed for ConcealedKan action consumed tiles: %v", consumed)
 	}
 	return &ConcealedKan{actor: actor, consumed: consumed}, nil

@@ -15,7 +15,7 @@ func NewConcealedKan(consumed [4]tile.Tile) (*ConcealedKan, error) {
 	var csm tile.Tiles = slices.Clone(consumed[:])
 	c0 := &csm[0]
 
-	if slices.ContainsFunc(csm, func(t tile.Tile) bool { return t.IsUnknown() }) {
+	if csm.ContainsUnknown() {
 		return nil, fmt.Errorf("unknown tile cannot use for Concealed Kan")
 	}
 	if slices.ContainsFunc(csm[1:], func(t tile.Tile) bool { return !c0.HasSameSymbol(&t) }) {

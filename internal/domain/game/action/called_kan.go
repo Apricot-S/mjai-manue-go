@@ -18,7 +18,7 @@ func NewCalledKan(actor, target seat.Seat, taken tile.Tile, consumed [3]tile.Til
 	if taken.IsUnknown() {
 		return nil, fmt.Errorf("unknown tile is not allowed for CalledKan action taken tile: %s", taken)
 	}
-	if hasUnknownTile(consumed[:]) {
+	if tile.Tiles(consumed[:]).ContainsUnknown() {
 		return nil, fmt.Errorf("unknown tile is not allowed for CalledKan action consumed tiles: %v", consumed)
 	}
 	return &CalledKan{actor: actor, target: target, taken: taken, consumed: consumed}, nil

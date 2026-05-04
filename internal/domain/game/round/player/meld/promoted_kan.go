@@ -23,7 +23,7 @@ func NewPromotedKan(
 	target seat.Seat,
 ) (*PromotedKan, error) {
 	tiles := tile.Tiles{taken, consumed[0], consumed[1], added}
-	if slices.ContainsFunc(tiles, func(t tile.Tile) bool { return t.IsUnknown() }) {
+	if tiles.ContainsUnknown() {
 		return nil, fmt.Errorf("unknown tile cannot use for Promoted Kan")
 	}
 	if slices.ContainsFunc(tiles, func(t tile.Tile) bool { return !taken.HasSameSymbol(&t) }) {

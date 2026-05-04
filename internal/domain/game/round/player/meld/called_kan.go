@@ -17,7 +17,7 @@ type CalledKan struct {
 
 func NewCalledKan(taken tile.Tile, consumed [3]tile.Tile, target seat.Seat) (*CalledKan, error) {
 	tiles := tile.Tiles{taken, consumed[0], consumed[1], consumed[2]}
-	if slices.ContainsFunc(tiles, func(t tile.Tile) bool { return t.IsUnknown() }) {
+	if tiles.ContainsUnknown() {
 		return nil, fmt.Errorf("unknown tile cannot use for Called Kan")
 	}
 	if slices.ContainsFunc(tiles, func(t tile.Tile) bool { return !taken.HasSameSymbol(&t) }) {
