@@ -6,6 +6,7 @@ import (
 
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/action"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/round/player"
+	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/round/service"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/seat"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/tile"
 )
@@ -62,16 +63,44 @@ func (s *State) legalDiscardActions(playerSeat seat.Seat) ([]action.Action, erro
 	}
 
 	for _, handTile := range tile.Tiles(p.HandTiles()).Distinct(nil) {
+		if p.RiichiState() == player.RiichiDeclared && !canDiscardAsRiichiDeclarationTile(p, handTile, false) {
+			continue
+		}
 		if err := addDiscard(handTile, false); err != nil {
 			return nil, err
 		}
 	}
 
 	if drawnTile := p.DrawnTile(); drawnTile != nil {
+		if p.RiichiState() == player.RiichiDeclared && !canDiscardAsRiichiDeclarationTile(p, *drawnTile, true) {
+			return actions, nil
+		}
 		if err := addDiscard(*drawnTile, true); err != nil {
 			return nil, err
 		}
 	}
 
 	return actions, nil
+}
+
+func canDiscardAsRiichiDeclarationTile(p player.Player, discardTile tile.Tile, tsumogiri bool) bool {
+	handBeforeDiscard, ok := p.Hand()
+	if !ok {
+		return false
+	}
+	if tsumogiri {
+		return service.IsTenpaiAll(handBeforeDiscard)
+	}
+
+	handAfterDiscard, err := handBeforeDiscard.Discard(&discardTile)
+	if err != nil {
+		return false
+	}
+	if drawnTile := p.DrawnTile(); drawnTile != nil {
+		handAfterDiscard, err = handAfterDiscard.Draw(drawnTile)
+		if err != nil {
+			return false
+		}
+	}
+	return service.IsTenpaiAll(handAfterDiscard)
 }

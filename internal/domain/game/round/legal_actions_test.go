@@ -146,6 +146,30 @@ func TestState_LegalActions_AfterRiichiAcceptedAllowsOnlyTsumogiri(t *testing.T)
 	}
 }
 
+func TestState_LegalActions_RiichiDeclarationTileKeepsTenpai(t *testing.T) {
+	hands := newValidHands()
+	hands[0] = riichiReadyHandForTest()
+	s := mustNewRoundStateForTest(t, hands)
+	actor := *seat.MustSeat(0)
+	if err := s.Apply(event.NewDraw(actor, *tile.MustTileFromCode("S"))); err != nil {
+		t.Fatalf("Apply(Draw) failed: %v", err)
+	}
+	if err := s.Apply(event.NewRiichi(actor)); err != nil {
+		t.Fatalf("Apply(Riichi) failed: %v", err)
+	}
+
+	got, err := s.LegalActions(actor)
+	if err != nil {
+		t.Fatalf("LegalActions() failed: %v", err)
+	}
+	if !containsDiscard(got, "W", false) {
+		t.Error("LegalActions() does not contain W hand discard, want riichi declaration tile")
+	}
+	if containsDiscard(got, "1m", false) {
+		t.Error("LegalActions() contains 1m hand discard, want discard that breaks tenpai excluded")
+	}
+}
+
 func TestState_LegalActions_InvalidatesCacheAfterApply(t *testing.T) {
 	s := mustNewRoundStateForTest(t, newValidHands())
 	actor := *seat.MustSeat(0)
@@ -196,4 +220,17 @@ func TestState_LegalActions_ReturnsSliceCopy(t *testing.T) {
 	if second[0] == nil {
 		t.Fatal("LegalActions() returned cache slice directly")
 	}
+}
+
+func containsDiscard(actions []action.Action, tileCode string, tsumogiri bool) bool {
+	for _, a := range actions {
+		discard, ok := a.(*action.Discard)
+		if !ok {
+			continue
+		}
+		if discard.Tile().String() == tileCode && discard.Tsumogiri() == tsumogiri {
+			return true
+		}
+	}
+	return false
 }
