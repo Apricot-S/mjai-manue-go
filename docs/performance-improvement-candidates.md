@@ -145,6 +145,8 @@ Status: 改善中。待ち集合の `uint64` bitset 化は実装済み。`Visibl
 
 ### 4. 牌コード変換と么九牌判定の table 化
 
+Status: 改善済み。`NewTileFromCode` / `MustTileFromCode` は code -> ID map、`Tile.IsYaochu` は bool lookup table を使うように変更済み。
+
 対象:
 
 - `internal/domain/game/tile/tile.go`

@@ -2,7 +2,6 @@ package tile
 
 import (
 	"fmt"
-	"slices"
 )
 
 // NumTileType34 is the number of distinct tile types without red fives.
@@ -41,6 +40,14 @@ var tileCodes = [NumTileType38]string{
 	"?", // unknown
 }
 
+var tileCodeToID = func() map[string]int {
+	m := make(map[string]int, NumTileType38)
+	for id, code := range tileCodes {
+		m[code] = id
+	}
+	return m
+}()
+
 var tileColors = [NumTileType38]rune{
 	'm', 'm', 'm', 'm', 'm', 'm', 'm', 'm', 'm',
 	'p', 'p', 'p', 'p', 'p', 'p', 'p', 'p', 'p',
@@ -67,6 +74,14 @@ var tileIsReds = [NumTileType38]bool{
 	true, true, true,
 	false,
 }
+
+var tileIsYaochus = func() [NumTileType38]bool {
+	ys := [NumTileType38]bool{}
+	for _, id := range YaochuhaiIDs {
+		ys[id] = true
+	}
+	return ys
+}()
 
 var doraIndicatorToDora = [NumTileType38]int{
 	1, 2, 3, 4, 5, 6, 7, 8, 0,
@@ -108,16 +123,16 @@ func MustTileFromID(id int) *Tile {
 }
 
 func NewTileFromCode(code string) (*Tile, error) {
-	id := slices.Index(tileCodes[:], code)
-	if id == -1 {
+	id, ok := tileCodeToID[code]
+	if !ok {
 		return nil, fmt.Errorf("invalid tile code: %s", code)
 	}
 	return NewTileFromID(id)
 }
 
 func MustTileFromCode(code string) *Tile {
-	id := slices.Index(tileCodes[:], code)
-	if id == -1 {
+	id, ok := tileCodeToID[code]
+	if !ok {
 		panic(fmt.Sprintf("invalid tile code: %s", code))
 	}
 	return MustTileFromID(id)
@@ -152,7 +167,7 @@ func (t Tile) IsHonors() bool {
 }
 
 func (t Tile) IsYaochu() bool {
-	return slices.Contains(YaochuhaiIDs[:], t.ID())
+	return tileIsYaochus[t.ID()]
 }
 
 func (t Tile) IsUnknown() bool {
