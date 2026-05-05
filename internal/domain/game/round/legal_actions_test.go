@@ -356,26 +356,7 @@ func TestState_LegalActions_IncludesTsumoWin(t *testing.T) {
 
 func TestState_LegalActions_ExcludesTsumoWinWithoutYaku(t *testing.T) {
 	actor := *seat.MustSeat(0)
-	p := openPlayerWithoutYakuTsumoForLegalActionsTest(t)
-	players := [common.NumPlayers]player.Player{
-		p,
-		player.NewInvisiblePlayer(),
-		player.NewInvisiblePlayer(),
-		player.NewInvisiblePlayer(),
-	}
-	s := NewStateForTest(
-		wind.East,
-		1,
-		0,
-		0,
-		[common.NumPlayers]int{25000, 25000, 25000, 25000},
-		actor,
-		actor,
-		tile.Tiles{*tile.MustTileFromCode("E")},
-		10,
-		players,
-	)
-	s.pendingDiscard = &actor
+	s := newStateWithOpenNoYakuTsumoForLegalActionsTest(t, 10, false)
 
 	got, err := s.LegalActions(actor)
 	if err != nil {
@@ -383,6 +364,32 @@ func TestState_LegalActions_ExcludesTsumoWinWithoutYaku(t *testing.T) {
 	}
 	if containsWin(got, actor, actor, "9s") {
 		t.Error("LegalActions() contains Win, want open tsumo without yaku excluded")
+	}
+}
+
+func TestState_LegalActions_IncludesTsumoWinAfterAKan(t *testing.T) {
+	actor := *seat.MustSeat(0)
+	s := newStateWithOpenNoYakuTsumoForLegalActionsTest(t, 10, true)
+
+	got, err := s.LegalActions(actor)
+	if err != nil {
+		t.Fatalf("LegalActions() failed: %v", err)
+	}
+	if !containsWin(got, actor, actor, "9s") {
+		t.Error("LegalActions() does not contain Win, want rinshan tsumo win")
+	}
+}
+
+func TestState_LegalActions_IncludesTsumoWinLastTile(t *testing.T) {
+	actor := *seat.MustSeat(0)
+	s := newStateWithOpenNoYakuTsumoForLegalActionsTest(t, 0, false)
+
+	got, err := s.LegalActions(actor)
+	if err != nil {
+		t.Fatalf("LegalActions() failed: %v", err)
+	}
+	if !containsWin(got, actor, actor, "9s") {
+		t.Error("LegalActions() does not contain Win, want haitei tsumo win")
 	}
 }
 
@@ -894,6 +901,33 @@ func openPlayerWithoutYakuTsumoForLegalActionsTest(t *testing.T) player.Player {
 		t.Fatalf("Draw() failed: %v", err)
 	}
 	return p
+}
+
+func newStateWithOpenNoYakuTsumoForLegalActionsTest(t *testing.T, numLeftTiles int, lastDrawWasReplacement bool) *State {
+	t.Helper()
+
+	actor := *seat.MustSeat(0)
+	players := [common.NumPlayers]player.Player{
+		openPlayerWithoutYakuTsumoForLegalActionsTest(t),
+		player.NewInvisiblePlayer(),
+		player.NewInvisiblePlayer(),
+		player.NewInvisiblePlayer(),
+	}
+	s := NewStateForTest(
+		wind.East,
+		1,
+		0,
+		0,
+		[common.NumPlayers]int{25000, 25000, 25000, 25000},
+		actor,
+		actor,
+		tile.Tiles{*tile.MustTileFromCode("E")},
+		numLeftTiles,
+		players,
+	)
+	s.pendingDiscard = &actor
+	s.lastDrawWasReplacement = lastDrawWasReplacement
+	return &s
 }
 
 func newStateBeforeConcealedKanForLegalActionsTest(t *testing.T, numLeftTiles int, numKans int) *State {

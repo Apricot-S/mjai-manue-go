@@ -52,6 +52,7 @@ type State struct {
 	nextDraw                seat.Seat
 	pendingDiscard          *seat.Seat
 	pendingRiichiAcceptance *seat.Seat
+	lastDrawWasReplacement  bool
 	canKyushukyuhai         [common.NumPlayers]bool
 	roundEnded              bool
 	roundEndedByWin         bool

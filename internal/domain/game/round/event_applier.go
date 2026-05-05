@@ -80,6 +80,7 @@ func (s *State) applyDraw(ev *event.Draw) error {
 	}
 
 	s.numLeftTiles--
+	s.lastDrawWasReplacement = isReplacementTileDraw
 	if isReplacementTileDraw {
 		s.pendingRobbedKanTile = nil
 		s.kanProgress = noKanProgress
@@ -106,6 +107,7 @@ func (s *State) applyDiscard(ev *event.Discard) error {
 	if p.RiichiState() == player.RiichiDeclared {
 		s.pendingRiichiAcceptance = &actorSeat
 	}
+	s.lastDrawWasReplacement = false
 	s.canKyushukyuhai[actorSeat.Index()] = false
 	s.pendingDiscard = nil
 	s.nextDraw = *seat.MustSeat((actorSeat.Index() + 1) % common.NumPlayers)
@@ -130,6 +132,7 @@ func (s *State) applyChii(ev *event.Chii) error {
 	}
 	s.disableKyushukyuhaiForAll()
 	s.pendingDiscard = &actorSeat
+	s.lastDrawWasReplacement = false
 	return nil
 }
 
@@ -146,6 +149,7 @@ func (s *State) applyPon(ev *event.Pon) error {
 	}
 	s.disableKyushukyuhaiForAll()
 	s.pendingDiscard = &actorSeat
+	s.lastDrawWasReplacement = false
 	return nil
 }
 
@@ -170,6 +174,7 @@ func (s *State) applyCalledKan(ev *event.CalledKan) error {
 	s.kanProgress = waitingReplacementBeforeDora
 	s.nextDraw = actorSeat
 	s.pendingDiscard = nil
+	s.lastDrawWasReplacement = false
 	return nil
 }
 
@@ -195,6 +200,7 @@ func (s *State) applyConcealedKan(ev *event.ConcealedKan) error {
 	s.kanProgress = waitingReplacementAfterDora
 	s.nextDraw = actorSeat
 	s.pendingDiscard = nil
+	s.lastDrawWasReplacement = false
 	s.lastActor = &actorSeat
 	return nil
 }
@@ -232,6 +238,7 @@ func (s *State) applyPromotedKan(ev *event.PromotedKan) error {
 	s.pendingRobbedKanTile = &added
 	s.nextDraw = actorSeat
 	s.pendingDiscard = nil
+	s.lastDrawWasReplacement = false
 	s.lastActor = &actorSeat
 	return nil
 }

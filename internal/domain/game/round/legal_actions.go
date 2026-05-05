@@ -153,8 +153,18 @@ func (s *State) canWinByTsumo(playerSeat seat.Seat, p *player.VisiblePlayer, win
 		s.SeatWind(playerSeat),
 		true,
 		p.RiichiState() != player.NotRiichi,
-		service.NoEvent,
+		s.tsumoWinEvent(),
 	)
+}
+
+func (s *State) tsumoWinEvent() service.WinEvent {
+	if s.lastDrawWasReplacement {
+		return service.AfterAKan
+	}
+	if s.numLeftTiles == 0 {
+		return service.LastTile
+	}
+	return service.NoEvent
 }
 
 func (s *State) canDeclareKyushukyuhai(playerSeat seat.Seat, p *player.VisiblePlayer) bool {
