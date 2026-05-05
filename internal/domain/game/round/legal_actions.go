@@ -36,7 +36,7 @@ func (s *State) calculateLegalActions(playerSeat seat.Seat) ([]action.Action, er
 	}
 
 	if s.pendingDiscard == nil || *s.pendingDiscard != playerSeat {
-		return nil, nil
+		return s.legalActionsOnOtherDiscard(playerSeat, visiblePlayer)
 	}
 
 	return s.legalActionsOnSelfDraw(playerSeat, visiblePlayer)
