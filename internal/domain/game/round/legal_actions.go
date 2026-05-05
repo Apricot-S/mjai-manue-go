@@ -2,11 +2,13 @@ package round
 
 import (
 	"fmt"
+	"maps"
 	"slices"
 
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/action"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/common"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/round/player"
+	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/round/player/hand"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/round/player/meld"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/round/service"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/seat"
@@ -14,6 +16,7 @@ import (
 )
 
 const maxNumActions = 13 + 1 + 1 // discard + riichi + win
+const maxKanCandidates = 3
 
 func (s *State) LegalActions(playerSeat seat.Seat) ([]action.Action, error) {
 	if actions, ok := s.legalActionsCache[playerSeat]; ok {
@@ -67,6 +70,11 @@ func (s *State) legalActionsOnSelfDraw(playerSeat seat.Seat, p *player.VisiblePl
 		if err := addDiscard(*drawnTile, true); err != nil {
 			return nil, err
 		}
+		concealedKans, err := s.legalConcealedKanActions(playerSeat, p)
+		if err != nil {
+			return nil, err
+		}
+		actions = append(actions, concealedKans...)
 		return actions, nil
 	}
 
@@ -101,7 +109,94 @@ func (s *State) legalActionsOnSelfDraw(playerSeat seat.Seat, p *player.VisiblePl
 	}
 	actions = append(actions, promotedKans...)
 
+	concealedKans, err := s.legalConcealedKanActions(playerSeat, p)
+	if err != nil {
+		return nil, err
+	}
+	actions = append(actions, concealedKans...)
+
 	return actions, nil
+}
+
+func (s *State) legalConcealedKanActions(playerSeat seat.Seat, p *player.VisiblePlayer) ([]action.Action, error) {
+	if s.numKans >= maxNumKan || s.numLeftTiles <= 0 {
+		return nil, nil
+	}
+	if p.RiichiState() == player.RiichiDeclared {
+		return nil, nil
+	}
+
+	handBeforeKan, ok := p.Hand()
+	if !ok {
+		return nil, nil
+	}
+	drawnTile := p.DrawnTile()
+	if drawnTile == nil {
+		return nil, nil
+	}
+
+	handAfterDraw, err := handBeforeKan.Draw(drawnTile)
+	if err != nil {
+		return nil, nil
+	}
+
+	actions := make([]action.Action, 0, maxKanCandidates)
+	for id, count := range handAfterDraw.ToTileCounts34() {
+		if count != 4 {
+			continue
+		}
+		candidate := *tile.MustTileFromID(id)
+		consumed := concealedKanConsumedTiles(candidate)
+		if p.RiichiState() == player.RiichiAccepted && !canConcealedKanAfterRiichi(handBeforeKan, *drawnTile, consumed) {
+			continue
+		}
+
+		k, err := meld.NewConcealedKan(consumed)
+		if err != nil {
+			continue
+		}
+		a, err := action.NewConcealedKan(playerSeat, [4]tile.Tile(k.Consumed()))
+		if err != nil {
+			return nil, err
+		}
+		actions = append(actions, a)
+	}
+	return actions, nil
+}
+
+func concealedKanConsumedTiles(candidate tile.Tile) [4]tile.Tile {
+	return [4]tile.Tile{candidate, candidate, candidate, candidate.AddRed()}
+}
+
+func canConcealedKanAfterRiichi(handBeforeKan *hand.VisibleHand, drawnTile tile.Tile, consumed [4]tile.Tile) bool {
+	if !drawnTile.HasSameSymbol(&consumed[0]) {
+		return false
+	}
+	drawnTileID34 := drawnTile.RemoveRed().ID()
+	tc34AfterKan := *handBeforeKan.ToTileCounts34()
+	if tc34AfterKan[drawnTileID34] != 3 {
+		return false
+	}
+	tc34AfterKan[drawnTileID34] = 0
+	handAfterKan := hand.MustVisibleHand(tc34AfterKan.ToTiles())
+	return maps.Equal(waitsFor(handBeforeKan), waitsFor(handAfterKan))
+}
+
+type waitSet map[int]struct{}
+
+func waitsFor(h *hand.VisibleHand) waitSet {
+	waits := waitSet{}
+	for id := range tile.NumTileType34 {
+		waitTile := tile.MustTileFromID(id)
+		handWithWait, err := h.Draw(waitTile)
+		if err != nil {
+			continue
+		}
+		if service.IsWinningForm(handWithWait) {
+			waits[id] = struct{}{}
+		}
+	}
+	return waits
 }
 
 func (s *State) legalPromotedKanActions(playerSeat seat.Seat, p *player.VisiblePlayer) ([]action.Action, error) {
@@ -115,7 +210,7 @@ func (s *State) legalPromotedKanActions(playerSeat seat.Seat, p *player.VisibleP
 	}
 	addedTiles = addedTiles.Distinct(nil)
 
-	actions := make([]action.Action, 0, len(p.Melds()))
+	actions := make([]action.Action, 0, maxKanCandidates)
 	for _, m := range p.Melds() {
 		pon, ok := m.(*meld.Pon)
 		if !ok {

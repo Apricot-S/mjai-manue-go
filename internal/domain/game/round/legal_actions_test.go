@@ -7,8 +7,10 @@ import (
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/action"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/common"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/event"
+	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/round/player/hand"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/seat"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/tile"
+	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/wind"
 )
 
 func TestState_LegalActions_NoPendingAction(t *testing.T) {
@@ -231,6 +233,107 @@ func TestState_LegalActions_IncludesPromotedKan(t *testing.T) {
 	}
 	if !containsPromotedKan(got, actor, "E", [3]string{"E", "E", "E"}) {
 		t.Error("LegalActions() does not contain PromotedKan, want kakan for existing pon")
+	}
+}
+
+func TestState_LegalActions_IncludesConcealedKan(t *testing.T) {
+	hands := newValidHands()
+	hands[0] = concealedKanHandForTest()
+	s := mustNewRoundStateForTest(t, hands)
+	actor := *seat.MustSeat(0)
+	kanTile := *tile.MustTileFromCode("E")
+	if err := s.Apply(event.NewDraw(actor, kanTile)); err != nil {
+		t.Fatalf("Apply(Draw) failed: %v", err)
+	}
+
+	got, err := s.LegalActions(actor)
+	if err != nil {
+		t.Fatalf("LegalActions() failed: %v", err)
+	}
+	if !containsConcealedKan(got, actor, [4]string{"E", "E", "E", "E"}) {
+		t.Error("LegalActions() does not contain ConcealedKan, want ankan for four identical tiles")
+	}
+}
+
+func TestState_LegalActions_ExcludesConcealedKan(t *testing.T) {
+	tests := []struct {
+		name string
+		s    *State
+	}{
+		{
+			name: "no replacement tile left",
+			s:    newStateBeforeConcealedKanForLegalActionsTest(t, 0, 0),
+		},
+		{
+			name: "fifth kan",
+			s:    newStateBeforeConcealedKanForLegalActionsTest(t, 10, maxNumKan),
+		},
+	}
+
+	actor := *seat.MustSeat(0)
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := tt.s.LegalActions(actor)
+			if err != nil {
+				t.Fatalf("LegalActions() failed: %v", err)
+			}
+			if containsConcealedKan(got, actor, [4]string{"E", "E", "E", "E"}) {
+				t.Error("LegalActions() contains ConcealedKan unexpectedly")
+			}
+		})
+	}
+}
+
+func TestState_LegalActions_AfterRiichiAcceptedIncludesConcealedKanWhenWaitsDoNotChange(t *testing.T) {
+	s := newRiichiAcceptedStateBeforeConcealedKanForTest(t)
+	actor := *seat.MustSeat(0)
+	kanTile := *tile.MustTileFromCode("1m")
+	if err := s.Apply(event.NewDraw(actor, kanTile)); err != nil {
+		t.Fatalf("Apply(Draw) failed: %v", err)
+	}
+
+	got, err := s.LegalActions(actor)
+	if err != nil {
+		t.Fatalf("LegalActions() failed: %v", err)
+	}
+	if !containsConcealedKan(got, actor, [4]string{"1m", "1m", "1m", "1m"}) {
+		t.Error("LegalActions() does not contain ConcealedKan, want ankan after riichi when waits do not change")
+	}
+}
+
+func TestCanConcealedKanAfterRiichi_ReturnsFalseForFourTilesInHand(t *testing.T) {
+	handBeforeKan := hand.CodesToHand([]string{
+		"1m", "1m", "1m", "1m",
+		"2p", "3p",
+		"4s", "5s", "6s",
+		"7s", "8s", "9s",
+		"E",
+	})
+	kanTile := *tile.MustTileFromCode("1m")
+
+	if canConcealedKanAfterRiichi(handBeforeKan, kanTile, [4]tile.Tile{kanTile, kanTile, kanTile, kanTile}) {
+		t.Error("canConcealedKanAfterRiichi() = true, want false for kan made from four tiles already in hand")
+	}
+}
+
+func TestCanConcealedKanAfterRiichi_HandlesRedFiveInHand(t *testing.T) {
+	handBeforeKan := hand.CodesToHand([]string{
+		"5m", "5m", "5mr",
+		"2p", "3p",
+		"4s", "5s", "6s",
+		"7s", "8s", "9s",
+		"E", "E",
+	})
+	drawnTile := *tile.MustTileFromCode("5m")
+	consumed := [4]tile.Tile{
+		*tile.MustTileFromCode("5m"),
+		*tile.MustTileFromCode("5m"),
+		*tile.MustTileFromCode("5m"),
+		*tile.MustTileFromCode("5mr"),
+	}
+
+	if !canConcealedKanAfterRiichi(handBeforeKan, drawnTile, consumed) {
+		t.Error("canConcealedKanAfterRiichi() = false, want true for hand containing red five")
 	}
 }
 
@@ -487,10 +590,101 @@ func containsPromotedKan(actions []action.Action, actor seat.Seat, addedCode str
 	return false
 }
 
+func containsConcealedKan(actions []action.Action, actor seat.Seat, consumedCodes [4]string) bool {
+	for _, a := range actions {
+		concealedKan, ok := a.(*action.ConcealedKan)
+		if !ok {
+			continue
+		}
+		if concealedKan.Actor() != actor {
+			continue
+		}
+		consumed := concealedKan.Consumed()
+		if consumed[0].String() == consumedCodes[0] &&
+			consumed[1].String() == consumedCodes[1] &&
+			consumed[2].String() == consumedCodes[2] &&
+			consumed[3].String() == consumedCodes[3] {
+			return true
+		}
+	}
+	return false
+}
+
 func unknownHandForLegalActionsTest() [common.InitHandSize]tile.Tile {
 	var hand [common.InitHandSize]tile.Tile
 	for i := range hand {
 		hand[i] = *tile.MustTileFromCode("?")
 	}
 	return hand
+}
+
+func newStateBeforeConcealedKanForLegalActionsTest(t *testing.T, numLeftTiles int, numKans int) *State {
+	t.Helper()
+
+	hands := newValidHands()
+	hands[0] = concealedKanHandForTest()
+	s := NewStateForTest(
+		wind.East,
+		1,
+		0,
+		0,
+		[common.NumPlayers]int{25000, 25000, 25000, 25000},
+		*seat.MustSeat(0),
+		*seat.MustSeat(0),
+		tile.Tiles{*tile.MustTileFromCode("E")},
+		numLeftTiles+1,
+		newVisiblePlayersForTest(t, hands),
+	)
+	actor := *seat.MustSeat(0)
+	if err := s.Apply(event.NewDraw(actor, *tile.MustTileFromCode("E"))); err != nil {
+		t.Fatalf("Apply(Draw) failed: %v", err)
+	}
+	s.numKans = numKans
+	return &s
+}
+
+func newRiichiAcceptedStateBeforeConcealedKanForTest(t *testing.T) *State {
+	t.Helper()
+
+	hands := newValidHands()
+	hands[0] = [common.InitHandSize]tile.Tile{
+		*tile.MustTileFromCode("1m"),
+		*tile.MustTileFromCode("1m"),
+		*tile.MustTileFromCode("1m"),
+		*tile.MustTileFromCode("2p"),
+		*tile.MustTileFromCode("3p"),
+		*tile.MustTileFromCode("4s"),
+		*tile.MustTileFromCode("5s"),
+		*tile.MustTileFromCode("6s"),
+		*tile.MustTileFromCode("7s"),
+		*tile.MustTileFromCode("8s"),
+		*tile.MustTileFromCode("E"),
+		*tile.MustTileFromCode("E"),
+		*tile.MustTileFromCode("W"),
+	}
+	s := mustNewRoundStateForTest(t, hands)
+	actor := *seat.MustSeat(0)
+	if err := s.Apply(event.NewDraw(actor, *tile.MustTileFromCode("9s"))); err != nil {
+		t.Fatalf("Apply(first Draw) failed: %v", err)
+	}
+	if err := s.Apply(event.NewRiichi(actor)); err != nil {
+		t.Fatalf("Apply(Riichi) failed: %v", err)
+	}
+	if err := s.Apply(event.NewDiscard(actor, *tile.MustTileFromCode("W"), false)); err != nil {
+		t.Fatalf("Apply(first Discard) failed: %v", err)
+	}
+	if err := s.Apply(event.NewRiichiAccepted(actor, nil, nil)); err != nil {
+		t.Fatalf("Apply(RiichiAccepted) failed: %v", err)
+	}
+	for i := 1; i < 4; i++ {
+		other := *seat.MustSeat(i)
+		drawnTile := *tile.MustTileFromCode("6m")
+		if err := s.Apply(event.NewDraw(other, drawnTile)); err != nil {
+			t.Fatalf("Apply(other Draw %d) failed: %v", i, err)
+		}
+		if err := s.Apply(event.NewDiscard(other, drawnTile, true)); err != nil {
+			t.Fatalf("Apply(other Discard %d) failed: %v", i, err)
+		}
+	}
+	return s
 }
