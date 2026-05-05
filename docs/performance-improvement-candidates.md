@@ -213,6 +213,8 @@ Status: 改善済み。ID -> `Tile` table を追加し、`NewTileFromID` / `Must
 
 ### 6. 役判定の nested map を配列または bit mask に置換
 
+Status: 改善済み。`sanshokuDoujun` / `ikkiTsuukan` / `sanshokuDoukou` は nested map ではなく bit mask を使うように変更済み。
+
 対象:
 
 - `internal/domain/game/round/service/yaku.go`

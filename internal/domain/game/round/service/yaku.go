@@ -400,12 +400,36 @@ func iipeikou(allBlocks []block.Block, isOpen bool) int {
 	return 0
 }
 
-func sanshokuDoujun(allBlocks []block.Block, isOpen bool) int {
-	colorNumMap := map[rune]map[int]bool{
-		tile.ManzuColor: {},
-		tile.PinzuColor: {},
-		tile.SouzuColor: {},
+const allSuitColorBits = 0b111
+
+func suitColorBit(c rune) uint8 {
+	switch c {
+	case tile.ManzuColor:
+		return 1 << 0
+	case tile.PinzuColor:
+		return 1 << 1
+	case tile.SouzuColor:
+		return 1 << 2
+	default:
+		return 0
 	}
+}
+
+func suitColorIndex(c rune) int {
+	switch c {
+	case tile.ManzuColor:
+		return 0
+	case tile.PinzuColor:
+		return 1
+	case tile.SouzuColor:
+		return 2
+	default:
+		return -1
+	}
+}
+
+func sanshokuDoujun(allBlocks []block.Block, isOpen bool) int {
+	var colorBitsByNumber [8]uint8
 
 	for _, b := range allBlocks {
 		sequence, ok := b.(*block.Sequence)
@@ -414,13 +438,11 @@ func sanshokuDoujun(allBlocks []block.Block, isOpen bool) int {
 		}
 
 		t := sequence.ToTiles()[0]
-		colorNumMap[t.Color()][t.Number()] = true
+		colorBitsByNumber[t.Number()] |= suitColorBit(t.Color())
 	}
 
 	for n := 1; n <= 7; n++ {
-		if colorNumMap[tile.ManzuColor][n] &&
-			colorNumMap[tile.PinzuColor][n] &&
-			colorNumMap[tile.SouzuColor][n] {
+		if colorBitsByNumber[n] == allSuitColorBits {
 			if isOpen {
 				return 1
 			}
@@ -432,11 +454,7 @@ func sanshokuDoujun(allBlocks []block.Block, isOpen bool) int {
 }
 
 func ikkiTsuukan(allBlocks []block.Block, isOpen bool) int {
-	colorNumMap := map[rune]map[int]bool{
-		tile.ManzuColor: {},
-		tile.PinzuColor: {},
-		tile.SouzuColor: {},
-	}
+	var numberBitsByColor [3]uint16
 
 	for _, b := range allBlocks {
 		sequence, ok := b.(*block.Sequence)
@@ -445,11 +463,15 @@ func ikkiTsuukan(allBlocks []block.Block, isOpen bool) int {
 		}
 
 		t := sequence.ToTiles()[0]
-		colorNumMap[t.Color()][t.Number()] = true
+		colorIndex := suitColorIndex(t.Color())
+		if colorIndex < 0 {
+			continue
+		}
+		numberBitsByColor[colorIndex] |= 1 << t.Number()
 	}
 
-	for _, c := range []rune{tile.ManzuColor, tile.PinzuColor, tile.SouzuColor} {
-		if colorNumMap[c][1] && colorNumMap[c][4] && colorNumMap[c][7] {
+	for _, numberBits := range numberBitsByColor {
+		if numberBits&(1<<1) != 0 && numberBits&(1<<4) != 0 && numberBits&(1<<7) != 0 {
 			if isOpen {
 				return 1
 			}
@@ -571,12 +593,7 @@ func sanankou(
 }
 
 func sanshokuDoukou(allBlocks []block.Block) int {
-	colorNumMap := map[rune]map[int]bool{
-		tile.ManzuColor:  {},
-		tile.PinzuColor:  {},
-		tile.SouzuColor:  {},
-		tile.HonorsColor: {},
-	}
+	var colorBitsByNumber [10]uint8
 
 	for _, b := range allBlocks {
 		switch b.(type) {
@@ -585,13 +602,11 @@ func sanshokuDoukou(allBlocks []block.Block) int {
 		}
 
 		t := b.ToTiles()[0]
-		colorNumMap[t.Color()][t.Number()] = true
+		colorBitsByNumber[t.Number()] |= suitColorBit(t.Color())
 	}
 
 	for n := 1; n <= 9; n++ {
-		if colorNumMap[tile.ManzuColor][n] &&
-			colorNumMap[tile.PinzuColor][n] &&
-			colorNumMap[tile.SouzuColor][n] {
+		if colorBitsByNumber[n] == allSuitColorBits {
 			return 2
 		}
 	}
