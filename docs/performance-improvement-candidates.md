@@ -40,6 +40,8 @@ go test ./internal/domain/game/round/service -bench BenchmarkShantenAnalysis -be
 
 ### 1. `AnalyzeShanten` の DFS 中の allocation 削減
 
+Status: 改善済み（一部）。DFS 中の block slice copy をやめ、Goal 保存時だけ block 列をコピーするように変更済み。
+
 対象:
 
 - `internal/domain/game/round/service/shanten.go`
@@ -105,6 +107,8 @@ go test ./internal/domain/game/round/service -bench BenchmarkShantenAnalysis -be
 - 赤牌は `TileCounts34` 化された後の判定なので、table key には含めない。
 
 ### 3. `waitsFor` の bitset 化と手牌生成削減
+
+Status: 改善中。待ち集合の `uint64` bitset 化は実装済み。`VisibleHand` 生成削減は未実施。
 
 対象:
 
