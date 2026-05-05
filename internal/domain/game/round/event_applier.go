@@ -17,6 +17,12 @@ type EventApplier interface {
 }
 
 func (s *State) Apply(ev event.Event) error {
+	if s.roundEnded {
+		if _, ok := ev.(*event.Win); !ok || !s.roundEndedByWin {
+			return fmt.Errorf("cannot apply %T: round already ended", ev)
+		}
+	}
+
 	var err error
 	switch ev := ev.(type) {
 	case *event.Draw:
@@ -301,13 +307,42 @@ func (s *State) applyRiichiAcceptedScoreUpdate(ev *event.RiichiAccepted) {
 }
 
 func (s *State) applyWin(ev *event.Win) error {
-	if !s.canApplyWin(ev) {
+	if s.roundEnded {
+		if !s.canApplyAdditionalWin(ev) {
+			return fmt.Errorf("cannot Win: round already ended")
+		}
+	} else if !s.canApplyWin(ev) {
 		return fmt.Errorf("cannot Win: invalid timing")
 	}
 	s.applyScoreUpdate(ev.Scores(), ev.Deltas())
+	s.roundEnded = true
+	s.roundEndedByWin = true
 	actorSeat := ev.Actor()
+	targetSeat := ev.Target()
+	s.winTarget = &targetSeat
+	s.winActors[actorSeat.Index()] = true
 	s.lastActor = &actorSeat
 	return nil
+}
+
+func (s *State) canApplyAdditionalWin(ev *event.Win) bool {
+	if !s.roundEndedByWin || s.winTarget == nil {
+		// Additional wins are only possible after a previous win in this round.
+		return false
+	}
+	if ev.Actor() == ev.Target() {
+		// Tsumo immediately ends the round, so it cannot have double/triple wins.
+		return false
+	}
+	if ev.Target() != *s.winTarget {
+		// Double/triple ron must be against the same discarding player.
+		return false
+	}
+	if s.winActors[ev.Actor().Index()] {
+		// The same player cannot win twice from the same discard.
+		return false
+	}
+	return s.canApplyWin(ev)
 }
 
 func (s *State) canApplyWin(ev *event.Win) bool {
@@ -352,6 +387,7 @@ func isTileMatchKnownEnough(stateTile *tile.Tile, eventTile *tile.Tile) bool {
 
 func (s *State) applyDrawRound(ev *event.DrawRound) error {
 	s.applyScoreUpdate(ev.Scores(), ev.Deltas())
+	s.roundEnded = true
 	return nil
 }
 

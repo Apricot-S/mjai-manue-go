@@ -35,6 +35,10 @@ func (s *State) LegalActions(playerSeat seat.Seat) ([]action.Action, error) {
 }
 
 func (s *State) calculateLegalActions(playerSeat seat.Seat) ([]action.Action, error) {
+	if s.roundEnded {
+		return nil, nil
+	}
+
 	visiblePlayer, ok := s.players[playerSeat.Index()].(*player.VisiblePlayer)
 	if !ok {
 		return nil, fmt.Errorf("cannot list legal actions: player %d is invisible", playerSeat.Index())

@@ -53,6 +53,10 @@ type State struct {
 	pendingDiscard          *seat.Seat
 	pendingRiichiAcceptance *seat.Seat
 	canKyushukyuhai         [common.NumPlayers]bool
+	roundEnded              bool
+	roundEndedByWin         bool
+	winTarget               *seat.Seat
+	winActors               [common.NumPlayers]bool
 	lastActor               *seat.Seat
 	players                 [common.NumPlayers]player.Player
 	legalActionsCache       map[seat.Seat][]action.Action
