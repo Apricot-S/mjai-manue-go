@@ -103,6 +103,10 @@ func (s *State) legalActionsOnSelfDraw(playerSeat seat.Seat, p *player.VisiblePl
 		actions = append(actions, action.NewRiichi(playerSeat))
 	}
 
+	if s.canDeclareKyushukyuhai(playerSeat, p) {
+		actions = append(actions, action.NewKyushukyuhai(playerSeat))
+	}
+
 	promotedKans, err := s.legalPromotedKanActions(playerSeat, p)
 	if err != nil {
 		return nil, err
@@ -116,6 +120,34 @@ func (s *State) legalActionsOnSelfDraw(playerSeat seat.Seat, p *player.VisiblePl
 	actions = append(actions, concealedKans...)
 
 	return actions, nil
+}
+
+func (s *State) canDeclareKyushukyuhai(playerSeat seat.Seat, p *player.VisiblePlayer) bool {
+	if !s.canKyushukyuhai[playerSeat.Index()] {
+		return false
+	}
+
+	handBeforeDeclare, ok := p.Hand()
+	if !ok {
+		return false
+	}
+	drawnTile := p.DrawnTile()
+	if drawnTile == nil {
+		return false
+	}
+	handAfterDraw, err := handBeforeDeclare.Draw(drawnTile)
+	if err != nil {
+		return false
+	}
+
+	tc34 := handAfterDraw.ToTileCounts34()
+	numYaochuTypes := 0
+	for _, id := range tile.YaochuhaiIDs {
+		if tc34[id] > 0 {
+			numYaochuTypes++
+		}
+	}
+	return numYaochuTypes >= 9
 }
 
 func (s *State) legalConcealedKanActions(playerSeat seat.Seat, p *player.VisiblePlayer) ([]action.Action, error) {

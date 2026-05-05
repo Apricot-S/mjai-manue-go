@@ -100,6 +100,7 @@ func (s *State) applyDiscard(ev *event.Discard) error {
 	if p.RiichiState() == player.RiichiDeclared {
 		s.pendingRiichiAcceptance = &actorSeat
 	}
+	s.canKyushukyuhai[actorSeat.Index()] = false
 	s.pendingDiscard = nil
 	s.nextDraw = *seat.MustSeat((actorSeat.Index() + 1) % common.NumPlayers)
 	s.lastActor = &actorSeat
@@ -121,6 +122,7 @@ func (s *State) applyChii(ev *event.Chii) error {
 	}); err != nil {
 		return err
 	}
+	s.disableKyushukyuhaiForAll()
 	s.pendingDiscard = &actorSeat
 	return nil
 }
@@ -136,6 +138,7 @@ func (s *State) applyPon(ev *event.Pon) error {
 	}); err != nil {
 		return err
 	}
+	s.disableKyushukyuhaiForAll()
 	s.pendingDiscard = &actorSeat
 	return nil
 }
@@ -154,6 +157,7 @@ func (s *State) applyCalledKan(ev *event.CalledKan) error {
 	}); err != nil {
 		return err
 	}
+	s.disableKyushukyuhaiForAll()
 	s.numKans++
 	s.pendingKanActor = &actorSeat
 	s.pendingDoraReveals++
@@ -179,6 +183,7 @@ func (s *State) applyConcealedKan(ev *event.ConcealedKan) error {
 	}
 	s.numKans++
 	actorSeat := ev.Actor()
+	s.disableKyushukyuhaiForAll()
 	s.pendingKanActor = &actorSeat
 	s.pendingDoraReveals++
 	s.kanProgress = waitingReplacementAfterDora
@@ -359,6 +364,12 @@ func (s *State) applyScoreUpdate(scores *[common.NumPlayers]int, deltas *[common
 		for i, delta := range deltas {
 			s.scores[i] += delta
 		}
+	}
+}
+
+func (s *State) disableKyushukyuhaiForAll() {
+	for i := range s.canKyushukyuhai {
+		s.canKyushukyuhai[i] = false
 	}
 }
 

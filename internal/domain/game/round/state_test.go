@@ -36,7 +36,13 @@ func NewStateForTest(
 		doraIndicators: doraIndicators,
 		numLeftTiles:   numLeftTiles,
 		nextDraw:       dealer,
-		players:        players,
+		canKyushukyuhai: [common.NumPlayers]bool{
+			true,
+			true,
+			true,
+			true,
+		},
+		players: players,
 	}
 }
 

@@ -223,6 +223,102 @@ func TestState_LegalActions_ExcludesRiichi(t *testing.T) {
 	}
 }
 
+func TestState_LegalActions_IncludesKyushukyuhai(t *testing.T) {
+	hands := newValidHands()
+	hands[0] = kyushukyuhaiHandForTest()
+	s := mustNewRoundStateForTest(t, hands)
+	actor := *seat.MustSeat(0)
+	if err := s.Apply(event.NewDraw(actor, *tile.MustTileFromCode("W"))); err != nil {
+		t.Fatalf("Apply(Draw) failed: %v", err)
+	}
+
+	got, err := s.LegalActions(actor)
+	if err != nil {
+		t.Fatalf("LegalActions() failed: %v", err)
+	}
+	if !containsKyushukyuhai(got, actor) {
+		t.Error("LegalActions() does not contain Kyushukyuhai, want abortive draw with 9 yaochu types")
+	}
+}
+
+func TestState_LegalActions_ExcludesKyushukyuhaiAfterFirstDiscard(t *testing.T) {
+	hands := newValidHands()
+	hands[0] = kyushukyuhaiHandForTest()
+	s := mustNewRoundStateForTest(t, hands)
+	actor := *seat.MustSeat(0)
+	firstDraw := *tile.MustTileFromCode("W")
+	if err := s.Apply(event.NewDraw(actor, firstDraw)); err != nil {
+		t.Fatalf("Apply(first Draw) failed: %v", err)
+	}
+	if err := s.Apply(event.NewDiscard(actor, firstDraw, true)); err != nil {
+		t.Fatalf("Apply(first Discard) failed: %v", err)
+	}
+	for i := 1; i < 4; i++ {
+		other := *seat.MustSeat(i)
+		drawnTile := *tile.MustTileFromCode("6m")
+		if err := s.Apply(event.NewDraw(other, drawnTile)); err != nil {
+			t.Fatalf("Apply(other Draw %d) failed: %v", i, err)
+		}
+		if err := s.Apply(event.NewDiscard(other, drawnTile, true)); err != nil {
+			t.Fatalf("Apply(other Discard %d) failed: %v", i, err)
+		}
+	}
+	if err := s.Apply(event.NewDraw(actor, *tile.MustTileFromCode("N"))); err != nil {
+		t.Fatalf("Apply(second Draw) failed: %v", err)
+	}
+
+	got, err := s.LegalActions(actor)
+	if err != nil {
+		t.Fatalf("LegalActions() failed: %v", err)
+	}
+	if containsKyushukyuhai(got, actor) {
+		t.Error("LegalActions() contains Kyushukyuhai after first discard")
+	}
+}
+
+func TestState_LegalActions_ExcludesKyushukyuhaiForOtherPlayersAfterConcealedKan(t *testing.T) {
+	hands := newValidHands()
+	hands[0] = concealedKanHandForTest()
+	for i := 1; i < common.NumPlayers; i++ {
+		hands[i] = kyushukyuhaiHandForTest()
+	}
+	s := mustNewRoundStateForTest(t, hands)
+	kanActor := *seat.MustSeat(0)
+	kanTile := *tile.MustTileFromCode("E")
+	if err := s.Apply(event.NewDraw(kanActor, kanTile)); err != nil {
+		t.Fatalf("Apply(Draw) failed: %v", err)
+	}
+	if err := s.Apply(event.NewConcealedKan(kanActor, [4]tile.Tile{kanTile, kanTile, kanTile, kanTile})); err != nil {
+		t.Fatalf("Apply(ConcealedKan) failed: %v", err)
+	}
+	if err := s.Apply(event.NewDora(*tile.MustTileFromCode("6p"))); err != nil {
+		t.Fatalf("Apply(Dora) failed: %v", err)
+	}
+	if err := s.Apply(event.NewDraw(kanActor, *tile.MustTileFromCode("N"))); err != nil {
+		t.Fatalf("Apply(replacement Draw) failed: %v", err)
+	}
+	if err := s.Apply(event.NewDiscard(kanActor, *tile.MustTileFromCode("N"), true)); err != nil {
+		t.Fatalf("Apply(Discard) failed: %v", err)
+	}
+
+	for i := 1; i < common.NumPlayers; i++ {
+		actor := *seat.MustSeat(i)
+		if err := s.Apply(event.NewDraw(actor, *tile.MustTileFromCode("W"))); err != nil {
+			t.Fatalf("Apply(Draw %d) failed: %v", i, err)
+		}
+		got, err := s.LegalActions(actor)
+		if err != nil {
+			t.Fatalf("LegalActions(%d) failed: %v", i, err)
+		}
+		if containsKyushukyuhai(got, actor) {
+			t.Errorf("LegalActions(%d) contains Kyushukyuhai after earlier concealed kan", i)
+		}
+		if err := s.Apply(event.NewDiscard(actor, *tile.MustTileFromCode("W"), true)); err != nil {
+			t.Fatalf("Apply(Discard %d) failed: %v", i, err)
+		}
+	}
+}
+
 func TestState_LegalActions_IncludesPromotedKan(t *testing.T) {
 	s := newStateBeforePromotedKanForTest(t, 10, 0)
 	actor := *seat.MustSeat(3)
@@ -603,6 +699,19 @@ func containsRiichi(actions []action.Action, actor seat.Seat) bool {
 	return false
 }
 
+func containsKyushukyuhai(actions []action.Action, actor seat.Seat) bool {
+	for _, a := range actions {
+		kyushukyuhai, ok := a.(*action.Kyushukyuhai)
+		if !ok {
+			continue
+		}
+		if kyushukyuhai.Actor() == actor {
+			return true
+		}
+	}
+	return false
+}
+
 func containsPromotedKan(actions []action.Action, actor seat.Seat, addedCode string, consumedCodes [3]string) bool {
 	for _, a := range actions {
 		promotedKan, ok := a.(*action.PromotedKan)
@@ -648,6 +757,24 @@ func unknownHandForLegalActionsTest() [common.InitHandSize]tile.Tile {
 		hand[i] = *tile.MustTileFromCode("?")
 	}
 	return hand
+}
+
+func kyushukyuhaiHandForTest() [common.InitHandSize]tile.Tile {
+	return [common.InitHandSize]tile.Tile{
+		*tile.MustTileFromCode("1m"),
+		*tile.MustTileFromCode("9m"),
+		*tile.MustTileFromCode("1p"),
+		*tile.MustTileFromCode("9p"),
+		*tile.MustTileFromCode("1s"),
+		*tile.MustTileFromCode("9s"),
+		*tile.MustTileFromCode("E"),
+		*tile.MustTileFromCode("S"),
+		*tile.MustTileFromCode("2m"),
+		*tile.MustTileFromCode("3m"),
+		*tile.MustTileFromCode("4m"),
+		*tile.MustTileFromCode("5m"),
+		*tile.MustTileFromCode("6m"),
+	}
 }
 
 func newStateBeforeConcealedKanForLegalActionsTest(t *testing.T, numLeftTiles int, numKans int) *State {

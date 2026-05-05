@@ -52,6 +52,7 @@ type State struct {
 	nextDraw                seat.Seat
 	pendingDiscard          *seat.Seat
 	pendingRiichiAcceptance *seat.Seat
+	canKyushukyuhai         [common.NumPlayers]bool
 	lastActor               *seat.Seat
 	players                 [common.NumPlayers]player.Player
 	legalActionsCache       map[seat.Seat][]action.Action
@@ -86,6 +87,9 @@ func NewState(ev *event.StartRound, previousScores [common.NumPlayers]int) (*Sta
 	s.doraIndicators = append(s.doraIndicators, ev.DoraIndicator())
 	s.numLeftTiles = NumInitWall
 	s.nextDraw = ev.Dealer()
+	for i := range s.canKyushukyuhai {
+		s.canKyushukyuhai[i] = true
+	}
 
 	if ev.Scores() != nil {
 		s.scores = *ev.Scores()
