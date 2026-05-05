@@ -221,6 +221,48 @@ func TestState_LegalActions_ExcludesRiichi(t *testing.T) {
 	}
 }
 
+func TestState_LegalActions_IncludesPromotedKan(t *testing.T) {
+	s := newStateBeforePromotedKanForTest(t, 10, 0)
+	actor := *seat.MustSeat(3)
+
+	got, err := s.LegalActions(actor)
+	if err != nil {
+		t.Fatalf("LegalActions() failed: %v", err)
+	}
+	if !containsPromotedKan(got, actor, "E", [3]string{"E", "E", "E"}) {
+		t.Error("LegalActions() does not contain PromotedKan, want kakan for existing pon")
+	}
+}
+
+func TestState_LegalActions_ExcludesPromotedKan(t *testing.T) {
+	tests := []struct {
+		name string
+		s    *State
+	}{
+		{
+			name: "no replacement tile left",
+			s:    newStateBeforePromotedKanForTest(t, 0, 0),
+		},
+		{
+			name: "fifth kan",
+			s:    newStateBeforePromotedKanForTest(t, 10, maxNumKan),
+		},
+	}
+
+	actor := *seat.MustSeat(3)
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := tt.s.LegalActions(actor)
+			if err != nil {
+				t.Fatalf("LegalActions() failed: %v", err)
+			}
+			if containsPromotedKan(got, actor, "E", [3]string{"E", "E", "E"}) {
+				t.Error("LegalActions() contains PromotedKan unexpectedly")
+			}
+		})
+	}
+}
+
 func TestState_LegalActions_AfterRiichiAcceptedAllowsOnlyTsumogiri(t *testing.T) {
 	hands := newValidHands()
 	hands[0] = riichiReadyHandForTest()
@@ -420,6 +462,25 @@ func containsRiichi(actions []action.Action, actor seat.Seat) bool {
 			continue
 		}
 		if riichi.Actor() == actor {
+			return true
+		}
+	}
+	return false
+}
+
+func containsPromotedKan(actions []action.Action, actor seat.Seat, addedCode string, consumedCodes [3]string) bool {
+	for _, a := range actions {
+		promotedKan, ok := a.(*action.PromotedKan)
+		if !ok {
+			continue
+		}
+		if promotedKan.Actor() != actor || promotedKan.Added().String() != addedCode {
+			continue
+		}
+		consumed := promotedKan.Consumed()
+		if consumed[0].String() == consumedCodes[0] &&
+			consumed[1].String() == consumedCodes[1] &&
+			consumed[2].String() == consumedCodes[2] {
 			return true
 		}
 	}

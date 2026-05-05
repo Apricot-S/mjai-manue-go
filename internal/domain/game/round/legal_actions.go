@@ -7,6 +7,7 @@ import (
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/action"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/common"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/round/player"
+	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/round/player/meld"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/round/service"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/seat"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/tile"
@@ -94,6 +95,45 @@ func (s *State) legalActionsOnSelfDraw(playerSeat seat.Seat, p *player.VisiblePl
 		actions = append(actions, action.NewRiichi(playerSeat))
 	}
 
+	promotedKans, err := s.legalPromotedKanActions(playerSeat, p)
+	if err != nil {
+		return nil, err
+	}
+	actions = append(actions, promotedKans...)
+
+	return actions, nil
+}
+
+func (s *State) legalPromotedKanActions(playerSeat seat.Seat, p *player.VisiblePlayer) ([]action.Action, error) {
+	if s.numKans >= maxNumKan || s.numLeftTiles <= 0 {
+		return nil, nil
+	}
+
+	addedTiles := tile.Tiles(p.HandTiles())
+	if drawnTile := p.DrawnTile(); drawnTile != nil {
+		addedTiles = append(addedTiles, *drawnTile)
+	}
+	addedTiles = addedTiles.Distinct(nil)
+
+	actions := make([]action.Action, 0, len(p.Melds()))
+	for _, m := range p.Melds() {
+		pon, ok := m.(*meld.Pon)
+		if !ok {
+			continue
+		}
+
+		for _, added := range addedTiles {
+			k, err := meld.NewPromotedKan(*pon.Taken(), [2]tile.Tile(pon.Consumed()), added, *pon.Target())
+			if err != nil {
+				continue
+			}
+			a, err := action.NewPromotedKan(playerSeat, *k.Added(), [3]tile.Tile(pon.ToTiles()))
+			if err != nil {
+				return nil, err
+			}
+			actions = append(actions, a)
+		}
+	}
 	return actions, nil
 }
 
