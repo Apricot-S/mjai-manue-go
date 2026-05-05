@@ -301,6 +301,23 @@ func TestState_LegalActions_AfterRiichiAcceptedIncludesConcealedKanWhenWaitsDoNo
 	}
 }
 
+func TestState_LegalActions_AfterRiichiAcceptedIncludesConcealedKanWhenOnlyWinningFormChanges(t *testing.T) {
+	s := newRiichiAcceptedStateBeforeConcealedKanChangingOnlyWinningFormForTest(t)
+	actor := *seat.MustSeat(0)
+	kanTile := *tile.MustTileFromCode("2m")
+	if err := s.Apply(event.NewDraw(actor, kanTile)); err != nil {
+		t.Fatalf("Apply(Draw) failed: %v", err)
+	}
+
+	got, err := s.LegalActions(actor)
+	if err != nil {
+		t.Fatalf("LegalActions() failed: %v", err)
+	}
+	if !containsConcealedKan(got, actor, [4]string{"2m", "2m", "2m", "2m"}) {
+		t.Error("LegalActions() does not contain ConcealedKan, want ankan after riichi when waits stay the same")
+	}
+}
+
 func TestCanConcealedKanAfterRiichi_ReturnsFalseForFourTilesInHand(t *testing.T) {
 	handBeforeKan := hand.CodesToHand([]string{
 		"1m", "1m", "1m", "1m",
@@ -334,6 +351,21 @@ func TestCanConcealedKanAfterRiichi_HandlesRedFiveInHand(t *testing.T) {
 
 	if !canConcealedKanAfterRiichi(handBeforeKan, drawnTile, consumed) {
 		t.Error("canConcealedKanAfterRiichi() = false, want true for hand containing red five")
+	}
+}
+
+func TestCanConcealedKanAfterRiichi_ReturnsFalseWhenWaitsChange(t *testing.T) {
+	handBeforeKan := hand.CodesToHand([]string{
+		"3m", "4m", "4m", "4m",
+		"1p", "2p", "3p",
+		"4s", "5s", "6s",
+		"7s", "8s", "9s",
+	})
+	drawnTile := *tile.MustTileFromCode("4m")
+	consumed := [4]tile.Tile{drawnTile, drawnTile, drawnTile, drawnTile}
+
+	if canConcealedKanAfterRiichi(handBeforeKan, drawnTile, consumed) {
+		t.Error("canConcealedKanAfterRiichi() = true, want false when waits change from 2m/3m/5m to 3m")
 	}
 }
 
@@ -665,6 +697,52 @@ func newRiichiAcceptedStateBeforeConcealedKanForTest(t *testing.T) *State {
 	s := mustNewRoundStateForTest(t, hands)
 	actor := *seat.MustSeat(0)
 	if err := s.Apply(event.NewDraw(actor, *tile.MustTileFromCode("9s"))); err != nil {
+		t.Fatalf("Apply(first Draw) failed: %v", err)
+	}
+	if err := s.Apply(event.NewRiichi(actor)); err != nil {
+		t.Fatalf("Apply(Riichi) failed: %v", err)
+	}
+	if err := s.Apply(event.NewDiscard(actor, *tile.MustTileFromCode("W"), false)); err != nil {
+		t.Fatalf("Apply(first Discard) failed: %v", err)
+	}
+	if err := s.Apply(event.NewRiichiAccepted(actor, nil, nil)); err != nil {
+		t.Fatalf("Apply(RiichiAccepted) failed: %v", err)
+	}
+	for i := 1; i < 4; i++ {
+		other := *seat.MustSeat(i)
+		drawnTile := *tile.MustTileFromCode("6m")
+		if err := s.Apply(event.NewDraw(other, drawnTile)); err != nil {
+			t.Fatalf("Apply(other Draw %d) failed: %v", i, err)
+		}
+		if err := s.Apply(event.NewDiscard(other, drawnTile, true)); err != nil {
+			t.Fatalf("Apply(other Discard %d) failed: %v", i, err)
+		}
+	}
+	return s
+}
+
+func newRiichiAcceptedStateBeforeConcealedKanChangingOnlyWinningFormForTest(t *testing.T) *State {
+	t.Helper()
+
+	hands := newValidHands()
+	hands[0] = [common.InitHandSize]tile.Tile{
+		*tile.MustTileFromCode("1m"),
+		*tile.MustTileFromCode("1m"),
+		*tile.MustTileFromCode("1m"),
+		*tile.MustTileFromCode("2m"),
+		*tile.MustTileFromCode("2m"),
+		*tile.MustTileFromCode("2m"),
+		*tile.MustTileFromCode("3m"),
+		*tile.MustTileFromCode("3m"),
+		*tile.MustTileFromCode("3m"),
+		*tile.MustTileFromCode("4s"),
+		*tile.MustTileFromCode("5s"),
+		*tile.MustTileFromCode("6s"),
+		*tile.MustTileFromCode("W"),
+	}
+	s := mustNewRoundStateForTest(t, hands)
+	actor := *seat.MustSeat(0)
+	if err := s.Apply(event.NewDraw(actor, *tile.MustTileFromCode("E"))); err != nil {
 		t.Fatalf("Apply(first Draw) failed: %v", err)
 	}
 	if err := s.Apply(event.NewRiichi(actor)); err != nil {
