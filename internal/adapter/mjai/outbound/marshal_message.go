@@ -31,6 +31,8 @@ func ToMessage(a action.Action, log string) (Message, error) {
 		return NewReach(a, log), nil
 	case *action.Win:
 		return NewHora(a, log), nil
+	case *action.Kyushukyuhai:
+		return NewKyushukyuhai(a, log), nil
 	default:
 		return nil, fmt.Errorf("unsupported action type: %T", a)
 	}
