@@ -168,7 +168,7 @@ func analyzeShantenInternal(
 				goalVector[i] += 2
 				goal := Goal{
 					Shanten:     newShanten,
-					Blocks:      makeNewBlocks(blocks, allPairs[i]),
+					Blocks:      makeGoalBlocks(blocks, allPairs[i]),
 					CountVector: goalVector,
 				}
 				*goals = append(*goals, goal)
@@ -209,7 +209,7 @@ func analyzeShantenInternal(
 				numMeldsLeft-1,
 				i+1, // The same Pung can only be taken out once.
 				upperbound,
-				makeNewBlocks(blocks, allMelds[i]),
+				append(blocks, allMelds[i]),
 				goals,
 				allowedExtraTiles,
 			)
@@ -254,7 +254,7 @@ func analyzeShantenInternal(
 				numMeldsLeft-1,
 				chowID+tile.NumTileType34,
 				upperbound,
-				makeNewBlocks(blocks, allMelds[chowID+tile.NumTileType34]),
+				append(blocks, allMelds[chowID+tile.NumTileType34]),
 				goals,
 				allowedExtraTiles,
 			)
@@ -267,10 +267,11 @@ func analyzeShantenInternal(
 	return upperbound
 }
 
-func makeNewBlocks(blocks []block.Block, newBlock block.Block) []block.Block {
-	newBlocks := make([]block.Block, len(blocks), cap(blocks))
-	copy(newBlocks, blocks)
-	return append(newBlocks, newBlock)
+func makeGoalBlocks(blocks []block.Block, pair block.Block) []block.Block {
+	goalBlocks := make([]block.Block, len(blocks)+1)
+	copy(goalBlocks, blocks)
+	goalBlocks[len(blocks)] = pair
+	return goalBlocks
 }
 
 func AnalyzeShantenChiitoitsu(hand *hand.VisibleHand) int {
