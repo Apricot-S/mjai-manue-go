@@ -13,7 +13,7 @@ import (
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/tile"
 )
 
-const maxNumActions = 13 + 1 + 1 // discard + riichi + win
+const maxNumActions = 13 + 1 + 1 + 1 // discard + riichi + win + kyushukyuhai
 const maxKanCandidates = 3
 
 func (s *State) legalActionsOnSelfDraw(playerSeat seat.Seat, p *player.VisiblePlayer) ([]action.Action, error) {
