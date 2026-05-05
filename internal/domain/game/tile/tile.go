@@ -99,13 +99,21 @@ type Tile struct {
 	isRed  bool
 }
 
-func newTileFromValidID(id int) *Tile {
-	return &Tile{
-		id:     id,
-		color:  tileColors[id],
-		number: tileNumbers[id],
-		isRed:  tileIsReds[id],
+var tilesByID = func() [NumTileType38]Tile {
+	ts := [NumTileType38]Tile{}
+	for id := range ts {
+		ts[id] = Tile{
+			id:     id,
+			color:  tileColors[id],
+			number: tileNumbers[id],
+			isRed:  tileIsReds[id],
+		}
 	}
+	return ts
+}()
+
+func newTileFromValidID(id int) *Tile {
+	return &tilesByID[id]
 }
 
 func NewTileFromID(id int) (*Tile, error) {
@@ -127,7 +135,7 @@ func NewTileFromCode(code string) (*Tile, error) {
 	if !ok {
 		return nil, fmt.Errorf("invalid tile code: %s", code)
 	}
-	return NewTileFromID(id)
+	return newTileFromValidID(id), nil
 }
 
 func MustTileFromCode(code string) *Tile {
@@ -135,7 +143,7 @@ func MustTileFromCode(code string) *Tile {
 	if !ok {
 		panic(fmt.Sprintf("invalid tile code: %s", code))
 	}
-	return MustTileFromID(id)
+	return newTileFromValidID(id)
 }
 
 func (t Tile) ID() int {

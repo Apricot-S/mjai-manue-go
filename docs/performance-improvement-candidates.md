@@ -176,6 +176,8 @@ Status: 改善済み。`NewTileFromCode` / `MustTileFromCode` は code -> ID map
 
 ### 5. `MustTileFromID` の値生成削減
 
+Status: 改善済み。ID -> `Tile` table を追加し、`NewTileFromID` / `MustTileFromID` は既存値の pointer を返すように変更済み。
+
 対象:
 
 - `internal/domain/game/tile/tile.go`
