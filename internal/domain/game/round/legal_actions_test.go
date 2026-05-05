@@ -7,7 +7,9 @@ import (
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/action"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/common"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/event"
+	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/round/player"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/round/player/hand"
+	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/round/player/meld"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/seat"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/tile"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/wind"
@@ -316,6 +318,71 @@ func TestState_LegalActions_ExcludesKyushukyuhaiForOtherPlayersAfterConcealedKan
 		if err := s.Apply(event.NewDiscard(actor, *tile.MustTileFromCode("W"), true)); err != nil {
 			t.Fatalf("Apply(Discard %d) failed: %v", i, err)
 		}
+	}
+}
+
+func TestState_LegalActions_IncludesTsumoWin(t *testing.T) {
+	hands := newValidHands()
+	hands[0] = [common.InitHandSize]tile.Tile{
+		*tile.MustTileFromCode("1m"),
+		*tile.MustTileFromCode("1m"),
+		*tile.MustTileFromCode("1m"),
+		*tile.MustTileFromCode("2p"),
+		*tile.MustTileFromCode("3p"),
+		*tile.MustTileFromCode("4p"),
+		*tile.MustTileFromCode("3s"),
+		*tile.MustTileFromCode("4s"),
+		*tile.MustTileFromCode("5s"),
+		*tile.MustTileFromCode("6s"),
+		*tile.MustTileFromCode("6s"),
+		*tile.MustTileFromCode("6s"),
+		*tile.MustTileFromCode("9s"),
+	}
+	s := mustNewRoundStateForTest(t, hands)
+	actor := *seat.MustSeat(0)
+	winningTile := *tile.MustTileFromCode("9s")
+	if err := s.Apply(event.NewDraw(actor, winningTile)); err != nil {
+		t.Fatalf("Apply(Draw) failed: %v", err)
+	}
+
+	got, err := s.LegalActions(actor)
+	if err != nil {
+		t.Fatalf("LegalActions() failed: %v", err)
+	}
+	if !containsWin(got, actor, actor, "9s") {
+		t.Error("LegalActions() does not contain Win, want menzen tsumo win")
+	}
+}
+
+func TestState_LegalActions_ExcludesTsumoWinWithoutYaku(t *testing.T) {
+	actor := *seat.MustSeat(0)
+	p := openPlayerWithoutYakuTsumoForLegalActionsTest(t)
+	players := [common.NumPlayers]player.Player{
+		p,
+		player.NewInvisiblePlayer(),
+		player.NewInvisiblePlayer(),
+		player.NewInvisiblePlayer(),
+	}
+	s := NewStateForTest(
+		wind.East,
+		1,
+		0,
+		0,
+		[common.NumPlayers]int{25000, 25000, 25000, 25000},
+		actor,
+		actor,
+		tile.Tiles{*tile.MustTileFromCode("E")},
+		10,
+		players,
+	)
+	s.pendingDiscard = &actor
+
+	got, err := s.LegalActions(actor)
+	if err != nil {
+		t.Fatalf("LegalActions() failed: %v", err)
+	}
+	if containsWin(got, actor, actor, "9s") {
+		t.Error("LegalActions() contains Win, want open tsumo without yaku excluded")
 	}
 }
 
@@ -712,6 +779,19 @@ func containsKyushukyuhai(actions []action.Action, actor seat.Seat) bool {
 	return false
 }
 
+func containsWin(actions []action.Action, actor seat.Seat, target seat.Seat, winningTileCode string) bool {
+	for _, a := range actions {
+		win, ok := a.(*action.Win)
+		if !ok {
+			continue
+		}
+		if win.Actor() == actor && win.Target() == target && win.WinningTile().String() == winningTileCode {
+			return true
+		}
+	}
+	return false
+}
+
 func containsPromotedKan(actions []action.Action, actor seat.Seat, addedCode string, consumedCodes [3]string) bool {
 	for _, a := range actions {
 		promotedKan, ok := a.(*action.PromotedKan)
@@ -775,6 +855,45 @@ func kyushukyuhaiHandForTest() [common.InitHandSize]tile.Tile {
 		*tile.MustTileFromCode("5m"),
 		*tile.MustTileFromCode("6m"),
 	}
+}
+
+func openPlayerWithoutYakuTsumoForLegalActionsTest(t *testing.T) player.Player {
+	t.Helper()
+
+	handTiles := [common.InitHandSize]tile.Tile{
+		*tile.MustTileFromCode("1m"),
+		*tile.MustTileFromCode("1m"),
+		*tile.MustTileFromCode("2p"),
+		*tile.MustTileFromCode("3p"),
+		*tile.MustTileFromCode("4p"),
+		*tile.MustTileFromCode("3s"),
+		*tile.MustTileFromCode("4s"),
+		*tile.MustTileFromCode("5s"),
+		*tile.MustTileFromCode("6s"),
+		*tile.MustTileFromCode("6s"),
+		*tile.MustTileFromCode("6s"),
+		*tile.MustTileFromCode("9s"),
+		*tile.MustTileFromCode("E"),
+	}
+	p, err := player.NewVisiblePlayer(handTiles)
+	if err != nil {
+		t.Fatalf("player.NewVisiblePlayer() failed: %v", err)
+	}
+	pon := meld.MustPon(
+		*tile.MustTileFromCode("1m"),
+		[2]tile.Tile{*tile.MustTileFromCode("1m"), *tile.MustTileFromCode("1m")},
+		*seat.MustSeat(1),
+	)
+	if err := p.Pon(*pon); err != nil {
+		t.Fatalf("Pon() failed: %v", err)
+	}
+	if err := p.Discard(*tile.MustTileFromCode("E"), false); err != nil {
+		t.Fatalf("Discard() failed: %v", err)
+	}
+	if err := p.Draw(*tile.MustTileFromCode("9s")); err != nil {
+		t.Fatalf("Draw() failed: %v", err)
+	}
+	return p
 }
 
 func newStateBeforeConcealedKanForLegalActionsTest(t *testing.T, numLeftTiles int, numKans int) *State {

@@ -57,6 +57,14 @@ func (s *State) legalActionsOnSelfDraw(playerSeat seat.Seat, p *player.VisiblePl
 	}
 
 	actions := make([]action.Action, 0, maxNumActions)
+	addWin := func(winningTile tile.Tile) error {
+		a, err := action.NewWin(playerSeat, playerSeat, winningTile)
+		if err != nil {
+			return err
+		}
+		actions = append(actions, a)
+		return nil
+	}
 	addDiscard := func(discardedTile tile.Tile, tsumogiri bool) error {
 		a, err := action.NewDiscard(playerSeat, discardedTile, tsumogiri)
 		if err != nil {
@@ -64,6 +72,12 @@ func (s *State) legalActionsOnSelfDraw(playerSeat seat.Seat, p *player.VisiblePl
 		}
 		actions = append(actions, a)
 		return nil
+	}
+
+	if drawnTile := p.DrawnTile(); drawnTile != nil && s.canWinByTsumo(playerSeat, p, *drawnTile) {
+		if err := addWin(*drawnTile); err != nil {
+			return nil, err
+		}
 	}
 
 	if p.RiichiState() == player.RiichiAccepted {
@@ -124,6 +138,23 @@ func (s *State) legalActionsOnSelfDraw(playerSeat seat.Seat, p *player.VisiblePl
 	actions = append(actions, concealedKans...)
 
 	return actions, nil
+}
+
+func (s *State) canWinByTsumo(playerSeat seat.Seat, p *player.VisiblePlayer, winningTile tile.Tile) bool {
+	handBeforeWin, ok := p.Hand()
+	if !ok {
+		return false
+	}
+	return service.Has1Han(
+		handBeforeWin,
+		p.Melds(),
+		&winningTile,
+		s.roundWind,
+		s.SeatWind(playerSeat),
+		true,
+		p.RiichiState() != player.NotRiichi,
+		service.NoEvent,
+	)
 }
 
 func (s *State) canDeclareKyushukyuhai(playerSeat seat.Seat, p *player.VisiblePlayer) bool {
