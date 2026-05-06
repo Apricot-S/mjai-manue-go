@@ -13,7 +13,7 @@ import (
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/tile"
 )
 
-const maxNumActions = 13 + 1 + 1 + 1 // discard + riichi + win + kyushukyuhai
+const maxNumActionsOnSelfDraw = 13 + 1 + 1 + 1 // discard + riichi + win + kyushukyuhai
 const maxKanCandidates = 3
 
 func (s *State) legalActionsOnSelfDraw(playerSeat seat.Seat, p *player.VisiblePlayer) ([]action.Action, error) {
@@ -21,7 +21,7 @@ func (s *State) legalActionsOnSelfDraw(playerSeat seat.Seat, p *player.VisiblePl
 		return nil, fmt.Errorf("cannot list discard actions: player %d cannot discard", playerSeat.Index())
 	}
 
-	actions := make([]action.Action, 0, maxNumActions)
+	actions := make([]action.Action, 0, maxNumActionsOnSelfDraw)
 	addWin := func(winningTile tile.Tile) error {
 		a, err := action.NewWin(playerSeat, playerSeat, winningTile)
 		if err != nil {
