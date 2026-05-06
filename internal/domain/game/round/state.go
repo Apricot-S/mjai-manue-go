@@ -64,34 +64,41 @@ type State struct {
 }
 
 func NewState(ev *event.StartRound, previousScores [common.NumPlayers]int) (*State, error) {
-	if ev.RoundWind() < wind.East || wind.North < ev.RoundWind() {
-		return nil, fmt.Errorf("invalid round wind: %v", ev.RoundWind())
+	roundWind := ev.RoundWind()
+	roundNumber := ev.RoundNumber()
+	honba := ev.Honba()
+	riichiDeposit := ev.RiichiDeposit()
+	dealer := ev.Dealer()
+	doraIndicator := ev.DoraIndicator()
+
+	if roundWind < wind.East || wind.North < roundWind {
+		return nil, fmt.Errorf("invalid round wind: %v", roundWind)
 	}
-	if ev.RoundNumber() < minRoundNumber || maxRoundNumber < ev.RoundNumber() {
-		return nil, fmt.Errorf("invalid round number: %d", ev.RoundNumber())
+	if roundNumber < minRoundNumber || maxRoundNumber < roundNumber {
+		return nil, fmt.Errorf("invalid round number: %d", roundNumber)
 	}
-	if ev.Honba() < 0 {
-		return nil, fmt.Errorf("invalid honba: %d", ev.Honba())
+	if honba < 0 {
+		return nil, fmt.Errorf("invalid honba: %d", honba)
 	}
-	if ev.RiichiDeposit() < 0 {
-		return nil, fmt.Errorf("invalid riichi deposit: %d", ev.RiichiDeposit())
+	if riichiDeposit < 0 {
+		return nil, fmt.Errorf("invalid riichi deposit: %d", riichiDeposit)
 	}
-	if ev.DoraIndicator().IsUnknown() {
-		return nil, fmt.Errorf("invalid dora indicator: %v", ev.DoraIndicator())
+	if doraIndicator.IsUnknown() {
+		return nil, fmt.Errorf("invalid dora indicator: %v", doraIndicator)
 	}
 
 	s := &State{}
 
-	s.roundWind = ev.RoundWind()
-	s.roundNumber = ev.RoundNumber()
-	s.honba = ev.Honba()
-	s.riichiDeposit = ev.RiichiDeposit()
-	s.dealer = ev.Dealer()
+	s.roundWind = roundWind
+	s.roundNumber = roundNumber
+	s.honba = honba
+	s.riichiDeposit = riichiDeposit
+	s.dealer = dealer
 	s.startingDealer = *seat.MustSeat(0)
 	s.doraIndicators = make(tile.Tiles, 0, MaxNumDoraIndicators)
-	s.doraIndicators = append(s.doraIndicators, ev.DoraIndicator())
+	s.doraIndicators = append(s.doraIndicators, doraIndicator)
 	s.numLeftTiles = NumInitWall
-	s.nextDraw = ev.Dealer()
+	s.nextDraw = dealer
 	for i := range s.canKyushukyuhai {
 		s.canKyushukyuhai[i] = true
 	}
