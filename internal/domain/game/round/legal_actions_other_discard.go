@@ -11,6 +11,10 @@ import (
 const maxNumActionsOnOtherDiscard = 1 + 5 // ron + up to 5 chii patterns with red fives
 
 func (s *State) legalActionsOnOtherDiscard(playerSeat seat.Seat, p *player.VisiblePlayer) ([]action.Action, error) {
+	if s.pendingRobbedKanTile != nil && s.pendingKanActor != nil && *s.pendingKanActor != playerSeat {
+		return s.legalActionsOnRobbingKan(playerSeat, p, *s.pendingKanActor, *s.pendingRobbedKanTile)
+	}
+
 	targetSeat := s.lastActor
 	if targetSeat == nil || *targetSeat == playerSeat {
 		return nil, nil
@@ -37,6 +41,21 @@ func (s *State) legalActionsOnOtherDiscard(playerSeat seat.Seat, p *player.Visib
 	return actions, nil
 }
 
+func (s *State) legalActionsOnRobbingKan(playerSeat seat.Seat, p *player.VisiblePlayer, targetSeat seat.Seat, winningTile tile.Tile) ([]action.Action, error) {
+	actions := make([]action.Action, 0, 2)
+	if s.canWinByRon(playerSeat, p, winningTile) {
+		a, err := action.NewWin(playerSeat, targetSeat, winningTile)
+		if err != nil {
+			return nil, err
+		}
+		actions = append(actions, a)
+	}
+	if len(actions) > 0 {
+		actions = append(actions, action.NewPass(playerSeat))
+	}
+	return actions, nil
+}
+
 func (s *State) canWinByRon(playerSeat seat.Seat, p *player.VisiblePlayer, winningTile tile.Tile) bool {
 	handBeforeWin, ok := p.Hand()
 	if !ok {
@@ -55,6 +74,9 @@ func (s *State) canWinByRon(playerSeat seat.Seat, p *player.VisiblePlayer, winni
 }
 
 func (s *State) ronWinEvent() service.WinEvent {
+	if s.pendingRobbedKanTile != nil {
+		return service.RobbingAKan
+	}
 	if s.numLeftTiles == 0 {
 		return service.LastTile
 	}
