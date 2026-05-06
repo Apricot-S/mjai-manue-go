@@ -285,8 +285,7 @@ func (s *State) applyRiichi(ev *event.Riichi) error {
 	if err := s.players[ev.Actor().Index()].Riichi(); err != nil {
 		return err
 	}
-	actorSeat := ev.Actor()
-	s.lastActor = &actorSeat
+	s.lastActor = new(ev.Actor())
 	return nil
 }
 
@@ -300,8 +299,7 @@ func (s *State) applyRiichiAccepted(ev *event.RiichiAccepted) error {
 	s.applyRiichiAcceptedScoreUpdate(ev)
 	s.riichiDeposit++
 	s.pendingRiichiAcceptance = nil
-	actorSeat := ev.Actor()
-	s.lastActor = &actorSeat
+	s.lastActor = new(ev.Actor())
 	return nil
 }
 
@@ -324,11 +322,9 @@ func (s *State) applyWin(ev *event.Win) error {
 	s.applyScoreUpdate(ev.Scores(), ev.Deltas())
 	s.roundEnded = true
 	s.roundEndedByWin = true
-	actorSeat := ev.Actor()
-	targetSeat := ev.Target()
-	s.winTarget = &targetSeat
-	s.winActors[actorSeat.Index()] = true
-	s.lastActor = &actorSeat
+	s.winTarget = new(ev.Target())
+	s.winActors[ev.Actor().Index()] = true
+	s.lastActor = new(ev.Actor())
 	return nil
 }
 
