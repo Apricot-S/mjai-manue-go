@@ -46,6 +46,13 @@ func (s *State) canWinByRon(playerSeat seat.Seat, p *player.VisiblePlayer, winni
 		s.SeatWind(playerSeat),
 		false,
 		p.RiichiState() != player.NotRiichi,
-		service.NoEvent,
+		s.ronWinEvent(),
 	)
+}
+
+func (s *State) ronWinEvent() service.WinEvent {
+	if s.numLeftTiles == 0 {
+		return service.LastTile
+	}
+	return service.NoEvent
 }

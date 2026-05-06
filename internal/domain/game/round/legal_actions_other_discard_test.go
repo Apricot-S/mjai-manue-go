@@ -76,6 +76,30 @@ func TestState_LegalActions_OnOtherDiscardExcludesRonWithoutYaku(t *testing.T) {
 	}
 }
 
+func TestState_LegalActions_OnOtherDiscardIncludesRonLastTile(t *testing.T) {
+	hands := newValidHands()
+	hands[1] = ronWithoutYakuHandForLegalActionsTest()
+	s := mustNewRoundStateForTest(t, hands)
+	target := *seat.MustSeat(0)
+	actor := *seat.MustSeat(1)
+	winningTile := *tile.MustTileFromCode("9s")
+	if err := s.Apply(event.NewDraw(target, winningTile)); err != nil {
+		t.Fatalf("Apply(Draw) failed: %v", err)
+	}
+	s.numLeftTiles = 0
+	if err := s.Apply(event.NewDiscard(target, winningTile, true)); err != nil {
+		t.Fatalf("Apply(Discard) failed: %v", err)
+	}
+
+	got, err := s.LegalActions(actor)
+	if err != nil {
+		t.Fatalf("LegalActions() failed: %v", err)
+	}
+	if !containsWin(got, actor, target, "9s") {
+		t.Error("LegalActions() does not contain Win, want houtei ron")
+	}
+}
+
 func ronWithTanyaoHandForLegalActionsTest() [common.InitHandSize]tile.Tile {
 	return [common.InitHandSize]tile.Tile{
 		*tile.MustTileFromCode("2m"),
