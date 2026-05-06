@@ -30,6 +30,10 @@ func (s *State) legalActionsOnOtherDiscard(playerSeat seat.Seat, p *player.Visib
 		}
 		actions = append(actions, a)
 	}
+
+	if len(actions) > 0 {
+		actions = append(actions, action.NewPass(playerSeat))
+	}
 	return actions, nil
 }
 

@@ -65,6 +65,19 @@ func containsWin(actions []action.Action, actor seat.Seat, target seat.Seat, win
 	return false
 }
 
+func containsPass(actions []action.Action, actor seat.Seat) bool {
+	for _, a := range actions {
+		pass, ok := a.(*action.Pass)
+		if !ok {
+			continue
+		}
+		if pass.Actor() == actor {
+			return true
+		}
+	}
+	return false
+}
+
 func containsPromotedKan(actions []action.Action, actor seat.Seat, addedCode string, consumedCodes [3]string) bool {
 	for _, a := range actions {
 		promotedKan, ok := a.(*action.PromotedKan)

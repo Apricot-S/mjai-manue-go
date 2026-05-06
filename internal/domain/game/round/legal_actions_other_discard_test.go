@@ -51,6 +51,9 @@ func TestState_LegalActions_OnOtherDiscardIncludesRon(t *testing.T) {
 	if !containsWin(got, actor, target, "3p") {
 		t.Error("LegalActions() does not contain Win, want ron with tanyao")
 	}
+	if !containsPass(got, actor) {
+		t.Error("LegalActions() does not contain Pass, want pass when ron is available")
+	}
 }
 
 func TestState_LegalActions_OnOtherDiscardExcludesRonWithoutYaku(t *testing.T) {
