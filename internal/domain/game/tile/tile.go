@@ -106,33 +106,33 @@ var tilesByID = func() [NumTileType38]Tile {
 	return ts
 }()
 
-func newTileFromValidID(id int) *Tile {
-	return &tilesByID[id]
+func newTileFromValidID(id int) Tile {
+	return tilesByID[id]
 }
 
-func NewTileFromID(id int) (*Tile, error) {
+func NewTileFromID(id int) (Tile, error) {
 	if id < minTileID || id >= NumTileType38 {
-		return nil, fmt.Errorf("invalid tile id: %d", id)
+		return Tile{}, fmt.Errorf("invalid tile id: %d", id)
 	}
 	return newTileFromValidID(id), nil
 }
 
-func MustTileFromID(id int) *Tile {
+func MustTileFromID(id int) Tile {
 	if id < minTileID || id >= NumTileType38 {
 		panic(fmt.Sprintf("invalid tile id: %d", id))
 	}
 	return newTileFromValidID(id)
 }
 
-func NewTileFromCode(code string) (*Tile, error) {
+func NewTileFromCode(code string) (Tile, error) {
 	id, ok := tileCodeToID[code]
 	if !ok {
-		return nil, fmt.Errorf("invalid tile code: %s", code)
+		return Tile{}, fmt.Errorf("invalid tile code: %s", code)
 	}
 	return newTileFromValidID(id), nil
 }
 
-func MustTileFromCode(code string) *Tile {
+func MustTileFromCode(code string) Tile {
 	id, ok := tileCodeToID[code]
 	if !ok {
 		panic(fmt.Sprintf("invalid tile code: %s", code))
@@ -187,21 +187,21 @@ func (t Tile) Next(n int) *Tile {
 	}
 
 	nextID := t.RemoveRed().ID() + n
-	return MustTileFromID(nextID)
+	return new(MustTileFromID(nextID))
 }
 
 func (t Tile) NextForDora() Tile {
-	return *MustTileFromID(doraIndicatorToDora[t.ID()])
+	return MustTileFromID(doraIndicatorToDora[t.ID()])
 }
 
 func (t Tile) AddRed() Tile {
 	switch t.ID() {
 	case 4:
-		return *MustTileFromID(minRedID)
+		return MustTileFromID(minRedID)
 	case 13:
-		return *MustTileFromID(minRedID + 1)
+		return MustTileFromID(minRedID + 1)
 	case 22:
-		return *MustTileFromID(minRedID + 2)
+		return MustTileFromID(minRedID + 2)
 	default:
 		return t
 	}
@@ -210,11 +210,11 @@ func (t Tile) AddRed() Tile {
 func (t Tile) RemoveRed() Tile {
 	switch t.ID() {
 	case minRedID:
-		return *MustTileFromID(4)
+		return MustTileFromID(4)
 	case minRedID + 1:
-		return *MustTileFromID(13)
+		return MustTileFromID(13)
 	case minRedID + 2:
-		return *MustTileFromID(22)
+		return MustTileFromID(22)
 	default:
 		return t
 	}

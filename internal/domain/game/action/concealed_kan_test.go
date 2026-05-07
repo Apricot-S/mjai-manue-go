@@ -11,10 +11,10 @@ import (
 func TestNewConcealedKan(t *testing.T) {
 	actor := *seat.MustSeat(1)
 	consumed := [4]tile.Tile{
-		*tile.MustTileFromCode("5m"),
-		*tile.MustTileFromCode("5m"),
-		*tile.MustTileFromCode("5m"),
-		*tile.MustTileFromCode("5mr"),
+		tile.MustTileFromCode("5m"),
+		tile.MustTileFromCode("5m"),
+		tile.MustTileFromCode("5m"),
+		tile.MustTileFromCode("5mr"),
 	}
 
 	got, err := action.NewConcealedKan(actor, consumed)
@@ -32,7 +32,7 @@ func TestNewConcealedKan(t *testing.T) {
 
 func TestNewConcealedKan_UnknownTile(t *testing.T) {
 	actor := *seat.MustSeat(1)
-	unknown := *tile.MustTileFromCode("?")
+	unknown := tile.MustTileFromCode("?")
 
 	tests := []struct {
 		name     string
@@ -42,9 +42,9 @@ func TestNewConcealedKan_UnknownTile(t *testing.T) {
 			name: "consumed",
 			consumed: [4]tile.Tile{
 				unknown,
-				*tile.MustTileFromCode("5m"),
-				*tile.MustTileFromCode("5m"),
-				*tile.MustTileFromCode("5m"),
+				tile.MustTileFromCode("5m"),
+				tile.MustTileFromCode("5m"),
+				tile.MustTileFromCode("5m"),
 			},
 		},
 	}

@@ -25,10 +25,10 @@ type InvisiblePlayer struct {
 }
 
 var initInvisibleHandTiles tile.Tiles = tile.Tiles{
-	*tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"),
-	*tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"),
-	*tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"), *tile.MustTileFromCode("?"),
-	*tile.MustTileFromCode("?"),
+	tile.MustTileFromCode("?"), tile.MustTileFromCode("?"), tile.MustTileFromCode("?"), tile.MustTileFromCode("?"),
+	tile.MustTileFromCode("?"), tile.MustTileFromCode("?"), tile.MustTileFromCode("?"), tile.MustTileFromCode("?"),
+	tile.MustTileFromCode("?"), tile.MustTileFromCode("?"), tile.MustTileFromCode("?"), tile.MustTileFromCode("?"),
+	tile.MustTileFromCode("?"),
 }
 var initInvisibleHand hand.InvisibleHand = *hand.MustInvisibleHand(initInvisibleHandTiles)
 

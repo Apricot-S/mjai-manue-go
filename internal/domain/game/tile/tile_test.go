@@ -488,31 +488,31 @@ func TestTile_Next(t *testing.T) {
 			name: "0 after of 9 is 9",
 			code: "9p",
 			n:    0,
-			want: tile.MustTileFromCode("9p"),
+			want: new(tile.MustTileFromCode("9p")),
 		},
 		{
 			name: "1 after of 8 is 9",
 			code: "8p",
 			n:    1,
-			want: tile.MustTileFromCode("9p"),
+			want: new(tile.MustTileFromCode("9p")),
 		},
 		{
 			name: "2 before of 3 is 1",
 			code: "3m",
 			n:    -2,
-			want: tile.MustTileFromCode("1m"),
+			want: new(tile.MustTileFromCode("1m")),
 		},
 		{
 			name: "1 next of 5r is 6",
 			code: "5pr",
 			n:    1,
-			want: tile.MustTileFromCode("6p"),
+			want: new(tile.MustTileFromCode("6p")),
 		},
 		{
 			name: "0 next of 5r is 5",
 			code: "5pr",
 			n:    0,
-			want: tile.MustTileFromCode("5p"),
+			want: new(tile.MustTileFromCode("5p")),
 		},
 	}
 	for _, tt := range tests {
@@ -535,47 +535,47 @@ func TestTile_NextForDora(t *testing.T) {
 		{
 			name: "? -> ?",
 			code: "?",
-			want: *tile.MustTileFromCode("?"),
+			want: tile.MustTileFromCode("?"),
 		},
 		{
 			name: "1m -> 2m",
 			code: "1m",
-			want: *tile.MustTileFromCode("2m"),
+			want: tile.MustTileFromCode("2m"),
 		},
 		{
 			name: "8m -> 9m",
 			code: "8m",
-			want: *tile.MustTileFromCode("9m"),
+			want: tile.MustTileFromCode("9m"),
 		},
 		{
 			name: "9m -> 1m",
 			code: "9m",
-			want: *tile.MustTileFromCode("1m"),
+			want: tile.MustTileFromCode("1m"),
 		},
 		{
 			name: "E -> S",
 			code: "E",
-			want: *tile.MustTileFromCode("S"),
+			want: tile.MustTileFromCode("S"),
 		},
 		{
 			name: "N -> E",
 			code: "N",
-			want: *tile.MustTileFromCode("E"),
+			want: tile.MustTileFromCode("E"),
 		},
 		{
 			name: "P -> F",
 			code: "P",
-			want: *tile.MustTileFromCode("F"),
+			want: tile.MustTileFromCode("F"),
 		},
 		{
 			name: "C -> P",
 			code: "C",
-			want: *tile.MustTileFromCode("P"),
+			want: tile.MustTileFromCode("P"),
 		},
 		{
 			name: "5mr -> 6m",
 			code: "5mr",
-			want: *tile.MustTileFromCode("6m"),
+			want: tile.MustTileFromCode("6m"),
 		},
 	}
 	for _, tt := range tests {
@@ -598,22 +598,22 @@ func TestTile_AddRed(t *testing.T) {
 		{
 			name: "unknown will not be red",
 			code: "?",
-			want: *tile.MustTileFromCode("?"),
+			want: tile.MustTileFromCode("?"),
 		},
 		{
 			name: "suits other than 5 will not be red",
 			code: "4s",
-			want: *tile.MustTileFromCode("4s"),
+			want: tile.MustTileFromCode("4s"),
 		},
 		{
 			name: "red 5 stays red",
 			code: "5sr",
-			want: *tile.MustTileFromCode("5sr"),
+			want: tile.MustTileFromCode("5sr"),
 		},
 		{
 			name: "normal 5 becomes red 5",
 			code: "5s",
-			want: *tile.MustTileFromCode("5sr"),
+			want: tile.MustTileFromCode("5sr"),
 		},
 	}
 	for _, tt := range tests {
@@ -636,22 +636,22 @@ func TestTile_RemoveRed(t *testing.T) {
 		{
 			name: "no change unknown",
 			code: "?",
-			want: *tile.MustTileFromCode("?"),
+			want: tile.MustTileFromCode("?"),
 		},
 		{
 			name: "no change except for 5 suits",
 			code: "4s",
-			want: *tile.MustTileFromCode("4s"),
+			want: tile.MustTileFromCode("4s"),
 		},
 		{
 			name: "normal 5 stays normal",
 			code: "5m",
-			want: *tile.MustTileFromCode("5m"),
+			want: tile.MustTileFromCode("5m"),
 		},
 		{
 			name: "red 5 becomes normal 5",
 			code: "5mr",
-			want: *tile.MustTileFromCode("5m"),
+			want: tile.MustTileFromCode("5m"),
 		},
 	}
 	for _, tt := range tests {
@@ -707,7 +707,7 @@ func TestTile_HasSameSymbol(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			ti := tile.MustTileFromCode(tt.code)
 			other := tile.MustTileFromCode(tt.otherCode)
-			got := ti.HasSameSymbol(other)
+			got := ti.HasSameSymbol(&other)
 			if got != tt.want {
 				t.Errorf("HasSameSymbol() = %v, want %v", got, tt.want)
 			}

@@ -13,11 +13,11 @@ func TestMarshalMessage_Daiminkan(t *testing.T) {
 	daiminkan, err := action.NewCalledKan(
 		*seat.MustSeat(2),
 		*seat.MustSeat(0),
-		*tile.MustTileFromCode("E"),
+		tile.MustTileFromCode("E"),
 		[3]tile.Tile{
-			*tile.MustTileFromCode("E"),
-			*tile.MustTileFromCode("E"),
-			*tile.MustTileFromCode("E"),
+			tile.MustTileFromCode("E"),
+			tile.MustTileFromCode("E"),
+			tile.MustTileFromCode("E"),
 		},
 	)
 	if err != nil {
@@ -41,11 +41,11 @@ func TestMarshalMessage_Daiminkan_Log(t *testing.T) {
 	daiminkan, err := action.NewCalledKan(
 		*seat.MustSeat(2),
 		*seat.MustSeat(0),
-		*tile.MustTileFromCode("E"),
+		tile.MustTileFromCode("E"),
 		[3]tile.Tile{
-			*tile.MustTileFromCode("E"),
-			*tile.MustTileFromCode("E"),
-			*tile.MustTileFromCode("E"),
+			tile.MustTileFromCode("E"),
+			tile.MustTileFromCode("E"),
+			tile.MustTileFromCode("E"),
 		},
 	)
 	if err != nil {

@@ -9,7 +9,7 @@ import (
 
 func TestState_Apply_Dora_ReturnsErrorBeforeKan(t *testing.T) {
 	s := mustNewRoundStateForTest(t, newValidHands())
-	doraIndicator := *tile.MustTileFromCode("6p")
+	doraIndicator := tile.MustTileFromCode("6p")
 
 	if err := s.Apply(event.NewDora(doraIndicator)); err == nil {
 		t.Fatal("Apply(Dora) succeeded unexpectedly")

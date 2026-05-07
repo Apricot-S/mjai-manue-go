@@ -15,8 +15,8 @@ import (
 func TestState_Apply_ConsecutiveKan_AllowsOpenThenOpenWithMahjongSoulOrder(t *testing.T) {
 	s := newStateBeforeOpenThenOpenKanForTest(t)
 	actor := *seat.MustSeat(3)
-	firstReplacementTile := *tile.MustTileFromCode("S")
-	secondReplacementTile := *tile.MustTileFromCode("W")
+	firstReplacementTile := tile.MustTileFromCode("S")
+	secondReplacementTile := tile.MustTileFromCode("W")
 
 	// MahjongSoul order:
 	// open kan -> replacement tile -> dora -> open kan -> replacement tile -> dora -> discard.
@@ -33,8 +33,8 @@ func TestState_Apply_ConsecutiveKan_AllowsOpenThenOpenWithMahjongSoulOrder(t *te
 func TestState_Apply_ConsecutiveKan_AllowsOpenThenOpenWithTenhouOrder(t *testing.T) {
 	s := newStateBeforeOpenThenOpenKanForTest(t)
 	actor := *seat.MustSeat(3)
-	firstReplacementTile := *tile.MustTileFromCode("S")
-	secondReplacementTile := *tile.MustTileFromCode("W")
+	firstReplacementTile := tile.MustTileFromCode("S")
+	secondReplacementTile := tile.MustTileFromCode("W")
 
 	// Tenhou order:
 	// open kan -> replacement tile -> open kan -> dora -> replacement tile -> dora -> discard.
@@ -51,9 +51,9 @@ func TestState_Apply_ConsecutiveKan_AllowsOpenThenOpenWithTenhouOrder(t *testing
 func TestState_Apply_ConsecutiveKan_AllowsOpenThenConcealedWithMahjongSoulOrder(t *testing.T) {
 	s := newStateBeforeOpenThenConcealedKanForTest(t)
 	actor := *seat.MustSeat(3)
-	firstKanTile := *tile.MustTileFromCode("E")
-	firstReplacementTile := *tile.MustTileFromCode("S")
-	secondReplacementTile := *tile.MustTileFromCode("W")
+	firstKanTile := tile.MustTileFromCode("E")
+	firstReplacementTile := tile.MustTileFromCode("S")
+	secondReplacementTile := tile.MustTileFromCode("W")
 
 	// MahjongSoul order:
 	// open kan -> replacement tile -> dora -> concealed kan -> dora -> replacement tile -> discard.
@@ -70,8 +70,8 @@ func TestState_Apply_ConsecutiveKan_AllowsOpenThenConcealedWithMahjongSoulOrder(
 func TestState_Apply_ConsecutiveKan_AllowsOpenThenConcealedWithTenhouOrder(t *testing.T) {
 	s := newStateBeforeOpenThenConcealedKanForTest(t)
 	actor := *seat.MustSeat(3)
-	firstReplacementTile := *tile.MustTileFromCode("S")
-	secondReplacementTile := *tile.MustTileFromCode("W")
+	firstReplacementTile := tile.MustTileFromCode("S")
+	secondReplacementTile := tile.MustTileFromCode("W")
 
 	// Tenhou order:
 	// open kan -> replacement tile -> concealed kan -> dora -> dora -> replacement tile -> discard.
@@ -88,8 +88,8 @@ func TestState_Apply_ConsecutiveKan_AllowsOpenThenConcealedWithTenhouOrder(t *te
 func TestState_Apply_ConsecutiveKan_AllowsConcealedThenOpen(t *testing.T) {
 	s := newStateBeforeConcealedThenOpenKanForTest(t)
 	actor := *seat.MustSeat(3)
-	firstReplacementTile := *tile.MustTileFromCode("5p")
-	secondReplacementTile := *tile.MustTileFromCode("W")
+	firstReplacementTile := tile.MustTileFromCode("5p")
+	secondReplacementTile := tile.MustTileFromCode("W")
 
 	// concealed kan -> dora -> replacement tile -> open kan -> replacement tile -> dora -> discard.
 	applyConcealedKanForTest("E")(t, s, actor)
@@ -105,8 +105,8 @@ func TestState_Apply_ConsecutiveKan_AllowsConcealedThenOpen(t *testing.T) {
 func TestState_Apply_ConsecutiveKan_AllowsConcealedThenConcealed(t *testing.T) {
 	s := newStateBeforeConcealedThenConcealedKanForTest(t)
 	actor := *seat.MustSeat(3)
-	firstReplacementTile := *tile.MustTileFromCode("S")
-	secondReplacementTile := *tile.MustTileFromCode("W")
+	firstReplacementTile := tile.MustTileFromCode("S")
+	secondReplacementTile := tile.MustTileFromCode("W")
 
 	applyConcealedKanForTest("E")(t, s, actor)
 	applyDoraForTest(t, s, "6p")
@@ -124,7 +124,7 @@ func TestState_Apply_ConsecutiveKan_ReturnsErrorWhenConcealedKanReplacementTileP
 
 	applyConcealedKanForTest("E")(t, s, actor)
 
-	if err := s.Apply(event.NewDraw(actor, *tile.MustTileFromCode("5p"))); err == nil {
+	if err := s.Apply(event.NewDraw(actor, tile.MustTileFromCode("5p"))); err == nil {
 		t.Fatal("Apply(Draw) succeeded before concealed-kan dora reveal")
 	}
 }
@@ -132,8 +132,8 @@ func TestState_Apply_ConsecutiveKan_ReturnsErrorWhenConcealedKanReplacementTileP
 func TestState_Apply_ConsecutiveKan_ReturnsErrorWhenOpenThenOpenDiscardPrecedesSecondDoraReveal(t *testing.T) {
 	s := newStateBeforeOpenThenOpenKanForTest(t)
 	actor := *seat.MustSeat(3)
-	firstReplacementTile := *tile.MustTileFromCode("S")
-	secondReplacementTile := *tile.MustTileFromCode("W")
+	firstReplacementTile := tile.MustTileFromCode("S")
+	secondReplacementTile := tile.MustTileFromCode("W")
 
 	applyCalledKanForTest("E")(t, s, actor)
 	applyDrawForTest(t, s, actor, firstReplacementTile)
@@ -149,8 +149,8 @@ func TestState_Apply_ConsecutiveKan_ReturnsErrorWhenOpenThenOpenDiscardPrecedesS
 func TestState_Apply_ConsecutiveKan_ReturnsErrorWhenTenhouOrderDrawHasOnlyOneDoraReveal(t *testing.T) {
 	s := newStateBeforeOpenThenConcealedKanForTest(t)
 	actor := *seat.MustSeat(3)
-	firstReplacementTile := *tile.MustTileFromCode("S")
-	secondReplacementTile := *tile.MustTileFromCode("W")
+	firstReplacementTile := tile.MustTileFromCode("S")
+	secondReplacementTile := tile.MustTileFromCode("W")
 
 	applyCalledKanForTest("E")(t, s, actor)
 	applyDrawForTest(t, s, actor, firstReplacementTile)
@@ -175,7 +175,7 @@ func applyCalledKanForTest(code string) func(*testing.T, *State, seat.Seat) {
 		t.Helper()
 
 		target := *seat.MustSeat(0)
-		taken := *tile.MustTileFromCode(code)
+		taken := tile.MustTileFromCode(code)
 		if err := s.Apply(event.NewDraw(target, taken)); err != nil {
 			t.Fatalf("Apply(Draw target %s) failed: %v", code, err)
 		}
@@ -192,7 +192,7 @@ func applyPromotedKanForTest(code string) func(*testing.T, *State, seat.Seat) {
 	return func(t *testing.T, s *State, actor seat.Seat) {
 		t.Helper()
 
-		added := *tile.MustTileFromCode(code)
+		added := tile.MustTileFromCode(code)
 		if err := s.Apply(event.NewPromotedKan(actor, added, [3]tile.Tile{added, added, added})); err != nil {
 			t.Fatalf("Apply(PromotedKan %s) failed: %v", code, err)
 		}
@@ -203,7 +203,7 @@ func applyConcealedKanForTest(code string) func(*testing.T, *State, seat.Seat) {
 	return func(t *testing.T, s *State, actor seat.Seat) {
 		t.Helper()
 
-		kanTile := *tile.MustTileFromCode(code)
+		kanTile := tile.MustTileFromCode(code)
 		if err := s.Apply(event.NewConcealedKan(actor, [4]tile.Tile{kanTile, kanTile, kanTile, kanTile})); err != nil {
 			t.Fatalf("Apply(ConcealedKan %s) failed: %v", code, err)
 		}
@@ -221,7 +221,7 @@ func applyDrawForTest(t *testing.T, s *State, actor seat.Seat, drawn tile.Tile) 
 func applyDoraForTest(t *testing.T, s *State, code string) {
 	t.Helper()
 
-	if err := s.Apply(event.NewDora(*tile.MustTileFromCode(code))); err != nil {
+	if err := s.Apply(event.NewDora(tile.MustTileFromCode(code))); err != nil {
 		t.Fatalf("Apply(Dora %s) failed: %v", code, err)
 	}
 }
@@ -271,7 +271,7 @@ func newStateWithActorForConsecutiveKanTest(t *testing.T, actorPlayer player.Pla
 		[common.NumPlayers]int{25000, 25000, 25000, 25000},
 		*seat.MustSeat(0),
 		*seat.MustSeat(0),
-		tile.Tiles{*tile.MustTileFromCode("E")},
+		tile.Tiles{tile.MustTileFromCode("E")},
 		10,
 		players,
 	)
@@ -307,7 +307,7 @@ func playerBeforeConcealedThenConcealedKanForTest(t *testing.T) player.Player {
 	t.Helper()
 
 	p := visiblePlayerForConsecutiveKanTest(t, "E", "E", "E", "S", "S", "S")
-	if err := p.Draw(*tile.MustTileFromCode("E")); err != nil {
+	if err := p.Draw(tile.MustTileFromCode("E")); err != nil {
 		t.Fatalf("Draw(E) failed: %v", err)
 	}
 	return p
@@ -321,7 +321,7 @@ func visiblePlayerForConsecutiveKanTest(t *testing.T, codes ...string) player.Pl
 
 	var handTiles [common.InitHandSize]tile.Tile
 	for i, code := range baseCodes {
-		handTiles[i] = *tile.MustTileFromCode(code)
+		handTiles[i] = tile.MustTileFromCode(code)
 	}
 	p, err := player.NewVisiblePlayer(handTiles)
 	if err != nil {
@@ -333,10 +333,10 @@ func visiblePlayerForConsecutiveKanTest(t *testing.T, codes ...string) player.Pl
 func applyPonToPlayerForTest(t *testing.T, p player.Player, code string) {
 	t.Helper()
 
-	ponTile := *tile.MustTileFromCode(code)
+	ponTile := tile.MustTileFromCode(code)
 	consumed := [2]tile.Tile{ponTile, ponTile}
 	if code == "5p" {
-		consumed[1] = *tile.MustTileFromCode("5pr")
+		consumed[1] = tile.MustTileFromCode("5pr")
 	}
 	pon := meld.MustPon(ponTile, consumed, *seat.MustSeat(0))
 	if err := p.Pon(*pon); err != nil {
@@ -347,7 +347,7 @@ func applyPonToPlayerForTest(t *testing.T, p player.Player, code string) {
 func prepareAfterCallForKanTest(t *testing.T, p player.Player, discardCode string) {
 	t.Helper()
 
-	if err := p.Discard(*tile.MustTileFromCode(discardCode), false); err != nil {
+	if err := p.Discard(tile.MustTileFromCode(discardCode), false); err != nil {
 		t.Fatalf("Discard(%s) failed: %v", discardCode, err)
 	}
 }
@@ -356,7 +356,7 @@ func prepareDrawnTileForKanTest(t *testing.T, p player.Player, discardCode strin
 	t.Helper()
 
 	prepareAfterCallForKanTest(t, p, discardCode)
-	if err := p.Draw(*tile.MustTileFromCode(drawCode)); err != nil {
+	if err := p.Draw(tile.MustTileFromCode(drawCode)); err != nil {
 		t.Fatalf("Draw(%s) failed: %v", drawCode, err)
 	}
 }

@@ -187,7 +187,7 @@ func (s *State) legalConcealedKanActions(playerSeat seat.Seat, p *player.Visible
 		if count != 4 {
 			continue
 		}
-		candidate := *tile.MustTileFromID(id)
+		candidate := tile.MustTileFromID(id)
 		consumed := concealedKanConsumedTiles(candidate)
 		if p.RiichiState() == player.RiichiAccepted && !canConcealedKanAfterRiichi(handBeforeKan, *drawnTile, consumed) {
 			continue

@@ -20,7 +20,7 @@ func TestSortTiles(t *testing.T) {
 	tiles := make(tile.Tiles, 0, len(names))
 	for _, name := range names {
 		t := tile.MustTileFromCode(name)
-		tiles = append(tiles, *t)
+		tiles = append(tiles, t)
 	}
 	tiles.Sort()
 
@@ -58,18 +58,18 @@ func TestTiles_ContainsUnknown(t *testing.T) {
 		{
 			name: "no unknown",
 			tiles: tile.Tiles{
-				*tile.MustTileFromCode("1m"),
-				*tile.MustTileFromCode("5mr"),
-				*tile.MustTileFromCode("E"),
+				tile.MustTileFromCode("1m"),
+				tile.MustTileFromCode("5mr"),
+				tile.MustTileFromCode("E"),
 			},
 			want: false,
 		},
 		{
 			name: "contains unknown",
 			tiles: tile.Tiles{
-				*tile.MustTileFromCode("1m"),
-				*tile.MustTileFromCode("?"),
-				*tile.MustTileFromCode("E"),
+				tile.MustTileFromCode("1m"),
+				tile.MustTileFromCode("?"),
+				tile.MustTileFromCode("E"),
 			},
 			want: true,
 		},
@@ -99,21 +99,21 @@ func TestTiles_Distinct(t *testing.T) {
 		},
 		{
 			name:    "sort tiles",
-			tiles:   tile.Tiles{*tile.MustTileFromCode("5mr"), *tile.MustTileFromCode("5m")},
+			tiles:   tile.Tiles{tile.MustTileFromCode("5mr"), tile.MustTileFromCode("5m")},
 			exclude: nil,
-			want:    tile.Tiles{*tile.MustTileFromCode("5m"), *tile.MustTileFromCode("5mr")},
+			want:    tile.Tiles{tile.MustTileFromCode("5m"), tile.MustTileFromCode("5mr")},
 		},
 		{
 			name:    "remove duplicate tiles",
-			tiles:   tile.Tiles{*tile.MustTileFromCode("5m"), *tile.MustTileFromCode("5mr"), *tile.MustTileFromCode("5m")},
+			tiles:   tile.Tiles{tile.MustTileFromCode("5m"), tile.MustTileFromCode("5mr"), tile.MustTileFromCode("5m")},
 			exclude: nil,
-			want:    tile.Tiles{*tile.MustTileFromCode("5m"), *tile.MustTileFromCode("5mr")},
+			want:    tile.Tiles{tile.MustTileFromCode("5m"), tile.MustTileFromCode("5mr")},
 		},
 		{
 			name:    "exclude tiles",
-			tiles:   tile.Tiles{*tile.MustTileFromCode("5m"), *tile.MustTileFromCode("5mr"), *tile.MustTileFromCode("5m")},
+			tiles:   tile.Tiles{tile.MustTileFromCode("5m"), tile.MustTileFromCode("5mr"), tile.MustTileFromCode("5m")},
 			exclude: func(t tile.Tile) bool { return t.IsRed() },
-			want:    tile.Tiles{*tile.MustTileFromCode("5m")},
+			want:    tile.Tiles{tile.MustTileFromCode("5m")},
 		},
 	}
 	for _, tt := range tests {

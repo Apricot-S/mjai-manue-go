@@ -12,9 +12,9 @@ import (
 func TestState_Apply_AfterWinAllowsOnlyAdditionalWins(t *testing.T) {
 	s := newStateAfterRonForTerminalTest(t, *seat.MustSeat(1))
 	target := *seat.MustSeat(0)
-	winningTile := *tile.MustTileFromCode("6m")
+	winningTile := tile.MustTileFromCode("6m")
 
-	if err := s.Apply(event.NewDraw(*seat.MustSeat(2), *tile.MustTileFromCode("7m"))); err == nil {
+	if err := s.Apply(event.NewDraw(*seat.MustSeat(2), tile.MustTileFromCode("7m"))); err == nil {
 		t.Fatal("Apply(Draw) after Win succeeded unexpectedly")
 	}
 	if err := s.Apply(event.NewWin(
@@ -35,13 +35,13 @@ func TestState_Apply_AfterDrawRoundReturnsError(t *testing.T) {
 		t.Fatalf("Apply(DrawRound) failed: %v", err)
 	}
 
-	if err := s.Apply(event.NewDraw(*seat.MustSeat(0), *tile.MustTileFromCode("6m"))); err == nil {
+	if err := s.Apply(event.NewDraw(*seat.MustSeat(0), tile.MustTileFromCode("6m"))); err == nil {
 		t.Fatal("Apply(Draw) after DrawRound succeeded unexpectedly")
 	}
 	if err := s.Apply(event.NewWin(
 		*seat.MustSeat(1),
 		*seat.MustSeat(0),
-		tile.MustTileFromCode("6m"),
+		new(tile.MustTileFromCode("6m")),
 		8000,
 		nil,
 		&[common.NumPlayers]int{25000, 25000, 25000, 25000},
@@ -89,7 +89,7 @@ func newStateAfterRonForTerminalTest(t *testing.T, winActor seat.Seat) *State {
 
 	s := mustNewRoundStateForTest(t, newValidHands())
 	target := *seat.MustSeat(0)
-	winningTile := *tile.MustTileFromCode("6m")
+	winningTile := tile.MustTileFromCode("6m")
 	if err := s.Apply(event.NewDraw(target, winningTile)); err != nil {
 		t.Fatalf("Apply(Draw) failed: %v", err)
 	}

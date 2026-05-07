@@ -25,60 +25,60 @@ func TestNewVisibleHand(t *testing.T) {
 		},
 		{
 			name:    "visible hand cannot contain an unknown tile",
-			tiles:   []tile.Tile{*tile.MustTileFromCode("?")},
+			tiles:   []tile.Tile{tile.MustTileFromCode("?")},
 			want:    nil,
 			wantErr: true,
 		},
 		{
 			name:    "hand can contain four identical tiles",
-			tiles:   []tile.Tile{*tile.MustTileFromCode("1m"), *tile.MustTileFromCode("1m"), *tile.MustTileFromCode("1m"), *tile.MustTileFromCode("1m")},
-			want:    []tile.Tile{*tile.MustTileFromCode("1m"), *tile.MustTileFromCode("1m"), *tile.MustTileFromCode("1m"), *tile.MustTileFromCode("1m")},
+			tiles:   []tile.Tile{tile.MustTileFromCode("1m"), tile.MustTileFromCode("1m"), tile.MustTileFromCode("1m"), tile.MustTileFromCode("1m")},
+			want:    []tile.Tile{tile.MustTileFromCode("1m"), tile.MustTileFromCode("1m"), tile.MustTileFromCode("1m"), tile.MustTileFromCode("1m")},
 			wantErr: false,
 		},
 		{
 			name:    "hand cannot contain five identical tiles",
-			tiles:   []tile.Tile{*tile.MustTileFromCode("1m"), *tile.MustTileFromCode("1m"), *tile.MustTileFromCode("1m"), *tile.MustTileFromCode("1m"), *tile.MustTileFromCode("1m")},
+			tiles:   []tile.Tile{tile.MustTileFromCode("1m"), tile.MustTileFromCode("1m"), tile.MustTileFromCode("1m"), tile.MustTileFromCode("1m"), tile.MustTileFromCode("1m")},
 			want:    nil,
 			wantErr: true,
 		},
 		{
 			name:    "hand cannot contain two red fives",
-			tiles:   []tile.Tile{*tile.MustTileFromCode("5mr"), *tile.MustTileFromCode("5mr")},
+			tiles:   []tile.Tile{tile.MustTileFromCode("5mr"), tile.MustTileFromCode("5mr")},
 			want:    nil,
 			wantErr: true,
 		},
 		{
 			name:    "hand can contain four normal fives",
-			tiles:   []tile.Tile{*tile.MustTileFromCode("5m"), *tile.MustTileFromCode("5m"), *tile.MustTileFromCode("5m"), *tile.MustTileFromCode("5m")},
-			want:    []tile.Tile{*tile.MustTileFromCode("5m"), *tile.MustTileFromCode("5m"), *tile.MustTileFromCode("5m"), *tile.MustTileFromCode("5m")},
+			tiles:   []tile.Tile{tile.MustTileFromCode("5m"), tile.MustTileFromCode("5m"), tile.MustTileFromCode("5m"), tile.MustTileFromCode("5m")},
+			want:    []tile.Tile{tile.MustTileFromCode("5m"), tile.MustTileFromCode("5m"), tile.MustTileFromCode("5m"), tile.MustTileFromCode("5m")},
 			wantErr: false,
 		},
 		{
 			name: "hand can contain 14 tiles",
 			tiles: []tile.Tile{
-				*tile.MustTileFromCode("1m"), *tile.MustTileFromCode("1m"), *tile.MustTileFromCode("1m"),
-				*tile.MustTileFromCode("2m"), *tile.MustTileFromCode("2m"), *tile.MustTileFromCode("2m"),
-				*tile.MustTileFromCode("3m"), *tile.MustTileFromCode("3m"), *tile.MustTileFromCode("3m"),
-				*tile.MustTileFromCode("4m"), *tile.MustTileFromCode("4m"), *tile.MustTileFromCode("4m"),
-				*tile.MustTileFromCode("5m"), *tile.MustTileFromCode("5m"),
+				tile.MustTileFromCode("1m"), tile.MustTileFromCode("1m"), tile.MustTileFromCode("1m"),
+				tile.MustTileFromCode("2m"), tile.MustTileFromCode("2m"), tile.MustTileFromCode("2m"),
+				tile.MustTileFromCode("3m"), tile.MustTileFromCode("3m"), tile.MustTileFromCode("3m"),
+				tile.MustTileFromCode("4m"), tile.MustTileFromCode("4m"), tile.MustTileFromCode("4m"),
+				tile.MustTileFromCode("5m"), tile.MustTileFromCode("5m"),
 			},
 			want: []tile.Tile{
-				*tile.MustTileFromCode("1m"), *tile.MustTileFromCode("1m"), *tile.MustTileFromCode("1m"),
-				*tile.MustTileFromCode("2m"), *tile.MustTileFromCode("2m"), *tile.MustTileFromCode("2m"),
-				*tile.MustTileFromCode("3m"), *tile.MustTileFromCode("3m"), *tile.MustTileFromCode("3m"),
-				*tile.MustTileFromCode("4m"), *tile.MustTileFromCode("4m"), *tile.MustTileFromCode("4m"),
-				*tile.MustTileFromCode("5m"), *tile.MustTileFromCode("5m"),
+				tile.MustTileFromCode("1m"), tile.MustTileFromCode("1m"), tile.MustTileFromCode("1m"),
+				tile.MustTileFromCode("2m"), tile.MustTileFromCode("2m"), tile.MustTileFromCode("2m"),
+				tile.MustTileFromCode("3m"), tile.MustTileFromCode("3m"), tile.MustTileFromCode("3m"),
+				tile.MustTileFromCode("4m"), tile.MustTileFromCode("4m"), tile.MustTileFromCode("4m"),
+				tile.MustTileFromCode("5m"), tile.MustTileFromCode("5m"),
 			},
 			wantErr: false,
 		},
 		{
 			name: "hand cannot contain 15 tiles",
 			tiles: []tile.Tile{
-				*tile.MustTileFromCode("1m"), *tile.MustTileFromCode("1m"), *tile.MustTileFromCode("1m"),
-				*tile.MustTileFromCode("2m"), *tile.MustTileFromCode("2m"), *tile.MustTileFromCode("2m"),
-				*tile.MustTileFromCode("3m"), *tile.MustTileFromCode("3m"), *tile.MustTileFromCode("3m"),
-				*tile.MustTileFromCode("4m"), *tile.MustTileFromCode("4m"), *tile.MustTileFromCode("4m"),
-				*tile.MustTileFromCode("5m"), *tile.MustTileFromCode("5m"), *tile.MustTileFromCode("5m"),
+				tile.MustTileFromCode("1m"), tile.MustTileFromCode("1m"), tile.MustTileFromCode("1m"),
+				tile.MustTileFromCode("2m"), tile.MustTileFromCode("2m"), tile.MustTileFromCode("2m"),
+				tile.MustTileFromCode("3m"), tile.MustTileFromCode("3m"), tile.MustTileFromCode("3m"),
+				tile.MustTileFromCode("4m"), tile.MustTileFromCode("4m"), tile.MustTileFromCode("4m"),
+				tile.MustTileFromCode("5m"), tile.MustTileFromCode("5m"), tile.MustTileFromCode("5m"),
 			},
 			want:    nil,
 			wantErr: true,
@@ -116,17 +116,17 @@ func TestVisibleHand_ToTileCounts34(t *testing.T) {
 		},
 		{
 			name:  "1m 1m",
-			tiles: []tile.Tile{*tile.MustTileFromCode("1m"), *tile.MustTileFromCode("1m")},
+			tiles: []tile.Tile{tile.MustTileFromCode("1m"), tile.MustTileFromCode("1m")},
 			want:  &hand.TileCounts34{0: 2},
 		},
 		{
 			name:  "C",
-			tiles: []tile.Tile{*tile.MustTileFromCode("C")},
+			tiles: []tile.Tile{tile.MustTileFromCode("C")},
 			want:  &hand.TileCounts34{33: 1},
 		},
 		{
 			name:  "5mr 5pr 5sr",
-			tiles: []tile.Tile{*tile.MustTileFromCode("5mr"), *tile.MustTileFromCode("5pr"), *tile.MustTileFromCode("5sr")},
+			tiles: []tile.Tile{tile.MustTileFromCode("5mr"), tile.MustTileFromCode("5pr"), tile.MustTileFromCode("5sr")},
 			want:  &hand.TileCounts34{4: 1, 13: 1, 22: 1},
 		},
 	}
@@ -145,7 +145,7 @@ func TestVisibleHand_ToTileCounts34(t *testing.T) {
 }
 
 func TestVisibleHand_ToTileCounts34_HandAndTileCountsAreIndependent(t *testing.T) {
-	tiles := []tile.Tile{*tile.MustTileFromCode("1m"), *tile.MustTileFromCode("1m")}
+	tiles := []tile.Tile{tile.MustTileFromCode("1m"), tile.MustTileFromCode("1m")}
 	hand, err := hand.NewVisibleHand(tiles)
 	if err != nil {
 		t.Fatalf("could not construct receiver type: %v", err)
@@ -170,25 +170,25 @@ func TestVisibleHand_Count(t *testing.T) {
 		{
 			name:  "empty hand",
 			tiles: nil,
-			t:     tile.MustTileFromCode("5m"),
+			t:     new(tile.MustTileFromCode("5m")),
 			want:  0,
 		},
 		{
 			name:  "has 1 tile",
-			tiles: []tile.Tile{*tile.MustTileFromCode("5m"), *tile.MustTileFromCode("5mr")},
-			t:     tile.MustTileFromCode("5m"),
+			tiles: []tile.Tile{tile.MustTileFromCode("5m"), tile.MustTileFromCode("5mr")},
+			t:     new(tile.MustTileFromCode("5m")),
 			want:  1,
 		},
 		{
 			name:  "has 2 tile",
-			tiles: []tile.Tile{*tile.MustTileFromCode("5m"), *tile.MustTileFromCode("5m"), *tile.MustTileFromCode("5mr")},
-			t:     tile.MustTileFromCode("5m"),
+			tiles: []tile.Tile{tile.MustTileFromCode("5m"), tile.MustTileFromCode("5m"), tile.MustTileFromCode("5mr")},
+			t:     new(tile.MustTileFromCode("5m")),
 			want:  2,
 		},
 		{
 			name:  "red tile",
-			tiles: []tile.Tile{*tile.MustTileFromCode("5m"), *tile.MustTileFromCode("5mr")},
-			t:     tile.MustTileFromCode("5mr"),
+			tiles: []tile.Tile{tile.MustTileFromCode("5m"), tile.MustTileFromCode("5mr")},
+			t:     new(tile.MustTileFromCode("5mr")),
 			want:  1,
 		},
 	}
@@ -217,7 +217,7 @@ func TestVisibleHand_Count_Panic(t *testing.T) {
 		},
 		{
 			name:  "non empty hand",
-			tiles: []tile.Tile{*tile.MustTileFromCode("C")},
+			tiles: []tile.Tile{tile.MustTileFromCode("C")},
 		},
 	}
 	for _, tt := range tests {
@@ -232,7 +232,7 @@ func TestVisibleHand_Count_Panic(t *testing.T) {
 			if err != nil {
 				t.Fatalf("could not construct receiver type: %v", err)
 			}
-			h.Count(tile.MustTileFromCode("?"))
+			h.Count(new(tile.MustTileFromCode("?")))
 		})
 	}
 }
@@ -248,74 +248,74 @@ func TestVisibleHand_Draw(t *testing.T) {
 		{
 			name:      "visible hand cannot draw an unknown tile",
 			tiles:     []tile.Tile{},
-			tile:      tile.MustTileFromCode("?"),
+			tile:      new(tile.MustTileFromCode("?")),
 			wantTiles: nil,
 			wantErr:   true,
 		},
 		{
 			name:      "visible tile",
-			tiles:     []tile.Tile{*tile.MustTileFromCode("1m")},
-			tile:      tile.MustTileFromCode("1m"),
-			wantTiles: []tile.Tile{*tile.MustTileFromCode("1m"), *tile.MustTileFromCode("1m")},
+			tiles:     []tile.Tile{tile.MustTileFromCode("1m")},
+			tile:      new(tile.MustTileFromCode("1m")),
+			wantTiles: []tile.Tile{tile.MustTileFromCode("1m"), tile.MustTileFromCode("1m")},
 			wantErr:   false,
 		},
 		{
 			name:      "hand can draw 4th identical tiles",
-			tiles:     []tile.Tile{*tile.MustTileFromCode("1m"), *tile.MustTileFromCode("1m"), *tile.MustTileFromCode("1m")},
-			tile:      tile.MustTileFromCode("1m"),
-			wantTiles: []tile.Tile{*tile.MustTileFromCode("1m"), *tile.MustTileFromCode("1m"), *tile.MustTileFromCode("1m"), *tile.MustTileFromCode("1m")},
+			tiles:     []tile.Tile{tile.MustTileFromCode("1m"), tile.MustTileFromCode("1m"), tile.MustTileFromCode("1m")},
+			tile:      new(tile.MustTileFromCode("1m")),
+			wantTiles: []tile.Tile{tile.MustTileFromCode("1m"), tile.MustTileFromCode("1m"), tile.MustTileFromCode("1m"), tile.MustTileFromCode("1m")},
 			wantErr:   false,
 		},
 		{
 			name:      "hand cannot draw 5th identical tiles",
-			tiles:     []tile.Tile{*tile.MustTileFromCode("1m"), *tile.MustTileFromCode("1m"), *tile.MustTileFromCode("1m"), *tile.MustTileFromCode("1m")},
-			tile:      tile.MustTileFromCode("1m"),
+			tiles:     []tile.Tile{tile.MustTileFromCode("1m"), tile.MustTileFromCode("1m"), tile.MustTileFromCode("1m"), tile.MustTileFromCode("1m")},
+			tile:      new(tile.MustTileFromCode("1m")),
 			wantTiles: nil,
 			wantErr:   true,
 		},
 		{
 			name:      "hand cannot draw 2nd red fives",
-			tiles:     []tile.Tile{*tile.MustTileFromCode("5mr")},
-			tile:      tile.MustTileFromCode("5mr"),
+			tiles:     []tile.Tile{tile.MustTileFromCode("5mr")},
+			tile:      new(tile.MustTileFromCode("5mr")),
 			wantTiles: nil,
 			wantErr:   true,
 		},
 		{
 			name:      "hand can draw 4th normal fives",
-			tiles:     []tile.Tile{*tile.MustTileFromCode("5m"), *tile.MustTileFromCode("5m"), *tile.MustTileFromCode("5m")},
-			tile:      tile.MustTileFromCode("5m"),
-			wantTiles: []tile.Tile{*tile.MustTileFromCode("5m"), *tile.MustTileFromCode("5m"), *tile.MustTileFromCode("5m"), *tile.MustTileFromCode("5m")},
+			tiles:     []tile.Tile{tile.MustTileFromCode("5m"), tile.MustTileFromCode("5m"), tile.MustTileFromCode("5m")},
+			tile:      new(tile.MustTileFromCode("5m")),
+			wantTiles: []tile.Tile{tile.MustTileFromCode("5m"), tile.MustTileFromCode("5m"), tile.MustTileFromCode("5m"), tile.MustTileFromCode("5m")},
 			wantErr:   false,
 		},
 		{
 			name: "hand can draw 14th tile",
 			tiles: []tile.Tile{
-				*tile.MustTileFromCode("1m"), *tile.MustTileFromCode("1m"), *tile.MustTileFromCode("1m"),
-				*tile.MustTileFromCode("2m"), *tile.MustTileFromCode("2m"), *tile.MustTileFromCode("2m"),
-				*tile.MustTileFromCode("3m"), *tile.MustTileFromCode("3m"), *tile.MustTileFromCode("3m"),
-				*tile.MustTileFromCode("4m"), *tile.MustTileFromCode("4m"), *tile.MustTileFromCode("4m"),
-				*tile.MustTileFromCode("5m"),
+				tile.MustTileFromCode("1m"), tile.MustTileFromCode("1m"), tile.MustTileFromCode("1m"),
+				tile.MustTileFromCode("2m"), tile.MustTileFromCode("2m"), tile.MustTileFromCode("2m"),
+				tile.MustTileFromCode("3m"), tile.MustTileFromCode("3m"), tile.MustTileFromCode("3m"),
+				tile.MustTileFromCode("4m"), tile.MustTileFromCode("4m"), tile.MustTileFromCode("4m"),
+				tile.MustTileFromCode("5m"),
 			},
-			tile: tile.MustTileFromCode("5m"),
+			tile: new(tile.MustTileFromCode("5m")),
 			wantTiles: []tile.Tile{
-				*tile.MustTileFromCode("1m"), *tile.MustTileFromCode("1m"), *tile.MustTileFromCode("1m"),
-				*tile.MustTileFromCode("2m"), *tile.MustTileFromCode("2m"), *tile.MustTileFromCode("2m"),
-				*tile.MustTileFromCode("3m"), *tile.MustTileFromCode("3m"), *tile.MustTileFromCode("3m"),
-				*tile.MustTileFromCode("4m"), *tile.MustTileFromCode("4m"), *tile.MustTileFromCode("4m"),
-				*tile.MustTileFromCode("5m"), *tile.MustTileFromCode("5m"),
+				tile.MustTileFromCode("1m"), tile.MustTileFromCode("1m"), tile.MustTileFromCode("1m"),
+				tile.MustTileFromCode("2m"), tile.MustTileFromCode("2m"), tile.MustTileFromCode("2m"),
+				tile.MustTileFromCode("3m"), tile.MustTileFromCode("3m"), tile.MustTileFromCode("3m"),
+				tile.MustTileFromCode("4m"), tile.MustTileFromCode("4m"), tile.MustTileFromCode("4m"),
+				tile.MustTileFromCode("5m"), tile.MustTileFromCode("5m"),
 			},
 			wantErr: false,
 		},
 		{
 			name: "hand cannot draw 15th tile",
 			tiles: []tile.Tile{
-				*tile.MustTileFromCode("1m"), *tile.MustTileFromCode("1m"), *tile.MustTileFromCode("1m"),
-				*tile.MustTileFromCode("2m"), *tile.MustTileFromCode("2m"), *tile.MustTileFromCode("2m"),
-				*tile.MustTileFromCode("3m"), *tile.MustTileFromCode("3m"), *tile.MustTileFromCode("3m"),
-				*tile.MustTileFromCode("4m"), *tile.MustTileFromCode("4m"), *tile.MustTileFromCode("4m"),
-				*tile.MustTileFromCode("5m"), *tile.MustTileFromCode("5m"),
+				tile.MustTileFromCode("1m"), tile.MustTileFromCode("1m"), tile.MustTileFromCode("1m"),
+				tile.MustTileFromCode("2m"), tile.MustTileFromCode("2m"), tile.MustTileFromCode("2m"),
+				tile.MustTileFromCode("3m"), tile.MustTileFromCode("3m"), tile.MustTileFromCode("3m"),
+				tile.MustTileFromCode("4m"), tile.MustTileFromCode("4m"), tile.MustTileFromCode("4m"),
+				tile.MustTileFromCode("5m"), tile.MustTileFromCode("5m"),
 			},
-			tile:      tile.MustTileFromCode("5m"),
+			tile:      new(tile.MustTileFromCode("5m")),
 			wantTiles: nil,
 			wantErr:   true,
 		},
@@ -353,22 +353,22 @@ func TestVisibleHand_Discard(t *testing.T) {
 	}{
 		{
 			name:      "visible hand cannot discard an unknown tile",
-			tiles:     []tile.Tile{*tile.MustTileFromCode("1m")},
-			tile:      tile.MustTileFromCode("?"),
+			tiles:     []tile.Tile{tile.MustTileFromCode("1m")},
+			tile:      new(tile.MustTileFromCode("?")),
 			wantTiles: nil,
 			wantErr:   true,
 		},
 		{
 			name:      "visible tile",
-			tiles:     []tile.Tile{*tile.MustTileFromCode("1m")},
-			tile:      tile.MustTileFromCode("1m"),
+			tiles:     []tile.Tile{tile.MustTileFromCode("1m")},
+			tile:      new(tile.MustTileFromCode("1m")),
 			wantTiles: []tile.Tile{},
 			wantErr:   false,
 		},
 		{
 			name:      "cannot discard a tile that are not in the hand",
-			tiles:     []tile.Tile{*tile.MustTileFromCode("5m")},
-			tile:      tile.MustTileFromCode("5mr"),
+			tiles:     []tile.Tile{tile.MustTileFromCode("5m")},
+			tile:      new(tile.MustTileFromCode("5mr")),
 			wantTiles: nil,
 			wantErr:   true,
 		},
@@ -406,10 +406,10 @@ func TestVisibleHand_Call(t *testing.T) {
 	}{
 		{
 			name:  "chii",
-			tiles: []tile.Tile{*tile.MustTileFromCode("2m"), *tile.MustTileFromCode("3m")},
+			tiles: []tile.Tile{tile.MustTileFromCode("2m"), tile.MustTileFromCode("3m")},
 			meld: meld.MustChii(
-				*tile.MustTileFromCode("1m"),
-				[2]tile.Tile{*tile.MustTileFromCode("2m"), *tile.MustTileFromCode("3m")},
+				tile.MustTileFromCode("1m"),
+				[2]tile.Tile{tile.MustTileFromCode("2m"), tile.MustTileFromCode("3m")},
 				*seat.MustSeat(0),
 			),
 			wantTiles: []tile.Tile{},
@@ -417,10 +417,10 @@ func TestVisibleHand_Call(t *testing.T) {
 		},
 		{
 			name:  "pon",
-			tiles: []tile.Tile{*tile.MustTileFromCode("1m"), *tile.MustTileFromCode("1m")},
+			tiles: []tile.Tile{tile.MustTileFromCode("1m"), tile.MustTileFromCode("1m")},
 			meld: meld.MustPon(
-				*tile.MustTileFromCode("1m"),
-				[2]tile.Tile{*tile.MustTileFromCode("1m"), *tile.MustTileFromCode("1m")},
+				tile.MustTileFromCode("1m"),
+				[2]tile.Tile{tile.MustTileFromCode("1m"), tile.MustTileFromCode("1m")},
 				*seat.MustSeat(0),
 			),
 			wantTiles: []tile.Tile{},
@@ -428,10 +428,10 @@ func TestVisibleHand_Call(t *testing.T) {
 		},
 		{
 			name:  "called kan",
-			tiles: []tile.Tile{*tile.MustTileFromCode("1m"), *tile.MustTileFromCode("1m"), *tile.MustTileFromCode("1m")},
+			tiles: []tile.Tile{tile.MustTileFromCode("1m"), tile.MustTileFromCode("1m"), tile.MustTileFromCode("1m")},
 			meld: meld.MustCalledKan(
-				*tile.MustTileFromCode("1m"),
-				[3]tile.Tile{*tile.MustTileFromCode("1m"), *tile.MustTileFromCode("1m"), *tile.MustTileFromCode("1m")},
+				tile.MustTileFromCode("1m"),
+				[3]tile.Tile{tile.MustTileFromCode("1m"), tile.MustTileFromCode("1m"), tile.MustTileFromCode("1m")},
 				*seat.MustSeat(0),
 			),
 			wantTiles: []tile.Tile{},
@@ -439,20 +439,20 @@ func TestVisibleHand_Call(t *testing.T) {
 		},
 		{
 			name:  "concealed kan",
-			tiles: []tile.Tile{*tile.MustTileFromCode("1m"), *tile.MustTileFromCode("1m"), *tile.MustTileFromCode("1m"), *tile.MustTileFromCode("1m")},
+			tiles: []tile.Tile{tile.MustTileFromCode("1m"), tile.MustTileFromCode("1m"), tile.MustTileFromCode("1m"), tile.MustTileFromCode("1m")},
 			meld: meld.MustConcealedKan(
-				[4]tile.Tile{*tile.MustTileFromCode("1m"), *tile.MustTileFromCode("1m"), *tile.MustTileFromCode("1m"), *tile.MustTileFromCode("1m")},
+				[4]tile.Tile{tile.MustTileFromCode("1m"), tile.MustTileFromCode("1m"), tile.MustTileFromCode("1m"), tile.MustTileFromCode("1m")},
 			),
 			wantTiles: []tile.Tile{},
 			wantErr:   false,
 		},
 		{
 			name:  "promoted kan",
-			tiles: []tile.Tile{*tile.MustTileFromCode("5mr")},
+			tiles: []tile.Tile{tile.MustTileFromCode("5mr")},
 			meld: meld.MustPromotedKan(
-				*tile.MustTileFromCode("5m"),
-				[2]tile.Tile{*tile.MustTileFromCode("5m"), *tile.MustTileFromCode("5m")},
-				*tile.MustTileFromCode("5mr"),
+				tile.MustTileFromCode("5m"),
+				[2]tile.Tile{tile.MustTileFromCode("5m"), tile.MustTileFromCode("5m")},
+				tile.MustTileFromCode("5mr"),
 				*seat.MustSeat(0),
 			),
 			wantTiles: []tile.Tile{},
@@ -460,10 +460,10 @@ func TestVisibleHand_Call(t *testing.T) {
 		},
 		{
 			name:  "call fails when meld contains red/normal mismatch",
-			tiles: []tile.Tile{*tile.MustTileFromCode("4m"), *tile.MustTileFromCode("5mr")},
+			tiles: []tile.Tile{tile.MustTileFromCode("4m"), tile.MustTileFromCode("5mr")},
 			meld: meld.MustChii(
-				*tile.MustTileFromCode("6m"),
-				[2]tile.Tile{*tile.MustTileFromCode("4m"), *tile.MustTileFromCode("5m")},
+				tile.MustTileFromCode("6m"),
+				[2]tile.Tile{tile.MustTileFromCode("4m"), tile.MustTileFromCode("5m")},
 				*seat.MustSeat(0),
 			),
 			wantTiles: nil,

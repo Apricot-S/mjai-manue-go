@@ -13,10 +13,10 @@ func TestMarshalMessage_Ankan(t *testing.T) {
 	ankan, err := action.NewConcealedKan(
 		*seat.MustSeat(1),
 		[4]tile.Tile{
-			*tile.MustTileFromCode("5m"),
-			*tile.MustTileFromCode("5m"),
-			*tile.MustTileFromCode("5m"),
-			*tile.MustTileFromCode("5mr"),
+			tile.MustTileFromCode("5m"),
+			tile.MustTileFromCode("5m"),
+			tile.MustTileFromCode("5m"),
+			tile.MustTileFromCode("5mr"),
 		},
 	)
 	if err != nil {
@@ -40,10 +40,10 @@ func TestMarshalMessage_Ankan_Log(t *testing.T) {
 	ankan, err := action.NewConcealedKan(
 		*seat.MustSeat(1),
 		[4]tile.Tile{
-			*tile.MustTileFromCode("5m"),
-			*tile.MustTileFromCode("5m"),
-			*tile.MustTileFromCode("5m"),
-			*tile.MustTileFromCode("5mr"),
+			tile.MustTileFromCode("5m"),
+			tile.MustTileFromCode("5m"),
+			tile.MustTileFromCode("5m"),
+			tile.MustTileFromCode("5mr"),
 		},
 	)
 	if err != nil {

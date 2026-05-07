@@ -8,7 +8,7 @@ import (
 func CodesToHand(codes []string) *VisibleHand {
 	tiles := make([]tile.Tile, len(codes))
 	for i, code := range codes {
-		tiles[i] = *tile.MustTileFromCode(code)
+		tiles[i] = tile.MustTileFromCode(code)
 	}
 
 	h, err := NewVisibleHand(tiles)

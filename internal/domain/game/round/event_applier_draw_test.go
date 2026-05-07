@@ -14,7 +14,7 @@ import (
 func TestState_Apply_Draw(t *testing.T) {
 	s := mustNewRoundStateForTest(t, newValidHands())
 	actor := *seat.MustSeat(0)
-	drawnTile := *tile.MustTileFromCode("6m")
+	drawnTile := tile.MustTileFromCode("6m")
 
 	before := s.NumLeftTiles()
 	if err := s.Apply(event.NewDraw(actor, drawnTile)); err != nil {
@@ -42,7 +42,7 @@ func TestState_Apply_Draw(t *testing.T) {
 func TestState_Apply_Draw_ReturnsErrorWhenActorIsNotDealerAtRoundStart(t *testing.T) {
 	s := mustNewRoundStateForTest(t, newValidHands())
 	actor := *seat.MustSeat(1)
-	drawnTile := *tile.MustTileFromCode("6m")
+	drawnTile := tile.MustTileFromCode("6m")
 
 	if err := s.Apply(event.NewDraw(actor, drawnTile)); err == nil {
 		t.Fatal("Apply(Draw) succeeded unexpectedly")
@@ -69,7 +69,7 @@ func TestState_Apply_Draw_ReturnsErrorWhenNoTilesLeft(t *testing.T) {
 		[common.NumPlayers]int{25000, 25000, 25000, 25000},
 		*seat.MustSeat(0),
 		*seat.MustSeat(0),
-		tile.Tiles{*tile.MustTileFromCode("E")},
+		tile.Tiles{tile.MustTileFromCode("E")},
 		0,
 		[common.NumPlayers]player.Player{
 			actorPlayer,
@@ -79,7 +79,7 @@ func TestState_Apply_Draw_ReturnsErrorWhenNoTilesLeft(t *testing.T) {
 		},
 	)
 	actor := *seat.MustSeat(0)
-	drawnTile := *tile.MustTileFromCode("6m")
+	drawnTile := tile.MustTileFromCode("6m")
 
 	if err := s.Apply(event.NewDraw(actor, drawnTile)); err == nil {
 		t.Fatal("Apply(Draw) succeeded unexpectedly")

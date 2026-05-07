@@ -20,7 +20,7 @@ func TestNewNoReaction(t *testing.T) {
 }
 
 func TestNewActionReaction(t *testing.T) {
-	discard, err := action.NewDiscard(*seat.MustSeat(0), *tile.MustTileFromCode("1m"), true)
+	discard, err := action.NewDiscard(*seat.MustSeat(0), tile.MustTileFromCode("1m"), true)
 	if err != nil {
 		t.Fatalf("action.NewDiscard() failed: %v", err)
 	}

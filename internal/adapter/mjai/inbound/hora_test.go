@@ -20,7 +20,7 @@ func TestParseEvent_Hora(t *testing.T) {
 	if win.Target() != *seat.MustSeat(3) {
 		t.Errorf("Target() = %v, want %v", win.Target(), *seat.MustSeat(3))
 	}
-	if win.WinningTile() == nil || *win.WinningTile() != *tile.MustTileFromCode("9m") {
+	if win.WinningTile() == nil || *win.WinningTile() != tile.MustTileFromCode("9m") {
 		t.Errorf("WinningTile() = %v, want 9m", win.WinningTile())
 	}
 	if win.WinningPoints() != 8000 {

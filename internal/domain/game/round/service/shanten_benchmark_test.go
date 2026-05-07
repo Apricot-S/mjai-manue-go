@@ -36,7 +36,7 @@ func fillHand(wall []int, handLength int) *hand.VisibleHand {
 	tiles := make([]tile.Tile, 0, handLength)
 	for id, count := range tc34 {
 		for i := range count {
-			t := *tile.MustTileFromID(id)
+			t := tile.MustTileFromID(id)
 			if t.Number() == 5 && t.IsSuits() && i == 3 {
 				t = t.AddRed()
 			}

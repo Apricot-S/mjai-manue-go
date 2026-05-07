@@ -20,10 +20,10 @@ func TestParseEvent_Daiminkan(t *testing.T) {
 	if kan.Target() != *seat.MustSeat(3) {
 		t.Errorf("Target() = %v, want %v", kan.Target(), *seat.MustSeat(3))
 	}
-	if kan.Taken() != *tile.MustTileFromCode("4s") {
+	if kan.Taken() != tile.MustTileFromCode("4s") {
 		t.Errorf("Taken() = %v, want 4s", kan.Taken())
 	}
-	if kan.Consumed() != [3]tile.Tile{*tile.MustTileFromCode("4s"), *tile.MustTileFromCode("4s"), *tile.MustTileFromCode("4s")} {
+	if kan.Consumed() != [3]tile.Tile{tile.MustTileFromCode("4s"), tile.MustTileFromCode("4s"), tile.MustTileFromCode("4s")} {
 		t.Errorf("Consumed() = %v", kan.Consumed())
 	}
 }

@@ -44,7 +44,7 @@ func (m *StartKyoku) ToEvent() (*event.StartRound, error) {
 			if err != nil {
 				return nil, fmt.Errorf("invalid tile code for player %d index %d: %w", playerIndex, tileIndex, err)
 			}
-			hands[playerIndex][tileIndex] = *t
+			hands[playerIndex][tileIndex] = t
 		}
 	}
 

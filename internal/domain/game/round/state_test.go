@@ -56,7 +56,7 @@ func newValidHands() [common.NumPlayers][common.InitHandSize]tile.Tile {
 	var hands [common.NumPlayers][common.InitHandSize]tile.Tile
 	for player := range common.NumPlayers {
 		for i, code := range handCodes {
-			hands[player][i] = *tile.MustTileFromCode(code)
+			hands[player][i] = tile.MustTileFromCode(code)
 		}
 	}
 	return hands
@@ -64,7 +64,7 @@ func newValidHands() [common.NumPlayers][common.InitHandSize]tile.Tile {
 
 func TestNewState(t *testing.T) {
 	validDealer := *seat.MustSeat(1)
-	validDora := *tile.MustTileFromCode("1m")
+	validDora := tile.MustTileFromCode("1m")
 	validHands := newValidHands()
 	validScores := &[common.NumPlayers]int{25000, 25000, 25000, 25000}
 
@@ -137,7 +137,7 @@ func TestNewState(t *testing.T) {
 
 func TestNewStateRejectsInvalidStartRound(t *testing.T) {
 	validDealer := *seat.MustSeat(1)
-	validDora := *tile.MustTileFromCode("1m")
+	validDora := tile.MustTileFromCode("1m")
 	validHands := newValidHands()
 	validScores := &[common.NumPlayers]int{25000, 25000, 25000, 25000}
 
@@ -195,7 +195,7 @@ func TestNewStateRejectsInvalidStartRound(t *testing.T) {
 			roundNumber:   1,
 			honba:         0,
 			riichiDeposit: 0,
-			doraIndicator: *tile.MustTileFromCode("?"),
+			doraIndicator: tile.MustTileFromCode("?"),
 		},
 	}
 
@@ -221,7 +221,7 @@ func TestNewStateRejectsInvalidStartRound(t *testing.T) {
 
 func TestNewStateWithNilScores(t *testing.T) {
 	validDealer := *seat.MustSeat(1)
-	validDora := *tile.MustTileFromCode("1m")
+	validDora := tile.MustTileFromCode("1m")
 	validHands := newValidHands()
 
 	ev := event.NewStartRound(
@@ -248,10 +248,10 @@ func TestNewStateWithNilScores(t *testing.T) {
 
 func TestNewStateFallsBackToInvisiblePlayer(t *testing.T) {
 	validDealer := *seat.MustSeat(1)
-	validDora := *tile.MustTileFromCode("1m")
+	validDora := tile.MustTileFromCode("1m")
 	unknownHands := newValidHands()
 	for i := range unknownHands[0] {
-		unknownHands[0][i] = *tile.MustTileFromCode("?")
+		unknownHands[0][i] = tile.MustTileFromCode("?")
 	}
 
 	ev := event.NewStartRound(
@@ -285,10 +285,10 @@ func TestNewStateFallsBackToInvisiblePlayer(t *testing.T) {
 
 func TestNewStateErrorsOnInvalidVisibleHand(t *testing.T) {
 	validDealer := *seat.MustSeat(1)
-	validDora := *tile.MustTileFromCode("1m")
+	validDora := tile.MustTileFromCode("1m")
 	invalidHands := newValidHands()
 	for i := range 5 {
-		invalidHands[0][i] = *tile.MustTileFromCode("1m")
+		invalidHands[0][i] = tile.MustTileFromCode("1m")
 	}
 
 	ev := event.NewStartRound(

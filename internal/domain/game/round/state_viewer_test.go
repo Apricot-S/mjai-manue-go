@@ -23,7 +23,7 @@ func TestState_NextRound(t *testing.T) {
 			[4]int{25000, 25000, 25000, 25000},
 			*seat.MustSeat(0),
 			*seat.MustSeat(0),
-			tile.Tiles{*tile.MustTileFromCode("1m")},
+			tile.Tiles{tile.MustTileFromCode("1m")},
 			round.NumInitWall,
 			players,
 		)
@@ -129,13 +129,13 @@ func TestState_Doras(t *testing.T) {
 		},
 		{
 			name:           "single dora",
-			doraIndicators: tile.Tiles{*tile.MustTileFromCode("1m")},
-			want:           tile.Tiles{*tile.MustTileFromCode("2m")},
+			doraIndicators: tile.Tiles{tile.MustTileFromCode("1m")},
+			want:           tile.Tiles{tile.MustTileFromCode("2m")},
 		},
 		{
 			name:           "double dora",
-			doraIndicators: tile.Tiles{*tile.MustTileFromCode("5mr"), *tile.MustTileFromCode("S")},
-			want:           tile.Tiles{*tile.MustTileFromCode("6m"), *tile.MustTileFromCode("W")},
+			doraIndicators: tile.Tiles{tile.MustTileFromCode("5mr"), tile.MustTileFromCode("S")},
+			want:           tile.Tiles{tile.MustTileFromCode("6m"), tile.MustTileFromCode("W")},
 		},
 	}
 	for _, tt := range tests {
@@ -209,7 +209,7 @@ func TestState_SeatWind(t *testing.T) {
 			[4]int{25000, 25000, 25000, 25000},
 			dealer,
 			*seat.MustSeat(0),
-			tile.Tiles{*tile.MustTileFromCode("1m")},
+			tile.Tiles{tile.MustTileFromCode("1m")},
 			round.NumInitWall,
 			players,
 		)
@@ -356,7 +356,7 @@ func TestState_VisibleTiles(t *testing.T) {
 			[4]int{25000, 25000, 25000, 25000},
 			*seat.MustSeat(0),
 			*seat.MustSeat(0),
-			tile.Tiles{*tile.MustTileFromCode("5mr")},
+			tile.Tiles{tile.MustTileFromCode("5mr")},
 			round.NumInitWall,
 			players,
 		)
@@ -364,25 +364,25 @@ func TestState_VisibleTiles(t *testing.T) {
 
 	player0, _ := player.NewVisiblePlayer(
 		[13]tile.Tile{
-			*tile.MustTileFromCode("1m"), *tile.MustTileFromCode("2m"), *tile.MustTileFromCode("3m"), *tile.MustTileFromCode("4m"),
-			*tile.MustTileFromCode("1p"), *tile.MustTileFromCode("2p"), *tile.MustTileFromCode("3p"), *tile.MustTileFromCode("4p"),
-			*tile.MustTileFromCode("1s"), *tile.MustTileFromCode("2s"), *tile.MustTileFromCode("3s"), *tile.MustTileFromCode("4s"),
-			*tile.MustTileFromCode("E"),
+			tile.MustTileFromCode("1m"), tile.MustTileFromCode("2m"), tile.MustTileFromCode("3m"), tile.MustTileFromCode("4m"),
+			tile.MustTileFromCode("1p"), tile.MustTileFromCode("2p"), tile.MustTileFromCode("3p"), tile.MustTileFromCode("4p"),
+			tile.MustTileFromCode("1s"), tile.MustTileFromCode("2s"), tile.MustTileFromCode("3s"), tile.MustTileFromCode("4s"),
+			tile.MustTileFromCode("E"),
 		},
 	)
 	player1 := player.NewInvisiblePlayer()
 	player2 := player.NewInvisiblePlayer()
 	player3 := player.NewInvisiblePlayer()
 
-	player0.Draw(*tile.MustTileFromCode("5m"))
-	player0.Discard(*tile.MustTileFromCode("1m"), false)
+	player0.Draw(tile.MustTileFromCode("5m"))
+	player0.Discard(tile.MustTileFromCode("1m"), false)
 	player1.Chii(*meld.MustChii(
-		*tile.MustTileFromCode("1m"),
-		[2]tile.Tile{*tile.MustTileFromCode("2m"), *tile.MustTileFromCode("3m")},
+		tile.MustTileFromCode("1m"),
+		[2]tile.Tile{tile.MustTileFromCode("2m"), tile.MustTileFromCode("3m")},
 		*seat.MustSeat(0),
 	))
-	player0.TakeFromRiver(*tile.MustTileFromCode("1m"))
-	player1.Discard(*tile.MustTileFromCode("5p"), false)
+	player0.TakeFromRiver(tile.MustTileFromCode("1m"))
+	player1.Discard(tile.MustTileFromCode("5p"), false)
 
 	tests := []struct {
 		name     string
@@ -395,13 +395,13 @@ func TestState_VisibleTiles(t *testing.T) {
 			players:  [4]player.Player{player0, player1, player2, player3},
 			playerID: *seat.MustSeat(0),
 			want: []tile.Tile{
-				*tile.MustTileFromCode("5p"),
-				*tile.MustTileFromCode("1m"), *tile.MustTileFromCode("2m"), *tile.MustTileFromCode("3m"),
-				*tile.MustTileFromCode("5mr"),
-				*tile.MustTileFromCode("2m"), *tile.MustTileFromCode("3m"), *tile.MustTileFromCode("4m"), *tile.MustTileFromCode("5m"),
-				*tile.MustTileFromCode("1p"), *tile.MustTileFromCode("2p"), *tile.MustTileFromCode("3p"), *tile.MustTileFromCode("4p"),
-				*tile.MustTileFromCode("1s"), *tile.MustTileFromCode("2s"), *tile.MustTileFromCode("3s"), *tile.MustTileFromCode("4s"),
-				*tile.MustTileFromCode("E"),
+				tile.MustTileFromCode("5p"),
+				tile.MustTileFromCode("1m"), tile.MustTileFromCode("2m"), tile.MustTileFromCode("3m"),
+				tile.MustTileFromCode("5mr"),
+				tile.MustTileFromCode("2m"), tile.MustTileFromCode("3m"), tile.MustTileFromCode("4m"), tile.MustTileFromCode("5m"),
+				tile.MustTileFromCode("1p"), tile.MustTileFromCode("2p"), tile.MustTileFromCode("3p"), tile.MustTileFromCode("4p"),
+				tile.MustTileFromCode("1s"), tile.MustTileFromCode("2s"), tile.MustTileFromCode("3s"), tile.MustTileFromCode("4s"),
+				tile.MustTileFromCode("E"),
 			},
 		},
 		{
@@ -409,9 +409,9 @@ func TestState_VisibleTiles(t *testing.T) {
 			players:  [4]player.Player{player0, player1, player2, player3},
 			playerID: *seat.MustSeat(1),
 			want: []tile.Tile{
-				*tile.MustTileFromCode("5p"),
-				*tile.MustTileFromCode("1m"), *tile.MustTileFromCode("2m"), *tile.MustTileFromCode("3m"),
-				*tile.MustTileFromCode("5mr"),
+				tile.MustTileFromCode("5p"),
+				tile.MustTileFromCode("1m"), tile.MustTileFromCode("2m"), tile.MustTileFromCode("3m"),
+				tile.MustTileFromCode("5mr"),
 			},
 		},
 	}
@@ -436,7 +436,7 @@ func TestState_SafeTiles(t *testing.T) {
 			[4]int{25000, 25000, 25000, 25000},
 			*seat.MustSeat(0),
 			*seat.MustSeat(0),
-			tile.Tiles{*tile.MustTileFromCode("1m")},
+			tile.Tiles{tile.MustTileFromCode("1m")},
 			round.NumInitWall,
 			players,
 		)
@@ -466,7 +466,7 @@ func TestState_SafeTiles(t *testing.T) {
 	)
 
 	player1 := player.NewInvisiblePlayer()
-	player1.AddExtraSafeTiles(*tile.MustTileFromCode("1p"))
+	player1.AddExtraSafeTiles(tile.MustTileFromCode("1p"))
 
 	tests = append(
 		tests,
@@ -479,7 +479,7 @@ func TestState_SafeTiles(t *testing.T) {
 				player.NewInvisiblePlayer(),
 			},
 			playerID: *seat.MustSeat(1),
-			want:     tile.Tiles{*tile.MustTileFromCode("1p")},
+			want:     tile.Tiles{tile.MustTileFromCode("1p")},
 		},
 	)
 	tests = append(
@@ -498,9 +498,9 @@ func TestState_SafeTiles(t *testing.T) {
 	)
 
 	player0 := player.NewInvisiblePlayer()
-	player0.Draw(*tile.MustTileFromCode("1p"))
-	player0.Discard(*tile.MustTileFromCode("1p"), false)
-	player0.AddExtraSafeTiles(*tile.MustTileFromCode("1m"))
+	player0.Draw(tile.MustTileFromCode("1p"))
+	player0.Discard(tile.MustTileFromCode("1p"), false)
+	player0.AddExtraSafeTiles(tile.MustTileFromCode("1m"))
 	tests = append(
 		tests,
 		testCase{
@@ -512,7 +512,7 @@ func TestState_SafeTiles(t *testing.T) {
 				player.NewInvisiblePlayer(),
 			},
 			playerID: *seat.MustSeat(0),
-			want:     tile.Tiles{*tile.MustTileFromCode("1p"), *tile.MustTileFromCode("1m")},
+			want:     tile.Tiles{tile.MustTileFromCode("1p"), tile.MustTileFromCode("1m")},
 		},
 	)
 

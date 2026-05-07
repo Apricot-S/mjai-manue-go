@@ -17,10 +17,10 @@ func TestParseEvent_Kakan(t *testing.T) {
 	if kan.Actor() != *seat.MustSeat(3) {
 		t.Errorf("Actor() = %v, want %v", kan.Actor(), *seat.MustSeat(3))
 	}
-	if kan.Added() != *tile.MustTileFromCode("8m") {
+	if kan.Added() != tile.MustTileFromCode("8m") {
 		t.Errorf("Added() = %v, want 8m", kan.Added())
 	}
-	if kan.Consumed() != [3]tile.Tile{*tile.MustTileFromCode("8m"), *tile.MustTileFromCode("8m"), *tile.MustTileFromCode("8m")} {
+	if kan.Consumed() != [3]tile.Tile{tile.MustTileFromCode("8m"), tile.MustTileFromCode("8m"), tile.MustTileFromCode("8m")} {
 		t.Errorf("Consumed() = %v", kan.Consumed())
 	}
 }

@@ -12,11 +12,11 @@ import (
 func TestMarshalMessage_Kakan(t *testing.T) {
 	kakan, err := action.NewPromotedKan(
 		*seat.MustSeat(1),
-		*tile.MustTileFromCode("5mr"),
+		tile.MustTileFromCode("5mr"),
 		[3]tile.Tile{
-			*tile.MustTileFromCode("5m"),
-			*tile.MustTileFromCode("5m"),
-			*tile.MustTileFromCode("5m"),
+			tile.MustTileFromCode("5m"),
+			tile.MustTileFromCode("5m"),
+			tile.MustTileFromCode("5m"),
 		},
 	)
 	if err != nil {
@@ -39,11 +39,11 @@ func TestMarshalMessage_Kakan(t *testing.T) {
 func TestMarshalMessage_Kakan_Log(t *testing.T) {
 	kakan, err := action.NewPromotedKan(
 		*seat.MustSeat(1),
-		*tile.MustTileFromCode("5mr"),
+		tile.MustTileFromCode("5mr"),
 		[3]tile.Tile{
-			*tile.MustTileFromCode("5m"),
-			*tile.MustTileFromCode("5m"),
-			*tile.MustTileFromCode("5m"),
+			tile.MustTileFromCode("5m"),
+			tile.MustTileFromCode("5m"),
+			tile.MustTileFromCode("5m"),
 		},
 	)
 	if err != nil {

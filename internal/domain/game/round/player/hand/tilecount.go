@@ -8,7 +8,7 @@ func (tc34 *TileCounts34) ToTiles() []tile.Tile {
 	tiles := make([]tile.Tile, 0, tc34.NumTiles())
 	for i, c := range tc34 {
 		for range c {
-			tiles = append(tiles, *tile.MustTileFromID(i))
+			tiles = append(tiles, tile.MustTileFromID(i))
 		}
 	}
 	return tiles

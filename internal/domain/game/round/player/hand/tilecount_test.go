@@ -22,7 +22,7 @@ func TestTileCounts34_ToTiles(t *testing.T) {
 		{
 			name: "tile counts 34 can contain five identical tiles",
 			tc34: hand.TileCounts34{0: 5},
-			want: []tile.Tile{*tile.MustTileFromCode("1m"), *tile.MustTileFromCode("1m"), *tile.MustTileFromCode("1m"), *tile.MustTileFromCode("1m"), *tile.MustTileFromCode("1m")},
+			want: []tile.Tile{tile.MustTileFromCode("1m"), tile.MustTileFromCode("1m"), tile.MustTileFromCode("1m"), tile.MustTileFromCode("1m"), tile.MustTileFromCode("1m")},
 		},
 	}
 	for _, tt := range tests {

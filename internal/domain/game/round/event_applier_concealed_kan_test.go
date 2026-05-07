@@ -14,11 +14,11 @@ import (
 
 func concealedKanHandForTest() [common.InitHandSize]tile.Tile {
 	return [common.InitHandSize]tile.Tile{
-		*tile.MustTileFromCode("1m"), *tile.MustTileFromCode("2m"), *tile.MustTileFromCode("3m"),
-		*tile.MustTileFromCode("4p"), *tile.MustTileFromCode("5p"), *tile.MustTileFromCode("6p"),
-		*tile.MustTileFromCode("7s"), *tile.MustTileFromCode("8s"), *tile.MustTileFromCode("9s"),
-		*tile.MustTileFromCode("E"), *tile.MustTileFromCode("E"), *tile.MustTileFromCode("E"),
-		*tile.MustTileFromCode("W"),
+		tile.MustTileFromCode("1m"), tile.MustTileFromCode("2m"), tile.MustTileFromCode("3m"),
+		tile.MustTileFromCode("4p"), tile.MustTileFromCode("5p"), tile.MustTileFromCode("6p"),
+		tile.MustTileFromCode("7s"), tile.MustTileFromCode("8s"), tile.MustTileFromCode("9s"),
+		tile.MustTileFromCode("E"), tile.MustTileFromCode("E"), tile.MustTileFromCode("E"),
+		tile.MustTileFromCode("W"),
 	}
 }
 
@@ -27,7 +27,7 @@ func TestState_Apply_ConcealedKan(t *testing.T) {
 	hands[0] = concealedKanHandForTest()
 	s := mustNewRoundStateForTest(t, hands)
 	actor := *seat.MustSeat(0)
-	kanTile := *tile.MustTileFromCode("E")
+	kanTile := tile.MustTileFromCode("E")
 	consumed := [4]tile.Tile{kanTile, kanTile, kanTile, kanTile}
 
 	if err := s.Apply(event.NewDraw(actor, kanTile)); err != nil {
@@ -50,7 +50,7 @@ func TestState_Apply_ConcealedKan(t *testing.T) {
 
 func TestState_Apply_ConcealedKan_KeepsOpenHandOpen(t *testing.T) {
 	actor := *seat.MustSeat(0)
-	kanTile := *tile.MustTileFromCode("E")
+	kanTile := tile.MustTileFromCode("E")
 	p := openPlayerWithDrawnKanTileForTest(t, kanTile)
 	players := [common.NumPlayers]player.Player{
 		p,
@@ -66,7 +66,7 @@ func TestState_Apply_ConcealedKan_KeepsOpenHandOpen(t *testing.T) {
 		[common.NumPlayers]int{25000, 25000, 25000, 25000},
 		actor,
 		actor,
-		tile.Tiles{*tile.MustTileFromCode("E")},
+		tile.Tiles{tile.MustTileFromCode("E")},
 		10,
 		players,
 	)
@@ -87,7 +87,7 @@ func TestState_Apply_ConcealedKan_RequiresDoraBeforeReplacementTile(t *testing.T
 	hands[0] = concealedKanHandForTest()
 	s := mustNewRoundStateForTest(t, hands)
 	actor := *seat.MustSeat(0)
-	kanTile := *tile.MustTileFromCode("E")
+	kanTile := tile.MustTileFromCode("E")
 	consumed := [4]tile.Tile{kanTile, kanTile, kanTile, kanTile}
 
 	if err := s.Apply(event.NewDraw(actor, kanTile)); err != nil {
@@ -97,7 +97,7 @@ func TestState_Apply_ConcealedKan_RequiresDoraBeforeReplacementTile(t *testing.T
 		t.Fatalf("Apply(ConcealedKan) failed: %v", err)
 	}
 
-	if err := s.Apply(event.NewDraw(actor, *tile.MustTileFromCode("W"))); err == nil {
+	if err := s.Apply(event.NewDraw(actor, tile.MustTileFromCode("W"))); err == nil {
 		t.Fatal("Apply(Draw) succeeded unexpectedly")
 	}
 }
@@ -113,12 +113,12 @@ func TestState_Apply_ConcealedKan_ReturnsErrorWhenNoReplacementTileLeft(t *testi
 		[common.NumPlayers]int{25000, 25000, 25000, 25000},
 		*seat.MustSeat(0),
 		*seat.MustSeat(0),
-		tile.Tiles{*tile.MustTileFromCode("E")},
+		tile.Tiles{tile.MustTileFromCode("E")},
 		1,
 		newVisiblePlayersForTest(t, hands),
 	)
 	actor := *seat.MustSeat(0)
-	kanTile := *tile.MustTileFromCode("E")
+	kanTile := tile.MustTileFromCode("E")
 	consumed := [4]tile.Tile{kanTile, kanTile, kanTile, kanTile}
 
 	if err := s.Apply(event.NewDraw(actor, kanTile)); err != nil {
@@ -145,7 +145,7 @@ func TestState_Apply_ConcealedKan_ReturnsErrorOnFifthKan(t *testing.T) {
 	hands[0] = concealedKanHandForTest()
 	s := newStateForTestWithNumKans(mustNewRoundStateForTest(t, hands), maxNumKan)
 	actor := *seat.MustSeat(0)
-	kanTile := *tile.MustTileFromCode("E")
+	kanTile := tile.MustTileFromCode("E")
 	consumed := [4]tile.Tile{kanTile, kanTile, kanTile, kanTile}
 
 	if err := s.Apply(event.NewDraw(actor, kanTile)); err != nil {
@@ -169,8 +169,8 @@ func TestState_Apply_ConcealedKan_AllowsReplacementTileAfterDora(t *testing.T) {
 	hands[0] = concealedKanHandForTest()
 	s := mustNewRoundStateForTest(t, hands)
 	actor := *seat.MustSeat(0)
-	kanTile := *tile.MustTileFromCode("E")
-	replacementTile := *tile.MustTileFromCode("W")
+	kanTile := tile.MustTileFromCode("E")
+	replacementTile := tile.MustTileFromCode("W")
 	consumed := [4]tile.Tile{kanTile, kanTile, kanTile, kanTile}
 
 	if err := s.Apply(event.NewDraw(actor, kanTile)); err != nil {
@@ -179,7 +179,7 @@ func TestState_Apply_ConcealedKan_AllowsReplacementTileAfterDora(t *testing.T) {
 	if err := s.Apply(event.NewConcealedKan(actor, consumed)); err != nil {
 		t.Fatalf("Apply(ConcealedKan) failed: %v", err)
 	}
-	if err := s.Apply(event.NewDora(*tile.MustTileFromCode("6p"))); err != nil {
+	if err := s.Apply(event.NewDora(tile.MustTileFromCode("6p"))); err != nil {
 		t.Fatalf("Apply(Dora) failed: %v", err)
 	}
 
@@ -195,24 +195,24 @@ func openPlayerWithDrawnKanTileForTest(t *testing.T, kanTile tile.Tile) player.P
 	t.Helper()
 
 	handTiles := [common.InitHandSize]tile.Tile{
-		*tile.MustTileFromCode("1m"), *tile.MustTileFromCode("2m"), *tile.MustTileFromCode("3m"),
-		*tile.MustTileFromCode("4p"), *tile.MustTileFromCode("5p"), *tile.MustTileFromCode("6p"),
-		*tile.MustTileFromCode("7s"), *tile.MustTileFromCode("8s"), *tile.MustTileFromCode("9s"),
-		kanTile, kanTile, kanTile, *tile.MustTileFromCode("5pr"),
+		tile.MustTileFromCode("1m"), tile.MustTileFromCode("2m"), tile.MustTileFromCode("3m"),
+		tile.MustTileFromCode("4p"), tile.MustTileFromCode("5p"), tile.MustTileFromCode("6p"),
+		tile.MustTileFromCode("7s"), tile.MustTileFromCode("8s"), tile.MustTileFromCode("9s"),
+		kanTile, kanTile, kanTile, tile.MustTileFromCode("5pr"),
 	}
 	p, err := player.NewVisiblePlayer(handTiles)
 	if err != nil {
 		t.Fatalf("player.NewVisiblePlayer() failed: %v", err)
 	}
 	pon := meld.MustPon(
-		*tile.MustTileFromCode("5p"),
-		[2]tile.Tile{*tile.MustTileFromCode("5p"), *tile.MustTileFromCode("5pr")},
+		tile.MustTileFromCode("5p"),
+		[2]tile.Tile{tile.MustTileFromCode("5p"), tile.MustTileFromCode("5pr")},
 		*seat.MustSeat(1),
 	)
 	if err := p.Pon(*pon); err != nil {
 		t.Fatalf("Pon() failed: %v", err)
 	}
-	if err := p.Discard(*tile.MustTileFromCode("1m"), false); err != nil {
+	if err := p.Discard(tile.MustTileFromCode("1m"), false); err != nil {
 		t.Fatalf("Discard() failed: %v", err)
 	}
 	if err := p.Draw(kanTile); err != nil {

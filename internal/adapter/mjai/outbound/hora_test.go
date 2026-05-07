@@ -10,7 +10,7 @@ import (
 )
 
 func TestMarshalMessage_Hora(t *testing.T) {
-	win, err := action.NewWin(*seat.MustSeat(1), *seat.MustSeat(0), *tile.MustTileFromCode("5mr"))
+	win, err := action.NewWin(*seat.MustSeat(1), *seat.MustSeat(0), tile.MustTileFromCode("5mr"))
 	if err != nil {
 		t.Fatalf("NewWin() failed: %v", err)
 	}
@@ -29,7 +29,7 @@ func TestMarshalMessage_Hora(t *testing.T) {
 }
 
 func TestMarshalMessage_Hora_Log(t *testing.T) {
-	win, err := action.NewWin(*seat.MustSeat(1), *seat.MustSeat(0), *tile.MustTileFromCode("5mr"))
+	win, err := action.NewWin(*seat.MustSeat(1), *seat.MustSeat(0), tile.MustTileFromCode("5mr"))
 	if err != nil {
 		t.Fatalf("NewWin() failed: %v", err)
 	}

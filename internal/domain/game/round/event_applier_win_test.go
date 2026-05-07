@@ -42,7 +42,7 @@ func TestState_Apply_Win(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			s := mustNewRoundStateForTest(t, newValidHands())
 			actor := *seat.MustSeat(0)
-			winningTile := *tile.MustTileFromCode("6m")
+			winningTile := tile.MustTileFromCode("6m")
 
 			if err := s.Apply(event.NewDraw(actor, winningTile)); err != nil {
 				t.Fatalf("Apply(Draw) failed: %v", err)
@@ -72,7 +72,7 @@ func TestState_Apply_Win_ReturnsErrorBeforeFirstDraw(t *testing.T) {
 	if err := s.Apply(event.NewWin(
 		*seat.MustSeat(2),
 		*seat.MustSeat(3),
-		tile.MustTileFromCode("9m"),
+		new(tile.MustTileFromCode("9m")),
 		8000,
 		nil,
 		&scores,
@@ -89,7 +89,7 @@ func TestState_Apply_Win_Renhou(t *testing.T) {
 	s := mustNewRoundStateForTest(t, newValidHands())
 	actor := *seat.MustSeat(1)
 	target := *seat.MustSeat(0)
-	winningTile := *tile.MustTileFromCode("6m")
+	winningTile := tile.MustTileFromCode("6m")
 	scores := [common.NumPlayers]int{57000, -7000, 25000, 25000}
 
 	if err := s.Apply(event.NewDraw(target, winningTile)); err != nil {
@@ -118,7 +118,7 @@ func TestState_Apply_Win_RobbingKan(t *testing.T) {
 	s := newStateBeforePromotedKanForTest(t, 10, 0)
 	actor := *seat.MustSeat(1)
 	target := *seat.MustSeat(3)
-	added := *tile.MustTileFromCode("E")
+	added := tile.MustTileFromCode("E")
 	scores := [common.NumPlayers]int{25000, 57000, 25000, -7000}
 
 	if err := s.Apply(event.NewPromotedKan(target, added, [3]tile.Tile{added, added, added})); err != nil {
@@ -144,8 +144,8 @@ func TestState_Apply_Win_ReturnsErrorDuringRobbingKanWithDifferentWinningTile(t 
 	s := newStateBeforePromotedKanForTest(t, 10, 0)
 	actor := *seat.MustSeat(1)
 	target := *seat.MustSeat(3)
-	added := *tile.MustTileFromCode("E")
-	winningTile := *tile.MustTileFromCode("S")
+	added := tile.MustTileFromCode("E")
+	winningTile := tile.MustTileFromCode("S")
 	scores := [common.NumPlayers]int{25000, 57000, 25000, -7000}
 
 	if got := s.Player(target).River(); len(got) != 1 || got[0] != winningTile {
@@ -173,7 +173,7 @@ func TestState_Apply_Win_ReturnsErrorDuringRobbingKanWithDifferentWinningTile(t 
 func TestState_Apply_Win_TsumoWithoutWinningTile(t *testing.T) {
 	s := mustNewRoundStateForTest(t, newValidHands())
 	actor := *seat.MustSeat(0)
-	drawnTile := *tile.MustTileFromCode("6m")
+	drawnTile := tile.MustTileFromCode("6m")
 	scores := [common.NumPlayers]int{73000, 9000, 9000, 9000}
 
 	if err := s.Apply(event.NewDraw(actor, drawnTile)); err != nil {
@@ -199,13 +199,13 @@ func TestState_Apply_Win_InvisibleTsumo(t *testing.T) {
 	hands := [common.NumPlayers][common.InitHandSize]tile.Tile{}
 	for p := range common.NumPlayers {
 		for i := range common.InitHandSize {
-			hands[p][i] = *tile.MustTileFromCode("?")
+			hands[p][i] = tile.MustTileFromCode("?")
 		}
 	}
 	s := mustNewRoundStateForTest(t, hands)
 	actor := *seat.MustSeat(0)
-	unknownDrawnTile := *tile.MustTileFromCode("?")
-	winningTile := *tile.MustTileFromCode("6m")
+	unknownDrawnTile := tile.MustTileFromCode("?")
+	winningTile := tile.MustTileFromCode("6m")
 	scores := [common.NumPlayers]int{73000, 9000, 9000, 9000}
 
 	if err := s.Apply(event.NewDraw(actor, unknownDrawnTile)); err != nil {

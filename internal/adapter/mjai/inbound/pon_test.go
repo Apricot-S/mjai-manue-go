@@ -20,10 +20,10 @@ func TestParseEvent_Pon(t *testing.T) {
 	if pon.Target() != *seat.MustSeat(3) {
 		t.Errorf("Target() = %v, want %v", pon.Target(), *seat.MustSeat(3))
 	}
-	if pon.Taken() != *tile.MustTileFromCode("1s") {
+	if pon.Taken() != tile.MustTileFromCode("1s") {
 		t.Errorf("Taken() = %v, want 1s", pon.Taken())
 	}
-	if pon.Consumed() != [2]tile.Tile{*tile.MustTileFromCode("1s"), *tile.MustTileFromCode("1s")} {
+	if pon.Consumed() != [2]tile.Tile{tile.MustTileFromCode("1s"), tile.MustTileFromCode("1s")} {
 		t.Errorf("Consumed() = %v", pon.Consumed())
 	}
 }

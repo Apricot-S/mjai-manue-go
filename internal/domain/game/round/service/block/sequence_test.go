@@ -17,31 +17,31 @@ func TestNewSequence(t *testing.T) {
 	}{
 		{
 			name:    "can create sequence starting with 7",
-			tile:    *tile.MustTileFromCode("7s"),
-			want:    []tile.Tile{*tile.MustTileFromCode("7s"), *tile.MustTileFromCode("8s"), *tile.MustTileFromCode("9s")},
+			tile:    tile.MustTileFromCode("7s"),
+			want:    []tile.Tile{tile.MustTileFromCode("7s"), tile.MustTileFromCode("8s"), tile.MustTileFromCode("9s")},
 			wantErr: false,
 		},
 		{
 			name:    "cannot create sequence starting with 8",
-			tile:    *tile.MustTileFromCode("8m"),
+			tile:    tile.MustTileFromCode("8m"),
 			want:    nil,
 			wantErr: true,
 		},
 		{
 			name:    "cannot create sequence from honors",
-			tile:    *tile.MustTileFromCode("C"),
+			tile:    tile.MustTileFromCode("C"),
 			want:    nil,
 			wantErr: true,
 		},
 		{
 			name:    "cannot create sequence from unknown tile",
-			tile:    *tile.MustTileFromCode("?"),
+			tile:    tile.MustTileFromCode("?"),
 			want:    nil,
 			wantErr: true,
 		},
 		{
 			name:    "cannot create sequence from red five",
-			tile:    *tile.MustTileFromCode("5mr"),
+			tile:    tile.MustTileFromCode("5mr"),
 			want:    nil,
 			wantErr: true,
 		},

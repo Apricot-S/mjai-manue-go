@@ -24,7 +24,7 @@ func parseTileField(name string, value string) (*tile.Tile, error) {
 	if err != nil {
 		return nil, fmt.Errorf("invalid %s: %w", name, err)
 	}
-	return t, nil
+	return &t, nil
 }
 
 func parseKnownTileField(name string, value string) (*tile.Tile, error) {

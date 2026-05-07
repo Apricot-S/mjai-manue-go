@@ -31,7 +31,7 @@ func TestBot_Process_DrawSelf(t *testing.T) {
 		t.Fatalf("Process(StartRound) failed: %v", err)
 	}
 
-	drawnTile := *tile.MustTileFromCode("6m")
+	drawnTile := tile.MustTileFromCode("6m")
 	got, err := bot.Process(event.NewDraw(self, drawnTile))
 	if err != nil {
 		t.Fatalf("Process(Draw) failed: %v", err)
@@ -61,7 +61,7 @@ func TestBot_Process_DrawOther(t *testing.T) {
 	if _, err := bot.Process(mustNewStartRoundForTest(t, newValidHands())); err != nil {
 		t.Fatalf("Process(StartRound) failed: %v", err)
 	}
-	drawnTile := *tile.MustTileFromCode("6m")
+	drawnTile := tile.MustTileFromCode("6m")
 	if _, err := bot.Process(event.NewDraw(self, drawnTile)); err != nil {
 		t.Fatalf("Process(self Draw) failed: %v", err)
 	}
@@ -69,7 +69,7 @@ func TestBot_Process_DrawOther(t *testing.T) {
 		t.Fatalf("Process(self Discard) failed: %v", err)
 	}
 
-	got, err := bot.Process(event.NewDraw(other, *tile.MustTileFromCode("6m")))
+	got, err := bot.Process(event.NewDraw(other, tile.MustTileFromCode("6m")))
 	if err != nil {
 		t.Fatalf("Process(Draw) failed: %v", err)
 	}
@@ -85,7 +85,7 @@ func TestBot_Process_Discard(t *testing.T) {
 		t.Fatalf("Process(StartRound) failed: %v", err)
 	}
 
-	drawnTile := *tile.MustTileFromCode("6m")
+	drawnTile := tile.MustTileFromCode("6m")
 	if _, err := bot.Process(event.NewDraw(self, drawnTile)); err != nil {
 		t.Fatalf("Process(Draw) failed: %v", err)
 	}
@@ -102,7 +102,7 @@ func TestBot_Process_Discard(t *testing.T) {
 
 func TestBot_Process_DrawBeforeStartRound(t *testing.T) {
 	bot := mustNewBotForTest(t, *seat.MustSeat(0))
-	if _, err := bot.Process(event.NewDraw(*seat.MustSeat(0), *tile.MustTileFromCode("6m"))); err == nil {
+	if _, err := bot.Process(event.NewDraw(*seat.MustSeat(0), tile.MustTileFromCode("6m"))); err == nil {
 		t.Fatal("Process() succeeded unexpectedly")
 	}
 }
@@ -120,7 +120,7 @@ func TestBot_Process_EndRound(t *testing.T) {
 	if got.Kind() != application.ReactionNone {
 		t.Errorf("Kind() = %v, want %v", got.Kind(), application.ReactionNone)
 	}
-	if _, err := bot.Process(event.NewDraw(*seat.MustSeat(0), *tile.MustTileFromCode("6m"))); err == nil {
+	if _, err := bot.Process(event.NewDraw(*seat.MustSeat(0), tile.MustTileFromCode("6m"))); err == nil {
 		t.Fatal("Process(Draw) after EndRound succeeded unexpectedly")
 	}
 }
@@ -133,7 +133,7 @@ func TestBot_Process_ReportsRoundStateAfterStateUpdate(t *testing.T) {
 	if _, err := bot.Process(mustNewStartRoundForTest(t, newValidHands())); err != nil {
 		t.Fatalf("Process(StartRound) failed: %v", err)
 	}
-	if _, err := bot.Process(event.NewDraw(self, *tile.MustTileFromCode("6m"))); err != nil {
+	if _, err := bot.Process(event.NewDraw(self, tile.MustTileFromCode("6m"))); err != nil {
 		t.Fatalf("Process(Draw) failed: %v", err)
 	}
 
@@ -155,11 +155,11 @@ func TestBot_Process_ReportsNoRoundStateWhenApplyFails(t *testing.T) {
 	}
 	reporter.calls = 0
 
-	if _, err := bot.Process(event.NewDraw(self, *tile.MustTileFromCode("6m"))); err != nil {
+	if _, err := bot.Process(event.NewDraw(self, tile.MustTileFromCode("6m"))); err != nil {
 		t.Fatalf("Process(first Draw) failed: %v", err)
 	}
 	reporter.calls = 0
-	if _, err := bot.Process(event.NewDraw(self, *tile.MustTileFromCode("7m"))); err == nil {
+	if _, err := bot.Process(event.NewDraw(self, tile.MustTileFromCode("7m"))); err == nil {
 		t.Fatal("Process(second Draw) succeeded unexpectedly")
 	}
 

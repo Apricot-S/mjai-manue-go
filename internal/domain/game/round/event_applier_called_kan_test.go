@@ -13,11 +13,11 @@ import (
 func calledKanHandsForTest() [common.NumPlayers][common.InitHandSize]tile.Tile {
 	hands := newValidHands()
 	hands[3] = [common.InitHandSize]tile.Tile{
-		*tile.MustTileFromCode("1m"), *tile.MustTileFromCode("2m"), *tile.MustTileFromCode("3m"),
-		*tile.MustTileFromCode("4p"), *tile.MustTileFromCode("5p"), *tile.MustTileFromCode("6p"),
-		*tile.MustTileFromCode("7s"), *tile.MustTileFromCode("8s"), *tile.MustTileFromCode("9s"),
-		*tile.MustTileFromCode("E"), *tile.MustTileFromCode("E"), *tile.MustTileFromCode("E"),
-		*tile.MustTileFromCode("W"),
+		tile.MustTileFromCode("1m"), tile.MustTileFromCode("2m"), tile.MustTileFromCode("3m"),
+		tile.MustTileFromCode("4p"), tile.MustTileFromCode("5p"), tile.MustTileFromCode("6p"),
+		tile.MustTileFromCode("7s"), tile.MustTileFromCode("8s"), tile.MustTileFromCode("9s"),
+		tile.MustTileFromCode("E"), tile.MustTileFromCode("E"), tile.MustTileFromCode("E"),
+		tile.MustTileFromCode("W"),
 	}
 	return hands
 }
@@ -26,7 +26,7 @@ func TestState_Apply_CalledKan(t *testing.T) {
 	s := mustNewRoundStateForTest(t, calledKanHandsForTest())
 	actor := *seat.MustSeat(3)
 	target := *seat.MustSeat(0)
-	taken := *tile.MustTileFromCode("E")
+	taken := tile.MustTileFromCode("E")
 	consumed := [3]tile.Tile{taken, taken, taken}
 
 	if err := s.Apply(event.NewDraw(target, taken)); err != nil {
@@ -60,7 +60,7 @@ func TestState_Apply_CalledKan(t *testing.T) {
 func TestState_Apply_CalledKan_ReturnsErrorWhenActorAndTargetAreSame(t *testing.T) {
 	s := mustNewRoundStateForTest(t, calledKanHandsForTest())
 	actor := *seat.MustSeat(0)
-	taken := *tile.MustTileFromCode("E")
+	taken := tile.MustTileFromCode("E")
 	consumed := [3]tile.Tile{taken, taken, taken}
 
 	if err := s.Apply(event.NewDraw(actor, taken)); err != nil {
@@ -92,13 +92,13 @@ func TestState_Apply_CalledKan_ReturnsErrorForLastDiscard(t *testing.T) {
 		[common.NumPlayers]int{25000, 25000, 25000, 25000},
 		*seat.MustSeat(0),
 		*seat.MustSeat(0),
-		tile.Tiles{*tile.MustTileFromCode("E")},
+		tile.Tiles{tile.MustTileFromCode("E")},
 		1,
 		players,
 	)
 	actor := *seat.MustSeat(3)
 	target := *seat.MustSeat(0)
-	taken := *tile.MustTileFromCode("E")
+	taken := tile.MustTileFromCode("E")
 	consumed := [3]tile.Tile{taken, taken, taken}
 
 	if err := s.Apply(event.NewDraw(target, taken)); err != nil {
@@ -127,7 +127,7 @@ func TestState_Apply_CalledKan_ReturnsErrorOnFifthKan(t *testing.T) {
 	s := newStateForTestWithNumKans(mustNewRoundStateForTest(t, calledKanHandsForTest()), maxNumKan)
 	actor := *seat.MustSeat(3)
 	target := *seat.MustSeat(0)
-	taken := *tile.MustTileFromCode("E")
+	taken := tile.MustTileFromCode("E")
 	consumed := [3]tile.Tile{taken, taken, taken}
 
 	if err := s.Apply(event.NewDraw(target, taken)); err != nil {
@@ -153,7 +153,7 @@ func TestState_Apply_CalledKan_ReturnsErrorWhenDiscardFollowsCalledKan(t *testin
 	s := mustNewRoundStateForTest(t, calledKanHandsForTest())
 	actor := *seat.MustSeat(3)
 	target := *seat.MustSeat(0)
-	taken := *tile.MustTileFromCode("E")
+	taken := tile.MustTileFromCode("E")
 	consumed := [3]tile.Tile{taken, taken, taken}
 
 	if err := s.Apply(event.NewDraw(target, taken)); err != nil {
@@ -166,7 +166,7 @@ func TestState_Apply_CalledKan_ReturnsErrorWhenDiscardFollowsCalledKan(t *testin
 		t.Fatalf("Apply(CalledKan) failed: %v", err)
 	}
 
-	if err := s.Apply(event.NewDiscard(actor, *tile.MustTileFromCode("W"), false)); err == nil {
+	if err := s.Apply(event.NewDiscard(actor, tile.MustTileFromCode("W"), false)); err == nil {
 		t.Fatal("Apply(Discard) succeeded unexpectedly")
 	}
 
@@ -179,10 +179,10 @@ func TestState_Apply_CalledKan_AllowsDoraAfterReplacementTileDraw(t *testing.T) 
 	s := mustNewRoundStateForTest(t, calledKanHandsForTest())
 	actor := *seat.MustSeat(3)
 	target := *seat.MustSeat(0)
-	taken := *tile.MustTileFromCode("E")
+	taken := tile.MustTileFromCode("E")
 	consumed := [3]tile.Tile{taken, taken, taken}
-	replacementTile := *tile.MustTileFromCode("W")
-	doraIndicator := *tile.MustTileFromCode("6p")
+	replacementTile := tile.MustTileFromCode("W")
+	doraIndicator := tile.MustTileFromCode("6p")
 
 	if err := s.Apply(event.NewDraw(target, taken)); err != nil {
 		t.Fatalf("Apply(Draw) failed: %v", err)
@@ -210,9 +210,9 @@ func TestState_Apply_CalledKan_AllowsDiscardAfterDoraReveal(t *testing.T) {
 	s := mustNewRoundStateForTest(t, calledKanHandsForTest())
 	actor := *seat.MustSeat(3)
 	target := *seat.MustSeat(0)
-	taken := *tile.MustTileFromCode("E")
+	taken := tile.MustTileFromCode("E")
 	consumed := [3]tile.Tile{taken, taken, taken}
-	replacementTile := *tile.MustTileFromCode("W")
+	replacementTile := tile.MustTileFromCode("W")
 
 	if err := s.Apply(event.NewDraw(target, taken)); err != nil {
 		t.Fatalf("Apply(Draw) failed: %v", err)
@@ -226,7 +226,7 @@ func TestState_Apply_CalledKan_AllowsDiscardAfterDoraReveal(t *testing.T) {
 	if err := s.Apply(event.NewDraw(actor, replacementTile)); err != nil {
 		t.Fatalf("Apply(Draw) failed: %v", err)
 	}
-	if err := s.Apply(event.NewDora(*tile.MustTileFromCode("6p"))); err != nil {
+	if err := s.Apply(event.NewDora(tile.MustTileFromCode("6p"))); err != nil {
 		t.Fatalf("Apply(Dora) failed: %v", err)
 	}
 

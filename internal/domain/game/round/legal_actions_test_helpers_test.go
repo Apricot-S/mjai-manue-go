@@ -120,62 +120,62 @@ func containsConcealedKan(actions []action.Action, actor seat.Seat, consumedCode
 func unknownHandForLegalActionsTest() [common.InitHandSize]tile.Tile {
 	var hand [common.InitHandSize]tile.Tile
 	for i := range hand {
-		hand[i] = *tile.MustTileFromCode("?")
+		hand[i] = tile.MustTileFromCode("?")
 	}
 	return hand
 }
 
 func kyushukyuhaiHandForTest() [common.InitHandSize]tile.Tile {
 	return [common.InitHandSize]tile.Tile{
-		*tile.MustTileFromCode("1m"),
-		*tile.MustTileFromCode("9m"),
-		*tile.MustTileFromCode("1p"),
-		*tile.MustTileFromCode("9p"),
-		*tile.MustTileFromCode("1s"),
-		*tile.MustTileFromCode("9s"),
-		*tile.MustTileFromCode("E"),
-		*tile.MustTileFromCode("S"),
-		*tile.MustTileFromCode("2m"),
-		*tile.MustTileFromCode("3m"),
-		*tile.MustTileFromCode("4m"),
-		*tile.MustTileFromCode("5m"),
-		*tile.MustTileFromCode("6m"),
+		tile.MustTileFromCode("1m"),
+		tile.MustTileFromCode("9m"),
+		tile.MustTileFromCode("1p"),
+		tile.MustTileFromCode("9p"),
+		tile.MustTileFromCode("1s"),
+		tile.MustTileFromCode("9s"),
+		tile.MustTileFromCode("E"),
+		tile.MustTileFromCode("S"),
+		tile.MustTileFromCode("2m"),
+		tile.MustTileFromCode("3m"),
+		tile.MustTileFromCode("4m"),
+		tile.MustTileFromCode("5m"),
+		tile.MustTileFromCode("6m"),
 	}
 }
 
 func menzenTsumoHandForLegalActionsTest() [common.InitHandSize]tile.Tile {
 	return [common.InitHandSize]tile.Tile{
-		*tile.MustTileFromCode("1m"),
-		*tile.MustTileFromCode("1m"),
-		*tile.MustTileFromCode("1m"),
-		*tile.MustTileFromCode("2p"),
-		*tile.MustTileFromCode("3p"),
-		*tile.MustTileFromCode("4p"),
-		*tile.MustTileFromCode("3s"),
-		*tile.MustTileFromCode("4s"),
-		*tile.MustTileFromCode("5s"),
-		*tile.MustTileFromCode("6s"),
-		*tile.MustTileFromCode("6s"),
-		*tile.MustTileFromCode("6s"),
-		*tile.MustTileFromCode("9s"),
+		tile.MustTileFromCode("1m"),
+		tile.MustTileFromCode("1m"),
+		tile.MustTileFromCode("1m"),
+		tile.MustTileFromCode("2p"),
+		tile.MustTileFromCode("3p"),
+		tile.MustTileFromCode("4p"),
+		tile.MustTileFromCode("3s"),
+		tile.MustTileFromCode("4s"),
+		tile.MustTileFromCode("5s"),
+		tile.MustTileFromCode("6s"),
+		tile.MustTileFromCode("6s"),
+		tile.MustTileFromCode("6s"),
+		tile.MustTileFromCode("9s"),
 	}
 }
 
 func openChiiHandForLegalActionsTest() [common.InitHandSize]tile.Tile {
 	return [common.InitHandSize]tile.Tile{
-		*tile.MustTileFromCode("2m"),
-		*tile.MustTileFromCode("3m"),
-		*tile.MustTileFromCode("4m"),
-		*tile.MustTileFromCode("5m"),
-		*tile.MustTileFromCode("5mr"),
-		*tile.MustTileFromCode("1p"),
-		*tile.MustTileFromCode("2p"),
-		*tile.MustTileFromCode("3p"),
-		*tile.MustTileFromCode("4p"),
-		*tile.MustTileFromCode("5p"),
-		*tile.MustTileFromCode("6p"),
-		*tile.MustTileFromCode("7s"),
-		*tile.MustTileFromCode("8s"),
+		tile.MustTileFromCode("2m"),
+		tile.MustTileFromCode("3m"),
+		tile.MustTileFromCode("4m"),
+		tile.MustTileFromCode("5m"),
+		tile.MustTileFromCode("5mr"),
+		tile.MustTileFromCode("1p"),
+		tile.MustTileFromCode("2p"),
+		tile.MustTileFromCode("3p"),
+		tile.MustTileFromCode("4p"),
+		tile.MustTileFromCode("5p"),
+		tile.MustTileFromCode("6p"),
+		tile.MustTileFromCode("7s"),
+		tile.MustTileFromCode("8s"),
 	}
 }
 
@@ -184,7 +184,7 @@ func stateAfterChiiForLegalActionsTest(t *testing.T, s *State) *State {
 
 	target := *seat.MustSeat(0)
 	actor := *seat.MustSeat(1)
-	taken := *tile.MustTileFromCode("2m")
+	taken := tile.MustTileFromCode("2m")
 	if err := s.Apply(event.NewDraw(target, taken)); err != nil {
 		t.Fatalf("Apply(Draw) failed: %v", err)
 	}
@@ -192,8 +192,8 @@ func stateAfterChiiForLegalActionsTest(t *testing.T, s *State) *State {
 		t.Fatalf("Apply(Discard) failed: %v", err)
 	}
 	if err := s.Apply(event.NewChii(actor, target, taken, [2]tile.Tile{
-		*tile.MustTileFromCode("3m"),
-		*tile.MustTileFromCode("4m"),
+		tile.MustTileFromCode("3m"),
+		tile.MustTileFromCode("4m"),
 	})); err != nil {
 		t.Fatalf("Apply(Chii) failed: %v", err)
 	}
@@ -204,36 +204,36 @@ func openPlayerWithoutYakuTsumoForLegalActionsTest(t *testing.T) player.Player {
 	t.Helper()
 
 	handTiles := [common.InitHandSize]tile.Tile{
-		*tile.MustTileFromCode("1m"),
-		*tile.MustTileFromCode("1m"),
-		*tile.MustTileFromCode("2p"),
-		*tile.MustTileFromCode("3p"),
-		*tile.MustTileFromCode("4p"),
-		*tile.MustTileFromCode("3s"),
-		*tile.MustTileFromCode("4s"),
-		*tile.MustTileFromCode("5s"),
-		*tile.MustTileFromCode("6s"),
-		*tile.MustTileFromCode("6s"),
-		*tile.MustTileFromCode("6s"),
-		*tile.MustTileFromCode("9s"),
-		*tile.MustTileFromCode("E"),
+		tile.MustTileFromCode("1m"),
+		tile.MustTileFromCode("1m"),
+		tile.MustTileFromCode("2p"),
+		tile.MustTileFromCode("3p"),
+		tile.MustTileFromCode("4p"),
+		tile.MustTileFromCode("3s"),
+		tile.MustTileFromCode("4s"),
+		tile.MustTileFromCode("5s"),
+		tile.MustTileFromCode("6s"),
+		tile.MustTileFromCode("6s"),
+		tile.MustTileFromCode("6s"),
+		tile.MustTileFromCode("9s"),
+		tile.MustTileFromCode("E"),
 	}
 	p, err := player.NewVisiblePlayer(handTiles)
 	if err != nil {
 		t.Fatalf("player.NewVisiblePlayer() failed: %v", err)
 	}
 	pon := meld.MustPon(
-		*tile.MustTileFromCode("1m"),
-		[2]tile.Tile{*tile.MustTileFromCode("1m"), *tile.MustTileFromCode("1m")},
+		tile.MustTileFromCode("1m"),
+		[2]tile.Tile{tile.MustTileFromCode("1m"), tile.MustTileFromCode("1m")},
 		*seat.MustSeat(1),
 	)
 	if err := p.Pon(*pon); err != nil {
 		t.Fatalf("Pon() failed: %v", err)
 	}
-	if err := p.Discard(*tile.MustTileFromCode("E"), false); err != nil {
+	if err := p.Discard(tile.MustTileFromCode("E"), false); err != nil {
 		t.Fatalf("Discard() failed: %v", err)
 	}
-	if err := p.Draw(*tile.MustTileFromCode("9s")); err != nil {
+	if err := p.Draw(tile.MustTileFromCode("9s")); err != nil {
 		t.Fatalf("Draw() failed: %v", err)
 	}
 	return p
@@ -257,7 +257,7 @@ func newStateWithOpenNoYakuTsumoForLegalActionsTest(t *testing.T, numLeftTiles i
 		[common.NumPlayers]int{25000, 25000, 25000, 25000},
 		actor,
 		actor,
-		tile.Tiles{*tile.MustTileFromCode("E")},
+		tile.Tiles{tile.MustTileFromCode("E")},
 		numLeftTiles,
 		players,
 	)
@@ -279,12 +279,12 @@ func newStateBeforeConcealedKanForLegalActionsTest(t *testing.T, numLeftTiles in
 		[common.NumPlayers]int{25000, 25000, 25000, 25000},
 		*seat.MustSeat(0),
 		*seat.MustSeat(0),
-		tile.Tiles{*tile.MustTileFromCode("E")},
+		tile.Tiles{tile.MustTileFromCode("E")},
 		numLeftTiles+1,
 		newVisiblePlayersForTest(t, hands),
 	)
 	actor := *seat.MustSeat(0)
-	if err := s.Apply(event.NewDraw(actor, *tile.MustTileFromCode("E"))); err != nil {
+	if err := s.Apply(event.NewDraw(actor, tile.MustTileFromCode("E"))); err != nil {
 		t.Fatalf("Apply(Draw) failed: %v", err)
 	}
 	s.numKans = numKans
@@ -296,29 +296,29 @@ func newRiichiAcceptedStateBeforeConcealedKanForTest(t *testing.T) *State {
 
 	hands := newValidHands()
 	hands[0] = [common.InitHandSize]tile.Tile{
-		*tile.MustTileFromCode("1m"),
-		*tile.MustTileFromCode("1m"),
-		*tile.MustTileFromCode("1m"),
-		*tile.MustTileFromCode("2p"),
-		*tile.MustTileFromCode("3p"),
-		*tile.MustTileFromCode("4s"),
-		*tile.MustTileFromCode("5s"),
-		*tile.MustTileFromCode("6s"),
-		*tile.MustTileFromCode("7s"),
-		*tile.MustTileFromCode("8s"),
-		*tile.MustTileFromCode("E"),
-		*tile.MustTileFromCode("E"),
-		*tile.MustTileFromCode("W"),
+		tile.MustTileFromCode("1m"),
+		tile.MustTileFromCode("1m"),
+		tile.MustTileFromCode("1m"),
+		tile.MustTileFromCode("2p"),
+		tile.MustTileFromCode("3p"),
+		tile.MustTileFromCode("4s"),
+		tile.MustTileFromCode("5s"),
+		tile.MustTileFromCode("6s"),
+		tile.MustTileFromCode("7s"),
+		tile.MustTileFromCode("8s"),
+		tile.MustTileFromCode("E"),
+		tile.MustTileFromCode("E"),
+		tile.MustTileFromCode("W"),
 	}
 	s := mustNewRoundStateForTest(t, hands)
 	actor := *seat.MustSeat(0)
-	if err := s.Apply(event.NewDraw(actor, *tile.MustTileFromCode("9s"))); err != nil {
+	if err := s.Apply(event.NewDraw(actor, tile.MustTileFromCode("9s"))); err != nil {
 		t.Fatalf("Apply(first Draw) failed: %v", err)
 	}
 	if err := s.Apply(event.NewRiichi(actor)); err != nil {
 		t.Fatalf("Apply(Riichi) failed: %v", err)
 	}
-	if err := s.Apply(event.NewDiscard(actor, *tile.MustTileFromCode("W"), false)); err != nil {
+	if err := s.Apply(event.NewDiscard(actor, tile.MustTileFromCode("W"), false)); err != nil {
 		t.Fatalf("Apply(first Discard) failed: %v", err)
 	}
 	if err := s.Apply(event.NewRiichiAccepted(actor, nil, nil)); err != nil {
@@ -326,7 +326,7 @@ func newRiichiAcceptedStateBeforeConcealedKanForTest(t *testing.T) *State {
 	}
 	for i := 1; i < 4; i++ {
 		other := *seat.MustSeat(i)
-		drawnTile := *tile.MustTileFromCode("6m")
+		drawnTile := tile.MustTileFromCode("6m")
 		if err := s.Apply(event.NewDraw(other, drawnTile)); err != nil {
 			t.Fatalf("Apply(other Draw %d) failed: %v", i, err)
 		}
@@ -342,29 +342,29 @@ func newRiichiAcceptedStateBeforeConcealedKanChangingOnlyWinningFormForTest(t *t
 
 	hands := newValidHands()
 	hands[0] = [common.InitHandSize]tile.Tile{
-		*tile.MustTileFromCode("1m"),
-		*tile.MustTileFromCode("1m"),
-		*tile.MustTileFromCode("1m"),
-		*tile.MustTileFromCode("2m"),
-		*tile.MustTileFromCode("2m"),
-		*tile.MustTileFromCode("2m"),
-		*tile.MustTileFromCode("3m"),
-		*tile.MustTileFromCode("3m"),
-		*tile.MustTileFromCode("3m"),
-		*tile.MustTileFromCode("4s"),
-		*tile.MustTileFromCode("5s"),
-		*tile.MustTileFromCode("6s"),
-		*tile.MustTileFromCode("W"),
+		tile.MustTileFromCode("1m"),
+		tile.MustTileFromCode("1m"),
+		tile.MustTileFromCode("1m"),
+		tile.MustTileFromCode("2m"),
+		tile.MustTileFromCode("2m"),
+		tile.MustTileFromCode("2m"),
+		tile.MustTileFromCode("3m"),
+		tile.MustTileFromCode("3m"),
+		tile.MustTileFromCode("3m"),
+		tile.MustTileFromCode("4s"),
+		tile.MustTileFromCode("5s"),
+		tile.MustTileFromCode("6s"),
+		tile.MustTileFromCode("W"),
 	}
 	s := mustNewRoundStateForTest(t, hands)
 	actor := *seat.MustSeat(0)
-	if err := s.Apply(event.NewDraw(actor, *tile.MustTileFromCode("E"))); err != nil {
+	if err := s.Apply(event.NewDraw(actor, tile.MustTileFromCode("E"))); err != nil {
 		t.Fatalf("Apply(first Draw) failed: %v", err)
 	}
 	if err := s.Apply(event.NewRiichi(actor)); err != nil {
 		t.Fatalf("Apply(Riichi) failed: %v", err)
 	}
-	if err := s.Apply(event.NewDiscard(actor, *tile.MustTileFromCode("W"), false)); err != nil {
+	if err := s.Apply(event.NewDiscard(actor, tile.MustTileFromCode("W"), false)); err != nil {
 		t.Fatalf("Apply(first Discard) failed: %v", err)
 	}
 	if err := s.Apply(event.NewRiichiAccepted(actor, nil, nil)); err != nil {
@@ -372,7 +372,7 @@ func newRiichiAcceptedStateBeforeConcealedKanChangingOnlyWinningFormForTest(t *t
 	}
 	for i := 1; i < 4; i++ {
 		other := *seat.MustSeat(i)
-		drawnTile := *tile.MustTileFromCode("6m")
+		drawnTile := tile.MustTileFromCode("6m")
 		if err := s.Apply(event.NewDraw(other, drawnTile)); err != nil {
 			t.Fatalf("Apply(other Draw %d) failed: %v", i, err)
 		}

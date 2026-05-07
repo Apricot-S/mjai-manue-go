@@ -31,7 +31,7 @@ func mustNewStartRoundForTest(t *testing.T, hands [common.NumPlayers][common.Ini
 		0,
 		0,
 		*seat.MustSeat(0),
-		*tile.MustTileFromCode("E"),
+		tile.MustTileFromCode("E"),
 		&[common.NumPlayers]int{25000, 25000, 25000, 25000},
 		hands,
 	)
@@ -40,19 +40,19 @@ func mustNewStartRoundForTest(t *testing.T, hands [common.NumPlayers][common.Ini
 func newValidHands() [common.NumPlayers][common.InitHandSize]tile.Tile {
 	return [common.NumPlayers][common.InitHandSize]tile.Tile{
 		{
-			*tile.MustTileFromCode("1m"),
-			*tile.MustTileFromCode("2m"),
-			*tile.MustTileFromCode("3m"),
-			*tile.MustTileFromCode("4m"),
-			*tile.MustTileFromCode("5m"),
-			*tile.MustTileFromCode("6m"),
-			*tile.MustTileFromCode("7m"),
-			*tile.MustTileFromCode("8m"),
-			*tile.MustTileFromCode("9m"),
-			*tile.MustTileFromCode("1p"),
-			*tile.MustTileFromCode("2p"),
-			*tile.MustTileFromCode("3p"),
-			*tile.MustTileFromCode("4p"),
+			tile.MustTileFromCode("1m"),
+			tile.MustTileFromCode("2m"),
+			tile.MustTileFromCode("3m"),
+			tile.MustTileFromCode("4m"),
+			tile.MustTileFromCode("5m"),
+			tile.MustTileFromCode("6m"),
+			tile.MustTileFromCode("7m"),
+			tile.MustTileFromCode("8m"),
+			tile.MustTileFromCode("9m"),
+			tile.MustTileFromCode("1p"),
+			tile.MustTileFromCode("2p"),
+			tile.MustTileFromCode("3p"),
+			tile.MustTileFromCode("4p"),
 		},
 		unknownHand(),
 		unknownHand(),
@@ -63,7 +63,7 @@ func newValidHands() [common.NumPlayers][common.InitHandSize]tile.Tile {
 func unknownHand() [common.InitHandSize]tile.Tile {
 	var hand [common.InitHandSize]tile.Tile
 	for i := range common.InitHandSize {
-		hand[i] = *tile.MustTileFromCode("?")
+		hand[i] = tile.MustTileFromCode("?")
 	}
 	return hand
 }

@@ -10,11 +10,11 @@ import (
 
 func TestNewPromotedKan(t *testing.T) {
 	actor := *seat.MustSeat(1)
-	added := *tile.MustTileFromCode("5mr")
+	added := tile.MustTileFromCode("5mr")
 	consumed := [3]tile.Tile{
-		*tile.MustTileFromCode("5m"),
-		*tile.MustTileFromCode("5m"),
-		*tile.MustTileFromCode("5m"),
+		tile.MustTileFromCode("5m"),
+		tile.MustTileFromCode("5m"),
+		tile.MustTileFromCode("5m"),
 	}
 
 	got, err := action.NewPromotedKan(actor, added, consumed)
@@ -35,7 +35,7 @@ func TestNewPromotedKan(t *testing.T) {
 
 func TestNewPromotedKan_UnknownTile(t *testing.T) {
 	actor := *seat.MustSeat(1)
-	unknown := *tile.MustTileFromCode("?")
+	unknown := tile.MustTileFromCode("?")
 
 	tests := []struct {
 		name     string
@@ -46,18 +46,18 @@ func TestNewPromotedKan_UnknownTile(t *testing.T) {
 			name:  "added",
 			added: unknown,
 			consumed: [3]tile.Tile{
-				*tile.MustTileFromCode("5m"),
-				*tile.MustTileFromCode("5m"),
-				*tile.MustTileFromCode("5m"),
+				tile.MustTileFromCode("5m"),
+				tile.MustTileFromCode("5m"),
+				tile.MustTileFromCode("5m"),
 			},
 		},
 		{
 			name:  "consumed",
-			added: *tile.MustTileFromCode("5mr"),
+			added: tile.MustTileFromCode("5mr"),
 			consumed: [3]tile.Tile{
 				unknown,
-				*tile.MustTileFromCode("5m"),
-				*tile.MustTileFromCode("5m"),
+				tile.MustTileFromCode("5m"),
+				tile.MustTileFromCode("5m"),
 			},
 		},
 	}

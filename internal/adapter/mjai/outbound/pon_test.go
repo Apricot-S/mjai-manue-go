@@ -13,8 +13,8 @@ func TestMarshalMessage_Pon(t *testing.T) {
 	pon, err := action.NewPon(
 		*seat.MustSeat(2),
 		*seat.MustSeat(0),
-		*tile.MustTileFromCode("E"),
-		[2]tile.Tile{*tile.MustTileFromCode("E"), *tile.MustTileFromCode("E")},
+		tile.MustTileFromCode("E"),
+		[2]tile.Tile{tile.MustTileFromCode("E"), tile.MustTileFromCode("E")},
 	)
 	if err != nil {
 		t.Fatalf("NewPon() failed: %v", err)
@@ -37,8 +37,8 @@ func TestMarshalMessage_Pon_Log(t *testing.T) {
 	pon, err := action.NewPon(
 		*seat.MustSeat(2),
 		*seat.MustSeat(0),
-		*tile.MustTileFromCode("E"),
-		[2]tile.Tile{*tile.MustTileFromCode("E"), *tile.MustTileFromCode("E")},
+		tile.MustTileFromCode("E"),
+		[2]tile.Tile{tile.MustTileFromCode("E"), tile.MustTileFromCode("E")},
 	)
 	if err != nil {
 		t.Fatalf("NewPon() failed: %v", err)

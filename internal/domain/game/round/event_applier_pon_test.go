@@ -12,11 +12,11 @@ import (
 
 func TestState_Apply_Pon(t *testing.T) {
 	hands := newValidHands()
-	hands[3][1] = *tile.MustTileFromCode("1s")
+	hands[3][1] = tile.MustTileFromCode("1s")
 	s := mustNewRoundStateForTest(t, hands)
 	actor := *seat.MustSeat(3)
 	target := *seat.MustSeat(0)
-	taken := *tile.MustTileFromCode("1s")
+	taken := tile.MustTileFromCode("1s")
 
 	if err := s.Apply(event.NewDraw(target, taken)); err != nil {
 		t.Fatalf("Apply(Draw) failed: %v", err)
@@ -49,7 +49,7 @@ func TestState_Apply_Pon(t *testing.T) {
 func TestState_Apply_Pon_ReturnsErrorWhenActorAndTargetAreSame(t *testing.T) {
 	s := mustNewRoundStateForTest(t, newValidHands())
 	actor := *seat.MustSeat(0)
-	taken := *tile.MustTileFromCode("1s")
+	taken := tile.MustTileFromCode("1s")
 
 	if err := s.Apply(event.NewDraw(actor, taken)); err != nil {
 		t.Fatalf("Apply(Draw) failed: %v", err)
@@ -72,7 +72,7 @@ func TestState_Apply_Pon_ReturnsErrorWhenActorAndTargetAreSame(t *testing.T) {
 
 func TestState_Apply_Pon_ReturnsErrorForLastDiscard(t *testing.T) {
 	hands := newValidHands()
-	hands[3][1] = *tile.MustTileFromCode("1s")
+	hands[3][1] = tile.MustTileFromCode("1s")
 	players := newVisiblePlayersForTest(t, hands)
 
 	s := NewStateForTest(
@@ -83,13 +83,13 @@ func TestState_Apply_Pon_ReturnsErrorForLastDiscard(t *testing.T) {
 		[common.NumPlayers]int{25000, 25000, 25000, 25000},
 		*seat.MustSeat(0),
 		*seat.MustSeat(0),
-		tile.Tiles{*tile.MustTileFromCode("E")},
+		tile.Tiles{tile.MustTileFromCode("E")},
 		1,
 		players,
 	)
 	actor := *seat.MustSeat(3)
 	target := *seat.MustSeat(0)
-	taken := *tile.MustTileFromCode("1s")
+	taken := tile.MustTileFromCode("1s")
 
 	if err := s.Apply(event.NewDraw(target, taken)); err != nil {
 		t.Fatalf("Apply(Draw) failed: %v", err)

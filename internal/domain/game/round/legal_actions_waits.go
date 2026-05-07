@@ -26,7 +26,7 @@ func waitsFor(h *hand.VisibleHand) waitSet {
 	var waits waitSet
 	for id := range tile.NumTileType34 {
 		waitTile := tile.MustTileFromID(id)
-		handWithWait, err := h.Draw(waitTile)
+		handWithWait, err := h.Draw(&waitTile)
 		if err != nil {
 			continue
 		}

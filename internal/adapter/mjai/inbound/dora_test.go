@@ -13,7 +13,7 @@ func TestParseEvent_Dora(t *testing.T) {
 	if !ok {
 		t.Fatalf("ParseEvent() = %T, want *event.Dora", got)
 	}
-	if dora.Indicator() != *tile.MustTileFromCode("6p") {
+	if dora.Indicator() != tile.MustTileFromCode("6p") {
 		t.Errorf("Indicator() = %v, want 6p", dora.Indicator())
 	}
 }

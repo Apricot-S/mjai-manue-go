@@ -20,10 +20,10 @@ func TestParseEvent_Chi(t *testing.T) {
 	if chii.Target() != *seat.MustSeat(3) {
 		t.Errorf("Target() = %v, want %v", chii.Target(), *seat.MustSeat(3))
 	}
-	if chii.Taken() != *tile.MustTileFromCode("4s") {
+	if chii.Taken() != tile.MustTileFromCode("4s") {
 		t.Errorf("Taken() = %v, want 4s", chii.Taken())
 	}
-	if chii.Consumed() != [2]tile.Tile{*tile.MustTileFromCode("5sr"), *tile.MustTileFromCode("6s")} {
+	if chii.Consumed() != [2]tile.Tile{tile.MustTileFromCode("5sr"), tile.MustTileFromCode("6s")} {
 		t.Errorf("Consumed() = %v", chii.Consumed())
 	}
 }

@@ -11,8 +11,8 @@ import (
 func TestNewPon(t *testing.T) {
 	actor := *seat.MustSeat(2)
 	target := *seat.MustSeat(0)
-	taken := *tile.MustTileFromCode("E")
-	consumed := [2]tile.Tile{*tile.MustTileFromCode("E"), *tile.MustTileFromCode("E")}
+	taken := tile.MustTileFromCode("E")
+	consumed := [2]tile.Tile{tile.MustTileFromCode("E"), tile.MustTileFromCode("E")}
 
 	got, err := action.NewPon(actor, target, taken, consumed)
 	if err != nil {
@@ -36,8 +36,8 @@ func TestNewPon(t *testing.T) {
 func TestNewPon_UnknownTile(t *testing.T) {
 	actor := *seat.MustSeat(2)
 	target := *seat.MustSeat(0)
-	unknown := *tile.MustTileFromCode("?")
-	consumed := [2]tile.Tile{*tile.MustTileFromCode("E"), *tile.MustTileFromCode("E")}
+	unknown := tile.MustTileFromCode("?")
+	consumed := [2]tile.Tile{tile.MustTileFromCode("E"), tile.MustTileFromCode("E")}
 
 	tests := []struct {
 		name     string
@@ -51,8 +51,8 @@ func TestNewPon_UnknownTile(t *testing.T) {
 		},
 		{
 			name:     "consumed",
-			taken:    *tile.MustTileFromCode("E"),
-			consumed: [2]tile.Tile{unknown, *tile.MustTileFromCode("E")},
+			taken:    tile.MustTileFromCode("E"),
+			consumed: [2]tile.Tile{unknown, tile.MustTileFromCode("E")},
 		},
 	}
 

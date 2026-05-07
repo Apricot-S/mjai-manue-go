@@ -51,7 +51,7 @@ func (h *VisibleHand) ToTiles() []tile.Tile {
 	tiles := make([]tile.Tile, 0, maxNumTilesInHand)
 	for i, c := range h.tileCounts {
 		for range c {
-			tiles = append(tiles, *tile.MustTileFromID(i))
+			tiles = append(tiles, tile.MustTileFromID(i))
 		}
 	}
 	return tiles

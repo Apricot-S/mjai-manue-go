@@ -15,7 +15,7 @@ import (
 func TestState_Apply_PromotedKan(t *testing.T) {
 	s := newStateBeforePromotedKanForTest(t, 10, 0)
 	actor := *seat.MustSeat(3)
-	added := *tile.MustTileFromCode("E")
+	added := tile.MustTileFromCode("E")
 
 	if err := s.Apply(event.NewPromotedKan(actor, added, [3]tile.Tile{added, added, added})); err != nil {
 		t.Fatalf("Apply(PromotedKan) failed: %v", err)
@@ -35,7 +35,7 @@ func TestState_Apply_PromotedKan(t *testing.T) {
 func TestState_Apply_PromotedKan_ReturnsErrorWhenNoReplacementTileLeft(t *testing.T) {
 	s := newStateBeforePromotedKanForTest(t, 0, 0)
 	actor := *seat.MustSeat(3)
-	added := *tile.MustTileFromCode("E")
+	added := tile.MustTileFromCode("E")
 
 	if err := s.Apply(event.NewPromotedKan(actor, added, [3]tile.Tile{added, added, added})); err == nil {
 		t.Fatal("Apply(PromotedKan) succeeded unexpectedly")
@@ -49,7 +49,7 @@ func TestState_Apply_PromotedKan_ReturnsErrorWhenNoReplacementTileLeft(t *testin
 func TestState_Apply_PromotedKan_ReturnsErrorOnFifthKan(t *testing.T) {
 	s := newStateBeforePromotedKanForTest(t, 10, maxNumKan)
 	actor := *seat.MustSeat(3)
-	added := *tile.MustTileFromCode("E")
+	added := tile.MustTileFromCode("E")
 
 	if err := s.Apply(event.NewPromotedKan(actor, added, [3]tile.Tile{added, added, added})); err == nil {
 		t.Fatal("Apply(PromotedKan) succeeded unexpectedly")
@@ -63,12 +63,12 @@ func TestState_Apply_PromotedKan_ReturnsErrorOnFifthKan(t *testing.T) {
 func TestState_Apply_PromotedKan_ReturnsErrorWhenDiscardFollowsPromotedKan(t *testing.T) {
 	s := newStateBeforePromotedKanForTest(t, 10, 0)
 	actor := *seat.MustSeat(3)
-	added := *tile.MustTileFromCode("E")
+	added := tile.MustTileFromCode("E")
 
 	if err := s.Apply(event.NewPromotedKan(actor, added, [3]tile.Tile{added, added, added})); err != nil {
 		t.Fatalf("Apply(PromotedKan) failed: %v", err)
 	}
-	if err := s.Apply(event.NewDiscard(actor, *tile.MustTileFromCode("W"), false)); err == nil {
+	if err := s.Apply(event.NewDiscard(actor, tile.MustTileFromCode("W"), false)); err == nil {
 		t.Fatal("Apply(Discard) succeeded unexpectedly")
 	}
 }
@@ -76,9 +76,9 @@ func TestState_Apply_PromotedKan_ReturnsErrorWhenDiscardFollowsPromotedKan(t *te
 func TestState_Apply_PromotedKan_AllowsDoraAfterReplacementTileDraw(t *testing.T) {
 	s := newStateBeforePromotedKanForTest(t, 10, 0)
 	actor := *seat.MustSeat(3)
-	added := *tile.MustTileFromCode("E")
-	replacementTile := *tile.MustTileFromCode("W")
-	doraIndicator := *tile.MustTileFromCode("6p")
+	added := tile.MustTileFromCode("E")
+	replacementTile := tile.MustTileFromCode("W")
+	doraIndicator := tile.MustTileFromCode("6p")
 
 	if err := s.Apply(event.NewPromotedKan(actor, added, [3]tile.Tile{added, added, added})); err != nil {
 		t.Fatalf("Apply(PromotedKan) failed: %v", err)
@@ -98,8 +98,8 @@ func TestState_Apply_PromotedKan_AllowsDoraAfterReplacementTileDraw(t *testing.T
 func TestState_Apply_PromotedKan_AllowsDiscardAfterDoraReveal(t *testing.T) {
 	s := newStateBeforePromotedKanForTest(t, 10, 0)
 	actor := *seat.MustSeat(3)
-	added := *tile.MustTileFromCode("E")
-	replacementTile := *tile.MustTileFromCode("W")
+	added := tile.MustTileFromCode("E")
+	replacementTile := tile.MustTileFromCode("W")
 
 	if err := s.Apply(event.NewPromotedKan(actor, added, [3]tile.Tile{added, added, added})); err != nil {
 		t.Fatalf("Apply(PromotedKan) failed: %v", err)
@@ -107,7 +107,7 @@ func TestState_Apply_PromotedKan_AllowsDiscardAfterDoraReveal(t *testing.T) {
 	if err := s.Apply(event.NewDraw(actor, replacementTile)); err != nil {
 		t.Fatalf("Apply(Draw) failed: %v", err)
 	}
-	if err := s.Apply(event.NewDora(*tile.MustTileFromCode("6p"))); err != nil {
+	if err := s.Apply(event.NewDora(tile.MustTileFromCode("6p"))); err != nil {
 		t.Fatalf("Apply(Dora) failed: %v", err)
 	}
 	if err := s.Apply(event.NewDiscard(actor, replacementTile, true)); err != nil {
@@ -134,7 +134,7 @@ func newStateBeforePromotedKanForTest(t *testing.T, numLeftTiles int, numKans in
 		[common.NumPlayers]int{25000, 25000, 25000, 25000},
 		*seat.MustSeat(0),
 		*seat.MustSeat(0),
-		tile.Tiles{*tile.MustTileFromCode("E")},
+		tile.Tiles{tile.MustTileFromCode("E")},
 		numLeftTiles,
 		players,
 	)
@@ -148,28 +148,28 @@ func playerBeforePromotedKanForTest(t *testing.T) player.Player {
 	t.Helper()
 
 	handTiles := [common.InitHandSize]tile.Tile{
-		*tile.MustTileFromCode("1m"), *tile.MustTileFromCode("2m"), *tile.MustTileFromCode("3m"),
-		*tile.MustTileFromCode("4p"), *tile.MustTileFromCode("5p"), *tile.MustTileFromCode("6p"),
-		*tile.MustTileFromCode("7s"), *tile.MustTileFromCode("8s"), *tile.MustTileFromCode("9s"),
-		*tile.MustTileFromCode("E"), *tile.MustTileFromCode("E"), *tile.MustTileFromCode("S"),
-		*tile.MustTileFromCode("W"),
+		tile.MustTileFromCode("1m"), tile.MustTileFromCode("2m"), tile.MustTileFromCode("3m"),
+		tile.MustTileFromCode("4p"), tile.MustTileFromCode("5p"), tile.MustTileFromCode("6p"),
+		tile.MustTileFromCode("7s"), tile.MustTileFromCode("8s"), tile.MustTileFromCode("9s"),
+		tile.MustTileFromCode("E"), tile.MustTileFromCode("E"), tile.MustTileFromCode("S"),
+		tile.MustTileFromCode("W"),
 	}
 	p, err := player.NewVisiblePlayer(handTiles)
 	if err != nil {
 		t.Fatalf("player.NewVisiblePlayer() failed: %v", err)
 	}
 	pon := meld.MustPon(
-		*tile.MustTileFromCode("E"),
-		[2]tile.Tile{*tile.MustTileFromCode("E"), *tile.MustTileFromCode("E")},
+		tile.MustTileFromCode("E"),
+		[2]tile.Tile{tile.MustTileFromCode("E"), tile.MustTileFromCode("E")},
 		*seat.MustSeat(0),
 	)
 	if err := p.Pon(*pon); err != nil {
 		t.Fatalf("Pon() failed: %v", err)
 	}
-	if err := p.Discard(*tile.MustTileFromCode("S"), false); err != nil {
+	if err := p.Discard(tile.MustTileFromCode("S"), false); err != nil {
 		t.Fatalf("Discard() failed: %v", err)
 	}
-	if err := p.Draw(*tile.MustTileFromCode("E")); err != nil {
+	if err := p.Draw(tile.MustTileFromCode("E")); err != nil {
 		t.Fatalf("Draw() failed: %v", err)
 	}
 	return p

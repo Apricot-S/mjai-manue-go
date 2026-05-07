@@ -17,7 +17,7 @@ func TestState_RenderBoard(t *testing.T) {
 		0,
 		0,
 		*seat.MustSeat(0),
-		*tile.MustTileFromCode("E"),
+		tile.MustTileFromCode("E"),
 		&[4]int{25000, 25000, 25000, 25000},
 		hands,
 	)
@@ -26,7 +26,7 @@ func TestState_RenderBoard(t *testing.T) {
 	if err != nil {
 		t.Fatalf("NewState() failed: %v", err)
 	}
-	if err := s.Apply(event.NewDraw(*seat.MustSeat(0), *tile.MustTileFromCode("6m"))); err != nil {
+	if err := s.Apply(event.NewDraw(*seat.MustSeat(0), tile.MustTileFromCode("6m"))); err != nil {
 		t.Fatalf("Apply(Draw) failed: %v", err)
 	}
 
@@ -49,7 +49,7 @@ func TestState_RenderBoard(t *testing.T) {
 func TestState_RenderBoard_ActorAfterDiscard(t *testing.T) {
 	s := mustNewRoundStateForTest(t, newValidHands())
 	actor := *seat.MustSeat(0)
-	discardedTile := *tile.MustTileFromCode("6m")
+	discardedTile := tile.MustTileFromCode("6m")
 
 	if err := s.Apply(event.NewDraw(actor, discardedTile)); err != nil {
 		t.Fatalf("Apply(Draw) failed: %v", err)
@@ -76,11 +76,11 @@ func TestState_RenderBoard_ActorAfterDiscard(t *testing.T) {
 
 func TestState_RenderBoard_ActorAfterPon(t *testing.T) {
 	hands := newValidHands()
-	hands[3][1] = *tile.MustTileFromCode("1s")
+	hands[3][1] = tile.MustTileFromCode("1s")
 	s := mustNewRoundStateForTest(t, hands)
 	actor := *seat.MustSeat(3)
 	target := *seat.MustSeat(0)
-	taken := *tile.MustTileFromCode("1s")
+	taken := tile.MustTileFromCode("1s")
 
 	if err := s.Apply(event.NewDraw(target, taken)); err != nil {
 		t.Fatalf("Apply(Draw) failed: %v", err)

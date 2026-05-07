@@ -12,7 +12,7 @@ import (
 func TestState_Apply_Discard(t *testing.T) {
 	s := mustNewRoundStateForTest(t, newValidHands())
 	actor := *seat.MustSeat(0)
-	discardedTile := *tile.MustTileFromCode("6m")
+	discardedTile := tile.MustTileFromCode("6m")
 
 	if err := s.Apply(event.NewDraw(actor, discardedTile)); err != nil {
 		t.Fatalf("Apply(Draw) failed: %v", err)
@@ -44,7 +44,7 @@ func TestState_Apply_Discard_ReturnsErrorWhenActorIsNotPendingDiscardPlayer(t *t
 	s := mustNewRoundStateForTest(t, newValidHands())
 	drawActor := *seat.MustSeat(0)
 	discardActor := *seat.MustSeat(1)
-	drawnTile := *tile.MustTileFromCode("6m")
+	drawnTile := tile.MustTileFromCode("6m")
 
 	if err := s.Apply(event.NewDraw(drawActor, drawnTile)); err != nil {
 		t.Fatalf("Apply(Draw) failed: %v", err)
@@ -65,17 +65,17 @@ func TestState_Apply_Discard_ReturnsErrorWhenActorIsNotPendingDiscardPlayer(t *t
 func TestState_Apply_Discard_ReturnsErrorForSwapCallTileAfterPon(t *testing.T) {
 	hands := newValidHands()
 	hands[3] = [common.InitHandSize]tile.Tile{
-		*tile.MustTileFromCode("1m"), *tile.MustTileFromCode("2m"), *tile.MustTileFromCode("3m"),
-		*tile.MustTileFromCode("4p"), *tile.MustTileFromCode("5pr"), *tile.MustTileFromCode("6p"),
-		*tile.MustTileFromCode("7s"), *tile.MustTileFromCode("8s"), *tile.MustTileFromCode("9s"),
-		*tile.MustTileFromCode("5p"), *tile.MustTileFromCode("5p"), *tile.MustTileFromCode("S"),
-		*tile.MustTileFromCode("W"),
+		tile.MustTileFromCode("1m"), tile.MustTileFromCode("2m"), tile.MustTileFromCode("3m"),
+		tile.MustTileFromCode("4p"), tile.MustTileFromCode("5pr"), tile.MustTileFromCode("6p"),
+		tile.MustTileFromCode("7s"), tile.MustTileFromCode("8s"), tile.MustTileFromCode("9s"),
+		tile.MustTileFromCode("5p"), tile.MustTileFromCode("5p"), tile.MustTileFromCode("S"),
+		tile.MustTileFromCode("W"),
 	}
 	s := mustNewRoundStateForTest(t, hands)
 	actor := *seat.MustSeat(3)
 	target := *seat.MustSeat(0)
-	taken := *tile.MustTileFromCode("5p")
-	swapCallTile := *tile.MustTileFromCode("5pr")
+	taken := tile.MustTileFromCode("5p")
+	swapCallTile := tile.MustTileFromCode("5pr")
 
 	if err := s.Apply(event.NewDraw(target, taken)); err != nil {
 		t.Fatalf("Apply(Draw) failed: %v", err)

@@ -17,19 +17,19 @@ func TestNewTriplet(t *testing.T) {
 	}{
 		{
 			name:    "C triplet",
-			tile:    *tile.MustTileFromCode("C"),
-			want:    []tile.Tile{*tile.MustTileFromCode("C"), *tile.MustTileFromCode("C"), *tile.MustTileFromCode("C")},
+			tile:    tile.MustTileFromCode("C"),
+			want:    []tile.Tile{tile.MustTileFromCode("C"), tile.MustTileFromCode("C"), tile.MustTileFromCode("C")},
 			wantErr: false,
 		},
 		{
 			name:    "cannot create triplet from unknown tile",
-			tile:    *tile.MustTileFromCode("?"),
+			tile:    tile.MustTileFromCode("?"),
 			want:    nil,
 			wantErr: true,
 		},
 		{
 			name:    "cannot create triplet from red five",
-			tile:    *tile.MustTileFromCode("5mr"),
+			tile:    tile.MustTileFromCode("5mr"),
 			want:    nil,
 			wantErr: true,
 		},

@@ -10,7 +10,7 @@ import (
 )
 
 func TestMarshalMessage_Dahai(t *testing.T) {
-	discard, err := action.NewDiscard(*seat.MustSeat(1), *tile.MustTileFromCode("5mr"), false)
+	discard, err := action.NewDiscard(*seat.MustSeat(1), tile.MustTileFromCode("5mr"), false)
 	if err != nil {
 		t.Fatalf("NewDiscard() failed: %v", err)
 	}
@@ -29,7 +29,7 @@ func TestMarshalMessage_Dahai(t *testing.T) {
 }
 
 func TestMarshalMessage_Dahai_Log(t *testing.T) {
-	discard, err := action.NewDiscard(*seat.MustSeat(1), *tile.MustTileFromCode("5mr"), false)
+	discard, err := action.NewDiscard(*seat.MustSeat(1), tile.MustTileFromCode("5mr"), false)
 	if err != nil {
 		t.Fatalf("NewDiscard() failed: %v", err)
 	}
@@ -48,7 +48,7 @@ func TestMarshalMessage_Dahai_Log(t *testing.T) {
 }
 
 func TestToMessage_Dahai(t *testing.T) {
-	discard, err := action.NewDiscard(*seat.MustSeat(2), *tile.MustTileFromCode("E"), true)
+	discard, err := action.NewDiscard(*seat.MustSeat(2), tile.MustTileFromCode("E"), true)
 	if err != nil {
 		t.Fatalf("NewDiscard() failed: %v", err)
 	}
@@ -79,7 +79,7 @@ func TestToMessage_Dahai(t *testing.T) {
 }
 
 func TestToMessage_Dahai_Log(t *testing.T) {
-	discard, err := action.NewDiscard(*seat.MustSeat(2), *tile.MustTileFromCode("E"), true)
+	discard, err := action.NewDiscard(*seat.MustSeat(2), tile.MustTileFromCode("E"), true)
 	if err != nil {
 		t.Fatalf("NewDiscard() failed: %v", err)
 	}

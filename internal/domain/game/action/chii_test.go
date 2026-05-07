@@ -11,8 +11,8 @@ import (
 func TestNewChii(t *testing.T) {
 	actor := *seat.MustSeat(1)
 	target := *seat.MustSeat(0)
-	taken := *tile.MustTileFromCode("3m")
-	consumed := [2]tile.Tile{*tile.MustTileFromCode("1m"), *tile.MustTileFromCode("2m")}
+	taken := tile.MustTileFromCode("3m")
+	consumed := [2]tile.Tile{tile.MustTileFromCode("1m"), tile.MustTileFromCode("2m")}
 
 	got, err := action.NewChii(actor, target, taken, consumed)
 	if err != nil {
@@ -36,8 +36,8 @@ func TestNewChii(t *testing.T) {
 func TestNewChii_UnknownTile(t *testing.T) {
 	actor := *seat.MustSeat(1)
 	target := *seat.MustSeat(0)
-	unknown := *tile.MustTileFromCode("?")
-	consumed := [2]tile.Tile{*tile.MustTileFromCode("1m"), *tile.MustTileFromCode("2m")}
+	unknown := tile.MustTileFromCode("?")
+	consumed := [2]tile.Tile{tile.MustTileFromCode("1m"), tile.MustTileFromCode("2m")}
 
 	tests := []struct {
 		name     string
@@ -51,8 +51,8 @@ func TestNewChii_UnknownTile(t *testing.T) {
 		},
 		{
 			name:     "consumed",
-			taken:    *tile.MustTileFromCode("3m"),
-			consumed: [2]tile.Tile{unknown, *tile.MustTileFromCode("2m")},
+			taken:    tile.MustTileFromCode("3m"),
+			consumed: [2]tile.Tile{unknown, tile.MustTileFromCode("2m")},
 		},
 	}
 

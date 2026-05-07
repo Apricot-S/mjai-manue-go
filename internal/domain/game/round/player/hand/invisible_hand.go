@@ -29,7 +29,7 @@ func MustInvisibleHand(tiles []tile.Tile) *InvisibleHand {
 }
 
 func (h *InvisibleHand) ToTiles() []tile.Tile {
-	t := *tile.MustTileFromCode("?")
+	t := tile.MustTileFromCode("?")
 	tiles := make([]tile.Tile, h.tileCount)
 	for i := range tiles {
 		tiles[i] = t
