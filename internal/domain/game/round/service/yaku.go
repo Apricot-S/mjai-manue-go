@@ -471,7 +471,8 @@ func ikkiTsuukan(allBlocks []block.Block, isOpen bool) int {
 	}
 
 	for _, numberBits := range numberBitsByColor {
-		if numberBits&(1<<1) != 0 && numberBits&(1<<4) != 0 && numberBits&(1<<7) != 0 {
+		const ikkiTsuukanNumberBits = (1 << 1) | (1 << 4) | (1 << 7)
+		if numberBits&ikkiTsuukanNumberBits == ikkiTsuukanNumberBits {
 			if isOpen {
 				return 1
 			}
