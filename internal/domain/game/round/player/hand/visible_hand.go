@@ -65,7 +65,7 @@ func (h *VisibleHand) ToTileCounts34() *TileCounts34 {
 	return &tc
 }
 
-func (h *VisibleHand) Count(tile *tile.Tile) int {
+func (h *VisibleHand) Count(tile tile.Tile) int {
 	if tile.IsUnknown() {
 		panic("visible hand cannot count unknown tiles")
 	}
@@ -73,7 +73,7 @@ func (h *VisibleHand) Count(tile *tile.Tile) int {
 	return h.tileCounts[tile.ID()]
 }
 
-func (h *VisibleHand) Draw(tile *tile.Tile) (*VisibleHand, error) {
+func (h *VisibleHand) Draw(tile tile.Tile) (*VisibleHand, error) {
 	if tile.IsUnknown() {
 		return nil, fmt.Errorf("visible hand cannot draw an unknown tile")
 	}
@@ -95,7 +95,7 @@ func (h *VisibleHand) Draw(tile *tile.Tile) (*VisibleHand, error) {
 	return &VisibleHand{tileCounts: tileCounts, numTiles: h.numTiles + 1}, nil
 }
 
-func (h *VisibleHand) Discard(tile *tile.Tile) (*VisibleHand, error) {
+func (h *VisibleHand) Discard(tile tile.Tile) (*VisibleHand, error) {
 	if tile.IsUnknown() {
 		return nil, fmt.Errorf("visible hand cannot discard an unknown tile")
 	}
@@ -125,7 +125,7 @@ func (h *VisibleHand) Call(m meld.Meld) (*VisibleHand, error) {
 		consumed = mm.Consumed()
 		numConsumed = 4
 	case *meld.PromotedKan:
-		consumed = []tile.Tile{*mm.Added()}
+		consumed = []tile.Tile{mm.Added()}
 		numConsumed = 1
 	}
 

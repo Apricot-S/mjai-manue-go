@@ -220,6 +220,6 @@ func (t Tile) RemoveRed() Tile {
 	}
 }
 
-func (t Tile) HasSameSymbol(other *Tile) bool {
+func (t Tile) HasSameSymbol(other Tile) bool {
 	return t.Number() == other.Number() && t.Color() == other.Color()
 }

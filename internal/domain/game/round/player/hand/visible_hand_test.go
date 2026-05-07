@@ -164,31 +164,31 @@ func TestVisibleHand_Count(t *testing.T) {
 	tests := []struct {
 		name  string
 		tiles []tile.Tile
-		t     *tile.Tile
+		t     tile.Tile
 		want  int
 	}{
 		{
 			name:  "empty hand",
 			tiles: nil,
-			t:     new(tile.MustTileFromCode("5m")),
+			t:     tile.MustTileFromCode("5m"),
 			want:  0,
 		},
 		{
 			name:  "has 1 tile",
 			tiles: []tile.Tile{tile.MustTileFromCode("5m"), tile.MustTileFromCode("5mr")},
-			t:     new(tile.MustTileFromCode("5m")),
+			t:     tile.MustTileFromCode("5m"),
 			want:  1,
 		},
 		{
 			name:  "has 2 tile",
 			tiles: []tile.Tile{tile.MustTileFromCode("5m"), tile.MustTileFromCode("5m"), tile.MustTileFromCode("5mr")},
-			t:     new(tile.MustTileFromCode("5m")),
+			t:     tile.MustTileFromCode("5m"),
 			want:  2,
 		},
 		{
 			name:  "red tile",
 			tiles: []tile.Tile{tile.MustTileFromCode("5m"), tile.MustTileFromCode("5mr")},
-			t:     new(tile.MustTileFromCode("5mr")),
+			t:     tile.MustTileFromCode("5mr"),
 			want:  1,
 		},
 	}
@@ -232,7 +232,7 @@ func TestVisibleHand_Count_Panic(t *testing.T) {
 			if err != nil {
 				t.Fatalf("could not construct receiver type: %v", err)
 			}
-			h.Count(new(tile.MustTileFromCode("?")))
+			h.Count(tile.MustTileFromCode("?"))
 		})
 	}
 }
@@ -241,49 +241,49 @@ func TestVisibleHand_Draw(t *testing.T) {
 	tests := []struct {
 		name      string
 		tiles     []tile.Tile
-		tile      *tile.Tile
+		tile      tile.Tile
 		wantTiles []tile.Tile
 		wantErr   bool
 	}{
 		{
 			name:      "visible hand cannot draw an unknown tile",
 			tiles:     []tile.Tile{},
-			tile:      new(tile.MustTileFromCode("?")),
+			tile:      tile.MustTileFromCode("?"),
 			wantTiles: nil,
 			wantErr:   true,
 		},
 		{
 			name:      "visible tile",
 			tiles:     []tile.Tile{tile.MustTileFromCode("1m")},
-			tile:      new(tile.MustTileFromCode("1m")),
+			tile:      tile.MustTileFromCode("1m"),
 			wantTiles: []tile.Tile{tile.MustTileFromCode("1m"), tile.MustTileFromCode("1m")},
 			wantErr:   false,
 		},
 		{
 			name:      "hand can draw 4th identical tiles",
 			tiles:     []tile.Tile{tile.MustTileFromCode("1m"), tile.MustTileFromCode("1m"), tile.MustTileFromCode("1m")},
-			tile:      new(tile.MustTileFromCode("1m")),
+			tile:      tile.MustTileFromCode("1m"),
 			wantTiles: []tile.Tile{tile.MustTileFromCode("1m"), tile.MustTileFromCode("1m"), tile.MustTileFromCode("1m"), tile.MustTileFromCode("1m")},
 			wantErr:   false,
 		},
 		{
 			name:      "hand cannot draw 5th identical tiles",
 			tiles:     []tile.Tile{tile.MustTileFromCode("1m"), tile.MustTileFromCode("1m"), tile.MustTileFromCode("1m"), tile.MustTileFromCode("1m")},
-			tile:      new(tile.MustTileFromCode("1m")),
+			tile:      tile.MustTileFromCode("1m"),
 			wantTiles: nil,
 			wantErr:   true,
 		},
 		{
 			name:      "hand cannot draw 2nd red fives",
 			tiles:     []tile.Tile{tile.MustTileFromCode("5mr")},
-			tile:      new(tile.MustTileFromCode("5mr")),
+			tile:      tile.MustTileFromCode("5mr"),
 			wantTiles: nil,
 			wantErr:   true,
 		},
 		{
 			name:      "hand can draw 4th normal fives",
 			tiles:     []tile.Tile{tile.MustTileFromCode("5m"), tile.MustTileFromCode("5m"), tile.MustTileFromCode("5m")},
-			tile:      new(tile.MustTileFromCode("5m")),
+			tile:      tile.MustTileFromCode("5m"),
 			wantTiles: []tile.Tile{tile.MustTileFromCode("5m"), tile.MustTileFromCode("5m"), tile.MustTileFromCode("5m"), tile.MustTileFromCode("5m")},
 			wantErr:   false,
 		},
@@ -296,7 +296,7 @@ func TestVisibleHand_Draw(t *testing.T) {
 				tile.MustTileFromCode("4m"), tile.MustTileFromCode("4m"), tile.MustTileFromCode("4m"),
 				tile.MustTileFromCode("5m"),
 			},
-			tile: new(tile.MustTileFromCode("5m")),
+			tile: tile.MustTileFromCode("5m"),
 			wantTiles: []tile.Tile{
 				tile.MustTileFromCode("1m"), tile.MustTileFromCode("1m"), tile.MustTileFromCode("1m"),
 				tile.MustTileFromCode("2m"), tile.MustTileFromCode("2m"), tile.MustTileFromCode("2m"),
@@ -315,7 +315,7 @@ func TestVisibleHand_Draw(t *testing.T) {
 				tile.MustTileFromCode("4m"), tile.MustTileFromCode("4m"), tile.MustTileFromCode("4m"),
 				tile.MustTileFromCode("5m"), tile.MustTileFromCode("5m"),
 			},
-			tile:      new(tile.MustTileFromCode("5m")),
+			tile:      tile.MustTileFromCode("5m"),
 			wantTiles: nil,
 			wantErr:   true,
 		},
@@ -347,28 +347,28 @@ func TestVisibleHand_Discard(t *testing.T) {
 	tests := []struct {
 		name      string
 		tiles     []tile.Tile
-		tile      *tile.Tile
+		tile      tile.Tile
 		wantTiles []tile.Tile
 		wantErr   bool
 	}{
 		{
 			name:      "visible hand cannot discard an unknown tile",
 			tiles:     []tile.Tile{tile.MustTileFromCode("1m")},
-			tile:      new(tile.MustTileFromCode("?")),
+			tile:      tile.MustTileFromCode("?"),
 			wantTiles: nil,
 			wantErr:   true,
 		},
 		{
 			name:      "visible tile",
 			tiles:     []tile.Tile{tile.MustTileFromCode("1m")},
-			tile:      new(tile.MustTileFromCode("1m")),
+			tile:      tile.MustTileFromCode("1m"),
 			wantTiles: []tile.Tile{},
 			wantErr:   false,
 		},
 		{
 			name:      "cannot discard a tile that are not in the hand",
 			tiles:     []tile.Tile{tile.MustTileFromCode("5m")},
-			tile:      new(tile.MustTileFromCode("5mr")),
+			tile:      tile.MustTileFromCode("5mr"),
 			wantTiles: nil,
 			wantErr:   true,
 		},

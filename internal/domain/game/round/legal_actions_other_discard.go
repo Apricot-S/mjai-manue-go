@@ -64,7 +64,7 @@ func (s *State) canWinByRon(playerSeat seat.Seat, p *player.VisiblePlayer, winni
 	return service.Has1Han(
 		handBeforeWin,
 		p.Melds(),
-		&winningTile,
+		winningTile,
 		s.roundWind,
 		s.SeatWind(playerSeat),
 		false,

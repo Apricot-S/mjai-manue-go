@@ -16,8 +16,8 @@ type Meld interface {
 
 type OpenMeld interface {
 	Meld
-	Taken() *tile.Tile
-	Target() *seat.Seat
+	Taken() tile.Tile
+	Target() seat.Seat
 }
 
 type ChiiPon interface {

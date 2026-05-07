@@ -34,7 +34,7 @@ func NewChii(taken tile.Tile, consumed [2]tile.Tile, target seat.Seat) (*Chii, e
 	if tiles[0].Number() > 7 {
 		return nil, fmt.Errorf("Chii cannot start with 8 or 9; taken: %+v, consumed: %+v", taken, consumed)
 	}
-	if !tiles[0].Next(1).HasSameSymbol(&tiles[1]) || !tiles[0].Next(2).HasSameSymbol(&tiles[2]) {
+	if !tiles[0].Next(1).HasSameSymbol(tiles[1]) || !tiles[0].Next(2).HasSameSymbol(tiles[2]) {
 		return nil, fmt.Errorf("Chii tiles must form a sequence; taken: %+v, consumed: %+v", taken, consumed)
 	}
 
@@ -43,11 +43,11 @@ func NewChii(taken tile.Tile, consumed [2]tile.Tile, target seat.Seat) (*Chii, e
 
 	var ty chiiType
 	switch {
-	case taken.HasSameSymbol(&tiles[0]):
+	case taken.HasSameSymbol(tiles[0]):
 		ty = chiiTypeLow
-	case taken.HasSameSymbol(&tiles[1]):
+	case taken.HasSameSymbol(tiles[1]):
 		ty = chiiTypeMiddle
-	case taken.HasSameSymbol(&tiles[2]):
+	case taken.HasSameSymbol(tiles[2]):
 		ty = chiiTypeHigh
 	}
 
@@ -68,16 +68,16 @@ func MustChii(taken tile.Tile, consumed [2]tile.Tile, target seat.Seat) *Chii {
 	return c
 }
 
-func (c *Chii) Taken() *tile.Tile {
-	return &c.taken
+func (c *Chii) Taken() tile.Tile {
+	return c.taken
 }
 
 func (c *Chii) Consumed() []tile.Tile {
 	return c.consumed[:]
 }
 
-func (c *Chii) Target() *seat.Seat {
-	return &c.target
+func (c *Chii) Target() seat.Seat {
+	return c.target
 }
 
 func (c *Chii) ToTiles() []tile.Tile {

@@ -12,7 +12,6 @@ func TestNewConcealedKan(t *testing.T) {
 	tests := []struct {
 		name         string
 		consumed     [4]tile.Tile
-		wantTaken    *tile.Tile
 		wantConsumed []tile.Tile
 		wantTarget   int
 		wantErr      bool
@@ -20,7 +19,6 @@ func TestNewConcealedKan(t *testing.T) {
 		{
 			name:         "valid tiles: 1p",
 			consumed:     [4]tile.Tile{tile.MustTileFromCode("1p"), tile.MustTileFromCode("1p"), tile.MustTileFromCode("1p"), tile.MustTileFromCode("1p")},
-			wantTaken:    nil,
 			wantConsumed: []tile.Tile{tile.MustTileFromCode("1p"), tile.MustTileFromCode("1p"), tile.MustTileFromCode("1p"), tile.MustTileFromCode("1p")},
 			wantTarget:   -1,
 			wantErr:      false,
@@ -28,7 +26,6 @@ func TestNewConcealedKan(t *testing.T) {
 		{
 			name:         "valid tiles: C",
 			consumed:     [4]tile.Tile{tile.MustTileFromCode("C"), tile.MustTileFromCode("C"), tile.MustTileFromCode("C"), tile.MustTileFromCode("C")},
-			wantTaken:    nil,
 			wantConsumed: []tile.Tile{tile.MustTileFromCode("C"), tile.MustTileFromCode("C"), tile.MustTileFromCode("C"), tile.MustTileFromCode("C")},
 			wantTarget:   -1,
 			wantErr:      false,
@@ -36,7 +33,6 @@ func TestNewConcealedKan(t *testing.T) {
 		{
 			name:         "valid tiles: 5m5m5m5mr",
 			consumed:     [4]tile.Tile{tile.MustTileFromCode("5m"), tile.MustTileFromCode("5m"), tile.MustTileFromCode("5m"), tile.MustTileFromCode("5mr")},
-			wantTaken:    nil,
 			wantConsumed: []tile.Tile{tile.MustTileFromCode("5m"), tile.MustTileFromCode("5m"), tile.MustTileFromCode("5m"), tile.MustTileFromCode("5mr")},
 			wantTarget:   -1,
 			wantErr:      false,
@@ -44,7 +40,6 @@ func TestNewConcealedKan(t *testing.T) {
 		{
 			name:         "invalid tiles: 5m5m5m5m",
 			consumed:     [4]tile.Tile{tile.MustTileFromCode("5m"), tile.MustTileFromCode("5m"), tile.MustTileFromCode("5m"), tile.MustTileFromCode("5m")},
-			wantTaken:    nil,
 			wantConsumed: nil,
 			wantTarget:   -1,
 			wantErr:      true,
@@ -52,7 +47,6 @@ func TestNewConcealedKan(t *testing.T) {
 		{
 			name:         "invalid tiles: 5m5m5mr5mr",
 			consumed:     [4]tile.Tile{tile.MustTileFromCode("5m"), tile.MustTileFromCode("5m"), tile.MustTileFromCode("5mr"), tile.MustTileFromCode("5mr")},
-			wantTaken:    nil,
 			wantConsumed: nil,
 			wantTarget:   -1,
 			wantErr:      true,
@@ -60,7 +54,6 @@ func TestNewConcealedKan(t *testing.T) {
 		{
 			name:         "invalid tiles: ?",
 			consumed:     [4]tile.Tile{tile.MustTileFromCode("?"), tile.MustTileFromCode("?"), tile.MustTileFromCode("?"), tile.MustTileFromCode("?")},
-			wantTaken:    nil,
 			wantConsumed: nil,
 			wantTarget:   -1,
 			wantErr:      true,
@@ -68,7 +61,6 @@ func TestNewConcealedKan(t *testing.T) {
 		{
 			name:         "consumed tiles do not match",
 			consumed:     [4]tile.Tile{tile.MustTileFromCode("1m"), tile.MustTileFromCode("1m"), tile.MustTileFromCode("1m"), tile.MustTileFromCode("2m")},
-			wantTaken:    nil,
 			wantConsumed: nil,
 			wantTarget:   -1,
 			wantErr:      true,
@@ -76,7 +68,6 @@ func TestNewConcealedKan(t *testing.T) {
 		{
 			name:         "sort tiles: 5mr5m5m5m to 5m5m5m5mr",
 			consumed:     [4]tile.Tile{tile.MustTileFromCode("5mr"), tile.MustTileFromCode("5m"), tile.MustTileFromCode("5m"), tile.MustTileFromCode("5m")},
-			wantTaken:    nil,
 			wantConsumed: []tile.Tile{tile.MustTileFromCode("5m"), tile.MustTileFromCode("5m"), tile.MustTileFromCode("5m"), tile.MustTileFromCode("5mr")},
 			wantTarget:   -1,
 			wantErr:      false,

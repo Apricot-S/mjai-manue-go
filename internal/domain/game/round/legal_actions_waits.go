@@ -7,7 +7,7 @@ import (
 )
 
 func canConcealedKanAfterRiichi(handBeforeKan *hand.VisibleHand, drawnTile tile.Tile, consumed [4]tile.Tile) bool {
-	if !drawnTile.HasSameSymbol(&consumed[0]) {
+	if !drawnTile.HasSameSymbol(consumed[0]) {
 		return false
 	}
 	drawnTileID34 := drawnTile.RemoveRed().ID()
@@ -26,7 +26,7 @@ func waitsFor(h *hand.VisibleHand) waitSet {
 	var waits waitSet
 	for id := range tile.NumTileType34 {
 		waitTile := tile.MustTileFromID(id)
-		handWithWait, err := h.Draw(&waitTile)
+		handWithWait, err := h.Draw(waitTile)
 		if err != nil {
 			continue
 		}

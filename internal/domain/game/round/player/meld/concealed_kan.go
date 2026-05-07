@@ -18,7 +18,7 @@ func NewConcealedKan(consumed [4]tile.Tile) (*ConcealedKan, error) {
 	if csm.ContainsUnknown() {
 		return nil, fmt.Errorf("unknown tile cannot use for Concealed Kan")
 	}
-	if slices.ContainsFunc(csm[1:], func(t tile.Tile) bool { return !c0.HasSameSymbol(&t) }) {
+	if slices.ContainsFunc(csm[1:], func(t tile.Tile) bool { return !c0.HasSameSymbol(t) }) {
 		return nil, fmt.Errorf("mismatch consumed: %+v", consumed)
 	}
 	if c0.IsSuits() && c0.Number() == 5 && countRed(csm) != 1 {

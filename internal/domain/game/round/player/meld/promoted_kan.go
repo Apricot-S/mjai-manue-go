@@ -26,7 +26,7 @@ func NewPromotedKan(
 	if tiles.ContainsUnknown() {
 		return nil, fmt.Errorf("unknown tile cannot use for Promoted Kan")
 	}
-	if slices.ContainsFunc(tiles, func(t tile.Tile) bool { return !taken.HasSameSymbol(&t) }) {
+	if slices.ContainsFunc(tiles, func(t tile.Tile) bool { return !taken.HasSameSymbol(t) }) {
 		return nil, fmt.Errorf("mismatch taken: %+v, consumed: %+v, added: %+v", taken, consumed, added)
 	}
 	if taken.IsSuits() && taken.Number() == 5 && countRed(tiles) != 1 {
@@ -60,20 +60,20 @@ func MustPromotedKan(
 	return k
 }
 
-func (k *PromotedKan) Taken() *tile.Tile {
-	return &k.taken
+func (k *PromotedKan) Taken() tile.Tile {
+	return k.taken
 }
 
 func (k *PromotedKan) Consumed() []tile.Tile {
 	return k.consumed[:]
 }
 
-func (k *PromotedKan) Added() *tile.Tile {
-	return &k.added
+func (k *PromotedKan) Added() tile.Tile {
+	return k.added
 }
 
-func (k *PromotedKan) Target() *seat.Seat {
-	return &k.target
+func (k *PromotedKan) Target() seat.Seat {
+	return k.target
 }
 
 func (k *PromotedKan) ToTiles() []tile.Tile {

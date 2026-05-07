@@ -15,9 +15,9 @@ func TestNewChii(t *testing.T) {
 		taken        tile.Tile
 		consumed     [2]tile.Tile
 		target       seat.Seat
-		wantTaken    *tile.Tile
+		wantTaken    tile.Tile
 		wantConsumed []tile.Tile
-		wantTarget   *seat.Seat
+		wantTarget   seat.Seat
 		wantErr      bool
 	}{
 		{
@@ -25,9 +25,9 @@ func TestNewChii(t *testing.T) {
 			taken:        tile.MustTileFromCode("8m"),
 			consumed:     [2]tile.Tile{tile.MustTileFromCode("7m"), tile.MustTileFromCode("9m")},
 			target:       seat.MustSeat(0),
-			wantTaken:    new(tile.MustTileFromCode("8m")),
+			wantTaken:    tile.MustTileFromCode("8m"),
 			wantConsumed: []tile.Tile{tile.MustTileFromCode("7m"), tile.MustTileFromCode("9m")},
-			wantTarget:   new(seat.MustSeat(0)),
+			wantTarget:   seat.MustSeat(0),
 			wantErr:      false,
 		},
 		{
@@ -35,9 +35,9 @@ func TestNewChii(t *testing.T) {
 			taken:        tile.MustTileFromCode("5mr"),
 			consumed:     [2]tile.Tile{tile.MustTileFromCode("4m"), tile.MustTileFromCode("6m")},
 			target:       seat.MustSeat(0),
-			wantTaken:    new(tile.MustTileFromCode("5mr")),
+			wantTaken:    tile.MustTileFromCode("5mr"),
 			wantConsumed: []tile.Tile{tile.MustTileFromCode("4m"), tile.MustTileFromCode("6m")},
-			wantTarget:   new(seat.MustSeat(0)),
+			wantTarget:   seat.MustSeat(0),
 			wantErr:      false,
 		},
 		{
@@ -45,9 +45,9 @@ func TestNewChii(t *testing.T) {
 			taken:        tile.MustTileFromCode("?"),
 			consumed:     [2]tile.Tile{tile.MustTileFromCode("?"), tile.MustTileFromCode("?")},
 			target:       seat.MustSeat(0),
-			wantTaken:    nil,
+			wantTaken:    tile.Tile{},
 			wantConsumed: nil,
-			wantTarget:   new(seat.MustSeat(0)),
+			wantTarget:   seat.MustSeat(0),
 			wantErr:      true,
 		},
 		{
@@ -55,9 +55,9 @@ func TestNewChii(t *testing.T) {
 			taken:        tile.MustTileFromCode("E"),
 			consumed:     [2]tile.Tile{tile.MustTileFromCode("S"), tile.MustTileFromCode("W")},
 			target:       seat.MustSeat(0),
-			wantTaken:    nil,
+			wantTaken:    tile.Tile{},
 			wantConsumed: nil,
-			wantTarget:   new(seat.MustSeat(0)),
+			wantTarget:   seat.MustSeat(0),
 			wantErr:      true,
 		},
 		{
@@ -65,9 +65,9 @@ func TestNewChii(t *testing.T) {
 			taken:        tile.MustTileFromCode("8m"),
 			consumed:     [2]tile.Tile{tile.MustTileFromCode("9m"), tile.MustTileFromCode("1p")},
 			target:       seat.MustSeat(0),
-			wantTaken:    nil,
+			wantTaken:    tile.Tile{},
 			wantConsumed: nil,
-			wantTarget:   new(seat.MustSeat(0)),
+			wantTarget:   seat.MustSeat(0),
 			wantErr:      true,
 		},
 		{
@@ -75,9 +75,9 @@ func TestNewChii(t *testing.T) {
 			taken:        tile.MustTileFromCode("6m"),
 			consumed:     [2]tile.Tile{tile.MustTileFromCode("8m"), tile.MustTileFromCode("9m")},
 			target:       seat.MustSeat(0),
-			wantTaken:    nil,
+			wantTaken:    tile.Tile{},
 			wantConsumed: nil,
-			wantTarget:   new(seat.MustSeat(0)),
+			wantTarget:   seat.MustSeat(0),
 			wantErr:      true,
 		},
 		{
@@ -85,9 +85,9 @@ func TestNewChii(t *testing.T) {
 			taken:        tile.MustTileFromCode("6m"),
 			consumed:     [2]tile.Tile{tile.MustTileFromCode("7m"), tile.MustTileFromCode("9m")},
 			target:       seat.MustSeat(0),
-			wantTaken:    nil,
+			wantTaken:    tile.Tile{},
 			wantConsumed: nil,
-			wantTarget:   new(seat.MustSeat(0)),
+			wantTarget:   seat.MustSeat(0),
 			wantErr:      true,
 		},
 		{
@@ -95,9 +95,9 @@ func TestNewChii(t *testing.T) {
 			taken:        tile.MustTileFromCode("6m"),
 			consumed:     [2]tile.Tile{tile.MustTileFromCode("7m"), tile.MustTileFromCode("8p")},
 			target:       seat.MustSeat(0),
-			wantTaken:    nil,
+			wantTaken:    tile.Tile{},
 			wantConsumed: nil,
-			wantTarget:   new(seat.MustSeat(0)),
+			wantTarget:   seat.MustSeat(0),
 			wantErr:      true,
 		},
 		{
@@ -105,9 +105,9 @@ func TestNewChii(t *testing.T) {
 			taken:        tile.MustTileFromCode("8s"),
 			consumed:     [2]tile.Tile{tile.MustTileFromCode("9s"), tile.MustTileFromCode("7s")},
 			target:       seat.MustSeat(3),
-			wantTaken:    new(tile.MustTileFromCode("8s")),
+			wantTaken:    tile.MustTileFromCode("8s"),
 			wantConsumed: []tile.Tile{tile.MustTileFromCode("7s"), tile.MustTileFromCode("9s")},
-			wantTarget:   new(seat.MustSeat(3)),
+			wantTarget:   seat.MustSeat(3),
 			wantErr:      false,
 		},
 	}

@@ -113,7 +113,7 @@ func (s *State) canWinByTsumo(playerSeat seat.Seat, p *player.VisiblePlayer, win
 	return service.Has1Han(
 		handBeforeWin,
 		p.Melds(),
-		&winningTile,
+		winningTile,
 		s.roundWind,
 		s.SeatWind(playerSeat),
 		true,
@@ -145,7 +145,7 @@ func (s *State) canDeclareKyushukyuhai(playerSeat seat.Seat, p *player.VisiblePl
 	if drawnTile == nil {
 		return false
 	}
-	handAfterDraw, err := handBeforeDeclare.Draw(drawnTile)
+	handAfterDraw, err := handBeforeDeclare.Draw(*drawnTile)
 	if err != nil {
 		return false
 	}
@@ -177,7 +177,7 @@ func (s *State) legalConcealedKanActions(playerSeat seat.Seat, p *player.Visible
 		return nil, nil
 	}
 
-	handAfterDraw, err := handBeforeKan.Draw(drawnTile)
+	handAfterDraw, err := handBeforeKan.Draw(*drawnTile)
 	if err != nil {
 		return nil, nil
 	}
@@ -229,11 +229,11 @@ func (s *State) legalPromotedKanActions(playerSeat seat.Seat, p *player.VisibleP
 		}
 
 		for _, added := range addedTiles {
-			k, err := meld.NewPromotedKan(*pon.Taken(), [2]tile.Tile(pon.Consumed()), added, *pon.Target())
+			k, err := meld.NewPromotedKan(pon.Taken(), [2]tile.Tile(pon.Consumed()), added, pon.Target())
 			if err != nil {
 				continue
 			}
-			a, err := action.NewPromotedKan(playerSeat, *k.Added(), [3]tile.Tile(pon.ToTiles()))
+			a, err := action.NewPromotedKan(playerSeat, k.Added(), [3]tile.Tile(pon.ToTiles()))
 			if err != nil {
 				return nil, err
 			}
@@ -261,7 +261,7 @@ func (s *State) canRiichi(p *player.VisiblePlayer) bool {
 	if !ok {
 		return false
 	}
-	handAfterDraw, err := handBeforeRiichi.Draw(p.DrawnTile())
+	handAfterDraw, err := handBeforeRiichi.Draw(*p.DrawnTile())
 	if err != nil {
 		return false
 	}
@@ -277,12 +277,12 @@ func canDiscardAsRiichiDeclarationTile(p player.Player, discardTile tile.Tile, t
 		return service.IsTenpaiAll(handBeforeDiscard)
 	}
 
-	handAfterDiscard, err := handBeforeDiscard.Discard(&discardTile)
+	handAfterDiscard, err := handBeforeDiscard.Discard(discardTile)
 	if err != nil {
 		return false
 	}
 	if drawnTile := p.DrawnTile(); drawnTile != nil {
-		handAfterDiscard, err = handAfterDiscard.Draw(drawnTile)
+		handAfterDiscard, err = handAfterDiscard.Draw(*drawnTile)
 		if err != nil {
 			return false
 		}
@@ -292,6 +292,6 @@ func canDiscardAsRiichiDeclarationTile(p player.Player, discardTile tile.Tile, t
 
 func isSwapCallTile(t tile.Tile, swapCallTiles []tile.Tile) bool {
 	return slices.ContainsFunc(swapCallTiles, func(s tile.Tile) bool {
-		return t.HasSameSymbol(&s)
+		return t.HasSameSymbol(s)
 	})
 }

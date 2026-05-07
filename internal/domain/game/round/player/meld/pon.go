@@ -20,7 +20,7 @@ func NewPon(taken tile.Tile, consumed [2]tile.Tile, target seat.Seat) (*Pon, err
 	if tiles.ContainsUnknown() {
 		return nil, fmt.Errorf("unknown tile cannot use for Pon")
 	}
-	if slices.ContainsFunc(tiles, func(t tile.Tile) bool { return !taken.HasSameSymbol(&t) }) {
+	if slices.ContainsFunc(tiles, func(t tile.Tile) bool { return !taken.HasSameSymbol(t) }) {
 		return nil, fmt.Errorf("mismatch taken: %+v, consumed: %+v", taken, consumed)
 	}
 	if taken.IsSuits() && taken.Number() == 5 && countRed(tiles) > 1 {
@@ -48,16 +48,16 @@ func MustPon(taken tile.Tile, consumed [2]tile.Tile, target seat.Seat) *Pon {
 	return p
 }
 
-func (p *Pon) Taken() *tile.Tile {
-	return &p.taken
+func (p *Pon) Taken() tile.Tile {
+	return p.taken
 }
 
 func (p *Pon) Consumed() []tile.Tile {
 	return p.consumed[:]
 }
 
-func (p *Pon) Target() *seat.Seat {
-	return &p.target
+func (p *Pon) Target() seat.Seat {
+	return p.target
 }
 
 func (p *Pon) ToTiles() []tile.Tile {

@@ -216,14 +216,14 @@ func (s *State) applyPromotedKan(ev *event.PromotedKan) error {
 	added := ev.Added()
 	ponIndex := slices.IndexFunc(actor.Melds(), func(m meld.Meld) bool {
 		pon, ok := m.(*meld.Pon)
-		return ok && pon.Taken().HasSameSymbol(&added)
+		return ok && pon.Taken().HasSameSymbol(added)
 	})
 	if ponIndex == -1 {
 		return fmt.Errorf("cannot PromotedKan: failed to find pon for added tile %s", ev.Added())
 	}
 
 	pon := actor.Melds()[ponIndex].(*meld.Pon)
-	kan, err := meld.NewPromotedKan(*pon.Taken(), [2]tile.Tile(pon.Consumed()), ev.Added(), *pon.Target())
+	kan, err := meld.NewPromotedKan(pon.Taken(), [2]tile.Tile(pon.Consumed()), ev.Added(), pon.Target())
 	if err != nil {
 		return err
 	}

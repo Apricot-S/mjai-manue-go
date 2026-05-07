@@ -15,9 +15,9 @@ func TestNewPon(t *testing.T) {
 		taken        tile.Tile
 		consumed     [2]tile.Tile
 		target       seat.Seat
-		wantTaken    *tile.Tile
+		wantTaken    tile.Tile
 		wantConsumed []tile.Tile
-		wantTarget   *seat.Seat
+		wantTarget   seat.Seat
 		wantErr      bool
 	}{
 		{
@@ -25,9 +25,9 @@ func TestNewPon(t *testing.T) {
 			taken:        tile.MustTileFromCode("1m"),
 			consumed:     [2]tile.Tile{tile.MustTileFromCode("1m"), tile.MustTileFromCode("1m")},
 			target:       seat.MustSeat(0),
-			wantTaken:    new(tile.MustTileFromCode("1m")),
+			wantTaken:    tile.MustTileFromCode("1m"),
 			wantConsumed: []tile.Tile{tile.MustTileFromCode("1m"), tile.MustTileFromCode("1m")},
-			wantTarget:   new(seat.MustSeat(0)),
+			wantTarget:   seat.MustSeat(0),
 			wantErr:      false,
 		},
 		{
@@ -35,9 +35,9 @@ func TestNewPon(t *testing.T) {
 			taken:        tile.MustTileFromCode("C"),
 			consumed:     [2]tile.Tile{tile.MustTileFromCode("C"), tile.MustTileFromCode("C")},
 			target:       seat.MustSeat(0),
-			wantTaken:    new(tile.MustTileFromCode("C")),
+			wantTaken:    tile.MustTileFromCode("C"),
 			wantConsumed: []tile.Tile{tile.MustTileFromCode("C"), tile.MustTileFromCode("C")},
-			wantTarget:   new(seat.MustSeat(0)),
+			wantTarget:   seat.MustSeat(0),
 			wantErr:      false,
 		},
 		{
@@ -45,9 +45,9 @@ func TestNewPon(t *testing.T) {
 			taken:        tile.MustTileFromCode("5s"),
 			consumed:     [2]tile.Tile{tile.MustTileFromCode("5s"), tile.MustTileFromCode("5s")},
 			target:       seat.MustSeat(0),
-			wantTaken:    new(tile.MustTileFromCode("5s")),
+			wantTaken:    tile.MustTileFromCode("5s"),
 			wantConsumed: []tile.Tile{tile.MustTileFromCode("5s"), tile.MustTileFromCode("5s")},
-			wantTarget:   new(seat.MustSeat(0)),
+			wantTarget:   seat.MustSeat(0),
 			wantErr:      false,
 		},
 		{
@@ -55,9 +55,9 @@ func TestNewPon(t *testing.T) {
 			taken:        tile.MustTileFromCode("5sr"),
 			consumed:     [2]tile.Tile{tile.MustTileFromCode("5s"), tile.MustTileFromCode("5s")},
 			target:       seat.MustSeat(0),
-			wantTaken:    new(tile.MustTileFromCode("5sr")),
+			wantTaken:    tile.MustTileFromCode("5sr"),
 			wantConsumed: []tile.Tile{tile.MustTileFromCode("5s"), tile.MustTileFromCode("5s")},
-			wantTarget:   new(seat.MustSeat(0)),
+			wantTarget:   seat.MustSeat(0),
 			wantErr:      false,
 		},
 		{
@@ -65,9 +65,9 @@ func TestNewPon(t *testing.T) {
 			taken:        tile.MustTileFromCode("5p"),
 			consumed:     [2]tile.Tile{tile.MustTileFromCode("5p"), tile.MustTileFromCode("5pr")},
 			target:       seat.MustSeat(0),
-			wantTaken:    new(tile.MustTileFromCode("5p")),
+			wantTaken:    tile.MustTileFromCode("5p"),
 			wantConsumed: []tile.Tile{tile.MustTileFromCode("5p"), tile.MustTileFromCode("5pr")},
-			wantTarget:   new(seat.MustSeat(0)),
+			wantTarget:   seat.MustSeat(0),
 			wantErr:      false,
 		},
 		{
@@ -75,9 +75,9 @@ func TestNewPon(t *testing.T) {
 			taken:        tile.MustTileFromCode("5pr"),
 			consumed:     [2]tile.Tile{tile.MustTileFromCode("5p"), tile.MustTileFromCode("5pr")},
 			target:       seat.MustSeat(0),
-			wantTaken:    nil,
+			wantTaken:    tile.Tile{},
 			wantConsumed: nil,
-			wantTarget:   new(seat.MustSeat(0)),
+			wantTarget:   seat.MustSeat(0),
 			wantErr:      true,
 		},
 		{
@@ -85,9 +85,9 @@ func TestNewPon(t *testing.T) {
 			taken:        tile.MustTileFromCode("5p"),
 			consumed:     [2]tile.Tile{tile.MustTileFromCode("5pr"), tile.MustTileFromCode("5pr")},
 			target:       seat.MustSeat(0),
-			wantTaken:    nil,
+			wantTaken:    tile.Tile{},
 			wantConsumed: nil,
-			wantTarget:   new(seat.MustSeat(0)),
+			wantTarget:   seat.MustSeat(0),
 			wantErr:      true,
 		},
 		{
@@ -95,9 +95,9 @@ func TestNewPon(t *testing.T) {
 			taken:        tile.MustTileFromCode("?"),
 			consumed:     [2]tile.Tile{tile.MustTileFromCode("?"), tile.MustTileFromCode("?")},
 			target:       seat.MustSeat(0),
-			wantTaken:    nil,
+			wantTaken:    tile.Tile{},
 			wantConsumed: nil,
-			wantTarget:   new(seat.MustSeat(0)),
+			wantTarget:   seat.MustSeat(0),
 			wantErr:      true,
 		},
 		{
@@ -105,9 +105,9 @@ func TestNewPon(t *testing.T) {
 			taken:        tile.MustTileFromCode("1m"),
 			consumed:     [2]tile.Tile{tile.MustTileFromCode("2m"), tile.MustTileFromCode("2m")},
 			target:       seat.MustSeat(0),
-			wantTaken:    nil,
+			wantTaken:    tile.Tile{},
 			wantConsumed: nil,
-			wantTarget:   new(seat.MustSeat(0)),
+			wantTarget:   seat.MustSeat(0),
 			wantErr:      true,
 		},
 		{
@@ -115,9 +115,9 @@ func TestNewPon(t *testing.T) {
 			taken:        tile.MustTileFromCode("1m"),
 			consumed:     [2]tile.Tile{tile.MustTileFromCode("1m"), tile.MustTileFromCode("2m")},
 			target:       seat.MustSeat(0),
-			wantTaken:    nil,
+			wantTaken:    tile.Tile{},
 			wantConsumed: nil,
-			wantTarget:   new(seat.MustSeat(0)),
+			wantTarget:   seat.MustSeat(0),
 			wantErr:      true,
 		},
 		{
@@ -125,9 +125,9 @@ func TestNewPon(t *testing.T) {
 			taken:        tile.MustTileFromCode("5m"),
 			consumed:     [2]tile.Tile{tile.MustTileFromCode("5mr"), tile.MustTileFromCode("5m")},
 			target:       seat.MustSeat(0),
-			wantTaken:    new(tile.MustTileFromCode("5m")),
+			wantTaken:    tile.MustTileFromCode("5m"),
 			wantConsumed: []tile.Tile{tile.MustTileFromCode("5m"), tile.MustTileFromCode("5mr")},
-			wantTarget:   new(seat.MustSeat(0)),
+			wantTarget:   seat.MustSeat(0),
 			wantErr:      false,
 		},
 	}

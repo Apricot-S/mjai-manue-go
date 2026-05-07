@@ -101,7 +101,7 @@ func countDoras(doraIndicators []tile.Tile, allTiles []tile.Tile) int {
 	numDoras := 0
 	for i := range allTiles {
 		for j := range doras {
-			if doras[j].HasSameSymbol(&allTiles[i]) {
+			if doras[j].HasSameSymbol(allTiles[i]) {
 				numDoras++
 			}
 		}
@@ -133,7 +133,7 @@ func countRedDoras(hand *hand.VisibleHand, melds []meld.Meld) int {
 func Has1Han(
 	hand *hand.VisibleHand,
 	melds []meld.Meld,
-	winningTile *tile.Tile,
+	winningTile tile.Tile,
 	prevalentWind wind.Wind,
 	seatWind wind.Wind,
 	tsumo bool,
@@ -295,7 +295,7 @@ func pinfuStrict(
 	prevalentWind wind.Wind,
 	seatWind wind.Wind,
 	isOpen bool,
-	winningTile *tile.Tile,
+	winningTile tile.Tile,
 ) int {
 	if isOpen {
 		return 0
@@ -392,7 +392,7 @@ func iipeikou(allBlocks []block.Block, isOpen bool) int {
 			if _, ok := b2.(*block.Sequence); !ok {
 				continue
 			}
-			if t1.HasSameSymbol(&b2.ToTiles()[0]) {
+			if t1.HasSameSymbol(b2.ToTiles()[0]) {
 				return 1
 			}
 		}
@@ -548,7 +548,7 @@ func honiisou(allBlocks []block.Block, isOpen bool) int {
 func sanankou(
 	handBlocks []block.Block,
 	melds []meld.Meld,
-	winningTile *tile.Tile,
+	winningTile tile.Tile,
 	tsumo bool,
 ) int {
 	numAnkou := 0

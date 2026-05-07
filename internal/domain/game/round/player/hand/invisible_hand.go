@@ -37,14 +37,14 @@ func (h *InvisibleHand) ToTiles() []tile.Tile {
 	return tiles
 }
 
-func (h *InvisibleHand) Draw(tile *tile.Tile) (*InvisibleHand, error) {
+func (h *InvisibleHand) Draw(tile tile.Tile) (*InvisibleHand, error) {
 	if h.tileCount >= maxNumTilesInHand {
 		return nil, fmt.Errorf("cannot draw tile: hand already has %d tiles", h.tileCount)
 	}
 	return &InvisibleHand{tileCount: h.tileCount + 1}, nil
 }
 
-func (h *InvisibleHand) Discard(tile *tile.Tile) (*InvisibleHand, error) {
+func (h *InvisibleHand) Discard(tile tile.Tile) (*InvisibleHand, error) {
 	if h.tileCount <= 0 {
 		return nil, fmt.Errorf("cannot discard tile: hand is empty")
 	}

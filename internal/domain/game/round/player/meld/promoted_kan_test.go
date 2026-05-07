@@ -16,10 +16,10 @@ func TestNewPromotedKan(t *testing.T) {
 		consumed     [2]tile.Tile
 		added        tile.Tile
 		target       seat.Seat
-		wantTaken    *tile.Tile
+		wantTaken    tile.Tile
 		wantConsumed []tile.Tile
-		wantAdded    *tile.Tile
-		wantTarget   *seat.Seat
+		wantAdded    tile.Tile
+		wantTarget   seat.Seat
 		wantErr      bool
 	}{
 		{
@@ -28,10 +28,10 @@ func TestNewPromotedKan(t *testing.T) {
 			consumed:     [2]tile.Tile{tile.MustTileFromCode("1p"), tile.MustTileFromCode("1p")},
 			added:        tile.MustTileFromCode("1p"),
 			target:       seat.MustSeat(0),
-			wantTaken:    new(tile.MustTileFromCode("1p")),
+			wantTaken:    tile.MustTileFromCode("1p"),
 			wantConsumed: []tile.Tile{tile.MustTileFromCode("1p"), tile.MustTileFromCode("1p")},
-			wantAdded:    new(tile.MustTileFromCode("1p")),
-			wantTarget:   new(seat.MustSeat(0)),
+			wantAdded:    tile.MustTileFromCode("1p"),
+			wantTarget:   seat.MustSeat(0),
 			wantErr:      false,
 		},
 		{
@@ -40,10 +40,10 @@ func TestNewPromotedKan(t *testing.T) {
 			consumed:     [2]tile.Tile{tile.MustTileFromCode("C"), tile.MustTileFromCode("C")},
 			added:        tile.MustTileFromCode("C"),
 			target:       seat.MustSeat(3),
-			wantTaken:    new(tile.MustTileFromCode("C")),
+			wantTaken:    tile.MustTileFromCode("C"),
 			wantConsumed: []tile.Tile{tile.MustTileFromCode("C"), tile.MustTileFromCode("C")},
-			wantAdded:    new(tile.MustTileFromCode("C")),
-			wantTarget:   new(seat.MustSeat(3)),
+			wantAdded:    tile.MustTileFromCode("C"),
+			wantTarget:   seat.MustSeat(3),
 			wantErr:      false,
 		},
 		{
@@ -52,10 +52,10 @@ func TestNewPromotedKan(t *testing.T) {
 			consumed:     [2]tile.Tile{tile.MustTileFromCode("5s"), tile.MustTileFromCode("5s")},
 			added:        tile.MustTileFromCode("5s"),
 			target:       seat.MustSeat(0),
-			wantTaken:    new(tile.MustTileFromCode("5sr")),
+			wantTaken:    tile.MustTileFromCode("5sr"),
 			wantConsumed: []tile.Tile{tile.MustTileFromCode("5s"), tile.MustTileFromCode("5s")},
-			wantAdded:    new(tile.MustTileFromCode("5s")),
-			wantTarget:   new(seat.MustSeat(0)),
+			wantAdded:    tile.MustTileFromCode("5s"),
+			wantTarget:   seat.MustSeat(0),
 			wantErr:      false,
 		},
 		{
@@ -64,10 +64,10 @@ func TestNewPromotedKan(t *testing.T) {
 			consumed:     [2]tile.Tile{tile.MustTileFromCode("5s"), tile.MustTileFromCode("5sr")},
 			added:        tile.MustTileFromCode("5s"),
 			target:       seat.MustSeat(0),
-			wantTaken:    new(tile.MustTileFromCode("5s")),
+			wantTaken:    tile.MustTileFromCode("5s"),
 			wantConsumed: []tile.Tile{tile.MustTileFromCode("5s"), tile.MustTileFromCode("5sr")},
-			wantAdded:    new(tile.MustTileFromCode("5s")),
-			wantTarget:   new(seat.MustSeat(0)),
+			wantAdded:    tile.MustTileFromCode("5s"),
+			wantTarget:   seat.MustSeat(0),
 			wantErr:      false,
 		},
 		{
@@ -76,10 +76,10 @@ func TestNewPromotedKan(t *testing.T) {
 			consumed:     [2]tile.Tile{tile.MustTileFromCode("5s"), tile.MustTileFromCode("5s")},
 			added:        tile.MustTileFromCode("5sr"),
 			target:       seat.MustSeat(0),
-			wantTaken:    new(tile.MustTileFromCode("5s")),
+			wantTaken:    tile.MustTileFromCode("5s"),
 			wantConsumed: []tile.Tile{tile.MustTileFromCode("5s"), tile.MustTileFromCode("5s")},
-			wantAdded:    new(tile.MustTileFromCode("5sr")),
-			wantTarget:   new(seat.MustSeat(0)),
+			wantAdded:    tile.MustTileFromCode("5sr"),
+			wantTarget:   seat.MustSeat(0),
 			wantErr:      false,
 		},
 		{
@@ -88,10 +88,10 @@ func TestNewPromotedKan(t *testing.T) {
 			consumed:     [2]tile.Tile{tile.MustTileFromCode("5s"), tile.MustTileFromCode("5s")},
 			added:        tile.MustTileFromCode("5s"),
 			target:       seat.MustSeat(0),
-			wantTaken:    nil,
+			wantTaken:    tile.Tile{},
 			wantConsumed: nil,
-			wantAdded:    nil,
-			wantTarget:   nil,
+			wantAdded:    tile.Tile{},
+			wantTarget:   seat.Seat{},
 			wantErr:      true,
 		},
 		{
@@ -100,10 +100,10 @@ func TestNewPromotedKan(t *testing.T) {
 			consumed:     [2]tile.Tile{tile.MustTileFromCode("?"), tile.MustTileFromCode("?")},
 			added:        tile.MustTileFromCode("?"),
 			target:       seat.MustSeat(0),
-			wantTaken:    nil,
+			wantTaken:    tile.Tile{},
 			wantConsumed: nil,
-			wantAdded:    nil,
-			wantTarget:   nil,
+			wantAdded:    tile.Tile{},
+			wantTarget:   seat.Seat{},
 			wantErr:      true,
 		},
 		{
@@ -112,10 +112,10 @@ func TestNewPromotedKan(t *testing.T) {
 			consumed:     [2]tile.Tile{tile.MustTileFromCode("2m"), tile.MustTileFromCode("2m")},
 			added:        tile.MustTileFromCode("2m"),
 			target:       seat.MustSeat(0),
-			wantTaken:    nil,
+			wantTaken:    tile.Tile{},
 			wantConsumed: nil,
-			wantAdded:    nil,
-			wantTarget:   nil,
+			wantAdded:    tile.Tile{},
+			wantTarget:   seat.Seat{},
 			wantErr:      true,
 		},
 		{
@@ -124,10 +124,10 @@ func TestNewPromotedKan(t *testing.T) {
 			consumed:     [2]tile.Tile{tile.MustTileFromCode("1m"), tile.MustTileFromCode("2m")},
 			added:        tile.MustTileFromCode("1m"),
 			target:       seat.MustSeat(0),
-			wantTaken:    nil,
+			wantTaken:    tile.Tile{},
 			wantConsumed: nil,
-			wantAdded:    nil,
-			wantTarget:   nil,
+			wantAdded:    tile.Tile{},
+			wantTarget:   seat.Seat{},
 			wantErr:      true,
 		},
 		{
@@ -136,10 +136,10 @@ func TestNewPromotedKan(t *testing.T) {
 			consumed:     [2]tile.Tile{tile.MustTileFromCode("2m"), tile.MustTileFromCode("2m")},
 			added:        tile.MustTileFromCode("1m"),
 			target:       seat.MustSeat(0),
-			wantTaken:    nil,
+			wantTaken:    tile.Tile{},
 			wantConsumed: nil,
-			wantAdded:    nil,
-			wantTarget:   nil,
+			wantAdded:    tile.Tile{},
+			wantTarget:   seat.Seat{},
 			wantErr:      true,
 		},
 		{
@@ -148,10 +148,10 @@ func TestNewPromotedKan(t *testing.T) {
 			consumed:     [2]tile.Tile{tile.MustTileFromCode("5sr"), tile.MustTileFromCode("5s")},
 			added:        tile.MustTileFromCode("5s"),
 			target:       seat.MustSeat(0),
-			wantTaken:    new(tile.MustTileFromCode("5s")),
+			wantTaken:    tile.MustTileFromCode("5s"),
 			wantConsumed: []tile.Tile{tile.MustTileFromCode("5s"), tile.MustTileFromCode("5sr")},
-			wantAdded:    new(tile.MustTileFromCode("5s")),
-			wantTarget:   new(seat.MustSeat(0)),
+			wantAdded:    tile.MustTileFromCode("5s"),
+			wantTarget:   seat.MustSeat(0),
 			wantErr:      false,
 		},
 	}

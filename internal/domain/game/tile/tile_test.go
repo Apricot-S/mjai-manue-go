@@ -707,7 +707,7 @@ func TestTile_HasSameSymbol(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			ti := tile.MustTileFromCode(tt.code)
 			other := tile.MustTileFromCode(tt.otherCode)
-			got := ti.HasSameSymbol(&other)
+			got := ti.HasSameSymbol(other)
 			if got != tt.want {
 				t.Errorf("HasSameSymbol() = %v, want %v", got, tt.want)
 			}

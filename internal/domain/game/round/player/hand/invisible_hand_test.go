@@ -95,21 +95,21 @@ func TestInvisibleHand_Draw(t *testing.T) {
 	tests := []struct {
 		name      string
 		tiles     []tile.Tile
-		tile      *tile.Tile
+		tile      tile.Tile
 		wantTiles []tile.Tile
 		wantErr   bool
 	}{
 		{
 			name:      "unknown tile",
 			tiles:     []tile.Tile{},
-			tile:      new(tile.MustTileFromCode("?")),
+			tile:      tile.MustTileFromCode("?"),
 			wantTiles: []tile.Tile{tile.MustTileFromCode("?")},
 			wantErr:   false,
 		},
 		{
 			name:      "visible tile",
 			tiles:     []tile.Tile{tile.MustTileFromCode("?")},
-			tile:      new(tile.MustTileFromCode("1m")),
+			tile:      tile.MustTileFromCode("1m"),
 			wantTiles: []tile.Tile{tile.MustTileFromCode("?"), tile.MustTileFromCode("?")},
 			wantErr:   false,
 		},
@@ -122,7 +122,7 @@ func TestInvisibleHand_Draw(t *testing.T) {
 				tile.MustTileFromCode("?"), tile.MustTileFromCode("?"), tile.MustTileFromCode("?"),
 				tile.MustTileFromCode("?"),
 			},
-			tile: new(tile.MustTileFromCode("?")),
+			tile: tile.MustTileFromCode("?"),
 			wantTiles: []tile.Tile{
 				tile.MustTileFromCode("?"), tile.MustTileFromCode("?"), tile.MustTileFromCode("?"),
 				tile.MustTileFromCode("?"), tile.MustTileFromCode("?"), tile.MustTileFromCode("?"),
@@ -141,7 +141,7 @@ func TestInvisibleHand_Draw(t *testing.T) {
 				tile.MustTileFromCode("?"), tile.MustTileFromCode("?"), tile.MustTileFromCode("?"),
 				tile.MustTileFromCode("?"), tile.MustTileFromCode("?"),
 			},
-			tile:      new(tile.MustTileFromCode("?")),
+			tile:      tile.MustTileFromCode("?"),
 			wantTiles: nil,
 			wantErr:   true,
 		},
@@ -173,28 +173,28 @@ func TestInvisibleHand_Discard(t *testing.T) {
 	tests := []struct {
 		name      string
 		tiles     []tile.Tile
-		tile      *tile.Tile
+		tile      tile.Tile
 		wantTiles []tile.Tile
 		wantErr   bool
 	}{
 		{
 			name:      "unknown tile",
 			tiles:     []tile.Tile{tile.MustTileFromCode("?")},
-			tile:      new(tile.MustTileFromCode("?")),
+			tile:      tile.MustTileFromCode("?"),
 			wantTiles: []tile.Tile{},
 			wantErr:   false,
 		},
 		{
 			name:      "visible tile",
 			tiles:     []tile.Tile{tile.MustTileFromCode("?")},
-			tile:      new(tile.MustTileFromCode("1m")),
+			tile:      tile.MustTileFromCode("1m"),
 			wantTiles: []tile.Tile{},
 			wantErr:   false,
 		},
 		{
 			name:      "cannot discard from an empty hand",
 			tiles:     []tile.Tile{},
-			tile:      new(tile.MustTileFromCode("?")),
+			tile:      tile.MustTileFromCode("?"),
 			wantTiles: nil,
 			wantErr:   true,
 		},

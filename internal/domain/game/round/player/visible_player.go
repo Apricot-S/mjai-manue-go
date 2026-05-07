@@ -143,13 +143,13 @@ func (p *VisiblePlayer) Discard(t tile.Tile, tsumogiri bool) error {
 			return fmt.Errorf("cannot Discard: tile %s is forbidden due to swap-call", t)
 		}
 
-		newHand, err := p.hand.Discard(&t)
+		newHand, err := p.hand.Discard(t)
 		if err != nil {
 			return err
 		}
 
 		if p.drawnTile != nil {
-			if newHand, err = newHand.Draw(p.drawnTile); err != nil {
+			if newHand, err = newHand.Draw(*p.drawnTile); err != nil {
 				return err
 			}
 		}
@@ -247,7 +247,7 @@ func (p *VisiblePlayer) ConcealedKan(kan meld.ConcealedKan) error {
 		return fmt.Errorf("cannot ConcealedKan: player is not in a discardable state")
 	}
 
-	newHand, err := p.hand.Draw(p.drawnTile)
+	newHand, err := p.hand.Draw(*p.drawnTile)
 	if err != nil {
 		return err
 	}
@@ -275,13 +275,13 @@ func (p *VisiblePlayer) PromotedKan(kan meld.PromotedKan) error {
 		if !isPon {
 			return false
 		}
-		return *pon.Taken() == *kan.Taken()
+		return pon.Taken() == kan.Taken()
 	})
 	if ponIndex == -1 {
 		return fmt.Errorf("cannot PromotedKan: failed to find pon for promoted kan: %v", melds)
 	}
 
-	newHand, err := p.hand.Draw(p.drawnTile)
+	newHand, err := p.hand.Draw(*p.drawnTile)
 	if err != nil {
 		return err
 	}
@@ -309,7 +309,7 @@ func (p *VisiblePlayer) Riichi() error {
 		return fmt.Errorf("cannot Riichi: player hand is not concealed")
 	}
 
-	h, err := p.hand.Draw(p.drawnTile)
+	h, err := p.hand.Draw(*p.drawnTile)
 	if err != nil {
 		return err
 	}
