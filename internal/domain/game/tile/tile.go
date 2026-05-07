@@ -93,20 +93,14 @@ var doraIndicatorToDora = [NumTileType38]int{
 }
 
 type Tile struct {
-	id     int
-	number int
-	color  rune
-	isRed  bool
+	id int8
 }
 
 var tilesByID = func() [NumTileType38]Tile {
 	ts := [NumTileType38]Tile{}
 	for id := range ts {
 		ts[id] = Tile{
-			id:     id,
-			color:  tileColors[id],
-			number: tileNumbers[id],
-			isRed:  tileIsReds[id],
+			id: int8(id),
 		}
 	}
 	return ts
@@ -147,23 +141,23 @@ func MustTileFromCode(code string) *Tile {
 }
 
 func (t Tile) ID() int {
-	return t.id
+	return int(t.id)
 }
 
 func (t Tile) String() string {
-	return tileCodes[t.id]
+	return tileCodes[t.ID()]
 }
 
 func (t Tile) Color() rune {
-	return t.color
+	return tileColors[t.ID()]
 }
 
 func (t Tile) Number() int {
-	return t.number
+	return tileNumbers[t.ID()]
 }
 
 func (t Tile) IsRed() bool {
-	return t.isRed
+	return tileIsReds[t.ID()]
 }
 
 func (t Tile) IsSuits() bool {
@@ -179,7 +173,7 @@ func (t Tile) IsYaochu() bool {
 }
 
 func (t Tile) IsUnknown() bool {
-	return t.id == unknownID
+	return t.ID() == unknownID
 }
 
 func (t Tile) Next(n int) *Tile {
