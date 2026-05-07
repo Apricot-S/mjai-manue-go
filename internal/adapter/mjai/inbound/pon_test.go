@@ -14,11 +14,11 @@ func TestParseEvent_Pon(t *testing.T) {
 	if !ok {
 		t.Fatalf("ParseEvent() = %T, want *event.Pon", got)
 	}
-	if pon.Actor() != *seat.MustSeat(1) {
-		t.Errorf("Actor() = %v, want %v", pon.Actor(), *seat.MustSeat(1))
+	if pon.Actor() != seat.MustSeat(1) {
+		t.Errorf("Actor() = %v, want %v", pon.Actor(), seat.MustSeat(1))
 	}
-	if pon.Target() != *seat.MustSeat(3) {
-		t.Errorf("Target() = %v, want %v", pon.Target(), *seat.MustSeat(3))
+	if pon.Target() != seat.MustSeat(3) {
+		t.Errorf("Target() = %v, want %v", pon.Target(), seat.MustSeat(3))
 	}
 	if pon.Taken() != tile.MustTileFromCode("1s") {
 		t.Errorf("Taken() = %v, want 1s", pon.Taken())

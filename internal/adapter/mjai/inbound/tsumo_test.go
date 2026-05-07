@@ -20,14 +20,14 @@ func TestParseEvent_Tsumo(t *testing.T) {
 		{
 			name:      "valid",
 			b:         []byte(`{"type":"tsumo","actor":1,"pai":"E","possible_actions":[]}`),
-			wantActor: seat.MustSeat(1),
+			wantActor: new(seat.MustSeat(1)),
 			wantTile:  new(tile.MustTileFromCode("E")),
 			wantErr:   false,
 		},
 		{
 			name:      "allow unknown",
 			b:         []byte(`{"type":"tsumo","actor":0,"pai":"?"}`),
-			wantActor: seat.MustSeat(0),
+			wantActor: new(seat.MustSeat(0)),
 			wantTile:  new(tile.MustTileFromCode("?")),
 			wantErr:   false,
 		},

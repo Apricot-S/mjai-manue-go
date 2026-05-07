@@ -110,7 +110,7 @@ func (s *State) applyDiscard(ev *event.Discard) error {
 	s.lastDrawWasReplacement = false
 	s.canKyushukyuhai[actorSeat.Index()] = false
 	s.pendingDiscard = nil
-	s.nextDraw = *seat.MustSeat((actorSeat.Index() + 1) % common.NumPlayers)
+	s.nextDraw = seat.MustSeat((actorSeat.Index() + 1) % common.NumPlayers)
 	s.lastActor = &actorSeat
 	return nil
 }

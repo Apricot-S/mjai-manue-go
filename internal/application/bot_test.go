@@ -13,7 +13,7 @@ import (
 )
 
 func TestBot_Process_StartRound(t *testing.T) {
-	bot := mustNewBotForTest(t, *seat.MustSeat(0))
+	bot := mustNewBotForTest(t, seat.MustSeat(0))
 
 	got, err := bot.Process(mustNewStartRoundForTest(t, newValidHands()))
 	if err != nil {
@@ -25,7 +25,7 @@ func TestBot_Process_StartRound(t *testing.T) {
 }
 
 func TestBot_Process_DrawSelf(t *testing.T) {
-	self := *seat.MustSeat(0)
+	self := seat.MustSeat(0)
 	bot := mustNewBotForTest(t, self)
 	if _, err := bot.Process(mustNewStartRoundForTest(t, newValidHands())); err != nil {
 		t.Fatalf("Process(StartRound) failed: %v", err)
@@ -55,8 +55,8 @@ func TestBot_Process_DrawSelf(t *testing.T) {
 }
 
 func TestBot_Process_DrawOther(t *testing.T) {
-	self := *seat.MustSeat(0)
-	other := *seat.MustSeat(1)
+	self := seat.MustSeat(0)
+	other := seat.MustSeat(1)
 	bot := mustNewBotForTest(t, self)
 	if _, err := bot.Process(mustNewStartRoundForTest(t, newValidHands())); err != nil {
 		t.Fatalf("Process(StartRound) failed: %v", err)
@@ -79,7 +79,7 @@ func TestBot_Process_DrawOther(t *testing.T) {
 }
 
 func TestBot_Process_Discard(t *testing.T) {
-	self := *seat.MustSeat(0)
+	self := seat.MustSeat(0)
 	bot := mustNewBotForTest(t, self)
 	if _, err := bot.Process(mustNewStartRoundForTest(t, newValidHands())); err != nil {
 		t.Fatalf("Process(StartRound) failed: %v", err)
@@ -101,14 +101,14 @@ func TestBot_Process_Discard(t *testing.T) {
 }
 
 func TestBot_Process_DrawBeforeStartRound(t *testing.T) {
-	bot := mustNewBotForTest(t, *seat.MustSeat(0))
-	if _, err := bot.Process(event.NewDraw(*seat.MustSeat(0), tile.MustTileFromCode("6m"))); err == nil {
+	bot := mustNewBotForTest(t, seat.MustSeat(0))
+	if _, err := bot.Process(event.NewDraw(seat.MustSeat(0), tile.MustTileFromCode("6m"))); err == nil {
 		t.Fatal("Process() succeeded unexpectedly")
 	}
 }
 
 func TestBot_Process_EndRound(t *testing.T) {
-	bot := mustNewBotForTest(t, *seat.MustSeat(0))
+	bot := mustNewBotForTest(t, seat.MustSeat(0))
 	if _, err := bot.Process(mustNewStartRoundForTest(t, newValidHands())); err != nil {
 		t.Fatalf("Process(StartRound) failed: %v", err)
 	}
@@ -120,13 +120,13 @@ func TestBot_Process_EndRound(t *testing.T) {
 	if got.Kind() != application.ReactionNone {
 		t.Errorf("Kind() = %v, want %v", got.Kind(), application.ReactionNone)
 	}
-	if _, err := bot.Process(event.NewDraw(*seat.MustSeat(0), tile.MustTileFromCode("6m"))); err == nil {
+	if _, err := bot.Process(event.NewDraw(seat.MustSeat(0), tile.MustTileFromCode("6m"))); err == nil {
 		t.Fatal("Process(Draw) after EndRound succeeded unexpectedly")
 	}
 }
 
 func TestBot_Process_ReportsRoundStateAfterStateUpdate(t *testing.T) {
-	self := *seat.MustSeat(0)
+	self := seat.MustSeat(0)
 	reporter := &recordingRoundStateReporter{}
 	bot := application.NewBot(self, newTsumogiriAgentForTest(), reporter)
 
@@ -146,7 +146,7 @@ func TestBot_Process_ReportsRoundStateAfterStateUpdate(t *testing.T) {
 }
 
 func TestBot_Process_ReportsNoRoundStateWhenApplyFails(t *testing.T) {
-	self := *seat.MustSeat(0)
+	self := seat.MustSeat(0)
 	reporter := &recordingRoundStateReporter{}
 	bot := application.NewBot(self, newTsumogiriAgentForTest(), reporter)
 
@@ -171,7 +171,7 @@ func TestBot_Process_ReportsNoRoundStateWhenApplyFails(t *testing.T) {
 func TestBot_Process_ReturnsReporterError(t *testing.T) {
 	wantErr := errors.New("report failed")
 	bot := application.NewBot(
-		*seat.MustSeat(0),
+		seat.MustSeat(0),
 		newTsumogiriAgentForTest(),
 		errorRoundStateReporter{err: wantErr},
 	)

@@ -8,7 +8,7 @@ import (
 )
 
 func TestNewPass(t *testing.T) {
-	actor := *seat.MustSeat(2)
+	actor := seat.MustSeat(2)
 
 	got := action.NewPass(actor)
 

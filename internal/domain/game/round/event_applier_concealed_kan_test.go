@@ -26,7 +26,7 @@ func TestState_Apply_ConcealedKan(t *testing.T) {
 	hands := newValidHands()
 	hands[0] = concealedKanHandForTest()
 	s := mustNewRoundStateForTest(t, hands)
-	actor := *seat.MustSeat(0)
+	actor := seat.MustSeat(0)
 	kanTile := tile.MustTileFromCode("E")
 	consumed := [4]tile.Tile{kanTile, kanTile, kanTile, kanTile}
 
@@ -49,7 +49,7 @@ func TestState_Apply_ConcealedKan(t *testing.T) {
 }
 
 func TestState_Apply_ConcealedKan_KeepsOpenHandOpen(t *testing.T) {
-	actor := *seat.MustSeat(0)
+	actor := seat.MustSeat(0)
 	kanTile := tile.MustTileFromCode("E")
 	p := openPlayerWithDrawnKanTileForTest(t, kanTile)
 	players := [common.NumPlayers]player.Player{
@@ -86,7 +86,7 @@ func TestState_Apply_ConcealedKan_RequiresDoraBeforeReplacementTile(t *testing.T
 	hands := newValidHands()
 	hands[0] = concealedKanHandForTest()
 	s := mustNewRoundStateForTest(t, hands)
-	actor := *seat.MustSeat(0)
+	actor := seat.MustSeat(0)
 	kanTile := tile.MustTileFromCode("E")
 	consumed := [4]tile.Tile{kanTile, kanTile, kanTile, kanTile}
 
@@ -111,13 +111,13 @@ func TestState_Apply_ConcealedKan_ReturnsErrorWhenNoReplacementTileLeft(t *testi
 		0,
 		0,
 		[common.NumPlayers]int{25000, 25000, 25000, 25000},
-		*seat.MustSeat(0),
-		*seat.MustSeat(0),
+		seat.MustSeat(0),
+		seat.MustSeat(0),
 		tile.Tiles{tile.MustTileFromCode("E")},
 		1,
 		newVisiblePlayersForTest(t, hands),
 	)
-	actor := *seat.MustSeat(0)
+	actor := seat.MustSeat(0)
 	kanTile := tile.MustTileFromCode("E")
 	consumed := [4]tile.Tile{kanTile, kanTile, kanTile, kanTile}
 
@@ -144,7 +144,7 @@ func TestState_Apply_ConcealedKan_ReturnsErrorOnFifthKan(t *testing.T) {
 	hands := newValidHands()
 	hands[0] = concealedKanHandForTest()
 	s := newStateForTestWithNumKans(mustNewRoundStateForTest(t, hands), maxNumKan)
-	actor := *seat.MustSeat(0)
+	actor := seat.MustSeat(0)
 	kanTile := tile.MustTileFromCode("E")
 	consumed := [4]tile.Tile{kanTile, kanTile, kanTile, kanTile}
 
@@ -168,7 +168,7 @@ func TestState_Apply_ConcealedKan_AllowsReplacementTileAfterDora(t *testing.T) {
 	hands := newValidHands()
 	hands[0] = concealedKanHandForTest()
 	s := mustNewRoundStateForTest(t, hands)
-	actor := *seat.MustSeat(0)
+	actor := seat.MustSeat(0)
 	kanTile := tile.MustTileFromCode("E")
 	replacementTile := tile.MustTileFromCode("W")
 	consumed := [4]tile.Tile{kanTile, kanTile, kanTile, kanTile}
@@ -207,7 +207,7 @@ func openPlayerWithDrawnKanTileForTest(t *testing.T, kanTile tile.Tile) player.P
 	pon := meld.MustPon(
 		tile.MustTileFromCode("5p"),
 		[2]tile.Tile{tile.MustTileFromCode("5p"), tile.MustTileFromCode("5pr")},
-		*seat.MustSeat(1),
+		seat.MustSeat(1),
 	)
 	if err := p.Pon(*pon); err != nil {
 		t.Fatalf("Pon() failed: %v", err)

@@ -63,7 +63,7 @@ func newValidHands() [common.NumPlayers][common.InitHandSize]tile.Tile {
 }
 
 func TestNewState(t *testing.T) {
-	validDealer := *seat.MustSeat(1)
+	validDealer := seat.MustSeat(1)
 	validDora := tile.MustTileFromCode("1m")
 	validHands := newValidHands()
 	validScores := &[common.NumPlayers]int{25000, 25000, 25000, 25000}
@@ -113,7 +113,7 @@ func TestNewState(t *testing.T) {
 	}
 
 	for i := range common.NumPlayers {
-		playerSeat := *seat.MustSeat(i)
+		playerSeat := seat.MustSeat(i)
 		handTiles := s.Player(playerSeat).HandTiles()
 		if len(handTiles) != common.InitHandSize {
 			t.Fatalf("player %d hand size = %d, want %d", i, len(handTiles), common.InitHandSize)
@@ -136,7 +136,7 @@ func TestNewState(t *testing.T) {
 }
 
 func TestNewStateRejectsInvalidStartRound(t *testing.T) {
-	validDealer := *seat.MustSeat(1)
+	validDealer := seat.MustSeat(1)
 	validDora := tile.MustTileFromCode("1m")
 	validHands := newValidHands()
 	validScores := &[common.NumPlayers]int{25000, 25000, 25000, 25000}
@@ -220,7 +220,7 @@ func TestNewStateRejectsInvalidStartRound(t *testing.T) {
 }
 
 func TestNewStateWithNilScores(t *testing.T) {
-	validDealer := *seat.MustSeat(1)
+	validDealer := seat.MustSeat(1)
 	validDora := tile.MustTileFromCode("1m")
 	validHands := newValidHands()
 
@@ -247,7 +247,7 @@ func TestNewStateWithNilScores(t *testing.T) {
 }
 
 func TestNewStateFallsBackToInvisiblePlayer(t *testing.T) {
-	validDealer := *seat.MustSeat(1)
+	validDealer := seat.MustSeat(1)
 	validDora := tile.MustTileFromCode("1m")
 	unknownHands := newValidHands()
 	for i := range unknownHands[0] {
@@ -270,13 +270,13 @@ func TestNewStateFallsBackToInvisiblePlayer(t *testing.T) {
 		t.Fatalf("NewState() failed: %v", err)
 	}
 
-	firstSeat := *seat.MustSeat(0)
+	firstSeat := seat.MustSeat(0)
 	if _, ok := s.Player(firstSeat).Hand(); ok {
 		t.Fatalf("expected seat 0 to be invisible when visible hand initialization fails")
 	}
 
 	for i := 1; i < common.NumPlayers; i++ {
-		playerSeat := *seat.MustSeat(i)
+		playerSeat := seat.MustSeat(i)
 		if _, ok := s.Player(playerSeat).Hand(); !ok {
 			t.Fatalf("expected seat %d to be visible", i)
 		}
@@ -284,7 +284,7 @@ func TestNewStateFallsBackToInvisiblePlayer(t *testing.T) {
 }
 
 func TestNewStateErrorsOnInvalidVisibleHand(t *testing.T) {
-	validDealer := *seat.MustSeat(1)
+	validDealer := seat.MustSeat(1)
 	validDora := tile.MustTileFromCode("1m")
 	invalidHands := newValidHands()
 	for i := range 5 {

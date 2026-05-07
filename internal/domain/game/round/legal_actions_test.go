@@ -11,7 +11,7 @@ import (
 func TestState_LegalActions_NoPendingAction(t *testing.T) {
 	s := mustNewRoundStateForTest(t, newValidHands())
 
-	got, err := s.LegalActions(*seat.MustSeat(0))
+	got, err := s.LegalActions(seat.MustSeat(0))
 	if err != nil {
 		t.Fatalf("LegalActions() failed: %v", err)
 	}
@@ -25,7 +25,7 @@ func TestState_LegalActions_ReturnsErrorForInvisiblePlayerWithoutPendingAction(t
 	hands[0] = unknownHandForLegalActionsTest()
 	s := mustNewRoundStateForTest(t, hands)
 
-	if _, err := s.LegalActions(*seat.MustSeat(0)); err == nil {
+	if _, err := s.LegalActions(seat.MustSeat(0)); err == nil {
 		t.Fatal("LegalActions() succeeded unexpectedly")
 	}
 }
@@ -34,7 +34,7 @@ func TestState_LegalActions_ReturnsErrorForPendingInvisiblePlayer(t *testing.T) 
 	hands := newValidHands()
 	hands[0] = unknownHandForLegalActionsTest()
 	s := mustNewRoundStateForTest(t, hands)
-	actor := *seat.MustSeat(0)
+	actor := seat.MustSeat(0)
 	if err := s.Apply(event.NewDraw(actor, tile.MustTileFromCode("6m"))); err != nil {
 		t.Fatalf("Apply(Draw) failed: %v", err)
 	}
@@ -46,11 +46,11 @@ func TestState_LegalActions_ReturnsErrorForPendingInvisiblePlayer(t *testing.T) 
 
 func TestState_LegalActions_NotPendingActor(t *testing.T) {
 	s := mustNewRoundStateForTest(t, newValidHands())
-	if err := s.Apply(event.NewDraw(*seat.MustSeat(0), tile.MustTileFromCode("6m"))); err != nil {
+	if err := s.Apply(event.NewDraw(seat.MustSeat(0), tile.MustTileFromCode("6m"))); err != nil {
 		t.Fatalf("Apply(Draw) failed: %v", err)
 	}
 
-	got, err := s.LegalActions(*seat.MustSeat(1))
+	got, err := s.LegalActions(seat.MustSeat(1))
 	if err != nil {
 		t.Fatalf("LegalActions() failed: %v", err)
 	}
@@ -61,7 +61,7 @@ func TestState_LegalActions_NotPendingActor(t *testing.T) {
 
 func TestState_LegalActions_InvalidatesCacheAfterApply(t *testing.T) {
 	s := mustNewRoundStateForTest(t, newValidHands())
-	actor := *seat.MustSeat(0)
+	actor := seat.MustSeat(0)
 	drawnTile := tile.MustTileFromCode("6m")
 	if err := s.Apply(event.NewDraw(actor, drawnTile)); err != nil {
 		t.Fatalf("Apply(Draw) failed: %v", err)
@@ -88,7 +88,7 @@ func TestState_LegalActions_InvalidatesCacheAfterApply(t *testing.T) {
 
 func TestState_LegalActions_ReturnsSliceCopy(t *testing.T) {
 	s := mustNewRoundStateForTest(t, newValidHands())
-	actor := *seat.MustSeat(0)
+	actor := seat.MustSeat(0)
 	if err := s.Apply(event.NewDraw(actor, tile.MustTileFromCode("6m"))); err != nil {
 		t.Fatalf("Apply(Draw) failed: %v", err)
 	}

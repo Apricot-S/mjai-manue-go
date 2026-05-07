@@ -66,26 +66,26 @@ func TestSeat_IsShimochaOf(t *testing.T) {
 	}{
 		{
 			name:   "1 is shimocha of 0",
-			seat:   *seat.MustSeat(1),
-			target: *seat.MustSeat(0),
+			seat:   seat.MustSeat(1),
+			target: seat.MustSeat(0),
 			want:   true,
 		},
 		{
 			name:   "0 is shimocha of 3",
-			seat:   *seat.MustSeat(0),
-			target: *seat.MustSeat(3),
+			seat:   seat.MustSeat(0),
+			target: seat.MustSeat(3),
 			want:   true,
 		},
 		{
 			name:   "2 is not shimocha of 0",
-			seat:   *seat.MustSeat(2),
-			target: *seat.MustSeat(0),
+			seat:   seat.MustSeat(2),
+			target: seat.MustSeat(0),
 			want:   false,
 		},
 		{
 			name:   "same seat is not shimocha",
-			seat:   *seat.MustSeat(0),
-			target: *seat.MustSeat(0),
+			seat:   seat.MustSeat(0),
+			target: seat.MustSeat(0),
 			want:   false,
 		},
 	}

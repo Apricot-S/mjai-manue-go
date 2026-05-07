@@ -134,12 +134,12 @@ func TestCalculateFuHan(t *testing.T) {
 				meld.MustPon(
 					tile.MustTileFromCode("1m"),
 					[2]tile.Tile{tile.MustTileFromCode("1m"), tile.MustTileFromCode("1m")},
-					*seat.MustSeat(2),
+					seat.MustSeat(2),
 				),
 				meld.MustChii(
 					tile.MustTileFromCode("7s"),
 					[2]tile.Tile{tile.MustTileFromCode("8s"), tile.MustTileFromCode("9s")},
-					*seat.MustSeat(2),
+					seat.MustSeat(2),
 				),
 			},
 			prevalentWind:  wind.East,
@@ -238,12 +238,12 @@ func TestCalculateFuHan(t *testing.T) {
 				meld.MustPon(
 					tile.MustTileFromCode("F"),
 					[2]tile.Tile{tile.MustTileFromCode("F"), tile.MustTileFromCode("F")},
-					*seat.MustSeat(2),
+					seat.MustSeat(2),
 				),
 				meld.MustPon(
 					tile.MustTileFromCode("N"),
 					[2]tile.Tile{tile.MustTileFromCode("N"), tile.MustTileFromCode("N")},
-					*seat.MustSeat(2),
+					seat.MustSeat(2),
 				),
 			},
 			prevalentWind:  wind.East,
@@ -266,12 +266,12 @@ func TestCalculateFuHan(t *testing.T) {
 				meld.MustPon(
 					tile.MustTileFromCode("1m"),
 					[2]tile.Tile{tile.MustTileFromCode("1m"), tile.MustTileFromCode("1m")},
-					*seat.MustSeat(2),
+					seat.MustSeat(2),
 				),
 				meld.MustPon(
 					tile.MustTileFromCode("E"),
 					[2]tile.Tile{tile.MustTileFromCode("E"), tile.MustTileFromCode("E")},
-					*seat.MustSeat(2),
+					seat.MustSeat(2),
 				),
 			},
 			prevalentWind:  wind.East,
@@ -313,12 +313,12 @@ func TestCalculateFuHan(t *testing.T) {
 				meld.MustPon(
 					tile.MustTileFromCode("E"),
 					[2]tile.Tile{tile.MustTileFromCode("E"), tile.MustTileFromCode("E")},
-					*seat.MustSeat(2),
+					seat.MustSeat(2),
 				),
 				meld.MustCalledKan(
 					tile.MustTileFromCode("C"),
 					[3]tile.Tile{tile.MustTileFromCode("C"), tile.MustTileFromCode("C"), tile.MustTileFromCode("C")},
-					*seat.MustSeat(2),
+					seat.MustSeat(2),
 				),
 			},
 			prevalentWind:  wind.East,
@@ -361,7 +361,7 @@ func TestCalculateFuHan(t *testing.T) {
 				meld.MustPon(
 					tile.MustTileFromCode("1m"),
 					[2]tile.Tile{tile.MustTileFromCode("1m"), tile.MustTileFromCode("1m")},
-					*seat.MustSeat(2),
+					seat.MustSeat(2),
 				),
 			},
 			prevalentWind:  wind.East,
@@ -403,12 +403,12 @@ func TestCalculateFuHan(t *testing.T) {
 				meld.MustPon(
 					tile.MustTileFromCode("1m"),
 					[2]tile.Tile{tile.MustTileFromCode("1m"), tile.MustTileFromCode("1m")},
-					*seat.MustSeat(2),
+					seat.MustSeat(2),
 				),
 				meld.MustChii(
 					tile.MustTileFromCode("1s"),
 					[2]tile.Tile{tile.MustTileFromCode("2s"), tile.MustTileFromCode("3s")},
-					*seat.MustSeat(2),
+					seat.MustSeat(2),
 				),
 			},
 			prevalentWind:  wind.East,
@@ -451,7 +451,7 @@ func TestCalculateFuHan(t *testing.T) {
 				meld.MustChii(
 					tile.MustTileFromCode("4p"),
 					[2]tile.Tile{tile.MustTileFromCode("5p"), tile.MustTileFromCode("6p")},
-					*seat.MustSeat(2),
+					seat.MustSeat(2),
 				),
 			},
 			prevalentWind:  wind.East,
@@ -474,12 +474,12 @@ func TestCalculateFuHan(t *testing.T) {
 				meld.MustPon(
 					tile.MustTileFromCode("2m"),
 					[2]tile.Tile{tile.MustTileFromCode("2m"), tile.MustTileFromCode("2m")},
-					*seat.MustSeat(2),
+					seat.MustSeat(2),
 				),
 				meld.MustCalledKan(
 					tile.MustTileFromCode("1m"),
 					[3]tile.Tile{tile.MustTileFromCode("1m"), tile.MustTileFromCode("1m"), tile.MustTileFromCode("1m")},
-					*seat.MustSeat(2),
+					seat.MustSeat(2),
 				),
 			},
 			prevalentWind:  wind.East,
@@ -522,7 +522,7 @@ func TestCalculateFuHan(t *testing.T) {
 				meld.MustPon(
 					tile.MustTileFromCode("1m"),
 					[2]tile.Tile{tile.MustTileFromCode("1m"), tile.MustTileFromCode("1m")},
-					*seat.MustSeat(2),
+					seat.MustSeat(2),
 				),
 			},
 			prevalentWind:  wind.East,
@@ -565,7 +565,7 @@ func TestCalculateFuHan(t *testing.T) {
 				meld.MustPon(
 					tile.MustTileFromCode("1m"),
 					[2]tile.Tile{tile.MustTileFromCode("1m"), tile.MustTileFromCode("1m")},
-					*seat.MustSeat(2),
+					seat.MustSeat(2),
 				),
 			},
 			prevalentWind:  wind.East,
@@ -646,7 +646,7 @@ func TestCalculateFuHan(t *testing.T) {
 				meld.MustPon(
 					tile.MustTileFromCode("5p"),
 					[2]tile.Tile{tile.MustTileFromCode("5p"), tile.MustTileFromCode("5pr")},
-					*seat.MustSeat(2),
+					seat.MustSeat(2),
 				),
 			},
 			prevalentWind:  wind.East,
@@ -771,7 +771,7 @@ func TestHas1Han(t *testing.T) {
 				meld.MustPon(
 					tile.MustTileFromCode("1m"),
 					[2]tile.Tile{tile.MustTileFromCode("1m"), tile.MustTileFromCode("1m")},
-					*seat.MustSeat(2),
+					seat.MustSeat(2),
 				),
 			},
 			winningTile:   new(tile.MustTileFromCode("9s")),
@@ -789,7 +789,7 @@ func TestHas1Han(t *testing.T) {
 				meld.MustPon(
 					tile.MustTileFromCode("1m"),
 					[2]tile.Tile{tile.MustTileFromCode("1m"), tile.MustTileFromCode("1m")},
-					*seat.MustSeat(2),
+					seat.MustSeat(2),
 				),
 			},
 			winningTile:   new(tile.MustTileFromCode("2p")),
@@ -855,12 +855,12 @@ func TestHas1Han(t *testing.T) {
 				meld.MustPon(
 					tile.MustTileFromCode("1m"),
 					[2]tile.Tile{tile.MustTileFromCode("1m"), tile.MustTileFromCode("1m")},
-					*seat.MustSeat(2),
+					seat.MustSeat(2),
 				),
 				meld.MustPon(
 					tile.MustTileFromCode("E"),
 					[2]tile.Tile{tile.MustTileFromCode("E"), tile.MustTileFromCode("E")},
-					*seat.MustSeat(2),
+					seat.MustSeat(2),
 				),
 			},
 			winningTile:   new(tile.MustTileFromCode("1p")),
@@ -878,12 +878,12 @@ func TestHas1Han(t *testing.T) {
 				meld.MustPon(
 					tile.MustTileFromCode("1m"),
 					[2]tile.Tile{tile.MustTileFromCode("1m"), tile.MustTileFromCode("1m")},
-					*seat.MustSeat(2),
+					seat.MustSeat(2),
 				),
 				meld.MustChii(
 					tile.MustTileFromCode("7s"),
 					[2]tile.Tile{tile.MustTileFromCode("8s"), tile.MustTileFromCode("9s")},
-					*seat.MustSeat(2),
+					seat.MustSeat(2),
 				),
 			},
 			winningTile:   new(tile.MustTileFromCode("N")),
@@ -925,12 +925,12 @@ func TestHas1Han(t *testing.T) {
 				meld.MustPon(
 					tile.MustTileFromCode("2m"),
 					[2]tile.Tile{tile.MustTileFromCode("2m"), tile.MustTileFromCode("2m")},
-					*seat.MustSeat(2),
+					seat.MustSeat(2),
 				),
 				meld.MustCalledKan(
 					tile.MustTileFromCode("1m"),
 					[3]tile.Tile{tile.MustTileFromCode("1m"), tile.MustTileFromCode("1m"), tile.MustTileFromCode("1m")},
-					*seat.MustSeat(2),
+					seat.MustSeat(2),
 				),
 			},
 			winningTile:   new(tile.MustTileFromCode("2p")),
@@ -948,7 +948,7 @@ func TestHas1Han(t *testing.T) {
 				meld.MustChii(
 					tile.MustTileFromCode("1m"),
 					[2]tile.Tile{tile.MustTileFromCode("2m"), tile.MustTileFromCode("3m")},
-					*seat.MustSeat(2),
+					seat.MustSeat(2),
 				),
 				meld.MustConcealedKan(
 					[4]tile.Tile{tile.MustTileFromCode("9s"), tile.MustTileFromCode("9s"), tile.MustTileFromCode("9s"), tile.MustTileFromCode("9s")},
@@ -981,7 +981,7 @@ func TestHas1Han(t *testing.T) {
 				meld.MustChii(
 					tile.MustTileFromCode("1m"),
 					[2]tile.Tile{tile.MustTileFromCode("2m"), tile.MustTileFromCode("3m")},
-					*seat.MustSeat(2),
+					seat.MustSeat(2),
 				),
 				meld.MustConcealedKan(
 					[4]tile.Tile{tile.MustTileFromCode("9s"), tile.MustTileFromCode("9s"), tile.MustTileFromCode("9s"), tile.MustTileFromCode("9s")},
@@ -1002,12 +1002,12 @@ func TestHas1Han(t *testing.T) {
 				meld.MustPon(
 					tile.MustTileFromCode("7m"),
 					[2]tile.Tile{tile.MustTileFromCode("7m"), tile.MustTileFromCode("7m")},
-					*seat.MustSeat(2),
+					seat.MustSeat(2),
 				),
 				meld.MustPon(
 					tile.MustTileFromCode("7p"),
 					[2]tile.Tile{tile.MustTileFromCode("7p"), tile.MustTileFromCode("7p")},
-					*seat.MustSeat(2),
+					seat.MustSeat(2),
 				),
 			},
 			winningTile:   new(tile.MustTileFromCode("3p")),
@@ -1025,12 +1025,12 @@ func TestHas1Han(t *testing.T) {
 				meld.MustPon(
 					tile.MustTileFromCode("7m"),
 					[2]tile.Tile{tile.MustTileFromCode("7m"), tile.MustTileFromCode("7m")},
-					*seat.MustSeat(2),
+					seat.MustSeat(2),
 				),
 				meld.MustPon(
 					tile.MustTileFromCode("7p"),
 					[2]tile.Tile{tile.MustTileFromCode("7p"), tile.MustTileFromCode("7p")},
-					*seat.MustSeat(2),
+					seat.MustSeat(2),
 				),
 			},
 			winningTile:   new(tile.MustTileFromCode("3p")),
@@ -1048,7 +1048,7 @@ func TestHas1Han(t *testing.T) {
 				meld.MustCalledKan(
 					tile.MustTileFromCode("2m"),
 					[3]tile.Tile{tile.MustTileFromCode("2m"), tile.MustTileFromCode("2m"), tile.MustTileFromCode("2m")},
-					*seat.MustSeat(2),
+					seat.MustSeat(2),
 				),
 				meld.MustConcealedKan(
 					[4]tile.Tile{tile.MustTileFromCode("6p"), tile.MustTileFromCode("6p"), tile.MustTileFromCode("6p"), tile.MustTileFromCode("6p")},
@@ -1057,7 +1057,7 @@ func TestHas1Han(t *testing.T) {
 					tile.MustTileFromCode("7p"),
 					[2]tile.Tile{tile.MustTileFromCode("7p"), tile.MustTileFromCode("7p")},
 					tile.MustTileFromCode("7p"),
-					*seat.MustSeat(2),
+					seat.MustSeat(2),
 				),
 			},
 			winningTile:   new(tile.MustTileFromCode("3p")),

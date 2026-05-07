@@ -21,7 +21,7 @@ func TestParseEvent_Dahai(t *testing.T) {
 		{
 			name:          "valid",
 			b:             []byte(`{"type":"dahai","actor":1,"pai":"W","tsumogiri":false}`),
-			wantActor:     seat.MustSeat(1),
+			wantActor:     new(seat.MustSeat(1)),
 			wantTile:      new(tile.MustTileFromCode("W")),
 			wantTsumogiri: false,
 			wantErr:       false,
@@ -29,7 +29,7 @@ func TestParseEvent_Dahai(t *testing.T) {
 		{
 			name:          "valid tsumogiri",
 			b:             []byte(`{"type":"dahai","actor":3,"pai":"9m","tsumogiri":true}`),
-			wantActor:     seat.MustSeat(3),
+			wantActor:     new(seat.MustSeat(3)),
 			wantTile:      new(tile.MustTileFromCode("9m")),
 			wantTsumogiri: true,
 			wantErr:       false,

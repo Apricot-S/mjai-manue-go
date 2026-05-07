@@ -41,7 +41,7 @@ func TestState_Apply_Win(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			s := mustNewRoundStateForTest(t, newValidHands())
-			actor := *seat.MustSeat(0)
+			actor := seat.MustSeat(0)
 			winningTile := tile.MustTileFromCode("6m")
 
 			if err := s.Apply(event.NewDraw(actor, winningTile)); err != nil {
@@ -70,8 +70,8 @@ func TestState_Apply_Win_ReturnsErrorBeforeFirstDraw(t *testing.T) {
 	scores := [common.NumPlayers]int{25000, 30800, 34700, 9500}
 
 	if err := s.Apply(event.NewWin(
-		*seat.MustSeat(2),
-		*seat.MustSeat(3),
+		seat.MustSeat(2),
+		seat.MustSeat(3),
 		new(tile.MustTileFromCode("9m")),
 		8000,
 		nil,
@@ -87,8 +87,8 @@ func TestState_Apply_Win_ReturnsErrorBeforeFirstDraw(t *testing.T) {
 
 func TestState_Apply_Win_Renhou(t *testing.T) {
 	s := mustNewRoundStateForTest(t, newValidHands())
-	actor := *seat.MustSeat(1)
-	target := *seat.MustSeat(0)
+	actor := seat.MustSeat(1)
+	target := seat.MustSeat(0)
 	winningTile := tile.MustTileFromCode("6m")
 	scores := [common.NumPlayers]int{57000, -7000, 25000, 25000}
 
@@ -116,8 +116,8 @@ func TestState_Apply_Win_Renhou(t *testing.T) {
 
 func TestState_Apply_Win_RobbingKan(t *testing.T) {
 	s := newStateBeforePromotedKanForTest(t, 10, 0)
-	actor := *seat.MustSeat(1)
-	target := *seat.MustSeat(3)
+	actor := seat.MustSeat(1)
+	target := seat.MustSeat(3)
 	added := tile.MustTileFromCode("E")
 	scores := [common.NumPlayers]int{25000, 57000, 25000, -7000}
 
@@ -142,8 +142,8 @@ func TestState_Apply_Win_RobbingKan(t *testing.T) {
 
 func TestState_Apply_Win_ReturnsErrorDuringRobbingKanWithDifferentWinningTile(t *testing.T) {
 	s := newStateBeforePromotedKanForTest(t, 10, 0)
-	actor := *seat.MustSeat(1)
-	target := *seat.MustSeat(3)
+	actor := seat.MustSeat(1)
+	target := seat.MustSeat(3)
 	added := tile.MustTileFromCode("E")
 	winningTile := tile.MustTileFromCode("S")
 	scores := [common.NumPlayers]int{25000, 57000, 25000, -7000}
@@ -172,7 +172,7 @@ func TestState_Apply_Win_ReturnsErrorDuringRobbingKanWithDifferentWinningTile(t 
 
 func TestState_Apply_Win_TsumoWithoutWinningTile(t *testing.T) {
 	s := mustNewRoundStateForTest(t, newValidHands())
-	actor := *seat.MustSeat(0)
+	actor := seat.MustSeat(0)
 	drawnTile := tile.MustTileFromCode("6m")
 	scores := [common.NumPlayers]int{73000, 9000, 9000, 9000}
 
@@ -203,7 +203,7 @@ func TestState_Apply_Win_InvisibleTsumo(t *testing.T) {
 		}
 	}
 	s := mustNewRoundStateForTest(t, hands)
-	actor := *seat.MustSeat(0)
+	actor := seat.MustSeat(0)
 	unknownDrawnTile := tile.MustTileFromCode("?")
 	winningTile := tile.MustTileFromCode("6m")
 	scores := [common.NumPlayers]int{73000, 9000, 9000, 9000}

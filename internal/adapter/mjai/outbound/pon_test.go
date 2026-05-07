@@ -11,8 +11,8 @@ import (
 
 func TestMarshalMessage_Pon(t *testing.T) {
 	pon, err := action.NewPon(
-		*seat.MustSeat(2),
-		*seat.MustSeat(0),
+		seat.MustSeat(2),
+		seat.MustSeat(0),
 		tile.MustTileFromCode("E"),
 		[2]tile.Tile{tile.MustTileFromCode("E"), tile.MustTileFromCode("E")},
 	)
@@ -35,8 +35,8 @@ func TestMarshalMessage_Pon(t *testing.T) {
 
 func TestMarshalMessage_Pon_Log(t *testing.T) {
 	pon, err := action.NewPon(
-		*seat.MustSeat(2),
-		*seat.MustSeat(0),
+		seat.MustSeat(2),
+		seat.MustSeat(0),
 		tile.MustTileFromCode("E"),
 		[2]tile.Tile{tile.MustTileFromCode("E"), tile.MustTileFromCode("E")},
 	)

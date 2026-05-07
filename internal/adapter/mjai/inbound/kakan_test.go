@@ -14,8 +14,8 @@ func TestParseEvent_Kakan(t *testing.T) {
 	if !ok {
 		t.Fatalf("ParseEvent() = %T, want *event.PromotedKan", got)
 	}
-	if kan.Actor() != *seat.MustSeat(3) {
-		t.Errorf("Actor() = %v, want %v", kan.Actor(), *seat.MustSeat(3))
+	if kan.Actor() != seat.MustSeat(3) {
+		t.Errorf("Actor() = %v, want %v", kan.Actor(), seat.MustSeat(3))
 	}
 	if kan.Added() != tile.MustTileFromCode("8m") {
 		t.Errorf("Added() = %v, want 8m", kan.Added())

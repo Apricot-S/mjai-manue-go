@@ -14,8 +14,8 @@ func TestParseEvent_Ankan(t *testing.T) {
 	if !ok {
 		t.Fatalf("ParseEvent() = %T, want *event.ConcealedKan", got)
 	}
-	if kan.Actor() != *seat.MustSeat(2) {
-		t.Errorf("Actor() = %v, want %v", kan.Actor(), *seat.MustSeat(2))
+	if kan.Actor() != seat.MustSeat(2) {
+		t.Errorf("Actor() = %v, want %v", kan.Actor(), seat.MustSeat(2))
 	}
 	if kan.Consumed() != [4]tile.Tile{tile.MustTileFromCode("3m"), tile.MustTileFromCode("3m"), tile.MustTileFromCode("3m"), tile.MustTileFromCode("3m")} {
 		t.Errorf("Consumed() = %v", kan.Consumed())

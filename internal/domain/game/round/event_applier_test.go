@@ -14,7 +14,7 @@ import (
 func mustNewRoundStateForTest(t *testing.T, hands [common.NumPlayers][common.InitHandSize]tile.Tile) *State {
 	t.Helper()
 
-	validDealer := *seat.MustSeat(0)
+	validDealer := seat.MustSeat(0)
 	validDora := tile.MustTileFromCode("E")
 	validScores := &[common.NumPlayers]int{25000, 25000, 25000, 25000}
 

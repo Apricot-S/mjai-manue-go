@@ -8,7 +8,7 @@ import (
 )
 
 func TestNewRiichi(t *testing.T) {
-	actor := *seat.MustSeat(1)
+	actor := seat.MustSeat(1)
 
 	got := action.NewRiichi(actor)
 

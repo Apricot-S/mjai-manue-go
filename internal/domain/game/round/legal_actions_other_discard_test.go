@@ -14,8 +14,8 @@ import (
 
 func TestState_LegalActions_OnOtherDiscardNoAction(t *testing.T) {
 	s := mustNewRoundStateForTest(t, newValidHands())
-	target := *seat.MustSeat(0)
-	actor := *seat.MustSeat(2)
+	target := seat.MustSeat(0)
+	actor := seat.MustSeat(2)
 	discardedTile := tile.MustTileFromCode("6m")
 	if err := s.Apply(event.NewDraw(target, discardedTile)); err != nil {
 		t.Fatalf("Apply(Draw) failed: %v", err)
@@ -37,8 +37,8 @@ func TestState_LegalActions_OnOtherDiscardIncludesRon(t *testing.T) {
 	hands := newValidHands()
 	hands[1] = ronWithTanyaoHandForLegalActionsTest()
 	s := mustNewRoundStateForTest(t, hands)
-	target := *seat.MustSeat(0)
-	actor := *seat.MustSeat(1)
+	target := seat.MustSeat(0)
+	actor := seat.MustSeat(1)
 	winningTile := tile.MustTileFromCode("3p")
 	if err := s.Apply(event.NewDraw(target, winningTile)); err != nil {
 		t.Fatalf("Apply(Draw) failed: %v", err)
@@ -63,8 +63,8 @@ func TestState_LegalActions_OnOtherDiscardExcludesRonWithoutYaku(t *testing.T) {
 	hands := newValidHands()
 	hands[1] = ronWithoutYakuHandForLegalActionsTest()
 	s := mustNewRoundStateForTest(t, hands)
-	target := *seat.MustSeat(0)
-	actor := *seat.MustSeat(1)
+	target := seat.MustSeat(0)
+	actor := seat.MustSeat(1)
 	winningTile := tile.MustTileFromCode("9s")
 	if err := s.Apply(event.NewDraw(target, winningTile)); err != nil {
 		t.Fatalf("Apply(Draw) failed: %v", err)
@@ -86,8 +86,8 @@ func TestState_LegalActions_OnOtherDiscardIncludesRonLastTile(t *testing.T) {
 	hands := newValidHands()
 	hands[1] = ronWithoutYakuHandForLegalActionsTest()
 	s := mustNewRoundStateForTest(t, hands)
-	target := *seat.MustSeat(0)
-	actor := *seat.MustSeat(1)
+	target := seat.MustSeat(0)
+	actor := seat.MustSeat(1)
 	winningTile := tile.MustTileFromCode("9s")
 	if err := s.Apply(event.NewDraw(target, winningTile)); err != nil {
 		t.Fatalf("Apply(Draw) failed: %v", err)
@@ -108,8 +108,8 @@ func TestState_LegalActions_OnOtherDiscardIncludesRonLastTile(t *testing.T) {
 
 func TestState_LegalActions_OnRobbingKanIncludesRon(t *testing.T) {
 	s := newStateBeforeRobbingKanForLegalActionsTest(t)
-	target := *seat.MustSeat(3)
-	actor := *seat.MustSeat(1)
+	target := seat.MustSeat(3)
+	actor := seat.MustSeat(1)
 	added := tile.MustTileFromCode("E")
 	if err := s.Apply(event.NewPromotedKan(target, added, [3]tile.Tile{added, added, added})); err != nil {
 		t.Fatalf("Apply(PromotedKan) failed: %v", err)
@@ -148,8 +148,8 @@ func ronWithTanyaoHandForLegalActionsTest() [common.InitHandSize]tile.Tile {
 func newStateBeforeRobbingKanForLegalActionsTest(t *testing.T) *State {
 	t.Helper()
 
-	actor := *seat.MustSeat(1)
-	target := *seat.MustSeat(3)
+	actor := seat.MustSeat(1)
+	target := seat.MustSeat(3)
 	players := [common.NumPlayers]player.Player{
 		player.NewInvisiblePlayer(),
 		robbingKanPlayerForLegalActionsTest(t),
@@ -162,8 +162,8 @@ func newStateBeforeRobbingKanForLegalActionsTest(t *testing.T) *State {
 		0,
 		0,
 		[common.NumPlayers]int{25000, 25000, 25000, 25000},
-		*seat.MustSeat(0),
-		*seat.MustSeat(0),
+		seat.MustSeat(0),
+		seat.MustSeat(0),
 		tile.Tiles{tile.MustTileFromCode("E")},
 		10,
 		players,
@@ -200,7 +200,7 @@ func robbingKanPlayerForLegalActionsTest(t *testing.T) player.Player {
 	pon := meld.MustPon(
 		tile.MustTileFromCode("1m"),
 		[2]tile.Tile{tile.MustTileFromCode("1m"), tile.MustTileFromCode("1m")},
-		*seat.MustSeat(0),
+		seat.MustSeat(0),
 	)
 	if err := p.Pon(*pon); err != nil {
 		t.Fatalf("Pon() failed: %v", err)

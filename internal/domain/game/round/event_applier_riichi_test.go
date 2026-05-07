@@ -25,7 +25,7 @@ func TestState_Apply_Riichi(t *testing.T) {
 	hands := newValidHands()
 	hands[0] = riichiReadyHandForTest()
 	s := mustNewRoundStateForTest(t, hands)
-	actor := *seat.MustSeat(0)
+	actor := seat.MustSeat(0)
 
 	if err := s.Apply(event.NewDraw(actor, tile.MustTileFromCode("S"))); err != nil {
 		t.Fatalf("Apply(Draw) failed: %v", err)
@@ -48,13 +48,13 @@ func TestState_Apply_Riichi_ReturnsErrorWithoutNextDrawTurn(t *testing.T) {
 		0,
 		0,
 		[common.NumPlayers]int{25000, 25000, 25000, 25000},
-		*seat.MustSeat(0),
-		*seat.MustSeat(0),
+		seat.MustSeat(0),
+		seat.MustSeat(0),
 		tile.Tiles{tile.MustTileFromCode("E")},
 		common.NumPlayers,
 		newVisiblePlayersForTest(t, hands),
 	)
-	actor := *seat.MustSeat(0)
+	actor := seat.MustSeat(0)
 
 	if err := s.Apply(event.NewDraw(actor, tile.MustTileFromCode("S"))); err != nil {
 		t.Fatalf("Apply(Draw) failed: %v", err)
@@ -76,8 +76,8 @@ func TestState_Apply_Riichi_ReturnsErrorWhenActorIsNotPendingDiscardPlayer(t *te
 	hands := newValidHands()
 	hands[0] = riichiReadyHandForTest()
 	s := mustNewRoundStateForTest(t, hands)
-	drawActor := *seat.MustSeat(0)
-	riichiActor := *seat.MustSeat(1)
+	drawActor := seat.MustSeat(0)
+	riichiActor := seat.MustSeat(1)
 
 	if err := s.Apply(event.NewDraw(drawActor, tile.MustTileFromCode("S"))); err != nil {
 		t.Fatalf("Apply(Draw) failed: %v", err)
@@ -95,8 +95,8 @@ func TestState_Apply_DiscardAfterRiichi_ReturnsErrorWhenActorIsNotPendingDiscard
 	hands := newValidHands()
 	hands[0] = riichiReadyHandForTest()
 	s := mustNewRoundStateForTest(t, hands)
-	drawActor := *seat.MustSeat(0)
-	discardActor := *seat.MustSeat(1)
+	drawActor := seat.MustSeat(0)
+	discardActor := seat.MustSeat(1)
 	drawnTile := tile.MustTileFromCode("S")
 	discardedTile := tile.MustTileFromCode("W")
 
@@ -152,7 +152,7 @@ func TestState_Apply_RiichiAccepted(t *testing.T) {
 			hands := newValidHands()
 			hands[0] = riichiReadyHandForTest()
 			s := mustNewRoundStateForTest(t, hands)
-			actor := *seat.MustSeat(0)
+			actor := seat.MustSeat(0)
 
 			if err := s.Apply(event.NewDraw(actor, tile.MustTileFromCode("S"))); err != nil {
 				t.Fatalf("Apply(Draw) failed: %v", err)
@@ -184,8 +184,8 @@ func TestState_Apply_RiichiAccepted_ReturnsErrorWhenActorIsNotPendingRiichiAccep
 	hands := newValidHands()
 	hands[0] = riichiReadyHandForTest()
 	s := mustNewRoundStateForTest(t, hands)
-	riichiActor := *seat.MustSeat(0)
-	wrongActor := *seat.MustSeat(1)
+	riichiActor := seat.MustSeat(0)
+	wrongActor := seat.MustSeat(1)
 
 	if err := s.Apply(event.NewDraw(riichiActor, tile.MustTileFromCode("S"))); err != nil {
 		t.Fatalf("Apply(Draw) failed: %v", err)
@@ -215,8 +215,8 @@ func TestState_Apply_RiichiAccepted_AfterDeclarationTileCalled(t *testing.T) {
 	hands[3][0] = tile.MustTileFromCode("W")
 	hands[3][1] = tile.MustTileFromCode("W")
 	s := mustNewRoundStateForTest(t, hands)
-	riichiActor := *seat.MustSeat(0)
-	callActor := *seat.MustSeat(3)
+	riichiActor := seat.MustSeat(0)
+	callActor := seat.MustSeat(3)
 	declarationTile := tile.MustTileFromCode("W")
 
 	if err := s.Apply(event.NewDraw(riichiActor, tile.MustTileFromCode("S"))); err != nil {

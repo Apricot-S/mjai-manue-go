@@ -14,11 +14,11 @@ func TestParseEvent_Daiminkan(t *testing.T) {
 	if !ok {
 		t.Fatalf("ParseEvent() = %T, want *event.CalledKan", got)
 	}
-	if kan.Actor() != *seat.MustSeat(1) {
-		t.Errorf("Actor() = %v, want %v", kan.Actor(), *seat.MustSeat(1))
+	if kan.Actor() != seat.MustSeat(1) {
+		t.Errorf("Actor() = %v, want %v", kan.Actor(), seat.MustSeat(1))
 	}
-	if kan.Target() != *seat.MustSeat(3) {
-		t.Errorf("Target() = %v, want %v", kan.Target(), *seat.MustSeat(3))
+	if kan.Target() != seat.MustSeat(3) {
+		t.Errorf("Target() = %v, want %v", kan.Target(), seat.MustSeat(3))
 	}
 	if kan.Taken() != tile.MustTileFromCode("4s") {
 		t.Errorf("Taken() = %v, want 4s", kan.Taken())

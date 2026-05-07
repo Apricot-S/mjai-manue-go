@@ -13,8 +13,8 @@ func TestParseEvent_Reach(t *testing.T) {
 	if !ok {
 		t.Fatalf("ParseEvent() = %T, want *event.Riichi", got)
 	}
-	if reach.Actor() != *seat.MustSeat(2) {
-		t.Errorf("Actor() = %v, want %v", reach.Actor(), *seat.MustSeat(2))
+	if reach.Actor() != seat.MustSeat(2) {
+		t.Errorf("Actor() = %v, want %v", reach.Actor(), seat.MustSeat(2))
 	}
 }
 

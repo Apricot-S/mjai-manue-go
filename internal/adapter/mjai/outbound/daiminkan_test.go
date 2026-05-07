@@ -11,8 +11,8 @@ import (
 
 func TestMarshalMessage_Daiminkan(t *testing.T) {
 	daiminkan, err := action.NewCalledKan(
-		*seat.MustSeat(2),
-		*seat.MustSeat(0),
+		seat.MustSeat(2),
+		seat.MustSeat(0),
 		tile.MustTileFromCode("E"),
 		[3]tile.Tile{
 			tile.MustTileFromCode("E"),
@@ -39,8 +39,8 @@ func TestMarshalMessage_Daiminkan(t *testing.T) {
 
 func TestMarshalMessage_Daiminkan_Log(t *testing.T) {
 	daiminkan, err := action.NewCalledKan(
-		*seat.MustSeat(2),
-		*seat.MustSeat(0),
+		seat.MustSeat(2),
+		seat.MustSeat(0),
 		tile.MustTileFromCode("E"),
 		[3]tile.Tile{
 			tile.MustTileFromCode("E"),

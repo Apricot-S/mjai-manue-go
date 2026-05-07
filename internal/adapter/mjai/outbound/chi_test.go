@@ -11,8 +11,8 @@ import (
 
 func TestMarshalMessage_Chi(t *testing.T) {
 	chii, err := action.NewChii(
-		*seat.MustSeat(1),
-		*seat.MustSeat(0),
+		seat.MustSeat(1),
+		seat.MustSeat(0),
 		tile.MustTileFromCode("3m"),
 		[2]tile.Tile{tile.MustTileFromCode("1m"), tile.MustTileFromCode("2m")},
 	)
@@ -35,8 +35,8 @@ func TestMarshalMessage_Chi(t *testing.T) {
 
 func TestMarshalMessage_Chi_Log(t *testing.T) {
 	chii, err := action.NewChii(
-		*seat.MustSeat(1),
-		*seat.MustSeat(0),
+		seat.MustSeat(1),
+		seat.MustSeat(0),
 		tile.MustTileFromCode("3m"),
 		[2]tile.Tile{tile.MustTileFromCode("1m"), tile.MustTileFromCode("2m")},
 	)

@@ -14,7 +14,7 @@ import (
 
 func TestState_Apply_PromotedKan(t *testing.T) {
 	s := newStateBeforePromotedKanForTest(t, 10, 0)
-	actor := *seat.MustSeat(3)
+	actor := seat.MustSeat(3)
 	added := tile.MustTileFromCode("E")
 
 	if err := s.Apply(event.NewPromotedKan(actor, added, [3]tile.Tile{added, added, added})); err != nil {
@@ -34,7 +34,7 @@ func TestState_Apply_PromotedKan(t *testing.T) {
 
 func TestState_Apply_PromotedKan_ReturnsErrorWhenNoReplacementTileLeft(t *testing.T) {
 	s := newStateBeforePromotedKanForTest(t, 0, 0)
-	actor := *seat.MustSeat(3)
+	actor := seat.MustSeat(3)
 	added := tile.MustTileFromCode("E")
 
 	if err := s.Apply(event.NewPromotedKan(actor, added, [3]tile.Tile{added, added, added})); err == nil {
@@ -48,7 +48,7 @@ func TestState_Apply_PromotedKan_ReturnsErrorWhenNoReplacementTileLeft(t *testin
 
 func TestState_Apply_PromotedKan_ReturnsErrorOnFifthKan(t *testing.T) {
 	s := newStateBeforePromotedKanForTest(t, 10, maxNumKan)
-	actor := *seat.MustSeat(3)
+	actor := seat.MustSeat(3)
 	added := tile.MustTileFromCode("E")
 
 	if err := s.Apply(event.NewPromotedKan(actor, added, [3]tile.Tile{added, added, added})); err == nil {
@@ -62,7 +62,7 @@ func TestState_Apply_PromotedKan_ReturnsErrorOnFifthKan(t *testing.T) {
 
 func TestState_Apply_PromotedKan_ReturnsErrorWhenDiscardFollowsPromotedKan(t *testing.T) {
 	s := newStateBeforePromotedKanForTest(t, 10, 0)
-	actor := *seat.MustSeat(3)
+	actor := seat.MustSeat(3)
 	added := tile.MustTileFromCode("E")
 
 	if err := s.Apply(event.NewPromotedKan(actor, added, [3]tile.Tile{added, added, added})); err != nil {
@@ -75,7 +75,7 @@ func TestState_Apply_PromotedKan_ReturnsErrorWhenDiscardFollowsPromotedKan(t *te
 
 func TestState_Apply_PromotedKan_AllowsDoraAfterReplacementTileDraw(t *testing.T) {
 	s := newStateBeforePromotedKanForTest(t, 10, 0)
-	actor := *seat.MustSeat(3)
+	actor := seat.MustSeat(3)
 	added := tile.MustTileFromCode("E")
 	replacementTile := tile.MustTileFromCode("W")
 	doraIndicator := tile.MustTileFromCode("6p")
@@ -97,7 +97,7 @@ func TestState_Apply_PromotedKan_AllowsDoraAfterReplacementTileDraw(t *testing.T
 
 func TestState_Apply_PromotedKan_AllowsDiscardAfterDoraReveal(t *testing.T) {
 	s := newStateBeforePromotedKanForTest(t, 10, 0)
-	actor := *seat.MustSeat(3)
+	actor := seat.MustSeat(3)
 	added := tile.MustTileFromCode("E")
 	replacementTile := tile.MustTileFromCode("W")
 
@@ -118,7 +118,7 @@ func TestState_Apply_PromotedKan_AllowsDiscardAfterDoraReveal(t *testing.T) {
 func newStateBeforePromotedKanForTest(t *testing.T, numLeftTiles int, numKans int) *State {
 	t.Helper()
 
-	actor := *seat.MustSeat(3)
+	actor := seat.MustSeat(3)
 	p := playerBeforePromotedKanForTest(t)
 	players := [common.NumPlayers]player.Player{
 		player.NewInvisiblePlayer(),
@@ -132,8 +132,8 @@ func newStateBeforePromotedKanForTest(t *testing.T, numLeftTiles int, numKans in
 		0,
 		0,
 		[common.NumPlayers]int{25000, 25000, 25000, 25000},
-		*seat.MustSeat(0),
-		*seat.MustSeat(0),
+		seat.MustSeat(0),
+		seat.MustSeat(0),
 		tile.Tiles{tile.MustTileFromCode("E")},
 		numLeftTiles,
 		players,
@@ -161,7 +161,7 @@ func playerBeforePromotedKanForTest(t *testing.T) player.Player {
 	pon := meld.MustPon(
 		tile.MustTileFromCode("E"),
 		[2]tile.Tile{tile.MustTileFromCode("E"), tile.MustTileFromCode("E")},
-		*seat.MustSeat(0),
+		seat.MustSeat(0),
 	)
 	if err := p.Pon(*pon); err != nil {
 		t.Fatalf("Pon() failed: %v", err)

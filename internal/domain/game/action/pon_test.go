@@ -9,8 +9,8 @@ import (
 )
 
 func TestNewPon(t *testing.T) {
-	actor := *seat.MustSeat(2)
-	target := *seat.MustSeat(0)
+	actor := seat.MustSeat(2)
+	target := seat.MustSeat(0)
 	taken := tile.MustTileFromCode("E")
 	consumed := [2]tile.Tile{tile.MustTileFromCode("E"), tile.MustTileFromCode("E")}
 
@@ -34,8 +34,8 @@ func TestNewPon(t *testing.T) {
 }
 
 func TestNewPon_UnknownTile(t *testing.T) {
-	actor := *seat.MustSeat(2)
-	target := *seat.MustSeat(0)
+	actor := seat.MustSeat(2)
+	target := seat.MustSeat(0)
 	unknown := tile.MustTileFromCode("?")
 	consumed := [2]tile.Tile{tile.MustTileFromCode("E"), tile.MustTileFromCode("E")}
 

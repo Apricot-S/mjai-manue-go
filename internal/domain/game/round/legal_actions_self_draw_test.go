@@ -14,7 +14,7 @@ import (
 
 func TestState_LegalActions_PendingDiscard(t *testing.T) {
 	s := mustNewRoundStateForTest(t, newValidHands())
-	actor := *seat.MustSeat(0)
+	actor := seat.MustSeat(0)
 	drawnTile := tile.MustTileFromCode("E")
 	if err := s.Apply(event.NewDraw(actor, drawnTile)); err != nil {
 		t.Fatalf("Apply(Draw) failed: %v", err)
@@ -70,7 +70,7 @@ func TestState_LegalActions_IncludesRiichi(t *testing.T) {
 	hands := newValidHands()
 	hands[0] = riichiReadyHandForTest()
 	s := mustNewRoundStateForTest(t, hands)
-	actor := *seat.MustSeat(0)
+	actor := seat.MustSeat(0)
 	if err := s.Apply(event.NewDraw(actor, tile.MustTileFromCode("S"))); err != nil {
 		t.Fatalf("Apply(Draw) failed: %v", err)
 	}
@@ -94,7 +94,7 @@ func TestState_LegalActions_ExcludesRiichi(t *testing.T) {
 			setup: func(t *testing.T) (*State, seat.Seat) {
 				t.Helper()
 				s := mustNewRoundStateForTest(t, newValidHands())
-				actor := *seat.MustSeat(0)
+				actor := seat.MustSeat(0)
 				if err := s.Apply(event.NewDraw(actor, tile.MustTileFromCode("E"))); err != nil {
 					t.Fatalf("Apply(Draw) failed: %v", err)
 				}
@@ -108,7 +108,7 @@ func TestState_LegalActions_ExcludesRiichi(t *testing.T) {
 				hands := newValidHands()
 				hands[0] = riichiReadyHandForTest()
 				s := mustNewRoundStateForTest(t, hands)
-				actor := *seat.MustSeat(0)
+				actor := seat.MustSeat(0)
 				if err := s.Apply(event.NewDraw(actor, tile.MustTileFromCode("S"))); err != nil {
 					t.Fatalf("Apply(Draw) failed: %v", err)
 				}
@@ -123,7 +123,7 @@ func TestState_LegalActions_ExcludesRiichi(t *testing.T) {
 				hands := newValidHands()
 				hands[1] = openChiiHandForLegalActionsTest()
 				s := mustNewRoundStateForTest(t, hands)
-				return stateAfterChiiForLegalActionsTest(t, s), *seat.MustSeat(1)
+				return stateAfterChiiForLegalActionsTest(t, s), seat.MustSeat(1)
 			},
 		},
 	}
@@ -146,7 +146,7 @@ func TestState_LegalActions_IncludesKyushukyuhai(t *testing.T) {
 	hands := newValidHands()
 	hands[0] = kyushukyuhaiHandForTest()
 	s := mustNewRoundStateForTest(t, hands)
-	actor := *seat.MustSeat(0)
+	actor := seat.MustSeat(0)
 	if err := s.Apply(event.NewDraw(actor, tile.MustTileFromCode("W"))); err != nil {
 		t.Fatalf("Apply(Draw) failed: %v", err)
 	}
@@ -164,7 +164,7 @@ func TestState_LegalActions_ExcludesKyushukyuhaiAfterFirstDiscard(t *testing.T) 
 	hands := newValidHands()
 	hands[0] = kyushukyuhaiHandForTest()
 	s := mustNewRoundStateForTest(t, hands)
-	actor := *seat.MustSeat(0)
+	actor := seat.MustSeat(0)
 	firstDraw := tile.MustTileFromCode("W")
 	if err := s.Apply(event.NewDraw(actor, firstDraw)); err != nil {
 		t.Fatalf("Apply(first Draw) failed: %v", err)
@@ -173,7 +173,7 @@ func TestState_LegalActions_ExcludesKyushukyuhaiAfterFirstDiscard(t *testing.T) 
 		t.Fatalf("Apply(first Discard) failed: %v", err)
 	}
 	for i := 1; i < 4; i++ {
-		other := *seat.MustSeat(i)
+		other := seat.MustSeat(i)
 		drawnTile := tile.MustTileFromCode("6m")
 		if err := s.Apply(event.NewDraw(other, drawnTile)); err != nil {
 			t.Fatalf("Apply(other Draw %d) failed: %v", i, err)
@@ -202,7 +202,7 @@ func TestState_LegalActions_ExcludesKyushukyuhaiForOtherPlayersAfterConcealedKan
 		hands[i] = kyushukyuhaiHandForTest()
 	}
 	s := mustNewRoundStateForTest(t, hands)
-	kanActor := *seat.MustSeat(0)
+	kanActor := seat.MustSeat(0)
 	kanTile := tile.MustTileFromCode("E")
 	if err := s.Apply(event.NewDraw(kanActor, kanTile)); err != nil {
 		t.Fatalf("Apply(Draw) failed: %v", err)
@@ -221,7 +221,7 @@ func TestState_LegalActions_ExcludesKyushukyuhaiForOtherPlayersAfterConcealedKan
 	}
 
 	for i := 1; i < common.NumPlayers; i++ {
-		actor := *seat.MustSeat(i)
+		actor := seat.MustSeat(i)
 		if err := s.Apply(event.NewDraw(actor, tile.MustTileFromCode("W"))); err != nil {
 			t.Fatalf("Apply(Draw %d) failed: %v", i, err)
 		}
@@ -242,7 +242,7 @@ func TestState_LegalActions_IncludesTsumoWin(t *testing.T) {
 	hands := newValidHands()
 	hands[0] = menzenTsumoHandForLegalActionsTest()
 	s := mustNewRoundStateForTest(t, hands)
-	actor := *seat.MustSeat(0)
+	actor := seat.MustSeat(0)
 	winningTile := tile.MustTileFromCode("9s")
 	if err := s.Apply(event.NewDraw(actor, winningTile)); err != nil {
 		t.Fatalf("Apply(Draw) failed: %v", err)
@@ -258,7 +258,7 @@ func TestState_LegalActions_IncludesTsumoWin(t *testing.T) {
 }
 
 func TestState_LegalActions_ExcludesTsumoWinWithoutYaku(t *testing.T) {
-	actor := *seat.MustSeat(0)
+	actor := seat.MustSeat(0)
 	s := newStateWithOpenNoYakuTsumoForLegalActionsTest(t, 10, false)
 
 	got, err := s.LegalActions(actor)
@@ -271,7 +271,7 @@ func TestState_LegalActions_ExcludesTsumoWinWithoutYaku(t *testing.T) {
 }
 
 func TestState_LegalActions_IncludesTsumoWinAfterAKan(t *testing.T) {
-	actor := *seat.MustSeat(0)
+	actor := seat.MustSeat(0)
 	s := newStateWithOpenNoYakuTsumoForLegalActionsTest(t, 10, true)
 
 	got, err := s.LegalActions(actor)
@@ -284,7 +284,7 @@ func TestState_LegalActions_IncludesTsumoWinAfterAKan(t *testing.T) {
 }
 
 func TestState_LegalActions_IncludesTsumoWinLastTile(t *testing.T) {
-	actor := *seat.MustSeat(0)
+	actor := seat.MustSeat(0)
 	s := newStateWithOpenNoYakuTsumoForLegalActionsTest(t, 0, false)
 
 	got, err := s.LegalActions(actor)
@@ -298,7 +298,7 @@ func TestState_LegalActions_IncludesTsumoWinLastTile(t *testing.T) {
 
 func TestState_LegalActions_IncludesPromotedKan(t *testing.T) {
 	s := newStateBeforePromotedKanForTest(t, 10, 0)
-	actor := *seat.MustSeat(3)
+	actor := seat.MustSeat(3)
 
 	got, err := s.LegalActions(actor)
 	if err != nil {
@@ -318,7 +318,7 @@ func TestState_LegalActions_ExcludesPromotedKan(t *testing.T) {
 		{name: "fifth kan", s: newStateBeforePromotedKanForTest(t, 10, maxNumKan)},
 	}
 
-	actor := *seat.MustSeat(3)
+	actor := seat.MustSeat(3)
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			got, err := tt.s.LegalActions(actor)
@@ -336,7 +336,7 @@ func TestState_LegalActions_IncludesConcealedKan(t *testing.T) {
 	hands := newValidHands()
 	hands[0] = concealedKanHandForTest()
 	s := mustNewRoundStateForTest(t, hands)
-	actor := *seat.MustSeat(0)
+	actor := seat.MustSeat(0)
 	kanTile := tile.MustTileFromCode("E")
 	if err := s.Apply(event.NewDraw(actor, kanTile)); err != nil {
 		t.Fatalf("Apply(Draw) failed: %v", err)
@@ -360,7 +360,7 @@ func TestState_LegalActions_ExcludesConcealedKan(t *testing.T) {
 		{name: "fifth kan", s: newStateBeforeConcealedKanForLegalActionsTest(t, 10, maxNumKan)},
 	}
 
-	actor := *seat.MustSeat(0)
+	actor := seat.MustSeat(0)
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			got, err := tt.s.LegalActions(actor)
@@ -376,7 +376,7 @@ func TestState_LegalActions_ExcludesConcealedKan(t *testing.T) {
 
 func TestState_LegalActions_AfterRiichiAcceptedIncludesConcealedKanWhenWaitsDoNotChange(t *testing.T) {
 	s := newRiichiAcceptedStateBeforeConcealedKanForTest(t)
-	actor := *seat.MustSeat(0)
+	actor := seat.MustSeat(0)
 	kanTile := tile.MustTileFromCode("1m")
 	if err := s.Apply(event.NewDraw(actor, kanTile)); err != nil {
 		t.Fatalf("Apply(Draw) failed: %v", err)
@@ -393,7 +393,7 @@ func TestState_LegalActions_AfterRiichiAcceptedIncludesConcealedKanWhenWaitsDoNo
 
 func TestState_LegalActions_AfterRiichiAcceptedIncludesConcealedKanWhenOnlyWinningFormChanges(t *testing.T) {
 	s := newRiichiAcceptedStateBeforeConcealedKanChangingOnlyWinningFormForTest(t)
-	actor := *seat.MustSeat(0)
+	actor := seat.MustSeat(0)
 	kanTile := tile.MustTileFromCode("2m")
 	if err := s.Apply(event.NewDraw(actor, kanTile)); err != nil {
 		t.Fatalf("Apply(Draw) failed: %v", err)
@@ -463,7 +463,7 @@ func TestState_LegalActions_AfterRiichiAcceptedAllowsOnlyTsumogiri(t *testing.T)
 	hands := newValidHands()
 	hands[0] = riichiReadyHandForTest()
 	s := mustNewRoundStateForTest(t, hands)
-	actor := *seat.MustSeat(0)
+	actor := seat.MustSeat(0)
 	firstDraw := tile.MustTileFromCode("S")
 	firstDiscard := tile.MustTileFromCode("W")
 	if err := s.Apply(event.NewDraw(actor, firstDraw)); err != nil {
@@ -480,7 +480,7 @@ func TestState_LegalActions_AfterRiichiAcceptedAllowsOnlyTsumogiri(t *testing.T)
 	}
 
 	for i := 1; i < 4; i++ {
-		other := *seat.MustSeat(i)
+		other := seat.MustSeat(i)
 		drawnTile := tile.MustTileFromCode("6m")
 		if err := s.Apply(event.NewDraw(other, drawnTile)); err != nil {
 			t.Fatalf("Apply(other Draw %d) failed: %v", i, err)
@@ -518,7 +518,7 @@ func TestState_LegalActions_RiichiDeclarationTileKeepsTenpai(t *testing.T) {
 	hands := newValidHands()
 	hands[0] = riichiReadyHandForTest()
 	s := mustNewRoundStateForTest(t, hands)
-	actor := *seat.MustSeat(0)
+	actor := seat.MustSeat(0)
 	if err := s.Apply(event.NewDraw(actor, tile.MustTileFromCode("S"))); err != nil {
 		t.Fatalf("Apply(Draw) failed: %v", err)
 	}
@@ -542,7 +542,7 @@ func TestState_LegalActions_AfterChiiExcludesSwapCallTiles(t *testing.T) {
 	hands := newValidHands()
 	hands[1] = openChiiHandForLegalActionsTest()
 	s := mustNewRoundStateForTest(t, hands)
-	actor := *seat.MustSeat(1)
+	actor := seat.MustSeat(1)
 	s = stateAfterChiiForLegalActionsTest(t, s)
 
 	got, err := s.LegalActions(actor)

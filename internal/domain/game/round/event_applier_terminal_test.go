@@ -10,15 +10,15 @@ import (
 )
 
 func TestState_Apply_AfterWinAllowsOnlyAdditionalWins(t *testing.T) {
-	s := newStateAfterRonForTerminalTest(t, *seat.MustSeat(1))
-	target := *seat.MustSeat(0)
+	s := newStateAfterRonForTerminalTest(t, seat.MustSeat(1))
+	target := seat.MustSeat(0)
 	winningTile := tile.MustTileFromCode("6m")
 
-	if err := s.Apply(event.NewDraw(*seat.MustSeat(2), tile.MustTileFromCode("7m"))); err == nil {
+	if err := s.Apply(event.NewDraw(seat.MustSeat(2), tile.MustTileFromCode("7m"))); err == nil {
 		t.Fatal("Apply(Draw) after Win succeeded unexpectedly")
 	}
 	if err := s.Apply(event.NewWin(
-		*seat.MustSeat(2),
+		seat.MustSeat(2),
 		target,
 		&winningTile,
 		8000,
@@ -35,12 +35,12 @@ func TestState_Apply_AfterDrawRoundReturnsError(t *testing.T) {
 		t.Fatalf("Apply(DrawRound) failed: %v", err)
 	}
 
-	if err := s.Apply(event.NewDraw(*seat.MustSeat(0), tile.MustTileFromCode("6m"))); err == nil {
+	if err := s.Apply(event.NewDraw(seat.MustSeat(0), tile.MustTileFromCode("6m"))); err == nil {
 		t.Fatal("Apply(Draw) after DrawRound succeeded unexpectedly")
 	}
 	if err := s.Apply(event.NewWin(
-		*seat.MustSeat(1),
-		*seat.MustSeat(0),
+		seat.MustSeat(1),
+		seat.MustSeat(0),
 		new(tile.MustTileFromCode("6m")),
 		8000,
 		nil,
@@ -57,7 +57,7 @@ func TestState_LegalActions_AfterTerminalEventIsEmpty(t *testing.T) {
 	}{
 		{
 			name: "win",
-			s:    newStateAfterRonForTerminalTest(t, *seat.MustSeat(1)),
+			s:    newStateAfterRonForTerminalTest(t, seat.MustSeat(1)),
 		},
 		{
 			name: "draw round",
@@ -73,7 +73,7 @@ func TestState_LegalActions_AfterTerminalEventIsEmpty(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := tt.s.LegalActions(*seat.MustSeat(0))
+			got, err := tt.s.LegalActions(seat.MustSeat(0))
 			if err != nil {
 				t.Fatalf("LegalActions() failed: %v", err)
 			}
@@ -88,7 +88,7 @@ func newStateAfterRonForTerminalTest(t *testing.T, winActor seat.Seat) *State {
 	t.Helper()
 
 	s := mustNewRoundStateForTest(t, newValidHands())
-	target := *seat.MustSeat(0)
+	target := seat.MustSeat(0)
 	winningTile := tile.MustTileFromCode("6m")
 	if err := s.Apply(event.NewDraw(target, winningTile)); err != nil {
 		t.Fatalf("Apply(Draw) failed: %v", err)

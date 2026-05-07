@@ -9,8 +9,8 @@ import (
 )
 
 func TestNewWin(t *testing.T) {
-	actor := *seat.MustSeat(1)
-	target := *seat.MustSeat(0)
+	actor := seat.MustSeat(1)
+	target := seat.MustSeat(0)
 	winningTile := tile.MustTileFromCode("5mr")
 
 	got, err := action.NewWin(actor, target, winningTile)
@@ -30,8 +30,8 @@ func TestNewWin(t *testing.T) {
 }
 
 func TestNewWin_UnknownTile(t *testing.T) {
-	actor := *seat.MustSeat(1)
-	target := *seat.MustSeat(0)
+	actor := seat.MustSeat(1)
+	target := seat.MustSeat(0)
 	unknown := tile.MustTileFromCode("?")
 
 	tests := []struct {

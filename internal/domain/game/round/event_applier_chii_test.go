@@ -12,8 +12,8 @@ import (
 
 func TestState_Apply_Chii(t *testing.T) {
 	s := mustNewRoundStateForTest(t, newValidHands())
-	actor := *seat.MustSeat(1)
-	target := *seat.MustSeat(0)
+	actor := seat.MustSeat(1)
+	target := seat.MustSeat(0)
 	taken := tile.MustTileFromCode("4m")
 	consumed := [2]tile.Tile{tile.MustTileFromCode("2m"), tile.MustTileFromCode("3m")}
 
@@ -47,7 +47,7 @@ func TestState_Apply_Chii(t *testing.T) {
 
 func TestState_Apply_Chii_ReturnsErrorWhenActorAndTargetAreSame(t *testing.T) {
 	s := mustNewRoundStateForTest(t, newValidHands())
-	actor := *seat.MustSeat(0)
+	actor := seat.MustSeat(0)
 	taken := tile.MustTileFromCode("4m")
 	consumed := [2]tile.Tile{tile.MustTileFromCode("2m"), tile.MustTileFromCode("3m")}
 
@@ -78,14 +78,14 @@ func TestState_Apply_Chii_ReturnsErrorForLastDiscard(t *testing.T) {
 		0,
 		0,
 		[common.NumPlayers]int{25000, 25000, 25000, 25000},
-		*seat.MustSeat(0),
-		*seat.MustSeat(0),
+		seat.MustSeat(0),
+		seat.MustSeat(0),
 		tile.Tiles{tile.MustTileFromCode("E")},
 		1,
 		players,
 	)
-	actor := *seat.MustSeat(1)
-	target := *seat.MustSeat(0)
+	actor := seat.MustSeat(1)
+	target := seat.MustSeat(0)
 	taken := tile.MustTileFromCode("4m")
 	consumed := [2]tile.Tile{tile.MustTileFromCode("2m"), tile.MustTileFromCode("3m")}
 
@@ -113,8 +113,8 @@ func TestState_Apply_Chii_ReturnsErrorForLastDiscard(t *testing.T) {
 
 func TestState_Apply_Chii_ReturnsErrorWhenActorIsNotShimochaOfTarget(t *testing.T) {
 	s := mustNewRoundStateForTest(t, newValidHands())
-	actor := *seat.MustSeat(2)
-	target := *seat.MustSeat(0)
+	actor := seat.MustSeat(2)
+	target := seat.MustSeat(0)
 	taken := tile.MustTileFromCode("4m")
 	consumed := [2]tile.Tile{tile.MustTileFromCode("2m"), tile.MustTileFromCode("3m")}
 

@@ -14,11 +14,11 @@ func TestParseEvent_Chi(t *testing.T) {
 	if !ok {
 		t.Fatalf("ParseEvent() = %T, want *event.Chii", got)
 	}
-	if chii.Actor() != *seat.MustSeat(0) {
-		t.Errorf("Actor() = %v, want %v", chii.Actor(), *seat.MustSeat(0))
+	if chii.Actor() != seat.MustSeat(0) {
+		t.Errorf("Actor() = %v, want %v", chii.Actor(), seat.MustSeat(0))
 	}
-	if chii.Target() != *seat.MustSeat(3) {
-		t.Errorf("Target() = %v, want %v", chii.Target(), *seat.MustSeat(3))
+	if chii.Target() != seat.MustSeat(3) {
+		t.Errorf("Target() = %v, want %v", chii.Target(), seat.MustSeat(3))
 	}
 	if chii.Taken() != tile.MustTileFromCode("4s") {
 		t.Errorf("Taken() = %v, want 4s", chii.Taken())

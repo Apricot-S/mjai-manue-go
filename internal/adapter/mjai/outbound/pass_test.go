@@ -9,7 +9,7 @@ import (
 )
 
 func TestMarshalMessage_Pass(t *testing.T) {
-	msg, err := outbound.ToMessage(action.NewPass(*seat.MustSeat(2)), "")
+	msg, err := outbound.ToMessage(action.NewPass(seat.MustSeat(2)), "")
 	if err != nil {
 		t.Fatalf("ToMessage() failed: %v", err)
 	}
@@ -24,7 +24,7 @@ func TestMarshalMessage_Pass(t *testing.T) {
 }
 
 func TestMarshalMessage_Pass_Log(t *testing.T) {
-	msg, err := outbound.ToMessage(action.NewPass(*seat.MustSeat(2)), "decline call")
+	msg, err := outbound.ToMessage(action.NewPass(seat.MustSeat(2)), "decline call")
 	if err != nil {
 		t.Fatalf("ToMessage() failed: %v", err)
 	}
@@ -39,7 +39,7 @@ func TestMarshalMessage_Pass_Log(t *testing.T) {
 }
 
 func TestToMessage_Pass(t *testing.T) {
-	msg, err := outbound.ToMessage(action.NewPass(*seat.MustSeat(1)), "")
+	msg, err := outbound.ToMessage(action.NewPass(seat.MustSeat(1)), "")
 	if err != nil {
 		t.Fatalf("ToMessage() failed: %v", err)
 	}

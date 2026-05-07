@@ -14,11 +14,11 @@ func TestParseEvent_Hora(t *testing.T) {
 	if !ok {
 		t.Fatalf("ParseEvent() = %T, want *event.Win", got)
 	}
-	if win.Actor() != *seat.MustSeat(2) {
-		t.Errorf("Actor() = %v, want %v", win.Actor(), *seat.MustSeat(2))
+	if win.Actor() != seat.MustSeat(2) {
+		t.Errorf("Actor() = %v, want %v", win.Actor(), seat.MustSeat(2))
 	}
-	if win.Target() != *seat.MustSeat(3) {
-		t.Errorf("Target() = %v, want %v", win.Target(), *seat.MustSeat(3))
+	if win.Target() != seat.MustSeat(3) {
+		t.Errorf("Target() = %v, want %v", win.Target(), seat.MustSeat(3))
 	}
 	if win.WinningTile() == nil || *win.WinningTile() != tile.MustTileFromCode("9m") {
 		t.Errorf("WinningTile() = %v, want 9m", win.WinningTile())

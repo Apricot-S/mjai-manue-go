@@ -94,7 +94,7 @@ func NewState(ev *event.StartRound, previousScores [common.NumPlayers]int) (*Sta
 	s.honba = honba
 	s.riichiDeposit = riichiDeposit
 	s.dealer = dealer
-	s.startingDealer = *seat.MustSeat(0)
+	s.startingDealer = seat.MustSeat(0)
 	s.doraIndicators = make(tile.Tiles, 0, MaxNumDoraIndicators)
 	s.doraIndicators = append(s.doraIndicators, doraIndicator)
 	s.numLeftTiles = NumInitWall

@@ -63,8 +63,8 @@ func TestParseEvent_ReachAccepted(t *testing.T) {
 			if !ok {
 				t.Fatalf("ParseEvent() = %T, want *event.RiichiAccepted", got)
 			}
-			if accepted.Actor() != *seat.MustSeat(1) {
-				t.Errorf("Actor() = %v, want %v", accepted.Actor(), *seat.MustSeat(1))
+			if accepted.Actor() != seat.MustSeat(1) {
+				t.Errorf("Actor() = %v, want %v", accepted.Actor(), seat.MustSeat(1))
 			}
 			if got, want := accepted.Deltas(), tt.wantDeltas; (got == nil) != (want == nil) || got != nil && *got != *want {
 				t.Errorf("Deltas() = %v, want %v", got, want)

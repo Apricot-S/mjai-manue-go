@@ -11,7 +11,7 @@ import (
 
 func TestMarshalMessage_Ankan(t *testing.T) {
 	ankan, err := action.NewConcealedKan(
-		*seat.MustSeat(1),
+		seat.MustSeat(1),
 		[4]tile.Tile{
 			tile.MustTileFromCode("5m"),
 			tile.MustTileFromCode("5m"),
@@ -38,7 +38,7 @@ func TestMarshalMessage_Ankan(t *testing.T) {
 
 func TestMarshalMessage_Ankan_Log(t *testing.T) {
 	ankan, err := action.NewConcealedKan(
-		*seat.MustSeat(1),
+		seat.MustSeat(1),
 		[4]tile.Tile{
 			tile.MustTileFromCode("5m"),
 			tile.MustTileFromCode("5m"),

@@ -11,7 +11,7 @@ import (
 
 func TestState_Apply_Discard(t *testing.T) {
 	s := mustNewRoundStateForTest(t, newValidHands())
-	actor := *seat.MustSeat(0)
+	actor := seat.MustSeat(0)
 	discardedTile := tile.MustTileFromCode("6m")
 
 	if err := s.Apply(event.NewDraw(actor, discardedTile)); err != nil {
@@ -42,8 +42,8 @@ func TestState_Apply_Discard(t *testing.T) {
 
 func TestState_Apply_Discard_ReturnsErrorWhenActorIsNotPendingDiscardPlayer(t *testing.T) {
 	s := mustNewRoundStateForTest(t, newValidHands())
-	drawActor := *seat.MustSeat(0)
-	discardActor := *seat.MustSeat(1)
+	drawActor := seat.MustSeat(0)
+	discardActor := seat.MustSeat(1)
 	drawnTile := tile.MustTileFromCode("6m")
 
 	if err := s.Apply(event.NewDraw(drawActor, drawnTile)); err != nil {
@@ -72,8 +72,8 @@ func TestState_Apply_Discard_ReturnsErrorForSwapCallTileAfterPon(t *testing.T) {
 		tile.MustTileFromCode("W"),
 	}
 	s := mustNewRoundStateForTest(t, hands)
-	actor := *seat.MustSeat(3)
-	target := *seat.MustSeat(0)
+	actor := seat.MustSeat(3)
+	target := seat.MustSeat(0)
 	taken := tile.MustTileFromCode("5p")
 	swapCallTile := tile.MustTileFromCode("5pr")
 

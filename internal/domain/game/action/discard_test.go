@@ -9,7 +9,7 @@ import (
 )
 
 func TestNewDiscard(t *testing.T) {
-	actor := *seat.MustSeat(1)
+	actor := seat.MustSeat(1)
 	discardedTile := tile.MustTileFromCode("5mr")
 
 	got, err := action.NewDiscard(actor, discardedTile, true)
@@ -29,7 +29,7 @@ func TestNewDiscard(t *testing.T) {
 }
 
 func TestNewDiscard_UnknownTile(t *testing.T) {
-	actor := *seat.MustSeat(1)
+	actor := seat.MustSeat(1)
 	unknownTile := tile.MustTileFromCode("?")
 
 	tests := []struct {

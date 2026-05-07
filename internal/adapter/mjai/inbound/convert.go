@@ -13,7 +13,7 @@ func parseSeatField(name string, value int) (*seat.Seat, error) {
 	if err != nil {
 		return nil, fmt.Errorf("invalid %s: %w", name, err)
 	}
-	return s, nil
+	return &s, nil
 }
 
 func parseTileField(name string, value string) (*tile.Tile, error) {

@@ -13,7 +13,7 @@ import (
 
 func TestState_Apply_Draw(t *testing.T) {
 	s := mustNewRoundStateForTest(t, newValidHands())
-	actor := *seat.MustSeat(0)
+	actor := seat.MustSeat(0)
 	drawnTile := tile.MustTileFromCode("6m")
 
 	before := s.NumLeftTiles()
@@ -32,7 +32,7 @@ func TestState_Apply_Draw(t *testing.T) {
 	}
 
 	for i := 1; i < common.NumPlayers; i++ {
-		playerSeat := *seat.MustSeat(i)
+		playerSeat := seat.MustSeat(i)
 		if got := s.Player(playerSeat).DrawnTile(); got != nil {
 			t.Errorf("player %d DrawnTile() = %v, want nil", i, got)
 		}
@@ -41,7 +41,7 @@ func TestState_Apply_Draw(t *testing.T) {
 
 func TestState_Apply_Draw_ReturnsErrorWhenActorIsNotDealerAtRoundStart(t *testing.T) {
 	s := mustNewRoundStateForTest(t, newValidHands())
-	actor := *seat.MustSeat(1)
+	actor := seat.MustSeat(1)
 	drawnTile := tile.MustTileFromCode("6m")
 
 	if err := s.Apply(event.NewDraw(actor, drawnTile)); err == nil {
@@ -67,8 +67,8 @@ func TestState_Apply_Draw_ReturnsErrorWhenNoTilesLeft(t *testing.T) {
 		0,
 		0,
 		[common.NumPlayers]int{25000, 25000, 25000, 25000},
-		*seat.MustSeat(0),
-		*seat.MustSeat(0),
+		seat.MustSeat(0),
+		seat.MustSeat(0),
 		tile.Tiles{tile.MustTileFromCode("E")},
 		0,
 		[common.NumPlayers]player.Player{
@@ -78,7 +78,7 @@ func TestState_Apply_Draw_ReturnsErrorWhenNoTilesLeft(t *testing.T) {
 			player.NewInvisiblePlayer(),
 		},
 	)
-	actor := *seat.MustSeat(0)
+	actor := seat.MustSeat(0)
 	drawnTile := tile.MustTileFromCode("6m")
 
 	if err := s.Apply(event.NewDraw(actor, drawnTile)); err == nil {

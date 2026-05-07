@@ -30,7 +30,7 @@ func mustNewStartRoundForTest(t *testing.T, hands [common.NumPlayers][common.Ini
 		1,
 		0,
 		0,
-		*seat.MustSeat(0),
+		seat.MustSeat(0),
 		tile.MustTileFromCode("E"),
 		&[common.NumPlayers]int{25000, 25000, 25000, 25000},
 		hands,

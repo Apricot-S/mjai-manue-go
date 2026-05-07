@@ -9,7 +9,7 @@ import (
 )
 
 func TestMarshalMessage_Reach(t *testing.T) {
-	msg, err := outbound.ToMessage(action.NewRiichi(*seat.MustSeat(1)), "")
+	msg, err := outbound.ToMessage(action.NewRiichi(seat.MustSeat(1)), "")
 	if err != nil {
 		t.Fatalf("ToMessage() failed: %v", err)
 	}
@@ -24,7 +24,7 @@ func TestMarshalMessage_Reach(t *testing.T) {
 }
 
 func TestMarshalMessage_Reach_Log(t *testing.T) {
-	msg, err := outbound.ToMessage(action.NewRiichi(*seat.MustSeat(1)), "declare riichi")
+	msg, err := outbound.ToMessage(action.NewRiichi(seat.MustSeat(1)), "declare riichi")
 	if err != nil {
 		t.Fatalf("ToMessage() failed: %v", err)
 	}
@@ -39,7 +39,7 @@ func TestMarshalMessage_Reach_Log(t *testing.T) {
 }
 
 func TestToMessage_Reach(t *testing.T) {
-	msg, err := outbound.ToMessage(action.NewRiichi(*seat.MustSeat(2)), "")
+	msg, err := outbound.ToMessage(action.NewRiichi(seat.MustSeat(2)), "")
 	if err != nil {
 		t.Fatalf("ToMessage() failed: %v", err)
 	}

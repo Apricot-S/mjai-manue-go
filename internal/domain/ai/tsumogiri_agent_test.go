@@ -14,7 +14,7 @@ import (
 )
 
 func TestTsumogiriAgent_Decide(t *testing.T) {
-	self := *seat.MustSeat(0)
+	self := seat.MustSeat(0)
 	drawnTile := tile.MustTileFromCode("6m")
 	roundState := mustNewRoundStateForTest(t, newValidHands())
 	if err := roundState.Apply(event.NewDraw(self, drawnTile)); err != nil {
@@ -44,7 +44,7 @@ func TestTsumogiriAgent_Decide(t *testing.T) {
 }
 
 func TestTsumogiriAgent_Decide_NoLegalActions(t *testing.T) {
-	self := *seat.MustSeat(0)
+	self := seat.MustSeat(0)
 	roundState := mustNewRoundStateForTest(t, newValidHands())
 
 	if _, err := ai.NewTsumogiriAgent().Decide(ai.Request{
@@ -63,7 +63,7 @@ func mustNewRoundStateForTest(t *testing.T, hands [common.NumPlayers][common.Ini
 		1,
 		0,
 		0,
-		*seat.MustSeat(0),
+		seat.MustSeat(0),
 		tile.MustTileFromCode("E"),
 		&[common.NumPlayers]int{25000, 25000, 25000, 25000},
 		hands,

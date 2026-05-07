@@ -25,7 +25,7 @@ func (s *State) RenderBoard() string {
 	b.WriteByte('\n')
 
 	for i := range common.NumPlayers {
-		playerSeat := *seat.MustSeat(i)
+		playerSeat := seat.MustSeat(i)
 		p := s.Player(playerSeat)
 
 		actorMarker := " "

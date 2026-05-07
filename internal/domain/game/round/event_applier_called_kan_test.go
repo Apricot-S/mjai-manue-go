@@ -24,8 +24,8 @@ func calledKanHandsForTest() [common.NumPlayers][common.InitHandSize]tile.Tile {
 
 func TestState_Apply_CalledKan(t *testing.T) {
 	s := mustNewRoundStateForTest(t, calledKanHandsForTest())
-	actor := *seat.MustSeat(3)
-	target := *seat.MustSeat(0)
+	actor := seat.MustSeat(3)
+	target := seat.MustSeat(0)
 	taken := tile.MustTileFromCode("E")
 	consumed := [3]tile.Tile{taken, taken, taken}
 
@@ -59,7 +59,7 @@ func TestState_Apply_CalledKan(t *testing.T) {
 
 func TestState_Apply_CalledKan_ReturnsErrorWhenActorAndTargetAreSame(t *testing.T) {
 	s := mustNewRoundStateForTest(t, calledKanHandsForTest())
-	actor := *seat.MustSeat(0)
+	actor := seat.MustSeat(0)
 	taken := tile.MustTileFromCode("E")
 	consumed := [3]tile.Tile{taken, taken, taken}
 
@@ -90,14 +90,14 @@ func TestState_Apply_CalledKan_ReturnsErrorForLastDiscard(t *testing.T) {
 		0,
 		0,
 		[common.NumPlayers]int{25000, 25000, 25000, 25000},
-		*seat.MustSeat(0),
-		*seat.MustSeat(0),
+		seat.MustSeat(0),
+		seat.MustSeat(0),
 		tile.Tiles{tile.MustTileFromCode("E")},
 		1,
 		players,
 	)
-	actor := *seat.MustSeat(3)
-	target := *seat.MustSeat(0)
+	actor := seat.MustSeat(3)
+	target := seat.MustSeat(0)
 	taken := tile.MustTileFromCode("E")
 	consumed := [3]tile.Tile{taken, taken, taken}
 
@@ -125,8 +125,8 @@ func TestState_Apply_CalledKan_ReturnsErrorForLastDiscard(t *testing.T) {
 
 func TestState_Apply_CalledKan_ReturnsErrorOnFifthKan(t *testing.T) {
 	s := newStateForTestWithNumKans(mustNewRoundStateForTest(t, calledKanHandsForTest()), maxNumKan)
-	actor := *seat.MustSeat(3)
-	target := *seat.MustSeat(0)
+	actor := seat.MustSeat(3)
+	target := seat.MustSeat(0)
 	taken := tile.MustTileFromCode("E")
 	consumed := [3]tile.Tile{taken, taken, taken}
 
@@ -151,8 +151,8 @@ func TestState_Apply_CalledKan_ReturnsErrorOnFifthKan(t *testing.T) {
 
 func TestState_Apply_CalledKan_ReturnsErrorWhenDiscardFollowsCalledKan(t *testing.T) {
 	s := mustNewRoundStateForTest(t, calledKanHandsForTest())
-	actor := *seat.MustSeat(3)
-	target := *seat.MustSeat(0)
+	actor := seat.MustSeat(3)
+	target := seat.MustSeat(0)
 	taken := tile.MustTileFromCode("E")
 	consumed := [3]tile.Tile{taken, taken, taken}
 
@@ -177,8 +177,8 @@ func TestState_Apply_CalledKan_ReturnsErrorWhenDiscardFollowsCalledKan(t *testin
 
 func TestState_Apply_CalledKan_AllowsDoraAfterReplacementTileDraw(t *testing.T) {
 	s := mustNewRoundStateForTest(t, calledKanHandsForTest())
-	actor := *seat.MustSeat(3)
-	target := *seat.MustSeat(0)
+	actor := seat.MustSeat(3)
+	target := seat.MustSeat(0)
 	taken := tile.MustTileFromCode("E")
 	consumed := [3]tile.Tile{taken, taken, taken}
 	replacementTile := tile.MustTileFromCode("W")
@@ -208,8 +208,8 @@ func TestState_Apply_CalledKan_AllowsDoraAfterReplacementTileDraw(t *testing.T) 
 
 func TestState_Apply_CalledKan_AllowsDiscardAfterDoraReveal(t *testing.T) {
 	s := mustNewRoundStateForTest(t, calledKanHandsForTest())
-	actor := *seat.MustSeat(3)
-	target := *seat.MustSeat(0)
+	actor := seat.MustSeat(3)
+	target := seat.MustSeat(0)
 	taken := tile.MustTileFromCode("E")
 	consumed := [3]tile.Tile{taken, taken, taken}
 	replacementTile := tile.MustTileFromCode("W")

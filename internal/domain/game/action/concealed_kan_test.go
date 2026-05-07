@@ -9,7 +9,7 @@ import (
 )
 
 func TestNewConcealedKan(t *testing.T) {
-	actor := *seat.MustSeat(1)
+	actor := seat.MustSeat(1)
 	consumed := [4]tile.Tile{
 		tile.MustTileFromCode("5m"),
 		tile.MustTileFromCode("5m"),
@@ -31,7 +31,7 @@ func TestNewConcealedKan(t *testing.T) {
 }
 
 func TestNewConcealedKan_UnknownTile(t *testing.T) {
-	actor := *seat.MustSeat(1)
+	actor := seat.MustSeat(1)
 	unknown := tile.MustTileFromCode("?")
 
 	tests := []struct {

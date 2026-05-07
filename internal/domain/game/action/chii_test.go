@@ -9,8 +9,8 @@ import (
 )
 
 func TestNewChii(t *testing.T) {
-	actor := *seat.MustSeat(1)
-	target := *seat.MustSeat(0)
+	actor := seat.MustSeat(1)
+	target := seat.MustSeat(0)
 	taken := tile.MustTileFromCode("3m")
 	consumed := [2]tile.Tile{tile.MustTileFromCode("1m"), tile.MustTileFromCode("2m")}
 
@@ -34,8 +34,8 @@ func TestNewChii(t *testing.T) {
 }
 
 func TestNewChii_UnknownTile(t *testing.T) {
-	actor := *seat.MustSeat(1)
-	target := *seat.MustSeat(0)
+	actor := seat.MustSeat(1)
+	target := seat.MustSeat(0)
 	unknown := tile.MustTileFromCode("?")
 	consumed := [2]tile.Tile{tile.MustTileFromCode("1m"), tile.MustTileFromCode("2m")}
 
