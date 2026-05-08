@@ -9,6 +9,12 @@
 - `docs/board-state-output.md`: 盤面状態出力の実装状況と移植元参照（恒久仕様は `docs/design.md` に反映）
 - `docs/terminology-en.md`: 移植元コードの英語用語を確認する補助資料
 
+## 参照実装
+
+- `reference/repositories/mjai-manue-go-main/`: main merge 済みの過去 Go 実装。参照専用。必要な実装方針や差分確認に使う。
+- `reference/repositories/mjai-manue-original/`: CoffeeScript 版オリジナル。参照専用。移植元挙動・命名・AI ロジック確認に使う。
+- `reference/` 配下は編集しない。変更が必要な場合は現行コードへ反映し、参照元はそのままにする。
+
 ## 実装ルール（設計書の要点）
 
 - 依存方向は内側へ（外側→内側）。`domain` は I/O や外部仕様に依存しない。
