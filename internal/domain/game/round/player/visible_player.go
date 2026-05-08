@@ -18,7 +18,7 @@ type VisiblePlayer struct {
 	river                     []tile.Tile
 	discardedTiles            []tile.Tile
 	extraSafeTiles            []tile.Tile
-	waits                     waitSet
+	waits                     service.WaitSet
 	isFuriten                 bool
 	riichiState               RiichiState
 	riichiRiverIndex          int
@@ -92,7 +92,7 @@ func (p *VisiblePlayer) CanRonBy(winningTile *tile.Tile) bool {
 		// cannot verify the exact tile, so preserve the existing permissive behavior.
 		return true
 	}
-	return !p.isFuriten && p.waits.has(*winningTile)
+	return !p.isFuriten && p.waits.Has(*winningTile)
 }
 
 func (p *VisiblePlayer) RiichiState() RiichiState {
@@ -362,7 +362,7 @@ func (p *VisiblePlayer) AddExtraSafeTiles(t tile.Tile) {
 	}
 
 	p.extraSafeTiles = append(p.extraSafeTiles, t)
-	if p.waits.has(t) {
+	if p.waits.Has(t) {
 		p.isFuriten = true
 	}
 }
@@ -379,35 +379,14 @@ func (p *VisiblePlayer) TakeFromRiver(t tile.Tile) error {
 }
 
 func (p *VisiblePlayer) updateWaits() {
-	p.waits = waitsFor(&p.hand)
+	p.waits = service.WaitsFor(&p.hand)
 }
 
 func (p *VisiblePlayer) updateFuritenAfterDiscard() {
-	riverFuriten := slices.ContainsFunc(p.discardedTiles, p.waits.has)
+	riverFuriten := slices.ContainsFunc(p.discardedTiles, p.waits.Has)
 	if p.riichiState == RiichiAccepted {
 		p.isFuriten = p.isFuriten || riverFuriten
 		return
 	}
 	p.isFuriten = riverFuriten
-}
-
-type waitSet uint64
-
-func (w waitSet) has(t tile.Tile) bool {
-	return w&(waitSet(1)<<t.RemoveRed().ID()) != 0
-}
-
-func waitsFor(h *hand.VisibleHand) waitSet {
-	var waits waitSet
-	for id := range tile.NumTileType34 {
-		waitTile := tile.MustTileFromID(id)
-		handWithWait, err := h.Draw(waitTile)
-		if err != nil {
-			continue
-		}
-		if service.IsWinningForm(handWithWait) {
-			waits |= waitSet(1) << id
-		}
-	}
-	return waits
 }

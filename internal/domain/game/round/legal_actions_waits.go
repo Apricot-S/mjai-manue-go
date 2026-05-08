@@ -17,22 +17,5 @@ func canConcealedKanAfterRiichi(handBeforeKan *hand.VisibleHand, drawnTile tile.
 	}
 	tc34AfterKan[drawnTileID34] = 0
 	handAfterKan := hand.MustVisibleHand(tc34AfterKan.ToTiles())
-	return waitsFor(handBeforeKan) == waitsFor(handAfterKan)
-}
-
-type waitSet uint64
-
-func waitsFor(h *hand.VisibleHand) waitSet {
-	var waits waitSet
-	for id := range tile.NumTileType34 {
-		waitTile := tile.MustTileFromID(id)
-		handWithWait, err := h.Draw(waitTile)
-		if err != nil {
-			continue
-		}
-		if service.IsWinningForm(handWithWait) {
-			waits |= waitSet(1) << id
-		}
-	}
-	return waits
+	return service.WaitsFor(handBeforeKan) == service.WaitsFor(handAfterKan)
 }
