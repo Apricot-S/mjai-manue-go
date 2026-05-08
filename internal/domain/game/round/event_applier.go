@@ -23,6 +23,7 @@ func (s *State) Apply(ev event.Event) error {
 		}
 	}
 
+	pendingExtraSafeDiscard := s.pendingExtraSafeDiscard
 	var err error
 	switch ev := ev.(type) {
 	case *event.Draw:
@@ -57,6 +58,9 @@ func (s *State) Apply(ev event.Event) error {
 		return err
 	}
 
+	if _, ok := ev.(*event.Win); !ok {
+		s.flushPendingExtraSafeDiscard(pendingExtraSafeDiscard)
+	}
 	s.legalActionsCache = nil
 	return nil
 }
@@ -104,6 +108,7 @@ func (s *State) applyDiscard(ev *event.Discard) error {
 	if err := p.Discard(ev.Tile(), ev.Tsumogiri()); err != nil {
 		return err
 	}
+	s.pendingExtraSafeDiscard = &pendingExtraSafeDiscard{actor: actorSeat, tile: ev.Tile()}
 	if p.RiichiState() == player.RiichiDeclared {
 		s.pendingRiichiAcceptance = &actorSeat
 	}
@@ -236,6 +241,7 @@ func (s *State) applyPromotedKan(ev *event.PromotedKan) error {
 	s.pendingDoraReveals++
 	s.kanProgress = waitingReplacementBeforeDora
 	s.pendingRobbedKanTile = &added
+	s.pendingExtraSafeDiscard = &pendingExtraSafeDiscard{actor: actorSeat, tile: added}
 	s.nextDraw = actorSeat
 	s.pendingDiscard = nil
 	s.lastDrawWasReplacement = false
@@ -359,7 +365,9 @@ func (s *State) canApplyWin(ev *event.Win) bool {
 	}
 
 	targetRiver := s.players[ev.Target().Index()].River()
-	return len(targetRiver) > 0 && isTileMatchKnownEnough(&targetRiver[len(targetRiver)-1], ev.WinningTile())
+	return len(targetRiver) > 0 &&
+		isTileMatchKnownEnough(&targetRiver[len(targetRiver)-1], ev.WinningTile()) &&
+		!s.isRonFuriten(ev.Actor(), ev.WinningTile())
 }
 
 func (s *State) canApplyRobbingKan(ev *event.Win) bool {
@@ -386,6 +394,41 @@ func isTileMatchKnownEnough(stateTile *tile.Tile, eventTile *tile.Tile) bool {
 		return true
 	}
 	return *stateTile == *eventTile
+}
+
+func (s *State) isRonFuriten(actor seat.Seat, winningTile *tile.Tile) bool {
+	if winningTile == nil {
+		return false
+	}
+
+	p := s.players[actor.Index()]
+	for _, discardedTile := range p.DiscardedTiles() {
+		if discardedTile.HasSameSymbol(*winningTile) {
+			return true
+		}
+	}
+	for _, safeTile := range p.ExtraSafeTiles() {
+		if safeTile.HasSameSymbol(*winningTile) {
+			return true
+		}
+	}
+	return false
+}
+
+func (s *State) flushPendingExtraSafeDiscard(pending *pendingExtraSafeDiscard) {
+	if pending == nil {
+		return
+	}
+
+	for i := range s.players {
+		if i != pending.actor.Index() {
+			s.players[i].AddExtraSafeTiles(pending.tile)
+		}
+	}
+
+	if s.pendingExtraSafeDiscard == pending {
+		s.pendingExtraSafeDiscard = nil
+	}
 }
 
 func (s *State) applyDrawRound(ev *event.DrawRound) error {

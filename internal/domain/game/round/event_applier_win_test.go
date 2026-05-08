@@ -114,6 +114,148 @@ func TestState_Apply_Win_Renhou(t *testing.T) {
 	}
 }
 
+func TestState_Apply_Win_ReturnsErrorForRonOnOwnDiscardedTile(t *testing.T) {
+	s := mustNewRoundStateForTest(t, newValidHands())
+	actor := seat.MustSeat(0)
+	target := seat.MustSeat(3)
+	winningTile := tile.MustTileFromCode("6m")
+	scores := [common.NumPlayers]int{57000, 25000, 25000, -7000}
+
+	if err := s.Apply(event.NewDraw(actor, winningTile)); err != nil {
+		t.Fatalf("Apply(Draw) failed: %v", err)
+	}
+	if err := s.Apply(event.NewDiscard(actor, winningTile, true)); err != nil {
+		t.Fatalf("Apply(Discard) failed: %v", err)
+	}
+	if err := s.Apply(event.NewDraw(seat.MustSeat(1), tile.MustTileFromCode("7m"))); err != nil {
+		t.Fatalf("Apply(Draw) failed: %v", err)
+	}
+	if err := s.Apply(event.NewDiscard(seat.MustSeat(1), tile.MustTileFromCode("7m"), true)); err != nil {
+		t.Fatalf("Apply(Discard) failed: %v", err)
+	}
+	if err := s.Apply(event.NewDraw(seat.MustSeat(2), tile.MustTileFromCode("8m"))); err != nil {
+		t.Fatalf("Apply(Draw) failed: %v", err)
+	}
+	if err := s.Apply(event.NewDiscard(seat.MustSeat(2), tile.MustTileFromCode("8m"), true)); err != nil {
+		t.Fatalf("Apply(Discard) failed: %v", err)
+	}
+	if err := s.Apply(event.NewDraw(target, winningTile)); err != nil {
+		t.Fatalf("Apply(Draw) failed: %v", err)
+	}
+	if err := s.Apply(event.NewDiscard(target, winningTile, true)); err != nil {
+		t.Fatalf("Apply(Discard) failed: %v", err)
+	}
+	if err := s.Apply(event.NewWin(
+		actor,
+		target,
+		&winningTile,
+		32000,
+		nil,
+		&scores,
+	)); err == nil {
+		t.Fatal("Apply(Win) succeeded unexpectedly")
+	}
+
+	if got := s.Scores(); got != [common.NumPlayers]int{25000, 25000, 25000, 25000} {
+		t.Errorf("Scores() = %v, want unchanged initial scores", got)
+	}
+}
+
+func TestState_Apply_Win_ReturnsErrorForRonOnExtraSafeTile(t *testing.T) {
+	s := mustNewRoundStateForTest(t, newValidHands())
+	actor := seat.MustSeat(0)
+	target := seat.MustSeat(3)
+	winningTile := tile.MustTileFromCode("6m")
+	scores := [common.NumPlayers]int{57000, 25000, 25000, -7000}
+
+	if err := s.Apply(event.NewDraw(actor, tile.MustTileFromCode("7m"))); err != nil {
+		t.Fatalf("Apply(Draw) failed: %v", err)
+	}
+	if err := s.Apply(event.NewDiscard(actor, tile.MustTileFromCode("7m"), true)); err != nil {
+		t.Fatalf("Apply(Discard) failed: %v", err)
+	}
+	if err := s.Apply(event.NewDraw(seat.MustSeat(1), winningTile)); err != nil {
+		t.Fatalf("Apply(Draw) failed: %v", err)
+	}
+	if err := s.Apply(event.NewDiscard(seat.MustSeat(1), winningTile, true)); err != nil {
+		t.Fatalf("Apply(Discard) failed: %v", err)
+	}
+	if err := s.Apply(event.NewDraw(seat.MustSeat(2), tile.MustTileFromCode("7m"))); err != nil {
+		t.Fatalf("Apply(Draw) failed: %v", err)
+	}
+	if err := s.Apply(event.NewDiscard(seat.MustSeat(2), tile.MustTileFromCode("7m"), true)); err != nil {
+		t.Fatalf("Apply(Discard) failed: %v", err)
+	}
+	if err := s.Apply(event.NewDraw(target, winningTile)); err != nil {
+		t.Fatalf("Apply(Draw) failed: %v", err)
+	}
+	if err := s.Apply(event.NewDiscard(target, winningTile, true)); err != nil {
+		t.Fatalf("Apply(Discard) failed: %v", err)
+	}
+	if err := s.Apply(event.NewWin(
+		actor,
+		target,
+		&winningTile,
+		32000,
+		nil,
+		&scores,
+	)); err == nil {
+		t.Fatal("Apply(Win) succeeded unexpectedly")
+	}
+
+	if got := s.Scores(); got != [common.NumPlayers]int{25000, 25000, 25000, 25000} {
+		t.Errorf("Scores() = %v, want unchanged initial scores", got)
+	}
+}
+
+func TestState_Apply_Win_ReturnsErrorForRonOnSameSymbolRedFiveFuriten(t *testing.T) {
+	s := mustNewRoundStateForTest(t, newValidHands())
+	actor := seat.MustSeat(0)
+	target := seat.MustSeat(3)
+	discardedTile := tile.MustTileFromCode("5m")
+	winningTile := tile.MustTileFromCode("5mr")
+	scores := [common.NumPlayers]int{57000, 25000, 25000, -7000}
+
+	if err := s.Apply(event.NewDraw(actor, tile.MustTileFromCode("6m"))); err != nil {
+		t.Fatalf("Apply(Draw) failed: %v", err)
+	}
+	if err := s.Apply(event.NewDiscard(actor, discardedTile, false)); err != nil {
+		t.Fatalf("Apply(Discard) failed: %v", err)
+	}
+	if err := s.Apply(event.NewDraw(seat.MustSeat(1), tile.MustTileFromCode("7m"))); err != nil {
+		t.Fatalf("Apply(Draw) failed: %v", err)
+	}
+	if err := s.Apply(event.NewDiscard(seat.MustSeat(1), tile.MustTileFromCode("7m"), true)); err != nil {
+		t.Fatalf("Apply(Discard) failed: %v", err)
+	}
+	if err := s.Apply(event.NewDraw(seat.MustSeat(2), tile.MustTileFromCode("8m"))); err != nil {
+		t.Fatalf("Apply(Draw) failed: %v", err)
+	}
+	if err := s.Apply(event.NewDiscard(seat.MustSeat(2), tile.MustTileFromCode("8m"), true)); err != nil {
+		t.Fatalf("Apply(Discard) failed: %v", err)
+	}
+	if err := s.Apply(event.NewDraw(target, winningTile)); err != nil {
+		t.Fatalf("Apply(Draw) failed: %v", err)
+	}
+	if err := s.Apply(event.NewDiscard(target, winningTile, true)); err != nil {
+		t.Fatalf("Apply(Discard) failed: %v", err)
+	}
+	if err := s.Apply(event.NewWin(
+		actor,
+		target,
+		&winningTile,
+		32000,
+		nil,
+		&scores,
+	)); err == nil {
+		t.Fatal("Apply(Win) succeeded unexpectedly")
+	}
+
+	if got := s.Scores(); got != [common.NumPlayers]int{25000, 25000, 25000, 25000} {
+		t.Errorf("Scores() = %v, want unchanged initial scores", got)
+	}
+}
+
 func TestState_Apply_Win_RobbingKan(t *testing.T) {
 	s := newStateBeforePromotedKanForTest(t, 10, 0)
 	actor := seat.MustSeat(1)
@@ -158,6 +300,41 @@ func TestState_Apply_Win_ReturnsErrorDuringRobbingKanWithDifferentWinningTile(t 
 		actor,
 		target,
 		&winningTile,
+		32000,
+		nil,
+		&scores,
+	)); err == nil {
+		t.Fatal("Apply(Win) succeeded unexpectedly")
+	}
+
+	if got := s.Scores(); got != [common.NumPlayers]int{25000, 25000, 25000, 25000} {
+		t.Errorf("Scores() = %v, want unchanged initial scores", got)
+	}
+}
+
+func TestState_Apply_Win_ReturnsErrorForRonOnMissedPromotedKanTile(t *testing.T) {
+	s := newStateBeforePromotedKanForTest(t, 10, 0)
+	actor := seat.MustSeat(1)
+	target := seat.MustSeat(3)
+	added := tile.MustTileFromCode("E")
+	scores := [common.NumPlayers]int{25000, 57000, 25000, -7000}
+
+	if err := s.Apply(event.NewPromotedKan(target, added, [3]tile.Tile{added, added, added})); err != nil {
+		t.Fatalf("Apply(PromotedKan) failed: %v", err)
+	}
+	if err := s.Apply(event.NewDraw(target, added)); err != nil {
+		t.Fatalf("Apply(Draw) failed: %v", err)
+	}
+	if err := s.Apply(event.NewDora(tile.MustTileFromCode("6p"))); err != nil {
+		t.Fatalf("Apply(Dora) failed: %v", err)
+	}
+	if err := s.Apply(event.NewDiscard(target, added, true)); err != nil {
+		t.Fatalf("Apply(Discard) failed: %v", err)
+	}
+	if err := s.Apply(event.NewWin(
+		actor,
+		target,
+		&added,
 		32000,
 		nil,
 		&scores,

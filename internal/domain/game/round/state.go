@@ -52,6 +52,7 @@ type State struct {
 	nextDraw                seat.Seat
 	pendingDiscard          *seat.Seat
 	pendingRiichiAcceptance *seat.Seat
+	pendingExtraSafeDiscard *pendingExtraSafeDiscard
 	lastDrawWasReplacement  bool
 	canKyushukyuhai         [common.NumPlayers]bool
 	roundEnded              bool
@@ -61,6 +62,11 @@ type State struct {
 	lastActor               *seat.Seat
 	players                 [common.NumPlayers]player.Player
 	legalActionsCache       map[seat.Seat][]action.Action
+}
+
+type pendingExtraSafeDiscard struct {
+	actor seat.Seat
+	tile  tile.Tile
 }
 
 func NewState(ev *event.StartRound, previousScores [common.NumPlayers]int) (*State, error) {
