@@ -37,6 +37,7 @@
 3. mjai runtime の JSON Lines loop 共通化
 4. `VisiblePlayer` / `InvisiblePlayer` の小規模重複整理（読みにくくなるなら実施しない）
 5. `service/yaku.go` の TODO 注釈整理（ロジック再設計や panic 排除はしない）
+6. 内部 API と非自明処理へのコメント追加。不変条件・コーナーケース・移植仕様上の注意点に絞り、自明な getter や単純処理には増やしすぎない。
 
 ## ドキュメント更新の運用
 
