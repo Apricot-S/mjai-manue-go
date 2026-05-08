@@ -44,6 +44,7 @@ func (s *commonPlayerState) DrawnTile() *tile.Tile {
 	return s.drawnTile
 }
 
+// Slice getters return copies because player state is exposed as AI observation.
 func (s *commonPlayerState) Melds() []meld.Meld {
 	return slices.Clone(s.melds)
 }

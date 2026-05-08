@@ -7,12 +7,13 @@ import (
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/tile"
 )
 
+// InvisibleHand tracks only the number of hidden tiles. Tile identity is
+// intentionally unknown for opponents and for log entries that omit the hand.
+// Hand operations are immutable: Draw, Discard, and Call return a new hand.
 type InvisibleHand struct {
 	tileCount int
 }
 
-// NewInvisibleHand tracks only the number of hidden tiles. Tile identity is
-// intentionally unknown for opponents and for log entries that omit the hand.
 func NewInvisibleHand(tiles []tile.Tile) (*InvisibleHand, error) {
 	sum := len(tiles)
 	if sum > maxNumTilesInHand {

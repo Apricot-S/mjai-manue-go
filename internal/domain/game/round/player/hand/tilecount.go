@@ -2,6 +2,8 @@ package hand
 
 import "github.com/Apricot-S/mjai-manue-go/internal/domain/game/tile"
 
+// TileCounts34 is the 34-kind tile count representation. Red fives are merged
+// into the corresponding normal five counters before values reach this type.
 type TileCounts34 [tile.NumTileType34]int
 
 func (tc34 *TileCounts34) ToTiles() []tile.Tile {

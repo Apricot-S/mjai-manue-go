@@ -9,7 +9,8 @@ import (
 
 // VisibleHand stores known hand tiles. For convenience in generated hands used
 // by win checks and analysis, normal fives may appear four times even though a
-// real red-five set would be three normal fives plus one red five at most.
+// real red-five set would be three normal fives plus one red five at most. Hand
+// operations are immutable: Draw, Discard, and Call return a new hand.
 type VisibleHand struct {
 	tileCounts [tile.NumTileType37]int
 	numTiles   int
