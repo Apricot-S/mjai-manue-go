@@ -1,0 +1,629 @@
+package service
+
+import (
+	"maps"
+	"slices"
+
+	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/round/player/hand"
+	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/round/player/meld"
+	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/round/service/block"
+	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/tile"
+	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/wind"
+)
+
+type WinEvent int
+
+const (
+	NoEvent WinEvent = iota + 1
+	RobbingAKan
+	AfterAKan
+	LastTile
+	// Tenhou and Chiihou are always combined with Menzenchin tsumohou, so no flags are required.
+)
+
+// Note:
+// This function calculates Fu and Han based on the original mjai-manue specification,
+// not the exact Fu and Han.
+func CalculateFuHan(
+	hand *hand.VisibleHand,
+	handBlocks []block.Block,
+	melds []meld.Meld,
+	prevalentWind wind.Wind,
+	seatWind wind.Wind,
+	doraIndicators []tile.Tile,
+	riichi bool,
+) (fu int, han int, yakus map[string]int) {
+	meldBlocks := make([]block.Block, len(melds))
+	for i, m := range melds {
+		meldBlocks[i] = block.NewBlockFromMeld(m)
+	}
+
+	allBlocks := slices.Concat(handBlocks, meldBlocks)
+
+	allTiles := make(tile.Tiles, 0, 14)
+	for _, b := range allBlocks {
+		allTiles = append(allTiles, b.ToTiles()...)
+	}
+
+	isOpen := len(melds) > 0
+
+	yakus = map[string]int{
+		"reach": riichi_(riichi),
+		"tyc":   tanyao(allTiles),
+		"cty":   chantaiyao(allBlocks, isOpen),
+		"pf":    pinfu(allBlocks, prevalentWind, seatWind, isOpen),
+		"ykh":   yakuhai(allBlocks, prevalentWind, seatWind),
+		"ipk":   iipeikou(allBlocks, isOpen),
+		"ssj":   sanshokuDoujun(allBlocks, isOpen),
+		"ikt":   ikkiTsuukan(allBlocks, isOpen),
+		"tth":   toitoihou(allBlocks),
+		"cis":   chiniisou(allBlocks, isOpen),
+		"his":   honiisou(allBlocks, isOpen),
+	}
+	maps.DeleteFunc(yakus, func(k string, v int) bool {
+		return v <= 0
+	})
+
+	if len(yakus) > 0 {
+		numDoras := countDoras(doraIndicators, allTiles)
+		if numDoras > 0 {
+			yakus["dr"] = numDoras
+		}
+
+		numRedDoras := countRedDoras(hand, melds)
+		if numRedDoras > 0 {
+			yakus["adr"] = numRedDoras
+		}
+	}
+
+	// Original mjai-manue uses this simplified fu calculation; keep it as ported behavior.
+	_, isPinfu := yakus["pf"]
+	if isPinfu || isOpen {
+		fu = 30
+	} else {
+		fu = 40
+	}
+
+	han = 0
+	for _, h := range yakus {
+		han += h
+	}
+
+	return fu, han, yakus
+}
+
+func countDoras(doraIndicators []tile.Tile, allTiles []tile.Tile) int {
+	doras := make([]tile.Tile, len(doraIndicators))
+	for i := range doras {
+		doras[i] = doraIndicators[i].NextForDora()
+	}
+
+	numDoras := 0
+	for i := range allTiles {
+		for j := range doras {
+			if doras[j].HasSameSymbol(allTiles[i]) {
+				numDoras++
+			}
+		}
+	}
+
+	return numDoras
+}
+
+func countRedDoras(hand *hand.VisibleHand, melds []meld.Meld) int {
+	numRedDoras := 0
+
+	for _, ht := range hand.ToTiles() {
+		if ht.IsRed() {
+			numRedDoras++
+		}
+	}
+
+	for _, m := range melds {
+		for _, mt := range m.ToTiles() {
+			if mt.IsRed() {
+				numRedDoras++
+			}
+		}
+	}
+
+	return numRedDoras
+}
+
+func Has1Han(
+	hand *hand.VisibleHand,
+	melds []meld.Meld,
+	winningTile tile.Tile,
+	prevalentWind wind.Wind,
+	seatWind wind.Wind,
+	tsumo bool,
+	riichi bool,
+	event WinEvent,
+) bool {
+	handWithWinningTile, err := hand.Draw(winningTile)
+	if err != nil {
+		panic(err)
+	}
+
+	if IsWinningFormChiitoitsu(handWithWinningTile) || IsWinningFormKokushimusou(handWithWinningTile) {
+		return true
+	}
+
+	shanten, goals := AnalyzeShanten(handWithWinningTile, UpperBound(-1))
+	if shanten > -1 {
+		return false
+	}
+
+	openMelds := slices.Clone(melds)
+	openMelds = slices.DeleteFunc(openMelds, func(m meld.Meld) bool {
+		_, ok := m.(*meld.ConcealedKan)
+		return ok
+	})
+	isOpen := len(openMelds) > 0
+
+	if riichi {
+		return true
+	}
+	if !isOpen && tsumo {
+		return true
+	}
+	if event != NoEvent {
+		return true
+	}
+
+	meldBlocks := make([]block.Block, len(melds))
+	for i, m := range melds {
+		meldBlocks[i] = block.NewBlockFromMeld(m)
+	}
+
+	for i := range goals {
+		allBlocks := slices.Concat(goals[i].Blocks, meldBlocks)
+
+		allTiles := make(tile.Tiles, 0, 14)
+		for i := range allBlocks {
+			allTiles = append(allTiles, allBlocks[i].ToTiles()...)
+		}
+
+		if pinfuStrict(allBlocks, prevalentWind, seatWind, isOpen, winningTile) > 0 {
+			return true
+		}
+		if iipeikou(allBlocks, isOpen) > 0 {
+			return true
+		}
+		if tanyao(allTiles) > 0 {
+			return true
+		}
+		if yakuhai(allBlocks, prevalentWind, seatWind) > 0 {
+			return true
+		}
+		if chantaiyao(allBlocks, isOpen) > 0 {
+			return true
+		}
+		if sanshokuDoujun(allBlocks, isOpen) > 0 {
+			return true
+		}
+		if ikkiTsuukan(allBlocks, isOpen) > 0 {
+			return true
+		}
+		if toitoihou(allBlocks) > 0 {
+			return true
+		}
+		if sanankou(goals[i].Blocks, melds, winningTile, tsumo) > 0 {
+			return true
+		}
+		if sanshokuDoukou(allBlocks) > 0 {
+			return true
+		}
+		if sankantsu(allBlocks) > 0 {
+			return true
+		}
+		if honiisou(allBlocks, isOpen) > 0 {
+			return true
+		}
+		if chiniisou(allBlocks, isOpen) > 0 {
+			return true
+		}
+	}
+
+	return false
+}
+
+func riichi_(isRiichi bool) int {
+	if isRiichi {
+		return 1
+	}
+	return 0
+}
+
+func tanyao(allTiles []tile.Tile) int {
+	for _, t := range allTiles {
+		if t.IsYaochu() {
+			return 0
+		}
+	}
+	return 1
+}
+
+// Note:
+// To reproduce the behavior of the original mjai-manue,
+// Honroutou and Junchantaiyaochuu are also judged as Chantaiyao.
+func chantaiyao(allBlocks []block.Block, isOpen bool) int {
+	for _, b := range allBlocks {
+		if !slices.ContainsFunc(b.ToTiles(), func(p tile.Tile) bool { return p.IsYaochu() }) {
+			return 0
+		}
+	}
+
+	if isOpen {
+		return 1
+	}
+	return 2
+}
+
+// Original mjai-manue does not consider ryanmen criteria in this broad pinfu check.
+func pinfu(allBlocks []block.Block, prevalentWind wind.Wind, seatWind wind.Wind, isOpen bool) int {
+	if isOpen {
+		return 0
+	}
+
+	for _, b := range allBlocks {
+		switch b.(type) {
+		case *block.Triplet, *block.Quad:
+			return 0
+		case *block.Pair:
+			t := &b.ToTiles()[0]
+			if t.IsSuits() {
+				continue
+			}
+			if t.Number() > 4 {
+				// dragons
+				return 0
+			}
+
+			name := t.String()
+			if name == prevalentWind.String() || name == seatWind.String() {
+				return 0
+			}
+		}
+	}
+
+	return 1
+}
+
+func pinfuStrict(
+	allBlocks []block.Block,
+	prevalentWind wind.Wind,
+	seatWind wind.Wind,
+	isOpen bool,
+	winningTile tile.Tile,
+) int {
+	if isOpen {
+		return 0
+	}
+
+	isOpenWait := false
+	for _, b := range allBlocks {
+		switch b.(type) {
+		case *block.Triplet, *block.Quad:
+			return 0
+		case *block.Pair:
+			t := &b.ToTiles()[0]
+			if t.IsSuits() {
+				continue
+			}
+			if t.Number() > 4 {
+				// dragons
+				return 0
+			}
+
+			name := t.String()
+			if name == prevalentWind.String() || name == seatWind.String() {
+				return 0
+			}
+		case *block.Sequence:
+			tiles := b.ToTiles()
+			// Check if the sequence contains the winning tile
+			if !slices.ContainsFunc(tiles, func(t tile.Tile) bool { return t.HasSameSymbol(winningTile) }) {
+				continue
+			}
+			// The middle (kanchan) wait is not allowed
+			if tiles[1].HasSameSymbol(winningTile) {
+				continue
+			}
+			// The edge (penchan) wait is not allowed
+			if winningTile.Number() == 3 && tiles[2].HasSameSymbol(winningTile) {
+				continue
+			}
+			if winningTile.Number() == 7 && tiles[0].HasSameSymbol(winningTile) {
+				continue
+			}
+			// If the sequence contains the winning tile, it must be an open (ryanmen) wait
+			isOpenWait = true
+		}
+	}
+
+	if isOpenWait {
+		return 1
+	}
+	return 0
+}
+
+func yakuhai(allBlocks []block.Block, prevalentWind wind.Wind, seatWind wind.Wind) int {
+	han := 0
+
+	for _, b := range allBlocks {
+		switch b.(type) {
+		case *block.Triplet, *block.Quad:
+			t := b.ToTiles()[0]
+			if t.IsSuits() {
+				continue
+			}
+			if t.Number() > 4 {
+				// dragons
+				han++
+				continue
+			}
+
+			name := t.String()
+			if name == prevalentWind.String() {
+				han++
+			}
+			if name == seatWind.String() {
+				han++
+			}
+		}
+	}
+
+	return han
+}
+
+func iipeikou(allBlocks []block.Block, isOpen bool) int {
+	if isOpen {
+		return 0
+	}
+
+	for i, b1 := range allBlocks {
+		if _, ok := b1.(*block.Sequence); !ok {
+			continue
+		}
+		t1 := b1.ToTiles()[0]
+
+		for _, b2 := range allBlocks[i+1:] {
+			if _, ok := b2.(*block.Sequence); !ok {
+				continue
+			}
+			if t1.HasSameSymbol(b2.ToTiles()[0]) {
+				return 1
+			}
+		}
+	}
+	return 0
+}
+
+const allSuitColorBits = 0b111
+
+func suitColorBit(c rune) uint8 {
+	switch c {
+	case tile.ManzuColor:
+		return 1 << 0
+	case tile.PinzuColor:
+		return 1 << 1
+	case tile.SouzuColor:
+		return 1 << 2
+	default:
+		return 0
+	}
+}
+
+func suitColorIndex(c rune) int {
+	switch c {
+	case tile.ManzuColor:
+		return 0
+	case tile.PinzuColor:
+		return 1
+	case tile.SouzuColor:
+		return 2
+	default:
+		return -1
+	}
+}
+
+func sanshokuDoujun(allBlocks []block.Block, isOpen bool) int {
+	var colorBitsByNumber [8]uint8
+
+	for _, b := range allBlocks {
+		sequence, ok := b.(*block.Sequence)
+		if !ok {
+			continue
+		}
+
+		t := sequence.ToTiles()[0]
+		colorBitsByNumber[t.Number()] |= suitColorBit(t.Color())
+	}
+
+	for n := 1; n <= 7; n++ {
+		if colorBitsByNumber[n] == allSuitColorBits {
+			if isOpen {
+				return 1
+			}
+			return 2
+		}
+	}
+
+	return 0
+}
+
+func ikkiTsuukan(allBlocks []block.Block, isOpen bool) int {
+	var numberBitsByColor [3]uint16
+
+	for _, b := range allBlocks {
+		sequence, ok := b.(*block.Sequence)
+		if !ok {
+			continue
+		}
+
+		t := sequence.ToTiles()[0]
+		colorIndex := suitColorIndex(t.Color())
+		if colorIndex < 0 {
+			continue
+		}
+		numberBitsByColor[colorIndex] |= 1 << t.Number()
+	}
+
+	for _, numberBits := range numberBitsByColor {
+		const ikkiTsuukanNumberBits = (1 << 1) | (1 << 4) | (1 << 7)
+		if numberBits&ikkiTsuukanNumberBits == ikkiTsuukanNumberBits {
+			if isOpen {
+				return 1
+			}
+			return 2
+		}
+	}
+
+	return 0
+}
+
+func toitoihou(allBlocks []block.Block) int {
+	for _, b := range allBlocks {
+		if _, ok := b.(*block.Sequence); ok {
+			return 0
+		}
+	}
+	return 2
+}
+
+func chiniisou(allBlocks []block.Block, isOpen bool) int {
+	var color rune
+
+	for i, b := range allBlocks {
+		c := b.ToTiles()[0].Color()
+		if c == tile.HonorsColor {
+			return 0
+		}
+
+		if i == 0 {
+			color = c
+		} else if c != color {
+			return 0
+		}
+	}
+
+	if isOpen {
+		return 5
+	}
+	return 6
+}
+
+// Note:
+// To reproduce the behavior of the original mjai-manue,
+// Tsuuiisou are also judged as Honiisou.
+func honiisou(allBlocks []block.Block, isOpen bool) int {
+	var color rune = 0
+	hasHonors := false
+
+	for _, b := range allBlocks {
+		c := b.ToTiles()[0].Color()
+		if c == tile.HonorsColor {
+			hasHonors = true
+			continue
+		}
+
+		if color == 0 {
+			color = c
+		} else if c != color {
+			return 0
+		}
+	}
+
+	if !hasHonors {
+		return 0
+	}
+
+	if isOpen {
+		return 2
+	}
+	return 3
+}
+
+func sanankou(
+	handBlocks []block.Block,
+	melds []meld.Meld,
+	winningTile tile.Tile,
+	tsumo bool,
+) int {
+	numAnkou := 0
+	needCheckWait := false
+
+	// Count triplets in the hand
+	for _, b := range handBlocks {
+		if t, ok := b.(*block.Triplet); ok {
+			// In the case of Ron, exclude the triplet that contains the winning tile
+			if !tsumo && t.ToTiles()[0].HasSameSymbol(winningTile) {
+				needCheckWait = true
+				continue
+			}
+			numAnkou++
+		}
+	}
+
+	if needCheckWait {
+		for _, b := range handBlocks {
+			s, ok := b.(*block.Sequence)
+			if !ok {
+				continue
+			}
+
+			if slices.ContainsFunc(s.ToTiles(), func(t tile.Tile) bool { return t.HasSameSymbol(winningTile) }) {
+				numAnkou++
+				break
+			}
+		}
+	}
+
+	// Count only the concealed kan in the melds
+	for _, m := range melds {
+		if _, ok := m.(*meld.ConcealedKan); ok {
+			numAnkou++
+		}
+	}
+
+	if numAnkou >= 3 {
+		return 2
+	}
+	return 0
+}
+
+func sanshokuDoukou(allBlocks []block.Block) int {
+	var colorBitsByNumber [10]uint8
+
+	for _, b := range allBlocks {
+		switch b.(type) {
+		case *block.Sequence, *block.Pair:
+			continue
+		}
+
+		t := b.ToTiles()[0]
+		colorBitsByNumber[t.Number()] |= suitColorBit(t.Color())
+	}
+
+	for n := 1; n <= 9; n++ {
+		if colorBitsByNumber[n] == allSuitColorBits {
+			return 2
+		}
+	}
+
+	return 0
+}
+
+func sankantsu(allBlocks []block.Block) int {
+	numQuad := 0
+	for _, b := range allBlocks {
+		if _, ok := b.(*block.Quad); ok {
+			numQuad++
+		}
+	}
+	if numQuad >= 3 {
+		return 2
+	}
+	return 0
+}

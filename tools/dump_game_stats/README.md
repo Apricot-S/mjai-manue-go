@@ -14,7 +14,7 @@ This tool analyzes game logs in Mjai format, including gzip-compressed files, an
 ## Output
 
 The tool writes the resulting statistics as JSON to standard output.
-You can redirect or pipe it as needed for downstream processing.
+You can redirect the output as needed for downstream processing.
 
 The output is directly usable as `configs/game_stats.json`.
 
