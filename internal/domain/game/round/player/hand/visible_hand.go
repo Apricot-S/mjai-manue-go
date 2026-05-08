@@ -7,11 +7,15 @@ import (
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/tile"
 )
 
+// VisibleHand stores known hand tiles. For convenience in generated hands used
+// by win checks and analysis, normal fives may appear four times even though a
+// real red-five set would be three normal fives plus one red five at most.
 type VisibleHand struct {
 	tileCounts [tile.NumTileType37]int
 	numTiles   int
 }
 
+// NewVisibleHand accepts only known tiles and at most one red five per suit.
 func NewVisibleHand(tiles []tile.Tile) (*VisibleHand, error) {
 	tileCounts := [tile.NumTileType37]int{}
 	sum := 0
@@ -59,6 +63,7 @@ func (h *VisibleHand) ToTiles() []tile.Tile {
 
 func (h *VisibleHand) ToTileCounts34() *TileCounts34 {
 	tc := TileCounts34(h.tileCounts[:34])
+	// Merge red fives into their normal 34-tile counters for shanten/yaku logic.
 	tc[4] += h.tileCounts[34]
 	tc[13] += h.tileCounts[35]
 	tc[22] += h.tileCounts[36]
@@ -125,6 +130,8 @@ func (h *VisibleHand) Call(m meld.Meld) (*VisibleHand, error) {
 		consumed = mm.Consumed()
 		numConsumed = 4
 	case *meld.PromotedKan:
+		// A promoted kan consumes only the added tile from the hand; the original pon
+		// tiles are already outside the concealed hand.
 		consumed = []tile.Tile{mm.Added()}
 		numConsumed = 1
 	default:

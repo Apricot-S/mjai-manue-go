@@ -16,6 +16,9 @@ type jsonLinesPolicy struct {
 	errorOnEOFBeforeEndGame bool
 }
 
+// runJSONLines hosts the common mjai JSON Lines loop. The policy captures the
+// transport-level differences: stdio is sparse, while mjsonp TCP must ack every
+// non-terminal server message and treat early EOF as abnormal.
 func runJSONLines(name string, room string, agent ai.Agent, in io.Reader, out io.Writer, log io.Writer, policy jsonLinesPolicy) error {
 	r := bufio.NewScanner(in)
 	w := bufio.NewWriter(out)

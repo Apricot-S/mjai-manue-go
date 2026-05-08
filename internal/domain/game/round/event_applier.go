@@ -23,6 +23,8 @@ func (s *State) Apply(ev event.Event) error {
 		}
 	}
 
+	// A declined ron becomes an extra safe tile only after the next non-win event.
+	// Keep the previous pending discard so double/triple ron can still be applied.
 	pendingExtraSafeDiscard := s.pendingExtraSafeDiscard
 	var err error
 	switch ev := ev.(type) {

@@ -22,6 +22,8 @@ type commonPlayerState struct {
 	needsDeadWallDraw         bool
 }
 
+// newCommonPlayerState initializes fields shared by visible and invisible
+// players. Hand contents and furiten-by-actual-waits stay outside this struct.
 func newCommonPlayerState() commonPlayerState {
 	return commonPlayerState{
 		drawnTile:                 nil,

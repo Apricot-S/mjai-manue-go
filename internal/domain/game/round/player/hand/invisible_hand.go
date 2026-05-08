@@ -11,6 +11,8 @@ type InvisibleHand struct {
 	tileCount int
 }
 
+// NewInvisibleHand tracks only the number of hidden tiles. Tile identity is
+// intentionally unknown for opponents and for log entries that omit the hand.
 func NewInvisibleHand(tiles []tile.Tile) (*InvisibleHand, error) {
 	sum := len(tiles)
 	if sum > maxNumTilesInHand {
@@ -62,6 +64,8 @@ func (h *InvisibleHand) Call(m meld.Meld) (*InvisibleHand, error) {
 	case *meld.ConcealedKan:
 		numConsumed = 4
 	case *meld.PromotedKan:
+		// A promoted kan consumes one hidden tile; the original pon tiles were already
+		// consumed by the earlier call.
 		numConsumed = 1
 	default:
 		return nil, fmt.Errorf("cannot call unknown meld type: %T", m)
