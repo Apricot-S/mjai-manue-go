@@ -86,11 +86,16 @@ func (p *VisiblePlayer) IsFuriten() bool {
 	return p.isFuriten
 }
 
-func (p *VisiblePlayer) IsRonFuriten(winningTile *tile.Tile) bool {
-	if winningTile == nil || !p.waits.has(*winningTile) {
-		return false
+func (p *VisiblePlayer) CanRonBy(winningTile *tile.Tile) bool {
+	if winningTile == nil {
+		// When the event omits the winning tile, state transition validation
+		// cannot verify the exact tile, so preserve the existing permissive behavior.
+		return true
 	}
-	return p.isFuriten
+	if !p.waits.has(*winningTile) {
+		return true
+	}
+	return !p.isFuriten
 }
 
 func (p *VisiblePlayer) RiichiState() RiichiState {

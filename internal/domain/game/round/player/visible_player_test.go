@@ -1675,7 +1675,7 @@ func TestVisiblePlayer_AddExtraSafeTiles_UpdateFuritenFromActualHand(t *testing.
 	}
 }
 
-func TestVisiblePlayer_IsRonFuriten_SharedByAllWaits(t *testing.T) {
+func TestVisiblePlayer_CanRonBy_DisallowsAllWaitsWhenAnyWaitIsFuriten(t *testing.T) {
 	handTiles := [13]tile.Tile{
 		tile.MustTileFromCode("1p"), tile.MustTileFromCode("1p"), tile.MustTileFromCode("1p"),
 		tile.MustTileFromCode("2p"), tile.MustTileFromCode("2p"), tile.MustTileFromCode("2p"),
@@ -1691,8 +1691,8 @@ func TestVisiblePlayer_IsRonFuriten_SharedByAllWaits(t *testing.T) {
 	p.AddExtraSafeTiles(tile.MustTileFromCode("1m"))
 
 	winningTile := tile.MustTileFromCode("E")
-	if !p.IsRonFuriten(&winningTile) {
-		t.Error("IsRonFuriten(E) = false, want true when another wait 1m is extra safe")
+	if p.CanRonBy(&winningTile) {
+		t.Error("CanRonBy(E) = true, want false when another wait 1m is extra safe")
 	}
 }
 
@@ -1732,8 +1732,8 @@ func TestVisiblePlayer_Discard_UpdateFuritenAfterRiichiAccepted(t *testing.T) {
 	}
 
 	otherWait := tile.MustTileFromCode("3m")
-	if !p.IsRonFuriten(&otherWait) {
-		t.Error("IsRonFuriten(3m) = false, want true after missing tsumo on 6m after riichi")
+	if p.CanRonBy(&otherWait) {
+		t.Error("CanRonBy(3m) = true, want false after missing tsumo on 6m after riichi")
 	}
 }
 

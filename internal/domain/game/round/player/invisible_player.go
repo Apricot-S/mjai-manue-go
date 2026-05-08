@@ -81,22 +81,24 @@ func (p *InvisiblePlayer) IsFuriten() bool {
 	return false
 }
 
-func (p *InvisiblePlayer) IsRonFuriten(winningTile *tile.Tile) bool {
+func (p *InvisiblePlayer) CanRonBy(winningTile *tile.Tile) bool {
 	if winningTile == nil {
-		return false
+		// When the event omits the winning tile, state transition validation
+		// cannot verify the exact tile, so preserve the existing permissive behavior.
+		return true
 	}
 
 	for _, discardedTile := range p.discardedTiles {
 		if discardedTile.HasSameSymbol(*winningTile) {
-			return true
+			return false
 		}
 	}
 	for _, safeTile := range p.extraSafeTiles {
 		if safeTile.HasSameSymbol(*winningTile) {
-			return true
+			return false
 		}
 	}
-	return false
+	return true
 }
 
 func (p *InvisiblePlayer) RiichiState() RiichiState {

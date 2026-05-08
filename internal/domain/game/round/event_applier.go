@@ -367,7 +367,7 @@ func (s *State) canApplyWin(ev *event.Win) bool {
 	targetRiver := s.players[ev.Target().Index()].River()
 	return len(targetRiver) > 0 &&
 		isTileMatchKnownEnough(&targetRiver[len(targetRiver)-1], ev.WinningTile()) &&
-		!s.players[ev.Actor().Index()].IsRonFuriten(ev.WinningTile())
+		s.players[ev.Actor().Index()].CanRonBy(ev.WinningTile())
 }
 
 func (s *State) canApplyRobbingKan(ev *event.Win) bool {

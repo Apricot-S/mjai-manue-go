@@ -45,8 +45,9 @@ type PlayerViewer interface {
 	// IsFuriten returns whether the player's actual visible hand is furiten.
 	// Invisible players cannot update this from actual hand contents.
 	IsFuriten() bool
-	// IsRonFuriten returns whether ron on the winning tile is forbidden by furiten.
-	IsRonFuriten(winningTile *tile.Tile) bool
+	// CanRonBy returns whether ron by the winning tile is allowed by furiten constraints.
+	// It does not validate yaku, score, or complete legal action availability.
+	CanRonBy(winningTile *tile.Tile) bool
 
 	// RiichiState returns the riichi state.
 	RiichiState() RiichiState
