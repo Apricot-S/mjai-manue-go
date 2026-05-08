@@ -1,15 +1,12 @@
 package mjairuntime
 
 import (
-	"bufio"
 	"fmt"
 	"io"
 	"net"
 	"net/url"
 	"strings"
 
-	"github.com/Apricot-S/mjai-manue-go/internal/adapter/mjai/inbound"
-	"github.com/Apricot-S/mjai-manue-go/internal/adapter/mjai/outbound"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/ai"
 )
 
@@ -77,40 +74,9 @@ func parseMjsonpURL(rawURL string) (*mjsonpEndpoint, error) {
 }
 
 func runTCPConn(name string, room string, agent ai.Agent, conn net.Conn, log io.Writer) error {
-	r := bufio.NewScanner(conn)
-	w := bufio.NewWriter(conn)
-	defer w.Flush()
-
-	driver := NewDriver(name, room, agent, log)
-	for r.Scan() {
-		line := r.Bytes()
-		if err := traceLine(log, "<-", line); err != nil {
-			return err
-		}
-		if len(line) == 0 {
-			return fmt.Errorf("empty input line")
-		}
-
-		msg, err := inbound.ParseMessage(line)
-		if err != nil {
-			return err
-		}
-		outMsg, err := driver.Handle(msg)
-		if err != nil {
-			return err
-		}
-		if driver.Ended() {
-			return nil
-		}
-		if outMsg == nil {
-			outMsg = outbound.NewNone()
-		}
-		if err := writeMessageWithTrace(w, outMsg, log); err != nil {
-			return err
-		}
-	}
-	if err := r.Err(); err != nil {
-		return err
-	}
-	return fmt.Errorf("connection closed before end_game")
+	return runJSONLines(name, room, agent, conn, conn, log, jsonLinesPolicy{
+		respondNoneOnNoReaction: true,
+		stopOnEndGame:           true,
+		errorOnEOFBeforeEndGame: true,
+	})
 }
