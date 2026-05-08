@@ -9,6 +9,7 @@
 - `docs/protocols.md`: mjai / stdio / RiichiLab 各プロトコルの **メッセージ仕様の集約先**
   - `docs/design.md` 側に仕様詳細を重複記載せず、必要箇所から参照する方針
 - `docs/board-state-output.md`: 盤面状態出力の実装状況と移植元参照（恒久仕様は `docs/design.md` に反映）
+- `docs/tcp_client_game.coffee`: CoffeeScript 版 TCP client の移植元参照。mjsonp TCP adapter の振る舞い確認に使うが、Go 版は設計書に従ってより適切な error 返却・終了扱いにする。
 - `docs/terminology-en.md`: 移植元コードの英語用語を確認する補助資料
 
 ## 実装ルール（設計書の要点）
@@ -28,16 +29,12 @@
 - `round.State` / `EventApplier` / `LegalActions` は現状を最終形として扱う。責務分割目的での追加 struct/service 化は、間接参照が増えて読みにくくなるため原則行わない。
 - `service/yaku.go` の TODO はオリジナル実装由来のコメントを保持しているもの。未完了作業とは扱わず、必要ならその旨をコメントに追記する。
 
-## リファクタリング作業順
+## 直近の作業順
 
 レビュー負荷を抑えるため、以下は1件ずつ独立した差分で進める。
 
-1. viewer / player getter の防御コピー
-2. `hand.VisibleHand.Call` / `hand.InvisibleHand.Call` の未知 meld 防止
-3. mjai runtime の JSON Lines loop 共通化
-4. `VisiblePlayer` / `InvisiblePlayer` の小規模重複整理（読みにくくなるなら実施しない）
-5. `service/yaku.go` の TODO 注釈整理（ロジック再設計や panic 排除はしない）
-6. 内部 API と非自明処理へのコメント追加。不変条件・コーナーケース・移植仕様上の注意点に絞り、自明な getter や単純処理には増やしすぎない。
+1. mjsonp TCP adapter の CoffeeScript 版由来仕様反映。`hello` の protocol/version 検証は追加しない。socket lifecycle log を stderr 側へ出し、`error` message の response なし error 終了、`end_game` の response なし正常終了をテストで固定する。
+2. 内部 API と非自明処理へのコメント追加。不変条件・コーナーケース・移植仕様上の注意点に絞り、自明な getter や単純処理には増やしすぎない。
 
 ## ドキュメント更新の運用
 

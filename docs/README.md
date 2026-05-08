@@ -8,6 +8,7 @@
 - `protocols.md`: mjai / stdio / RiichiLab 各プロトコルのメッセージ仕様の集約先。メッセージ種別・フィールド・解釈はここを更新する。
 - `board-state-output.md`: 盤面状態出力の実装計画と Ruby 版 `mjai` の参照抜粋。実装が安定したら、恒久仕様は `design.md` に残し、この計画メモは縮小または削除する。
 - `performance-improvement-candidates.md`: 実装効率化候補の調査メモ。向聴計算、和了形判定、合法手列挙、牌変換などの改善案と検証方針をまとめる。
+- `tcp_client_game.coffee`: CoffeeScript 版 `mjai-manue` の TCP client 実装抜粋。mjsonp TCP adapter の振る舞いを確認するための移植元参照であり、Go 版は完全同一ではなく本設計書の方針に合わせて実装する。
 - `terminology-en.md`: CoffeeScript 版 `mjai-manue` 由来の英語用語集。移植元コードの語彙確認に使う補助資料。
 
 ## 分割方針

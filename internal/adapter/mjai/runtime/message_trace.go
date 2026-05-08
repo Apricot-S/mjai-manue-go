@@ -32,3 +32,11 @@ func traceLine(log io.Writer, direction string, line []byte) error {
 	_, err := fmt.Fprintf(log, "%s\t%s\n", direction, string(line))
 	return err
 }
+
+func logLine(log io.Writer, line string) error {
+	if log == nil {
+		return nil
+	}
+	_, err := fmt.Fprintln(log, line)
+	return err
+}

@@ -7,6 +7,7 @@ import (
 	"net"
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/Apricot-S/mjai-manue-go/internal/adapter/mjai/runtime"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/ai"
@@ -79,13 +80,118 @@ func TestRunTCP_RespondsToEachServerMessage(t *testing.T) {
 		serverErr <- nil
 	}()
 
+	var log strings.Builder
+	err = mjairuntime.RunTCP(mjairuntime.TCPConfig{
+		Name:  "tsumogiri",
+		URL:   "mjsonp://" + ln.Addr().String() + "/room",
+		Agent: ai.NewTsumogiriAgent(),
+		Log:   &log,
+	})
+	if err != nil {
+		t.Fatalf("RunTCP() failed: %v", err)
+	}
+	if err := <-serverErr; err != nil {
+		t.Fatalf("server failed: %v", err)
+	}
+	if !strings.Contains(log.String(), "connected\n") {
+		t.Errorf("log = %q, want connected log", log.String())
+	}
+	if !strings.Contains(log.String(), "closed\n") {
+		t.Errorf("log = %q, want closed log", log.String())
+	}
+}
+
+func TestRunTCP_ConnectionClosedBeforeEndGameReturnsError(t *testing.T) {
+	ln, err := net.Listen("tcp", "127.0.0.1:0")
+	if err != nil {
+		t.Fatalf("Listen() failed: %v", err)
+	}
+	defer ln.Close()
+
+	serverErr := make(chan error, 1)
+	go func() {
+		conn, err := ln.Accept()
+		if err != nil {
+			serverErr <- err
+			return
+		}
+		if err := conn.Close(); err != nil {
+			serverErr <- err
+			return
+		}
+		serverErr <- nil
+	}()
+
+	var log strings.Builder
+	err = mjairuntime.RunTCP(mjairuntime.TCPConfig{
+		Name:  "tsumogiri",
+		URL:   "mjsonp://" + ln.Addr().String() + "/room",
+		Agent: ai.NewTsumogiriAgent(),
+		Log:   &log,
+	})
+	if err == nil {
+		t.Fatal("RunTCP() succeeded unexpectedly")
+	}
+	if !strings.Contains(err.Error(), "connection closed before end_game") {
+		t.Errorf("error = %q, want connection closed before end_game", err.Error())
+	}
+	if err := <-serverErr; err != nil {
+		t.Fatalf("server failed: %v", err)
+	}
+	if !strings.Contains(log.String(), "connected\n") {
+		t.Errorf("log = %q, want connected log", log.String())
+	}
+	if !strings.Contains(log.String(), "closed\n") {
+		t.Errorf("log = %q, want closed log", log.String())
+	}
+}
+
+func TestRunTCP_ServerErrorClosesWithoutResponse(t *testing.T) {
+	ln, err := net.Listen("tcp", "127.0.0.1:0")
+	if err != nil {
+		t.Fatalf("Listen() failed: %v", err)
+	}
+	defer ln.Close()
+
+	serverErr := make(chan error, 1)
+	go func() {
+		conn, err := ln.Accept()
+		if err != nil {
+			serverErr <- err
+			return
+		}
+		defer conn.Close()
+
+		if _, err := fmt.Fprintln(conn, `{"type":"error","message":"server failed"}`); err != nil {
+			serverErr <- err
+			return
+		}
+		if err := conn.SetReadDeadline(time.Now().Add(500 * time.Millisecond)); err != nil {
+			serverErr <- err
+			return
+		}
+		got, err := bufio.NewReader(conn).ReadString('\n')
+		if err == nil {
+			serverErr <- fmt.Errorf("server error response = %q, want connection close without response", got)
+			return
+		}
+		if netErr, ok := err.(net.Error); ok && netErr.Timeout() {
+			serverErr <- fmt.Errorf("server error response timed out; connection was not closed")
+			return
+		}
+		serverErr <- nil
+	}()
+
 	err = mjairuntime.RunTCP(mjairuntime.TCPConfig{
 		Name:  "tsumogiri",
 		URL:   "mjsonp://" + ln.Addr().String() + "/room",
 		Agent: ai.NewTsumogiriAgent(),
 	})
-	if err != nil {
-		t.Fatalf("RunTCP() failed: %v", err)
+	if err == nil {
+		t.Fatal("RunTCP() succeeded unexpectedly")
+	}
+	if !strings.Contains(err.Error(), "server error: server failed") {
+		t.Errorf("error = %q, want server error", err.Error())
 	}
 	if err := <-serverErr; err != nil {
 		t.Fatalf("server failed: %v", err)

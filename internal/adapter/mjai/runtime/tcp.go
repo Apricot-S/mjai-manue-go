@@ -37,9 +37,19 @@ func RunTCP(cfg TCPConfig) error {
 
 	conn, err := net.Dial("tcp", endpoint.address)
 	if err != nil {
+		if logErr := logLine(cfg.Log, "tcp error: "+err.Error()); logErr != nil {
+			return logErr
+		}
 		return err
 	}
-	defer conn.Close()
+	if err := logLine(cfg.Log, "connected"); err != nil {
+		conn.Close()
+		return err
+	}
+	defer func() {
+		conn.Close()
+		_ = logLine(cfg.Log, "closed")
+	}()
 
 	return runTCPConn(cfg.Name, endpoint.room, cfg.Agent, conn, cfg.Log)
 }
