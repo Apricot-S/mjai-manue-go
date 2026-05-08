@@ -37,6 +37,12 @@
 - `tools/` 配下の各種統計生成ツールの設計・実装詳細
 - `test/` 配下の original-vs-port 比較フレームワークの設計・運用詳細（必要時にのみ実行する想定）
 
+### 2.3 公開 README の扱い
+
+`README.md` / `cmd/README.md` / `cmd/mjai-manue/README.md` は、将来の完成形を先行して示す利用者向けドキュメントとして扱う。
+そのため、現時点で `mjai-manue` 本体が未実装でも、README を逐次実装状況へ同期する作業は原則として行わない。
+コーディングエージェントが現状実装を判断する場合は、本設計書の「現状コードの把握」「実装計画」と実ファイルを一次情報とし、README の完成形記述だけを根拠に実装済みと判断しない。
+
 ## 3. 品質特性 (NFR)
 
 - **堅牢性**: 入力が空行・不正 JSON の場合はエラー終了する（継続しない）。
@@ -287,8 +293,7 @@ type Round interface {
 
 type Request struct {
     Actor ID
-    Options []Action // legal actions（合法手の列挙のみ。評価/優先度/理由は含めない）
-    // 必要なら「種別（自摸後/他家打牌後の鳴き等）」を入れる（ただし Options は常に合法手の集合）
+    Round ActionStateViewer // 局面 view と legal actions を含む観測（obs）
 }
 
 type Decision struct {
@@ -299,6 +304,7 @@ type Decision struct {
 
 - `LegalActions` は「行動候補の列挙」であり、**選択（どれを選ぶか）は Agent の責務**。空であることは、その actor に今返すべき action がないことを表す。
 - Agent へ渡す obs は局面 view と合法手一覧の両方を含む複合 interface（例: `ActionStateViewer`）とする。
+- `ai.Request` の `Round` は AI 分野でいう observation（obs）として扱う。legal actions は Request の別フィールドとして外から渡すのではなく、obs の一部として参照できる形を標準とする。これは強化学習・ゲームAI系の API で、局面観測とその局面で選べる action mask / legal actions を同じ観測側に含める設計が主流であるため。
 - チー候補は喰い替え制約を反映する。チー後に残る手牌がすべて喰い替え牌になる場合、そのチーは直後に合法打牌を選べないため `LegalActions` に含めない。
 - 将来的に tools で「4人全員の合法手」を観測したい場合、`LegalActions(playerID)` を 0..3 で呼び出せばよい（必要なら `LegalActionsAll()` を追加する）。
 - `Pass`（見送り）は **副露・和了が可能な局面に限って** `LegalActions` に含める（常に含めない）。
@@ -371,8 +377,8 @@ type Decision struct {
 ### 13.2 優先実装順
 
 1. **現状仕様の整合**
-   - `README.md` / `cmd/README.md` / `cmd/mjai-manue/README.md` が `mjai-manue` 実装済みのように読める箇所を、実装状況に合わせて修正する。
-   - `mjai-tsumogiri` の現行仕様（`--name`、URL 省略時 stdio、mjsonp URL 指定時 TCP、stderr trace/盤面出力）を docs とテストで固定する。
+   - `README.md` / `cmd/README.md` / `cmd/mjai-manue/README.md` は完成形を先行して示すため、未実装状態との逐次同期は行わない。コーディングエージェント向けの実装状況は本設計書と `AGENTS.md` に集約する。
+   - `mjai-tsumogiri` の現行仕様（`--name`、URL 省略時 stdio、mjsonp URL 指定時 TCP、stderr trace/盤面出力）を設計書とテストで固定する。
 
 2. **mjai inbound event の拡充（完了）**
    - `reach` / `reach_accepted` / `pon` / `chi` / `ankan` / `kakan` / `daiminkan` / `dora` / `hora` / `ryukyoku` を domain event 化し、`round.State.Apply` で状態遷移に反映する。domain event 名は `hora` を `Win`、`ryukyoku` を `DrawRound` とする。
@@ -412,5 +418,5 @@ type Decision struct {
    - `possible_actions` は入力にあっても信頼せず、合法手は State から算出する。
 
 9. **仕上げ**
-   - README / command docs / design docs を実装に合わせて再同期する。
+   - 完成形として先行している README 群と、実装状況を示す設計書・エージェント向け文書の役割分担を保ったまま、必要な補足だけを更新する。
    - `GOEXPERIMENT=jsonv2` 前提の `go test ./...` を通し、必要に応じて package 単位のテストと benchmark を追加する。

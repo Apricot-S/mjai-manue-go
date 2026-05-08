@@ -19,10 +19,12 @@
   - `internal/adapter/`: 具体 I/O（mjai TCP/stdio runtime、JSON codec 等）。外部プロトコル差分は ACL で吸収する。
   - `cmd/`: CLI エントリ。フラグ解析、Agent 選択、runtime 起動、終了コード変換のみ。
 - 現在実装済みの CLI は `cmd/mjai-tsumogiri`。`cmd/mjai-manue` は README のみ先行しており、本体実装は今後の計画対象。
+- `README.md` / `cmd/README.md` / `cmd/mjai-manue/README.md` は、あえて完成形を先行して記載している利用者向け文書。実装状況と逐次同期する作業は行わず、現状判断は `docs/design.md` と実ファイルを根拠にする。
 - stdout は **プロトコル出力専用**。ログ/エラーは stderr（`docs/design.md` の I/O 安全性）。
 - 入力が空行・不正 JSON の場合は **エラー終了**（継続しない）。
 - 送信はメッセージ単位で必ず flush する（透過性）。
 - `--seed` を持つコマンドでは乱数を決定的にする（決定性）。現行 `mjai-tsumogiri` は乱数を使わず、`--seed` も持たない。
+- `ai.Request` の `Round` は AI 分野でいう observation（obs）として扱う。legal actions は外側から別フィールドで渡すのではなく、obs（現状は `round.ActionStateViewer`）に含める設計を維持する。
 
 ## ドキュメント更新の運用
 
