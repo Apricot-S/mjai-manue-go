@@ -65,6 +65,24 @@ func containsWin(actions []action.Action, actor seat.Seat, target seat.Seat, win
 	return false
 }
 
+func containsChii(actions []action.Action, actor seat.Seat, target seat.Seat, takenCode string, consumedCodes [2]string) bool {
+	for _, a := range actions {
+		chii, ok := a.(*action.Chii)
+		if !ok {
+			continue
+		}
+		if chii.Actor() != actor || chii.Target() != target || chii.Taken().String() != takenCode {
+			continue
+		}
+		consumed := chii.Consumed()
+		if consumed[0].String() == consumedCodes[0] &&
+			consumed[1].String() == consumedCodes[1] {
+			return true
+		}
+	}
+	return false
+}
+
 func containsPon(actions []action.Action, actor seat.Seat, target seat.Seat, takenCode string, consumedCodes [2]string) bool {
 	for _, a := range actions {
 		pon, ok := a.(*action.Pon)

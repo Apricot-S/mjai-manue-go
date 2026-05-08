@@ -38,6 +38,12 @@ func (s *State) legalActionsOnOtherDiscard(playerSeat seat.Seat, p *player.Visib
 		actions = append(actions, a)
 	}
 
+	chiis, err := s.legalChiiActions(playerSeat, p, *targetSeat, discardedTile)
+	if err != nil {
+		return nil, err
+	}
+	actions = append(actions, chiis...)
+
 	pons, err := s.legalPonActions(playerSeat, p, *targetSeat, discardedTile)
 	if err != nil {
 		return nil, err
@@ -90,6 +96,73 @@ func (s *State) canWinByRon(playerSeat seat.Seat, p *player.VisiblePlayer, winni
 		p.RiichiState() != player.NotRiichi,
 		s.ronWinEvent(),
 	)
+}
+
+func (s *State) legalChiiActions(playerSeat seat.Seat, p *player.VisiblePlayer, targetSeat seat.Seat, taken tile.Tile) ([]action.Action, error) {
+	if !playerSeat.IsShimochaOf(targetSeat) || !p.CanChiiPonKan() || s.numLeftTiles <= 0 || !taken.IsSuits() {
+		return nil, nil
+	}
+
+	handBeforeCall, ok := p.Hand()
+	if !ok {
+		return nil, nil
+	}
+
+	consumedCandidates := chiiConsumedCandidates(handBeforeCall.Count, taken)
+	if len(consumedCandidates) == 0 {
+		return nil, nil
+	}
+
+	actions := make([]action.Action, 0, len(consumedCandidates))
+	for _, consumed := range consumedCandidates {
+		a, err := action.NewChii(playerSeat, targetSeat, taken, consumed)
+		if err != nil {
+			return nil, err
+		}
+		actions = append(actions, a)
+	}
+	return actions, nil
+}
+
+func chiiConsumedCandidates(count func(tile.Tile) int, taken tile.Tile) [][2]tile.Tile {
+	if !taken.IsSuits() {
+		return nil
+	}
+
+	candidates := make([][2]tile.Tile, 0, 5)
+	for _, offsets := range [][2]int{{-2, -1}, {-1, 1}, {1, 2}} {
+		first := taken.Next(offsets[0])
+		second := taken.Next(offsets[1])
+		if first == nil || second == nil {
+			continue
+		}
+		for _, firstCandidate := range chiiTileCandidates(count, *first) {
+			for _, secondCandidate := range chiiTileCandidates(count, *second) {
+				candidates = append(candidates, [2]tile.Tile{firstCandidate, secondCandidate})
+			}
+		}
+	}
+	return candidates
+}
+
+func chiiTileCandidates(count func(tile.Tile) int, t tile.Tile) []tile.Tile {
+	normal := t.RemoveRed()
+	if !normal.IsSuits() || normal.Number() != 5 {
+		if count(normal) == 0 {
+			return nil
+		}
+		return []tile.Tile{normal}
+	}
+
+	candidates := make([]tile.Tile, 0, 2)
+	if count(normal) > 0 {
+		candidates = append(candidates, normal)
+	}
+	red := normal.AddRed()
+	if count(red) > 0 {
+		candidates = append(candidates, red)
+	}
+	return candidates
 }
 
 func (s *State) legalPonActions(playerSeat seat.Seat, p *player.VisiblePlayer, targetSeat seat.Seat, taken tile.Tile) ([]action.Action, error) {

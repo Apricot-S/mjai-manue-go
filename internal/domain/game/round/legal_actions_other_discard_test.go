@@ -61,9 +61,9 @@ func TestState_LegalActions_OnOtherDiscardIncludesRon(t *testing.T) {
 
 func TestState_LegalActions_OnOtherDiscardExcludesRonWhenFuriten(t *testing.T) {
 	hands := newValidHands()
-	hands[1] = ronWithTanyaoHandForLegalActionsTest()
+	hands[2] = ronWithTanyaoHandForLegalActionsTest()
 	s := mustNewRoundStateForTest(t, hands)
-	actor := seat.MustSeat(1)
+	actor := seat.MustSeat(2)
 	winningTile := tile.MustTileFromCode("3p")
 	p := s.players[actor.Index()].(*player.VisiblePlayer)
 	p.AddExtraSafeTiles(winningTile)
@@ -347,6 +347,127 @@ func TestState_LegalActions_OnOtherDiscardExcludesCalledKanOnFifthKan(t *testing
 	}
 }
 
+func TestState_LegalActions_OnOtherDiscardIncludesChii(t *testing.T) {
+	hands := newValidHands()
+	hands[1] = chiiHandForLegalActionsTest("2m", "3m")
+	s := mustNewRoundStateForTest(t, hands)
+	target := seat.MustSeat(0)
+	actor := seat.MustSeat(1)
+	taken := tile.MustTileFromCode("4m")
+	if err := s.Apply(event.NewDraw(target, taken)); err != nil {
+		t.Fatalf("Apply(Draw) failed: %v", err)
+	}
+	if err := s.Apply(event.NewDiscard(target, taken, true)); err != nil {
+		t.Fatalf("Apply(Discard) failed: %v", err)
+	}
+
+	got, err := s.LegalActions(actor)
+	if err != nil {
+		t.Fatalf("LegalActions() failed: %v", err)
+	}
+	if !containsChii(got, actor, target, "4m", [2]string{"2m", "3m"}) {
+		t.Error("LegalActions() does not contain Chii, want chii from kamicha discard")
+	}
+	if !containsPass(got, actor) {
+		t.Error("LegalActions() does not contain Pass, want pass when chii is available")
+	}
+}
+
+func TestState_LegalActions_OnOtherDiscardExcludesChiiFromNonKamicha(t *testing.T) {
+	hands := newValidHands()
+	hands[2] = chiiHandForLegalActionsTest("2m", "3m")
+	s := mustNewRoundStateForTest(t, hands)
+	target := seat.MustSeat(0)
+	actor := seat.MustSeat(2)
+	taken := tile.MustTileFromCode("4m")
+	if err := s.Apply(event.NewDraw(target, taken)); err != nil {
+		t.Fatalf("Apply(Draw) failed: %v", err)
+	}
+	if err := s.Apply(event.NewDiscard(target, taken, true)); err != nil {
+		t.Fatalf("Apply(Discard) failed: %v", err)
+	}
+
+	got, err := s.LegalActions(actor)
+	if err != nil {
+		t.Fatalf("LegalActions() failed: %v", err)
+	}
+	if containsChii(got, actor, target, "4m", [2]string{"2m", "3m"}) {
+		t.Error("LegalActions() contains Chii, want chii excluded from non-kamicha discard")
+	}
+}
+
+func TestState_LegalActions_OnOtherDiscardIncludesChiiRedFiveChoices(t *testing.T) {
+	hands := newValidHands()
+	hands[1] = chiiHandWithRedFiveForLegalActionsTest()
+	s := mustNewRoundStateForTest(t, hands)
+	target := seat.MustSeat(0)
+	actor := seat.MustSeat(1)
+	taken := tile.MustTileFromCode("4m")
+	if err := s.Apply(event.NewDraw(target, taken)); err != nil {
+		t.Fatalf("Apply(Draw) failed: %v", err)
+	}
+	if err := s.Apply(event.NewDiscard(target, taken, true)); err != nil {
+		t.Fatalf("Apply(Discard) failed: %v", err)
+	}
+
+	got, err := s.LegalActions(actor)
+	if err != nil {
+		t.Fatalf("LegalActions() failed: %v", err)
+	}
+	if !containsChii(got, actor, target, "4m", [2]string{"3m", "5m"}) {
+		t.Error("LegalActions() does not contain Chii with normal five")
+	}
+	if !containsChii(got, actor, target, "4m", [2]string{"3m", "5mr"}) {
+		t.Error("LegalActions() does not contain Chii with red five")
+	}
+}
+
+func TestState_LegalActions_OnOtherDiscardIncludesMaxActions(t *testing.T) {
+	hands := newValidHands()
+	hands[1] = maxOtherDiscardActionsHandForLegalActionsTest()
+	s := mustNewRoundStateForTest(t, hands)
+	target := seat.MustSeat(0)
+	actor := seat.MustSeat(1)
+	taken := tile.MustTileFromCode("4m")
+	if err := s.Apply(event.NewDraw(target, taken)); err != nil {
+		t.Fatalf("Apply(Draw) failed: %v", err)
+	}
+	if err := s.Apply(event.NewDiscard(target, taken, true)); err != nil {
+		t.Fatalf("Apply(Discard) failed: %v", err)
+	}
+
+	got, err := s.LegalActions(actor)
+	if err != nil {
+		t.Fatalf("LegalActions() failed: %v", err)
+	}
+	if len(got) != maxNumActionsOnOtherDiscard {
+		t.Fatalf("LegalActions() length = %d, want %d: %v", len(got), maxNumActionsOnOtherDiscard, got)
+	}
+	if !containsWin(got, actor, target, "4m") {
+		t.Error("LegalActions() does not contain Win")
+	}
+	if !containsPon(got, actor, target, "4m", [2]string{"4m", "4m"}) {
+		t.Error("LegalActions() does not contain Pon")
+	}
+	if !containsCalledKan(got, actor, target, "4m", [3]string{"4m", "4m", "4m"}) {
+		t.Error("LegalActions() does not contain CalledKan")
+	}
+	for _, consumed := range [][2]string{
+		{"2m", "3m"},
+		{"3m", "5m"},
+		{"3m", "5mr"},
+		{"5m", "6m"},
+		{"5mr", "6m"},
+	} {
+		if !containsChii(got, actor, target, "4m", consumed) {
+			t.Errorf("LegalActions() does not contain Chii consumed=%v", consumed)
+		}
+	}
+	if !containsPass(got, actor) {
+		t.Error("LegalActions() does not contain Pass")
+	}
+}
+
 func TestState_LegalActions_OnOtherDiscardIncludesRonLastTile(t *testing.T) {
 	hands := newValidHands()
 	hands[1] = ronWithoutYakuHandForLegalActionsTest()
@@ -487,6 +608,60 @@ func calledKanHandForLegalActionsTest(firstCode, secondCode, thirdCode string) [
 		tile.MustTileFromCode("2s"),
 		tile.MustTileFromCode("3s"),
 		tile.MustTileFromCode("9p"),
+	}
+}
+
+func chiiHandForLegalActionsTest(firstCode, secondCode string) [common.InitHandSize]tile.Tile {
+	return [common.InitHandSize]tile.Tile{
+		tile.MustTileFromCode(firstCode),
+		tile.MustTileFromCode(secondCode),
+		tile.MustTileFromCode("1m"),
+		tile.MustTileFromCode("1m"),
+		tile.MustTileFromCode("7m"),
+		tile.MustTileFromCode("8m"),
+		tile.MustTileFromCode("9m"),
+		tile.MustTileFromCode("1p"),
+		tile.MustTileFromCode("2p"),
+		tile.MustTileFromCode("3p"),
+		tile.MustTileFromCode("1s"),
+		tile.MustTileFromCode("2s"),
+		tile.MustTileFromCode("3s"),
+	}
+}
+
+func chiiHandWithRedFiveForLegalActionsTest() [common.InitHandSize]tile.Tile {
+	return [common.InitHandSize]tile.Tile{
+		tile.MustTileFromCode("3m"),
+		tile.MustTileFromCode("5m"),
+		tile.MustTileFromCode("5mr"),
+		tile.MustTileFromCode("1m"),
+		tile.MustTileFromCode("1m"),
+		tile.MustTileFromCode("7m"),
+		tile.MustTileFromCode("8m"),
+		tile.MustTileFromCode("9m"),
+		tile.MustTileFromCode("1p"),
+		tile.MustTileFromCode("2p"),
+		tile.MustTileFromCode("3p"),
+		tile.MustTileFromCode("1s"),
+		tile.MustTileFromCode("2s"),
+	}
+}
+
+func maxOtherDiscardActionsHandForLegalActionsTest() [common.InitHandSize]tile.Tile {
+	return [common.InitHandSize]tile.Tile{
+		tile.MustTileFromCode("2m"),
+		tile.MustTileFromCode("3m"),
+		tile.MustTileFromCode("4m"),
+		tile.MustTileFromCode("4m"),
+		tile.MustTileFromCode("4m"),
+		tile.MustTileFromCode("5mr"),
+		tile.MustTileFromCode("5m"),
+		tile.MustTileFromCode("5m"),
+		tile.MustTileFromCode("5m"),
+		tile.MustTileFromCode("6m"),
+		tile.MustTileFromCode("P"),
+		tile.MustTileFromCode("P"),
+		tile.MustTileFromCode("P"),
 	}
 }
 
