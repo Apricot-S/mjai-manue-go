@@ -83,6 +83,25 @@ func containsPon(actions []action.Action, actor seat.Seat, target seat.Seat, tak
 	return false
 }
 
+func containsCalledKan(actions []action.Action, actor seat.Seat, target seat.Seat, takenCode string, consumedCodes [3]string) bool {
+	for _, a := range actions {
+		calledKan, ok := a.(*action.CalledKan)
+		if !ok {
+			continue
+		}
+		if calledKan.Actor() != actor || calledKan.Target() != target || calledKan.Taken().String() != takenCode {
+			continue
+		}
+		consumed := calledKan.Consumed()
+		if consumed[0].String() == consumedCodes[0] &&
+			consumed[1].String() == consumedCodes[1] &&
+			consumed[2].String() == consumedCodes[2] {
+			return true
+		}
+	}
+	return false
+}
+
 func containsPass(actions []action.Action, actor seat.Seat) bool {
 	for _, a := range actions {
 		pass, ok := a.(*action.Pass)

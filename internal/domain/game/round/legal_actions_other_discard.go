@@ -8,7 +8,7 @@ import (
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/tile"
 )
 
-const maxNumActionsOnOtherDiscard = 1 + 5 // ron + up to 5 chii patterns with red fives
+const maxNumActionsOnOtherDiscard = 1 + 1 + 5 // pon + daiminkan + up to 5 chii patterns with red fives
 
 func (s *State) legalActionsOnOtherDiscard(playerSeat seat.Seat, p *player.VisiblePlayer) ([]action.Action, error) {
 	if s.pendingRobbedKanTile != nil && s.pendingKanActor != nil && *s.pendingKanActor != playerSeat {
@@ -40,6 +40,12 @@ func (s *State) legalActionsOnOtherDiscard(playerSeat seat.Seat, p *player.Visib
 		return nil, err
 	}
 	actions = append(actions, pons...)
+
+	calledKans, err := s.legalCalledKanActions(playerSeat, p, *targetSeat, discardedTile)
+	if err != nil {
+		return nil, err
+	}
+	actions = append(actions, calledKans...)
 
 	if len(actions) > 0 {
 		actions = append(actions, action.NewPass(playerSeat))
@@ -106,6 +112,49 @@ func (s *State) legalPonActions(playerSeat seat.Seat, p *player.VisiblePlayer, t
 		actions = append(actions, a)
 	}
 	return actions, nil
+}
+
+func (s *State) legalCalledKanActions(playerSeat seat.Seat, p *player.VisiblePlayer, targetSeat seat.Seat, taken tile.Tile) ([]action.Action, error) {
+	if !p.CanChiiPonKan() || s.numKans >= maxNumKan || s.numLeftTiles <= 0 {
+		return nil, nil
+	}
+
+	handBeforeCall, ok := p.Hand()
+	if !ok {
+		return nil, nil
+	}
+	consumed, ok := calledKanConsumedCandidate(handBeforeCall.Count, taken)
+	if !ok {
+		return nil, nil
+	}
+
+	a, err := action.NewCalledKan(playerSeat, targetSeat, taken, consumed)
+	if err != nil {
+		return nil, err
+	}
+	return []action.Action{a}, nil
+}
+
+func calledKanConsumedCandidate(count func(tile.Tile) int, taken tile.Tile) ([3]tile.Tile, bool) {
+	normal := taken.RemoveRed()
+	if !normal.IsSuits() || normal.Number() != 5 {
+		if count(normal) < 3 {
+			return [3]tile.Tile{}, false
+		}
+		return [3]tile.Tile{normal, normal, normal}, true
+	}
+
+	red := normal.AddRed()
+	if taken.IsRed() {
+		if count(normal) < 3 {
+			return [3]tile.Tile{}, false
+		}
+		return [3]tile.Tile{normal, normal, normal}, true
+	}
+	if count(normal) < 2 || count(red) < 1 {
+		return [3]tile.Tile{}, false
+	}
+	return [3]tile.Tile{normal, normal, red}, true
 }
 
 func ponConsumedCandidates(count func(tile.Tile) int, taken tile.Tile) [][2]tile.Tile {

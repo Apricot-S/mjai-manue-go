@@ -248,6 +248,102 @@ func TestState_LegalActions_OnOtherDiscardExcludesPonAfterRiichiAccepted(t *test
 	}
 }
 
+func TestState_LegalActions_OnOtherDiscardIncludesCalledKan(t *testing.T) {
+	hands := newValidHands()
+	hands[1] = calledKanHandForLegalActionsTest("E", "E", "E")
+	s := mustNewRoundStateForTest(t, hands)
+	target := seat.MustSeat(0)
+	actor := seat.MustSeat(1)
+	taken := tile.MustTileFromCode("E")
+	if err := s.Apply(event.NewDraw(target, taken)); err != nil {
+		t.Fatalf("Apply(Draw) failed: %v", err)
+	}
+	if err := s.Apply(event.NewDiscard(target, taken, true)); err != nil {
+		t.Fatalf("Apply(Discard) failed: %v", err)
+	}
+
+	got, err := s.LegalActions(actor)
+	if err != nil {
+		t.Fatalf("LegalActions() failed: %v", err)
+	}
+	if !containsCalledKan(got, actor, target, "E", [3]string{"E", "E", "E"}) {
+		t.Error("LegalActions() does not contain CalledKan, want daiminkan with three matching tiles")
+	}
+	if !containsPass(got, actor) {
+		t.Error("LegalActions() does not contain Pass, want pass when called kan is available")
+	}
+}
+
+func TestState_LegalActions_OnOtherDiscardExcludesCalledKanWithTwoMatchingTiles(t *testing.T) {
+	hands := newValidHands()
+	hands[1] = ponHandForLegalActionsTest("E", "E")
+	s := mustNewRoundStateForTest(t, hands)
+	target := seat.MustSeat(0)
+	actor := seat.MustSeat(1)
+	taken := tile.MustTileFromCode("E")
+	if err := s.Apply(event.NewDraw(target, taken)); err != nil {
+		t.Fatalf("Apply(Draw) failed: %v", err)
+	}
+	if err := s.Apply(event.NewDiscard(target, taken, true)); err != nil {
+		t.Fatalf("Apply(Discard) failed: %v", err)
+	}
+
+	got, err := s.LegalActions(actor)
+	if err != nil {
+		t.Fatalf("LegalActions() failed: %v", err)
+	}
+	if containsCalledKan(got, actor, target, "E", [3]string{"E", "E", "E"}) {
+		t.Error("LegalActions() contains CalledKan, want called kan excluded with only two matching tiles")
+	}
+}
+
+func TestState_LegalActions_OnOtherDiscardIncludesCalledKanRedFive(t *testing.T) {
+	hands := newValidHands()
+	hands[1] = calledKanHandForLegalActionsTest("5m", "5m", "5mr")
+	s := mustNewRoundStateForTest(t, hands)
+	target := seat.MustSeat(0)
+	actor := seat.MustSeat(1)
+	taken := tile.MustTileFromCode("5m")
+	if err := s.Apply(event.NewDraw(target, taken)); err != nil {
+		t.Fatalf("Apply(Draw) failed: %v", err)
+	}
+	if err := s.Apply(event.NewDiscard(target, taken, true)); err != nil {
+		t.Fatalf("Apply(Discard) failed: %v", err)
+	}
+
+	got, err := s.LegalActions(actor)
+	if err != nil {
+		t.Fatalf("LegalActions() failed: %v", err)
+	}
+	if !containsCalledKan(got, actor, target, "5m", [3]string{"5m", "5m", "5mr"}) {
+		t.Error("LegalActions() does not contain CalledKan, want daiminkan containing red five")
+	}
+}
+
+func TestState_LegalActions_OnOtherDiscardExcludesCalledKanOnFifthKan(t *testing.T) {
+	hands := newValidHands()
+	hands[1] = calledKanHandForLegalActionsTest("E", "E", "E")
+	s := mustNewRoundStateForTest(t, hands)
+	s.numKans = maxNumKan
+	target := seat.MustSeat(0)
+	actor := seat.MustSeat(1)
+	taken := tile.MustTileFromCode("E")
+	if err := s.Apply(event.NewDraw(target, taken)); err != nil {
+		t.Fatalf("Apply(Draw) failed: %v", err)
+	}
+	if err := s.Apply(event.NewDiscard(target, taken, true)); err != nil {
+		t.Fatalf("Apply(Discard) failed: %v", err)
+	}
+
+	got, err := s.LegalActions(actor)
+	if err != nil {
+		t.Fatalf("LegalActions() failed: %v", err)
+	}
+	if containsCalledKan(got, actor, target, "E", [3]string{"E", "E", "E"}) {
+		t.Error("LegalActions() contains CalledKan, want fifth kan excluded")
+	}
+}
+
 func TestState_LegalActions_OnOtherDiscardIncludesRonLastTile(t *testing.T) {
 	hands := newValidHands()
 	hands[1] = ronWithoutYakuHandForLegalActionsTest()
@@ -356,6 +452,24 @@ func ponHandForLegalActionsTest(firstCode, secondCode string) [common.InitHandSi
 }
 
 func ponHandWithThreeMatchingTilesForLegalActionsTest(firstCode, secondCode, thirdCode string) [common.InitHandSize]tile.Tile {
+	return [common.InitHandSize]tile.Tile{
+		tile.MustTileFromCode(firstCode),
+		tile.MustTileFromCode(secondCode),
+		tile.MustTileFromCode(thirdCode),
+		tile.MustTileFromCode("1m"),
+		tile.MustTileFromCode("2m"),
+		tile.MustTileFromCode("3m"),
+		tile.MustTileFromCode("1p"),
+		tile.MustTileFromCode("2p"),
+		tile.MustTileFromCode("3p"),
+		tile.MustTileFromCode("1s"),
+		tile.MustTileFromCode("2s"),
+		tile.MustTileFromCode("3s"),
+		tile.MustTileFromCode("9p"),
+	}
+}
+
+func calledKanHandForLegalActionsTest(firstCode, secondCode, thirdCode string) [common.InitHandSize]tile.Tile {
 	return [common.InitHandSize]tile.Tile{
 		tile.MustTileFromCode(firstCode),
 		tile.MustTileFromCode(secondCode),
