@@ -3,6 +3,8 @@ package round
 import (
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/action"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/round/player"
+	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/round/player/hand"
+	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/round/player/meld"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/round/service"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/seat"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/tile"
@@ -115,6 +117,11 @@ func (s *State) legalChiiActions(playerSeat seat.Seat, p *player.VisiblePlayer, 
 
 	actions := make([]action.Action, 0, len(consumedCandidates))
 	for _, consumed := range consumedCandidates {
+		if ok, err := canChiiLeaveNonSwapCallTile(handBeforeCall, targetSeat, taken, consumed); err != nil {
+			return nil, err
+		} else if !ok {
+			continue
+		}
 		a, err := action.NewChii(playerSeat, targetSeat, taken, consumed)
 		if err != nil {
 			return nil, err
@@ -122,6 +129,21 @@ func (s *State) legalChiiActions(playerSeat seat.Seat, p *player.VisiblePlayer, 
 		actions = append(actions, a)
 	}
 	return actions, nil
+}
+
+func canChiiLeaveNonSwapCallTile(handBeforeCall *hand.VisibleHand, targetSeat seat.Seat, taken tile.Tile, consumed [2]tile.Tile) (bool, error) {
+	chii, err := meld.NewChii(taken, consumed, targetSeat)
+	if err != nil {
+		return false, err
+	}
+	handAfterCall, err := handBeforeCall.Call(chii)
+	if err != nil {
+		return false, err
+	}
+	remaining := tile.Tiles(handAfterCall.ToTiles())
+	return len(remaining.Distinct(func(t tile.Tile) bool {
+		return isSwapCallTile(t, chii.SwapCallTiles())
+	})) > 0, nil
 }
 
 func chiiConsumedCandidates(count func(tile.Tile) int, taken tile.Tile) [][2]tile.Tile {

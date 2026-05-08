@@ -422,6 +422,68 @@ func TestState_LegalActions_OnOtherDiscardIncludesChiiRedFiveChoices(t *testing.
 	}
 }
 
+func TestState_LegalActions_OnOtherDiscardExcludesChiiWhenAllRemainingTilesAreSwapCallTilesAfterTwoMelds(t *testing.T) {
+	actor := seat.MustSeat(1)
+	target := seat.MustSeat(0)
+	players := [common.NumPlayers]player.Player{
+		player.NewInvisiblePlayer(),
+		openPlayerForChiiSwapCallLegalActionsTest(t, []tile.Tile{
+			tile.MustTileFromCode("1m"), tile.MustTileFromCode("1m"), tile.MustTileFromCode("1m"),
+			tile.MustTileFromCode("2m"), tile.MustTileFromCode("3m"), tile.MustTileFromCode("4m"), tile.MustTileFromCode("4m"),
+		}, 2),
+		player.NewInvisiblePlayer(),
+		player.NewInvisiblePlayer(),
+	}
+	s := newStateForOtherDiscardLegalActionsTest(players)
+	taken := tile.MustTileFromCode("1m")
+	if err := s.Apply(event.NewDraw(target, taken)); err != nil {
+		t.Fatalf("Apply(Draw) failed: %v", err)
+	}
+	if err := s.Apply(event.NewDiscard(target, taken, true)); err != nil {
+		t.Fatalf("Apply(Discard) failed: %v", err)
+	}
+
+	got, err := s.LegalActions(actor)
+	if err != nil {
+		t.Fatalf("LegalActions() failed: %v", err)
+	}
+	if containsChii(got, actor, target, "1m", [2]string{"2m", "3m"}) {
+		t.Error("LegalActions() contains Chii, want chii excluded when all remaining tiles are swap-call tiles")
+	}
+	if containsChii(got, actor, target, "4m", [2]string{"2m", "3m"}) {
+		t.Error("LegalActions() contains Chii, want chii excluded when all remaining tiles are swap-call tiles")
+	}
+}
+
+func TestState_LegalActions_OnOtherDiscardExcludesChiiWhenAllRemainingTilesAreSwapCallTilesAfterThreeMelds(t *testing.T) {
+	actor := seat.MustSeat(1)
+	target := seat.MustSeat(0)
+	players := [common.NumPlayers]player.Player{
+		player.NewInvisiblePlayer(),
+		openPlayerForChiiSwapCallLegalActionsTest(t, []tile.Tile{
+			tile.MustTileFromCode("2m"), tile.MustTileFromCode("3m"), tile.MustTileFromCode("3m"), tile.MustTileFromCode("4m"),
+		}, 3),
+		player.NewInvisiblePlayer(),
+		player.NewInvisiblePlayer(),
+	}
+	s := newStateForOtherDiscardLegalActionsTest(players)
+	taken := tile.MustTileFromCode("3m")
+	if err := s.Apply(event.NewDraw(target, taken)); err != nil {
+		t.Fatalf("Apply(Draw) failed: %v", err)
+	}
+	if err := s.Apply(event.NewDiscard(target, taken, true)); err != nil {
+		t.Fatalf("Apply(Discard) failed: %v", err)
+	}
+
+	got, err := s.LegalActions(actor)
+	if err != nil {
+		t.Fatalf("LegalActions() failed: %v", err)
+	}
+	if containsChii(got, actor, target, "3m", [2]string{"2m", "4m"}) {
+		t.Error("LegalActions() contains Chii, want chii excluded when all remaining tiles are swap-call tiles")
+	}
+}
+
 func TestState_LegalActions_OnOtherDiscardIncludesMaxActions(t *testing.T) {
 	hands := newValidHands()
 	hands[1] = maxOtherDiscardActionsHandForLegalActionsTest()
@@ -663,6 +725,74 @@ func maxOtherDiscardActionsHandForLegalActionsTest() [common.InitHandSize]tile.T
 		tile.MustTileFromCode("P"),
 		tile.MustTileFromCode("P"),
 	}
+}
+
+func openPlayerForChiiSwapCallLegalActionsTest(t *testing.T, finalHand []tile.Tile, numMelds int) player.Player {
+	t.Helper()
+
+	callData := []struct {
+		taken    tile.Tile
+		consumed [2]tile.Tile
+		discard  tile.Tile
+	}{
+		{
+			taken:    tile.MustTileFromCode("7p"),
+			consumed: [2]tile.Tile{tile.MustTileFromCode("8p"), tile.MustTileFromCode("9p")},
+			discard:  tile.MustTileFromCode("E"),
+		},
+		{
+			taken:    tile.MustTileFromCode("1s"),
+			consumed: [2]tile.Tile{tile.MustTileFromCode("2s"), tile.MustTileFromCode("3s")},
+			discard:  tile.MustTileFromCode("S"),
+		},
+		{
+			taken:    tile.MustTileFromCode("7s"),
+			consumed: [2]tile.Tile{tile.MustTileFromCode("8s"), tile.MustTileFromCode("9s")},
+			discard:  tile.MustTileFromCode("W"),
+		},
+	}
+
+	tiles := append([]tile.Tile{}, finalHand...)
+	for i := range numMelds {
+		tiles = append(tiles, callData[i].consumed[:]...)
+		tiles = append(tiles, callData[i].discard)
+	}
+	if len(tiles) != common.InitHandSize {
+		t.Fatalf("test setup hand size = %d, want %d", len(tiles), common.InitHandSize)
+	}
+
+	var handTiles [common.InitHandSize]tile.Tile
+	copy(handTiles[:], tiles)
+	p, err := player.NewVisiblePlayer(handTiles)
+	if err != nil {
+		t.Fatalf("player.NewVisiblePlayer() failed: %v", err)
+	}
+	for i := range numMelds {
+		chii := meld.MustChii(callData[i].taken, callData[i].consumed, seat.MustSeat(0))
+		if err := p.Chii(*chii); err != nil {
+			t.Fatalf("Chii(%d) failed: %v", i, err)
+		}
+		if err := p.Discard(callData[i].discard, false); err != nil {
+			t.Fatalf("Discard(%d) failed: %v", i, err)
+		}
+	}
+	return p
+}
+
+func newStateForOtherDiscardLegalActionsTest(players [common.NumPlayers]player.Player) *State {
+	s := NewStateForTest(
+		wind.East,
+		1,
+		0,
+		0,
+		[common.NumPlayers]int{25000, 25000, 25000, 25000},
+		seat.MustSeat(0),
+		seat.MustSeat(0),
+		tile.Tiles{tile.MustTileFromCode("E")},
+		10,
+		players,
+	)
+	return &s
 }
 
 func newStateBeforeRobbingKanForLegalActionsTest(t *testing.T) *State {
