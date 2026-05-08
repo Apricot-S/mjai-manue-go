@@ -114,6 +114,140 @@ func TestState_LegalActions_OnOtherDiscardExcludesRonWithoutYaku(t *testing.T) {
 	}
 }
 
+func TestState_LegalActions_OnOtherDiscardIncludesPon(t *testing.T) {
+	hands := newValidHands()
+	hands[1] = ponHandForLegalActionsTest("E", "E")
+	s := mustNewRoundStateForTest(t, hands)
+	target := seat.MustSeat(0)
+	actor := seat.MustSeat(1)
+	taken := tile.MustTileFromCode("E")
+	if err := s.Apply(event.NewDraw(target, taken)); err != nil {
+		t.Fatalf("Apply(Draw) failed: %v", err)
+	}
+	if err := s.Apply(event.NewDiscard(target, taken, true)); err != nil {
+		t.Fatalf("Apply(Discard) failed: %v", err)
+	}
+
+	got, err := s.LegalActions(actor)
+	if err != nil {
+		t.Fatalf("LegalActions() failed: %v", err)
+	}
+	if !containsPon(got, actor, target, "E", [2]string{"E", "E"}) {
+		t.Error("LegalActions() does not contain Pon, want pon with two matching tiles")
+	}
+	if !containsPass(got, actor) {
+		t.Error("LegalActions() does not contain Pass, want pass when pon is available")
+	}
+}
+
+func TestState_LegalActions_OnOtherDiscardExcludesPonWithOneMatchingTile(t *testing.T) {
+	hands := newValidHands()
+	hands[1] = ponHandForLegalActionsTest("E", "S")
+	s := mustNewRoundStateForTest(t, hands)
+	target := seat.MustSeat(0)
+	actor := seat.MustSeat(1)
+	taken := tile.MustTileFromCode("E")
+	if err := s.Apply(event.NewDraw(target, taken)); err != nil {
+		t.Fatalf("Apply(Draw) failed: %v", err)
+	}
+	if err := s.Apply(event.NewDiscard(target, taken, true)); err != nil {
+		t.Fatalf("Apply(Discard) failed: %v", err)
+	}
+
+	got, err := s.LegalActions(actor)
+	if err != nil {
+		t.Fatalf("LegalActions() failed: %v", err)
+	}
+	if containsPon(got, actor, target, "E", [2]string{"E", "E"}) {
+		t.Error("LegalActions() contains Pon, want pon excluded with only one matching tile")
+	}
+}
+
+func TestState_LegalActions_OnOtherDiscardIncludesPonRedFiveChoices(t *testing.T) {
+	hands := newValidHands()
+	hands[1] = ponHandForLegalActionsTest("5m", "5mr")
+	s := mustNewRoundStateForTest(t, hands)
+	target := seat.MustSeat(0)
+	actor := seat.MustSeat(1)
+	taken := tile.MustTileFromCode("5m")
+	if err := s.Apply(event.NewDraw(target, taken)); err != nil {
+		t.Fatalf("Apply(Draw) failed: %v", err)
+	}
+	if err := s.Apply(event.NewDiscard(target, taken, true)); err != nil {
+		t.Fatalf("Apply(Discard) failed: %v", err)
+	}
+
+	got, err := s.LegalActions(actor)
+	if err != nil {
+		t.Fatalf("LegalActions() failed: %v", err)
+	}
+	if !containsPon(got, actor, target, "5m", [2]string{"5m", "5mr"}) {
+		t.Error("LegalActions() does not contain Pon, want red-five consumed choice")
+	}
+}
+
+func TestState_LegalActions_OnOtherDiscardIncludesTwoPonChoicesWithRedFive(t *testing.T) {
+	hands := newValidHands()
+	hands[1] = ponHandWithThreeMatchingTilesForLegalActionsTest("5m", "5m", "5mr")
+	s := mustNewRoundStateForTest(t, hands)
+	target := seat.MustSeat(0)
+	actor := seat.MustSeat(1)
+	taken := tile.MustTileFromCode("5m")
+	if err := s.Apply(event.NewDraw(target, taken)); err != nil {
+		t.Fatalf("Apply(Draw) failed: %v", err)
+	}
+	if err := s.Apply(event.NewDiscard(target, taken, true)); err != nil {
+		t.Fatalf("Apply(Discard) failed: %v", err)
+	}
+
+	got, err := s.LegalActions(actor)
+	if err != nil {
+		t.Fatalf("LegalActions() failed: %v", err)
+	}
+	if !containsPon(got, actor, target, "5m", [2]string{"5m", "5m"}) {
+		t.Error("LegalActions() does not contain Pon with two normal fives")
+	}
+	if !containsPon(got, actor, target, "5m", [2]string{"5m", "5mr"}) {
+		t.Error("LegalActions() does not contain Pon with normal and red five")
+	}
+}
+
+func TestState_LegalActions_OnOtherDiscardExcludesPonAfterRiichiAccepted(t *testing.T) {
+	hands := newValidHands()
+	hands[0] = riichiReadyHandForTest()
+	s := mustNewRoundStateForTest(t, hands)
+	actor := seat.MustSeat(0)
+	if err := s.Apply(event.NewDraw(actor, tile.MustTileFromCode("S"))); err != nil {
+		t.Fatalf("Apply(Draw) failed: %v", err)
+	}
+	if err := s.Apply(event.NewRiichi(actor)); err != nil {
+		t.Fatalf("Apply(Riichi) failed: %v", err)
+	}
+	if err := s.Apply(event.NewDiscard(actor, tile.MustTileFromCode("W"), false)); err != nil {
+		t.Fatalf("Apply(Discard) failed: %v", err)
+	}
+	if err := s.Apply(event.NewRiichiAccepted(actor, nil, nil)); err != nil {
+		t.Fatalf("Apply(RiichiAccepted) failed: %v", err)
+	}
+
+	target := seat.MustSeat(1)
+	taken := tile.MustTileFromCode("E")
+	if err := s.Apply(event.NewDraw(target, taken)); err != nil {
+		t.Fatalf("Apply(Draw) failed: %v", err)
+	}
+	if err := s.Apply(event.NewDiscard(target, taken, true)); err != nil {
+		t.Fatalf("Apply(Discard) failed: %v", err)
+	}
+
+	got, err := s.LegalActions(actor)
+	if err != nil {
+		t.Fatalf("LegalActions() failed: %v", err)
+	}
+	if containsPon(got, actor, target, "E", [2]string{"E", "E"}) {
+		t.Error("LegalActions() contains Pon, want pon excluded after riichi accepted")
+	}
+}
+
 func TestState_LegalActions_OnOtherDiscardIncludesRonLastTile(t *testing.T) {
 	hands := newValidHands()
 	hands[1] = ronWithoutYakuHandForLegalActionsTest()
@@ -200,6 +334,42 @@ func ronWithTanyaoHandForLegalActionsTest() [common.InitHandSize]tile.Tile {
 		tile.MustTileFromCode("8s"),
 		tile.MustTileFromCode("6m"),
 		tile.MustTileFromCode("6m"),
+	}
+}
+
+func ponHandForLegalActionsTest(firstCode, secondCode string) [common.InitHandSize]tile.Tile {
+	return [common.InitHandSize]tile.Tile{
+		tile.MustTileFromCode(firstCode),
+		tile.MustTileFromCode(secondCode),
+		tile.MustTileFromCode("1m"),
+		tile.MustTileFromCode("2m"),
+		tile.MustTileFromCode("3m"),
+		tile.MustTileFromCode("1p"),
+		tile.MustTileFromCode("2p"),
+		tile.MustTileFromCode("3p"),
+		tile.MustTileFromCode("1s"),
+		tile.MustTileFromCode("2s"),
+		tile.MustTileFromCode("3s"),
+		tile.MustTileFromCode("9p"),
+		tile.MustTileFromCode("9s"),
+	}
+}
+
+func ponHandWithThreeMatchingTilesForLegalActionsTest(firstCode, secondCode, thirdCode string) [common.InitHandSize]tile.Tile {
+	return [common.InitHandSize]tile.Tile{
+		tile.MustTileFromCode(firstCode),
+		tile.MustTileFromCode(secondCode),
+		tile.MustTileFromCode(thirdCode),
+		tile.MustTileFromCode("1m"),
+		tile.MustTileFromCode("2m"),
+		tile.MustTileFromCode("3m"),
+		tile.MustTileFromCode("1p"),
+		tile.MustTileFromCode("2p"),
+		tile.MustTileFromCode("3p"),
+		tile.MustTileFromCode("1s"),
+		tile.MustTileFromCode("2s"),
+		tile.MustTileFromCode("3s"),
+		tile.MustTileFromCode("9p"),
 	}
 }
 

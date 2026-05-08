@@ -35,6 +35,12 @@ func (s *State) legalActionsOnOtherDiscard(playerSeat seat.Seat, p *player.Visib
 		actions = append(actions, a)
 	}
 
+	pons, err := s.legalPonActions(playerSeat, p, *targetSeat, discardedTile)
+	if err != nil {
+		return nil, err
+	}
+	actions = append(actions, pons...)
+
 	if len(actions) > 0 {
 		actions = append(actions, action.NewPass(playerSeat))
 	}
@@ -75,6 +81,53 @@ func (s *State) canWinByRon(playerSeat seat.Seat, p *player.VisiblePlayer, winni
 		p.RiichiState() != player.NotRiichi,
 		s.ronWinEvent(),
 	)
+}
+
+func (s *State) legalPonActions(playerSeat seat.Seat, p *player.VisiblePlayer, targetSeat seat.Seat, taken tile.Tile) ([]action.Action, error) {
+	if !p.CanChiiPonKan() || s.numLeftTiles <= 0 {
+		return nil, nil
+	}
+
+	handBeforeCall, ok := p.Hand()
+	if !ok {
+		return nil, nil
+	}
+	consumedCandidates := ponConsumedCandidates(handBeforeCall.Count, taken)
+	if len(consumedCandidates) == 0 {
+		return nil, nil
+	}
+
+	actions := make([]action.Action, 0, len(consumedCandidates))
+	for _, consumed := range consumedCandidates {
+		a, err := action.NewPon(playerSeat, targetSeat, taken, consumed)
+		if err != nil {
+			return nil, err
+		}
+		actions = append(actions, a)
+	}
+	return actions, nil
+}
+
+func ponConsumedCandidates(count func(tile.Tile) int, taken tile.Tile) [][2]tile.Tile {
+	normal := taken.RemoveRed()
+	if !normal.IsSuits() || normal.Number() != 5 {
+		if count(normal) < 2 {
+			return nil
+		}
+		return [][2]tile.Tile{{normal, normal}}
+	}
+
+	red := normal.AddRed()
+	normalCount := count(normal)
+	redCount := count(red)
+	consumed := make([][2]tile.Tile, 0, 2)
+	if normalCount >= 2 {
+		consumed = append(consumed, [2]tile.Tile{normal, normal})
+	}
+	if !taken.IsRed() && normalCount >= 1 && redCount >= 1 {
+		consumed = append(consumed, [2]tile.Tile{normal, red})
+	}
+	return consumed
 }
 
 func (s *State) ronWinEvent() service.WinEvent {
