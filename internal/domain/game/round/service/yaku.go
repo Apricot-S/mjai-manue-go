@@ -76,7 +76,7 @@ func CalculateFuHan(
 		}
 	}
 
-	// TODO Calculate fu more accurately
+	// Original mjai-manue uses this simplified fu calculation; keep it as ported behavior.
 	_, isPinfu := yakus["pf"]
 	if isPinfu || isOpen {
 		fu = 30
@@ -260,7 +260,7 @@ func chantaiyao(allBlocks []block.Block, isOpen bool) int {
 	return 2
 }
 
-// TODO Consider ryanmen criteria
+// Original mjai-manue does not consider ryanmen criteria in this broad pinfu check.
 func pinfu(allBlocks []block.Block, prevalentWind wind.Wind, seatWind wind.Wind, isOpen bool) int {
 	if isOpen {
 		return 0
