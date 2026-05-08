@@ -266,8 +266,9 @@ inbound 側は最終的に「JSON の `type` を見て domain の `event.Event` 
 
 #### 結論
 
-- `EventApplier` は「外部イベントを適用して Round/Match を遷移させる」ドメインの中核なので、早い段階で設計を固めるのが良い。
-- 現状の実装では `round.State` が `Apply(ev event.Event) error` を持ち、イベント適用の入り口になっている（実装済みイベントは限定的）。
+- `EventApplier` は「外部イベントを適用して Round/Match を遷移させる」ドメインの中核であり、現状の実装で設計を固定する。
+- 現状の実装では `round.State` が `Apply(ev event.Event) error` を持ち、イベント適用の入り口になっている。mjai の局進行イベントは実装済みで、今後イベント種別が増える見込みはない。
+- `round.State` は現状を最終形として扱う。カン進行・終局管理・action timing などを小さな struct や service に分割しても、メソッド呼び出しや間接参照が増えて読みやすさを損ねる可能性が高いため、責務分割目的の追加リファクタリングは原則として行わない。
 - `request_action` を受け取れない前提（オリジナル mjai 相当）では、エージェントは **State から legal actions を計算**し、さらに「今 action を返すべき局面か」も State から判断する必要がある。
 - `possible_actions` は存在しないものとして扱い、意思決定の根拠にしない（RiichiLab 互換性のため）。
 
@@ -311,8 +312,21 @@ type Decision struct {
 
 #### どこで legal actions を計算するか（DDD的な置き場）
 
-- 最初は `round.State` のメソッド（もしくは `round` package のドメインサービス）として実装するのが現実的。
-- 後で複雑化したら「`LegalActionCalculator` ドメインサービス」へ切り出す（Round が依存するのではなく、application がサービスを呼ぶ形にすると依存方向が自然）。
+- `LegalActions` は `round.State` のメソッドとして維持する。現状以上の複雑化は見込まないため、`LegalActionCalculator` のようなドメインサービスへの切り出しは行わない。
+- ただし AI へ渡す viewer は observation（obs）として扱うため、getter が内部 slice を直接公開しないよう、防御コピーなどで状態破壊を防ぐ。
+
+### 9.4 Player 実装の重複整理
+
+`VisiblePlayer` と `InvisiblePlayer` は、河・副露・立直状態・喰い替え・安全牌などの状態と処理が一部重複している。
+この重複は削減余地があるが、手牌の可視性による差分が大きいため、継承風の大きな抽象化や過度な分割は避ける。
+採用する場合は、共通状態を private struct にまとめる程度の小さい整理に留め、読みやすさとテストの明確さを優先する。
+
+### 9.5 役判定サービスの扱い
+
+`service.CalculateFuHan` と `service.Has1Han` は、現状を移植仕様として完成形と扱う。
+`service/yaku.go` に残る TODO はオリジナル実装に由来するコメントを移植時にも保持しているものであり、未完了作業を意味しない。
+ノイズになる場合は、TODO を削除するのではなく「オリジナル由来の TODO であり現行移植では仕様として維持する」旨のコメントへ置き換える。
+内部ロジックの invariant 破壊はバグとして扱うため、外部入力が直接入らない箇所の `panic` は許容する。
 
 ## 10. AI (Agent) 設計
 
@@ -420,3 +434,27 @@ type Decision struct {
 9. **仕上げ**
    - 完成形として先行している README 群と、実装状況を示す設計書・エージェント向け文書の役割分担を保ったまま、必要な補足だけを更新する。
    - `GOEXPERIMENT=jsonv2` 前提の `go test ./...` を通し、必要に応じて package 単位のテストと benchmark を追加する。
+
+### 13.3 リファクタリング作業順（1件ずつ）
+
+レビュー負荷を抑えるため、以下は1件ずつ独立した差分で実施する。
+
+1. **viewer / player getter の防御コピー**
+   - `round.State` や `Player` の viewer/getter が内部 slice を直接返している箇所を確認し、AI obs から内部状態を破壊できないよう `slices.Clone` 等で防御コピーする。
+   - 挙動変更ではなく境界の安全化として扱い、必要な単体テストを追加する。
+
+2. **`hand.VisibleHand.Call` / `hand.InvisibleHand.Call` の未知 meld 防止**
+   - `Call(m meld.Meld)` の type switch で未知 meld が渡された場合に、消費牌なしで成功しないよう error を返す。
+   - これはバグ修正として扱い、未知 meld 用のテストを追加する。
+
+3. **mjai runtime の JSON Lines loop 共通化**
+   - stdio と mjsonp TCP client の読み取り・trace・空行チェック・parse・driver handle・flush の重複を内部 helper に寄せる。
+   - transport 差分（stdio は sparse output、mjsonp は `NoReaction` を同期応答 `none` にする、`end_game` の扱い）は明示的な policy として残す。
+
+4. **`VisiblePlayer` / `InvisiblePlayer` の小規模重複整理**
+   - 共通状態を private struct にまとめる程度に留める。
+   - 手牌可視性に関わる処理や domain invariant が読みにくくなる場合は実施しない。
+
+5. **`service/yaku.go` の TODO 注釈整理**
+   - TODO が未完了作業に見える場合のみ、オリジナル由来コメントであることを明記する。
+   - 役判定ロジック自体の再設計や `panic` 排除は行わない。

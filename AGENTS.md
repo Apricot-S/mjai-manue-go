@@ -25,6 +25,18 @@
 - 送信はメッセージ単位で必ず flush する（透過性）。
 - `--seed` を持つコマンドでは乱数を決定的にする（決定性）。現行 `mjai-tsumogiri` は乱数を使わず、`--seed` も持たない。
 - `ai.Request` の `Round` は AI 分野でいう observation（obs）として扱う。legal actions は外側から別フィールドで渡すのではなく、obs（現状は `round.ActionStateViewer`）に含める設計を維持する。
+- `round.State` / `EventApplier` / `LegalActions` は現状を最終形として扱う。責務分割目的での追加 struct/service 化は、間接参照が増えて読みにくくなるため原則行わない。
+- `service/yaku.go` の TODO はオリジナル実装由来のコメントを保持しているもの。未完了作業とは扱わず、必要ならその旨をコメントに追記する。
+
+## リファクタリング作業順
+
+レビュー負荷を抑えるため、以下は1件ずつ独立した差分で進める。
+
+1. viewer / player getter の防御コピー
+2. `hand.VisibleHand.Call` / `hand.InvisibleHand.Call` の未知 meld 防止
+3. mjai runtime の JSON Lines loop 共通化
+4. `VisiblePlayer` / `InvisiblePlayer` の小規模重複整理（読みにくくなるなら実施しない）
+5. `service/yaku.go` の TODO 注釈整理（ロジック再設計や panic 排除はしない）
 
 ## ドキュメント更新の運用
 
