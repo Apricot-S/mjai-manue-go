@@ -948,6 +948,9 @@ func TestInvisiblePlayer_RiichiAccepted_Success(t *testing.T) {
 	if p.RiichiDiscardedTilesIndex() != 0 {
 		t.Errorf("RiichiDiscardedTilesIndex() = %v, want %v", p.RiichiDiscardedTilesIndex(), 0)
 	}
+	if p.CanChiiPonKan() {
+		t.Error("CanChiiPonKan() = true, want false after riichi accepted")
+	}
 
 	secondTile := tile.MustTileFromCode("2m")
 	if err := p.Draw(secondTile); err != nil {

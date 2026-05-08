@@ -118,7 +118,7 @@ func (p *InvisiblePlayer) CanDiscard() bool {
 }
 
 func (p *InvisiblePlayer) CanChiiPonKan() bool {
-	return !p.needsDeadWallDraw && !p.CanDiscard() && len(p.Melds()) < 4
+	return p.riichiState == NotRiichi && !p.needsDeadWallDraw && !p.CanDiscard() && len(p.Melds()) < 4
 }
 
 func (p *InvisiblePlayer) IsConcealed() bool {
