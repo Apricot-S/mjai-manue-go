@@ -269,6 +269,9 @@ func TestState_LegalActions_OnOtherDiscardIncludesCalledKan(t *testing.T) {
 	if !containsCalledKan(got, actor, target, "E", [3]string{"E", "E", "E"}) {
 		t.Error("LegalActions() does not contain CalledKan, want daiminkan with three matching tiles")
 	}
+	if !containsPon(got, actor, target, "E", [2]string{"E", "E"}) {
+		t.Error("LegalActions() does not contain Pon, want pon when daiminkan is available")
+	}
 	if !containsPass(got, actor) {
 		t.Error("LegalActions() does not contain Pass, want pass when called kan is available")
 	}
