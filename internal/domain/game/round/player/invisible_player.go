@@ -62,19 +62,19 @@ func (p *InvisiblePlayer) DrawnTile() *tile.Tile {
 }
 
 func (p *InvisiblePlayer) Melds() []meld.Meld {
-	return p.melds
+	return slices.Clone(p.melds)
 }
 
 func (p *InvisiblePlayer) River() []tile.Tile {
-	return p.river
+	return slices.Clone(p.river)
 }
 
 func (p *InvisiblePlayer) DiscardedTiles() []tile.Tile {
-	return p.discardedTiles
+	return slices.Clone(p.discardedTiles)
 }
 
 func (p *InvisiblePlayer) ExtraSafeTiles() []tile.Tile {
-	return p.extraSafeTiles
+	return slices.Clone(p.extraSafeTiles)
 }
 
 func (p *InvisiblePlayer) IsFuriten() bool {
@@ -118,7 +118,7 @@ func (p *InvisiblePlayer) CanDiscard() bool {
 }
 
 func (p *InvisiblePlayer) CanChiiPonKan() bool {
-	return p.riichiState == NotRiichi && !p.needsDeadWallDraw && !p.CanDiscard() && len(p.Melds()) < 4
+	return p.riichiState == NotRiichi && !p.needsDeadWallDraw && !p.CanDiscard() && len(p.melds) < 4
 }
 
 func (p *InvisiblePlayer) IsConcealed() bool {
@@ -126,7 +126,7 @@ func (p *InvisiblePlayer) IsConcealed() bool {
 }
 
 func (p *InvisiblePlayer) SwapCallTiles() []tile.Tile {
-	return p.swapCallTiles
+	return slices.Clone(p.swapCallTiles)
 }
 
 func (p *InvisiblePlayer) Draw(t tile.Tile) error {
@@ -271,8 +271,7 @@ func (p *InvisiblePlayer) PromotedKan(kan meld.PromotedKan) error {
 		return fmt.Errorf("cannot PromotedKan: player is not in a discardable state")
 	}
 
-	melds := p.Melds()
-	ponIndex := slices.IndexFunc(melds, func(m meld.Meld) bool {
+	ponIndex := slices.IndexFunc(p.melds, func(m meld.Meld) bool {
 		pon, isPon := m.(*meld.Pon)
 		if !isPon {
 			return false
@@ -280,7 +279,7 @@ func (p *InvisiblePlayer) PromotedKan(kan meld.PromotedKan) error {
 		return pon.Taken() == kan.Taken()
 	})
 	if ponIndex == -1 {
-		return fmt.Errorf("cannot PromotedKan: failed to find pon for promoted kan: %v", melds)
+		return fmt.Errorf("cannot PromotedKan: failed to find pon for promoted kan: %v", p.melds)
 	}
 
 	newHand, err := p.hand.Draw(*p.drawnTile)
@@ -295,7 +294,7 @@ func (p *InvisiblePlayer) PromotedKan(kan meld.PromotedKan) error {
 
 	p.hand = *h
 	p.drawnTile = nil
-	melds[ponIndex] = &kan
+	p.melds[ponIndex] = &kan
 	p.needsDeadWallDraw = true
 	return nil
 }

@@ -66,6 +66,57 @@ func TestNewInvisiblePlayer(t *testing.T) {
 	}
 }
 
+func TestInvisiblePlayer_GettersReturnCopies(t *testing.T) {
+	p := player.NewInvisiblePlayer()
+
+	discardedTile := tile.MustTileFromCode("1m")
+	if err := p.Draw(discardedTile); err != nil {
+		t.Fatalf("Draw() failed: %v", err)
+	}
+	if err := p.Discard(discardedTile, true); err != nil {
+		t.Fatalf("Discard() failed: %v", err)
+	}
+	p.AddExtraSafeTiles(tile.MustTileFromCode("1p"))
+
+	pon, err := meld.NewPon(tile.MustTileFromCode("E"), [2]tile.Tile{tile.MustTileFromCode("E"), tile.MustTileFromCode("E")}, seat.MustSeat(1))
+	if err != nil {
+		t.Fatalf("NewPon() failed: %v", err)
+	}
+	if err := p.Pon(*pon); err != nil {
+		t.Fatalf("Pon() failed: %v", err)
+	}
+
+	melds := p.Melds()
+	melds[0] = nil
+	if p.Melds()[0] == nil {
+		t.Errorf("Melds() exposed internal slice")
+	}
+
+	river := p.River()
+	river[0] = tile.MustTileFromCode("8m")
+	if p.River()[0] != discardedTile {
+		t.Errorf("River() exposed internal slice; got %v, want %v", p.River()[0], discardedTile)
+	}
+
+	discardedTiles := p.DiscardedTiles()
+	discardedTiles[0] = tile.MustTileFromCode("7m")
+	if p.DiscardedTiles()[0] != discardedTile {
+		t.Errorf("DiscardedTiles() exposed internal slice; got %v, want %v", p.DiscardedTiles()[0], discardedTile)
+	}
+
+	extraSafeTiles := p.ExtraSafeTiles()
+	extraSafeTiles[0] = tile.MustTileFromCode("6m")
+	if want := tile.MustTileFromCode("1p"); p.ExtraSafeTiles()[0] != want {
+		t.Errorf("ExtraSafeTiles() exposed internal slice; got %v, want %v", p.ExtraSafeTiles()[0], want)
+	}
+
+	swapCallTiles := p.SwapCallTiles()
+	swapCallTiles[0] = tile.MustTileFromCode("5m")
+	if reflect.DeepEqual(p.SwapCallTiles(), swapCallTiles) {
+		t.Errorf("SwapCallTiles() exposed internal slice")
+	}
+}
+
 func TestInvisiblePlayer_Draw_Unknown(t *testing.T) {
 	p := player.NewInvisiblePlayer()
 

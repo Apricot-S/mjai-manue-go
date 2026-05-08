@@ -117,6 +117,67 @@ func TestNewVisiblePlayer(t *testing.T) {
 	}
 }
 
+func TestVisiblePlayer_GettersReturnCopies(t *testing.T) {
+	handTiles := [13]tile.Tile{
+		tile.MustTileFromCode("E"), tile.MustTileFromCode("E"), tile.MustTileFromCode("E"),
+		tile.MustTileFromCode("2p"), tile.MustTileFromCode("3p"), tile.MustTileFromCode("4p"),
+		tile.MustTileFromCode("5p"), tile.MustTileFromCode("6p"), tile.MustTileFromCode("7p"),
+		tile.MustTileFromCode("2s"), tile.MustTileFromCode("3s"), tile.MustTileFromCode("4s"),
+		tile.MustTileFromCode("9m"),
+	}
+	p, err := player.NewVisiblePlayer(handTiles)
+	if err != nil {
+		t.Fatalf("NewVisiblePlayer() failed: %v", err)
+	}
+
+	discardedTile := tile.MustTileFromCode("9m")
+	if err := p.Draw(tile.MustTileFromCode("1m")); err != nil {
+		t.Fatalf("Draw() failed: %v", err)
+	}
+	if err := p.Discard(discardedTile, false); err != nil {
+		t.Fatalf("Discard() failed: %v", err)
+	}
+	p.AddExtraSafeTiles(tile.MustTileFromCode("1p"))
+
+	pon, err := meld.NewPon(tile.MustTileFromCode("E"), [2]tile.Tile{tile.MustTileFromCode("E"), tile.MustTileFromCode("E")}, seat.MustSeat(1))
+	if err != nil {
+		t.Fatalf("NewPon() failed: %v", err)
+	}
+	if err := p.Pon(*pon); err != nil {
+		t.Fatalf("Pon() failed: %v", err)
+	}
+
+	melds := p.Melds()
+	melds[0] = nil
+	if p.Melds()[0] == nil {
+		t.Errorf("Melds() exposed internal slice")
+	}
+
+	river := p.River()
+	river[0] = tile.MustTileFromCode("8m")
+	if p.River()[0] != discardedTile {
+		t.Errorf("River() exposed internal slice; got %v, want %v", p.River()[0], discardedTile)
+	}
+
+	discardedTiles := p.DiscardedTiles()
+	discardedTiles[0] = tile.MustTileFromCode("7m")
+	if p.DiscardedTiles()[0] != discardedTile {
+		t.Errorf("DiscardedTiles() exposed internal slice; got %v, want %v", p.DiscardedTiles()[0], discardedTile)
+	}
+
+	extraSafeTiles := p.ExtraSafeTiles()
+	extraSafeTiles[0] = tile.MustTileFromCode("6m")
+	if want := tile.MustTileFromCode("1p"); p.ExtraSafeTiles()[0] != want {
+		t.Errorf("ExtraSafeTiles() exposed internal slice; got %v, want %v", p.ExtraSafeTiles()[0], want)
+	}
+
+	swapCallTiles := p.SwapCallTiles()
+	swapCallTiles[0] = tile.MustTileFromCode("5m")
+	if reflect.DeepEqual(p.SwapCallTiles(), swapCallTiles) {
+		t.Errorf("SwapCallTiles() exposed internal slice")
+	}
+}
+
 func TestVisiblePlayer_Draw_Success(t *testing.T) {
 	handTiles := [13]tile.Tile{
 		tile.MustTileFromCode("C"), tile.MustTileFromCode("9s"), tile.MustTileFromCode("4m"),

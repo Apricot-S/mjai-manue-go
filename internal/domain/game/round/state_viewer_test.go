@@ -149,6 +149,29 @@ func TestState_Doras(t *testing.T) {
 	}
 }
 
+func TestState_DoraIndicators_ReturnsCopy(t *testing.T) {
+	players := [4]player.Player{}
+	s := round.NewStateForTest(
+		wind.East,
+		1,
+		0,
+		0,
+		[4]int{25000, 25000, 25000, 25000},
+		seat.MustSeat(0),
+		seat.MustSeat(0),
+		tile.Tiles{tile.MustTileFromCode("1m")},
+		round.NumInitWall,
+		players,
+	)
+
+	got := s.DoraIndicators()
+	got[0] = tile.MustTileFromCode("9m")
+
+	if want := tile.MustTileFromCode("1m"); s.DoraIndicators()[0] != want {
+		t.Errorf("DoraIndicators() exposed internal slice; got %v, want %v", s.DoraIndicators()[0], want)
+	}
+}
+
 func TestState_Turn(t *testing.T) {
 	newInitStateForTest := func(numLeftTiles int) round.State {
 		players := [4]player.Player{}

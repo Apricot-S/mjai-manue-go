@@ -76,7 +76,7 @@ func (s *State) StartingDealer() seat.Seat {
 }
 
 func (s *State) DoraIndicators() tile.Tiles {
-	return s.doraIndicators
+	return slices.Clone(s.doraIndicators)
 }
 
 func (s *State) NumLeftTiles() int {
