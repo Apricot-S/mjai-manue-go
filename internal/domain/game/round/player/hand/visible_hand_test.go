@@ -10,6 +10,20 @@ import (
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/tile"
 )
 
+type unknownMeldForTest struct{}
+
+func (unknownMeldForTest) Consumed() []tile.Tile {
+	return nil
+}
+
+func (unknownMeldForTest) ToTiles() []tile.Tile {
+	return nil
+}
+
+func (unknownMeldForTest) String() string {
+	return "unknown"
+}
+
 func TestNewVisibleHand(t *testing.T) {
 	tests := []struct {
 		name    string
@@ -466,6 +480,13 @@ func TestVisibleHand_Call(t *testing.T) {
 				[2]tile.Tile{tile.MustTileFromCode("4m"), tile.MustTileFromCode("5m")},
 				seat.MustSeat(0),
 			),
+			wantTiles: nil,
+			wantErr:   true,
+		},
+		{
+			name:      "unknown meld type",
+			tiles:     []tile.Tile{tile.MustTileFromCode("1m")},
+			meld:      unknownMeldForTest{},
 			wantTiles: nil,
 			wantErr:   true,
 		},

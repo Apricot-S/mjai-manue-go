@@ -63,6 +63,8 @@ func (h *InvisibleHand) Call(m meld.Meld) (*InvisibleHand, error) {
 		numConsumed = 4
 	case *meld.PromotedKan:
 		numConsumed = 1
+	default:
+		return nil, fmt.Errorf("cannot call unknown meld type: %T", m)
 	}
 
 	if h.tileCount < numConsumed {

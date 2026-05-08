@@ -127,6 +127,8 @@ func (h *VisibleHand) Call(m meld.Meld) (*VisibleHand, error) {
 	case *meld.PromotedKan:
 		consumed = []tile.Tile{mm.Added()}
 		numConsumed = 1
+	default:
+		return nil, fmt.Errorf("cannot call unknown meld type: %T", m)
 	}
 
 	tileCounts := h.tileCounts

@@ -295,6 +295,13 @@ func TestInvisibleHand_Call(t *testing.T) {
 			wantTiles: nil,
 			wantErr:   true,
 		},
+		{
+			name:      "unknown meld type",
+			tiles:     []tile.Tile{tile.MustTileFromCode("?")},
+			meld:      unknownMeldForTest{},
+			wantTiles: nil,
+			wantErr:   true,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
