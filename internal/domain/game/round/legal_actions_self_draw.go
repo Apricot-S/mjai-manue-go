@@ -7,6 +7,7 @@ import (
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/action"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/common"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/round/player"
+	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/round/player/hand"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/round/player/meld"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/round/service"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/seat"
@@ -214,6 +215,20 @@ func (s *State) legalConcealedKanActions(playerSeat seat.Seat, p *player.Visible
 
 func concealedKanConsumedTiles(candidate tile.Tile) [4]tile.Tile {
 	return [4]tile.Tile{candidate, candidate, candidate, candidate.AddRed()}
+}
+
+func canConcealedKanAfterRiichi(handBeforeKan *hand.VisibleHand, drawnTile tile.Tile, consumed [4]tile.Tile) bool {
+	if !drawnTile.HasSameSymbol(consumed[0]) {
+		return false
+	}
+	drawnTileID34 := drawnTile.RemoveRed().ID()
+	tc34AfterKan := *handBeforeKan.ToTileCounts34()
+	if tc34AfterKan[drawnTileID34] != 3 {
+		return false
+	}
+	tc34AfterKan[drawnTileID34] = 0
+	handAfterKan := hand.MustVisibleHand(tc34AfterKan.ToTiles())
+	return service.WaitsFor(handBeforeKan) == service.WaitsFor(handAfterKan)
 }
 
 func (s *State) legalPromotedKanActions(playerSeat seat.Seat, p *player.VisiblePlayer) ([]action.Action, error) {
