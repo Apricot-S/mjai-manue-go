@@ -77,6 +77,28 @@ func (p *InvisiblePlayer) ExtraSafeTiles() []tile.Tile {
 	return p.extraSafeTiles
 }
 
+func (p *InvisiblePlayer) IsFuriten() bool {
+	return false
+}
+
+func (p *InvisiblePlayer) IsRonFuriten(winningTile *tile.Tile) bool {
+	if winningTile == nil {
+		return false
+	}
+
+	for _, discardedTile := range p.discardedTiles {
+		if discardedTile.HasSameSymbol(*winningTile) {
+			return true
+		}
+	}
+	for _, safeTile := range p.extraSafeTiles {
+		if safeTile.HasSameSymbol(*winningTile) {
+			return true
+		}
+	}
+	return false
+}
+
 func (p *InvisiblePlayer) RiichiState() RiichiState {
 	return p.riichiState
 }

@@ -367,7 +367,7 @@ func (s *State) canApplyWin(ev *event.Win) bool {
 	targetRiver := s.players[ev.Target().Index()].River()
 	return len(targetRiver) > 0 &&
 		isTileMatchKnownEnough(&targetRiver[len(targetRiver)-1], ev.WinningTile()) &&
-		!s.isRonFuriten(ev.Actor(), ev.WinningTile())
+		!s.players[ev.Actor().Index()].IsRonFuriten(ev.WinningTile())
 }
 
 func (s *State) canApplyRobbingKan(ev *event.Win) bool {
@@ -394,25 +394,6 @@ func isTileMatchKnownEnough(stateTile *tile.Tile, eventTile *tile.Tile) bool {
 		return true
 	}
 	return *stateTile == *eventTile
-}
-
-func (s *State) isRonFuriten(actor seat.Seat, winningTile *tile.Tile) bool {
-	if winningTile == nil {
-		return false
-	}
-
-	p := s.players[actor.Index()]
-	for _, discardedTile := range p.DiscardedTiles() {
-		if discardedTile.HasSameSymbol(*winningTile) {
-			return true
-		}
-	}
-	for _, safeTile := range p.ExtraSafeTiles() {
-		if safeTile.HasSameSymbol(*winningTile) {
-			return true
-		}
-	}
-	return false
 }
 
 func (s *State) flushPendingExtraSafeDiscard(pending *pendingExtraSafeDiscard) {

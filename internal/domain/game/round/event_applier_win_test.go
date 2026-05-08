@@ -5,6 +5,7 @@ import (
 
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/common"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/event"
+	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/round/player"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/seat"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/tile"
 )
@@ -115,8 +116,10 @@ func TestState_Apply_Win_Renhou(t *testing.T) {
 }
 
 func TestState_Apply_Win_ReturnsErrorForRonOnOwnDiscardedTile(t *testing.T) {
-	s := mustNewRoundStateForTest(t, newValidHands())
+	hands := newValidHands()
 	actor := seat.MustSeat(0)
+	hands[actor.Index()] = tenpaiHandWaiting36mForTest()
+	s := mustNewRoundStateForTest(t, hands)
 	target := seat.MustSeat(3)
 	winningTile := tile.MustTileFromCode("6m")
 	scores := [common.NumPlayers]int{57000, 25000, 25000, -7000}
@@ -162,8 +165,10 @@ func TestState_Apply_Win_ReturnsErrorForRonOnOwnDiscardedTile(t *testing.T) {
 }
 
 func TestState_Apply_Win_ReturnsErrorForRonOnExtraSafeTile(t *testing.T) {
-	s := mustNewRoundStateForTest(t, newValidHands())
+	hands := newValidHands()
 	actor := seat.MustSeat(0)
+	hands[actor.Index()] = tenpaiHandWaiting36mForTest()
+	s := mustNewRoundStateForTest(t, hands)
 	target := seat.MustSeat(3)
 	winningTile := tile.MustTileFromCode("6m")
 	scores := [common.NumPlayers]int{57000, 25000, 25000, -7000}
@@ -208,24 +213,128 @@ func TestState_Apply_Win_ReturnsErrorForRonOnExtraSafeTile(t *testing.T) {
 	}
 }
 
-func TestState_Apply_Win_ReturnsErrorForRonOnSameSymbolRedFiveFuriten(t *testing.T) {
-	s := mustNewRoundStateForTest(t, newValidHands())
+func TestState_Apply_Win_ReturnsErrorForInvisibleRonOnOwnDiscardedTile(t *testing.T) {
+	hands := newValidHands()
 	actor := seat.MustSeat(0)
+	for i := range common.InitHandSize {
+		hands[actor.Index()][i] = tile.MustTileFromCode("?")
+	}
+	s := mustNewRoundStateForTest(t, hands)
 	target := seat.MustSeat(3)
-	discardedTile := tile.MustTileFromCode("5m")
-	winningTile := tile.MustTileFromCode("5mr")
+	winningTile := tile.MustTileFromCode("6m")
 	scores := [common.NumPlayers]int{57000, 25000, 25000, -7000}
 
-	if err := s.Apply(event.NewDraw(actor, tile.MustTileFromCode("6m"))); err != nil {
+	if err := s.Apply(event.NewDraw(actor, tile.MustTileFromCode("?"))); err != nil {
 		t.Fatalf("Apply(Draw) failed: %v", err)
 	}
-	if err := s.Apply(event.NewDiscard(actor, discardedTile, false)); err != nil {
+	if err := s.Apply(event.NewDiscard(actor, winningTile, false)); err != nil {
 		t.Fatalf("Apply(Discard) failed: %v", err)
 	}
 	if err := s.Apply(event.NewDraw(seat.MustSeat(1), tile.MustTileFromCode("7m"))); err != nil {
 		t.Fatalf("Apply(Draw) failed: %v", err)
 	}
 	if err := s.Apply(event.NewDiscard(seat.MustSeat(1), tile.MustTileFromCode("7m"), true)); err != nil {
+		t.Fatalf("Apply(Discard) failed: %v", err)
+	}
+	if err := s.Apply(event.NewDraw(seat.MustSeat(2), tile.MustTileFromCode("8m"))); err != nil {
+		t.Fatalf("Apply(Draw) failed: %v", err)
+	}
+	if err := s.Apply(event.NewDiscard(seat.MustSeat(2), tile.MustTileFromCode("8m"), true)); err != nil {
+		t.Fatalf("Apply(Discard) failed: %v", err)
+	}
+	if err := s.Apply(event.NewDraw(target, winningTile)); err != nil {
+		t.Fatalf("Apply(Draw) failed: %v", err)
+	}
+	if err := s.Apply(event.NewDiscard(target, winningTile, true)); err != nil {
+		t.Fatalf("Apply(Discard) failed: %v", err)
+	}
+	if err := s.Apply(event.NewWin(
+		actor,
+		target,
+		&winningTile,
+		32000,
+		nil,
+		&scores,
+	)); err == nil {
+		t.Fatal("Apply(Win) succeeded unexpectedly")
+	}
+
+	if got := s.Scores(); got != [common.NumPlayers]int{25000, 25000, 25000, 25000} {
+		t.Errorf("Scores() = %v, want unchanged initial scores", got)
+	}
+}
+
+func TestState_Apply_Win_ReturnsErrorForInvisibleRonOnExtraSafeTile(t *testing.T) {
+	hands := newValidHands()
+	actor := seat.MustSeat(0)
+	for i := range common.InitHandSize {
+		hands[actor.Index()][i] = tile.MustTileFromCode("?")
+	}
+	s := mustNewRoundStateForTest(t, hands)
+	target := seat.MustSeat(3)
+	winningTile := tile.MustTileFromCode("6m")
+	scores := [common.NumPlayers]int{57000, 25000, 25000, -7000}
+
+	if err := s.Apply(event.NewDraw(actor, tile.MustTileFromCode("?"))); err != nil {
+		t.Fatalf("Apply(Draw) failed: %v", err)
+	}
+	if err := s.Apply(event.NewDiscard(actor, tile.MustTileFromCode("7m"), false)); err != nil {
+		t.Fatalf("Apply(Discard) failed: %v", err)
+	}
+	if err := s.Apply(event.NewDraw(seat.MustSeat(1), winningTile)); err != nil {
+		t.Fatalf("Apply(Draw) failed: %v", err)
+	}
+	if err := s.Apply(event.NewDiscard(seat.MustSeat(1), winningTile, true)); err != nil {
+		t.Fatalf("Apply(Discard) failed: %v", err)
+	}
+	if err := s.Apply(event.NewDraw(seat.MustSeat(2), tile.MustTileFromCode("8m"))); err != nil {
+		t.Fatalf("Apply(Draw) failed: %v", err)
+	}
+	if err := s.Apply(event.NewDiscard(seat.MustSeat(2), tile.MustTileFromCode("8m"), true)); err != nil {
+		t.Fatalf("Apply(Discard) failed: %v", err)
+	}
+	if err := s.Apply(event.NewDraw(target, winningTile)); err != nil {
+		t.Fatalf("Apply(Draw) failed: %v", err)
+	}
+	if err := s.Apply(event.NewDiscard(target, winningTile, true)); err != nil {
+		t.Fatalf("Apply(Discard) failed: %v", err)
+	}
+	if err := s.Apply(event.NewWin(
+		actor,
+		target,
+		&winningTile,
+		32000,
+		nil,
+		&scores,
+	)); err == nil {
+		t.Fatal("Apply(Win) succeeded unexpectedly")
+	}
+
+	if got := s.Scores(); got != [common.NumPlayers]int{25000, 25000, 25000, 25000} {
+		t.Errorf("Scores() = %v, want unchanged initial scores", got)
+	}
+}
+
+func TestState_Apply_Win_ReturnsErrorForRonOnSameSymbolRedFiveFuriten(t *testing.T) {
+	hands := newValidHands()
+	actor := seat.MustSeat(0)
+	hands[actor.Index()] = tenpaiHandWaiting58mForTest()
+	s := mustNewRoundStateForTest(t, hands)
+	target := seat.MustSeat(3)
+	safeTile := tile.MustTileFromCode("5m")
+	winningTile := tile.MustTileFromCode("5mr")
+	scores := [common.NumPlayers]int{57000, 25000, 25000, -7000}
+
+	if err := s.Apply(event.NewDraw(actor, tile.MustTileFromCode("6m"))); err != nil {
+		t.Fatalf("Apply(Draw) failed: %v", err)
+	}
+	if err := s.Apply(event.NewDiscard(actor, tile.MustTileFromCode("6m"), true)); err != nil {
+		t.Fatalf("Apply(Discard) failed: %v", err)
+	}
+	if err := s.Apply(event.NewDraw(seat.MustSeat(1), safeTile)); err != nil {
+		t.Fatalf("Apply(Draw) failed: %v", err)
+	}
+	if err := s.Apply(event.NewDiscard(seat.MustSeat(1), safeTile, true)); err != nil {
 		t.Fatalf("Apply(Discard) failed: %v", err)
 	}
 	if err := s.Apply(event.NewDraw(seat.MustSeat(2), tile.MustTileFromCode("8m"))); err != nil {
@@ -318,6 +427,11 @@ func TestState_Apply_Win_ReturnsErrorForRonOnMissedPromotedKanTile(t *testing.T)
 	target := seat.MustSeat(3)
 	added := tile.MustTileFromCode("E")
 	scores := [common.NumPlayers]int{25000, 57000, 25000, -7000}
+	actorPlayer, err := player.NewVisiblePlayer(tenpaiHandWaitingEastForTest())
+	if err != nil {
+		t.Fatalf("player.NewVisiblePlayer() failed: %v", err)
+	}
+	s.players[actor.Index()] = actorPlayer
 
 	if err := s.Apply(event.NewPromotedKan(target, added, [3]tile.Tile{added, added, added})); err != nil {
 		t.Fatalf("Apply(PromotedKan) failed: %v", err)
@@ -345,6 +459,44 @@ func TestState_Apply_Win_ReturnsErrorForRonOnMissedPromotedKanTile(t *testing.T)
 	if got := s.Scores(); got != [common.NumPlayers]int{25000, 25000, 25000, 25000} {
 		t.Errorf("Scores() = %v, want unchanged initial scores", got)
 	}
+}
+
+func tenpaiHandWaiting36mForTest() [common.InitHandSize]tile.Tile {
+	return handTilesForTest(
+		"1m", "2m", "3m",
+		"1p", "2p", "3p",
+		"1s", "2s", "3s",
+		"4m", "5m",
+		"5p", "5p",
+	)
+}
+
+func tenpaiHandWaiting58mForTest() [common.InitHandSize]tile.Tile {
+	return handTilesForTest(
+		"1m", "2m", "3m",
+		"1p", "2p", "3p",
+		"1s", "2s", "3s",
+		"6m", "7m",
+		"5p", "5p",
+	)
+}
+
+func tenpaiHandWaitingEastForTest() [common.InitHandSize]tile.Tile {
+	return handTilesForTest(
+		"1m", "1m", "1m",
+		"2p", "2p", "2p",
+		"3s", "3s", "3s",
+		"S", "S", "S",
+		"E",
+	)
+}
+
+func handTilesForTest(codes ...string) [common.InitHandSize]tile.Tile {
+	var handTiles [common.InitHandSize]tile.Tile
+	for i, code := range codes {
+		handTiles[i] = tile.MustTileFromCode(code)
+	}
+	return handTiles
 }
 
 func TestState_Apply_Win_TsumoWithoutWinningTile(t *testing.T) {

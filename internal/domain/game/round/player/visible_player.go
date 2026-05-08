@@ -18,6 +18,8 @@ type VisiblePlayer struct {
 	river                     []tile.Tile
 	discardedTiles            []tile.Tile
 	extraSafeTiles            []tile.Tile
+	waits                     waitSet
+	isFuriten                 bool
 	riichiState               RiichiState
 	riichiRiverIndex          int
 	riichiDiscardedTilesIndex int
@@ -32,7 +34,7 @@ func NewVisiblePlayer(handTiles [common.InitHandSize]tile.Tile) (*VisiblePlayer,
 		return nil, err
 	}
 
-	return &VisiblePlayer{
+	p := &VisiblePlayer{
 		hand:                      *h,
 		drawnTile:                 nil,
 		melds:                     make([]meld.Meld, 0, maxNumMelds),
@@ -45,7 +47,9 @@ func NewVisiblePlayer(handTiles [common.InitHandSize]tile.Tile) (*VisiblePlayer,
 		isConcealed:               true,
 		swapCallTiles:             nil,
 		needsDeadWallDraw:         false,
-	}, nil
+	}
+	p.updateWaits()
+	return p, nil
 }
 
 func (p *VisiblePlayer) Hand() (*hand.VisibleHand, bool) {
@@ -76,6 +80,17 @@ func (p *VisiblePlayer) DiscardedTiles() []tile.Tile {
 
 func (p *VisiblePlayer) ExtraSafeTiles() []tile.Tile {
 	return p.extraSafeTiles
+}
+
+func (p *VisiblePlayer) IsFuriten() bool {
+	return p.isFuriten
+}
+
+func (p *VisiblePlayer) IsRonFuriten(winningTile *tile.Tile) bool {
+	if winningTile == nil || !p.waits.has(*winningTile) {
+		return false
+	}
+	return p.isFuriten
 }
 
 func (p *VisiblePlayer) RiichiState() RiichiState {
@@ -169,6 +184,8 @@ func (p *VisiblePlayer) Discard(t tile.Tile, tsumogiri bool) error {
 	p.river = append(p.river, t)
 	p.discardedTiles = append(p.discardedTiles, t)
 	p.swapCallTiles = nil
+	p.updateWaits()
+	p.updateFuritenAfterDiscard()
 	return nil
 }
 
@@ -199,6 +216,7 @@ func (p *VisiblePlayer) Chii(chii meld.Chii) error {
 	p.melds = append(p.melds, &chii)
 	p.isConcealed = false
 	p.swapCallTiles = swapCallTiles
+	p.updateWaits()
 	return nil
 }
 
@@ -219,6 +237,7 @@ func (p *VisiblePlayer) Pon(pon meld.Pon) error {
 	p.melds = append(p.melds, &pon)
 	p.isConcealed = false
 	p.swapCallTiles = pon.SwapCallTiles()
+	p.updateWaits()
 	return nil
 }
 
@@ -239,6 +258,7 @@ func (p *VisiblePlayer) CalledKan(kan meld.CalledKan) error {
 	p.melds = append(p.melds, &kan)
 	p.isConcealed = false
 	p.needsDeadWallDraw = true
+	p.updateWaits()
 	return nil
 }
 
@@ -261,6 +281,7 @@ func (p *VisiblePlayer) ConcealedKan(kan meld.ConcealedKan) error {
 	p.drawnTile = nil
 	p.melds = append(p.melds, &kan)
 	p.needsDeadWallDraw = true
+	p.updateWaits()
 	return nil
 }
 
@@ -295,6 +316,7 @@ func (p *VisiblePlayer) PromotedKan(kan meld.PromotedKan) error {
 	p.drawnTile = nil
 	melds[ponIndex] = &kan
 	p.needsDeadWallDraw = true
+	p.updateWaits()
 	return nil
 }
 
@@ -338,6 +360,9 @@ func (p *VisiblePlayer) AddExtraSafeTiles(t tile.Tile) {
 	}
 
 	p.extraSafeTiles = append(p.extraSafeTiles, t)
+	if p.waits.has(t) {
+		p.isFuriten = true
+	}
 }
 
 func (p *VisiblePlayer) TakeFromRiver(t tile.Tile) error {
@@ -349,4 +374,38 @@ func (p *VisiblePlayer) TakeFromRiver(t tile.Tile) error {
 
 	p.river = slices.Delete(p.river, numRiver-1, numRiver)
 	return nil
+}
+
+func (p *VisiblePlayer) updateWaits() {
+	p.waits = waitsFor(&p.hand)
+}
+
+func (p *VisiblePlayer) updateFuritenAfterDiscard() {
+	riverFuriten := slices.ContainsFunc(p.discardedTiles, p.waits.has)
+	if p.riichiState == RiichiAccepted {
+		p.isFuriten = p.isFuriten || riverFuriten
+		return
+	}
+	p.isFuriten = riverFuriten
+}
+
+type waitSet uint64
+
+func (w waitSet) has(t tile.Tile) bool {
+	return w&(waitSet(1)<<t.RemoveRed().ID()) != 0
+}
+
+func waitsFor(h *hand.VisibleHand) waitSet {
+	var waits waitSet
+	for id := range tile.NumTileType34 {
+		waitTile := tile.MustTileFromID(id)
+		handWithWait, err := h.Draw(waitTile)
+		if err != nil {
+			continue
+		}
+		if service.IsWinningForm(handWithWait) {
+			waits |= waitSet(1) << id
+		}
+	}
+	return waits
 }

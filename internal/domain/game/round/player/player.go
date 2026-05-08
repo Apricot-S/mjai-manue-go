@@ -42,6 +42,11 @@ type PlayerViewer interface {
 	// ExtraSafeTiles returns extra safe tiles (安全牌).
 	// The tiles that are safe in the same turn and the tiles that are safe after riichi.
 	ExtraSafeTiles() []tile.Tile
+	// IsFuriten returns whether the player's actual visible hand is furiten.
+	// Invisible players cannot update this from actual hand contents.
+	IsFuriten() bool
+	// IsRonFuriten returns whether ron on the winning tile is forbidden by furiten.
+	IsRonFuriten(winningTile *tile.Tile) bool
 
 	// RiichiState returns the riichi state.
 	RiichiState() RiichiState

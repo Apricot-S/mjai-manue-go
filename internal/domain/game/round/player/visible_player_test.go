@@ -1651,6 +1651,92 @@ func TestVisiblePlayer_AddExtraSafeTiles(t *testing.T) {
 	}
 }
 
+func TestVisiblePlayer_AddExtraSafeTiles_UpdateFuritenFromActualHand(t *testing.T) {
+	handTiles := [13]tile.Tile{
+		tile.MustTileFromCode("1m"), tile.MustTileFromCode("2m"), tile.MustTileFromCode("3m"),
+		tile.MustTileFromCode("1p"), tile.MustTileFromCode("2p"), tile.MustTileFromCode("3p"),
+		tile.MustTileFromCode("1s"), tile.MustTileFromCode("2s"), tile.MustTileFromCode("3s"),
+		tile.MustTileFromCode("4m"), tile.MustTileFromCode("5m"),
+		tile.MustTileFromCode("5p"), tile.MustTileFromCode("5p"),
+	}
+	p, err := player.NewVisiblePlayer(handTiles)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+
+	p.AddExtraSafeTiles(tile.MustTileFromCode("9m"))
+	if p.IsFuriten() {
+		t.Error("IsFuriten() = true, want false when extra safe tile is not a wait")
+	}
+
+	p.AddExtraSafeTiles(tile.MustTileFromCode("6m"))
+	if !p.IsFuriten() {
+		t.Error("IsFuriten() = false, want true when extra safe tile is a wait")
+	}
+}
+
+func TestVisiblePlayer_IsRonFuriten_SharedByAllWaits(t *testing.T) {
+	handTiles := [13]tile.Tile{
+		tile.MustTileFromCode("1p"), tile.MustTileFromCode("1p"), tile.MustTileFromCode("1p"),
+		tile.MustTileFromCode("2p"), tile.MustTileFromCode("2p"), tile.MustTileFromCode("2p"),
+		tile.MustTileFromCode("3s"), tile.MustTileFromCode("3s"), tile.MustTileFromCode("3s"),
+		tile.MustTileFromCode("1m"), tile.MustTileFromCode("1m"),
+		tile.MustTileFromCode("E"), tile.MustTileFromCode("E"),
+	}
+	p, err := player.NewVisiblePlayer(handTiles)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+
+	p.AddExtraSafeTiles(tile.MustTileFromCode("1m"))
+
+	winningTile := tile.MustTileFromCode("E")
+	if !p.IsRonFuriten(&winningTile) {
+		t.Error("IsRonFuriten(E) = false, want true when another wait 1m is extra safe")
+	}
+}
+
+func TestVisiblePlayer_Discard_UpdateFuritenAfterRiichiAccepted(t *testing.T) {
+	handTiles := [13]tile.Tile{
+		tile.MustTileFromCode("1p"), tile.MustTileFromCode("2p"), tile.MustTileFromCode("3p"),
+		tile.MustTileFromCode("1s"), tile.MustTileFromCode("2s"), tile.MustTileFromCode("3s"),
+		tile.MustTileFromCode("7s"), tile.MustTileFromCode("8s"), tile.MustTileFromCode("9s"),
+		tile.MustTileFromCode("4m"), tile.MustTileFromCode("5m"),
+		tile.MustTileFromCode("5p"), tile.MustTileFromCode("5p"),
+	}
+	p, err := player.NewVisiblePlayer(handTiles)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+
+	riichiDiscard := tile.MustTileFromCode("9m")
+	if err := p.Draw(riichiDiscard); err != nil {
+		t.Fatalf("unexpected error on Draw: %v", err)
+	}
+	if err := p.Riichi(); err != nil {
+		t.Fatalf("unexpected error on Riichi: %v", err)
+	}
+	if err := p.Discard(riichiDiscard, true); err != nil {
+		t.Fatalf("unexpected error on Discard: %v", err)
+	}
+	if err := p.RiichiAccepted(); err != nil {
+		t.Fatalf("unexpected error on RiichiAccepted: %v", err)
+	}
+
+	missedTsumo := tile.MustTileFromCode("6m")
+	if err := p.Draw(missedTsumo); err != nil {
+		t.Fatalf("unexpected error on Draw: %v", err)
+	}
+	if err := p.Discard(missedTsumo, true); err != nil {
+		t.Fatalf("unexpected error on Discard: %v", err)
+	}
+
+	otherWait := tile.MustTileFromCode("3m")
+	if !p.IsRonFuriten(&otherWait) {
+		t.Error("IsRonFuriten(3m) = false, want true after missing tsumo on 6m after riichi")
+	}
+}
+
 func TestVisiblePlayer_AddExtraSafeTiles_Panic(t *testing.T) {
 	handTiles := [13]tile.Tile{
 		tile.MustTileFromCode("C"), tile.MustTileFromCode("9s"), tile.MustTileFromCode("4m"),
