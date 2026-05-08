@@ -10,18 +10,8 @@ import (
 )
 
 type InvisiblePlayer struct {
-	hand                      hand.InvisibleHand
-	drawnTile                 *tile.Tile
-	melds                     []meld.Meld
-	river                     []tile.Tile
-	discardedTiles            []tile.Tile
-	extraSafeTiles            []tile.Tile
-	riichiState               RiichiState
-	riichiRiverIndex          int
-	riichiDiscardedTilesIndex int
-	isConcealed               bool
-	swapCallTiles             []tile.Tile
-	needsDeadWallDraw         bool
+	hand hand.InvisibleHand
+	commonPlayerState
 }
 
 var initInvisibleHandTiles tile.Tiles = tile.Tiles{
@@ -34,18 +24,8 @@ var initInvisibleHand hand.InvisibleHand = *hand.MustInvisibleHand(initInvisible
 
 func NewInvisiblePlayer() *InvisiblePlayer {
 	return &InvisiblePlayer{
-		hand:                      initInvisibleHand,
-		drawnTile:                 nil,
-		melds:                     make([]meld.Meld, 0, maxNumMelds),
-		river:                     make([]tile.Tile, 0, maxNumRiver),
-		discardedTiles:            make([]tile.Tile, 0, maxNumDiscardedTiles),
-		extraSafeTiles:            make([]tile.Tile, 0, 3),
-		riichiState:               NotRiichi,
-		riichiRiverIndex:          -1,
-		riichiDiscardedTilesIndex: -1,
-		isConcealed:               true,
-		swapCallTiles:             nil,
-		needsDeadWallDraw:         false,
+		hand:              initInvisibleHand,
+		commonPlayerState: newCommonPlayerState(),
 	}
 }
 
@@ -55,26 +35,6 @@ func (p *InvisiblePlayer) Hand() (*hand.VisibleHand, bool) {
 
 func (p *InvisiblePlayer) HandTiles() []tile.Tile {
 	return p.hand.ToTiles()
-}
-
-func (p *InvisiblePlayer) DrawnTile() *tile.Tile {
-	return p.drawnTile
-}
-
-func (p *InvisiblePlayer) Melds() []meld.Meld {
-	return slices.Clone(p.melds)
-}
-
-func (p *InvisiblePlayer) River() []tile.Tile {
-	return slices.Clone(p.river)
-}
-
-func (p *InvisiblePlayer) DiscardedTiles() []tile.Tile {
-	return slices.Clone(p.discardedTiles)
-}
-
-func (p *InvisiblePlayer) ExtraSafeTiles() []tile.Tile {
-	return slices.Clone(p.extraSafeTiles)
 }
 
 func (p *InvisiblePlayer) IsFuriten() bool {
@@ -99,34 +59,6 @@ func (p *InvisiblePlayer) CanRonBy(winningTile *tile.Tile) bool {
 		}
 	}
 	return true
-}
-
-func (p *InvisiblePlayer) RiichiState() RiichiState {
-	return p.riichiState
-}
-
-func (p *InvisiblePlayer) RiichiRiverIndex() int {
-	return p.riichiRiverIndex
-}
-
-func (p *InvisiblePlayer) RiichiDiscardedTilesIndex() int {
-	return p.riichiDiscardedTilesIndex
-}
-
-func (p *InvisiblePlayer) CanDiscard() bool {
-	return !p.needsDeadWallDraw && p.drawnTile != nil || p.swapCallTiles != nil
-}
-
-func (p *InvisiblePlayer) CanChiiPonKan() bool {
-	return p.riichiState == NotRiichi && !p.needsDeadWallDraw && !p.CanDiscard() && len(p.melds) < 4
-}
-
-func (p *InvisiblePlayer) IsConcealed() bool {
-	return p.isConcealed
-}
-
-func (p *InvisiblePlayer) SwapCallTiles() []tile.Tile {
-	return slices.Clone(p.swapCallTiles)
 }
 
 func (p *InvisiblePlayer) Draw(t tile.Tile) error {
@@ -331,15 +263,4 @@ func (p *InvisiblePlayer) AddExtraSafeTiles(t tile.Tile) {
 	}
 
 	p.extraSafeTiles = append(p.extraSafeTiles, t)
-}
-
-func (p *InvisiblePlayer) TakeFromRiver(t tile.Tile) error {
-	numRiver := len(p.river)
-
-	if t != p.river[numRiver-1] {
-		return fmt.Errorf("cannot take tile %s; last river tile is %s", t, p.river[numRiver-1])
-	}
-
-	p.river = slices.Delete(p.river, numRiver-1, numRiver)
-	return nil
 }
