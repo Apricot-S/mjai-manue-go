@@ -689,6 +689,18 @@ func TestHas1Han(t *testing.T) {
 		want          bool
 	}{
 		{
+			name:          "no Win",
+			handCodes:     []string{"1m", "1m", "1m", "2p", "3p", "4p", "3s", "4s", "5s", "6s", "6s", "6s", "9s"},
+			melds:         nil,
+			winningTile:   tile.MustTileFromCode("8s"),
+			prevalentWind: wind.East,
+			seatWind:      wind.South,
+			tsumo:         false,
+			riichi:        false,
+			event:         service.NoEvent,
+			want:          false,
+		},
+		{
 			name:          "chiitoitsu",
 			handCodes:     []string{"1m", "1m", "8m", "8m", "2p", "8p", "8p", "5s", "5s", "E", "E", "C", "C"},
 			melds:         nil,
