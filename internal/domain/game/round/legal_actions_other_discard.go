@@ -168,15 +168,15 @@ func chiiConsumedCandidates(count func(tile.Tile) int, taken tile.Tile) [][2]til
 }
 
 func chiiTileCandidates(count func(tile.Tile) int, t tile.Tile) []tile.Tile {
-	normal := t.RemoveRed()
-	if !normal.IsSuits() || normal.Number() != 5 {
-		if count(normal) == 0 {
+	if !t.IsSuits() || t.Number() != 5 {
+		if count(t) == 0 {
 			return nil
 		}
-		return []tile.Tile{normal}
+		return []tile.Tile{t}
 	}
 
 	candidates := make([]tile.Tile, 0, 2)
+	normal := t.RemoveRed()
 	if count(normal) > 0 {
 		candidates = append(candidates, normal)
 	}
@@ -234,14 +234,14 @@ func (s *State) legalCalledKanActions(playerSeat seat.Seat, p *player.VisiblePla
 }
 
 func calledKanConsumedCandidate(count func(tile.Tile) int, taken tile.Tile) ([3]tile.Tile, bool) {
-	normal := taken.RemoveRed()
-	if !normal.IsSuits() || normal.Number() != 5 {
-		if count(normal) < 3 {
+	if !taken.IsSuits() || taken.Number() != 5 {
+		if count(taken) < 3 {
 			return [3]tile.Tile{}, false
 		}
-		return [3]tile.Tile{normal, normal, normal}, true
+		return [3]tile.Tile{taken, taken, taken}, true
 	}
 
+	normal := taken.RemoveRed()
 	red := normal.AddRed()
 	if taken.IsRed() {
 		if count(normal) < 3 {
@@ -256,14 +256,14 @@ func calledKanConsumedCandidate(count func(tile.Tile) int, taken tile.Tile) ([3]
 }
 
 func ponConsumedCandidates(count func(tile.Tile) int, taken tile.Tile) [][2]tile.Tile {
-	normal := taken.RemoveRed()
-	if !normal.IsSuits() || normal.Number() != 5 {
-		if count(normal) < 2 {
+	if !taken.IsSuits() || taken.Number() != 5 {
+		if count(taken) < 2 {
 			return nil
 		}
-		return [][2]tile.Tile{{normal, normal}}
+		return [][2]tile.Tile{{taken, taken}}
 	}
 
+	normal := taken.RemoveRed()
 	red := normal.AddRed()
 	normalCount := count(normal)
 	redCount := count(red)
