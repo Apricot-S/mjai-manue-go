@@ -380,7 +380,8 @@ func (s *State) canApplyRobbingKan(ev *event.Win) bool {
 	if s.pendingRobbedKanTile == nil {
 		return false
 	}
-	return isTileMatchKnownEnough(s.pendingRobbedKanTile, ev.WinningTile())
+	return isTileMatchKnownEnough(s.pendingRobbedKanTile, ev.WinningTile()) &&
+		s.players[ev.Actor().Index()].CanRonBy(ev.WinningTile())
 }
 
 func isTileMatchKnownEnough(stateTile *tile.Tile, eventTile *tile.Tile) bool {

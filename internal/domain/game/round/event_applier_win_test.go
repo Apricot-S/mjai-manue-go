@@ -87,8 +87,10 @@ func TestState_Apply_Win_ReturnsErrorBeforeFirstDraw(t *testing.T) {
 }
 
 func TestState_Apply_Win_Renhou(t *testing.T) {
-	s := mustNewRoundStateForTest(t, newValidHands())
+	hands := newValidHands()
 	actor := seat.MustSeat(1)
+	hands[actor.Index()] = tenpaiHandWaiting36mForTest()
+	s := mustNewRoundStateForTest(t, hands)
 	target := seat.MustSeat(0)
 	winningTile := tile.MustTileFromCode("6m")
 	scores := [common.NumPlayers]int{57000, -7000, 25000, 25000}
@@ -388,6 +390,38 @@ func TestState_Apply_Win_RobbingKan(t *testing.T) {
 
 	if got := s.Scores(); got != scores {
 		t.Errorf("Scores() = %v, want %v", got, scores)
+	}
+}
+
+func TestState_Apply_Win_ReturnsErrorForFuritenRobbingKan(t *testing.T) {
+	s := newStateBeforePromotedKanForTest(t, 10, 0)
+	actor := seat.MustSeat(1)
+	target := seat.MustSeat(3)
+	added := tile.MustTileFromCode("E")
+	scores := [common.NumPlayers]int{25000, 57000, 25000, -7000}
+	actorPlayer, err := player.NewVisiblePlayer(tenpaiHandWaitingEastForTest())
+	if err != nil {
+		t.Fatalf("player.NewVisiblePlayer() failed: %v", err)
+	}
+	actorPlayer.AddExtraSafeTiles(added)
+	s.players[actor.Index()] = actorPlayer
+
+	if err := s.Apply(event.NewPromotedKan(target, added, [3]tile.Tile{added, added, added})); err != nil {
+		t.Fatalf("Apply(PromotedKan) failed: %v", err)
+	}
+	if err := s.Apply(event.NewWin(
+		actor,
+		target,
+		&added,
+		32000,
+		nil,
+		&scores,
+	)); err == nil {
+		t.Fatal("Apply(Win) succeeded unexpectedly")
+	}
+
+	if got := s.Scores(); got != [common.NumPlayers]int{25000, 25000, 25000, 25000} {
+		t.Errorf("Scores() = %v, want unchanged initial scores", got)
 	}
 }
 

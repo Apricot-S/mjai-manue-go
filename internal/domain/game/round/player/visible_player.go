@@ -92,10 +92,7 @@ func (p *VisiblePlayer) CanRonBy(winningTile *tile.Tile) bool {
 		// cannot verify the exact tile, so preserve the existing permissive behavior.
 		return true
 	}
-	if !p.waits.has(*winningTile) {
-		return true
-	}
-	return !p.isFuriten
+	return !p.isFuriten && p.waits.has(*winningTile)
 }
 
 func (p *VisiblePlayer) RiichiState() RiichiState {

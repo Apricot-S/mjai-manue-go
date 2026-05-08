@@ -87,7 +87,11 @@ func TestState_LegalActions_AfterTerminalEventIsEmpty(t *testing.T) {
 func newStateAfterRonForTerminalTest(t *testing.T, winActor seat.Seat) *State {
 	t.Helper()
 
-	s := mustNewRoundStateForTest(t, newValidHands())
+	hands := newValidHands()
+	hands[winActor.Index()] = tenpaiHandWaiting36mForTest()
+	// The terminal tests also apply an additional ron by player 2.
+	hands[seat.MustSeat(2).Index()] = tenpaiHandWaiting36mForTest()
+	s := mustNewRoundStateForTest(t, hands)
 	target := seat.MustSeat(0)
 	winningTile := tile.MustTileFromCode("6m")
 	if err := s.Apply(event.NewDraw(target, winningTile)); err != nil {

@@ -1696,6 +1696,25 @@ func TestVisiblePlayer_CanRonBy_DisallowsAllWaitsWhenAnyWaitIsFuriten(t *testing
 	}
 }
 
+func TestVisiblePlayer_CanRonBy_ReturnsFalseForNonWait(t *testing.T) {
+	handTiles := [13]tile.Tile{
+		tile.MustTileFromCode("1m"), tile.MustTileFromCode("2m"), tile.MustTileFromCode("3m"),
+		tile.MustTileFromCode("1p"), tile.MustTileFromCode("2p"), tile.MustTileFromCode("3p"),
+		tile.MustTileFromCode("1s"), tile.MustTileFromCode("2s"), tile.MustTileFromCode("3s"),
+		tile.MustTileFromCode("4m"), tile.MustTileFromCode("5m"),
+		tile.MustTileFromCode("5p"), tile.MustTileFromCode("5p"),
+	}
+	p, err := player.NewVisiblePlayer(handTiles)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+
+	nonWait := tile.MustTileFromCode("9m")
+	if p.CanRonBy(&nonWait) {
+		t.Error("CanRonBy(9m) = true, want false for a non-wait tile")
+	}
+}
+
 func TestVisiblePlayer_Discard_UpdateFuritenAfterRiichiAccepted(t *testing.T) {
 	handTiles := [13]tile.Tile{
 		tile.MustTileFromCode("1p"), tile.MustTileFromCode("2p"), tile.MustTileFromCode("3p"),
