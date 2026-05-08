@@ -13,7 +13,13 @@ import (
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/tile"
 )
 
-const maxNumActionsOnSelfDraw = 13 + 1 + 1 + 1 // discard + riichi + win + kyushukyuhai
+// maxNumActionsOnSelfDraw is discard + riichi + win + kyushukyuhai.
+// Example: a kokushi musou starting hand that wins on the first self draw can have 13 discard choices plus riichi,
+// tsumo win, and kyushukyuhai.
+const maxNumActionsOnSelfDraw = 13 + 1 + 1 + 1
+
+// maxKanCandidates is the largest number of distinct kan choices in a legal hand after self draw.
+// Example: a 14-tile hand can contain three different four-of-a-kind groups.
 const maxKanCandidates = 3
 
 func (s *State) legalActionsOnSelfDraw(playerSeat seat.Seat, p *player.VisiblePlayer) ([]action.Action, error) {

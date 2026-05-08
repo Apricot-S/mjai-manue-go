@@ -8,7 +8,10 @@ import (
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/tile"
 )
 
-const maxNumActionsOnOtherDiscard = 1 + 1 + 5 // pon + daiminkan + up to 5 chii patterns with red fives
+// maxNumActionsOnOtherDiscard is ron + pon + daiminkan + up to 5 chii patterns with red fives + pass.
+// Example: holding 234445555r6mPPP and seeing 4m discarded by kamicha
+// yields ron, pon, daiminkan, five chii choices (23, 35, 35r, 56, 5r6), and pass.
+const maxNumActionsOnOtherDiscard = 1 + 1 + 1 + 5 + 1
 
 func (s *State) legalActionsOnOtherDiscard(playerSeat seat.Seat, p *player.VisiblePlayer) ([]action.Action, error) {
 	if s.pendingRobbedKanTile != nil && s.pendingKanActor != nil && *s.pendingKanActor != playerSeat {
