@@ -6,10 +6,7 @@
 
 - `docs/README.md`: docs 配下の文書の役割と分割方針
 - `docs/design.md`: 全体方針（ゴール/非ゴール、NFR、DDD/レイヤ、ユースケース、現状実装、実装計画、テスト戦略）
-- `docs/protocols.md`: mjai / stdio / RiichiLab 各プロトコルの **メッセージ仕様の集約先**
-  - `docs/design.md` 側に仕様詳細を重複記載せず、必要箇所から参照する方針
 - `docs/board-state-output.md`: 盤面状態出力の実装状況と移植元参照（恒久仕様は `docs/design.md` に反映）
-- `docs/tcp_client_game.coffee`: CoffeeScript 版 TCP client の移植元参照。mjsonp TCP adapter の振る舞い確認に使うが、Go 版は設計書に従ってより適切な error 返却・終了扱いにする。
 - `docs/terminology-en.md`: 移植元コードの英語用語を確認する補助資料
 
 ## 実装ルール（設計書の要点）
@@ -29,17 +26,10 @@
 - `round.State` / `EventApplier` / `LegalActions` は現状を最終形として扱う。責務分割目的での追加 struct/service 化は、間接参照が増えて読みにくくなるため原則行わない。
 - `service/yaku.go` の TODO はオリジナル実装由来のコメントを保持しているもの。未完了作業とは扱わず、必要ならその旨をコメントに追記する。
 
-## 直近の作業順
-
-レビュー負荷を抑えるため、以下は1件ずつ独立した差分で進める。
-
-1. mjsonp TCP adapter の CoffeeScript 版由来仕様反映。`hello` の protocol/version 検証は追加しない。socket lifecycle log を stderr 側へ出し、`error` message の response なし error 終了、`end_game` の response なし正常終了をテストで固定する。
-2. 内部 API と非自明処理へのコメント追加。不変条件・コーナーケース・移植仕様上の注意点に絞り、自明な getter や単純処理には増やしすぎない。
-
 ## ドキュメント更新の運用
 
 - 仕様/設計に影響する変更（パッケージ構造、責務分担、主要インタフェース、I/O 方針、実装計画、テスト方針など）を入れる場合は、該当箇所の `docs/design.md` も同時に更新する。
-- プロトコル（メッセージ種別・フィールド・解釈）を変更/追加する場合は、まず `docs/protocols.md` を更新し、`docs/design.md` から参照する（重複記載しない）。
+- プロトコル（メッセージ種別・フィールド・解釈）を変更/追加する場合は、adapter codec とその単体テストを更新し、設計判断に影響する場合は `docs/design.md` も更新する。
 - docs 配下に新しい設計メモや計画文書を追加する場合は、`docs/README.md` に役割を追記する。
 - `docs/design.md` の見出し番号（`## 4.x` など）は参照の手掛かりになるため、可能な限り維持する（大きく組み替える場合は最小限の破壊に留める）。
 
