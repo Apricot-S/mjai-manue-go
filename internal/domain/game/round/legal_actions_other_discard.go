@@ -57,6 +57,10 @@ func (s *State) legalActionsOnRobbingKan(playerSeat seat.Seat, p *player.Visible
 }
 
 func (s *State) canWinByRon(playerSeat seat.Seat, p *player.VisiblePlayer, winningTile tile.Tile) bool {
+	if p.IsFuriten() {
+		return false
+	}
+
 	handBeforeWin, ok := p.Hand()
 	if !ok {
 		return false

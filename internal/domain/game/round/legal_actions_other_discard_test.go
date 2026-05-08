@@ -59,6 +59,38 @@ func TestState_LegalActions_OnOtherDiscardIncludesRon(t *testing.T) {
 	}
 }
 
+func TestState_LegalActions_OnOtherDiscardExcludesRonWhenFuriten(t *testing.T) {
+	hands := newValidHands()
+	hands[1] = ronWithTanyaoHandForLegalActionsTest()
+	s := mustNewRoundStateForTest(t, hands)
+	actor := seat.MustSeat(1)
+	winningTile := tile.MustTileFromCode("3p")
+	p := s.players[actor.Index()].(*player.VisiblePlayer)
+	p.AddExtraSafeTiles(winningTile)
+	if !p.IsFuriten() {
+		t.Fatal("test setup failed: actor is not furiten")
+	}
+
+	target := seat.MustSeat(0)
+	if err := s.Apply(event.NewDraw(target, winningTile)); err != nil {
+		t.Fatalf("Apply(Draw) failed: %v", err)
+	}
+	if err := s.Apply(event.NewDiscard(target, winningTile, true)); err != nil {
+		t.Fatalf("Apply(Discard) failed: %v", err)
+	}
+
+	got, err := s.LegalActions(actor)
+	if err != nil {
+		t.Fatalf("LegalActions() failed: %v", err)
+	}
+	if containsWin(got, actor, target, "3p") {
+		t.Error("LegalActions() contains Win, want furiten ron excluded")
+	}
+	if containsPass(got, actor) {
+		t.Error("LegalActions() contains Pass, want no pass when furiten ron is excluded")
+	}
+}
+
 func TestState_LegalActions_OnOtherDiscardExcludesRonWithoutYaku(t *testing.T) {
 	hands := newValidHands()
 	hands[1] = ronWithoutYakuHandForLegalActionsTest()
@@ -124,6 +156,32 @@ func TestState_LegalActions_OnRobbingKanIncludesRon(t *testing.T) {
 	}
 	if !containsPass(got, actor) {
 		t.Error("LegalActions() does not contain Pass, want pass when robbing-a-kan ron is available")
+	}
+}
+
+func TestState_LegalActions_OnRobbingKanExcludesRonWhenFuriten(t *testing.T) {
+	s := newStateBeforeRobbingKanForLegalActionsTest(t)
+	target := seat.MustSeat(3)
+	actor := seat.MustSeat(1)
+	added := tile.MustTileFromCode("E")
+	p := s.players[actor.Index()].(*player.VisiblePlayer)
+	p.AddExtraSafeTiles(added)
+	if !p.IsFuriten() {
+		t.Fatal("test setup failed: actor is not furiten")
+	}
+	if err := s.Apply(event.NewPromotedKan(target, added, [3]tile.Tile{added, added, added})); err != nil {
+		t.Fatalf("Apply(PromotedKan) failed: %v", err)
+	}
+
+	got, err := s.LegalActions(actor)
+	if err != nil {
+		t.Fatalf("LegalActions() failed: %v", err)
+	}
+	if containsWin(got, actor, target, "E") {
+		t.Error("LegalActions() contains Win, want furiten robbing-a-kan ron excluded")
+	}
+	if containsPass(got, actor) {
+		t.Error("LegalActions() contains Pass, want no pass when furiten robbing-a-kan ron is excluded")
 	}
 }
 
