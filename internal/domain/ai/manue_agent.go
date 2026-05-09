@@ -50,17 +50,20 @@ func (*ManueAgent) decideSelfTurn(legalActions []action.Action, self player.Play
 		return Decision{}, fmt.Errorf("cannot decide: no tsumogiri discard after riichi accepted")
 	}
 
-	if riichi := firstActionOfType[*action.Riichi](legalActions); riichi != nil {
-		return Decision{Action: riichi}, nil
-	}
-
-	if discard, err := firstDiscardCandidate(legalActions); err != nil {
+	candidates, err := getSelfTurnCandidates(legalActions, self)
+	if err != nil {
 		return Decision{}, err
-	} else if discard != nil {
-		return Decision{Action: discard}, nil
+	}
+	if len(candidates) == 0 {
+		return Decision{}, fmt.Errorf("cannot decide self turn: no self-turn candidate")
 	}
 
-	return Decision{}, fmt.Errorf("cannot decide self turn: no discard candidate")
+	candidate := chooseBestCandidate(candidates, true)
+	return Decision{
+		Action: candidate.action,
+		Log:    formatCandidateLog(candidates),
+		Trace:  formatDecisionTrace(candidates, &candidate),
+	}, nil
 }
 
 func (*ManueAgent) decideOtherDiscardReaction(legalActions []action.Action) (Decision, error) {
@@ -73,16 +76,6 @@ func (*ManueAgent) decideOtherDiscardReaction(legalActions []action.Action) (Dec
 	}
 
 	return Decision{}, fmt.Errorf("cannot decide other discard reaction: no call or pass candidate")
-}
-
-func firstDiscardCandidate(actions []action.Action) (*action.Discard, error) {
-	for _, a := range actions {
-		discard, ok := a.(*action.Discard)
-		if ok {
-			return discard, nil
-		}
-	}
-	return nil, nil
 }
 
 func firstActionOfType[T action.Action](actions []action.Action) T {

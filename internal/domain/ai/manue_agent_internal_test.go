@@ -1,12 +1,15 @@
 package ai
 
 import (
+	"fmt"
+	"strings"
 	"testing"
 
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/action"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/round/player"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/round/player/hand"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/round/player/meld"
+	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/round/service"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/seat"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/tile"
 )
@@ -73,8 +76,9 @@ func TestManueAgent_DecideActionSkeleton(t *testing.T) {
 		{
 			name:        "riichi before discard",
 			actions:     []action.Action{handDiscard, riichi},
+			hand:        hand.CodesToHand([]string{"1m", "2m", "3m", "4m", "5m", "6m", "7m", "8m", "9m", "1p", "1p", "E", "E", "1m"}),
 			riichiState: player.NotRiichi,
-			drawnTile:   &drawnTile,
+			drawnTile:   nil,
 			want:        riichi,
 			decide: func(agent *ManueAgent, actions []action.Action, self player.PlayerViewer) (Decision, error) {
 				return agent.decideSelfTurn(actions, self)
@@ -131,6 +135,35 @@ func TestManueAgent_DecideActionSkeleton(t *testing.T) {
 	}
 }
 
+func TestManueAgent_decideSelfTurn_ReturnsOriginalStyleActionLog(t *testing.T) {
+	self := seat.MustSeat(0)
+	discard, err := action.NewDiscard(self, tile.MustTileFromCode("5m"), false)
+	if err != nil {
+		t.Fatalf("NewDiscard() failed: %v", err)
+	}
+
+	decision, err := NewManueAgent(0).decideSelfTurn([]action.Action{discard}, stubPlayerViewer{
+		hand:        hand.CodesToHand([]string{"1m", "2m", "3m", "4m", "5m", "6m", "7m", "8m", "9m", "1p", "1p", "E", "E", "5m"}),
+		riichiState: player.NotRiichi,
+		drawnTile:   nil,
+	})
+	if err != nil {
+		t.Fatalf("decideSelfTurn() failed: %v", err)
+	}
+	if !strings.Contains(decision.Log, "| action |") {
+		t.Errorf("Log = %q, want metrics table", decision.Log)
+	}
+	if strings.Contains(decision.Log, "decidedKey") {
+		t.Errorf("Log = %q, should not contain decidedKey", decision.Log)
+	}
+	if !strings.HasSuffix(decision.Log, "\n\n\n") {
+		t.Errorf("Log = %q, want original blank-line suffix", decision.Log)
+	}
+	if !strings.Contains(decision.Trace, "decidedKey -1.5m\n") {
+		t.Errorf("Trace = %q, want decidedKey", decision.Trace)
+	}
+}
+
 func TestManueAgent_decideSelfTurn_ReturnsErrorWithoutTsumogiriAfterRiichiAccepted(t *testing.T) {
 	self := seat.MustSeat(0)
 	handDiscard, err := action.NewDiscard(self, tile.MustTileFromCode("1m"), false)
@@ -145,6 +178,333 @@ func TestManueAgent_decideSelfTurn_ReturnsErrorWithoutTsumogiriAfterRiichiAccept
 	})
 	if err == nil {
 		t.Fatal("selectAction() succeeded unexpectedly")
+	}
+}
+
+func TestManueAgent_chooseBestCandidate_PrefersBlackTileOnTie(t *testing.T) {
+	self := seat.MustSeat(0)
+	redDiscard, err := action.NewDiscard(self, tile.MustTileFromCode("5mr"), false)
+	if err != nil {
+		t.Fatalf("NewDiscard(red) failed: %v", err)
+	}
+	blackDiscard, err := action.NewDiscard(self, tile.MustTileFromCode("5m"), false)
+	if err != nil {
+		t.Fatalf("NewDiscard(black) failed: %v", err)
+	}
+
+	candidates, err := getSelfTurnCandidates([]action.Action{redDiscard, blackDiscard}, stubPlayerViewer{
+		hand: hand.CodesToHand([]string{
+			"1m", "2m", "3m", "4m", "5m", "5mr", "6m", "7m",
+			"1p", "2p", "3p", "E", "E", "S",
+		}),
+		riichiState: player.NotRiichi,
+		drawnTile:   nil,
+	})
+	if err != nil {
+		t.Fatalf("getSelfTurnCandidates() failed: %v", err)
+	}
+	got := chooseBestCandidate(candidates, true)
+	if got.action != blackDiscard {
+		t.Errorf("chooseBestCandidate() = %v, want black discard", got)
+	}
+}
+
+func TestManueAgent_getSelfTurnCandidates_BuildsDiscardCandidate(t *testing.T) {
+	self := seat.MustSeat(0)
+	discard, err := action.NewDiscard(self, tile.MustTileFromCode("5m"), false)
+	if err != nil {
+		t.Fatalf("NewDiscard() failed: %v", err)
+	}
+
+	got, err := getSelfTurnCandidates([]action.Action{discard}, stubPlayerViewer{
+		hand: hand.CodesToHand([]string{
+			"1m", "2m", "3m", "4m", "5m", "6m", "7m",
+			"1p", "2p", "3p", "E", "E", "S", "S",
+		}),
+		riichiState: player.NotRiichi,
+		drawnTile:   nil,
+	})
+	if err != nil {
+		t.Fatalf("getSelfTurnCandidates() failed: %v", err)
+	}
+	if len(got) != 1 {
+		t.Fatalf("len(getSelfTurnCandidates()) = %d, want 1", len(got))
+	}
+	if got[0].traceKey != "-1.5m" {
+		t.Errorf("traceKey = %q, want %q", got[0].traceKey, "-1.5m")
+	}
+	if got[0].riichi {
+		t.Errorf("riichi = true, want false")
+	}
+	if got[0].action != discard {
+		t.Errorf("action = %v, want original discard action", got[0].action)
+	}
+	if got[0].discardTile != discard.Tile() {
+		t.Errorf("discardTile = %v, want %v", got[0].discardTile, discard.Tile())
+	}
+}
+
+func TestManueAgent_getSelfTurnCandidates_BuildsRiichiCandidate(t *testing.T) {
+	self := seat.MustSeat(0)
+	riichi := action.NewRiichi(self)
+	discard, err := action.NewDiscard(self, tile.MustTileFromCode("5m"), false)
+	if err != nil {
+		t.Fatalf("NewDiscard() failed: %v", err)
+	}
+
+	got, err := getSelfTurnCandidates([]action.Action{discard, riichi}, stubPlayerViewer{
+		hand: hand.CodesToHand([]string{
+			"1m", "2m", "3m", "4m", "5m", "6m", "7m", "8m", "9m",
+			"1p", "1p", "E", "E", "5m",
+		}),
+		riichiState: player.NotRiichi,
+		drawnTile:   nil,
+	})
+	if err != nil {
+		t.Fatalf("getSelfTurnCandidates() failed: %v", err)
+	}
+	var gotRiichi *actionCandidate
+	for i := range got {
+		if got[i].riichi {
+			gotRiichi = &got[i]
+			break
+		}
+	}
+	if gotRiichi == nil {
+		t.Fatalf("getSelfTurnCandidates() contains no riichi candidate")
+	}
+	if gotRiichi.traceKey != "0.5m" {
+		t.Errorf("traceKey = %q, want %q", gotRiichi.traceKey, "0.5m")
+	}
+	if gotRiichi.action != riichi {
+		t.Errorf("action = %v, want riichi action", gotRiichi.action)
+	}
+	if gotRiichi.discardTile != discard.Tile() {
+		t.Errorf("discardTile = %v, want %v", gotRiichi.discardTile, discard.Tile())
+	}
+}
+
+func TestManueAgent_getSelfTurnCandidates_FiltersNonTenpaiRiichiCandidate(t *testing.T) {
+	self := seat.MustSeat(0)
+	riichi := action.NewRiichi(self)
+	discard, err := action.NewDiscard(self, tile.MustTileFromCode("5m"), false)
+	if err != nil {
+		t.Fatalf("NewDiscard() failed: %v", err)
+	}
+
+	got, err := getSelfTurnCandidates([]action.Action{discard, riichi}, stubPlayerViewer{
+		hand: hand.CodesToHand([]string{
+			"1m", "2m", "3m", "4m", "5m", "6m", "7m",
+			"1p", "2p", "3p", "E", "E", "S", "S",
+		}),
+		riichiState: player.NotRiichi,
+		drawnTile:   nil,
+	})
+	if err != nil {
+		t.Fatalf("getSelfTurnCandidates() failed: %v", err)
+	}
+	for _, candidate := range got {
+		if candidate.riichi {
+			t.Fatalf("getSelfTurnCandidates() contains riichi candidate unexpectedly: %+v", candidate)
+		}
+	}
+}
+
+func TestManueAgent_getSelfTurnCandidates_IncludesRiichiAndDiscardCandidates(t *testing.T) {
+	self := seat.MustSeat(0)
+	riichi := action.NewRiichi(self)
+	discard, err := action.NewDiscard(self, tile.MustTileFromCode("5m"), false)
+	if err != nil {
+		t.Fatalf("NewDiscard() failed: %v", err)
+	}
+
+	got, err := getSelfTurnCandidates([]action.Action{discard, riichi}, stubPlayerViewer{
+		hand: hand.CodesToHand([]string{
+			"1m", "2m", "3m", "4m", "5m", "6m", "7m", "8m", "9m",
+			"1p", "1p", "E", "E", "5m",
+		}),
+		riichiState: player.NotRiichi,
+		drawnTile:   nil,
+	})
+	if err != nil {
+		t.Fatalf("getSelfTurnCandidates() failed: %v", err)
+	}
+	wantTraceKeys := map[string]bool{"0.5m": false, "-1.5m": false}
+	for _, candidate := range got {
+		if _, ok := wantTraceKeys[candidate.traceKey]; ok {
+			wantTraceKeys[candidate.traceKey] = true
+		}
+	}
+	for traceKey, found := range wantTraceKeys {
+		if !found {
+			t.Errorf("getSelfTurnCandidates() does not contain %q", traceKey)
+		}
+	}
+}
+
+func TestManueAgent_scoreDiscardCandidate_MarksRedDiscard(t *testing.T) {
+	redDiscardTile := tile.MustTileFromCode("5mr")
+
+	got := scoreDiscardCandidate(redDiscardTile, 1)
+	if !got.red {
+		t.Errorf("red = false, want true")
+	}
+	if got.shanten != 1 {
+		t.Errorf("shanten = %d, want 1", got.shanten)
+	}
+}
+
+func TestManueAgent_formatDiscardTraceKey(t *testing.T) {
+	discardTile := tile.MustTileFromCode("5m")
+	if got := formatDiscardTraceKey(false, discardTile); got != "-1.5m" {
+		t.Errorf("formatDiscardTraceKey(false) = %q, want %q", got, "-1.5m")
+	}
+	if got := formatDiscardTraceKey(true, discardTile); got != "0.5m" {
+		t.Errorf("formatDiscardTraceKey(true) = %q, want %q", got, "0.5m")
+	}
+}
+
+func TestManueAgent_formatCandidateTrace(t *testing.T) {
+	self := seat.MustSeat(0)
+	discard, err := action.NewDiscard(self, tile.MustTileFromCode("5m"), false)
+	if err != nil {
+		t.Fatalf("NewDiscard() failed: %v", err)
+	}
+
+	got := formatCandidateTrace([]actionCandidate{
+		{
+			traceKey:    "-1.5m",
+			action:      discard,
+			riichi:      false,
+			discardTile: discard.Tile(),
+			score: candidateScore{
+				avgRank:       2.25,
+				expPts:        1200,
+				dealInProb:    0.125,
+				winProb:       0.25,
+				drawProb:      0.375,
+				othersWinProb: 0.5,
+				avgWinPts:     3900,
+				avgDrawPts:    1000,
+				shanten:       1,
+			},
+		},
+	})
+	want := "| action | avgRank | expPt | hojuProb | myHoraProb | ryukyokuProb | otherHoraProb | avgHoraPt | ryukyokuAvgPt | shanten | \n" +
+		"|  -1.5m |  2.2500 |  1200 |    0.125 |      0.250 |        0.375 |         0.500 |      3900 |          1000 |       1 | \n"
+	if got != want {
+		t.Errorf("formatCandidateTrace() =\n%q\nwant\n%q", got, want)
+	}
+}
+
+func TestManueAgent_formatCandidateTrace_FormatsInfinityShanten(t *testing.T) {
+	self := seat.MustSeat(0)
+	discard, err := action.NewDiscard(self, tile.MustTileFromCode("5m"), false)
+	if err != nil {
+		t.Fatalf("NewDiscard() failed: %v", err)
+	}
+
+	got := formatCandidateTrace([]actionCandidate{
+		{
+			traceKey:    "-1.5m",
+			action:      discard,
+			riichi:      false,
+			discardTile: discard.Tile(),
+			score: candidateScore{
+				shanten: service.InfinityShanten,
+			},
+		},
+	})
+	if !strings.Contains(got, "Infinity") {
+		t.Errorf("formatCandidateTrace() = %q, want it to contain Infinity", got)
+	}
+	if strings.Contains(got, fmt.Sprintf("%d", service.InfinityShanten)) {
+		t.Errorf("formatCandidateTrace() = %q, should not contain raw InfinityShanten integer", got)
+	}
+}
+
+func TestManueAgent_formatDecisionTrace_AppendsDecidedKey(t *testing.T) {
+	self := seat.MustSeat(0)
+	discard, err := action.NewDiscard(self, tile.MustTileFromCode("5m"), false)
+	if err != nil {
+		t.Fatalf("NewDiscard() failed: %v", err)
+	}
+	selected := &actionCandidate{
+		traceKey:    "-1.5m",
+		action:      discard,
+		riichi:      false,
+		discardTile: discard.Tile(),
+		score: candidateScore{
+			shanten: 1,
+		},
+	}
+
+	got := formatDecisionTrace([]actionCandidate{*selected}, selected)
+	if !strings.HasSuffix(got, "\n\n\ndecidedKey -1.5m\n") {
+		t.Errorf("formatDecisionTrace() = %q, want two blank lines before decidedKey suffix", got)
+	}
+}
+
+func TestManueAgent_compareCandidateScore(t *testing.T) {
+	tests := []struct {
+		name        string
+		lhs         candidateScore
+		rhs         candidateScore
+		preferBlack bool
+		want        int
+	}{
+		{
+			name:        "better average rank wins",
+			lhs:         candidateScore{avgRank: 1.9, expPts: 0},
+			rhs:         candidateScore{avgRank: 2.0, expPts: 1000},
+			preferBlack: true,
+			want:        -1,
+		},
+		{
+			name:        "higher expected points wins on rank tie",
+			lhs:         candidateScore{avgRank: 2.0, expPts: 1000},
+			rhs:         candidateScore{avgRank: 2.0, expPts: 900},
+			preferBlack: true,
+			want:        -1,
+		},
+		{
+			name:        "black tile wins on expected value tie",
+			lhs:         candidateScore{avgRank: 2.0, expPts: 1000, red: false},
+			rhs:         candidateScore{avgRank: 2.0, expPts: 1000, red: true},
+			preferBlack: true,
+			want:        -1,
+		},
+		{
+			name:        "red tie ignored when preferBlack is false",
+			lhs:         candidateScore{avgRank: 2.0, expPts: 1000, red: false},
+			rhs:         candidateScore{avgRank: 2.0, expPts: 1000, red: true},
+			preferBlack: false,
+			want:        0,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := compareCandidateScore(&tt.lhs, &tt.rhs, tt.preferBlack)
+			if got != tt.want {
+				t.Errorf("compareCandidateScore() = %d, want %d", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestManueAgent_compareCandidateFallback_PreservesPhase1RiichiPreference(t *testing.T) {
+	self := seat.MustSeat(0)
+	riichi := action.NewRiichi(self)
+	discard, err := action.NewDiscard(self, tile.MustTileFromCode("5m"), false)
+	if err != nil {
+		t.Fatalf("NewDiscard() failed: %v", err)
+	}
+
+	lhs := actionCandidate{action: riichi, riichi: true, discardTile: discard.Tile()}
+	rhs := actionCandidate{action: discard, riichi: false, discardTile: discard.Tile()}
+	if got := compareCandidateFallback(lhs, rhs); got != -1 {
+		t.Errorf("compareCandidateFallback(riichi, discard) = %d, want -1", got)
 	}
 }
 

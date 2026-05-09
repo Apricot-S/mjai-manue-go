@@ -353,7 +353,7 @@ type Decision struct {
 
 移植の初期段階では `configs/` の読み込みは導入しない。`NewManueAgent(seed uint64)` は CLI 用の安定した constructor として維持し、configs / estimator / stats が必要になった段階で `NewManueAgentWithDeps(seed uint64, deps ManueAgentDeps)` のようなテスト差し替え可能な constructor を追加する。これにより、configs の embed JSON や `encoding/json/v2` 初期化に引きずられず、まず action 分類・優先順位・打牌評価の小さい単位から移植できる。configs 依存を導入するまでは CoffeeScript 版との完全一致を移植ゴールにせず、判断入口と合法手選択の段階的な一致範囲を明示して進める。
 
-`mjai-manue` Phase 1 では configs 非依存の判断骨格だけを実装する。具体的には、合法手集合から `Win` を最優先で選ぶ、リーチ成立後はツモ切り打牌を選ぶ、リーチ宣言可能なら `Riichi` を選ぶ、通常手番では暫定的に最初の打牌を選ぶ、他家打牌への反応では暫定的に最初の副露/カンを選び、行動候補が `Pass` だけなら `Pass` を選ぶ。打牌評価、副露するかどうかの期待値評価、危険度・聴牌確率・順位期待値は後続 phase で置き換える。
+`mjai-manue` Phase 1 では configs 非依存の判断骨格だけを実装する。具体的には、合法手集合から `Win` を最優先で選ぶ、リーチ成立後はツモ切り打牌を選ぶ、通常手番では打牌/立直候補を暫定 score で選ぶ、他家打牌への反応では暫定的に最初の副露/カンを選び、行動候補が `Pass` だけなら `Pass` を選ぶ。打牌評価、副露するかどうかの期待値評価、危険度・聴牌確率・順位期待値は後続 phase で置き換える。
 
 移植中の `ManueAgent` は、完成形の呼び出し関係を先に固定し、下位の評価関数をハリボテから旧 Go 実装相当へ段階的に差し替える。
 
@@ -362,15 +362,16 @@ ManueAgent.Decide
   ├─ Win action selection
   ├─ decideSelfTurn
   │   ├─ tsumogiriDiscard              // riichi accepted
-  │   ├─ chooseRiichi                  // temporary: choose if legal
-  │   ├─ getMetrics                    // later: prior Go/CoffeeScript logic
-  │   └─ chooseBestMetric              // later
+  │   ├─ buildSelfTurnCandidates       // discard and riichi+discard candidates
+  │   ├─ scoreCandidates               // later: prior Go/CoffeeScript logic
+  │   └─ chooseBestCandidate
   └─ decideOtherDiscardReaction
-      ├─ getFuroMetrics                // later
-      └─ chooseBestMetric              // later
+      ├─ buildReactionCandidates       // later: call/pass + discard pairs
+      ├─ scoreCandidates               // later
+      └─ chooseBestCandidate
 ```
 
-中間段階で完成形と異なる独自の評価ロジックを増やすことは避ける。たとえば通常打牌は、旧 metrics を移植するまで暫定 fallback として最初の `Discard` を選ぶに留め、別方針の向聴最小評価などを中心ロジックとして追加しない。
+中間段階で完成形と異なる独自の評価ロジックを増やすことは避ける。たとえば通常打牌は、オリジナル実装相当の評価を移植するまで暫定 fallback に留め、別方針の向聴最小評価などを中心ロジックとして追加しない。内部構造は現行 Go の語彙へ寄せる一方、trace log の action key や表形式はオリジナル実装と揃える。
 
 ## 11. 設定ファイル (embed 固定)
 
@@ -389,7 +390,7 @@ ManueAgent.Decide
 
 - 入力は mjai オリジナルと同様に **mjsonp ストリーム**（JSON Lines）を使用する。
 - メッセージ種別や必須フィールド等の仕様は adapter codec の単体テストで固定する。
-- 期待値は **action のみ**を比較する（評価値等の細部は比較しない）。
+- 期待値は **action のみ**を比較する（`log` や評価値等の細部は比較しない）。
   - 比較単位は「意思決定が必要な局面（エージェントが action を出力した時点）」とする。
 - golden fixture は対象 package の `testdata/` 配下に置く。runtime 結合の fixture は `internal/adapter/mjai/runtime/testdata/` を起点とし、入力は `*.input.mjson`、期待 stdout は transport ごとに `*.stdio.golden` / `*.mjsonp.golden` とする。
 - stdio と mjsonp TCP は transport としての応答方針が異なるため、runtime golden test では同一入力でも期待 stdout を分ける。stdio は sparse output のため action line のみ、mjsonp TCP は同期応答用 `none` を含む protocol output 全体を比較する。
@@ -456,12 +457,12 @@ ManueAgent.Decide
 6. **`mjai-manue` 本体の追加（一部完了）**
    - `cmd/mjai-manue` に実体を追加し、`--name` / `--seed` / URL mode を実装する。（完了）
    - `ManueAgent` を追加し、乱数を注入する。`--seed` 未指定時は seed `0`、PCG の第2 seed は `0` 固定とする。（完了）
-   - 現状は合法手集合の先頭を deterministic に選ぶ最小実装。次に embed 済み `configs/` を使う判断材料と CoffeeScript 版の評価ロジックを段階移植する。
+   - 現状は Phase 1 の判断骨格（和了優先、リーチ後ツモ切り、打牌/立直/副露 fallback）を実装済み。Phase 2 の入口として、現行コードの語彙に合わせた candidate / score 構造、旧 Go / CoffeeScript 版由来の score 比較規則（平均順位、期待点、赤牌回避）、通常手番の打牌および立直+打牌 candidate 足場、オリジナル互換の trace table 出力足場を追加済み。ただし期待値・危険度・聴牌確率・順位期待値の中身はまだ configs / estimator に接続しておらず、後続 phase で差し替える。
 
 7. **CoffeeScript 版ロジックの段階移植**
    - 以前 main ブランチで移植した `internal/ai` 実装を主な作業元にし、CoffeeScript 版 `coffee/manue_ai.coffee` を挙動確認の一次資料として使う。
    - Phase 1 は configs 非依存で、完成形の呼び出し関係（和了優先、`decideSelfTurn`、`decideOtherDiscardReaction`）と暫定 fallback を実装する。
-   - Phase 2 で `getMetrics` / `getFuroMetrics` / `chooseBestMetric` の形を旧 Go 実装に合わせて作り、下位をハリボテから順に差し替える。
+   - Phase 2 で候補生成 / score 計算 / best candidate 選択の形を作り、下位をハリボテから順に差し替える。通常手番は打牌候補と立直+打牌候補を同じ candidate として扱い、立直+打牌候補はオリジナル実装に合わせて通常手の向聴数が 0 以下の打牌だけを通す。現時点では評価値を同点扱いにして旧実装の tie-break（赤牌回避）と Phase 1 の立直優先 fallback だけを反映する。副露は「どれで鳴くか/鳴かない + 直後の打牌」が本来の評価単位になるため、現時点では早期分岐と fallback を維持し、複合 candidate は後続 phase で導入する。trace log の action key や表形式はオリジナル実装互換を維持するが、内部識別子や構造は現行 Go のドメイン語彙へ寄せる。trace table の列は先に固定し、未接続の score 列は後続 phase で実値へ差し替える。
    - Phase 3 で `configs/`、危険度 estimator、聴牌確率 estimator、順位期待値系を接続する。`NewManueAgent(seed)` は維持し、必要なら deps 付き constructor を追加する。
    - 既存の `shanten` / `tenpai` / `win` / `yaku` / `point` service を再利用し、必要な不足だけを追加する。
    - original-vs-port 比較は CI には入れず、差分調査の補助として使う。

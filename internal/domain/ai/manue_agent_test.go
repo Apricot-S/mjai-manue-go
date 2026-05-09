@@ -15,13 +15,13 @@ func TestManueAgent_Decide_SelectsRiichiBeforeDiscard(t *testing.T) {
 	hands := newValidHands()
 	hands[0] = [13]tile.Tile{
 		tile.MustTileFromCode("1m"), tile.MustTileFromCode("2m"), tile.MustTileFromCode("3m"),
-		tile.MustTileFromCode("4p"), tile.MustTileFromCode("5p"), tile.MustTileFromCode("6p"),
-		tile.MustTileFromCode("7s"), tile.MustTileFromCode("8s"), tile.MustTileFromCode("9s"),
-		tile.MustTileFromCode("E"), tile.MustTileFromCode("E"), tile.MustTileFromCode("S"),
-		tile.MustTileFromCode("W"),
+		tile.MustTileFromCode("4m"), tile.MustTileFromCode("5m"), tile.MustTileFromCode("6m"),
+		tile.MustTileFromCode("7m"), tile.MustTileFromCode("8m"), tile.MustTileFromCode("9m"),
+		tile.MustTileFromCode("1p"), tile.MustTileFromCode("1p"), tile.MustTileFromCode("E"),
+		tile.MustTileFromCode("E"),
 	}
 	state := mustNewRoundStateForTest(t, hands)
-	drawnTile := tile.MustTileFromCode("S")
+	drawnTile := tile.MustTileFromCode("5m")
 	if err := state.Apply(event.NewDraw(self, drawnTile)); err != nil {
 		t.Fatalf("Apply() failed: %v", err)
 	}

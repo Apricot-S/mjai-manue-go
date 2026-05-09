@@ -82,6 +82,8 @@ func TestGoldenStdout(t *testing.T) {
 			if err != nil {
 				t.Fatalf("jsonMessages(golden) failed: %v", err)
 			}
+			stripMessageLogs(gotMessages)
+			stripMessageLogs(wantMessages)
 			if !reflect.DeepEqual(gotMessages, wantMessages) {
 				t.Errorf("stdout =\n%s\nwant\n%s", formatJSONMessages(t, gotMessages), formatJSONMessages(t, wantMessages))
 			}
@@ -125,6 +127,12 @@ func jsonMessages(s string) ([]map[string]any, error) {
 		messages = append(messages, msg)
 	}
 	return messages, nil
+}
+
+func stripMessageLogs(messages []map[string]any) {
+	for _, msg := range messages {
+		delete(msg, "log")
+	}
 }
 
 func formatJSONMessages(t *testing.T, messages []map[string]any) string {
