@@ -64,6 +64,9 @@ See [cmd/](cmd/) for more information.
 
 ## How It Works
 
+> [!NOTE]
+> The original README's "仕組み" section was based on an older CoffeeScript implementation and does not match the final implementation being ported. This section has been rewritten based on the final implementation.
+
 (TODO)
 
 The discard that minimizes this avgRank is selected.
