@@ -110,7 +110,7 @@ flowchart LR
 - `internal/application/` に Bot と入力への反応（`NoReaction` / `Action`）が実装されている。現状の action 判定は `round.State.LegalActions(selfID)` が空かどうかを参照する。`LegalActions` は自摸後・副露後など `pendingDiscard` が立つ局面の打牌候補、自摸和了、ロン、ポン、チー、大明槓、見送り候補まで実装済み。Agent へ渡す観測は `round.ActionStateViewer` として、局面 view と合法手一覧の両方を含む。
 - `internal/domain/ai/` に Agent インタフェースとツモ切り Agent が実装されている。ツモ切り Agent は drawn tile がある場合に `Discard(tsumogiri=true)`、ない場合に `Pass` を返す。
 - `cmd/mjai-tsumogiri/` に、stdio / mjsonp TCP client を切り替えて最小AIを起動する `package main` 実装が存在する。現状のフラグは `--name` のみで、`--seed` はない。
-- `cmd/mjai-manue/` は README のみ先行しており、本体 CLI と Manue Agent は未実装。
+- `cmd/mjai-manue/` は最小 CLI を実装済み。`--name` / `--seed` / stdio / mjsonp TCP client の runtime 配線を持つ。`internal/domain/ai/ManueAgent` は seed 注入済みの最小実装で、現状は合法手集合の先頭を deterministic に選ぶ。CoffeeScript 版の評価ロジックは未移植。
 - `configs/` は JSON を build 時 embed して読み出す実装がある（`encoding/json/v2` 前提）。
 
 本設計書は、上記の既存資産を活用し、未実装の protocol event/action、合法手列挙、`mjai-manue` 本体、RiichiLab bridge を段階的に足していく前提で進める。
@@ -346,7 +346,7 @@ type Decision struct {
 1. `mjai-tsumogiri`: 最小AI（常にツモ切り、鳴き/立直はしない等の単純方針）
 2. `mjai-manue`: CoffeeScript版のロジックを移植し、入力→出力一致を狙う
 
-現状、`internal/domain/ai/` には最小 Agent としてツモ切り Agent が実装されている。`mjai-manue` 用 Agent と `cmd/mjai-manue` はこれから追加する。
+現状、`internal/domain/ai/` には最小 Agent としてツモ切り Agent と ManueAgent の最小実装が存在する。`mjai-manue` CLI は実体を持つが、CoffeeScript 版の評価ロジックはこれから ManueAgent へ段階移植する。
 
 ## 11. 設定ファイル (embed 固定)
 
@@ -418,10 +418,10 @@ type Decision struct {
    - まず `mjai-tsumogiri` で stdio sparse output と mjsonp 同期応答の差を固定する。
    - 盤面出力は protocol output と混ぜず、必要な範囲で stderr 側の golden test を分ける。
 
-6. **`mjai-manue` 本体の追加**
-   - `cmd/mjai-manue` に実体を追加し、`--name` / `--seed` / URL mode を実装する。
-   - `ManueAgent` を追加し、embed 済み `configs/` と乱数を注入する。`--seed` 未指定時は seed `0`、PCG の第2 seed は `0` 固定とする。
-   - まずは合法手集合から deterministic に選べる最小実装で runtime とテストを通し、その後 CoffeeScript 版の評価ロジックを段階移植する。
+6. **`mjai-manue` 本体の追加（一部完了）**
+   - `cmd/mjai-manue` に実体を追加し、`--name` / `--seed` / URL mode を実装する。（完了）
+   - `ManueAgent` を追加し、乱数を注入する。`--seed` 未指定時は seed `0`、PCG の第2 seed は `0` 固定とする。（完了）
+   - 現状は合法手集合の先頭を deterministic に選ぶ最小実装。次に embed 済み `configs/` を使う判断材料と CoffeeScript 版の評価ロジックを段階移植する。
 
 7. **CoffeeScript 版ロジックの段階移植**
    - 打牌評価、リーチ判断、副露判断、和了判断、危険度/順位期待値系の順で小さく移植する。
