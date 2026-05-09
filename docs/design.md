@@ -326,8 +326,6 @@ type Decision struct {
 ### 9.5 役判定サービスの扱い
 
 `service.CalculateFuHan` と `service.Has1Han` は、現状を移植仕様として完成形と扱う。
-`service/yaku.go` に残る TODO はオリジナル実装に由来するコメントを移植時にも保持しているものであり、未完了作業を意味しない。
-ノイズになる場合は、TODO を削除するのではなく「オリジナル由来の TODO であり現行移植では仕様として維持する」旨のコメントへ置き換える。
 内部ロジックの invariant 破壊はバグとして扱うため、外部入力が直接入らない箇所の `panic` は許容する。
 
 ## 10. AI (Agent) 設計
@@ -367,6 +365,9 @@ type Decision struct {
 - メッセージ種別や必須フィールド等の仕様は adapter codec の単体テストで固定する。
 - 期待値は **action のみ**を比較する（評価値等の細部は比較しない）。
   - 比較単位は「意思決定が必要な局面（エージェントが action を出力した時点）」とする。
+- golden fixture は対象 package の `testdata/` 配下に置く。runtime 結合の fixture は `internal/adapter/mjai/runtime/testdata/` を起点とし、入力は `*.input.mjson`、期待 action は `*.actions.golden` とする。
+- stdio と mjsonp TCP は transport としての応答方針が異なるため、runtime golden test では同一入力をそれぞれの policy で処理したうえで、同期応答用 `none` や `join` は除外し、actor を持つ action line のみを比較する。
+- stdout の protocol output と stderr の trace / 盤面状態出力は混ぜない。stderr 側を golden 化する場合は、protocol action golden とは別 fixture・別テストとして扱う。
 
 ### 12.3 original-vs-port 比較
 

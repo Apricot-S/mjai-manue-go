@@ -30,7 +30,6 @@
 - `--seed` を持つコマンドでは乱数を決定的にする（決定性）。現行 `mjai-tsumogiri` は乱数を使わず、`--seed` も持たない。
 - `ai.Request` の `Round` は AI 分野でいう observation（obs）として扱う。legal actions は外側から別フィールドで渡すのではなく、obs（現状は `round.ActionStateViewer`）に含める設計を維持する。
 - `round.State` / `EventApplier` / `LegalActions` は現状を最終形として扱う。責務分割目的での追加 struct/service 化は、間接参照が増えて読みにくくなるため原則行わない。
-- `service/yaku.go` の TODO はオリジナル実装由来のコメントを保持しているもの。未完了作業とは扱わず、必要ならその旨をコメントに追記する。
 
 ## ドキュメント更新の運用
 
