@@ -41,6 +41,18 @@ func TestGoldenStdout(t *testing.T) {
 				errorOnEOFBeforeEndGame: true,
 			},
 		},
+		{
+			name:   "manue_stdio_chiihou_phase1",
+			input:  "testdata/manue/chiihou.input.mjson",
+			golden: "testdata/manue/chiihou.stdio.golden",
+			policy: jsonLinesPolicy{},
+		},
+		{
+			name:   "manue_stdio_double_riichi_phase1",
+			input:  "testdata/manue/double_riichi.input.mjson",
+			golden: "testdata/manue/double_riichi.stdio.golden",
+			policy: jsonLinesPolicy{},
+		},
 	}
 
 	for _, tt := range tests {
@@ -49,7 +61,11 @@ func TestGoldenStdout(t *testing.T) {
 			want := readGoldenFile(t, tt.golden)
 
 			var out bytes.Buffer
-			err := runJSONLines("tsumogiri", "default", ai.NewTsumogiriAgent(), strings.NewReader(input), &out, nil, tt.policy)
+			var agent ai.Agent = ai.NewTsumogiriAgent()
+			if strings.HasPrefix(tt.name, "manue_") {
+				agent = ai.NewManueAgent(0)
+			}
+			err := runJSONLines("tsumogiri", "default", agent, strings.NewReader(input), &out, nil, tt.policy)
 			if err != nil {
 				t.Fatalf("runJSONLines() failed: %v", err)
 			}

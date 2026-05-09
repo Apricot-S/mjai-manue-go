@@ -347,6 +347,12 @@ type Decision struct {
 
 現状、`internal/domain/ai/` には最小 Agent としてツモ切り Agent と ManueAgent の最小実装が存在する。`mjai-manue` CLI は実体を持つが、CoffeeScript 版の評価ロジックはこれから ManueAgent へ段階移植する。
 
+`mjai-manue` の CoffeeScript 版ロジック移植では、以前 main ブランチで移植した Go 実装（`reference/repositories/mjai-manue-go-main/internal/ai/`）を主な作業元とし、CoffeeScript 版 `coffee/manue_ai.coffee` は挙動確認の一次資料として参照する。現行コードの state/action 型は main ブランチ当時と異なるため、旧 `game.StateAnalyzer` 相当をそのまま復活させるのではなく、現行の `round.ActionStateViewer` と `LegalActions` を入口にして必要な評価材料だけを段階的に接続する。
+
+移植の初期段階では `configs/` の読み込みは導入しない。`NewManueAgent(seed uint64)` は CLI 用の安定した constructor として維持し、configs / estimator / stats が必要になった段階で `NewManueAgentWithDeps(seed uint64, deps ManueAgentDeps)` のようなテスト差し替え可能な constructor を追加する。これにより、configs の embed JSON や `encoding/json/v2` 初期化に引きずられず、まず action 分類・優先順位・打牌評価の小さい単位から移植できる。configs 依存を導入するまでは CoffeeScript 版との完全一致を移植ゴールにせず、判断入口と合法手選択の段階的な一致範囲を明示して進める。
+
+`mjai-manue` Phase 1 では configs 非依存の判断骨格だけを実装する。具体的には、合法手集合から `Win` を最優先で選ぶ、リーチ成立後はツモ切り打牌を選ぶ、リーチ宣言可能なら `Riichi` を選ぶ、通常手番では暫定的に最初の打牌を選ぶ、他家打牌への反応では暫定的に最初の副露/カンを選び、行動候補が `Pass` だけなら `Pass` を選ぶ。打牌評価、副露するかどうかの期待値評価、危険度・聴牌確率・順位期待値は後続 phase で置き換える。
+
 ## 11. 設定ファイル (embed 固定)
 
 - `configs/` にある JSON は build 時に embed する。
@@ -373,6 +379,8 @@ type Decision struct {
   - runtime 仕様では、stdio と mjsonp の差分（`NoReaction`、同期応答用 `none`、actor 付き `Pass`、`end_game` 無応答）や、outbound action 種別（`dahai` / `reach` / `hora` / `pon` / `chi` / 各種 kan / `kyushukyuhai`）を固定する。
   - stdio では `end_game` 後も EOF まで入力を読み続けるため、同一 JSON Lines stream 内で次の `start_game` を受け取り、別 id のゲームにも応答できることを golden test で固定する。
   - AI ロジックでは、CoffeeScript 版から移植した判断単位ごとに fixture を追加する。例: 打牌評価、リーチ判断、副露判断、和了判断、見送り判断。
+  - `mjai-manue` の移植テストは、局面を private field の上書きで無理に作らず、原則として mjai JSON Lines 入力から `round.State` を構築して action golden を比較する。局面の意味を fixture に閉じ込められるため、現行 `round.State` の invariant を壊さずに移植差分を確認できる。
+  - ただし、合法手集合の分類や優先順位のように state 構築を必要としない小さい純粋判断は、AI package 内の単体テストで固定する。golden test は「入力列から最終的にどの protocol action が出るか」を見る結合寄りのテスト、単体テストは「同じ合法手集合ならどの action を選ぶか」を見るテストとして役割を分ける。
   - 不正 JSON、空行、開始前 event などのエラー系は golden ではなく通常の単体テストで固定する。
   - 長い半荘ログを大量に golden 化することは避ける。失敗時の原因特定が重くなるため、長大な差分確認は `original-vs-port` 比較に寄せる。
 
@@ -432,7 +440,10 @@ type Decision struct {
    - 現状は合法手集合の先頭を deterministic に選ぶ最小実装。次に embed 済み `configs/` を使う判断材料と CoffeeScript 版の評価ロジックを段階移植する。
 
 7. **CoffeeScript 版ロジックの段階移植**
-   - 打牌評価、リーチ判断、副露判断、和了判断、危険度/順位期待値系の順で小さく移植する。
+   - 以前 main ブランチで移植した `internal/ai` 実装を主な作業元にし、CoffeeScript 版 `coffee/manue_ai.coffee` を挙動確認の一次資料として使う。
+   - Phase 1 は configs 非依存で、合法手分類と優先順位（和了優先、リーチ後ツモ切り、リーチ宣言、暫定打牌、副露/見送り）だけを移植する。
+   - Phase 2 で打牌評価、リーチ判断、副露判断を configs なし、または固定値で動く範囲から移植する。
+   - Phase 3 で `configs/`、危険度 estimator、聴牌確率 estimator、順位期待値系を接続する。`NewManueAgent(seed)` は維持し、必要なら deps 付き constructor を追加する。
    - 既存の `shanten` / `tenpai` / `win` / `yaku` / `point` service を再利用し、必要な不足だけを追加する。
    - original-vs-port 比較は CI には入れず、差分調査の補助として使う。
 

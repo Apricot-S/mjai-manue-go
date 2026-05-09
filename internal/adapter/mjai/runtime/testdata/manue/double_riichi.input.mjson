@@ -1,0 +1,10 @@
+{"type":"start_game","gametype":"tonpu","id":3,"names":["A","B","C","D"]}
+{"type":"start_kyoku","bakaze":"E","kyoku":1,"honba":0,"kyotaku":0,"oya":0,"dora_marker":"4m","tehais":[["?","?","?","?","?","?","?","?","?","?","?","?","?"],["?","?","?","?","?","?","?","?","?","?","?","?","?"],["?","?","?","?","?","?","?","?","?","?","?","?","?"],["1m","2m","3m","4p","5p","6p","7s","8s","9s","E","E","S","W"]],"scores":[25000,25000,25000,25000]}
+{"type":"tsumo","actor":0,"pai":"?"}
+{"type":"dahai","actor":0,"pai":"N","tsumogiri":true}
+{"type":"tsumo","actor":1,"pai":"?"}
+{"type":"dahai","actor":1,"pai":"P","tsumogiri":true}
+{"type":"tsumo","actor":2,"pai":"?"}
+{"type":"dahai","actor":2,"pai":"F","tsumogiri":true}
+{"type":"tsumo","actor":3,"pai":"S"}
+{"type":"end_game","scores":[25000,25000,25000,25000]}
