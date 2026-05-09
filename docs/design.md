@@ -353,6 +353,23 @@ type Decision struct {
 
 `mjai-manue` Phase 1 では configs 非依存の判断骨格だけを実装する。具体的には、合法手集合から `Win` を最優先で選ぶ、リーチ成立後はツモ切り打牌を選ぶ、リーチ宣言可能なら `Riichi` を選ぶ、通常手番では暫定的に最初の打牌を選ぶ、他家打牌への反応では暫定的に最初の副露/カンを選び、行動候補が `Pass` だけなら `Pass` を選ぶ。打牌評価、副露するかどうかの期待値評価、危険度・聴牌確率・順位期待値は後続 phase で置き換える。
 
+移植中の `ManueAgent` は、完成形の呼び出し関係を先に固定し、下位の評価関数をハリボテから旧 Go 実装相当へ段階的に差し替える。
+
+```text
+ManueAgent.Decide
+  ├─ Win action selection
+  ├─ decideSelfTurn
+  │   ├─ tsumogiriDiscard              // riichi accepted
+  │   ├─ chooseRiichi                  // temporary: choose if legal
+  │   ├─ getMetrics                    // later: prior Go/CoffeeScript logic
+  │   └─ chooseBestMetric              // later
+  └─ decideOtherDiscardReaction
+      ├─ getFuroMetrics                // later
+      └─ chooseBestMetric              // later
+```
+
+中間段階で完成形と異なる独自の評価ロジックを増やすことは避ける。たとえば通常打牌は、旧 metrics を移植するまで暫定 fallback として最初の `Discard` を選ぶに留め、別方針の向聴最小評価などを中心ロジックとして追加しない。
+
 ## 11. 設定ファイル (embed 固定)
 
 - `configs/` にある JSON は build 時に embed する。
@@ -441,8 +458,8 @@ type Decision struct {
 
 7. **CoffeeScript 版ロジックの段階移植**
    - 以前 main ブランチで移植した `internal/ai` 実装を主な作業元にし、CoffeeScript 版 `coffee/manue_ai.coffee` を挙動確認の一次資料として使う。
-   - Phase 1 は configs 非依存で、合法手分類と優先順位（和了優先、リーチ後ツモ切り、リーチ宣言、暫定打牌、副露/見送り）だけを移植する。
-   - Phase 2 で打牌評価、リーチ判断、副露判断を configs なし、または固定値で動く範囲から移植する。
+   - Phase 1 は configs 非依存で、完成形の呼び出し関係（和了優先、`decideSelfTurn`、`decideOtherDiscardReaction`）と暫定 fallback を実装する。
+   - Phase 2 で `getMetrics` / `getFuroMetrics` / `chooseBestMetric` の形を旧 Go 実装に合わせて作り、下位をハリボテから順に差し替える。
    - Phase 3 で `configs/`、危険度 estimator、聴牌確率 estimator、順位期待値系を接続する。`NewManueAgent(seed)` は維持し、必要なら deps 付き constructor を追加する。
    - 既存の `shanten` / `tenpai` / `win` / `yaku` / `point` service を再利用し、必要な不足だけを追加する。
    - original-vs-port 比較は CI には入れず、差分調査の補助として使う。

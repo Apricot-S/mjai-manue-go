@@ -33,51 +33,65 @@ func (a *ManueAgent) Decide(request Request) (Decision, error) {
 	}
 
 	self := request.Round.Player(request.Self)
-	selected, err := a.selectAction(legalActions, self)
-	if err != nil {
-		return Decision{}, err
+	if win := firstActionOfType[*action.Win](legalActions); win != nil {
+		return Decision{Action: win}, nil
 	}
-	return Decision{Action: selected}, nil
+	if self.CanDiscard() {
+		return a.decideSelfTurn(legalActions, self)
+	}
+	return a.decideOtherDiscardReaction(legalActions)
 }
 
-func (*ManueAgent) selectAction(legalActions []action.Action, self player.PlayerViewer) (action.Action, error) {
-	if win := firstActionOfType[*action.Win](legalActions); win != nil {
-		return win, nil
-	}
-
+func (*ManueAgent) decideSelfTurn(legalActions []action.Action, self player.PlayerViewer) (Decision, error) {
 	if self.RiichiState() == player.RiichiAccepted {
 		if discard := tsumogiriDiscard(legalActions); discard != nil {
-			return discard, nil
+			return Decision{Action: discard}, nil
 		}
-		return nil, fmt.Errorf("cannot decide: no tsumogiri discard after riichi accepted")
+		return Decision{}, fmt.Errorf("cannot decide: no tsumogiri discard after riichi accepted")
 	}
 
 	if riichi := firstActionOfType[*action.Riichi](legalActions); riichi != nil {
-		return riichi, nil
+		return Decision{Action: riichi}, nil
 	}
 
-	if discard := firstActionOfType[*action.Discard](legalActions); discard != nil {
-		return discard, nil
+	if discard, err := firstDiscardCandidate(legalActions); err != nil {
+		return Decision{}, err
+	} else if discard != nil {
+		return Decision{Action: discard}, nil
 	}
 
+	return Decision{}, fmt.Errorf("cannot decide self turn: no discard candidate")
+}
+
+func (*ManueAgent) decideOtherDiscardReaction(legalActions []action.Action) (Decision, error) {
 	if call := firstCallAction(legalActions); call != nil {
-		return call, nil
+		return Decision{Action: call}, nil
 	}
 
 	if pass := firstActionOfType[*action.Pass](legalActions); pass != nil {
-		return pass, nil
+		return Decision{Action: pass}, nil
 	}
 
-	return legalActions[0], nil
+	return Decision{}, fmt.Errorf("cannot decide other discard reaction: no call or pass candidate")
+}
+
+func firstDiscardCandidate(actions []action.Action) (*action.Discard, error) {
+	for _, a := range actions {
+		discard, ok := a.(*action.Discard)
+		if ok {
+			return discard, nil
+		}
+	}
+	return nil, nil
 }
 
 func firstActionOfType[T action.Action](actions []action.Action) T {
-	var zero T
 	for _, a := range actions {
 		if typed, ok := a.(T); ok {
 			return typed
 		}
 	}
+	var zero T
 	return zero
 }
 

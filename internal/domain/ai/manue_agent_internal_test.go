@@ -11,7 +11,7 @@ import (
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/tile"
 )
 
-func TestManueAgent_selectAction_Priorities(t *testing.T) {
+func TestManueAgent_DecideActionSkeleton(t *testing.T) {
 	self := seat.MustSeat(0)
 	target := seat.MustSeat(1)
 	drawnTile := tile.MustTileFromCode("5p")
@@ -40,9 +40,11 @@ func TestManueAgent_selectAction_Priorities(t *testing.T) {
 	tests := []struct {
 		name        string
 		actions     []action.Action
+		hand        *hand.VisibleHand
 		riichiState player.RiichiState
 		drawnTile   *tile.Tile
 		want        action.Action
+		decide      func(*ManueAgent, []action.Action, player.PlayerViewer) (Decision, error)
 	}{
 		{
 			name:        "win first",
@@ -50,6 +52,13 @@ func TestManueAgent_selectAction_Priorities(t *testing.T) {
 			riichiState: player.NotRiichi,
 			drawnTile:   &drawnTile,
 			want:        win,
+			decide: func(agent *ManueAgent, actions []action.Action, self player.PlayerViewer) (Decision, error) {
+				if win := firstActionOfType[*action.Win](actions); win != nil {
+					return Decision{Action: win}, nil
+				}
+				t.Fatal("firstActionOfType[*action.Win]() returned nil")
+				return Decision{}, nil
+			},
 		},
 		{
 			name:        "riichi accepted tsumogiri",
@@ -57,6 +66,9 @@ func TestManueAgent_selectAction_Priorities(t *testing.T) {
 			riichiState: player.RiichiAccepted,
 			drawnTile:   &drawnTile,
 			want:        tsumogiriDiscard,
+			decide: func(agent *ManueAgent, actions []action.Action, self player.PlayerViewer) (Decision, error) {
+				return agent.decideSelfTurn(actions, self)
+			},
 		},
 		{
 			name:        "riichi before discard",
@@ -64,13 +76,20 @@ func TestManueAgent_selectAction_Priorities(t *testing.T) {
 			riichiState: player.NotRiichi,
 			drawnTile:   &drawnTile,
 			want:        riichi,
+			decide: func(agent *ManueAgent, actions []action.Action, self player.PlayerViewer) (Decision, error) {
+				return agent.decideSelfTurn(actions, self)
+			},
 		},
 		{
 			name:        "discard before call",
 			actions:     []action.Action{chii, handDiscard, pass},
+			hand:        hand.CodesToHand([]string{"1m", "2m", "3m", "4m", "5m", "6m", "7m", "8m", "9m", "1p", "1p", "E", "S"}),
 			riichiState: player.NotRiichi,
 			drawnTile:   &drawnTile,
 			want:        handDiscard,
+			decide: func(agent *ManueAgent, actions []action.Action, self player.PlayerViewer) (Decision, error) {
+				return agent.decideSelfTurn(actions, self)
+			},
 		},
 		{
 			name:        "call before pass",
@@ -78,6 +97,9 @@ func TestManueAgent_selectAction_Priorities(t *testing.T) {
 			riichiState: player.NotRiichi,
 			drawnTile:   nil,
 			want:        chii,
+			decide: func(agent *ManueAgent, actions []action.Action, self player.PlayerViewer) (Decision, error) {
+				return agent.decideOtherDiscardReaction(actions)
+			},
 		},
 		{
 			name:        "pass only",
@@ -85,27 +107,31 @@ func TestManueAgent_selectAction_Priorities(t *testing.T) {
 			riichiState: player.NotRiichi,
 			drawnTile:   nil,
 			want:        pass,
+			decide: func(agent *ManueAgent, actions []action.Action, self player.PlayerViewer) (Decision, error) {
+				return agent.decideOtherDiscardReaction(actions)
+			},
 		},
 	}
 
 	agent := NewManueAgent(0)
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := agent.selectAction(tt.actions, stubPlayerViewer{
+			decision, err := tt.decide(agent, tt.actions, stubPlayerViewer{
+				hand:        tt.hand,
 				riichiState: tt.riichiState,
 				drawnTile:   tt.drawnTile,
 			})
 			if err != nil {
-				t.Fatalf("selectAction() failed: %v", err)
+				t.Fatalf("decide failed: %v", err)
 			}
-			if got != tt.want {
-				t.Errorf("selectAction() = %T %[1]v, want %T %[2]v", got, tt.want)
+			if decision.Action != tt.want {
+				t.Errorf("Action = %T %[1]v, want %T %[2]v", decision.Action, tt.want)
 			}
 		})
 	}
 }
 
-func TestManueAgent_selectAction_ReturnsErrorWithoutTsumogiriAfterRiichiAccepted(t *testing.T) {
+func TestManueAgent_decideSelfTurn_ReturnsErrorWithoutTsumogiriAfterRiichiAccepted(t *testing.T) {
 	self := seat.MustSeat(0)
 	handDiscard, err := action.NewDiscard(self, tile.MustTileFromCode("1m"), false)
 	if err != nil {
@@ -113,7 +139,7 @@ func TestManueAgent_selectAction_ReturnsErrorWithoutTsumogiriAfterRiichiAccepted
 	}
 	drawnTile := tile.MustTileFromCode("5p")
 
-	_, err = NewManueAgent(0).selectAction([]action.Action{handDiscard}, stubPlayerViewer{
+	_, err = NewManueAgent(0).decideSelfTurn([]action.Action{handDiscard}, stubPlayerViewer{
 		riichiState: player.RiichiAccepted,
 		drawnTile:   &drawnTile,
 	})
@@ -123,11 +149,17 @@ func TestManueAgent_selectAction_ReturnsErrorWithoutTsumogiriAfterRiichiAccepted
 }
 
 type stubPlayerViewer struct {
+	hand        *hand.VisibleHand
 	riichiState player.RiichiState
 	drawnTile   *tile.Tile
 }
 
-func (p stubPlayerViewer) Hand() (*hand.VisibleHand, bool) { return nil, false }
+func (p stubPlayerViewer) Hand() (*hand.VisibleHand, bool) {
+	if p.hand == nil {
+		return nil, false
+	}
+	return p.hand, true
+}
 func (p stubPlayerViewer) HandTiles() []tile.Tile          { return nil }
 func (p stubPlayerViewer) DrawnTile() *tile.Tile           { return p.drawnTile }
 func (p stubPlayerViewer) Melds() []meld.Meld              { return nil }
