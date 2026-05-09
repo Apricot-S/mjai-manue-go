@@ -79,7 +79,7 @@ Decisions such as "whether to call or not" and "whether to declare Riichi or not
 
 The original author says the name can be written in kanji as `麻鵺`, roughly meaning "an unidentified thing that plays Mahjong".
 
-Source: [mixi2 post by Gimite](https://mixi.social/@gimite/posts/8243ddf6-cfd5-47f1-bd1c-beb222f4e15e)
+Source: [mixi2 post by Hiroshi Ichikawa](https://mixi.social/@gimite/posts/8243ddf6-cfd5-47f1-bd1c-beb222f4e15e)
 
 ## Credits
 
