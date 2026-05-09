@@ -32,14 +32,6 @@ Unlike the original project, this project embeds configuration files at build ti
 - Fixed an incorrect shanten number calculation when a hand contains four identical tiles.
 - Logs more detailed game-state information using mjai's board-state format.
 
-## How It Works
-
-(TODO)
-
-The discard that minimizes this avgRank is selected.
-
-Decisions such as "whether to call or not" and "whether to declare Riichi or not" are also made in a similar method.
-
 ## Prerequisites
 
 This project (including all tools under [tools/](tools/)) requires:
@@ -69,6 +61,14 @@ mjai-manue [--name <PLAYER_NAME>] [--seed <INT>] [<URL>]
 ```
 
 See [cmd/](cmd/) for more information.
+
+## How It Works
+
+(TODO)
+
+The discard that minimizes this avgRank is selected.
+
+Decisions such as "whether to call or not" and "whether to declare Riichi or not" are also made in a similar method.
 
 ## Name
 
