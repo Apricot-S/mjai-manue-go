@@ -39,7 +39,7 @@ func (d *Driver) Handle(msg inbound.Message) (outbound.Message, error) {
 			return nil, err
 		}
 		d.agent.Reset()
-		d.bot = application.NewBot(self, d.agent, newRoundStateReporter(d.log))
+		d.bot = application.NewBot(self, d.agent, newReporter(d.log))
 		d.ended = false
 		return nil, nil
 	case *inbound.EndGame:

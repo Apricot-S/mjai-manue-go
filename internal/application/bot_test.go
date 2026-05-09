@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/Apricot-S/mjai-manue-go/internal/application"
+	"github.com/Apricot-S/mjai-manue-go/internal/domain/ai"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/action"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/event"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/round"
@@ -127,7 +128,7 @@ func TestBot_Process_EndRound(t *testing.T) {
 
 func TestBot_Process_ReportsRoundStateAfterStateUpdate(t *testing.T) {
 	self := seat.MustSeat(0)
-	reporter := &recordingRoundStateReporter{}
+	reporter := &recordingReporter{}
 	bot := application.NewBot(self, newTsumogiriAgentForTest(), reporter)
 
 	if _, err := bot.Process(mustNewStartRoundForTest(t, newValidHands())); err != nil {
@@ -145,9 +146,26 @@ func TestBot_Process_ReportsRoundStateAfterStateUpdate(t *testing.T) {
 	}
 }
 
+func TestBot_Process_ReportsDecisionTrace(t *testing.T) {
+	self := seat.MustSeat(0)
+	reporter := &recordingReporter{}
+	bot := application.NewBot(self, traceAgent{trace: "evaluation trace\n"}, reporter)
+
+	if _, err := bot.Process(mustNewStartRoundForTest(t, newValidHands())); err != nil {
+		t.Fatalf("Process(StartRound) failed: %v", err)
+	}
+	if _, err := bot.Process(event.NewDraw(self, tile.MustTileFromCode("6m"))); err != nil {
+		t.Fatalf("Process(Draw) failed: %v", err)
+	}
+
+	if reporter.lastTrace != "evaluation trace\n" {
+		t.Errorf("reported trace = %q, want evaluation trace", reporter.lastTrace)
+	}
+}
+
 func TestBot_Process_ReportsNoRoundStateWhenApplyFails(t *testing.T) {
 	self := seat.MustSeat(0)
-	reporter := &recordingRoundStateReporter{}
+	reporter := &recordingReporter{}
 	bot := application.NewBot(self, newTsumogiriAgentForTest(), reporter)
 
 	if _, err := bot.Process(mustNewStartRoundForTest(t, newValidHands())); err != nil {
@@ -173,7 +191,7 @@ func TestBot_Process_ReturnsReporterError(t *testing.T) {
 	bot := application.NewBot(
 		seat.MustSeat(0),
 		newTsumogiriAgentForTest(),
-		errorRoundStateReporter{err: wantErr},
+		errorReporter{err: wantErr},
 	)
 
 	if _, err := bot.Process(mustNewStartRoundForTest(t, newValidHands())); !errors.Is(err, wantErr) {
@@ -181,21 +199,46 @@ func TestBot_Process_ReturnsReporterError(t *testing.T) {
 	}
 }
 
-type recordingRoundStateReporter struct {
+type recordingReporter struct {
 	calls     int
 	lastBoard string
+	lastTrace string
 }
 
-func (r *recordingRoundStateReporter) ReportRoundState(state round.BoardRenderer) error {
+func (r *recordingReporter) ReportRoundState(state round.BoardRenderer) error {
 	r.calls++
 	r.lastBoard = state.RenderBoard()
 	return nil
 }
 
-type errorRoundStateReporter struct {
+func (r *recordingReporter) ReportDecisionTrace(trace string) error {
+	r.lastTrace = trace
+	return nil
+}
+
+type errorReporter struct {
 	err error
 }
 
-func (r errorRoundStateReporter) ReportRoundState(round.BoardRenderer) error {
+func (r errorReporter) ReportRoundState(round.BoardRenderer) error {
 	return r.err
+}
+
+func (r errorReporter) ReportDecisionTrace(string) error {
+	return r.err
+}
+
+type traceAgent struct {
+	trace string
+}
+
+func (traceAgent) Reset() {}
+
+func (a traceAgent) Decide(request ai.Request) (ai.Decision, error) {
+	decision, err := ai.NewTsumogiriAgent().Decide(request)
+	if err != nil {
+		return ai.Decision{}, err
+	}
+	decision.Trace = a.trace
+	return decision, nil
 }

@@ -19,7 +19,7 @@ Ruby版 `mjai` の `Game.render_board()` 相当として、状態更新後の局
   - `BoardRenderer` interface
   - ForTest 構築 state を使って整形ロジックを単体テストする。
 - `internal/application`
-  - `RoundStateReporter` を `Bot` へ明示引数で注入する。
+  - `Reporter` を `Bot` へ明示引数で注入する。
   - `StartRound` 後、通常 event の `Apply` 成功後に reporter を呼ぶ。
   - reporter がない場合は従来動作を維持する。
 - `internal/adapter/mjai/runtime`

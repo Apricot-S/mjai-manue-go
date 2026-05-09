@@ -15,14 +15,15 @@ type Bot struct {
 	agent        ai.Agent
 	gameState    *game.State
 	currentRound *round.State
-	reporter     RoundStateReporter
+	reporter     Reporter
 }
 
-type RoundStateReporter interface {
+type Reporter interface {
 	ReportRoundState(state round.BoardRenderer) error
+	ReportDecisionTrace(trace string) error
 }
 
-func NewBot(self seat.Seat, agent ai.Agent, reporter RoundStateReporter) *Bot {
+func NewBot(self seat.Seat, agent ai.Agent, reporter Reporter) *Bot {
 	return &Bot{
 		self:      self,
 		agent:     agent,
@@ -81,6 +82,9 @@ func (b *Bot) processRoundEvent(ev event.Event) (Reaction, error) {
 	if err != nil {
 		return Reaction{}, err
 	}
+	if err := b.reportDecisionTrace(decision.Trace); err != nil {
+		return Reaction{}, err
+	}
 	return NewActionReaction(decision.Action, decision.Log), nil
 }
 
@@ -100,4 +104,14 @@ func (b *Bot) reportRoundState() error {
 		return nil
 	}
 	return b.reporter.ReportRoundState(b.currentRound)
+}
+
+func (b *Bot) reportDecisionTrace(trace string) error {
+	if trace == "" {
+		return nil
+	}
+	if b.reporter == nil {
+		return nil
+	}
+	return b.reporter.ReportDecisionTrace(trace)
 }

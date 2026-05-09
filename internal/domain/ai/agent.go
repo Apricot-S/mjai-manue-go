@@ -14,6 +14,7 @@ type Request struct {
 type Decision struct {
 	Action action.Action
 	Log    string
+	Trace  string
 }
 
 type Agent interface {

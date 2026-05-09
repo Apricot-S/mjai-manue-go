@@ -302,6 +302,7 @@ type Request struct {
 type Decision struct {
     Action Action
     Log string
+    Trace string
 }
 ```
 
@@ -333,8 +334,9 @@ type Decision struct {
 ### 10.1 Agent インタフェース（案）
 
 - 入力: 現在の game/round state と意思決定要求
-- 出力: 選択した Action と任意のログ文字列
-- ログ文字列は domain action に埋め込まず、application 層の Reaction として保持し、adapter の outbound codec に渡す。
+- 出力: 選択した Action、任意の JSON `log` 用文字列、任意の stderr trace 用文字列
+- JSON `log` 用文字列は domain action に埋め込まず、application 層の Reaction として保持し、adapter の outbound codec に渡す。
+- stderr trace 用文字列は評価値一覧など protocol output に混ぜない診断出力として扱う。Agent は `os.Stderr` 等の I/O を直接呼ばず、`Decision.Trace` のような値として返す。application は trace が空でない場合のみ、盤面状態出力と decision trace 出力の両方を扱う `Reporter` に渡し、adapter / runtime が注入された stderr writer へ出力する。
 - Agent は `Reset()` と `Decide(request)` を持つ。runtime は `start_game` ごとに `Reset()` を呼び、同一プロセスで複数ゲームを処理しても乱数系列が前ゲームの消費量に依存しないようにする。
 - 乱数は Agent が seed から再初期化できる形で保持し、評価ロジックからは `Random` インタフェース（または `*rand.Rand`）として使えるようにしてテスト可能にする。
 - Go stdlib の PCG を使い、CLI の `--seed` は PCG の第1 seed に渡す。PCG の第2 seed は `0` 固定とする。
