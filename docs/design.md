@@ -365,8 +365,8 @@ type Decision struct {
 - メッセージ種別や必須フィールド等の仕様は adapter codec の単体テストで固定する。
 - 期待値は **action のみ**を比較する（評価値等の細部は比較しない）。
   - 比較単位は「意思決定が必要な局面（エージェントが action を出力した時点）」とする。
-- golden fixture は対象 package の `testdata/` 配下に置く。runtime 結合の fixture は `internal/adapter/mjai/runtime/testdata/` を起点とし、入力は `*.input.mjson`、期待 action は `*.actions.golden` とする。
-- stdio と mjsonp TCP は transport としての応答方針が異なるため、runtime golden test では同一入力をそれぞれの policy で処理したうえで、同期応答用 `none` や `join` は除外し、actor を持つ action line のみを比較する。
+- golden fixture は対象 package の `testdata/` 配下に置く。runtime 結合の fixture は `internal/adapter/mjai/runtime/testdata/` を起点とし、入力は `*.input.mjson`、期待 stdout は transport ごとに `*.stdio.golden` / `*.mjsonp.golden` とする。
+- stdio と mjsonp TCP は transport としての応答方針が異なるため、runtime golden test では同一入力でも期待 stdout を分ける。stdio は sparse output のため action line のみ、mjsonp TCP は同期応答用 `none` を含む protocol output 全体を比較する。
 - stdout の protocol output と stderr の trace / 盤面状態出力は混ぜない。stderr 側を golden 化する場合は、protocol action golden とは別 fixture・別テストとして扱う。
 
 ### 12.3 original-vs-port 比較
