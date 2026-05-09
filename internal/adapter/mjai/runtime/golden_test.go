@@ -26,6 +26,12 @@ func TestGoldenStdout(t *testing.T) {
 			policy: jsonLinesPolicy{},
 		},
 		{
+			name:   "stdio_two_games",
+			input:  "testdata/tsumogiri/two_games.input.mjson",
+			golden: "testdata/tsumogiri/two_games.stdio.golden",
+			policy: jsonLinesPolicy{},
+		},
+		{
 			name:   "mjsonp",
 			input:  "testdata/tsumogiri/self_draw.input.mjson",
 			golden: "testdata/tsumogiri/self_draw.mjsonp.golden",
