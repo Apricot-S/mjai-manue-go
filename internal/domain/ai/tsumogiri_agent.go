@@ -13,6 +13,8 @@ func NewTsumogiriAgent() *TsumogiriAgent {
 	return &TsumogiriAgent{}
 }
 
+func (*TsumogiriAgent) Reset() {}
+
 func (*TsumogiriAgent) Decide(request Request) (Decision, error) {
 	legalActions, err := request.Round.LegalActions(request.Self)
 	if err != nil {

@@ -45,7 +45,7 @@
 
 - **堅牢性**: 入力が空行・不正 JSON の場合はエラー終了する（継続しない）。
 - **I/O 安全性**: stdout はプロトコル出力に使うため、ログやエラーは stderr に出す。
-- **決定性**: 乱数を使うコマンドは `--seed` 未指定時もデフォルト seed `0` で決定的にし、`--seed` 指定時はその seed で再現性を担保する。現行 `mjai-tsumogiri` は乱数を使わない。
+- **決定性**: 乱数を使うコマンドは `--seed` 未指定時もデフォルト seed `0` で決定的にし、`--seed` 指定時はその seed で再現性を担保する。同一プロセスで複数ゲームを処理する場合も、各 `start_game` で Agent の乱数状態を同じ seed へリセットする。現行 `mjai-tsumogiri` は乱数を使わない。
 - **透過性**: 送信はメッセージ単位で必ず flush する。
 
 ## 4. アーキテクチャ方針 (DDD + Clean/Hexagonal)
@@ -110,7 +110,7 @@ flowchart LR
 - `internal/application/` に Bot と入力への反応（`NoReaction` / `Action`）が実装されている。現状の action 判定は `round.State.LegalActions(selfID)` が空かどうかを参照する。`LegalActions` は自摸後・副露後など `pendingDiscard` が立つ局面の打牌候補、自摸和了、ロン、ポン、チー、大明槓、見送り候補まで実装済み。Agent へ渡す観測は `round.ActionStateViewer` として、局面 view と合法手一覧の両方を含む。
 - `internal/domain/ai/` に Agent インタフェースとツモ切り Agent が実装されている。ツモ切り Agent は drawn tile がある場合に `Discard(tsumogiri=true)`、ない場合に `Pass` を返す。
 - `cmd/mjai-tsumogiri/` に、stdio / mjsonp TCP client を切り替えて最小AIを起動する `package main` 実装が存在する。現状のフラグは `--name` のみで、`--seed` はない。
-- `cmd/mjai-manue/` は最小 CLI を実装済み。`--name` / `--seed` / stdio / mjsonp TCP client の runtime 配線を持つ。`internal/domain/ai/ManueAgent` は seed 注入済みの最小実装で、現状は合法手集合の先頭を deterministic に選ぶ。CoffeeScript 版の評価ロジックは未移植。
+- `cmd/mjai-manue/` は最小 CLI を実装済み。`--name` / `--seed` / stdio / mjsonp TCP client の runtime 配線を持つ。`internal/domain/ai/ManueAgent` は seed 注入済みの最小実装で、`start_game` ごとに乱数生成器を seed 初期状態へリセットする。現状は合法手集合の先頭を deterministic に選ぶ。CoffeeScript 版の評価ロジックは未移植。
 - `configs/` は JSON を build 時 embed して読み出す実装がある（`encoding/json/v2` 前提）。
 
 本設計書は、上記の既存資産を活用し、未実装の protocol event/action、合法手列挙、`mjai-manue` 本体、RiichiLab bridge を段階的に足していく前提で進める。
@@ -335,9 +335,10 @@ type Decision struct {
 - 入力: 現在の game/round state と意思決定要求
 - 出力: 選択した Action と任意のログ文字列
 - ログ文字列は domain action に埋め込まず、application 層の Reaction として保持し、adapter の outbound codec に渡す。
-- 乱数は Agent に直接持たせず、`Random` インタフェース（または `*rand.Rand`）を注入してテスト可能にする。
+- Agent は `Reset()` と `Decide(request)` を持つ。runtime は `start_game` ごとに `Reset()` を呼び、同一プロセスで複数ゲームを処理しても乱数系列が前ゲームの消費量に依存しないようにする。
+- 乱数は Agent が seed から再初期化できる形で保持し、評価ロジックからは `Random` インタフェース（または `*rand.Rand`）として使えるようにしてテスト可能にする。
 - Go stdlib の PCG を使い、CLI の `--seed` は PCG の第1 seed に渡す。PCG の第2 seed は `0` 固定とする。
-- 現状の `TsumogiriAgent` は乱数を使わない。乱数注入と `--seed` は `mjai-manue` 実装時に導入する。
+- 現状の `TsumogiriAgent` は乱数を使わないため `Reset()` は no-op とする。
 
 ### 10.2 実装フェーズ
 

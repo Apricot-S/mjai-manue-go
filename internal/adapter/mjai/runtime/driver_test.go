@@ -40,6 +40,25 @@ func TestDriver_HandleStartGameCreatesBotWithoutOutput(t *testing.T) {
 	}
 }
 
+func TestDriver_HandleStartGameResetsAgent(t *testing.T) {
+	agent := &recordingAgent{}
+	driver := mjairuntime.NewDriver("manue", "default", agent, nil)
+
+	if _, err := driver.Handle(&inbound.StartGame{Type: "start_game", ID: 0}); err != nil {
+		t.Fatalf("Handle(first start_game) failed: %v", err)
+	}
+	if _, err := driver.Handle(&inbound.EndGame{Type: "end_game"}); err != nil {
+		t.Fatalf("Handle(end_game) failed: %v", err)
+	}
+	if _, err := driver.Handle(&inbound.StartGame{Type: "start_game", ID: 1}); err != nil {
+		t.Fatalf("Handle(second start_game) failed: %v", err)
+	}
+
+	if agent.resets != 2 {
+		t.Errorf("Reset calls = %d, want 2", agent.resets)
+	}
+}
+
 func TestDriver_HandleEndGameMarksEnded(t *testing.T) {
 	driver := mjairuntime.NewDriver("tsumogiri", "default", ai.NewTsumogiriAgent(), nil)
 
@@ -103,4 +122,16 @@ func TestDriver_HandleEventBeforeStartGame(t *testing.T) {
 	if _, err := driver.Handle(&inbound.Tsumo{Type: "tsumo", Actor: 0, Pai: "6m"}); err == nil {
 		t.Fatal("Handle() succeeded unexpectedly")
 	}
+}
+
+type recordingAgent struct {
+	resets int
+}
+
+func (a *recordingAgent) Reset() {
+	a.resets++
+}
+
+func (*recordingAgent) Decide(ai.Request) (ai.Decision, error) {
+	return ai.Decision{}, nil
 }

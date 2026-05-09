@@ -17,5 +17,6 @@ type Decision struct {
 }
 
 type Agent interface {
+	Reset()
 	Decide(request Request) (Decision, error)
 }

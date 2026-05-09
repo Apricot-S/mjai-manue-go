@@ -6,13 +6,18 @@ import (
 )
 
 type ManueAgent struct {
-	rng *rand.Rand
+	seed uint64
+	rng  *rand.Rand
 }
 
 func NewManueAgent(seed uint64) *ManueAgent {
-	return &ManueAgent{
-		rng: rand.New(rand.NewPCG(seed, 0)),
-	}
+	agent := &ManueAgent{seed: seed}
+	agent.Reset()
+	return agent
+}
+
+func (a *ManueAgent) Reset() {
+	a.rng = rand.New(rand.NewPCG(a.seed, 0))
 }
 
 func (*ManueAgent) Decide(request Request) (Decision, error) {
