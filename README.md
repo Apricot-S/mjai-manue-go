@@ -70,6 +70,12 @@ mjai-manue [--name <PLAYER_NAME>] [--seed <INT>] [<URL>]
 
 See [cmd/](cmd/) for more information.
 
+## Name
+
+`mjai-manue` is pronounced "MJAI Manue" (`エムジェイエーアイ・マヌエ`).
+
+According to the original author, the name can be written in kanji as `麻鵺` and roughly means an unidentified thing that plays Mahjong. Source: [mixi2 post by Gimite](https://mixi.social/@gimite/posts/8243ddf6-cfd5-47f1-bd1c-beb222f4e15e).
+
 ## Credits
 
 This project is a Go port of [mjai-manue](https://github.com/gimite/mjai-manue), created by [Hiroshi Ichikawa](https://github.com/gimite).
