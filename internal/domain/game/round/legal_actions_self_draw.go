@@ -46,14 +46,15 @@ func (s *State) legalActionsOnSelfDraw(playerSeat seat.Seat, p *player.VisiblePl
 		return nil
 	}
 
-	if drawnTile := p.DrawnTile(); drawnTile != nil && s.canWinByTsumo(playerSeat, p, *drawnTile) {
+	drawnTile := p.DrawnTile()
+
+	if drawnTile != nil && s.canWinByTsumo(playerSeat, p, *drawnTile) {
 		if err := addWin(*drawnTile); err != nil {
 			return nil, err
 		}
 	}
 
 	if p.RiichiState() == player.RiichiAccepted {
-		drawnTile := p.DrawnTile()
 		if drawnTile == nil {
 			return nil, fmt.Errorf("cannot list discard actions: riichi player %d has no drawn tile", playerSeat.Index())
 		}
@@ -80,7 +81,7 @@ func (s *State) legalActionsOnSelfDraw(playerSeat seat.Seat, p *player.VisiblePl
 		}
 	}
 
-	if drawnTile := p.DrawnTile(); drawnTile != nil {
+	if drawnTile != nil {
 		if p.RiichiState() == player.RiichiDeclared && !canDiscardAsRiichiDeclarationTile(p, *drawnTile, true) {
 			return actions, nil
 		}
