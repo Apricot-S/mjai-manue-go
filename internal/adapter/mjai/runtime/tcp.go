@@ -54,7 +54,6 @@ func RunTCP(cfg TCPConfig) error {
 	return runJSONLines(cfg.Name, endpoint.room, cfg.Agent, conn, conn, cfg.Log, jsonLinesPolicy{
 		respondNoneOnNoReaction: true,
 		stopOnEndGame:           true,
-		errorOnEOFBeforeEndGame: true,
 	})
 }
 

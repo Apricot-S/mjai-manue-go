@@ -38,7 +38,6 @@ func TestGoldenStdout(t *testing.T) {
 			policy: jsonLinesPolicy{
 				respondNoneOnNoReaction: true,
 				stopOnEndGame:           true,
-				errorOnEOFBeforeEndGame: true,
 			},
 		},
 		{

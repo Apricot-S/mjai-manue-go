@@ -101,7 +101,7 @@ func TestRunTCP_RespondsToEachServerMessage(t *testing.T) {
 	}
 }
 
-func TestRunTCP_ConnectionClosedBeforeEndGameReturnsError(t *testing.T) {
+func TestRunTCP_ConnectionClosedBeforeEndGameReturnsNil(t *testing.T) {
 	ln, err := net.Listen("tcp", "127.0.0.1:0")
 	if err != nil {
 		t.Fatalf("Listen() failed: %v", err)
@@ -129,11 +129,8 @@ func TestRunTCP_ConnectionClosedBeforeEndGameReturnsError(t *testing.T) {
 		Agent: ai.NewTsumogiriAgent(),
 		Log:   &log,
 	})
-	if err == nil {
-		t.Fatal("RunTCP() succeeded unexpectedly")
-	}
-	if !strings.Contains(err.Error(), "connection closed before end_game") {
-		t.Errorf("error = %q, want connection closed before end_game", err.Error())
+	if err != nil {
+		t.Fatalf("RunTCP() failed: %v", err)
 	}
 	if err := <-serverErr; err != nil {
 		t.Fatalf("server failed: %v", err)
