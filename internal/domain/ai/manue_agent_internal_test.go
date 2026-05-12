@@ -415,8 +415,8 @@ func TestManueAgent_formatCandidateTrace_FormatsInfinityShanten(t *testing.T) {
 			},
 		},
 	})
-	if !strings.Contains(got, "Infinity") {
-		t.Errorf("formatCandidateTrace() = %q, want it to contain Infinity", got)
+	if !strings.Contains(got, "Inf") {
+		t.Errorf("formatCandidateTrace() = %q, want it to contain Inf", got)
 	}
 	if strings.Contains(got, fmt.Sprintf("%d", service.InfinityShanten)) {
 		t.Errorf("formatCandidateTrace() = %q, should not contain raw InfinityShanten integer", got)

@@ -74,7 +74,7 @@ func formatCandidateTrace(candidates []actionCandidate) string {
 
 func formatShantenTraceValue(shanten int) string {
 	if shanten == service.InfinityShanten {
-		return "Infinity"
+		return "Inf"
 	}
 	return fmt.Sprintf("%d", shanten)
 }
