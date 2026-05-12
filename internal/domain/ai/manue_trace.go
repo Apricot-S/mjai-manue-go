@@ -17,8 +17,8 @@ func formatDiscardTraceKey(riichi bool, discardTile tile.Tile) string {
 	return fmt.Sprintf("%d.%s", prefix, discardTile)
 }
 
-func formatDecisionTrace(candidates []actionCandidate, selected *actionCandidate) string {
-	trace := formatCandidateLog(candidates)
+func formatDecisionTrace(log string, selected *actionCandidate) string {
+	trace := log
 	if selected == nil {
 		return trace
 	}

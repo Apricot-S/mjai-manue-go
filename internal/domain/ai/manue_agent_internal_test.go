@@ -439,7 +439,7 @@ func TestManueAgent_formatDecisionTrace_AppendsDecidedKey(t *testing.T) {
 		},
 	}
 
-	got := formatDecisionTrace([]actionCandidate{*selected}, selected)
+	got := formatDecisionTrace(formatCandidateLog([]actionCandidate{*selected}), selected)
 	if !strings.HasSuffix(got, "\n\n\ndecidedKey -1.5m\n") {
 		t.Errorf("formatDecisionTrace() = %q, want two blank lines before decidedKey suffix", got)
 	}

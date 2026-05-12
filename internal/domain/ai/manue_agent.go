@@ -59,10 +59,11 @@ func (*ManueAgent) decideSelfTurn(legalActions []action.Action, self player.Play
 	}
 
 	candidate := chooseBestCandidate(candidates, true)
+	log := formatCandidateLog(candidates)
 	return Decision{
 		Action: candidate.action,
-		Log:    formatCandidateLog(candidates),
-		Trace:  formatDecisionTrace(candidates, &candidate),
+		Log:    log,
+		Trace:  formatDecisionTrace(log, &candidate),
 	}, nil
 }
 
