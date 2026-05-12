@@ -3,6 +3,7 @@ package ai
 import (
 	"fmt"
 	"slices"
+	"strconv"
 	"strings"
 
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/round/service"
@@ -58,14 +59,14 @@ func formatCandidateTrace(candidates []actionCandidate) string {
 	for _, candidate := range sortedCandidates {
 		rows = append(rows, []string{
 			candidate.traceKey,
-			fmt.Sprintf("%.4f", candidate.score.avgRank),
-			fmt.Sprintf("%.0f", candidate.score.expPts),
-			fmt.Sprintf("%.3f", candidate.score.dealInProb),
-			fmt.Sprintf("%.3f", candidate.score.winProb),
-			fmt.Sprintf("%.3f", candidate.score.drawProb),
-			fmt.Sprintf("%.3f", candidate.score.othersWinProb),
-			fmt.Sprintf("%.0f", candidate.score.avgWinPts),
-			fmt.Sprintf("%.0f", candidate.score.avgDrawPts),
+			strconv.FormatFloat(candidate.score.avgRank, 'f', 4, 64),
+			strconv.FormatFloat(candidate.score.expPts, 'f', 0, 64),
+			strconv.FormatFloat(candidate.score.dealInProb, 'f', 3, 64),
+			strconv.FormatFloat(candidate.score.winProb, 'f', 3, 64),
+			strconv.FormatFloat(candidate.score.drawProb, 'f', 3, 64),
+			strconv.FormatFloat(candidate.score.othersWinProb, 'f', 3, 64),
+			strconv.FormatFloat(candidate.score.avgWinPts, 'f', 0, 64),
+			strconv.FormatFloat(candidate.score.avgDrawPts, 'f', 0, 64),
 			formatShantenTraceValue(candidate.score.shanten),
 		})
 	}
@@ -76,7 +77,7 @@ func formatShantenTraceValue(shanten int) string {
 	if shanten == service.InfinityShanten {
 		return "Inf"
 	}
-	return fmt.Sprintf("%d", shanten)
+	return strconv.Itoa(shanten)
 }
 
 func formatTraceTable(rows [][]string) string {
