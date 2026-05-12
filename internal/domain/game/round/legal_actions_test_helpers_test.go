@@ -198,6 +198,24 @@ func kyushukyuhaiHandForTest() [common.InitHandSize]tile.Tile {
 	}
 }
 
+func kokushiTenpaiHandForLegalActionsTest() [common.InitHandSize]tile.Tile {
+	return [common.InitHandSize]tile.Tile{
+		tile.MustTileFromCode("1m"),
+		tile.MustTileFromCode("9m"),
+		tile.MustTileFromCode("1p"),
+		tile.MustTileFromCode("9p"),
+		tile.MustTileFromCode("1s"),
+		tile.MustTileFromCode("9s"),
+		tile.MustTileFromCode("E"),
+		tile.MustTileFromCode("S"),
+		tile.MustTileFromCode("W"),
+		tile.MustTileFromCode("P"),
+		tile.MustTileFromCode("F"),
+		tile.MustTileFromCode("C"),
+		tile.MustTileFromCode("1m"),
+	}
+}
+
 func menzenTsumoHandForLegalActionsTest() [common.InitHandSize]tile.Tile {
 	return [common.InitHandSize]tile.Tile{
 		tile.MustTileFromCode("1m"),

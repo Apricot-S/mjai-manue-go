@@ -48,6 +48,23 @@ func (s *State) legalActionsOnSelfDraw(playerSeat seat.Seat, p *player.VisiblePl
 
 	drawnTile := p.DrawnTile()
 
+	if p.RiichiState() == player.RiichiDeclared {
+		for _, handTile := range tile.Tiles(p.HandTiles()).Distinct(nil) {
+			if !canDiscardAsRiichiDeclarationTile(p, handTile, false) {
+				continue
+			}
+			if err := addDiscard(handTile, false); err != nil {
+				return nil, err
+			}
+		}
+		if drawnTile != nil && canDiscardAsRiichiDeclarationTile(p, *drawnTile, true) {
+			if err := addDiscard(*drawnTile, true); err != nil {
+				return nil, err
+			}
+		}
+		return actions, nil
+	}
+
 	if drawnTile != nil && s.canWinByTsumo(playerSeat, p, *drawnTile) {
 		if err := addWin(*drawnTile); err != nil {
 			return nil, err
@@ -73,18 +90,12 @@ func (s *State) legalActionsOnSelfDraw(playerSeat seat.Seat, p *player.VisiblePl
 		if isSwapCallTile(handTile, p.SwapCallTiles()) {
 			continue
 		}
-		if p.RiichiState() == player.RiichiDeclared && !canDiscardAsRiichiDeclarationTile(p, handTile, false) {
-			continue
-		}
 		if err := addDiscard(handTile, false); err != nil {
 			return nil, err
 		}
 	}
 
 	if drawnTile != nil {
-		if p.RiichiState() == player.RiichiDeclared && !canDiscardAsRiichiDeclarationTile(p, *drawnTile, true) {
-			return actions, nil
-		}
 		if err := addDiscard(*drawnTile, true); err != nil {
 			return nil, err
 		}

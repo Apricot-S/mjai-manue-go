@@ -160,6 +160,31 @@ func TestState_LegalActions_IncludesKyushukyuhai(t *testing.T) {
 	}
 }
 
+func TestState_LegalActions_AfterRiichiDeclarationExcludesTsumoWinAndKyushukyuhai(t *testing.T) {
+	hands := newValidHands()
+	hands[0] = kokushiTenpaiHandForLegalActionsTest()
+	s := mustNewRoundStateForTest(t, hands)
+	actor := seat.MustSeat(0)
+	winningTile := tile.MustTileFromCode("N")
+	if err := s.Apply(event.NewDraw(actor, winningTile)); err != nil {
+		t.Fatalf("Apply(Draw) failed: %v", err)
+	}
+	if err := s.Apply(event.NewRiichi(actor)); err != nil {
+		t.Fatalf("Apply(Riichi) failed: %v", err)
+	}
+
+	got, err := s.LegalActions(actor)
+	if err != nil {
+		t.Fatalf("LegalActions() failed: %v", err)
+	}
+	if containsWin(got, actor, actor, "N") {
+		t.Error("LegalActions() contains Win after riichi declaration")
+	}
+	if containsKyushukyuhai(got, actor) {
+		t.Error("LegalActions() contains Kyushukyuhai after riichi declaration")
+	}
+}
+
 func TestState_LegalActions_ExcludesKyushukyuhaiAfterFirstDiscard(t *testing.T) {
 	hands := newValidHands()
 	hands[0] = kyushukyuhaiHandForTest()
