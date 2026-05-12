@@ -207,7 +207,7 @@ func (s *State) legalConcealedKanActions(playerSeat seat.Seat, p *player.Visible
 			continue
 		}
 		candidate := tile.MustTileFromID(id)
-		consumed := concealedKanConsumedTiles(candidate)
+		consumed := [4]tile.Tile{candidate, candidate, candidate, candidate.AddRed()}
 		if p.RiichiState() == player.RiichiAccepted && !canConcealedKanAfterRiichi(handBeforeKan, *drawnTile, consumed) {
 			continue
 		}
@@ -223,10 +223,6 @@ func (s *State) legalConcealedKanActions(playerSeat seat.Seat, p *player.Visible
 		actions = append(actions, a)
 	}
 	return actions, nil
-}
-
-func concealedKanConsumedTiles(candidate tile.Tile) [4]tile.Tile {
-	return [4]tile.Tile{candidate, candidate, candidate, candidate.AddRed()}
 }
 
 func canConcealedKanAfterRiichi(handBeforeKan *hand.VisibleHand, drawnTile tile.Tile, consumed [4]tile.Tile) bool {
