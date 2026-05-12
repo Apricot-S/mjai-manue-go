@@ -51,7 +51,11 @@ func RunTCP(cfg TCPConfig) error {
 		_ = logLine(cfg.Log, "closed")
 	}()
 
-	return runTCPConn(cfg.Name, endpoint.room, cfg.Agent, conn, cfg.Log)
+	return runJSONLines(cfg.Name, endpoint.room, cfg.Agent, conn, conn, cfg.Log, jsonLinesPolicy{
+		respondNoneOnNoReaction: true,
+		stopOnEndGame:           true,
+		errorOnEOFBeforeEndGame: true,
+	})
 }
 
 type mjsonpEndpoint struct {
@@ -81,12 +85,4 @@ func parseMjsonpURL(rawURL string) (*mjsonpEndpoint, error) {
 		address: u.Host,
 		room:    room,
 	}, nil
-}
-
-func runTCPConn(name string, room string, agent ai.Agent, conn net.Conn, log io.Writer) error {
-	return runJSONLines(name, room, agent, conn, conn, log, jsonLinesPolicy{
-		respondNoneOnNoReaction: true,
-		stopOnEndGame:           true,
-		errorOnEOFBeforeEndGame: true,
-	})
 }
