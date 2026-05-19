@@ -27,7 +27,7 @@ type WinScoreStats interface {
 }
 ```
 
-`configs.GameStats` は上記の `WinScoreStats` を構造的に満たす getter を持つ。これにより、AI package は `configs` を import せず、外側の組み立て側だけが `configs.GetStats()` の戻り値を deps に渡せる。
+`configs.GameStats` は上記の `WinScoreStats` を構造的に満たす getter を持つ。これにより、AI package は `configs` を import せず、外側の組み立て側だけが `configs.LoadGameStats()` の戻り値を deps に渡せる。
 
 ## Planned Split
 

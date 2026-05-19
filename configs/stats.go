@@ -40,7 +40,7 @@ var rawGameStats []byte
 //go:embed light_game_stats.json
 var rawLightGameStats []byte
 
-func GetStats() (*GameStats, error) {
+func LoadGameStats() (*GameStats, error) {
 	var stats GameStats
 	if err := json.Unmarshal(rawGameStats, &stats); err != nil {
 		return nil, err
