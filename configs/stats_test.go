@@ -44,6 +44,9 @@ func TestLoadGameStats(t *testing.T) {
 		if got.YamitenStats["12,4"].Tenpai != 4 {
 			t.Errorf("LoadGameStats().YamitenStats[\"12,4\"].Tenpai = %v, want %v", got.YamitenStats["12,4"].Tenpai, 4)
 		}
+		if _, ok := got.YamitenStats["missing"]; ok {
+			t.Errorf("LoadGameStats().YamitenStats[\"missing\"] exists unexpectedly")
+		}
 		if got.RyukyokuTenpaiStat.Total != 13172 {
 			t.Errorf("LoadGameStats().RyukyokuTenpaiStat.Total = %v, want %v", got.RyukyokuTenpaiStat.Total, 13172)
 		}
