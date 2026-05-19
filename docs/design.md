@@ -351,7 +351,7 @@ type Decision struct {
 
 `mjai-manue` の CoffeeScript 版ロジック移植では、以前 main ブランチで移植した Go 実装（`reference/repositories/mjai-manue-go-main/internal/ai/`）を主な作業元とし、CoffeeScript 版 `coffee/manue_ai.coffee` は挙動確認の一次資料として参照する。現行コードの state/action 型は main ブランチ当時と異なるため、旧 `game.StateAnalyzer` 相当をそのまま復活させるのではなく、現行の `round.ActionStateViewer` と `LegalActions` を入口にして必要な評価材料だけを段階的に接続する。
 
-移植の初期段階では `configs/` の読み込みは導入しない。`NewManueAgent(seed uint64)` は CLI 用の安定した constructor として維持し、configs / estimator / stats が必要になった段階で `NewManueAgentWithDeps(seed uint64, deps ManueAgentDeps)` のようなテスト差し替え可能な constructor を追加する。これにより、configs の embed JSON や `encoding/json/v2` 初期化に引きずられず、まず action 分類・優先順位・打牌評価の小さい単位から移植できる。configs 依存を導入するまでは CoffeeScript 版との完全一致を移植ゴールにせず、判断入口と合法手選択の段階的な一致範囲を明示して進める。
+移植の初期段階では `configs/` の読み込みは CLI に導入しない。`NewManueAgent(seed uint64)` は CLI 用の安定した constructor として維持し、stats / estimator / decision tree が必要な経路では `NewManueAgentWithDeps(seed, deps)` を使う。これにより、CLI を configs の embed JSON や `encoding/json/v2` 初期化に引きずらず、まず action 分類・優先順位・打牌評価の小さい単位から移植できる。現状は deps 付き constructor と stats 受け口だけを追加し、CLI からは引き続き `NewManueAgent(seed)` を使う。stats / decision tree など容量の大きい設定値は丸ごとコピーせず、用途別の小さい interface を deps 側で束ね、`configs` の値をその interface 実装として参照する方針で進める。詳細は `docs/manue-deps.md` に集約する。CLI の configs 読み込みを導入するまでは CoffeeScript 版との完全一致を移植ゴールにせず、判断入口と合法手選択の段階的な一致範囲を明示して進める。
 
 `mjai-manue` Phase 1 では configs 非依存の判断骨格だけを実装する。具体的には、合法手集合から `Win` を最優先で選ぶ、リーチ成立後はツモ切り打牌を選ぶ、通常手番では打牌/立直候補を暫定 score で選ぶ、他家打牌への反応では暫定的に最初の副露/カンを選び、行動候補が `Pass` だけなら `Pass` を選ぶ。打牌評価、副露するかどうかの期待値評価、危険度・聴牌確率・順位期待値は後続 phase で置き換える。
 
@@ -457,7 +457,7 @@ ManueAgent.Decide
 6. **`mjai-manue` 本体の追加（一部完了）**
    - `cmd/mjai-manue` に実体を追加し、`--name` / `--seed` / URL mode を実装する。（完了）
    - `ManueAgent` を追加し、乱数を注入する。`--seed` 未指定時は seed `0`、PCG の第2 seed は `0` 固定とする。（完了）
-   - 現状は Phase 1 の判断骨格（和了優先、リーチ後ツモ切り、打牌/立直/副露 fallback）を実装済み。Phase 2 の入口として、現行コードの語彙に合わせた candidate / score 構造、旧 Go / CoffeeScript 版由来の score 比較規則（平均順位、期待点、赤牌回避）、通常手番の打牌および立直+打牌 candidate 足場、オリジナル互換の trace table 出力足場、score 変化の確率分布と平均順位計算を扱う小さい基盤を追加済み。ただし期待値・危険度・聴牌確率・順位期待値の中身はまだ configs / estimator に接続しておらず、後続 phase で差し替える。
+   - 現状は Phase 1 の判断骨格（和了優先、リーチ後ツモ切り、打牌/立直/副露 fallback）を実装済み。Phase 2 の入口として、現行コードの語彙に合わせた candidate / score 構造、旧 Go / CoffeeScript 版由来の score 比較規則（平均順位、期待点、赤牌回避）、通常手番の打牌および立直+打牌 candidate 足場、オリジナル互換の trace table 出力足場、score 変化の確率分布・平均順位計算・流局/和了時 score change 分布を扱う小さい基盤を追加済み。和了点頻度から score change 分布を作る純粋関数までは追加済みだが、期待値・危険度・聴牌確率・順位期待値の中身はまだ configs / estimator に接続しておらず、後続 phase で差し替える。
 
 7. **CoffeeScript 版ロジックの段階移植**
    - 以前 main ブランチで移植した `internal/ai` 実装を主な作業元にし、CoffeeScript 版 `coffee/manue_ai.coffee` を挙動確認の一次資料として使う。

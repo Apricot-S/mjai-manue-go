@@ -135,6 +135,23 @@ func TestManueAgent_DecideActionSkeleton(t *testing.T) {
 	}
 }
 
+func TestNewManueAgentWithDeps(t *testing.T) {
+	stats := stubManueStats{numWins: 1}
+	agent := NewManueAgentWithDeps(123, ManueAgentDeps{Stats: stats})
+	if agent.seed != 123 {
+		t.Errorf("seed = %d, want 123", agent.seed)
+	}
+	if agent.deps.Stats == nil {
+		t.Fatalf("deps.Stats = nil, want stats")
+	}
+	if got := agent.deps.Stats.NumWins(); got != stats.numWins {
+		t.Errorf("deps.Stats.NumWins() = %d, want %d", got, stats.numWins)
+	}
+	if agent.rng == nil {
+		t.Errorf("rng = nil, want initialized rng")
+	}
+}
+
 func TestManueAgent_decideSelfTurn_ReturnsOriginalStyleActionLog(t *testing.T) {
 	self := seat.MustSeat(0)
 	discard, err := action.NewDiscard(self, tile.MustTileFromCode("5m"), false)

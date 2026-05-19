@@ -11,10 +11,37 @@ import (
 type ManueAgent struct {
 	seed uint64
 	rng  *rand.Rand
+	deps ManueAgentDeps
+}
+
+type ManueAgentDeps struct {
+	Stats ManueStats
+}
+
+type ManueStats interface {
+	WinScoreStats
+}
+
+type WinScoreStats interface {
+	NumWins() int
+	NumSelfDrawWins() int
+	NonDealerWinPointFreqs() map[string]int
+	DealerWinPointFreqs() map[string]int
 }
 
 func NewManueAgent(seed uint64) *ManueAgent {
-	agent := &ManueAgent{seed: seed}
+	return newManueAgent(seed, ManueAgentDeps{})
+}
+
+func NewManueAgentWithDeps(seed uint64, deps ManueAgentDeps) *ManueAgent {
+	return newManueAgent(seed, deps)
+}
+
+func newManueAgent(seed uint64, deps ManueAgentDeps) *ManueAgent {
+	agent := &ManueAgent{
+		seed: seed,
+		deps: deps,
+	}
 	agent.Reset()
 	return agent
 }

@@ -3,6 +3,8 @@ package configs
 import (
 	"math"
 	"testing"
+
+	"github.com/Apricot-S/mjai-manue-go/internal/domain/ai"
 )
 
 func TestGetStats(t *testing.T) {
@@ -61,6 +63,20 @@ func TestGetStats(t *testing.T) {
 
 		if math.Abs(got.WinProbsMap["E1,0,1"]["0"]-0.49478259990894036) > epsilon {
 			t.Errorf("GetStats().WinProbsMap[\"E1,0,1\"][\"0\"] = %v, want %v", got.WinProbsMap["E1,0,1"]["0"], 0.49478259990894036)
+		}
+
+		var winScoreStats ai.WinScoreStats = got
+		if winScoreStats.NumWins() != got.NumHoras {
+			t.Errorf("NumWins() = %v, want %v", winScoreStats.NumWins(), got.NumHoras)
+		}
+		if winScoreStats.NumSelfDrawWins() != got.NumTsumoHoras {
+			t.Errorf("NumSelfDrawWins() = %v, want %v", winScoreStats.NumSelfDrawWins(), got.NumTsumoHoras)
+		}
+		if winScoreStats.NonDealerWinPointFreqs()["total"] != got.KoHoraPointsFreqs["total"] {
+			t.Errorf("NonDealerWinPointFreqs()[\"total\"] = %v, want %v", winScoreStats.NonDealerWinPointFreqs()["total"], got.KoHoraPointsFreqs["total"])
+		}
+		if winScoreStats.DealerWinPointFreqs()["1500"] != got.OyaHoraPointsFreqs["1500"] {
+			t.Errorf("DealerWinPointFreqs()[\"1500\"] = %v, want %v", winScoreStats.DealerWinPointFreqs()["1500"], got.OyaHoraPointsFreqs["1500"])
 		}
 	})
 }

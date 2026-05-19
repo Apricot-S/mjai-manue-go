@@ -50,3 +50,19 @@ func GetStats() (*GameStats, error) {
 	}
 	return &stats, nil
 }
+
+func (s *GameStats) NumWins() int {
+	return s.NumHoras
+}
+
+func (s *GameStats) NumSelfDrawWins() int {
+	return s.NumTsumoHoras
+}
+
+func (s *GameStats) NonDealerWinPointFreqs() map[string]int {
+	return s.KoHoraPointsFreqs
+}
+
+func (s *GameStats) DealerWinPointFreqs() map[string]int {
+	return s.OyaHoraPointsFreqs
+}
