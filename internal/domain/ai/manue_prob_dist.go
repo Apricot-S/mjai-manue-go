@@ -186,6 +186,17 @@ func (d aheadVectorProbDist) mapValueScalar(mapper func(aheadVector) float64) sc
 	return newScalarProbDist(scalars)
 }
 
+// mapValueScoreDelta maps ahead-vector outcomes to score-delta outcomes while
+// preserving their probabilities. Outcomes with the same mapped value are
+// merged.
+func (d aheadVectorProbDist) mapValueScoreDelta(mapper func(aheadVector) scoreDelta) scoreDeltaProbDist {
+	scoreDeltas := make(scoreDeltaProbDist, len(d))
+	for value, prob := range d {
+		scoreDeltas[mapper(value)] += prob
+	}
+	return newScoreDeltaProbDist(scoreDeltas)
+}
+
 // addAheadVectorProbDists returns the distribution of lhs + rhs, assuming the
 // two ahead-vector random variables are independent.
 func addAheadVectorProbDists(lhs, rhs aheadVectorProbDist) aheadVectorProbDist {
