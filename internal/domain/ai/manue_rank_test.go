@@ -2,6 +2,44 @@ package ai
 
 import "testing"
 
+func TestAverageRank(t *testing.T) {
+	scoreChanges := newScoreDeltaProbDist(map[scoreDelta]float64{
+		{}: 1,
+	})
+	opponents := []rankOpponent{
+		{
+			id:       1,
+			score:    24000,
+			position: 1,
+			winProbs: relativeWinProbTable{
+				"1000": 0.8,
+			},
+		},
+		{
+			id:       2,
+			score:    26000,
+			position: 2,
+			winProbs: relativeWinProbTable{
+				"-1000": 0.4,
+			},
+		},
+		{
+			id:       3,
+			score:    25000,
+			position: 3,
+			winProbs: relativeWinProbTable{
+				"0": 0.6,
+			},
+		},
+	}
+
+	got := averageRank(scoreChanges, 0, 25000, 0, opponents)
+	want := 4.0 - (0.8 + 0.4 + 0.6)
+	if !almostEqual(got, want) {
+		t.Errorf("averageRank() = %v, want %v", got, want)
+	}
+}
+
 func TestWinProbAgainst(t *testing.T) {
 	scoreChanges := newScoreDeltaProbDist(map[scoreDelta]float64{
 		{1000, -1000, 0, 0}: 0.25,

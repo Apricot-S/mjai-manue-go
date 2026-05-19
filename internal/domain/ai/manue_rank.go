@@ -4,6 +4,49 @@ import "strconv"
 
 type relativeWinProbTable map[string]float64
 
+type rankOpponent struct {
+	id       int
+	score    float64
+	position int
+	winProbs relativeWinProbTable
+}
+
+// averageRank returns self's expected final rank from pairwise win probabilities
+// against the other players.
+func averageRank(
+	scoreChanges scoreDeltaProbDist,
+	selfID int,
+	selfScore float64,
+	selfPosition int,
+	opponents []rankOpponent,
+) float64 {
+	winsDist := aheadVectorProbDist{{}: 1.0}
+	for _, opponent := range opponents {
+		winProb := winProbAgainst(
+			scoreChanges,
+			selfID,
+			opponent.id,
+			selfScore,
+			opponent.score,
+			selfPosition,
+			opponent.position,
+			opponent.winProbs,
+		)
+
+		var wins aheadVector
+		wins[opponent.id] = 1
+		winsDist = addAheadVectorProbDists(winsDist, newAheadVectorProbDist(map[aheadVector]float64{
+			{}:   1.0 - winProb,
+			wins: winProb,
+		}))
+	}
+
+	rankDist := winsDist.mapValueScalar(func(wins aheadVector) float64 {
+		return float64(4 - countAheadWins(wins))
+	})
+	return rankDist.expected()
+}
+
 // winProbAgainst returns the probability that self finishes ahead of another
 // player after applying a score-delta distribution.
 func winProbAgainst(

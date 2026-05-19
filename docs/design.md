@@ -457,7 +457,7 @@ ManueAgent.Decide
 6. **`mjai-manue` 本体の追加（一部完了）**
    - `cmd/mjai-manue` に実体を追加し、`--name` / `--seed` / URL mode を実装する。（完了）
    - `ManueAgent` を追加し、乱数を注入する。`--seed` 未指定時は seed `0`、PCG の第2 seed は `0` 固定とする。（完了）
-   - 現状は Phase 1 の判断骨格（和了優先、リーチ後ツモ切り、打牌/立直/副露 fallback）を実装済み。Phase 2 の入口として、現行コードの語彙に合わせた candidate / score 構造、旧 Go / CoffeeScript 版由来の score 比較規則（平均順位、期待点、赤牌回避）、通常手番の打牌および立直+打牌 candidate 足場、オリジナル互換の trace table 出力足場、score 変化の確率分布を扱う小さい基盤を追加済み。ただし期待値・危険度・聴牌確率・順位期待値の中身はまだ configs / estimator に接続しておらず、後続 phase で差し替える。
+   - 現状は Phase 1 の判断骨格（和了優先、リーチ後ツモ切り、打牌/立直/副露 fallback）を実装済み。Phase 2 の入口として、現行コードの語彙に合わせた candidate / score 構造、旧 Go / CoffeeScript 版由来の score 比較規則（平均順位、期待点、赤牌回避）、通常手番の打牌および立直+打牌 candidate 足場、オリジナル互換の trace table 出力足場、score 変化の確率分布と平均順位計算を扱う小さい基盤を追加済み。ただし期待値・危険度・聴牌確率・順位期待値の中身はまだ configs / estimator に接続しておらず、後続 phase で差し替える。
 
 7. **CoffeeScript 版ロジックの段階移植**
    - 以前 main ブランチで移植した `internal/ai` 実装を主な作業元にし、CoffeeScript 版 `coffee/manue_ai.coffee` を挙動確認の一次資料として使う。
