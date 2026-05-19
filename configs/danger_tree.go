@@ -21,7 +21,7 @@ type DecisionNode struct {
 //go:embed danger_tree.all.json
 var rawDangerTree []byte
 
-func GetDangerTree() (*DecisionNode, error) {
+func LoadDangerTree() (*DecisionNode, error) {
 	var root DecisionNode
 	if err := json.Unmarshal(rawDangerTree, &root); err != nil {
 		return nil, err
