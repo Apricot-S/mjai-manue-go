@@ -99,9 +99,6 @@ func randomWinScoreDeltaDistFromStats(
 	dealerID int,
 	stats WinScoreStats,
 ) (scoreDeltaProbDist, error) {
-	if stats == nil {
-		return nil, fmt.Errorf("cannot build random win score delta distribution: stats is nil")
-	}
 	if stats.NumWins() <= 0 {
 		return nil, fmt.Errorf("cannot build random win score delta distribution: numWins must be positive")
 	}
@@ -122,10 +119,6 @@ func randomWinScoreDeltaDistFromStats(
 // noten player reaches tenpai before exhaustive draw, conditional on the round
 // ending by exhaustive draw.
 func notenExhaustiveDrawTenpaiProb(stats DrawTenpaiStats, currentTurn float64) (float64, error) {
-	if stats == nil {
-		return 0, fmt.Errorf("cannot estimate exhaustive-draw tenpai probability: stats is nil")
-	}
-
 	notenFreq := stats.ExhaustiveDrawNotenCount()
 	if notenFreq < 0 {
 		return 0, fmt.Errorf("cannot estimate exhaustive-draw tenpai probability: noten count must be non-negative")

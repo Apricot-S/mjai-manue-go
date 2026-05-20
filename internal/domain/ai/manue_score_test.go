@@ -164,13 +164,6 @@ func TestRandomWinScoreDeltaDistFromStats_SelectsNonDealerPointFreqs(t *testing.
 	assertScoreDeltaProbDist(t, got, want)
 }
 
-func TestRandomWinScoreDeltaDistFromStats_ReturnsErrorWithoutStats(t *testing.T) {
-	_, err := randomWinScoreDeltaDistFromStats(0, 0, nil)
-	if err == nil {
-		t.Fatal("randomWinScoreDeltaDistFromStats() succeeded unexpectedly")
-	}
-}
-
 func TestRandomWinScoreDeltaDistFromStats_ReturnsErrorWithInvalidNumWins(t *testing.T) {
 	_, err := randomWinScoreDeltaDistFromStats(0, 0, stubManueStats{})
 	if err == nil {
@@ -253,13 +246,6 @@ func TestNotenExhaustiveDrawTenpaiProb_ReturnsErrorWithMissingTurnFreq(t *testin
 			"16.25": 100,
 		},
 	}, 16)
-	if err == nil {
-		t.Fatal("notenExhaustiveDrawTenpaiProb() succeeded unexpectedly")
-	}
-}
-
-func TestNotenExhaustiveDrawTenpaiProb_ReturnsErrorWithoutStats(t *testing.T) {
-	_, err := notenExhaustiveDrawTenpaiProb(nil, 16)
 	if err == nil {
 		t.Fatal("notenExhaustiveDrawTenpaiProb() succeeded unexpectedly")
 	}
