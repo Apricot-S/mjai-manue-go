@@ -90,6 +90,22 @@ func TestGameStats_WinScoreStats(t *testing.T) {
 	}
 }
 
+func TestGameStats_RoundEndStats(t *testing.T) {
+	got, err := LoadGameStats()
+	if err != nil {
+		t.Fatalf("LoadGameStats() error = %v", err)
+		return
+	}
+
+	var roundEndStats ai.RoundEndStats = got
+	if roundEndStats.TurnDistribution()[17] != got.NumTurnsDistribution[17] {
+		t.Errorf("TurnDistribution()[17] = %v, want %v", roundEndStats.TurnDistribution()[17], got.NumTurnsDistribution[17])
+	}
+	if roundEndStats.ExhaustiveDrawRatio() != got.RyukyokuRatio {
+		t.Errorf("ExhaustiveDrawRatio() = %v, want %v", roundEndStats.ExhaustiveDrawRatio(), got.RyukyokuRatio)
+	}
+}
+
 func TestGameStats_DrawTenpaiStats(t *testing.T) {
 	got, err := LoadGameStats()
 	if err != nil {
@@ -117,5 +133,28 @@ func TestGameStats_DrawTenpaiStats(t *testing.T) {
 	}
 	if _, ok := drawTenpaiStats.ExhaustiveDrawTenpaiTurnFreq("missing"); ok {
 		t.Errorf("ExhaustiveDrawTenpaiTurnFreq(\"missing\") ok = true, want false")
+	}
+}
+
+func TestGameStats_TenpaiEstimatorStats(t *testing.T) {
+	got, err := LoadGameStats()
+	if err != nil {
+		t.Fatalf("LoadGameStats() error = %v", err)
+		return
+	}
+
+	var tenpaiEstimatorStats ai.TenpaiEstimatorStats = got
+	total, tenpai, ok := tenpaiEstimatorStats.YamitenCounts(17, 0)
+	if !ok {
+		t.Errorf("YamitenCounts(17, 0) ok = false, want true")
+	}
+	if total != got.YamitenStats["17,0"].Total {
+		t.Errorf("YamitenCounts(17, 0) total = %v, want %v", total, got.YamitenStats["17,0"].Total)
+	}
+	if tenpai != got.YamitenStats["17,0"].Tenpai {
+		t.Errorf("YamitenCounts(17, 0) tenpai = %v, want %v", tenpai, got.YamitenStats["17,0"].Tenpai)
+	}
+	if _, _, ok := tenpaiEstimatorStats.YamitenCounts(99, 99); ok {
+		t.Errorf("YamitenCounts(99, 99) ok = true, want false")
 	}
 }

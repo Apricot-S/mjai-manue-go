@@ -7,6 +7,8 @@ import (
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/round"
 )
 
+const numTurnDistributionEntries = 18
+
 // validateManueStats checks structural invariants of stats before they are used
 // by ManueAgent. The validation assumes stats is immutable; implementations
 // must not change returned values after validation.
@@ -14,7 +16,13 @@ func validateManueStats(stats ManueStats) error {
 	if err := validateWinScoreStats(stats); err != nil {
 		return err
 	}
+	if err := validateRoundEndStats(stats); err != nil {
+		return err
+	}
 	if err := validateDrawTenpaiStats(stats); err != nil {
+		return err
+	}
+	if err := validateTenpaiEstimatorStats(stats); err != nil {
 		return err
 	}
 	return nil
@@ -73,6 +81,33 @@ func validateWinPointFreqs(label string, pointFreqs map[string]int) error {
 	return nil
 }
 
+func validateRoundEndStats(stats RoundEndStats) error {
+	turnDistribution := stats.TurnDistribution()
+	if len(turnDistribution) != numTurnDistributionEntries {
+		return fmt.Errorf("invalid round end stats: turn distribution length must be %d", numTurnDistributionEntries)
+	}
+
+	sumProb := 0.0
+	for i, prob := range turnDistribution {
+		if prob < 0.0 {
+			return fmt.Errorf("invalid round end stats: turn distribution probability at %d must be non-negative", i)
+		}
+		sumProb += prob
+	}
+	if sumProb <= 0.0 {
+		return fmt.Errorf("invalid round end stats: turn distribution total must be positive")
+	}
+
+	exhaustiveDrawRatio := stats.ExhaustiveDrawRatio()
+	if exhaustiveDrawRatio < 0.0 {
+		return fmt.Errorf("invalid round end stats: exhaustive draw ratio must be non-negative")
+	}
+	if exhaustiveDrawRatio > sumProb {
+		return fmt.Errorf("invalid round end stats: exhaustive draw ratio must not exceed turn distribution total")
+	}
+	return nil
+}
+
 func validateDrawTenpaiStats(stats DrawTenpaiStats) error {
 	notenFreq := stats.ExhaustiveDrawNotenCount()
 	if notenFreq < 0 {
@@ -95,6 +130,24 @@ func validateDrawTenpaiStats(stats DrawTenpaiStats) error {
 	totalFreqs := sumTenpaiFreqs + notenFreq
 	if totalFreqs <= 0 {
 		return fmt.Errorf("invalid draw tenpai stats: frequency total must be positive")
+	}
+	return nil
+}
+
+func validateTenpaiEstimatorStats(stats TenpaiEstimatorStats) error {
+	for remainTurns := range numTurnDistributionEntries {
+		for numMelds := 0; numMelds <= 4; numMelds++ {
+			total, tenpai, ok := stats.YamitenCounts(remainTurns, numMelds)
+			if !ok {
+				continue
+			}
+			if total <= 0 {
+				return fmt.Errorf("invalid tenpai estimator stats: yamiten total for %d,%d must be positive", remainTurns, numMelds)
+			}
+			if tenpai < 0 || tenpai > total {
+				return fmt.Errorf("invalid tenpai estimator stats: yamiten tenpai for %d,%d must be between 0 and total", remainTurns, numMelds)
+			}
+		}
 	}
 	return nil
 }

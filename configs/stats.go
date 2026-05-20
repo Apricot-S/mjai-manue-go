@@ -3,6 +3,7 @@ package configs
 import (
 	_ "embed"
 	"encoding/json/v2"
+	"fmt"
 )
 
 type YamitenStat struct {
@@ -67,6 +68,14 @@ func (s *GameStats) DealerWinPointFreqs() map[string]int {
 	return s.OyaHoraPointsFreqs
 }
 
+func (s *GameStats) TurnDistribution() []float64 {
+	return s.NumTurnsDistribution
+}
+
+func (s *GameStats) ExhaustiveDrawRatio() float64 {
+	return s.RyukyokuRatio
+}
+
 func (s *GameStats) ExhaustiveDrawNotenCount() int {
 	return s.RyukyokuTenpaiStat.Noten
 }
@@ -74,4 +83,12 @@ func (s *GameStats) ExhaustiveDrawNotenCount() int {
 func (s *GameStats) ExhaustiveDrawTenpaiTurnFreq(turnKey string) (int, bool) {
 	freq, ok := s.RyukyokuTenpaiStat.TenpaiTurnDistribution[turnKey]
 	return freq, ok
+}
+
+func (s *GameStats) YamitenCounts(remainTurns int, numMelds int) (int, int, bool) {
+	stat, ok := s.YamitenStats[fmt.Sprintf("%d,%d", remainTurns, numMelds)]
+	if !ok {
+		return 0, 0, false
+	}
+	return stat.Total, stat.Tenpai, true
 }

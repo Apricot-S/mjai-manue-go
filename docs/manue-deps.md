@@ -20,7 +20,9 @@ type ManueAgentDeps struct {
 // agent after validation.
 type ManueStats interface {
     WinScoreStats
+    RoundEndStats
     DrawTenpaiStats
+    TenpaiEstimatorStats
 }
 
 type WinScoreStats interface {
@@ -30,13 +32,22 @@ type WinScoreStats interface {
     DealerWinPointFreqs() map[string]int
 }
 
+type RoundEndStats interface {
+    TurnDistribution() []float64
+    ExhaustiveDrawRatio() float64
+}
+
 type DrawTenpaiStats interface {
     ExhaustiveDrawNotenCount() int
     ExhaustiveDrawTenpaiTurnFreq(turnKey string) (freq int, ok bool)
 }
+
+type TenpaiEstimatorStats interface {
+    YamitenCounts(remainTurns int, numMelds int) (total int, tenpai int, ok bool)
+}
 ```
 
-`configs.GameStats` は上記の `WinScoreStats` / `DrawTenpaiStats` を構造的に満たす getter を持つ。これにより、AI package は `configs` を import せず、外側の組み立て側だけが `configs.LoadGameStats()` の戻り値を deps に渡せる。
+`configs.GameStats` は上記の `WinScoreStats` / `RoundEndStats` / `DrawTenpaiStats` / `TenpaiEstimatorStats` を構造的に満たす getter を持つ。これにより、AI package は `configs` を import せず、外側の組み立て側だけが `configs.LoadGameStats()` の戻り値を deps に渡せる。
 
 ## Planned Split
 
@@ -57,7 +68,7 @@ type ManueStats interface {
 
 ```go
 type RoundEndStats interface {
-    NumTurnsDistribution() []float64
+    TurnDistribution() []float64
     ExhaustiveDrawRatio() float64
 }
 
@@ -75,6 +86,8 @@ type DealInStats interface {
 ```
 
 `YamitenStat` や `RyukyokuTenpaiStat` のような config schema 型をそのまま AI interface で返すことは避ける。AI が使う値に寄せた getter にすることで、config の JSON 構造変更や分割の影響を狭くする。
+
+CoffeeScript 版には `ManueAI#getTenpaiProb` と `TenpaiProbEstimator#estimate` の重複実装があるが、Go 版では `TenpaiEstimatorStats` を通した共通関数へ一本化する。差し替えは stats interface の実装差し替えで行い、別の estimator deps は特徴量ベース推定が必要になった時点で追加する。
 
 ## Stats Validation
 

@@ -2,6 +2,7 @@ package ai
 
 import (
 	"fmt"
+	"math"
 	"strconv"
 
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/round"
@@ -115,6 +116,69 @@ func randomWinScoreDeltaDistFromStats(
 	)
 }
 
+func exhaustiveDrawProb(stats RoundEndStats, currentTurn float64) (float64, error) {
+	currentTurnIndex := int(currentTurn)
+	turnDistribution := stats.TurnDistribution()
+	if currentTurnIndex < 0 || currentTurnIndex >= numTurnDistributionEntries {
+		return 0, fmt.Errorf("cannot estimate exhaustive-draw probability: current turn is out of range")
+	}
+
+	remainingProb := 0.0
+	for _, prob := range turnDistribution[currentTurnIndex:] {
+		remainingProb += prob
+	}
+	if remainingProb <= 0 {
+		return 0, fmt.Errorf("cannot estimate exhaustive-draw probability: remaining turn probability must be positive")
+	}
+	return stats.ExhaustiveDrawRatio() / remainingProb, nil
+}
+
+func exhaustiveDrawProbOnSelfNoWin(stats RoundEndStats, currentTurn float64) (float64, error) {
+	prob, err := exhaustiveDrawProb(stats, currentTurn)
+	if err != nil {
+		return 0, err
+	}
+	return math.Pow(prob, 3.0/4.0), nil
+}
+
+func expectedRemainingTurns(stats RoundEndStats, currentTurn float64) (int, error) {
+	currentTurnIndex := int(math.Round(currentTurn))
+	if currentTurnIndex < 0 || currentTurnIndex >= numTurnDistributionEntries {
+		return 0, fmt.Errorf("cannot estimate expected remaining turns: current turn is out of range")
+	}
+
+	turnDistribution := stats.TurnDistribution()
+	num := 0.0
+	den := 0.0
+	for i := currentTurnIndex; i < numTurnDistributionEntries; i++ {
+		prob := turnDistribution[i]
+		num += prob * (float64(i) - math.Round(currentTurn) + 0.5)
+		den += prob
+	}
+	if den == 0 {
+		return 0, nil
+	}
+	return int(math.Round(num / den)), nil
+}
+
+func tenpaiProb(stats TenpaiEstimatorStats, riichi bool, remainTurns int, numMelds int) (float64, error) {
+	if riichi {
+		return 1.0, nil
+	}
+
+	total, tenpai, ok := stats.YamitenCounts(remainTurns, numMelds)
+	if !ok {
+		return 1.0, nil
+	}
+	if total <= 0 {
+		return 0, fmt.Errorf("cannot estimate tenpai probability: yamiten total must be positive")
+	}
+	if tenpai < 0 || tenpai > total {
+		return 0, fmt.Errorf("cannot estimate tenpai probability: yamiten tenpai must be between 0 and total")
+	}
+	return float64(tenpai) / float64(total), nil
+}
+
 // notenExhaustiveDrawTenpaiProb returns the probability that a currently
 // noten player reaches tenpai before exhaustive draw, conditional on the round
 // ending by exhaustive draw.
@@ -139,6 +203,18 @@ func notenExhaustiveDrawTenpaiProb(stats DrawTenpaiStats, currentTurn float64) (
 		return 0, fmt.Errorf("cannot estimate exhaustive-draw tenpai probability: frequency total must be positive")
 	}
 	return float64(tenpaiFreq) / float64(totalFreq), nil
+}
+
+// exhaustiveDrawTenpaiProbs adjusts current tenpai probabilities into
+// exhaustive-draw tenpai probabilities. It keeps the current tenpai probability
+// and adds the chance that a currently noten player reaches tenpai before
+// exhaustive draw.
+func exhaustiveDrawTenpaiProbs(currentTenpaiProbs [4]float64, notenTenpaiProb float64) [4]float64 {
+	var probs [4]float64
+	for playerID, currentTenpaiProb := range currentTenpaiProbs {
+		probs[playerID] = currentTenpaiProb + (1.0-currentTenpaiProb)*notenTenpaiProb
+	}
+	return probs
 }
 
 // ryukyokuScoreDelta returns the score change vector for exhaustive draw
@@ -168,6 +244,17 @@ func ryukyokuScoreDeltaDist(tenpaiProbs [4]float64) scoreDeltaProbDist {
 	return tenpaisDist.mapValueScoreDelta(func(tenpais aheadVector) scoreDelta {
 		return ryukyokuScoreDelta(aheadVectorToBoolArray(tenpais))
 	})
+}
+
+func exhaustiveDrawScoreDeltaDist(
+	currentTenpaiProbs [4]float64,
+	notenTenpaiProb float64,
+) scoreDeltaProbDist {
+	return ryukyokuScoreDeltaDist(exhaustiveDrawTenpaiProbs(currentTenpaiProbs, notenTenpaiProb))
+}
+
+func exhaustiveDrawAvgPts(selfID int, tenpaiProbs [4]float64) float64 {
+	return ryukyokuScoreDeltaDist(tenpaiProbs).expected()[selfID]
 }
 
 func aheadVectorToBoolArray(value aheadVector) [4]bool {

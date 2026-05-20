@@ -171,6 +171,149 @@ func TestRandomWinScoreDeltaDistFromStats_ReturnsErrorWithInvalidNumWins(t *test
 	}
 }
 
+func TestExhaustiveDrawProb(t *testing.T) {
+	got, err := exhaustiveDrawProb(stubManueStats{
+		turnDistribution:    []float64{0.1, 0.2, 0.3, 0.4},
+		exhaustiveDrawRatio: 0.27,
+	}, 2.75)
+	if err != nil {
+		t.Fatalf("exhaustiveDrawProb() failed: %v", err)
+	}
+
+	want := 0.27 / 0.7
+	if !almostEqual(got, want) {
+		t.Errorf("exhaustiveDrawProb() = %v, want %v", got, want)
+	}
+}
+
+func TestExhaustiveDrawProb_ReturnsErrorWithOutOfRangeTurn(t *testing.T) {
+	_, err := exhaustiveDrawProb(stubManueStats{
+		turnDistribution:    []float64{0.1},
+		exhaustiveDrawRatio: 0.1,
+	}, 1)
+	if err == nil {
+		t.Fatal("exhaustiveDrawProb() succeeded unexpectedly")
+	}
+}
+
+func TestExhaustiveDrawProbOnSelfNoWin(t *testing.T) {
+	got, err := exhaustiveDrawProbOnSelfNoWin(stubManueStats{
+		turnDistribution:    []float64{0.25, 0.75},
+		exhaustiveDrawRatio: 0.25,
+	}, 0)
+	if err != nil {
+		t.Fatalf("exhaustiveDrawProbOnSelfNoWin() failed: %v", err)
+	}
+
+	want := 0.35355339059327373
+	if !almostEqual(got, want) {
+		t.Errorf("exhaustiveDrawProbOnSelfNoWin() = %v, want %v", got, want)
+	}
+}
+
+func TestExpectedRemainingTurns(t *testing.T) {
+	got, err := expectedRemainingTurns(stubManueStats{
+		turnDistribution: []float64{
+			0,
+			0,
+			0,
+			0.2,
+			0.3,
+			0.5,
+			0,
+			0,
+			0,
+			0,
+			0,
+			0,
+			0,
+			0,
+			0,
+			0,
+			0,
+			0,
+		},
+	}, 3.2)
+	if err != nil {
+		t.Fatalf("expectedRemainingTurns() failed: %v", err)
+	}
+
+	if got != 2 {
+		t.Errorf("expectedRemainingTurns() = %v, want 2", got)
+	}
+}
+
+func TestExpectedRemainingTurns_ReturnsZeroWithoutRemainingTurnProb(t *testing.T) {
+	got, err := expectedRemainingTurns(stubManueStats{
+		turnDistribution: fullTurnDistribution(0),
+	}, 3)
+	if err != nil {
+		t.Fatalf("expectedRemainingTurns() failed: %v", err)
+	}
+
+	if got != 0 {
+		t.Errorf("expectedRemainingTurns() = %v, want 0", got)
+	}
+}
+
+func TestExpectedRemainingTurns_ReturnsErrorWithOutOfRangeTurn(t *testing.T) {
+	_, err := expectedRemainingTurns(stubManueStats{
+		turnDistribution: fullTurnDistribution(0.1),
+	}, 18)
+	if err == nil {
+		t.Fatal("expectedRemainingTurns() succeeded unexpectedly")
+	}
+}
+
+func TestTenpaiProb_ReturnsOneWithRiichi(t *testing.T) {
+	got, err := tenpaiProb(stubManueStats{}, true, 10, 0)
+	if err != nil {
+		t.Fatalf("tenpaiProb() failed: %v", err)
+	}
+
+	if got != 1.0 {
+		t.Errorf("tenpaiProb() = %v, want 1", got)
+	}
+}
+
+func TestTenpaiProb_ReturnsYamitenRatio(t *testing.T) {
+	got, err := tenpaiProb(stubManueStats{
+		yamitenCounts: map[string]yamitenCount{
+			"10,2": {total: 20, tenpai: 5},
+		},
+	}, false, 10, 2)
+	if err != nil {
+		t.Fatalf("tenpaiProb() failed: %v", err)
+	}
+
+	want := 0.25
+	if got != want {
+		t.Errorf("tenpaiProb() = %v, want %v", got, want)
+	}
+}
+
+func TestTenpaiProb_ReturnsOneWithoutStats(t *testing.T) {
+	got, err := tenpaiProb(stubManueStats{}, false, 10, 2)
+	if err != nil {
+		t.Fatalf("tenpaiProb() failed: %v", err)
+	}
+
+	if got != 1.0 {
+		t.Errorf("tenpaiProb() = %v, want 1", got)
+	}
+}
+
+func TestTenpaiProb_ReturnsErrorWithInvalidYamitenCounts(t *testing.T) {
+	_, err := tenpaiProb(stubManueStats{
+		yamitenCounts: map[string]yamitenCount{
+			"10,2": {total: 0, tenpai: 0},
+		},
+	}, false, 10, 2)
+	if err == nil {
+		t.Fatal("tenpaiProb() succeeded unexpectedly")
+	}
+}
+
 func TestNotenExhaustiveDrawTenpaiProb(t *testing.T) {
 	got, err := notenExhaustiveDrawTenpaiProb(stubManueStats{
 		exhaustiveDrawNotenCount: 100,
@@ -258,6 +401,14 @@ func TestNotenExhaustiveDrawTenpaiProb_ReturnsErrorWithoutFreqs(t *testing.T) {
 	}
 }
 
+func TestExhaustiveDrawTenpaiProbs(t *testing.T) {
+	got := exhaustiveDrawTenpaiProbs([4]float64{0, 0.25, 0.5, 1}, 0.4)
+	want := [4]float64{0.4, 0.55, 0.7, 1}
+	if got != want {
+		t.Errorf("exhaustiveDrawTenpaiProbs() = %v, want %v", got, want)
+	}
+}
+
 func TestRyukyokuScoreDelta(t *testing.T) {
 	got := ryukyokuScoreDelta([4]bool{true, false, true, false})
 	want := scoreDelta{1500, -1500, 1500, -1500}
@@ -273,4 +424,18 @@ func TestRyukyokuScoreDeltaDist(t *testing.T) {
 		{1500, -1500, 1500, -1500}:  0.5,
 	}
 	assertScoreDeltaProbDist(t, got, want)
+}
+
+func TestExhaustiveDrawScoreDeltaDist(t *testing.T) {
+	got := exhaustiveDrawScoreDeltaDist([4]float64{1, 0, 0.5, 0}, 0.5)
+	want := ryukyokuScoreDeltaDist([4]float64{1, 0.5, 0.75, 0.5})
+	assertScoreDeltaProbDist(t, got, want)
+}
+
+func TestExhaustiveDrawAvgPts(t *testing.T) {
+	got := exhaustiveDrawAvgPts(0, [4]float64{1, 0, 0.5, 0})
+	want := 2250.0
+	if got != want {
+		t.Errorf("exhaustiveDrawAvgPts() = %v, want %v", got, want)
+	}
 }

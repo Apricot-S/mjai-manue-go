@@ -83,6 +83,42 @@ func TestValidateWinScoreStats_ReturnsErrorWithInvalidPointFreqs(t *testing.T) {
 	}
 }
 
+func TestValidateRoundEndStats_ReturnsErrorWithInvalidTurnDistributionLength(t *testing.T) {
+	stats := validStubManueStats()
+	stats.turnDistribution = stats.turnDistribution[:numTurnDistributionEntries-1]
+
+	if err := validateRoundEndStats(stats); err == nil {
+		t.Fatal("validateRoundEndStats() succeeded unexpectedly")
+	}
+}
+
+func TestValidateRoundEndStats_ReturnsErrorWithNegativeTurnProb(t *testing.T) {
+	stats := validStubManueStats()
+	stats.turnDistribution[1] = -0.1
+
+	if err := validateRoundEndStats(stats); err == nil {
+		t.Fatal("validateRoundEndStats() succeeded unexpectedly")
+	}
+}
+
+func TestValidateRoundEndStats_ReturnsErrorWithInvalidExhaustiveDrawRatio(t *testing.T) {
+	stats := validStubManueStats()
+	stats.exhaustiveDrawRatio = -0.1
+
+	if err := validateRoundEndStats(stats); err == nil {
+		t.Fatal("validateRoundEndStats() succeeded unexpectedly")
+	}
+}
+
+func TestValidateRoundEndStats_ReturnsErrorWhenExhaustiveDrawRatioExceedsTotal(t *testing.T) {
+	stats := validStubManueStats()
+	stats.exhaustiveDrawRatio = 2
+
+	if err := validateRoundEndStats(stats); err == nil {
+		t.Fatal("validateRoundEndStats() succeeded unexpectedly")
+	}
+}
+
 func TestValidateDrawTenpaiStats_ReturnsErrorWithNegativeNotenCount(t *testing.T) {
 	stats := validStubManueStats()
 	stats.exhaustiveDrawNotenCount = -1
@@ -122,6 +158,37 @@ func TestValidateDrawTenpaiStats_ReturnsErrorWithoutFreqs(t *testing.T) {
 	}
 }
 
+func TestValidateTenpaiEstimatorStats_ReturnsErrorWithInvalidYamitenCounts(t *testing.T) {
+	tests := []struct {
+		name  string
+		count yamitenCount
+	}{
+		{
+			name:  "invalid total",
+			count: yamitenCount{total: 0, tenpai: 0},
+		},
+		{
+			name:  "negative tenpai",
+			count: yamitenCount{total: 10, tenpai: -1},
+		},
+		{
+			name:  "too many tenpai",
+			count: yamitenCount{total: 10, tenpai: 11},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			stats := validStubManueStats()
+			stats.yamitenCounts["1,0"] = tt.count
+
+			if err := validateTenpaiEstimatorStats(stats); err == nil {
+				t.Fatal("validateTenpaiEstimatorStats() succeeded unexpectedly")
+			}
+		})
+	}
+}
+
 func validStubManueStats() stubManueStats {
 	return stubManueStats{
 		numWins:         10,
@@ -136,9 +203,22 @@ func validStubManueStats() stubManueStats {
 			"3000":  2,
 			"total": 3,
 		},
+		turnDistribution:              fullTurnDistribution(0.01),
+		exhaustiveDrawRatio:           0.1,
 		exhaustiveDrawNotenCount:      100,
 		exhaustiveDrawTenpaiTurnFreqs: fullTurnFreqs(1),
+		yamitenCounts: map[string]yamitenCount{
+			"1,0": {total: 10, tenpai: 3},
+		},
 	}
+}
+
+func fullTurnDistribution(prob float64) []float64 {
+	distribution := make([]float64, numTurnDistributionEntries)
+	for i := range distribution {
+		distribution[i] = prob
+	}
+	return distribution
 }
 
 func fullTurnFreqs(freq int) map[string]int {

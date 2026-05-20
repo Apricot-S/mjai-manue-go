@@ -23,7 +23,9 @@ type ManueAgentDeps struct {
 // agent after validation.
 type ManueStats interface {
 	WinScoreStats
+	RoundEndStats
 	DrawTenpaiStats
+	TenpaiEstimatorStats
 }
 
 type WinScoreStats interface {
@@ -31,6 +33,15 @@ type WinScoreStats interface {
 	NumSelfDrawWins() int
 	NonDealerWinPointFreqs() map[string]int
 	DealerWinPointFreqs() map[string]int
+}
+
+type RoundEndStats interface {
+	TurnDistribution() []float64
+	ExhaustiveDrawRatio() float64
+}
+
+type TenpaiEstimatorStats interface {
+	YamitenCounts(remainTurns int, numMelds int) (total int, tenpai int, ok bool)
 }
 
 type DrawTenpaiStats interface {
