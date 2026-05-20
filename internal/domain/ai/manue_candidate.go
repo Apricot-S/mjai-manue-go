@@ -99,6 +99,9 @@ func getSelfTurnCandidates(actions []action.Action, self player.PlayerViewer) ([
 		return nil, fmt.Errorf("cannot build self-turn candidates: %w", err)
 	}
 
+	// Self-turn candidates currently cover discard and riichi+discard only.
+	// Concealed kan, promoted kan, and kyushukyuhai are intentionally not
+	// selected.
 	riichi := firstActionOfType[*action.Riichi](actions)
 	var candidates []actionCandidate
 	for _, a := range actions {

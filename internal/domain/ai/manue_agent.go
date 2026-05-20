@@ -68,11 +68,12 @@ func (a *ManueAgent) Decide(request Request) (Decision, error) {
 		return Decision{}, fmt.Errorf("cannot decide: no legal actions for player %d", request.Self.Index())
 	}
 
-	self := request.Round.Player(request.Self)
 	if win := firstActionOfType[*action.Win](legalActions); win != nil {
+		// Always take a winning action when it is legal.
+		// The current policy does not allow passing on win opportunities.
 		return Decision{Action: win}, nil
 	}
-	if self.CanDiscard() {
+	if self := request.Round.Player(request.Self); self.CanDiscard() {
 		return a.decideSelfTurn(legalActions, self)
 	}
 	return a.decideOtherDiscardReaction(legalActions)
@@ -80,6 +81,8 @@ func (a *ManueAgent) Decide(request Request) (Decision, error) {
 
 func (*ManueAgent) decideSelfTurn(legalActions []action.Action, self player.PlayerViewer) (Decision, error) {
 	if self.RiichiState() == player.RiichiAccepted {
+		// After riichi is accepted, always discard the drawn tile.
+		// Concealed kan is intentionally ignored even if it is legal.
 		if discard := tsumogiriDiscard(legalActions); discard != nil {
 			return Decision{Action: discard}, nil
 		}
@@ -138,7 +141,7 @@ func tsumogiriDiscard(actions []action.Action) *action.Discard {
 func firstCallAction(actions []action.Action) action.Action {
 	for _, a := range actions {
 		switch a.(type) {
-		case *action.Chii, *action.Pon, *action.CalledKan, *action.PromotedKan, *action.ConcealedKan:
+		case *action.Chii, *action.Pon, *action.CalledKan:
 			return a
 		}
 	}
