@@ -12,7 +12,7 @@ func TestLoadGameStats(t *testing.T) {
 
 	got, err := LoadGameStats()
 	if err != nil {
-		t.Errorf("LoadGameStats() error = %v", err)
+		t.Fatalf("LoadGameStats() error = %v", err)
 		return
 	}
 
@@ -66,6 +66,14 @@ func TestLoadGameStats(t *testing.T) {
 	if math.Abs(got.WinProbsMap["E1,0,1"]["0"]-0.49478259990894036) > epsilon {
 		t.Errorf("LoadGameStats().WinProbsMap[\"E1,0,1\"][\"0\"] = %v, want %v", got.WinProbsMap["E1,0,1"]["0"], 0.49478259990894036)
 	}
+}
+
+func TestGameStats_WinScoreStats(t *testing.T) {
+	got, err := LoadGameStats()
+	if err != nil {
+		t.Fatalf("LoadGameStats() error = %v", err)
+		return
+	}
 
 	var winScoreStats ai.WinScoreStats = got
 	if winScoreStats.NumWins() != got.NumHoras {
@@ -80,26 +88,34 @@ func TestLoadGameStats(t *testing.T) {
 	if winScoreStats.DealerWinPointFreqs()["1500"] != got.OyaHoraPointsFreqs["1500"] {
 		t.Errorf("DealerWinPointFreqs()[\"1500\"] = %v, want %v", winScoreStats.DealerWinPointFreqs()["1500"], got.OyaHoraPointsFreqs["1500"])
 	}
+}
 
-	var manueStats ai.ManueStats = got
-	if manueStats.ExhaustiveDrawNotenCount() != got.RyukyokuTenpaiStat.Noten {
-		t.Errorf("ExhaustiveDrawNotenCount() = %v, want %v", manueStats.ExhaustiveDrawNotenCount(), got.RyukyokuTenpaiStat.Noten)
+func TestGameStats_DrawTenpaiStats(t *testing.T) {
+	got, err := LoadGameStats()
+	if err != nil {
+		t.Fatalf("LoadGameStats() error = %v", err)
+		return
 	}
-	freq, ok := manueStats.ExhaustiveDrawTenpaiTurnFreq("17")
+
+	var drawTenpaiStats ai.DrawTenpaiStats = got
+	if drawTenpaiStats.ExhaustiveDrawNotenCount() != got.RyukyokuTenpaiStat.Noten {
+		t.Errorf("ExhaustiveDrawNotenCount() = %v, want %v", drawTenpaiStats.ExhaustiveDrawNotenCount(), got.RyukyokuTenpaiStat.Noten)
+	}
+	freq, ok := drawTenpaiStats.ExhaustiveDrawTenpaiTurnFreq("17")
 	if !ok {
 		t.Errorf("ExhaustiveDrawTenpaiTurnFreq(\"17\") ok = false, want true")
 	}
 	if freq != got.RyukyokuTenpaiStat.TenpaiTurnDistribution["17"] {
 		t.Errorf("ExhaustiveDrawTenpaiTurnFreq(\"17\") = %v, want %v", freq, got.RyukyokuTenpaiStat.TenpaiTurnDistribution["17"])
 	}
-	freq, ok = manueStats.ExhaustiveDrawTenpaiTurnFreq("0.75")
+	freq, ok = drawTenpaiStats.ExhaustiveDrawTenpaiTurnFreq("0.75")
 	if !ok {
 		t.Errorf("ExhaustiveDrawTenpaiTurnFreq(\"0.75\") ok = false, want true")
 	}
 	if freq != 0 {
 		t.Errorf("ExhaustiveDrawTenpaiTurnFreq(\"0.75\") = %v, want 0", freq)
 	}
-	if _, ok := manueStats.ExhaustiveDrawTenpaiTurnFreq("missing"); ok {
+	if _, ok := drawTenpaiStats.ExhaustiveDrawTenpaiTurnFreq("missing"); ok {
 		t.Errorf("ExhaustiveDrawTenpaiTurnFreq(\"missing\") ok = true, want false")
 	}
 }
