@@ -228,9 +228,9 @@ func ryukyokuScoreDelta(tenpais [4]bool) scoreDelta {
 	return delta
 }
 
-// ryukyokuScoreDeltaDist returns the score change distribution assuming the
-// round ends in an exhaustive draw.
-func ryukyokuScoreDeltaDist(tenpaiProbs [4]float64) scoreDeltaProbDist {
+// exhaustiveDrawScoreDeltaDistFromTenpaiProbs returns the score change
+// distribution assuming the round ends in an exhaustive draw.
+func exhaustiveDrawScoreDeltaDistFromTenpaiProbs(tenpaiProbs [4]float64) scoreDeltaProbDist {
 	tenpaisDist := aheadVectorProbDist{{}: 1.0}
 	for playerID, tenpaiProb := range tenpaiProbs {
 		var tenpais aheadVector
@@ -246,15 +246,22 @@ func ryukyokuScoreDeltaDist(tenpaiProbs [4]float64) scoreDeltaProbDist {
 	})
 }
 
-func exhaustiveDrawScoreDeltaDist(
+// futureExhaustiveDrawScoreDeltaDist returns the exhaustive-draw score change
+// distribution from current tenpai probabilities. It first adjusts current
+// tenpai probabilities by the chance that currently noten players reach tenpai
+// before exhaustive draw.
+func futureExhaustiveDrawScoreDeltaDist(
 	currentTenpaiProbs [4]float64,
 	notenTenpaiProb float64,
 ) scoreDeltaProbDist {
-	return ryukyokuScoreDeltaDist(exhaustiveDrawTenpaiProbs(currentTenpaiProbs, notenTenpaiProb))
+	return exhaustiveDrawScoreDeltaDistFromTenpaiProbs(exhaustiveDrawTenpaiProbs(currentTenpaiProbs, notenTenpaiProb))
 }
 
+// exhaustiveDrawAvgPts returns self's expected score change assuming the round
+// ends in an exhaustive draw and tenpaiProbs already represent exhaustive-draw
+// tenpai probabilities.
 func exhaustiveDrawAvgPts(selfID int, tenpaiProbs [4]float64) float64 {
-	return ryukyokuScoreDeltaDist(tenpaiProbs).expected()[selfID]
+	return exhaustiveDrawScoreDeltaDistFromTenpaiProbs(tenpaiProbs).expected()[selfID]
 }
 
 func aheadVectorToBoolArray(value aheadVector) [4]bool {
