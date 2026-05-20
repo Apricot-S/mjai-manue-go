@@ -20,6 +20,7 @@ type ManueAgentDeps struct {
 
 type ManueStats interface {
 	WinScoreStats
+	DrawTenpaiStats
 }
 
 type WinScoreStats interface {
@@ -27,6 +28,11 @@ type WinScoreStats interface {
 	NumSelfDrawWins() int
 	NonDealerWinPointFreqs() map[string]int
 	DealerWinPointFreqs() map[string]int
+}
+
+type DrawTenpaiStats interface {
+	ExhaustiveDrawNotenCount() int
+	ExhaustiveDrawTenpaiTurnFreq(turnKey string) (freq int, ok bool)
 }
 
 func NewManueAgent(seed uint64) *ManueAgent {

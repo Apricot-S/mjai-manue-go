@@ -66,3 +66,12 @@ func (s *GameStats) NonDealerWinPointFreqs() map[string]int {
 func (s *GameStats) DealerWinPointFreqs() map[string]int {
 	return s.OyaHoraPointsFreqs
 }
+
+func (s *GameStats) ExhaustiveDrawNotenCount() int {
+	return s.RyukyokuTenpaiStat.Noten
+}
+
+func (s *GameStats) ExhaustiveDrawTenpaiTurnFreq(turnKey string) (int, bool) {
+	freq, ok := s.RyukyokuTenpaiStat.TenpaiTurnDistribution[turnKey]
+	return freq, ok
+}

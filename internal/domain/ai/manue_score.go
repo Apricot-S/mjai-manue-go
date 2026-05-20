@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"strconv"
 
+	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/round"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/round/service"
 )
 
@@ -115,6 +116,36 @@ func randomWinScoreDeltaDistFromStats(
 		float64(stats.NumSelfDrawWins())/float64(stats.NumWins()),
 		pointFreqs,
 	)
+}
+
+// notenExhaustiveDrawTenpaiProb returns the probability that a currently
+// noten player reaches tenpai before exhaustive draw, conditional on the round
+// ending by exhaustive draw.
+func notenExhaustiveDrawTenpaiProb(stats DrawTenpaiStats, currentTurn float64) (float64, error) {
+	if stats == nil {
+		return 0, fmt.Errorf("cannot estimate exhaustive-draw tenpai probability: stats is nil")
+	}
+
+	notenFreq := stats.ExhaustiveDrawNotenCount()
+	if notenFreq < 0 {
+		return 0, fmt.Errorf("cannot estimate exhaustive-draw tenpai probability: noten count must be non-negative")
+	}
+
+	tenpaiFreq := 0
+	for turn := currentTurn + 0.25; turn <= round.FinalTurn; turn += 0.25 {
+		key := strconv.FormatFloat(turn, 'f', -1, 64)
+		freq, ok := stats.ExhaustiveDrawTenpaiTurnFreq(key)
+		if !ok {
+			return 0, fmt.Errorf("cannot estimate exhaustive-draw tenpai probability: missing tenpai turn frequency for turn %s", key)
+		}
+		tenpaiFreq += freq
+	}
+
+	totalFreq := tenpaiFreq + notenFreq
+	if totalFreq <= 0 {
+		return 0, fmt.Errorf("cannot estimate exhaustive-draw tenpai probability: frequency total must be positive")
+	}
+	return float64(tenpaiFreq) / float64(totalFreq), nil
 }
 
 // ryukyokuScoreDelta returns the score change vector for exhaustive draw

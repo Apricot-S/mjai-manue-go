@@ -178,6 +178,100 @@ func TestRandomWinScoreDeltaDistFromStats_ReturnsErrorWithInvalidNumWins(t *test
 	}
 }
 
+func TestNotenExhaustiveDrawTenpaiProb(t *testing.T) {
+	got, err := notenExhaustiveDrawTenpaiProb(stubManueStats{
+		exhaustiveDrawNotenCount: 100,
+		exhaustiveDrawTenpaiTurnFreqs: map[string]int{
+			"16.25": 30,
+			"16.5":  20,
+			"16.75": 10,
+			"17":    40,
+			"17.25": 0,
+			"17.5":  0,
+		},
+	}, 16)
+	if err != nil {
+		t.Fatalf("notenExhaustiveDrawTenpaiProb() failed: %v", err)
+	}
+
+	want := 0.5
+	if got != want {
+		t.Errorf("notenExhaustiveDrawTenpaiProb() = %v, want %v", got, want)
+	}
+}
+
+func TestNotenExhaustiveDrawTenpaiProb_UsesFutureTurnsOnly(t *testing.T) {
+	got, err := notenExhaustiveDrawTenpaiProb(stubManueStats{
+		exhaustiveDrawNotenCount: 100,
+		exhaustiveDrawTenpaiTurnFreqs: map[string]int{
+			"15.75": 1000,
+			"16":    1000,
+			"16.25": 100,
+			"16.5":  0,
+			"16.75": 0,
+			"17":    0,
+			"17.25": 0,
+			"17.5":  0,
+		},
+	}, 16)
+	if err != nil {
+		t.Fatalf("notenExhaustiveDrawTenpaiProb() failed: %v", err)
+	}
+
+	want := 0.5
+	if got != want {
+		t.Errorf("notenExhaustiveDrawTenpaiProb() = %v, want %v", got, want)
+	}
+}
+
+func TestNotenExhaustiveDrawTenpaiProb_AllowsExistingZeroFreq(t *testing.T) {
+	got, err := notenExhaustiveDrawTenpaiProb(stubManueStats{
+		exhaustiveDrawNotenCount: 100,
+		exhaustiveDrawTenpaiTurnFreqs: map[string]int{
+			"16.25": 0,
+			"16.5":  100,
+			"16.75": 0,
+			"17":    0,
+			"17.25": 0,
+			"17.5":  0,
+		},
+	}, 16)
+	if err != nil {
+		t.Fatalf("notenExhaustiveDrawTenpaiProb() failed: %v", err)
+	}
+
+	want := 0.5
+	if got != want {
+		t.Errorf("notenExhaustiveDrawTenpaiProb() = %v, want %v", got, want)
+	}
+}
+
+func TestNotenExhaustiveDrawTenpaiProb_ReturnsErrorWithMissingTurnFreq(t *testing.T) {
+	_, err := notenExhaustiveDrawTenpaiProb(stubManueStats{
+		exhaustiveDrawNotenCount: 100,
+		exhaustiveDrawTenpaiTurnFreqs: map[string]int{
+			"16.25": 100,
+		},
+	}, 16)
+	if err == nil {
+		t.Fatal("notenExhaustiveDrawTenpaiProb() succeeded unexpectedly")
+	}
+}
+
+func TestNotenExhaustiveDrawTenpaiProb_ReturnsErrorWithoutStats(t *testing.T) {
+	_, err := notenExhaustiveDrawTenpaiProb(nil, 16)
+	if err == nil {
+		t.Fatal("notenExhaustiveDrawTenpaiProb() succeeded unexpectedly")
+	}
+}
+
+func TestNotenExhaustiveDrawTenpaiProb_ReturnsErrorWithoutFreqs(t *testing.T) {
+	_, err := notenExhaustiveDrawTenpaiProb(stubManueStats{}, 16)
+	if err == nil {
+		t.Fatal("notenExhaustiveDrawTenpaiProb() succeeded unexpectedly")
+	}
+}
+
 func TestRyukyokuScoreDelta(t *testing.T) {
 	got := ryukyokuScoreDelta([4]bool{true, false, true, false})
 	want := scoreDelta{1500, -1500, 1500, -1500}
@@ -196,10 +290,12 @@ func TestRyukyokuScoreDeltaDist(t *testing.T) {
 }
 
 type stubManueStats struct {
-	numWins                int
-	numSelfDrawWins        int
-	nonDealerWinPointFreqs map[string]int
-	dealerWinPointFreqs    map[string]int
+	numWins                       int
+	numSelfDrawWins               int
+	nonDealerWinPointFreqs        map[string]int
+	dealerWinPointFreqs           map[string]int
+	exhaustiveDrawNotenCount      int
+	exhaustiveDrawTenpaiTurnFreqs map[string]int
 }
 
 func (s stubManueStats) NumWins() int {
@@ -216,4 +312,13 @@ func (s stubManueStats) NonDealerWinPointFreqs() map[string]int {
 
 func (s stubManueStats) DealerWinPointFreqs() map[string]int {
 	return s.dealerWinPointFreqs
+}
+
+func (s stubManueStats) ExhaustiveDrawNotenCount() int {
+	return s.exhaustiveDrawNotenCount
+}
+
+func (s stubManueStats) ExhaustiveDrawTenpaiTurnFreq(turnKey string) (int, bool) {
+	freq, ok := s.exhaustiveDrawTenpaiTurnFreqs[turnKey]
+	return freq, ok
 }

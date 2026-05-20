@@ -6,7 +6,7 @@
 
 ## Current Interfaces
 
-現時点で実装している読み口は、ランダム和了時の score change 分布に必要なものだけ。
+現時点で実装している読み口は、ランダム和了時の score change 分布と流局時聴牌確率の基礎計算に必要なものだけ。
 
 ```go
 func NewManueAgentWithDeps(seed uint64, deps ManueAgentDeps) *ManueAgent
@@ -17,6 +17,7 @@ type ManueAgentDeps struct {
 
 type ManueStats interface {
     WinScoreStats
+    DrawTenpaiStats
 }
 
 type WinScoreStats interface {
@@ -25,9 +26,14 @@ type WinScoreStats interface {
     NonDealerWinPointFreqs() map[string]int
     DealerWinPointFreqs() map[string]int
 }
+
+type DrawTenpaiStats interface {
+    ExhaustiveDrawNotenCount() int
+    ExhaustiveDrawTenpaiTurnFreq(turnKey string) (freq int, ok bool)
+}
 ```
 
-`configs.GameStats` は上記の `WinScoreStats` を構造的に満たす getter を持つ。これにより、AI package は `configs` を import せず、外側の組み立て側だけが `configs.LoadGameStats()` の戻り値を deps に渡せる。
+`configs.GameStats` は上記の `WinScoreStats` / `DrawTenpaiStats` を構造的に満たす getter を持つ。これにより、AI package は `configs` を import せず、外側の組み立て側だけが `configs.LoadGameStats()` の戻り値を deps に渡せる。
 
 ## Planned Split
 
@@ -37,7 +43,8 @@ type WinScoreStats interface {
 type ManueStats interface {
     WinScoreStats
     RoundEndStats
-    TenpaiStats
+    DrawTenpaiStats
+    TenpaiEstimatorStats
     RankStats
     DealInStats
 }
@@ -51,10 +58,8 @@ type RoundEndStats interface {
     ExhaustiveDrawRatio() float64
 }
 
-type TenpaiStats interface {
+type TenpaiEstimatorStats interface {
     YamitenCounts(remainTurns int, numMelds int) (total int, tenpai int, ok bool)
-    ExhaustiveDrawNotenCount() int
-    ExhaustiveDrawTenpaiTurnCount(turnKey string) int
 }
 
 type RankStats interface {
