@@ -15,6 +15,9 @@ type ManueAgentDeps struct {
     Stats ManueStats
 }
 
+// ManueStats provides read-only access to immutable statistical data used by
+// ManueAgent. Implementations must return stable values for the lifetime of the
+// agent after validation.
 type ManueStats interface {
     WinScoreStats
     DrawTenpaiStats
@@ -72,6 +75,16 @@ type DealInStats interface {
 ```
 
 `YamitenStat` や `RyukyokuTenpaiStat` のような config schema 型をそのまま AI interface で返すことは避ける。AI が使う値に寄せた getter にすることで、config の JSON 構造変更や分割の影響を狭くする。
+
+## Stats Validation
+
+stats はゲーム中に変化しない静的データなので、値の正当性は評価計算のたびに確認するのではなく、deps を組み立てる段階で一度検証する方針にする。これにより、壊れた設定値は早期に「設定ロード/組み立ての失敗」として検出でき、候補評価中の重複チェックも後から減らせる。
+
+現時点では private な `validateManueStats(stats ManueStats) error` を純粋関数として追加し、`NewManueAgentWithDeps` にはまだ組み込まない。`NewManueAgent(seed)` は configs 非依存の CLI 起動経路として残しており、stats が実際に必須になった段階で deps 付き constructor の error 返却や validation 組み込みを検討する。
+
+validation は、`NumWins() > 0`、自摸和了数が和了数の範囲内であること、和了点頻度の `total` が正で点数 key が parse 可能であること、流局時聴牌確率に必要な turn key が存在すること、流局ノーテン数が非負であることなど、静的 stats の構造・範囲を対象にする。一方で actor/dealer ID や `currentTurn` のような呼び出しごとの引数 validation は、必要に応じて計算関数側に残す。
+
+計算関数内に既にある stats 関連チェックは、validation 関数を追加した直後には無理に削らない。stats が Agent 作成時 validation を通る経路に一本化された後で、重複しているチェックを整理する。
 
 ## LightGameStats
 

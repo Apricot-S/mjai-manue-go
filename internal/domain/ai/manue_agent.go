@@ -18,6 +18,9 @@ type ManueAgentDeps struct {
 	Stats ManueStats
 }
 
+// ManueStats provides read-only access to immutable statistical data used by
+// ManueAgent. Implementations must return stable values for the lifetime of the
+// agent after validation.
 type ManueStats interface {
 	WinScoreStats
 	DrawTenpaiStats
