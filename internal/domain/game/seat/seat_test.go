@@ -98,3 +98,51 @@ func TestSeat_IsShimochaOf(t *testing.T) {
 		})
 	}
 }
+
+func TestSeat_DistanceFrom(t *testing.T) {
+	tests := []struct {
+		name string
+		seat seat.Seat
+		base seat.Seat
+		want int
+	}{
+		{
+			name: "same seat",
+			seat: seat.MustSeat(1),
+			base: seat.MustSeat(1),
+			want: 0,
+		},
+		{
+			name: "shimocha",
+			seat: seat.MustSeat(2),
+			base: seat.MustSeat(1),
+			want: 1,
+		},
+		{
+			name: "toimen",
+			seat: seat.MustSeat(3),
+			base: seat.MustSeat(1),
+			want: 2,
+		},
+		{
+			name: "kamicha",
+			seat: seat.MustSeat(0),
+			base: seat.MustSeat(1),
+			want: 3,
+		},
+		{
+			name: "matches index from starting dealer",
+			seat: seat.MustSeat(3),
+			base: seat.MustSeat(0),
+			want: 3,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := tt.seat.DistanceFrom(tt.base); got != tt.want {
+				t.Errorf("DistanceFrom() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}

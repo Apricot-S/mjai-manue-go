@@ -41,7 +41,7 @@ func buildRankOpponents(stats RankStats, state rankStateViewer, self seat.Seat) 
 	nextRoundWind, nextRoundNumber := state.NextRound()
 	scores := state.Scores()
 	startingDealer := state.StartingDealer()
-	selfPosition := rankPosition(self, startingDealer)
+	selfPosition := self.DistanceFrom(startingDealer)
 
 	opponents := make([]rankOpponent, 0, common.NumPlayers-1)
 	for i := range common.NumPlayers {
@@ -49,7 +49,7 @@ func buildRankOpponents(stats RankStats, state rankStateViewer, self seat.Seat) 
 		if opponentSeat == self {
 			continue
 		}
-		opponentPosition := rankPosition(opponentSeat, startingDealer)
+		opponentPosition := opponentSeat.DistanceFrom(startingDealer)
 		opponents = append(opponents, rankOpponent{
 			id:       i,
 			score:    float64(scores[i]),
@@ -58,10 +58,6 @@ func buildRankOpponents(stats RankStats, state rankStateViewer, self seat.Seat) 
 		})
 	}
 	return opponents
-}
-
-func rankPosition(playerSeat seat.Seat, startingDealer seat.Seat) int {
-	return (playerSeat.Index() - startingDealer.Index() + common.NumPlayers) % common.NumPlayers
 }
 
 // averageRank returns self's expected final rank from pairwise win probabilities

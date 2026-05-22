@@ -110,13 +110,6 @@ func TestBuildRankOpponents(t *testing.T) {
 	}
 }
 
-func TestRankPosition(t *testing.T) {
-	got := rankPosition(seat.MustSeat(0), seat.MustSeat(2))
-	if got != 2 {
-		t.Errorf("rankPosition() = %d, want 2", got)
-	}
-}
-
 func TestRelativeWinProbs(t *testing.T) {
 	got := relativeWinProbs(stubManueStats{
 		relativeWinProbs: map[string]map[string]float64{
