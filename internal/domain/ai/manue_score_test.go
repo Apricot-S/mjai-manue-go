@@ -171,6 +171,38 @@ func TestRandomWinScoreDeltaDistFromStats_ReturnsErrorWithInvalidNumWins(t *test
 	}
 }
 
+func TestWinScoreDeltaDistFromPointsDist(t *testing.T) {
+	got, err := winScoreDeltaDistFromPointsDist(1, 0, stubManueStats{
+		numWins:         10,
+		numSelfDrawWins: 4,
+	}, scalarProbDist{
+		1000: 0.25,
+		2000: 0.75,
+	})
+	if err != nil {
+		t.Fatalf("winScoreDeltaDistFromPointsDist() failed: %v", err)
+	}
+
+	want := scoreDeltaProbDist{
+		{-500, 1000, -250, -250}:  0.10,
+		{-1000, 2000, -500, -500}: 0.30,
+		{-1000, 1000, 0, 0}:       0.05,
+		{-2000, 2000, 0, 0}:       0.15,
+		{0, 1000, -1000, 0}:       0.05,
+		{0, 2000, -2000, 0}:       0.15,
+		{0, 1000, 0, -1000}:       0.05,
+		{0, 2000, 0, -2000}:       0.15,
+	}
+	assertScoreDeltaProbDist(t, got, want)
+}
+
+func TestWinScoreDeltaDistFromPointsDist_ReturnsErrorWithInvalidNumWins(t *testing.T) {
+	_, err := winScoreDeltaDistFromPointsDist(0, 0, stubManueStats{}, scalarProbDist{1000: 1})
+	if err == nil {
+		t.Fatal("winScoreDeltaDistFromPointsDist() succeeded unexpectedly")
+	}
+}
+
 func TestExhaustiveDrawProb(t *testing.T) {
 	got, err := exhaustiveDrawProb(stubManueStats{
 		turnDistribution:    []float64{0.1, 0.2, 0.3, 0.4},
@@ -311,6 +343,136 @@ func TestTenpaiProb_ReturnsErrorWithInvalidYamitenCounts(t *testing.T) {
 	}, false, 10, 2)
 	if err == nil {
 		t.Fatal("tenpaiProb() succeeded unexpectedly")
+	}
+}
+
+func TestDealInExpPts(t *testing.T) {
+	got, err := dealInExpPts(stubManueStats{avgWinPts: 5500}, 0.8)
+	if err != nil {
+		t.Fatalf("dealInExpPts() failed: %v", err)
+	}
+
+	want := -1100.0
+	if !almostEqual(got, want) {
+		t.Errorf("dealInExpPts() = %v, want %v", got, want)
+	}
+}
+
+func TestDealInExpPts_ReturnsErrorWithInvalidSafeProb(t *testing.T) {
+	_, err := dealInExpPts(stubManueStats{avgWinPts: 5500}, 1.1)
+	if err == nil {
+		t.Fatal("dealInExpPts() succeeded unexpectedly")
+	}
+}
+
+func TestSafeWinExpPts(t *testing.T) {
+	got, err := safeWinExpPts(0.8, 4000)
+	if err != nil {
+		t.Fatalf("safeWinExpPts() failed: %v", err)
+	}
+
+	want := 3200.0
+	if got != want {
+		t.Errorf("safeWinExpPts() = %v, want %v", got, want)
+	}
+}
+
+func TestSafeWinExpPts_ReturnsErrorWithInvalidSafeProb(t *testing.T) {
+	_, err := safeWinExpPts(-0.1, 4000)
+	if err == nil {
+		t.Fatal("safeWinExpPts() succeeded unexpectedly")
+	}
+}
+
+func TestExhaustiveDrawExpPts(t *testing.T) {
+	got, err := exhaustiveDrawExpPts(0.8, 0.25, 1500)
+	if err != nil {
+		t.Fatalf("exhaustiveDrawExpPts() failed: %v", err)
+	}
+
+	want := 300.0
+	if got != want {
+		t.Errorf("exhaustiveDrawExpPts() = %v, want %v", got, want)
+	}
+}
+
+func TestExhaustiveDrawExpPts_ReturnsErrorWithInvalidProb(t *testing.T) {
+	if _, err := exhaustiveDrawExpPts(1.1, 0.25, 1500); err == nil {
+		t.Fatal("exhaustiveDrawExpPts() succeeded unexpectedly with invalid safe probability")
+	}
+	if _, err := exhaustiveDrawExpPts(0.8, -0.1, 1500); err == nil {
+		t.Fatal("exhaustiveDrawExpPts() succeeded unexpectedly with invalid exhaustive-draw probability")
+	}
+}
+
+func TestRemainingRoundEndProbs(t *testing.T) {
+	drawProb, othersWinProb, err := remainingRoundEndProbs(0.2, 0.3)
+	if err != nil {
+		t.Fatalf("remainingRoundEndProbs() failed: %v", err)
+	}
+
+	if !almostEqual(drawProb, 0.24) {
+		t.Errorf("drawProb = %v, want 0.24", drawProb)
+	}
+	if !almostEqual(othersWinProb, 0.56) {
+		t.Errorf("othersWinProb = %v, want 0.56", othersWinProb)
+	}
+}
+
+func TestRemainingRoundEndProbs_ReturnsErrorWithInvalidProb(t *testing.T) {
+	if _, _, err := remainingRoundEndProbs(-0.1, 0.3); err == nil {
+		t.Fatal("remainingRoundEndProbs() succeeded unexpectedly with invalid self win probability")
+	}
+	if _, _, err := remainingRoundEndProbs(0.2, 1.1); err == nil {
+		t.Fatal("remainingRoundEndProbs() succeeded unexpectedly with invalid exhaustive-draw probability")
+	}
+}
+
+func TestFutureScoreDeltaDist(t *testing.T) {
+	selfWinDist := scoreDeltaProbDist{{1000, 0, 0, 0}: 1}
+	exhaustiveDrawDist := scoreDeltaProbDist{{0, 1000, 0, 0}: 1}
+	otherWinDists := []scoreDeltaProbDist{
+		{{0, 0, 1000, 0}: 1},
+		{{0, 0, 0, 1000}: 1},
+	}
+
+	got := futureScoreDeltaDist(selfWinDist, 0.2, exhaustiveDrawDist, 0.3, otherWinDists, 0.5)
+	want := scoreDeltaProbDist{
+		{1000, 0, 0, 0}: 0.2,
+		{0, 1000, 0, 0}: 0.3,
+		{0, 0, 1000, 0}: 0.25,
+		{0, 0, 0, 1000}: 0.25,
+	}
+	assertScoreDeltaProbDist(t, got, want)
+}
+
+func TestTotalScoreDeltaDist(t *testing.T) {
+	immediateDist := scoreDeltaProbDist{
+		{}:            0.8,
+		{-1000, 1000}: 0.2,
+	}
+	futureDist := scoreDeltaProbDist{
+		{1000, 0, 0, 0}: 0.25,
+		{0, 1000, 0, 0}: 0.75,
+	}
+
+	got := totalScoreDeltaDist(immediateDist, futureDist)
+	want := scoreDeltaProbDist{
+		{-1000, 1000}:   0.2,
+		{1000, 0, 0, 0}: 0.2,
+		{0, 1000, 0, 0}: 0.6,
+	}
+	assertScoreDeltaProbDist(t, got, want)
+}
+
+func TestExpectedPts(t *testing.T) {
+	got := expectedPts(0, scoreDeltaProbDist{
+		{1000, -1000, 0, 0}: 0.25,
+		{-500, 500, 0, 0}:   0.75,
+	})
+	want := -125.0
+	if got != want {
+		t.Errorf("expectedPts() = %v, want %v", got, want)
 	}
 }
 

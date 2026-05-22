@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/ai"
+	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/wind"
 )
 
 func TestLoadGameStats(t *testing.T) {
@@ -106,6 +107,19 @@ func TestGameStats_RoundEndStats(t *testing.T) {
 	}
 }
 
+func TestGameStats_DealInStats(t *testing.T) {
+	got, err := LoadGameStats()
+	if err != nil {
+		t.Fatalf("LoadGameStats() error = %v", err)
+		return
+	}
+
+	var dealInStats ai.DealInStats = got
+	if dealInStats.AvgWinPts() != got.AverageHoraPoints {
+		t.Errorf("AvgWinPts() = %v, want %v", dealInStats.AvgWinPts(), got.AverageHoraPoints)
+	}
+}
+
 func TestGameStats_DrawTenpaiStats(t *testing.T) {
 	got, err := LoadGameStats()
 	if err != nil {
@@ -156,5 +170,27 @@ func TestGameStats_TenpaiEstimatorStats(t *testing.T) {
 	}
 	if _, _, ok := tenpaiEstimatorStats.YamitenCounts(99, 99); ok {
 		t.Errorf("YamitenCounts(99, 99) ok = true, want false")
+	}
+}
+
+func TestGameStats_RankStats(t *testing.T) {
+	const epsilon = 1e-15
+
+	got, err := LoadGameStats()
+	if err != nil {
+		t.Fatalf("LoadGameStats() error = %v", err)
+		return
+	}
+
+	var rankStats ai.RankStats = got
+	winProbs, ok := rankStats.RelativeWinProbs(wind.East, 1, 0, 1)
+	if !ok {
+		t.Fatal("RelativeWinProbs(East, 1, 0, 1) ok = false, want true")
+	}
+	if math.Abs(winProbs["0"]-0.49478259990894036) > epsilon {
+		t.Errorf("RelativeWinProbs(East, 1, 0, 1)[\"0\"] = %v, want %v", winProbs["0"], 0.49478259990894036)
+	}
+	if _, ok := rankStats.RelativeWinProbs(wind.North, 4, 0, 1); ok {
+		t.Errorf("RelativeWinProbs(North, 4, 0, 1) ok = true, want false")
 	}
 }

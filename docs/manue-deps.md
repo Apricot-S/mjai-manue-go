@@ -6,7 +6,7 @@
 
 ## Current Interfaces
 
-現時点で実装している読み口は、ランダム和了時の score change 分布と流局時聴牌確率の基礎計算に必要なものだけ。
+現時点で実装している読み口は、ランダム和了時の score change 分布、流局時聴牌確率、順位期待値の基礎計算に必要なものだけ。
 
 ```go
 func NewManueAgentWithDeps(seed uint64, deps ManueAgentDeps) *ManueAgent
@@ -23,6 +23,8 @@ type ManueStats interface {
     RoundEndStats
     DrawTenpaiStats
     TenpaiEstimatorStats
+    RankStats
+    DealInStats
 }
 
 type WinScoreStats interface {
@@ -45,43 +47,25 @@ type DrawTenpaiStats interface {
 type TenpaiEstimatorStats interface {
     YamitenCounts(remainTurns int, numMelds int) (total int, tenpai int, ok bool)
 }
-```
 
-`configs.GameStats` は上記の `WinScoreStats` / `RoundEndStats` / `DrawTenpaiStats` / `TenpaiEstimatorStats` を構造的に満たす getter を持つ。これにより、AI package は `configs` を import せず、外側の組み立て側だけが `configs.LoadGameStats()` の戻り値を deps に渡せる。
-
-## Planned Split
-
-`ManueStats` は大きな単一 interface にせず、用途別の小さい interface を埋め込んで育てる。
-
-```go
-type ManueStats interface {
-    WinScoreStats
-    RoundEndStats
-    DrawTenpaiStats
-    TenpaiEstimatorStats
-    RankStats
-    DealInStats
-}
-```
-
-候補:
-
-```go
-type RoundEndStats interface {
-    TurnDistribution() []float64
-    ExhaustiveDrawRatio() float64
-}
-
-type TenpaiEstimatorStats interface {
-    YamitenCounts(remainTurns int, numMelds int) (total int, tenpai int, ok bool)
+type DealInStats interface {
+    AvgWinPts() float64
 }
 
 type RankStats interface {
-    RelativeWinProbTable(key string) (relativeWinProbTable, bool)
+    RelativeWinProbs(roundWind wind.Wind, roundNumber int, selfPosition int, otherPosition int) (map[string]float64, bool)
 }
+```
 
-type DealInStats interface {
-    AverageWinPoints() float64
+`configs.GameStats` は上記の `WinScoreStats` / `RoundEndStats` / `DrawTenpaiStats` / `TenpaiEstimatorStats` / `RankStats` / `DealInStats` を構造的に満たす getter を持つ。これにより、AI package は `configs` を import せず、外側の組み立て側だけが `configs.LoadGameStats()` の戻り値を deps に渡せる。順位期待値用の `winProbsMap` key 形式（例: `E1,0,1`）は config schema 側の都合なので、AI 側の interface 境界には出さず、`configs.GameStats.RelativeWinProbs` の内部で組み立てる。
+
+## Future Split
+
+`ManueStats` は大きな単一 interface にせず、用途別の小さい interface を埋め込んで育てる。現在必要な stats 系の読み口は `Current Interfaces` に移動済みで、今後は危険度推定や decision tree など stats 以外の依存を追加する段階で別 interface を増やす。
+
+```go
+type DangerEstimator interface {
+    // Details will be added when danger estimation is migrated.
 }
 ```
 

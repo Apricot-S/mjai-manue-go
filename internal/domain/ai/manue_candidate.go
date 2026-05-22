@@ -93,6 +93,22 @@ func compareCandidateScore(lhs, rhs *candidateScore, preferBlack bool) int {
 	return 0
 }
 
+// evaluateCandidateScore fills the fields derived from the final score-change
+// distribution while preserving candidate-local estimates such as probabilities
+// and shanten.
+func evaluateCandidateScore(
+	score candidateScore,
+	scoreChanges scoreDeltaProbDist,
+	selfID int,
+	selfScore float64,
+	selfPosition int,
+	opponents []rankOpponent,
+) candidateScore {
+	score.expPts = expectedPts(selfID, scoreChanges)
+	score.avgRank = averageRank(scoreChanges, selfID, selfScore, selfPosition, opponents)
+	return score
+}
+
 func getSelfTurnCandidates(actions []action.Action, self player.PlayerViewer) ([]actionCandidate, error) {
 	h, err := selfTurnHand(self)
 	if err != nil {

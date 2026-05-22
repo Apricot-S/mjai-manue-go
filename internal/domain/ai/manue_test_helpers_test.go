@@ -1,6 +1,10 @@
 package ai
 
-import "fmt"
+import (
+	"fmt"
+
+	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/wind"
+)
 
 type stubManueStats struct {
 	numWins                       int
@@ -9,9 +13,11 @@ type stubManueStats struct {
 	dealerWinPointFreqs           map[string]int
 	turnDistribution              []float64
 	exhaustiveDrawRatio           float64
+	avgWinPts                     float64
 	exhaustiveDrawNotenCount      int
 	exhaustiveDrawTenpaiTurnFreqs map[string]int
 	yamitenCounts                 map[string]yamitenCount
+	relativeWinProbs              map[string]map[string]float64
 }
 
 type yamitenCount struct {
@@ -43,6 +49,10 @@ func (s stubManueStats) ExhaustiveDrawRatio() float64 {
 	return s.exhaustiveDrawRatio
 }
 
+func (s stubManueStats) AvgWinPts() float64 {
+	return s.avgWinPts
+}
+
 func (s stubManueStats) ExhaustiveDrawNotenCount() int {
 	return s.exhaustiveDrawNotenCount
 }
@@ -58,4 +68,15 @@ func (s stubManueStats) YamitenCounts(remainTurns int, numMelds int) (int, int, 
 		return 0, 0, false
 	}
 	return count.total, count.tenpai, true
+}
+
+func (s stubManueStats) RelativeWinProbs(
+	roundWind wind.Wind,
+	roundNumber int,
+	selfPosition int,
+	otherPosition int,
+) (map[string]float64, bool) {
+	key := fmt.Sprintf("%s%d,%d,%d", roundWind, roundNumber, selfPosition, otherPosition)
+	winProbs, ok := s.relativeWinProbs[key]
+	return winProbs, ok
 }

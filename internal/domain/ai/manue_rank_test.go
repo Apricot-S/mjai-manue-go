@@ -1,6 +1,31 @@
 package ai
 
-import "testing"
+import (
+	"testing"
+
+	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/common"
+	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/seat"
+	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/wind"
+)
+
+type stubRankStateViewer struct {
+	nextRoundWind  wind.Wind
+	nextRoundNum   int
+	scores         [common.NumPlayers]int
+	startingDealer seat.Seat
+}
+
+func (s stubRankStateViewer) NextRound() (wind.Wind, int) {
+	return s.nextRoundWind, s.nextRoundNum
+}
+
+func (s stubRankStateViewer) Scores() [common.NumPlayers]int {
+	return s.scores
+}
+
+func (s stubRankStateViewer) StartingDealer() seat.Seat {
+	return s.startingDealer
+}
 
 func TestAverageRank(t *testing.T) {
 	scoreChanges := newScoreDeltaProbDist(map[scoreDelta]float64{
@@ -37,6 +62,79 @@ func TestAverageRank(t *testing.T) {
 	want := 4.0 - (0.8 + 0.4 + 0.6)
 	if !almostEqual(got, want) {
 		t.Errorf("averageRank() = %v, want %v", got, want)
+	}
+}
+
+func TestBuildRankOpponents(t *testing.T) {
+	got := buildRankOpponents(stubManueStats{
+		relativeWinProbs: map[string]map[string]float64{
+			"S2,0,1": {"1000": 0.6},
+			"S2,0,2": {"1000": 0.7},
+			"S2,0,3": {"1000": 0.8},
+		},
+	}, stubRankStateViewer{
+		nextRoundWind:  wind.South,
+		nextRoundNum:   2,
+		scores:         [common.NumPlayers]int{27000, 24000, 26000, 23000},
+		startingDealer: seat.MustSeat(1),
+	}, seat.MustSeat(1))
+
+	if len(got) != 3 {
+		t.Fatalf("len(buildRankOpponents()) = %d, want 3", len(got))
+	}
+	tests := []struct {
+		index        int
+		wantID       int
+		wantScore    float64
+		wantPosition int
+		wantWinProb  float64
+	}{
+		{index: 0, wantID: 0, wantScore: 27000, wantPosition: 3, wantWinProb: 0.8},
+		{index: 1, wantID: 2, wantScore: 26000, wantPosition: 1, wantWinProb: 0.6},
+		{index: 2, wantID: 3, wantScore: 23000, wantPosition: 2, wantWinProb: 0.7},
+	}
+	for _, tt := range tests {
+		opponent := got[tt.index]
+		if opponent.id != tt.wantID {
+			t.Errorf("opponents[%d].id = %d, want %d", tt.index, opponent.id, tt.wantID)
+		}
+		if opponent.score != tt.wantScore {
+			t.Errorf("opponents[%d].score = %v, want %v", tt.index, opponent.score, tt.wantScore)
+		}
+		if opponent.position != tt.wantPosition {
+			t.Errorf("opponents[%d].position = %d, want %d", tt.index, opponent.position, tt.wantPosition)
+		}
+		if opponent.winProbs["1000"] != tt.wantWinProb {
+			t.Errorf("opponents[%d].winProbs[\"1000\"] = %v, want %v", tt.index, opponent.winProbs["1000"], tt.wantWinProb)
+		}
+	}
+}
+
+func TestRankPosition(t *testing.T) {
+	got := rankPosition(seat.MustSeat(0), seat.MustSeat(2))
+	if got != 2 {
+		t.Errorf("rankPosition() = %d, want 2", got)
+	}
+}
+
+func TestRelativeWinProbs(t *testing.T) {
+	got := relativeWinProbs(stubManueStats{
+		relativeWinProbs: map[string]map[string]float64{
+			"E1,0,1": {
+				"0": 0.5,
+			},
+		},
+	}, wind.East, 1, 0, 1)
+
+	if got["0"] != 0.5 {
+		t.Errorf("relativeWinProbs()[\"0\"] = %v, want 0.5", got["0"])
+	}
+}
+
+func TestRelativeWinProbs_ReturnsNilWithoutStats(t *testing.T) {
+	got := relativeWinProbs(stubManueStats{}, wind.East, 1, 0, 1)
+	if got != nil {
+		t.Errorf("relativeWinProbs() = %v, want nil", got)
 	}
 }
 

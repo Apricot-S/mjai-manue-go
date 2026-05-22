@@ -25,6 +25,9 @@ func validateManueStats(stats ManueStats) error {
 	if err := validateTenpaiEstimatorStats(stats); err != nil {
 		return err
 	}
+	if err := validateDealInStats(stats); err != nil {
+		return err
+	}
 	return nil
 }
 
@@ -148,6 +151,13 @@ func validateTenpaiEstimatorStats(stats TenpaiEstimatorStats) error {
 				return fmt.Errorf("invalid tenpai estimator stats: yamiten tenpai for %d,%d must be between 0 and total", remainTurns, numMelds)
 			}
 		}
+	}
+	return nil
+}
+
+func validateDealInStats(stats DealInStats) error {
+	if stats.AvgWinPts() <= 0 {
+		return fmt.Errorf("invalid deal-in stats: average win points must be positive")
 	}
 	return nil
 }

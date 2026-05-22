@@ -6,6 +6,7 @@ import (
 
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/action"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/round/player"
+	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/wind"
 )
 
 type ManueAgent struct {
@@ -26,6 +27,8 @@ type ManueStats interface {
 	RoundEndStats
 	DrawTenpaiStats
 	TenpaiEstimatorStats
+	RankStats
+	DealInStats
 }
 
 type WinScoreStats interface {
@@ -42,6 +45,14 @@ type RoundEndStats interface {
 
 type TenpaiEstimatorStats interface {
 	YamitenCounts(remainTurns int, numMelds int) (total int, tenpai int, ok bool)
+}
+
+type DealInStats interface {
+	AvgWinPts() float64
+}
+
+type RankStats interface {
+	RelativeWinProbs(roundWind wind.Wind, roundNumber int, selfPosition int, otherPosition int) (map[string]float64, bool)
 }
 
 type DrawTenpaiStats interface {

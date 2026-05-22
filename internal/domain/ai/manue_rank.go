@@ -1,14 +1,67 @@
 package ai
 
-import "strconv"
+import (
+	"strconv"
+
+	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/common"
+	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/seat"
+	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/wind"
+)
 
 type relativeWinProbTable map[string]float64
+
+type rankStateViewer interface {
+	NextRound() (wind.Wind, int)
+	Scores() [common.NumPlayers]int
+	StartingDealer() seat.Seat
+}
 
 type rankOpponent struct {
 	id       int
 	score    float64
 	position int
 	winProbs relativeWinProbTable
+}
+
+func relativeWinProbs(
+	stats RankStats,
+	roundWind wind.Wind,
+	roundNumber int,
+	selfPosition int,
+	otherPosition int,
+) relativeWinProbTable {
+	winProbs, ok := stats.RelativeWinProbs(roundWind, roundNumber, selfPosition, otherPosition)
+	if !ok {
+		return nil
+	}
+	return relativeWinProbTable(winProbs)
+}
+
+func buildRankOpponents(stats RankStats, state rankStateViewer, self seat.Seat) []rankOpponent {
+	nextRoundWind, nextRoundNumber := state.NextRound()
+	scores := state.Scores()
+	startingDealer := state.StartingDealer()
+	selfPosition := rankPosition(self, startingDealer)
+
+	opponents := make([]rankOpponent, 0, common.NumPlayers-1)
+	for i := range common.NumPlayers {
+		opponentSeat := seat.MustSeat(i)
+		if opponentSeat == self {
+			continue
+		}
+		opponentPosition := rankPosition(opponentSeat, startingDealer)
+		opponents = append(opponents, rankOpponent{
+			id:       i,
+			score:    float64(scores[i]),
+			position: opponentPosition,
+			winProbs: relativeWinProbs(stats, nextRoundWind, nextRoundNumber, selfPosition, opponentPosition),
+		})
+	}
+	return opponents
+}
+
+func rankPosition(playerSeat seat.Seat, startingDealer seat.Seat) int {
+	return (playerSeat.Index() - startingDealer.Index() + common.NumPlayers) % common.NumPlayers
 }
 
 // averageRank returns self's expected final rank from pairwise win probabilities

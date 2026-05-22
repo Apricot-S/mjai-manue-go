@@ -116,6 +116,21 @@ func randomWinScoreDeltaDistFromStats(
 	)
 }
 
+func winScoreDeltaDistFromPointsDist(
+	actorID int,
+	dealerID int,
+	stats WinScoreStats,
+	pointsDist scalarProbDist,
+) (scoreDeltaProbDist, error) {
+	if stats.NumWins() <= 0 {
+		return nil, fmt.Errorf("cannot build win score delta distribution: numWins must be positive")
+	}
+	return multiplyScalarScoreDeltaProbDists(
+		pointsDist,
+		winScoreFactorDist(actorID, dealerID, float64(stats.NumSelfDrawWins())/float64(stats.NumWins())),
+	), nil
+}
+
 func exhaustiveDrawProb(stats RoundEndStats, currentTurn float64) (float64, error) {
 	currentTurnIndex := int(currentTurn)
 	turnDistribution := stats.TurnDistribution()
@@ -177,6 +192,83 @@ func tenpaiProb(stats TenpaiEstimatorStats, riichi bool, remainTurns int, numMel
 		return 0, fmt.Errorf("cannot estimate tenpai probability: yamiten tenpai must be between 0 and total")
 	}
 	return float64(tenpai) / float64(total), nil
+}
+
+// dealInExpPts returns expected points from dealing in. It is negative because
+// it represents self's score change when the discard is unsafe.
+func dealInExpPts(stats DealInStats, safeProb float64) (float64, error) {
+	if safeProb < 0.0 || safeProb > 1.0 {
+		return 0.0, fmt.Errorf("cannot estimate deal-in expected points: safe probability must be between 0 and 1")
+	}
+	return -(1.0 - safeProb) * stats.AvgWinPts(), nil
+}
+
+func safeWinExpPts(safeProb float64, avgWinPts float64) (float64, error) {
+	if safeProb < 0.0 || safeProb > 1.0 {
+		return 0.0, fmt.Errorf("cannot estimate safe win expected points: safe probability must be between 0 and 1")
+	}
+	return safeProb * avgWinPts, nil
+}
+
+func exhaustiveDrawExpPts(safeProb float64, exhaustiveDrawProb float64, avgDrawPts float64) (float64, error) {
+	if safeProb < 0.0 || safeProb > 1.0 {
+		return 0.0, fmt.Errorf("cannot estimate exhaustive-draw expected points: safe probability must be between 0 and 1")
+	}
+	if exhaustiveDrawProb < 0.0 || exhaustiveDrawProb > 1.0 {
+		return 0.0, fmt.Errorf("cannot estimate exhaustive-draw expected points: exhaustive-draw probability must be between 0 and 1")
+	}
+	return safeProb * exhaustiveDrawProb * avgDrawPts, nil
+}
+
+// remainingRoundEndProbs splits the probability mass left after accounting for
+// self's future win into exhaustive draw and other players' win.
+func remainingRoundEndProbs(selfWinProb float64, exhaustiveDrawProbOnSelfNoWin float64) (drawProb float64, othersWinProb float64, err error) {
+	if selfWinProb < 0.0 || selfWinProb > 1.0 {
+		return 0.0, 0.0, fmt.Errorf("cannot estimate remaining round-end probabilities: self win probability must be between 0 and 1")
+	}
+	if exhaustiveDrawProbOnSelfNoWin < 0.0 || exhaustiveDrawProbOnSelfNoWin > 1.0 {
+		return 0.0, 0.0, fmt.Errorf("cannot estimate remaining round-end probabilities: exhaustive-draw probability must be between 0 and 1")
+	}
+
+	noSelfWinProb := 1.0 - selfWinProb
+	return noSelfWinProb * exhaustiveDrawProbOnSelfNoWin,
+		noSelfWinProb * (1.0 - exhaustiveDrawProbOnSelfNoWin),
+		nil
+}
+
+// futureScoreDeltaDist mixes possible future round-ending outcomes after a
+// discard did not immediately deal in.
+func futureScoreDeltaDist(
+	selfWinDist scoreDeltaProbDist,
+	selfWinProb float64,
+	exhaustiveDrawDist scoreDeltaProbDist,
+	exhaustiveDrawProb float64,
+	otherWinDists []scoreDeltaProbDist,
+	othersWinProb float64,
+) scoreDeltaProbDist {
+	items := []weightedScoreDeltaProbDist{
+		{dist: selfWinDist, prob: selfWinProb},
+		{dist: exhaustiveDrawDist, prob: exhaustiveDrawProb},
+	}
+	otherWinProb := 0.0
+	if len(otherWinDists) > 0 {
+		otherWinProb = othersWinProb / float64(len(otherWinDists))
+	}
+	for _, dist := range otherWinDists {
+		items = append(items, weightedScoreDeltaProbDist{dist: dist, prob: otherWinProb})
+	}
+	return mergeScoreDeltaProbDists(items)
+}
+
+// totalScoreDeltaDist replaces the no-change branch of immediateDist with the
+// future round-ending distribution. This mirrors Manue's flow where no
+// immediate deal-in means the round continues.
+func totalScoreDeltaDist(immediateDist scoreDeltaProbDist, futureDist scoreDeltaProbDist) scoreDeltaProbDist {
+	return immediateDist.replace(scoreDelta{}, futureDist)
+}
+
+func expectedPts(selfID int, scoreChanges scoreDeltaProbDist) float64 {
+	return scoreChanges.expected()[selfID]
 }
 
 // notenExhaustiveDrawTenpaiProb returns the probability that a currently

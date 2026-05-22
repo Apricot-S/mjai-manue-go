@@ -371,6 +371,64 @@ func TestManueAgent_scoreDiscardCandidate_MarksRedDiscard(t *testing.T) {
 	}
 }
 
+func TestEvaluateCandidateScore(t *testing.T) {
+	scoreChanges := newScoreDeltaProbDist(map[scoreDelta]float64{
+		{1000, -1000, 0, 0}: 0.25,
+		{-500, 500, 0, 0}:   0.75,
+	})
+	base := candidateScore{
+		winProb:  0.2,
+		drawProb: 0.3,
+		shanten:  1,
+	}
+
+	got := evaluateCandidateScore(base, scoreChanges, 0, 25000, 0, []rankOpponent{
+		{
+			id:       1,
+			score:    25000,
+			position: 1,
+			winProbs: relativeWinProbTable{
+				"2000":  1.0,
+				"-1000": 0.0,
+			},
+		},
+		{
+			id:       2,
+			score:    24000,
+			position: 2,
+			winProbs: relativeWinProbTable{
+				"2000": 1.0,
+				"500":  1.0,
+			},
+		},
+		{
+			id:       3,
+			score:    26000,
+			position: 3,
+			winProbs: relativeWinProbTable{
+				"0":     0.5,
+				"-1500": 0.0,
+			},
+		},
+	})
+
+	if !almostEqual(got.expPts, -125) {
+		t.Errorf("expPts = %v, want -125", got.expPts)
+	}
+	if !almostEqual(got.avgRank, 2.625) {
+		t.Errorf("avgRank = %v, want 2.625", got.avgRank)
+	}
+	if got.winProb != base.winProb {
+		t.Errorf("winProb = %v, want %v", got.winProb, base.winProb)
+	}
+	if got.drawProb != base.drawProb {
+		t.Errorf("drawProb = %v, want %v", got.drawProb, base.drawProb)
+	}
+	if got.shanten != base.shanten {
+		t.Errorf("shanten = %v, want %v", got.shanten, base.shanten)
+	}
+}
+
 func TestManueAgent_formatDiscardTraceKey(t *testing.T) {
 	discardTile := tile.MustTileFromCode("5m")
 	if got := formatDiscardTraceKey(false, discardTile); got != "-1.5m" {

@@ -4,6 +4,8 @@ import (
 	_ "embed"
 	"encoding/json/v2"
 	"fmt"
+
+	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/wind"
 )
 
 type YamitenStat struct {
@@ -76,6 +78,10 @@ func (s *GameStats) ExhaustiveDrawRatio() float64 {
 	return s.RyukyokuRatio
 }
 
+func (s *GameStats) AvgWinPts() float64 {
+	return s.AverageHoraPoints
+}
+
 func (s *GameStats) ExhaustiveDrawNotenCount() int {
 	return s.RyukyokuTenpaiStat.Noten
 }
@@ -91,4 +97,15 @@ func (s *GameStats) YamitenCounts(remainTurns int, numMelds int) (int, int, bool
 		return 0, 0, false
 	}
 	return stat.Total, stat.Tenpai, true
+}
+
+func (s *GameStats) RelativeWinProbs(
+	roundWind wind.Wind,
+	roundNumber int,
+	selfPosition int,
+	otherPosition int,
+) (map[string]float64, bool) {
+	key := fmt.Sprintf("%s%d,%d,%d", roundWind, roundNumber, selfPosition, otherPosition)
+	winProbs, ok := s.WinProbsMap[key]
+	return winProbs, ok
 }
