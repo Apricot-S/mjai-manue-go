@@ -2,12 +2,258 @@ package ai
 
 import (
 	"fmt"
+	"maps"
 	"math"
 	"strconv"
 
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/round"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/round/service"
 )
+
+type dealInEstimate struct {
+	winnerID int
+	prob     float64
+}
+
+type winEstimate struct {
+	// prob is the win probability.
+	prob float64
+	// avgPts is the average win points when self wins.
+	avgPts float64
+	// expPts is the expected win points over all estimation trials.
+	expPts float64
+	// pointsDist is the win-points distribution when self wins.
+	pointsDist scalarProbDist
+}
+
+type winEstimateAccumulator struct {
+	numTries   int
+	totalWins  int
+	totalPts   float64
+	pointFreqs map[float64]int
+}
+
+func (a *winEstimateAccumulator) addNoWinTrial() {
+	a.numTries++
+}
+
+func (a *winEstimateAccumulator) addWinTrial(points float64) error {
+	if points <= 0 {
+		return fmt.Errorf("cannot add win trial: points must be positive")
+	}
+	a.numTries++
+	a.totalWins++
+	a.totalPts += points
+	if a.pointFreqs == nil {
+		a.pointFreqs = make(map[float64]int)
+	}
+	a.pointFreqs[points]++
+	return nil
+}
+
+func (a *winEstimateAccumulator) merge(other winEstimateAccumulator) error {
+	if other.numTries < 0 || other.totalWins < 0 || other.totalPts < 0 {
+		return fmt.Errorf("cannot merge win estimate accumulator: values must be non-negative")
+	}
+	if other.totalWins > other.numTries {
+		return fmt.Errorf("cannot merge win estimate accumulator: totalWins must not exceed numTries")
+	}
+
+	countedWins := 0
+	for points, freq := range other.pointFreqs {
+		if points <= 0 {
+			return fmt.Errorf("cannot merge win estimate accumulator: points must be positive")
+		}
+		if freq < 0 {
+			return fmt.Errorf("cannot merge win estimate accumulator: point frequency must be non-negative")
+		}
+		countedWins += freq
+	}
+	if countedWins != other.totalWins {
+		return fmt.Errorf("cannot merge win estimate accumulator: point frequencies must sum to totalWins")
+	}
+
+	a.numTries += other.numTries
+	a.totalWins += other.totalWins
+	a.totalPts += other.totalPts
+	if len(other.pointFreqs) > 0 && a.pointFreqs == nil {
+		a.pointFreqs = make(map[float64]int, len(other.pointFreqs))
+	}
+	for points, freq := range other.pointFreqs {
+		a.pointFreqs[points] += freq
+	}
+	return nil
+}
+
+func (a winEstimateAccumulator) estimate() (winEstimate, error) {
+	return newWinEstimate(a.numTries, a.totalWins, a.totalPts, a.pointFreqs)
+}
+
+func (a winEstimateAccumulator) clone() winEstimateAccumulator {
+	return winEstimateAccumulator{
+		numTries:   a.numTries,
+		totalWins:  a.totalWins,
+		totalPts:   a.totalPts,
+		pointFreqs: maps.Clone(a.pointFreqs),
+	}
+}
+
+type winEstimateAccumulatorSet map[string]winEstimateAccumulator
+
+func newWinEstimateAccumulatorSet(keys []string) winEstimateAccumulatorSet {
+	accumulators := make(winEstimateAccumulatorSet, len(keys))
+	for _, key := range keys {
+		accumulators[key] = winEstimateAccumulator{}
+	}
+	return accumulators
+}
+
+func (s winEstimateAccumulatorSet) addNoWinTrial(key string) {
+	accumulator := s[key]
+	accumulator.addNoWinTrial()
+	s[key] = accumulator
+}
+
+func (s winEstimateAccumulatorSet) addWinTrial(key string, points float64) error {
+	accumulator := s[key]
+	if err := accumulator.addWinTrial(points); err != nil {
+		return err
+	}
+	s[key] = accumulator
+	return nil
+}
+
+func (s winEstimateAccumulatorSet) addTrial(winPtsByKey map[string]float64) error {
+	for key, points := range winPtsByKey {
+		if _, ok := s[key]; !ok {
+			return fmt.Errorf("cannot add win estimate trial: unknown candidate key %q", key)
+		}
+		if points <= 0 {
+			return fmt.Errorf("cannot add win estimate trial: points must be positive")
+		}
+	}
+
+	for key := range s {
+		points, ok := winPtsByKey[key]
+		if ok {
+			if err := s.addWinTrial(key, points); err != nil {
+				return err
+			}
+			continue
+		}
+		s.addNoWinTrial(key)
+	}
+	return nil
+}
+
+func (s winEstimateAccumulatorSet) merge(other winEstimateAccumulatorSet) error {
+	merged := make(winEstimateAccumulatorSet, len(other))
+	for key, otherAccumulator := range other {
+		accumulator := s[key].clone()
+		if err := accumulator.merge(otherAccumulator); err != nil {
+			return fmt.Errorf("cannot merge win estimate accumulator for %q: %w", key, err)
+		}
+		merged[key] = accumulator
+	}
+	maps.Copy(s, merged)
+	return nil
+}
+
+func (s winEstimateAccumulatorSet) estimates() (map[string]winEstimate, error) {
+	estimates := make(map[string]winEstimate, len(s))
+	for key, accumulator := range s {
+		estimate, err := accumulator.estimate()
+		if err != nil {
+			return nil, fmt.Errorf("cannot build win estimate for %q: %w", key, err)
+		}
+		estimates[key] = estimate
+	}
+	return estimates, nil
+}
+
+func winEstimatesFromTrials(keys []string, trials []map[string]float64) (map[string]winEstimate, error) {
+	accumulators := newWinEstimateAccumulatorSet(keys)
+	for _, trial := range trials {
+		if err := accumulators.addTrial(trial); err != nil {
+			return nil, err
+		}
+	}
+	return accumulators.estimates()
+}
+
+func newWinEstimate(
+	numTries int,
+	totalWins int,
+	totalPts float64,
+	pointFreqs map[float64]int,
+) (winEstimate, error) {
+	if numTries <= 0 {
+		return winEstimate{}, fmt.Errorf("cannot build win estimate: numTries must be positive")
+	}
+	if totalWins < 0 {
+		return winEstimate{}, fmt.Errorf("cannot build win estimate: totalWins must be non-negative")
+	}
+	if totalWins > numTries {
+		return winEstimate{}, fmt.Errorf("cannot build win estimate: totalWins must not exceed numTries")
+	}
+	if totalPts < 0 {
+		return winEstimate{}, fmt.Errorf("cannot build win estimate: totalPts must be non-negative")
+	}
+	if totalWins == 0 {
+		if totalPts != 0 || len(pointFreqs) != 0 {
+			return winEstimate{}, fmt.Errorf("cannot build win estimate: zero wins must have no points")
+		}
+		return winEstimate{
+			prob:       0,
+			avgPts:     0,
+			expPts:     0,
+			pointsDist: scalarProbDist{},
+		}, nil
+	}
+
+	totalWinsFloat := float64(totalWins)
+	dist := make(map[float64]float64, len(pointFreqs))
+	countedWins := 0
+	for points, freq := range pointFreqs {
+		if points <= 0 {
+			return winEstimate{}, fmt.Errorf("cannot build win estimate: points must be positive")
+		}
+		if freq < 0 {
+			return winEstimate{}, fmt.Errorf("cannot build win estimate: point frequency must be non-negative")
+		}
+		countedWins += freq
+		dist[points] = float64(freq) / totalWinsFloat
+	}
+	if countedWins != totalWins {
+		return winEstimate{}, fmt.Errorf("cannot build win estimate: point frequencies must sum to totalWins")
+	}
+
+	return winEstimate{
+		prob:       totalWinsFloat / float64(numTries),
+		avgPts:     totalPts / totalWinsFloat,
+		expPts:     totalPts / float64(numTries),
+		pointsDist: newScalarProbDist(dist),
+	}, nil
+}
+
+func dealInProb(estimates []dealInEstimate) (float64, error) {
+	safeProb, err := safeProb(estimates)
+	if err != nil {
+		return 0, err
+	}
+	return 1.0 - safeProb, nil
+}
+
+func safeProb(estimates []dealInEstimate) (float64, error) {
+	safeProb := 1.0
+	for _, estimate := range estimates {
+		if estimate.prob < 0.0 || estimate.prob > 1.0 {
+			return 0, fmt.Errorf("cannot estimate safe probability: deal-in probability must be between 0 and 1")
+		}
+		safeProb *= 1.0 - estimate.prob
+	}
+	return safeProb, nil
+}
 
 // winScoreFactor returns how one win point unit changes all players' scores.
 //
@@ -131,6 +377,15 @@ func winScoreDeltaDistFromPointsDist(
 	), nil
 }
 
+func selfWinScoreDeltaDistFromEstimate(
+	selfID int,
+	dealerID int,
+	stats WinScoreStats,
+	estimate winEstimate,
+) (scoreDeltaProbDist, error) {
+	return winScoreDeltaDistFromPointsDist(selfID, dealerID, stats, estimate.pointsDist)
+}
+
 func exhaustiveDrawProb(stats RoundEndStats, currentTurn float64) (float64, error) {
 	currentTurnIndex := int(currentTurn)
 	turnDistribution := stats.TurnDistribution()
@@ -201,6 +456,86 @@ func dealInExpPts(stats DealInStats, safeProb float64) (float64, error) {
 		return 0.0, fmt.Errorf("cannot estimate deal-in expected points: safe probability must be between 0 and 1")
 	}
 	return -(1.0 - safeProb) * stats.AvgWinPts(), nil
+}
+
+// immediateDealInScoreDeltaDist returns the immediate score-change
+// distribution for a discard against one possible ron winner.
+//
+// dealInProb is the probability of dealing in to winnerID. The no-change branch
+// means this opponent did not ron the discard and the round can continue.
+func immediateDealInScoreDeltaDist(
+	winnerID int,
+	selfID int,
+	dealInProb float64,
+	pointsDist scalarProbDist,
+) (scoreDeltaProbDist, error) {
+	if dealInProb < 0.0 || dealInProb > 1.0 {
+		return nil, fmt.Errorf("cannot build immediate deal-in score delta distribution: deal-in probability must be between 0 and 1")
+	}
+
+	var dealInFactor scoreDelta
+	dealInFactor[winnerID] = 1.0
+	dealInFactor[selfID] = -1.0
+	unitDist := newScoreDeltaProbDist(map[scoreDelta]float64{
+		dealInFactor: dealInProb,
+		{}:           1.0 - dealInProb,
+	})
+	return multiplyScalarScoreDeltaProbDists(pointsDist, unitDist), nil
+}
+
+func immediateDealInScoreDeltaDistFromStats(
+	winnerID int,
+	selfID int,
+	dealerID int,
+	dealInProb float64,
+	stats WinScoreStats,
+) (scoreDeltaProbDist, error) {
+	pointFreqs := stats.NonDealerWinPointFreqs()
+	if winnerID == dealerID {
+		pointFreqs = stats.DealerWinPointFreqs()
+	}
+	pointsDist, err := winPointsDist(pointFreqs)
+	if err != nil {
+		return nil, err
+	}
+	return immediateDealInScoreDeltaDist(winnerID, selfID, dealInProb, pointsDist)
+}
+
+func immediateScoreDeltaDistFromStats(
+	selfID int,
+	dealerID int,
+	estimates []dealInEstimate,
+	stats WinScoreStats,
+) (scoreDeltaProbDist, error) {
+	dists := make([]scoreDeltaProbDist, 0, len(estimates))
+	for _, estimate := range estimates {
+		dist, err := immediateDealInScoreDeltaDistFromStats(
+			estimate.winnerID,
+			selfID,
+			dealerID,
+			estimate.prob,
+			stats,
+		)
+		if err != nil {
+			return nil, err
+		}
+		dists = append(dists, dist)
+	}
+	return immediateScoreDeltaDist(dists), nil
+}
+
+// immediateScoreDeltaDist merges immediate deal-in distributions from multiple
+// possible ron winners.
+//
+// Each distribution must include a no-change branch. The merge replaces only
+// that branch, so it models the same first-ron approximation as Manue and avoids
+// expanding double/triple ron combinations.
+func immediateScoreDeltaDist(dists []scoreDeltaProbDist) scoreDeltaProbDist {
+	result := scoreDeltaProbDist{{}: 1.0}
+	for _, dist := range dists {
+		result = result.replace(scoreDelta{}, dist)
+	}
+	return result
 }
 
 func safeWinExpPts(safeProb float64, avgWinPts float64) (float64, error) {

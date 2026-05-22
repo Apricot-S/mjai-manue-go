@@ -83,6 +83,12 @@ validation は、`NumWins() > 0`、自摸和了数が和了数の範囲内であ
 
 計算関数内に既にある stats 関連チェックは、validation 関数を追加した直後には無理に削らない。stats が Agent 作成時 validation を通る経路に一本化された後で、重複しているチェックを整理する。
 
+## Candidate Score Helper Cleanup
+
+`apply*ToCandidateScore` 系の小さい helper は、移植中に CoffeeScript 版 `getMetricsInternal` の各 metric 代入と対応を取りやすくし、estimator 未接続の段階でも純粋関数として検証するための足場である。
+
+deps / estimator 接続後に候補評価の入力と責務が固まったら、単なるフィールド代入だけの helper は `evaluateCandidate...` 系の orchestration へ畳み込み、意味のある境界だけを残す。これは stats validation を Agent 作成時へ寄せた後に計算関数内の重複 validation を削る作業と並ぶ、後続リファクタリング項目として扱う。
+
 ## LightGameStats
 
 `LightGameStats` は `game_stats.json` とは別の `light_game_stats.json` から読み込まれ、主用途は順位推定の `WinProbsMap` である。そのため、`configs` 側でも `GameStats` へ埋め込む必然性は薄く、将来的には分離したまま扱ってよい。
