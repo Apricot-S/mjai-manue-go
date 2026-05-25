@@ -8,6 +8,7 @@
 
 - `docs/README.md`: docs 配下の文書の役割と分割方針。
 - `docs/board-state-output.md`: 盤面状態出力の実装状況と Ruby 版 `mjai` の参照抜粋。
+- `docs/manue-ai-porting-plan.md`: CoffeeScript 版 Manue AI ロジックの分解と再移植計画。
 - `docs/terminology-en.md`: CoffeeScript 版 `mjai-manue` 由来の英語用語集。
 
 - 本プロジェクトは https://github.com/gimite/mjai-manue (CoffeeScript版) を Go に移植する。
@@ -110,7 +111,7 @@ flowchart LR
 - `internal/application/` に Bot と入力への反応（`NoReaction` / `Action`）が実装されている。現状の action 判定は `round.State.LegalActions(selfID)` が空かどうかを参照する。`LegalActions` は自摸後・副露後など `pendingDiscard` が立つ局面の打牌候補、自摸和了、ロン、ポン、チー、大明槓、見送り候補まで実装済み。Agent へ渡す観測は `round.ActionStateViewer` として、局面 view と合法手一覧の両方を含む。
 - `internal/domain/ai/` に Agent インタフェースとツモ切り Agent が実装されている。ツモ切り Agent は drawn tile がある場合に `Discard(tsumogiri=true)`、ない場合に `Pass` を返す。
 - `cmd/mjai-tsumogiri/` に、stdio / mjsonp TCP client を切り替えて最小AIを起動する `package main` 実装が存在する。現状のフラグは `--name` のみで、`--seed` はない。
-- `cmd/mjai-manue/` は最小 CLI を実装済み。`--name` / `--seed` / stdio / mjsonp TCP client の runtime 配線を持つ。`internal/domain/ai/ManueAgent` は seed 注入済みの最小実装で、`start_game` ごとに乱数生成器を seed 初期状態へリセットする。現状は合法手集合の先頭を deterministic に選ぶ。CoffeeScript 版の評価ロジックは未移植。
+- `cmd/mjai-manue/` は最小 CLI を実装済み。`--name` / `--seed` / stdio / mjsonp TCP client の runtime 配線を持つ。`internal/domain/ai/ManueAgent` は seed 注入済みで、`start_game` ごとに乱数生成器を seed 初期状態へリセットする。現状は和了優先、リーチ後ツモ切り、打牌/立直候補の暫定評価、副露 fallback の途中実装であり、CoffeeScript 版の期待値評価・危険度推定・副露評価は未接続。
 - `configs/` は JSON を build 時 embed して読み出す実装がある（`encoding/json/v2` 前提）。
 
 本設計書は、上記の既存資産を活用し、未実装の protocol event/action、合法手列挙、`mjai-manue` 本体、RiichiLab bridge を段階的に足していく前提で進める。
@@ -347,15 +348,13 @@ type Decision struct {
 1. `mjai-tsumogiri`: 最小AI（常にツモ切り、鳴き/立直はしない等の単純方針）
 2. `mjai-manue`: CoffeeScript版のロジックを移植し、入力→出力一致を狙う
 
-現状、`internal/domain/ai/` には最小 Agent としてツモ切り Agent と ManueAgent の最小実装が存在する。`mjai-manue` CLI は実体を持つが、CoffeeScript 版の評価ロジックはこれから ManueAgent へ段階移植する。
+現状、`internal/domain/ai/` にはツモ切り Agent と ManueAgent の途中実装が存在する。ManueAgent には使える純粋関数もあるが、候補評価へ接続されていない helper / wrapper / scaffold も混在しているため、CoffeeScript 版の構造を分解して再構築する。詳細な作業計画は `docs/manue-ai-porting-plan.md` に集約する。
 
-`mjai-manue` の CoffeeScript 版ロジック移植では、以前 main ブランチで移植した Go 実装（`reference/repositories/mjai-manue-go-main/internal/ai/`）を主な作業元とし、CoffeeScript 版 `coffee/manue_ai.coffee` は挙動確認の一次資料として参照する。現行コードの state/action 型は main ブランチ当時と異なるため、旧 `game.StateAnalyzer` 相当をそのまま復活させるのではなく、現行の `round.ActionStateViewer` と `LegalActions` を入口にして必要な評価材料だけを段階的に接続する。
+`mjai-manue` の CoffeeScript 版ロジック移植では、CoffeeScript 版 `reference/repositories/mjai-manue-original/coffee/manue_ai.coffee` をロジックの一次資料とし、以前 main ブランチで移植した Go 実装（`reference/repositories/mjai-manue-go-main/internal/ai/`）は動線・出力対応の補助資料として参照する。旧 `game.StateAnalyzer` 相当は復活させず、現行の `round.ActionStateViewer` と `LegalActions` を入口にする。
 
-移植の初期段階では `configs/` の読み込みは CLI に導入しない。`NewManueAgent(seed uint64)` は CLI 用の安定した constructor として維持し、stats / estimator / decision tree が必要な経路では `NewManueAgentWithDeps(seed, deps)` を使う。これにより、CLI を configs の embed JSON や `encoding/json/v2` 初期化に引きずらず、まず action 分類・優先順位・打牌評価の小さい単位から移植できる。現状は deps 付き constructor と stats 受け口だけを追加し、CLI からは引き続き `NewManueAgent(seed)` を使う。stats / decision tree など容量の大きい設定値は丸ごとコピーせず、用途別の小さい interface を deps 側で束ね、`configs` の値をその interface 実装として参照する方針で進める。詳細は `docs/manue-deps.md` に集約する。CLI の configs 読み込みを導入するまでは CoffeeScript 版との完全一致を移植ゴールにせず、判断入口と合法手選択の段階的な一致範囲を明示して進める。
+`cmd/mjai-manue` から Manue 本体を動かすため、stats と danger tree は CLI 側で `configs` から読み込み、`ManueAgent` へ deps として渡す。`internal/domain/ai` は `configs` を直接 import せず、stats / danger tree / estimator は用途別の小さい interface で受け取る。`NewManueAgent(seed)` はテストや簡易利用用に残してよいが、完成した `cmd/mjai-manue` では deps 付き constructor を使う。
 
-`mjai-manue` Phase 1 では configs 非依存の判断骨格だけを実装する。具体的には、合法手集合から `Win` を最優先で選ぶ、リーチ成立後はツモ切り打牌を選ぶ、通常手番では打牌/立直候補を暫定 score で選ぶ、他家打牌への反応では暫定的に最初の副露/カンを選び、行動候補が `Pass` だけなら `Pass` を選ぶ。打牌評価、副露するかどうかの期待値評価、危険度・聴牌確率・順位期待値は後続 phase で置き換える。
-
-移植中の `ManueAgent` は、完成形の呼び出し関係を先に固定し、下位の評価関数をハリボテから旧 Go 実装相当へ段階的に差し替える。
+`ManueAgent` の再構築では、完成形と異なる独自評価を増やさない。通常手番、副露反応、危険度、和了推定、流局、順位期待値は CoffeeScript 版 `getMetricsInternal` と同じ意味の評価値へ寄せ、既に `domain/game` にあるルール判定（合法手、向聴、役、点数、聴牌、和了形）は再実装しない。移植実装の内部語彙は現行 domain に合わせて原則 English にし、CoffeeScript 由来の `hoju` / `hora` / `ryukyoku` はそれぞれ `dealIn` / `win` / `exhaustiveDraw` として扱う。
 
 ```text
 ManueAgent.Decide
@@ -363,15 +362,16 @@ ManueAgent.Decide
   ├─ decideSelfTurn
   │   ├─ tsumogiriDiscard              // riichi accepted
   │   ├─ buildSelfTurnCandidates       // discard and riichi+discard candidates
-  │   ├─ scoreCandidates               // later: prior Go/CoffeeScript logic
+  │   │   └─ prefer tsumogiri over hand discard for the same tile kind
+  │   ├─ evaluateDiscardCandidates     // safe, win, draw, rank metrics
   │   └─ chooseBestCandidate
   └─ decideOtherDiscardReaction
-      ├─ buildReactionCandidates       // later: call/pass + discard pairs
-      ├─ scoreCandidates               // later
+      ├─ buildReactionCandidates       // pass and call candidates
+      ├─ evaluateReactionCandidates    // call + best following discard
       └─ chooseBestCandidate
 ```
 
-中間段階で完成形と異なる独自の評価ロジックを増やすことは避ける。たとえば通常打牌は、オリジナル実装相当の評価を移植するまで暫定 fallback に留め、別方針の向聴最小評価などを中心ロジックとして追加しない。内部構造は現行 Go の語彙へ寄せる一方、trace log の action key や表形式はオリジナル実装と揃える。
+trace log の action key や表形式はオリジナル実装と揃える。内部構造は現行 Go のドメイン語彙へ寄せる。
 
 ## 11. 設定ファイル (embed 固定)
 
@@ -457,13 +457,13 @@ ManueAgent.Decide
 6. **`mjai-manue` 本体の追加（一部完了）**
    - `cmd/mjai-manue` に実体を追加し、`--name` / `--seed` / URL mode を実装する。（完了）
    - `ManueAgent` を追加し、乱数を注入する。`--seed` 未指定時は seed `0`、PCG の第2 seed は `0` 固定とする。（完了）
-   - 現状は Phase 1 の判断骨格（和了優先、リーチ後ツモ切り、打牌/立直/副露 fallback）を実装済み。Phase 2 の入口として、現行コードの語彙に合わせた candidate / score 構造、旧 Go / CoffeeScript 版由来の score 比較規則（平均順位、期待点、赤牌回避）、通常手番の打牌および立直+打牌 candidate 足場、オリジナル互換の trace table 出力足場、score 変化の確率分布・平均順位計算・流局/和了時 score change 分布を扱う小さい基盤を追加済み。和了点頻度から score change 分布を作る純粋関数、和了推定値、和了推定の試行結果を候補別 accumulator に集計して和了率・平均和了点・和了点分布・試行全体の和了点期待値を組み立てる関数、候補別 accumulator へ1試行分の和了点を反映する入口、複数試行を直列に流して候補別和了推定を作る入口、候補から和了推定用キーを抽出し候補別和了推定を作る接続 helper、候補別和了推定値を candidate score へ反映する helper、試行結果から候補別和了推定を作って candidate score へ反映する helper、候補生成時にツモ牌込み14枚手牌・打牌後手牌・向聴解析結果・Goal 一覧を candidate に保持し、和了推定では14枚手牌の Goal と ThrowableVector を使って候補別に評価する構造、立直候補と重い向聴候補向けの和了推定 Goal フィルタリング、試行ツモ牌カウントと Goal の required tiles 達成判定、達成 Goal から最大和了点を選ぶ試行単位 helper、候補別に1試行分の和了点 map を作る helper、試行牌列から候補別和了推定を作る helper、壁から試行ツモ牌を切り出す helper、34種カウントから壁を生成する helper、見えている牌から未見牌の壁を生成する helper、未見牌の壁を固定 seed 乱数で直列シャッフルして候補別和了推定を作る入口、局状態・流局統計から候補別和了推定を作る状態接続入口、Goal に yaku/point 計算結果を付与して和了推定対象へ変換する入口、候補群から点数付き Goal map を作る接続 helper、和了点分布から自分の和了時 score change 分布を作る関数、和了推定値の candidate score への反映、放銃時の期待点、相手別 estimate からの安全確率・放銃確率と candidate score への反映、即時放銃 score change 分布と stats 接続・相手別 estimate からの畳み込み、安全時和了期待点、流局期待点、score change 分布から期待点を取り出す関数、流局確率、期待残り巡目、流局時聴牌確率、ヤミテン統計による聴牌確率、流局時聴牌確率への補正、流局時 score change 分布、平均流局点、平均和了点・平均流局点の candidate score への反映、自分の和了後に残る流局/他家和了確率の分岐と candidate score への反映、candidate score に基づく未来の終局 score change 分布と即時分布への接続、準備済み推定値・分布から candidate score を最終評価へ流す接続 helper、順位期待値用 stats interface と局状態から順位計算用 opponent を組み立てる基礎計算までは追加済みだが、期待値・危険度・順位期待値の中身はまだ estimator に接続しておらず、後続 phase で差し替える。`getHoraEstimation` 相当のモンテカルロはまず直列で移植し、将来必要になれば worker ごとの候補別 accumulator を merge する形で並列化する。
+   - 現状は和了優先、リーチ後ツモ切り、打牌/立直候補の暫定評価、副露 fallback まで実装済み。`manue_prob_dist.go`、score / rank / trace 系の純粋関数、和了推定に使える壁生成・試行・accumulator は残し、未接続 wrapper や scaffold helper は `docs/manue-ai-porting-plan.md` に従って整理する。
 
-7. **CoffeeScript 版ロジックの段階移植**
-   - 以前 main ブランチで移植した `internal/ai` 実装を主な作業元にし、CoffeeScript 版 `coffee/manue_ai.coffee` を挙動確認の一次資料として使う。
-   - Phase 1 は configs 非依存で、完成形の呼び出し関係（和了優先、`decideSelfTurn`、`decideOtherDiscardReaction`）と暫定 fallback を実装する。
-   - Phase 2 で候補生成 / score 計算 / best candidate 選択の形を作り、下位をハリボテから順に差し替える。通常手番は打牌候補と立直+打牌候補を同じ candidate として扱い、立直+打牌候補はオリジナル実装に合わせて通常手の向聴数が 0 以下の打牌だけを通す。現時点では評価値を同点扱いにして旧実装の tie-break（赤牌回避）と Phase 1 の立直優先 fallback だけを反映する。副露は「どれで鳴くか/鳴かない + 直後の打牌」が本来の評価単位になるため、現時点では早期分岐と fallback を維持し、複合 candidate は後続 phase で導入する。trace log の action key や表形式はオリジナル実装互換を維持するが、内部識別子や構造は現行 Go のドメイン語彙へ寄せる。trace table の列は先に固定し、未接続の score 列は後続 phase で実値へ差し替える。
-   - Phase 3 で `configs/`、危険度 estimator、聴牌確率 estimator、順位期待値系を接続する。`NewManueAgent(seed)` は維持し、必要なら deps 付き constructor を追加する。
+7. **CoffeeScript 版ロジックの再移植**
+   - CoffeeScript 版 `manue_ai.coffee` を一次資料、過去 Go 実装を補助資料として、`DecideAction` / `decideDahai` / `decideFuro` / `getMetricsInternal` を現行 `round.ActionStateViewer` と `LegalActions` に合わせて再構築する。
+   - `cmd/mjai-manue` は `configs.LoadGameStats()` と `configs.LoadDangerTree()` を呼び、deps validation 済みの `ManueAgent` を runtime に渡す。`internal/domain/ai` は configs を直接 import しない。
+   - 合法手に同一牌種の手出し discard とツモ切り discard が両方ある場合は、候補生成時点で手出し側を省き、ツモ切り側へ正規化する。CoffeeScript 版は牌種単位の候補 key を選び、出力時にツモ牌と同一なら `tsumogiri=true` にしていたため、この正規化で現行 Go の action 差分を吸収する。
+   - 危険度推定、和了推定、流局、他家和了、順位期待値を candidate evaluation へ接続し、通常手番と副露反応の両方を CoffeeScript 版 `getMetricsInternal` 相当の評価値で選ぶ。評価語彙は `dealInProb`、`winProb`、`exhaustiveDrawProb`、`scoreDeltaDist` のように English/domain 寄りの名前を使う。
    - 既存の `shanten` / `tenpai` / `win` / `yaku` / `point` service を再利用し、必要な不足だけを追加する。
    - original-vs-port 比較は CI には入れず、差分調査の補助として使う。
 

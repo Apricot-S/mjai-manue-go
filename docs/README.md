@@ -7,6 +7,7 @@
 - `design.md`: 全体設計の一次資料。ゴール/非ゴール、NFR、レイヤ責務、ユースケース、主要インタフェース案、テスト戦略を集約する。
 - `board-state-output.md`: 盤面状態出力の実装計画と Ruby 版 `mjai` の参照抜粋。実装が安定したら、恒久仕様は `design.md` に残し、この計画メモは縮小または削除する。
 - `performance-improvement-candidates.md`: 実装効率化候補の調査メモ。向聴計算、和了形判定、合法手列挙、牌変換などの改善案と検証方針をまとめる。
+- `manue-ai-porting-plan.md`: `internal/domain/ai` で CoffeeScript 版 Manue AI ロジックを移植し直すための作業計画。オリジナル分解、現行コードの残す/捨てる判断、実装順をまとめる。
 - `manue-deps.md`: `ManueAgent` の stats / estimator / config 依存を小さい interface として整理する方針メモ。
 - `terminology-en.md`: CoffeeScript 版 `mjai-manue` 由来の英語用語集。移植元コードの語彙確認に使う補助資料。
 

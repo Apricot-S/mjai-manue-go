@@ -4,15 +4,16 @@
 
 そのため、AI 側は必要な読み口だけを小さい interface として定義し、`ManueAgentDeps` ではそれらを束ねた複合 interface を受け取る方針にする。`configs` の値は adapter 的な実装で interface を満たし、AI ロジックは JSON schema や embed の都合に直接依存しない。
 
-## Current Interfaces
+## Target Interfaces
 
-現時点で実装している読み口は、ランダム和了時の score change 分布、流局時聴牌確率、順位期待値の基礎計算に必要なものだけ。
+Manue 本体を `cmd/mjai-manue` から動かす段階では、stats と危険度推定に必要な依存を deps として渡す。AI package は `configs` を直接 import せず、外側が `configs.LoadGameStats()` / `configs.LoadDangerTree()` の結果をこの interface へ適合させる。
 
 ```go
-func NewManueAgentWithDeps(seed uint64, deps ManueAgentDeps) *ManueAgent
+func NewManueAgentWithDeps(seed uint64, deps ManueAgentDeps) (*ManueAgent, error)
 
 type ManueAgentDeps struct {
-    Stats ManueStats
+    Stats  ManueStats
+    Danger DangerEstimator
 }
 
 // ManueStats provides read-only access to immutable statistical data used by
@@ -55,19 +56,17 @@ type DealInStats interface {
 type RankStats interface {
     RelativeWinProbs(roundWind wind.Wind, roundNumber int, selfPosition int, otherPosition int) (map[string]float64, bool)
 }
+
+type DangerEstimator interface {
+    DealInProb(scene DangerScene, discard tile.Tile) (float64, error)
+}
 ```
 
 `configs.GameStats` は上記の `WinScoreStats` / `RoundEndStats` / `DrawTenpaiStats` / `TenpaiEstimatorStats` / `RankStats` / `DealInStats` を構造的に満たす getter を持つ。これにより、AI package は `configs` を import せず、外側の組み立て側だけが `configs.LoadGameStats()` の戻り値を deps に渡せる。順位期待値用の `winProbsMap` key 形式（例: `E1,0,1`）は config schema 側の都合なので、AI 側の interface 境界には出さず、`configs.GameStats.RelativeWinProbs` の内部で組み立てる。
 
 ## Future Split
 
-`ManueStats` は大きな単一 interface にせず、用途別の小さい interface を埋め込んで育てる。現在必要な stats 系の読み口は `Current Interfaces` に移動済みで、今後は危険度推定や decision tree など stats 以外の依存を追加する段階で別 interface を増やす。
-
-```go
-type DangerEstimator interface {
-    // Details will be added when danger estimation is migrated.
-}
-```
+`ManueStats` は大きな単一 interface にせず、用途別の小さい interface を埋め込んで育てる。stats 以外の危険度推定は `ManueStats` に混ぜず、`DangerEstimator` として分ける。
 
 `YamitenStat` や `RyukyokuTenpaiStat` のような config schema 型をそのまま AI interface で返すことは避ける。AI が使う値に寄せた getter にすることで、config の JSON 構造変更や分割の影響を狭くする。
 
@@ -77,7 +76,7 @@ CoffeeScript 版には `ManueAI#getTenpaiProb` と `TenpaiProbEstimator#estimate
 
 stats はゲーム中に変化しない静的データなので、値の正当性は評価計算のたびに確認するのではなく、deps を組み立てる段階で一度検証する方針にする。これにより、壊れた設定値は早期に「設定ロード/組み立ての失敗」として検出でき、候補評価中の重複チェックも後から減らせる。
 
-現時点では private な `validateManueStats(stats ManueStats) error` を純粋関数として追加し、`NewManueAgentWithDeps` にはまだ組み込まない。`NewManueAgent(seed)` は configs 非依存の CLI 起動経路として残しており、stats が実際に必須になった段階で deps 付き constructor の error 返却や validation 組み込みを検討する。
+deps 付き constructor は `validateManueStats(stats ManueStats) error` と danger estimator の nil check を実行し、壊れた設定値を Agent 作成時に検出する。`NewManueAgent(seed)` はテストや簡易利用用に残してよいが、完成した `cmd/mjai-manue` では使わない。
 
 validation は、`NumWins() > 0`、自摸和了数が和了数の範囲内であること、和了点頻度の `total` が正で点数 key が parse 可能であること、流局時聴牌確率に必要な turn key が存在すること、流局ノーテン数が非負であることなど、静的 stats の構造・範囲を対象にする。一方で actor/dealer ID や `currentTurn` のような呼び出しごとの引数 validation は、必要に応じて計算関数側に残す。
 
@@ -97,12 +96,15 @@ AI interface としては `RankStats` に対応させる。`GameStats` と `Ligh
 
 ## Danger Tree
 
-`DecisionNode` / danger tree は stats とは別の設定値なので、`ManueStats` に混ぜない。AI は tree そのものではなく、危険度推定を行う estimator interface に依存する方針にする。
+`DecisionNode` / danger tree は stats とは別の設定値なので、`ManueStats` に混ぜない。AI は config schema ではなく、危険度推定を行う estimator interface に依存する方針にする。
 
 ```go
-type DangerEstimator interface {
-    // Details will be added when danger estimation is migrated.
+type DangerTreeNode interface {
+    LeafProb() (float64, bool)
+    Feature() (string, bool)
+    NegativeNode() DangerTreeNode
+    PositiveNode() DangerTreeNode
 }
 ```
 
-これにより、巨大な decision tree を AI 内部へコピーせず、estimator 実装が必要な参照だけを保持できる。
+実装時に必要なら `configs.DecisionNode` に上記を満たす accessor を追加する。これにより、巨大な decision tree を AI 内部へコピーせず、estimator 実装が必要な参照だけを保持できる。
