@@ -24,6 +24,7 @@ const (
 // Note:
 // This function calculates Fu and Han based on the original mjai-manue specification,
 // not the exact Fu and Han.
+// hand must contain exactly the concealed tiles represented by handBlocks.
 func CalculateFuHan(
 	hand *hand.VisibleHand,
 	handBlocks []block.Block,
