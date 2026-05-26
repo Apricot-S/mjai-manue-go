@@ -237,3 +237,39 @@ Go 移植前に、次の単位で CoffeeScript 版の出力を固定できる局
 - 安全牌は直後放銃確率 0 になる。
 - リーチ者の聴牌確率は 1 になる。
 - 候補比較は平均順位、期待点、赤牌回避の順で tie-break する。
+
+### 9.1 実装前に固定する判断単位
+
+characterization は「最終 action だけで十分なケース」と「中間 metric まで固定するケース」を分ける。CoffeeScript 版の責務は絡み合っているため、全ケースで内部値を固定しようとせず、Go 移植で崩しやすい接続点だけを選ぶ。
+
+| ID | 対象 | 固定するもの | 主な入力条件 |
+| --- | --- | --- | --- |
+| OC-001 | 和了優先 | `hora` action が即返ること。metrics/log は不要。 | `possibleActions` に `hora` と他 action が混在する。 |
+| OC-002 | リーチ accepted | 手牌評価せず、ツモ切り discard を返すこと。 | 自分が `reach` accepted、`possibleActions` にツモ切り discard がある。 |
+| OC-003 | リーチ accepted 異常系 | ツモ切り discard がなければ error/none 相当の異常として扱うこと。 | 自分が `reach` accepted、手出し discard だけがある。 |
+| OC-004 | 通常打牌重複 | 同一牌候補は 1 つに正規化されること。 | 同じ牌の手出し/ツモ切りが possibleActions にある。 |
+| OC-005 | 赤牌候補 | 赤牌と黒 5 の扱いを固定すること。 | 赤 5 と黒 5 の discard が同時に候補になる。 |
+| OC-006 | reach now 候補 | `canReach` 時、`reachMode="now"` で `shanten <= 0` の候補だけ reach 候補になること。 | reach action と複数 discard がある。 |
+| OC-007 | reach never 候補 | `canReach` 時、通常 discard は `reachMode="never"` として比較されること。 | reach action と通常 discard が比較で競合する。 |
+| OC-008 | reach declared | リーチ宣言後の打牌で `shanten > 0` 候補が除外されること。 | `reachDeclared` 状態で discard 候補が複数ある。 |
+| OC-009 | 副露 none | `none` 候補が副露候補と同じ比較器で評価されること。 | `pass` と `chi`/`pon` がある。 |
+| OC-010 | 副露選択 action | 副露候補が勝った場合、返る action は副露のみで、後続 discard は返らないこと。 | 副露後の最善打牌がある。 |
+| OC-011 | 喰い替え | `isKuikae` の牌が副露後 discard 候補から除外されること。 | 順子/刻子の喰い替えが可能な副露 action。 |
+| OC-012 | 安全牌 shortcut | 安全牌候補の対象相手への直後放銃確率が 0 になること。 | 対象者の現物を discard 候補に含める。 |
+| OC-013 | 聴牌確率 | リーチ者は 1、非リーチ者は `yamitenStats`、欠損時 1 になること。 | リーチ者/副露者/門前非リーチ者を混在させる。 |
+| OC-014 | 直後放銃分布 | 複数相手のロン分布を無変化 branch 置換で合成すること。 | 2 人以上が放銃対象になりうる discard。 |
+| OC-015 | 和了推定 shanten | 候補別 shanten が打牌後再解析ではなく `throwableVector` 由来になること。 | 打牌後再解析と throwable vector で差が出る候補。 |
+| OC-016 | 和了推定 points | 達成 goal が複数ある場合、候補ごとに最大 points が採用されること。 | 1 試行で複数 goal を達成する手牌。 |
+| OC-017 | 流局確率 | `ryukyokuRatio / 残り turnDistribution` と、その `3/4` 乗が使われること。 | 現在巡目以降の分布が単純な人工 stats。 |
+| OC-018 | 流局点 | 現在聴牌確率とノーテンからの聴牌化確率を合成し、3000 点授受分布になること。 | 4 人の聴牌確率を 0/1/中間値で混在させる。 |
+| OC-019 | 順位期待値 | 点差分布から相手ごとの勝率を独立 Bernoulli として平均順位へ変換すること。 | 2 相手以上との勝率が中間値になる stats。 |
+| OC-020 | 比較 tie-break | `averageRank`、`expectedPoints`、赤牌回避、走査順の順で選ぶこと。 | metric を人工的に固定できる候補集合。 |
+| OC-021 | trace/log | 表列名、`decidedKey`、末尾空行など、利用側に見える文字列形を固定すること。 | 代表的な通常打牌 1 ケース。 |
+
+### 9.2 Go 移植前の最低ライン
+
+実装前に最低限固定するケースは OC-001、OC-002、OC-006、OC-009、OC-011、OC-012、OC-015、OC-017、OC-020 とする。これらは dispatcher、候補生成、危険度、和了推定、終局確率、最終比較の接続を代表する。
+
+OC-008 は CoffeeScript 版では AI 内部の filtering 対象だが、Go 版では `domain/game` の `LegalActions` 境界で扱う。AI 側の characterization 最低ラインには含めず、`TestState_LegalActions_RiichiDeclarationTileKeepsTenpai` を根拠にする。
+
+OC-014、OC-016、OC-018、OC-019 は純粋関数テストで先に Go 側の期待値を固定し、CoffeeScript 版との差分が疑わしい場合に original-vs-port の補助比較を行う。trace/log の OC-021 は action golden とは分け、代表ケースだけを固定する。

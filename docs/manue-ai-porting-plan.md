@@ -11,6 +11,11 @@
 
 ## 2. 実装順
 
+0. **事前整理**
+   - 現行 `internal/domain/ai` の Manue 固有コードを、挙動変更なしで責務別ファイルへ分ける。
+   - 対応する unit test も同じ境界へ分ける。
+   - これは仕様固定のための準備であり、既存実装への流用前提にはしない。
+
 1. **仕様固定**
    - `docs/manue-ai-original-spec.md` の characterization ケース候補を、実装前にテスト候補へ落とし込む。
    - 原仕様と Go 移植仕様の差分が必要な箇所は、実装前に `docs/manue-ai-porting-spec.md` へ理由付きで追記する。

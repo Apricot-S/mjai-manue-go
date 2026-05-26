@@ -40,7 +40,7 @@ ManueAgent.Decide
 - 同一牌の手出し discard とツモ切り discard が両方ある場合は、CoffeeScript 版の「選択牌が手牌末尾と `Pai.equal` なら `tsumogiri=true`」に合わせ、候補生成時にツモ切り側へ正規化する。
 - 赤牌差分は CoffeeScript 版の `Pai.equal` と同じ扱いにする。赤を黒 5 と勝手に同一視しない。
 - legal action に `Riichi` がある場合、通常打牌候補とは別に reach+discard 候補を作る。ただし原仕様どおり、`reachMode="now"` 評価で `shanten <= 0` になる候補だけを残す。
-- リーチ宣言後・成立前の打牌は action と trace key は通常打牌のまま、評価だけ `reachMode="now"` 相当にする。
+- リーチ宣言後・成立前の打牌は、`round.State.LegalActions` がテンパイ維持できる立直宣言牌だけを列挙する前提にする。AI candidate builder は追加のシャンテン再検証で候補を除外しない。候補の action と trace key は通常打牌のまま、評価だけ `scoreAsRiichi=true` として扱う。
 
 ### 3.2 他家打牌反応
 
@@ -157,3 +157,33 @@ wire JSON の `log` field と stderr trace は混ぜない。action golden test 
 - runtime golden は action のみ比較する。trace/log は別 fixture にする。
 - Characterization は `docs/manue-ai-original-spec.md` のケース候補を優先する。
 - 最終確認は PowerShell で `$env:GOEXPERIMENT='jsonv2'; go test ./...` を実行する。
+
+### 10.1 Characterization の移植先
+
+`docs/manue-ai-original-spec.md` の OC-* は、Go 側では次の粒度へ落とす。
+
+| Original ID | Go 側テスト粒度 | 比較対象 |
+| --- | --- | --- |
+| OC-001, OC-002, OC-003 | Agent dispatcher | action と error |
+| OC-004, OC-005, OC-006, OC-007 | candidate builder | candidate key、action、riichi/scoreAsRiichi、discard tile |
+| OC-008 | domain/game LegalActions boundary | `TestState_LegalActions_RiichiDeclarationTileKeepsTenpai` で検証済み。AI 側では再検証しない。 |
+| OC-009, OC-010, OC-011 | reaction candidate builder + Agent 判断 | candidate key、返却 action |
+| OC-012, OC-013, OC-014 | danger/deal-in evaluator | `safeProb`、`dealInProb`、`immediateScoreDeltaDist` |
+| OC-015, OC-016 | win estimator | candidate shanten、win probability、points distribution |
+| OC-017, OC-018 | round-end model | exhaustive draw probability、tenpai probability、score delta distribution |
+| OC-019 | rank model | average rank |
+| OC-020 | candidate comparator | selected candidate key |
+| OC-021 | trace formatter | trace/log string |
+
+Agent 判断の characterization は、最終的に mjai JSON Lines から `round.State` を作って action を比較する。純粋関数で十分に固定できるものは、CoffeeScript 実行 fixture へ寄せず、Go の table-driven test で期待値を明示する。
+
+### 10.2 原仕様との差分記録が必要な箇所
+
+次は移植時に差分が出やすいため、実装前または最初のテスト追加時に意図を明記する。
+
+- 点数計算: CoffeeScript 版は `calculateFan` の簡易役判定を使うが、Go 側は `service.CalculateFuHan` / `service.RonPoints` を使う。差分が出たら、互換性を優先するか domain/game の正規計算を優先するかをケース単位で記録する。
+- 乱数: CoffeeScript 版は `seedRandom("")` で呼び出しごとに同じ乱数列を使う。Go 側は `--seed` と `math/rand/v2` による決定性を優先し、乱数列の完全一致は要求しない。
+- trace/log: CoffeeScript 版は `console.log` と `@log` が混在する。Go 側は stdout へ直接出さず、`Decision.Trace` / metadata として返す。
+- legal actions: CoffeeScript 版の対象外 action は初期実装では選ばない。暗槓、加槓、九種九牌などを扱う場合は別仕様を追加する。
+- state 管理: CoffeeScript 版は AI 内部の game/player 参照が広い。Go 側では `round.ActionStateViewer` / `round.StateViewer` を observation として使い、AI 側に重複 state を持たない。
+- 立直宣言牌: CoffeeScript 版は AI 側の `shanten <= 0` filtering で宣言牌を絞るが、Go 側は `domain/game` の `LegalActions` が合法な立直宣言牌だけを列挙する。AI 側で同じシャンテン計算を防御的に繰り返さない。
