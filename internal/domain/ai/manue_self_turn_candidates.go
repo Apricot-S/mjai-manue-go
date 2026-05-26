@@ -35,9 +35,9 @@ func getSelfTurnCandidates(actions []action.Action, self player.PlayerViewer) ([
 			// Thirteen Orphans do not create riichi candidates.
 			candidates = append(candidates, buildSelfTurnCandidate(riichi, discard.Tile(), h, afterDiscard, turnShanten, shanten, turnGoals, true, true))
 		}
-		if riichiDeclared && shanten > 0 {
-			continue
-		}
+		// After a riichi declaration, domain/game LegalActions already filters
+		// discards to tiles that keep tenpai, so AI does not re-run shanten as a
+		// defensive check here.
 		candidates = append(candidates, buildSelfTurnCandidate(discard, discard.Tile(), h, afterDiscard, turnShanten, shanten, turnGoals, false, riichiDeclared))
 	}
 	return candidates, nil

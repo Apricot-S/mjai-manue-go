@@ -155,7 +155,7 @@ func TestManueAgent_getSelfTurnCandidates_FiltersNonTenpaiRiichiCandidate(t *tes
 	}
 }
 
-func TestManueAgent_getSelfTurnCandidates_RiichiDeclaredScoresDiscardAsRiichi(t *testing.T) {
+func TestManueAgent_getSelfTurnCandidates_RiichiDeclaredScoresLegalActionsAsRiichi(t *testing.T) {
 	self := seat.MustSeat(0)
 	tenpaiDiscard, err := action.NewDiscard(self, tile.MustTileFromCode("5m"), false)
 	if err != nil {
@@ -177,20 +177,30 @@ func TestManueAgent_getSelfTurnCandidates_RiichiDeclaredScoresDiscardAsRiichi(t 
 	if err != nil {
 		t.Fatalf("getSelfTurnCandidates() failed: %v", err)
 	}
-	if len(got) != 1 {
-		t.Fatalf("len(getSelfTurnCandidates()) = %d, want 1", len(got))
+	if len(got) != 2 {
+		t.Fatalf("len(getSelfTurnCandidates()) = %d, want 2", len(got))
 	}
-	if got[0].traceKey != "-1.5m" {
-		t.Errorf("traceKey = %q, want -1.5m", got[0].traceKey)
+	wantActions := map[action.Action]bool{
+		tenpaiDiscard:    false,
+		nonTenpaiDiscard: false,
 	}
-	if got[0].riichi {
-		t.Errorf("riichi = true, want false because declaration action is already done")
+	for _, candidate := range got {
+		if candidate.riichi {
+			t.Errorf("riichi = true for %q, want false because declaration action is already done", candidate.traceKey)
+		}
+		if !candidate.scoreAsRiichi {
+			t.Errorf("scoreAsRiichi = false for %q, want true", candidate.traceKey)
+		}
+		if _, ok := wantActions[candidate.action]; !ok {
+			t.Errorf("action = %v, want one of legal-action inputs", candidate.action)
+			continue
+		}
+		wantActions[candidate.action] = true
 	}
-	if !got[0].scoreAsRiichi {
-		t.Errorf("scoreAsRiichi = false, want true")
-	}
-	if got[0].action != tenpaiDiscard {
-		t.Errorf("action = %v, want tenpai discard", got[0].action)
+	for action, found := range wantActions {
+		if !found {
+			t.Errorf("getSelfTurnCandidates() did not include %v", action)
+		}
 	}
 }
 
