@@ -59,14 +59,14 @@ func formatCandidateTrace(candidates []actionCandidate) string {
 	for _, candidate := range sortedCandidates {
 		rows = append(rows, []string{
 			candidate.traceKey,
-			strconv.FormatFloat(candidate.score.avgRank, 'f', 4, 64),
-			strconv.FormatFloat(candidate.score.expPts, 'f', 0, 64),
+			strconv.FormatFloat(candidate.score.averageRank, 'f', 4, 64),
+			strconv.FormatFloat(candidate.score.expectedPoints, 'f', 0, 64),
 			strconv.FormatFloat(candidate.score.dealInProb, 'f', 3, 64),
 			strconv.FormatFloat(candidate.score.winProb, 'f', 3, 64),
-			strconv.FormatFloat(candidate.score.drawProb, 'f', 3, 64),
-			strconv.FormatFloat(candidate.score.othersWinProb, 'f', 3, 64),
-			strconv.FormatFloat(candidate.score.avgWinPts, 'f', 0, 64),
-			strconv.FormatFloat(candidate.score.avgDrawPts, 'f', 0, 64),
+			strconv.FormatFloat(candidate.score.exhaustiveDrawProb, 'f', 3, 64),
+			strconv.FormatFloat(candidate.score.otherWinProb, 'f', 3, 64),
+			strconv.FormatFloat(candidate.score.averageWinPoints, 'f', 0, 64),
+			strconv.FormatFloat(candidate.score.exhaustiveDrawAveragePoints, 'f', 0, 64),
 			formatShantenTraceValue(candidate.score.shanten),
 		})
 	}

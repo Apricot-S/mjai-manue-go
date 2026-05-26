@@ -191,7 +191,7 @@ func TestValidateTenpaiEstimatorStats_ReturnsErrorWithInvalidYamitenCounts(t *te
 
 func TestValidateDealInStats_ReturnsErrorWithInvalidAvgWinPts(t *testing.T) {
 	stats := validStubManueStats()
-	stats.avgWinPts = 0
+	stats.avgWinPointsValue = 0
 
 	if err := validateDealInStats(stats); err == nil {
 		t.Fatal("validateDealInStats() succeeded unexpectedly")
@@ -214,7 +214,7 @@ func validStubManueStats() stubManueStats {
 		},
 		turnDistribution:              fullTurnDistribution(0.01),
 		exhaustiveDrawRatio:           0.1,
-		avgWinPts:                     5500,
+		avgWinPointsValue:             5500,
 		exhaustiveDrawNotenCount:      100,
 		exhaustiveDrawTenpaiTurnFreqs: fullTurnFreqs(1),
 		yamitenCounts: map[string]yamitenCount{

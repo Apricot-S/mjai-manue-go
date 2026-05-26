@@ -17,7 +17,7 @@ type stubManueStats struct {
 	dealerWinPointFreqs           map[string]int
 	turnDistribution              []float64
 	exhaustiveDrawRatio           float64
-	avgWinPts                     float64
+	avgWinPointsValue             float64
 	exhaustiveDrawNotenCount      int
 	exhaustiveDrawTenpaiTurnFreqs map[string]int
 	yamitenCounts                 map[string]yamitenCount
@@ -54,7 +54,7 @@ func (s stubManueStats) ExhaustiveDrawRatio() float64 {
 }
 
 func (s stubManueStats) AvgWinPts() float64 {
-	return s.avgWinPts
+	return s.avgWinPointsValue
 }
 
 func (s stubManueStats) ExhaustiveDrawNotenCount() int {

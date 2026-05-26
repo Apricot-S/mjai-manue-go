@@ -2,6 +2,7 @@ package ai
 
 import (
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/common"
+	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/round"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/round/player"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/round/player/hand"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/round/player/meld"
@@ -79,6 +80,28 @@ type stubCandidateEvaluationStateViewer struct {
 	nextRoundWind   wind.Wind
 	nextRoundNumber int
 	numLeftTiles    int
+}
+
+func stubStateWithSelf(self player.PlayerViewer) stubCandidateEvaluationStateViewer {
+	selfSeat := seat.MustSeat(0)
+	return stubCandidateEvaluationStateViewer{
+		turn:         0,
+		roundWind:    wind.East,
+		roundNumber:  1,
+		seatWinds:    [common.NumPlayers]wind.Wind{wind.East, wind.South, wind.West, wind.North},
+		dealer:       selfSeat,
+		scores:       [common.NumPlayers]int{25000, 25000, 25000, 25000},
+		startingSeat: selfSeat,
+		players: [common.NumPlayers]player.PlayerViewer{
+			self,
+			stubPlayerViewer{},
+			stubPlayerViewer{},
+			stubPlayerViewer{},
+		},
+		nextRoundWind:   wind.East,
+		nextRoundNumber: 1,
+		numLeftTiles:    round.NumInitWall,
+	}
 }
 
 func (s stubCandidateEvaluationStateViewer) RoundWind() wind.Wind {
