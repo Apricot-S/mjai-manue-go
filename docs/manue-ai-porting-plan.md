@@ -134,7 +134,8 @@ feature evaluator 群は旧 Go 実装 `estimator/danger_estimator.go` を現行 
 - `service.AnalyzeShanten` の `Goal` と `ThrowableVector` を使い、候補ごとの達成可能性を判定する。
 - 候補ごとの `shanten` は打牌後の手牌を再解析するのではなく、CoffeeScript 版の `shantenVector` と同じく、打牌前/副露後の `Goal.ThrowableVector` からその牌を捨てられる goal の最小 `Shanten` を採用する。`none` は base shanten を使う。
 - 和了推定 goal の pruning は候補ごとの `shanten` ではなく、CoffeeScript 版の `analysis.shanten()` と同じ打牌前/副露後の base shanten を使う。
-- `service.CalculateFuHan` と `service.RonPoints` で点数を計算する。`CalculateFuHan` の hand 引数は和了牌を含む 14 枚の入力を前提とするため、候補 scoring では打牌後の 13 枚ではなく、移植元の `calculateFan(goal, tehais, reachMode)` と同じく候補構築時の turn hand を渡す。
+- `service.CalculateFuHan` と `service.RonPoints` で点数を計算する。`CalculateFuHan` の hand 引数は `handBlocks` と同じ構成牌を持つ concealed hand を前提とするため、候補 scoring では `Goal.Blocks` から scoring hand を組み立てて渡す。
+- 赤ドラは CoffeeScript 版の `pai.red() && any(allPais, sameSymbol)` と同じく、候補 hand / meld 内の赤牌のうち goal の構成牌に同種牌が含まれるものだけを scoring hand / meld に残して `adr` として数える。
 - 候補別 accumulator で `winProb`、`averageWinPoints`、`winPointsDist`、`expectedWinPoints` を作る。
 
 Monte Carlo はまず直列で実装する。並列化が必要になった場合は、worker ごとに候補別 accumulator を作って merge する。

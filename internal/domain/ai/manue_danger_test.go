@@ -4,6 +4,8 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/round/player"
+	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/seat"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/tile"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/wind"
 )
@@ -122,5 +124,64 @@ func TestDangerSceneEvaluateOuterPrereachMatchesOriginalDirection(t *testing.T) 
 	}
 	if got {
 		t.Error("dangerScene.evaluate(1_inner_prereach_sutehai) = true, want false without 2m")
+	}
+}
+
+func TestNewDangerSceneKeepsPrereachTilesEmptyWithoutRiichi(t *testing.T) {
+	self := seat.MustSeat(0)
+	target := seat.MustSeat(1)
+	var players [4]player.PlayerViewer
+	players[self.Index()] = stubPlayerViewer{}
+	players[target.Index()] = stubPlayerViewer{
+		discardedTiles: []tile.Tile{tile.MustTileFromCode("1m")},
+	}
+	state := stubCandidateEvaluationStateViewer{
+		players: players,
+	}
+
+	scene := newDangerScene(state, self, target)
+	got, err := scene.evaluate("prereach_suji", tile.MustTileFromCode("4m"))
+	if err != nil {
+		t.Fatalf("dangerScene.evaluate(prereach_suji) failed: %v", err)
+	}
+	if got {
+		t.Error("dangerScene.evaluate(prereach_suji) = true, want false before target riichi")
+	}
+}
+
+func TestNewDangerSceneUsesTilesThroughRiichiDiscard(t *testing.T) {
+	self := seat.MustSeat(0)
+	target := seat.MustSeat(1)
+	var players [4]player.PlayerViewer
+	players[self.Index()] = stubPlayerViewer{}
+	players[target.Index()] = stubPlayerViewer{
+		discardedTiles: []tile.Tile{
+			tile.MustTileFromCode("1m"),
+			tile.MustTileFromCode("7m"),
+			tile.MustTileFromCode("2p"),
+			tile.MustTileFromCode("8p"),
+		},
+		riichiDiscardedTilesIndex: 1,
+		hasRiichiDiscardIndex:     true,
+	}
+	state := stubCandidateEvaluationStateViewer{
+		players: players,
+	}
+
+	scene := newDangerScene(state, self, target)
+	got, err := scene.evaluate("prereach_suji", tile.MustTileFromCode("4m"))
+	if err != nil {
+		t.Fatalf("dangerScene.evaluate(prereach_suji) failed: %v", err)
+	}
+	if !got {
+		t.Error("dangerScene.evaluate(prereach_suji) = false, want true for riichi discard suji")
+	}
+
+	got, err = scene.evaluate("prereach_suji", tile.MustTileFromCode("5p"))
+	if err != nil {
+		t.Fatalf("dangerScene.evaluate(prereach_suji late discard) failed: %v", err)
+	}
+	if got {
+		t.Error("dangerScene.evaluate(prereach_suji) = true, want false for discard after riichi declaration")
 	}
 }

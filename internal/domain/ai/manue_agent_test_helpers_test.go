@@ -11,9 +11,12 @@ import (
 )
 
 type stubPlayerViewer struct {
-	hand        *hand.VisibleHand
-	riichiState player.RiichiState
-	drawnTile   *tile.Tile
+	hand                      *hand.VisibleHand
+	riichiState               player.RiichiState
+	drawnTile                 *tile.Tile
+	discardedTiles            []tile.Tile
+	riichiDiscardedTilesIndex int
+	hasRiichiDiscardIndex     bool
 }
 
 func (p stubPlayerViewer) Hand() (*hand.VisibleHand, bool) {
@@ -25,18 +28,25 @@ func (p stubPlayerViewer) Hand() (*hand.VisibleHand, bool) {
 func (p stubPlayerViewer) HandTiles() []tile.Tile          { return nil }
 func (p stubPlayerViewer) DrawnTile() *tile.Tile           { return p.drawnTile }
 func (p stubPlayerViewer) Melds() []meld.Meld              { return nil }
-func (p stubPlayerViewer) River() []tile.Tile              { return nil }
-func (p stubPlayerViewer) DiscardedTiles() []tile.Tile     { return nil }
+func (p stubPlayerViewer) River() []tile.Tile              { return p.discardedTiles }
+func (p stubPlayerViewer) DiscardedTiles() []tile.Tile     { return p.discardedTiles }
 func (p stubPlayerViewer) ExtraSafeTiles() []tile.Tile     { return nil }
 func (p stubPlayerViewer) IsFuriten() bool                 { return false }
 func (p stubPlayerViewer) CanRonBy(*tile.Tile) bool        { return true }
 func (p stubPlayerViewer) RiichiState() player.RiichiState { return p.riichiState }
-func (p stubPlayerViewer) RiichiRiverIndex() int           { return -1 }
-func (p stubPlayerViewer) RiichiDiscardedTilesIndex() int  { return -1 }
+func (p stubPlayerViewer) RiichiRiverIndex() int           { return p.riichiIndex() }
+func (p stubPlayerViewer) RiichiDiscardedTilesIndex() int  { return p.riichiIndex() }
 func (p stubPlayerViewer) CanDiscard() bool                { return p.drawnTile != nil }
 func (p stubPlayerViewer) CanChiiPonKan() bool             { return p.drawnTile == nil }
 func (p stubPlayerViewer) IsConcealed() bool               { return true }
 func (p stubPlayerViewer) SwapCallTiles() []tile.Tile      { return nil }
+
+func (p stubPlayerViewer) riichiIndex() int {
+	if !p.hasRiichiDiscardIndex {
+		return -1
+	}
+	return p.riichiDiscardedTilesIndex
+}
 
 type stubWinEstimateStateViewer struct {
 	turn         float64

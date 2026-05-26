@@ -1059,6 +1059,56 @@ func TestScoredWinEstimateGoals(t *testing.T) {
 	}
 }
 
+func TestScoredWinEstimateGoalsBuildsHandFromGoalBlocks(t *testing.T) {
+	candidate := actionCandidate{
+		discardTile: tile.MustTileFromCode("?"),
+		turnHand: hand.MustVisibleHand([]tile.Tile{
+			tile.MustTileFromCode("5mr"),
+			tile.MustTileFromCode("1m"),
+			tile.MustTileFromCode("1m"),
+			tile.MustTileFromCode("1m"),
+			tile.MustTileFromCode("2p"),
+			tile.MustTileFromCode("3p"),
+			tile.MustTileFromCode("4p"),
+			tile.MustTileFromCode("3s"),
+			tile.MustTileFromCode("4s"),
+			tile.MustTileFromCode("6s"),
+			tile.MustTileFromCode("6s"),
+			tile.MustTileFromCode("6s"),
+			tile.MustTileFromCode("9s"),
+			tile.MustTileFromCode("9s"),
+		}),
+		scoreAsRiichi: true,
+		shantenGoals: []service.Goal{
+			{
+				Blocks: []block.Block{
+					block.MustTriplet(tile.MustTileFromCode("1m")),
+					block.MustSequence(tile.MustTileFromCode("2p")),
+					block.MustSequence(tile.MustTileFromCode("3s")),
+					block.MustTriplet(tile.MustTileFromCode("6s")),
+					block.MustPair(tile.MustTileFromCode("9s")),
+				},
+			},
+		},
+	}
+
+	got, err := scoredWinEstimateGoals(candidate, winEstimateGoalContext{
+		roundWind: wind.East,
+		seatWind:  wind.South,
+		dealer:    false,
+	})
+	if err != nil {
+		t.Fatalf("scoredWinEstimateGoals() failed: %v", err)
+	}
+	if len(got) != 1 {
+		t.Fatalf("len(scoredWinEstimateGoals()) = %d, want 1", len(got))
+	}
+	wantPoints := service.RonPoints(40, 1, false)
+	if got[0].points != float64(wantPoints) {
+		t.Errorf("scoredWinEstimateGoals()[0].points = %v, want %v", got[0].points, wantPoints)
+	}
+}
+
 func TestScoredWinEstimateGoalsRequiresTurnHand(t *testing.T) {
 	_, err := scoredWinEstimateGoals(actionCandidate{}, winEstimateGoalContext{})
 	if err == nil {

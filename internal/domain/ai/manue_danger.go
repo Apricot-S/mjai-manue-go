@@ -82,11 +82,12 @@ func newDangerScene(state round.StateViewer, self seat.Seat, target seat.Seat) d
 	if h, ok := selfPlayer.Hand(); ok {
 		selfHand = h.ToTiles()
 	}
-	prereachTiles := targetPlayer.DiscardedTiles()
+	prereachTiles := []tile.Tile(nil)
 	reachTiles := []tile.Tile(nil)
-	if idx := targetPlayer.RiichiDiscardedTilesIndex(); idx >= 0 && idx < len(prereachTiles) {
-		prereachTiles = prereachTiles[:idx+1]
-		reachTiles = []tile.Tile{prereachTiles[idx]}
+	discardedTiles := targetPlayer.DiscardedTiles()
+	if idx := targetPlayer.RiichiDiscardedTilesIndex(); idx >= 0 && idx < len(discardedTiles) {
+		prereachTiles = discardedTiles[:idx+1]
+		reachTiles = []tile.Tile{discardedTiles[idx]}
 	}
 	half := len(prereachTiles) / 2
 	return dangerScene{

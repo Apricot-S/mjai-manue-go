@@ -10,6 +10,7 @@ import (
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/round/player/hand"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/round/player/meld"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/round/service"
+	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/round/service/block"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/seat"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/tile"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/wind"
@@ -250,8 +251,12 @@ func scoredWinEstimateGoals(candidate actionCandidate, context winEstimateGoalCo
 	goals := filteredWinEstimateGoals(candidate)
 	scoredGoals := make([]winEstimateGoal, 0, len(goals))
 	for _, goal := range goals {
+		scoringHand, err := scoringHandForGoal(candidate.turnHand, goal.Blocks)
+		if err != nil {
+			return nil, err
+		}
 		fu, han, _ := service.CalculateFuHan(
-			candidate.turnHand,
+			scoringHand,
 			goal.Blocks,
 			context.melds,
 			context.roundWind,
@@ -269,6 +274,34 @@ func scoredWinEstimateGoals(candidate actionCandidate, context winEstimateGoalCo
 		})
 	}
 	return scoredGoals, nil
+}
+
+func scoringHandForGoal(sourceHand *hand.VisibleHand, blocks []block.Block) (*hand.VisibleHand, error) {
+	redCounts := make(map[int]int, 3)
+	for _, t := range sourceHand.ToTiles() {
+		if t.IsRed() {
+			redCounts[t.RemoveRed().ID()]++
+		}
+	}
+
+	tiles := make([]tile.Tile, 0, 14)
+	for _, b := range blocks {
+		for _, t := range b.ToTiles() {
+			normal := t.RemoveRed()
+			if redCounts[normal.ID()] > 0 {
+				tiles = append(tiles, normal.AddRed())
+				redCounts[normal.ID()]--
+				continue
+			}
+			tiles = append(tiles, normal)
+		}
+	}
+
+	scoringHand, err := hand.NewVisibleHand(tiles)
+	if err != nil {
+		return nil, fmt.Errorf("cannot build scoring hand for win estimate goal: %w", err)
+	}
+	return scoringHand, nil
 }
 
 func scoredWinEstimateGoalsByKey(
