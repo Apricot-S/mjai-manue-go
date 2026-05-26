@@ -236,14 +236,6 @@ func newWinEstimate(
 	}, nil
 }
 
-func dealInProb(estimates []dealInEstimate) (float64, error) {
-	safeProb, err := safeProb(estimates)
-	if err != nil {
-		return 0, err
-	}
-	return 1.0 - safeProb, nil
-}
-
 func safeProb(estimates []dealInEstimate) (float64, error) {
 	safeProb := 1.0
 	for _, estimate := range estimates {
@@ -323,6 +315,19 @@ func winPointsDist(pointFreqs map[string]int) (scalarProbDist, error) {
 	return newScalarProbDist(dist), nil
 }
 
+func winPointsDistFromValidatedStats(pointFreqs map[string]int) scalarProbDist {
+	totalFreqsFloat := float64(pointFreqs["total"])
+	dist := make(map[float64]float64, len(pointFreqs)-1)
+	for points, freq := range pointFreqs {
+		if points == "total" {
+			continue
+		}
+		parsedPoints, _ := strconv.ParseFloat(points, 64)
+		dist[parsedPoints] = float64(freq) / totalFreqsFloat
+	}
+	return newScalarProbDist(dist)
+}
+
 // randomWinScoreDeltaDist returns the score-change distribution for a random
 // win by actorID.
 func randomWinScoreDeltaDist(
@@ -345,20 +350,14 @@ func randomWinScoreDeltaDistFromStats(
 	actorID int,
 	dealerID int,
 	stats WinScoreStats,
-) (scoreDeltaProbDist, error) {
-	if stats.NumWins() <= 0 {
-		return nil, fmt.Errorf("cannot build random win score delta distribution: numWins must be positive")
-	}
-
+) scoreDeltaProbDist {
 	pointFreqs := stats.NonDealerWinPointFreqs()
 	if actorID == dealerID {
 		pointFreqs = stats.DealerWinPointFreqs()
 	}
-	return randomWinScoreDeltaDist(
-		actorID,
-		dealerID,
-		float64(stats.NumSelfDrawWins())/float64(stats.NumWins()),
-		pointFreqs,
+	return multiplyScalarScoreDeltaProbDists(
+		winPointsDistFromValidatedStats(pointFreqs),
+		winScoreFactorDist(actorID, dealerID, float64(stats.NumSelfDrawWins())/float64(stats.NumWins())),
 	)
 }
 
@@ -367,14 +366,11 @@ func winScoreDeltaDistFromPointsDist(
 	dealerID int,
 	stats WinScoreStats,
 	pointsDist scalarProbDist,
-) (scoreDeltaProbDist, error) {
-	if stats.NumWins() <= 0 {
-		return nil, fmt.Errorf("cannot build win score delta distribution: numWins must be positive")
-	}
+) scoreDeltaProbDist {
 	return multiplyScalarScoreDeltaProbDists(
 		pointsDist,
 		winScoreFactorDist(actorID, dealerID, float64(stats.NumSelfDrawWins())/float64(stats.NumWins())),
-	), nil
+	)
 }
 
 func selfWinScoreDeltaDistFromEstimate(
@@ -382,7 +378,7 @@ func selfWinScoreDeltaDistFromEstimate(
 	dealerID int,
 	stats WinScoreStats,
 	estimate winEstimate,
-) (scoreDeltaProbDist, error) {
+) scoreDeltaProbDist {
 	return winScoreDeltaDistFromPointsDist(selfID, dealerID, stats, estimate.pointsDist)
 }
 
@@ -431,31 +427,16 @@ func expectedRemainingTurns(stats RoundEndStats, currentTurn float64) (int, erro
 	return int(math.Round(num / den)), nil
 }
 
-func tenpaiProb(stats TenpaiEstimatorStats, riichi bool, remainTurns int, numMelds int) (float64, error) {
+func tenpaiProb(stats TenpaiEstimatorStats, riichi bool, remainTurns int, numMelds int) float64 {
 	if riichi {
-		return 1.0, nil
+		return 1.0
 	}
 
 	total, tenpai, ok := stats.YamitenCounts(remainTurns, numMelds)
 	if !ok {
-		return 1.0, nil
+		return 1.0
 	}
-	if total <= 0 {
-		return 0, fmt.Errorf("cannot estimate tenpai probability: yamiten total must be positive")
-	}
-	if tenpai < 0 || tenpai > total {
-		return 0, fmt.Errorf("cannot estimate tenpai probability: yamiten tenpai must be between 0 and total")
-	}
-	return float64(tenpai) / float64(total), nil
-}
-
-// dealInExpPts returns expected points from dealing in. It is negative because
-// it represents self's score change when the discard is unsafe.
-func dealInExpPts(stats DealInStats, safeProb float64) (float64, error) {
-	if safeProb < 0.0 || safeProb > 1.0 {
-		return 0.0, fmt.Errorf("cannot estimate deal-in expected points: safe probability must be between 0 and 1")
-	}
-	return -(1.0 - safeProb) * stats.AvgWinPts(), nil
+	return float64(tenpai) / float64(total)
 }
 
 // immediateDealInScoreDeltaDist returns the immediate score-change
@@ -494,10 +475,7 @@ func immediateDealInScoreDeltaDistFromStats(
 	if winnerID == dealerID {
 		pointFreqs = stats.DealerWinPointFreqs()
 	}
-	pointsDist, err := winPointsDist(pointFreqs)
-	if err != nil {
-		return nil, err
-	}
+	pointsDist := winPointsDistFromValidatedStats(pointFreqs)
 	return immediateDealInScoreDeltaDist(winnerID, selfID, dealInProb, pointsDist)
 }
 
@@ -536,23 +514,6 @@ func immediateScoreDeltaDist(dists []scoreDeltaProbDist) scoreDeltaProbDist {
 		result = result.replace(scoreDelta{}, dist)
 	}
 	return result
-}
-
-func safeWinExpPts(safeProb float64, avgWinPts float64) (float64, error) {
-	if safeProb < 0.0 || safeProb > 1.0 {
-		return 0.0, fmt.Errorf("cannot estimate safe win expected points: safe probability must be between 0 and 1")
-	}
-	return safeProb * avgWinPts, nil
-}
-
-func exhaustiveDrawExpPts(safeProb float64, exhaustiveDrawProb float64, avgDrawPts float64) (float64, error) {
-	if safeProb < 0.0 || safeProb > 1.0 {
-		return 0.0, fmt.Errorf("cannot estimate exhaustive-draw expected points: safe probability must be between 0 and 1")
-	}
-	if exhaustiveDrawProb < 0.0 || exhaustiveDrawProb > 1.0 {
-		return 0.0, fmt.Errorf("cannot estimate exhaustive-draw expected points: exhaustive-draw probability must be between 0 and 1")
-	}
-	return safeProb * exhaustiveDrawProb * avgDrawPts, nil
 }
 
 // remainingRoundEndProbs splits the probability mass left after accounting for
@@ -611,17 +572,11 @@ func expectedPts(selfID int, scoreChanges scoreDeltaProbDist) float64 {
 // ending by exhaustive draw.
 func notenExhaustiveDrawTenpaiProb(stats DrawTenpaiStats, currentTurn float64) (float64, error) {
 	notenFreq := stats.ExhaustiveDrawNotenCount()
-	if notenFreq < 0 {
-		return 0, fmt.Errorf("cannot estimate exhaustive-draw tenpai probability: noten count must be non-negative")
-	}
 
 	tenpaiFreq := 0
 	for turn := currentTurn + 0.25; turn <= round.FinalTurn; turn += 0.25 {
 		key := strconv.FormatFloat(turn, 'f', -1, 64)
-		freq, ok := stats.ExhaustiveDrawTenpaiTurnFreq(key)
-		if !ok {
-			return 0, fmt.Errorf("cannot estimate exhaustive-draw tenpai probability: missing tenpai turn frequency for turn %s", key)
-		}
+		freq, _ := stats.ExhaustiveDrawTenpaiTurnFreq(key)
 		tenpaiFreq += freq
 	}
 

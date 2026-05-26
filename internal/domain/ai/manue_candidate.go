@@ -42,9 +42,12 @@ type actionCandidate struct {
 	traceKey         string
 	action           action.Action
 	riichi           bool
+	scoreAsRiichi    bool
 	discardTile      tile.Tile
+	melds            []meld.Meld
 	turnHand         *hand.VisibleHand
 	afterDiscardHand *hand.VisibleHand
+	baseShanten      int
 	shantenGoals     []service.Goal
 	score            candidateScore
 }
@@ -67,39 +70,14 @@ type winEstimateStateViewer interface {
 	Turn() float64
 }
 
-type candidateScoreDeltaDists struct {
-	immediateDist      scoreDeltaProbDist
-	selfWinDist        scoreDeltaProbDist
-	exhaustiveDrawDist scoreDeltaProbDist
-	otherWinDists      []scoreDeltaProbDist
-}
-
 func chooseBestCandidate(candidates []actionCandidate, preferBlack bool) actionCandidate {
 	best := candidates[0]
 	for _, candidate := range candidates[1:] {
-		if compareCandidate(candidate, best, preferBlack) < 0 {
+		if compareCandidateScore(&candidate.score, &best.score, preferBlack) < 0 {
 			best = candidate
 		}
 	}
 	return best
-}
-
-func compareCandidate(lhs, rhs actionCandidate, preferBlack bool) int {
-	if r := compareCandidateScore(&lhs.score, &rhs.score, preferBlack); r != 0 {
-		return r
-	}
-	return compareCandidateFallback(lhs, rhs)
-}
-
-// compareCandidateFallback preserves Phase 1 behavior until score calculation is migrated.
-func compareCandidateFallback(lhs, rhs actionCandidate) int {
-	if lhs.riichi && !rhs.riichi {
-		return -1
-	}
-	if !lhs.riichi && rhs.riichi {
-		return 1
-	}
-	return 0
 }
 
 func compareCandidateScore(lhs, rhs *candidateScore, preferBlack bool) int {
@@ -161,60 +139,6 @@ func evaluateCandidateScoreFromState(
 	)
 }
 
-func applyDealInEstimatesToCandidateScore(score candidateScore, estimates []dealInEstimate) (candidateScore, float64, error) {
-	safeProb, err := safeProb(estimates)
-	if err != nil {
-		return candidateScore{}, 0, err
-	}
-	score.dealInProb = 1.0 - safeProb
-	return score, safeProb, nil
-}
-
-func applyWinEstimateToCandidateScore(score candidateScore, estimate winEstimate) (candidateScore, error) {
-	if estimate.prob < 0.0 || estimate.prob > 1.0 {
-		return candidateScore{}, fmt.Errorf("cannot apply win estimate: win probability must be between 0 and 1")
-	}
-	score.winProb = estimate.prob
-	score.avgWinPts = estimate.avgPts
-	return score, nil
-}
-
-func applyWinEstimatesToCandidates(
-	candidates []actionCandidate,
-	estimates map[string]winEstimate,
-) ([]actionCandidate, error) {
-	updated := make([]actionCandidate, len(candidates))
-	for i, candidate := range candidates {
-		estimate, ok := estimates[candidate.traceKey]
-		if !ok {
-			return nil, fmt.Errorf("cannot apply win estimates: missing estimate for %q", candidate.traceKey)
-		}
-		score, err := applyWinEstimateToCandidateScore(candidate.score, estimate)
-		if err != nil {
-			return nil, fmt.Errorf("cannot apply win estimate for %q: %w", candidate.traceKey, err)
-		}
-		candidate.score = score
-		updated[i] = candidate
-	}
-	return updated, nil
-}
-
-func applyRoundEndProbsToCandidateScore(score candidateScore, exhaustiveDrawProbOnSelfNoWin float64) (candidateScore, error) {
-	drawProb, othersWinProb, err := remainingRoundEndProbs(score.winProb, exhaustiveDrawProbOnSelfNoWin)
-	if err != nil {
-		return candidateScore{}, err
-	}
-	score.drawProb = drawProb
-	score.othersWinProb = othersWinProb
-	return score, nil
-}
-
-func applyAveragePtsToCandidateScore(score candidateScore, avgWinPts float64, avgDrawPts float64) candidateScore {
-	score.avgWinPts = avgWinPts
-	score.avgDrawPts = avgDrawPts
-	return score
-}
-
 func candidateTotalScoreDeltaDist(
 	score candidateScore,
 	immediateDist scoreDeltaProbDist,
@@ -239,30 +163,37 @@ func evaluateCandidateFromPreparedDists(
 	winEstimate winEstimate,
 	exhaustiveDrawProbOnSelfNoWin float64,
 	avgDrawPts float64,
-	dists candidateScoreDeltaDists,
+	immediateDist scoreDeltaProbDist,
+	selfWinDist scoreDeltaProbDist,
+	exhaustiveDrawDist scoreDeltaProbDist,
+	otherWinDists []scoreDeltaProbDist,
 	rankStats RankStats,
 	state rankStateViewer,
 	self seat.Seat,
 ) (candidateScore, error) {
-	score, _, err := applyDealInEstimatesToCandidateScore(score, dealInEstimates)
+	safeProb, err := safeProb(dealInEstimates)
 	if err != nil {
 		return candidateScore{}, err
 	}
-	score, err = applyWinEstimateToCandidateScore(score, winEstimate)
+	score.dealInProb = 1.0 - safeProb
+	if winEstimate.prob < 0.0 || winEstimate.prob > 1.0 {
+		return candidateScore{}, fmt.Errorf("cannot evaluate candidate: win probability must be between 0 and 1")
+	}
+	score.winProb = winEstimate.prob
+	score.avgWinPts = winEstimate.avgPts
+	drawProb, othersWinProb, err := remainingRoundEndProbs(score.winProb, exhaustiveDrawProbOnSelfNoWin)
 	if err != nil {
 		return candidateScore{}, err
 	}
-	score, err = applyRoundEndProbsToCandidateScore(score, exhaustiveDrawProbOnSelfNoWin)
-	if err != nil {
-		return candidateScore{}, err
-	}
-	score = applyAveragePtsToCandidateScore(score, score.avgWinPts, avgDrawPts)
+	score.drawProb = drawProb
+	score.othersWinProb = othersWinProb
+	score.avgDrawPts = avgDrawPts
 	scoreChanges := candidateTotalScoreDeltaDist(
 		score,
-		dists.immediateDist,
-		dists.selfWinDist,
-		dists.exhaustiveDrawDist,
-		dists.otherWinDists,
+		immediateDist,
+		selfWinDist,
+		exhaustiveDrawDist,
+		otherWinDists,
 	)
 	return evaluateCandidateScoreFromState(score, scoreChanges, rankStats, state, self), nil
 }
@@ -291,29 +222,20 @@ func winEstimatesForCandidates(candidates []actionCandidate, trials []map[string
 	return winEstimatesFromTrials(keys, trials)
 }
 
-func applyWinEstimateTrialsToCandidates(
-	candidates []actionCandidate,
-	trials []map[string]float64,
-) ([]actionCandidate, error) {
-	estimates, err := winEstimatesForCandidates(candidates, trials)
-	if err != nil {
-		return nil, err
-	}
-	return applyWinEstimatesToCandidates(candidates, estimates)
-}
-
 func filteredWinEstimateGoals(candidate actionCandidate) []service.Goal {
 	goals := make([]service.Goal, 0, len(candidate.shantenGoals))
 	for _, goal := range candidate.shantenGoals {
-		if candidate.riichi && goal.Shanten > 0 {
+		if candidate.scoreAsRiichi && goal.Shanten > 0 {
 			continue
 		}
-		if candidate.score.shanten > 3 && goal.Shanten > candidate.score.shanten {
+		if candidate.baseShanten > 3 && goal.Shanten > candidate.baseShanten {
 			continue
 		}
-		discardID := candidate.discardTile.RemoveRed().ID()
-		if goal.ThrowableVector[discardID] <= 0 {
-			continue
+		if !candidate.discardTile.IsUnknown() {
+			discardID := candidate.discardTile.RemoveRed().ID()
+			if goal.ThrowableVector[discardID] <= 0 {
+				continue
+			}
 		}
 		goals = append(goals, goal)
 	}
@@ -335,7 +257,7 @@ func scoredWinEstimateGoals(candidate actionCandidate, context winEstimateGoalCo
 			context.roundWind,
 			context.seatWind,
 			context.doraIndicators,
-			candidate.riichi,
+			candidate.scoreAsRiichi,
 		)
 		points := service.RonPoints(fu, han, context.dealer)
 		if points <= 0 {
@@ -359,7 +281,11 @@ func scoredWinEstimateGoalsByKey(
 
 	goalsByKey := make(map[string][]winEstimateGoal, len(candidates))
 	for _, candidate := range candidates {
-		goals, err := scoredWinEstimateGoals(candidate, context)
+		candidateContext := context
+		if candidate.melds != nil {
+			candidateContext.melds = candidate.melds
+		}
+		goals, err := scoredWinEstimateGoals(candidate, candidateContext)
 		if err != nil {
 			return nil, fmt.Errorf("cannot score win estimate goals for %q: %w", candidate.traceKey, err)
 		}
@@ -538,38 +464,213 @@ func winEstimatesFromState(
 	return winEstimatesFromShuffledWall(candidates, goalsByKey, wall, numDraws, numTries, rng)
 }
 
+func candidateShanten(discardTile tile.Tile, baseShanten int, goals []service.Goal) int {
+	if discardTile.IsUnknown() {
+		return baseShanten
+	}
+	discardID := discardTile.RemoveRed().ID()
+	shanten := service.InfinityShanten
+	for _, goal := range goals {
+		if goal.ThrowableVector[discardID] > 0 && goal.Shanten < shanten {
+			shanten = goal.Shanten
+		}
+	}
+	return shanten
+}
+
 func getSelfTurnCandidates(actions []action.Action, self player.PlayerViewer) ([]actionCandidate, error) {
 	h, err := selfTurnHand(self)
 	if err != nil {
 		return nil, fmt.Errorf("cannot build self-turn candidates: %w", err)
 	}
-	_, turnGoals := service.AnalyzeShanten(h, service.AllowedExtraTiles(1))
+	turnShanten, turnGoals := service.AnalyzeShanten(h, service.AllowedExtraTiles(1))
 
 	// Self-turn candidates currently cover discard and riichi+discard only.
 	// Concealed kan, promoted kan, and kyushukyuhai are intentionally not
 	// selected.
 	riichi := firstActionOfType[*action.Riichi](actions)
+	riichiDeclared := self.RiichiState() == player.RiichiDeclared
 	var candidates []actionCandidate
+	for _, discard := range normalizedSelfTurnDiscards(actions) {
+		afterDiscard, err := h.Discard(discard.Tile())
+		if err != nil {
+			return nil, fmt.Errorf("cannot build self-turn candidate for %s: %w", discard.Tile(), err)
+		}
+		shanten := candidateShanten(discard.Tile(), turnShanten, turnGoals)
+		if riichi != nil && shanten <= 0 {
+			// Match Manue's riichi candidate filtering: only regular-hand shanten
+			// from AnalyzeShanten is considered here, so Seven Pairs and
+			// Thirteen Orphans do not create riichi candidates.
+			candidates = append(candidates, buildSelfTurnCandidate(riichi, discard.Tile(), h, afterDiscard, turnShanten, shanten, turnGoals, true, true))
+		}
+		if riichiDeclared && shanten > 0 {
+			continue
+		}
+		candidates = append(candidates, buildSelfTurnCandidate(discard, discard.Tile(), h, afterDiscard, turnShanten, shanten, turnGoals, false, riichiDeclared))
+	}
+	return candidates, nil
+}
+
+func getOtherDiscardReactionCandidates(actions []action.Action, self player.PlayerViewer) ([]actionCandidate, error) {
+	h, err := selfTurnHand(self)
+	if err != nil {
+		return nil, fmt.Errorf("cannot build reaction candidates: %w", err)
+	}
+
+	candidates := make([]actionCandidate, 0, len(actions))
+	if pass := firstActionOfType[*action.Pass](actions); pass != nil {
+		shanten, goals := service.AnalyzeShanten(h, service.AllowedExtraTiles(1))
+		unknown := tile.MustTileFromCode("?")
+		candidates = append(candidates, actionCandidate{
+			traceKey:         "none",
+			action:           pass,
+			discardTile:      unknown,
+			melds:            self.Melds(),
+			turnHand:         h,
+			afterDiscardHand: h,
+			baseShanten:      shanten,
+			shantenGoals:     goals,
+			score:            scoreDiscardCandidate(unknown, shanten),
+		})
+	}
+
+	callIndex := 0
+	for _, a := range actions {
+		callMeld, ok, err := actionCallMeld(a)
+		if err != nil {
+			return nil, err
+		}
+		if !ok {
+			continue
+		}
+		callCandidates, err := getCallReactionCandidates(callIndex, a, callMeld, h, self.Melds())
+		if err != nil {
+			return nil, err
+		}
+		candidates = append(candidates, callCandidates...)
+		callIndex++
+	}
+	return candidates, nil
+}
+
+func getCallReactionCandidates(
+	callIndex int,
+	callAction action.Action,
+	callMeld meld.Meld,
+	baseHand *hand.VisibleHand,
+	baseMelds []meld.Meld,
+) ([]actionCandidate, error) {
+	turnHand, err := baseHand.Call(callMeld)
+	if err != nil {
+		return nil, fmt.Errorf("cannot build reaction candidates for call %d: %w", callIndex, err)
+	}
+	nextMelds := append(slices.Clone(baseMelds), callMeld)
+	turnShanten, turnGoals := service.AnalyzeShanten(turnHand, service.AllowedExtraTiles(1))
+
+	if _, ok := callMeld.(*meld.CalledKan); ok {
+		unknown := tile.MustTileFromCode("?")
+		shanten, goals := service.AnalyzeShanten(turnHand, service.AllowedExtraTiles(1))
+		return []actionCandidate{{
+			traceKey:         fmt.Sprintf("%d.none", callIndex),
+			action:           callAction,
+			discardTile:      unknown,
+			melds:            nextMelds,
+			turnHand:         turnHand,
+			afterDiscardHand: turnHand,
+			baseShanten:      shanten,
+			shantenGoals:     goals,
+			score:            scoreDiscardCandidate(unknown, shanten),
+		}}, nil
+	}
+
+	swapCallTiles := callSwapTiles(callMeld)
+	discardTiles := tile.Tiles(turnHand.ToTiles()).Distinct(func(t tile.Tile) bool {
+		return isSwapCallTile(t, swapCallTiles)
+	})
+	candidates := make([]actionCandidate, 0, len(discardTiles))
+	for _, discardTile := range discardTiles {
+		afterDiscard, err := turnHand.Discard(discardTile)
+		if err != nil {
+			return nil, fmt.Errorf("cannot build reaction candidate %d.%s: %w", callIndex, discardTile, err)
+		}
+		shanten := candidateShanten(discardTile, turnShanten, turnGoals)
+		candidates = append(candidates, actionCandidate{
+			traceKey:         fmt.Sprintf("%d.%s", callIndex, discardTile),
+			action:           callAction,
+			discardTile:      discardTile,
+			melds:            nextMelds,
+			turnHand:         turnHand,
+			afterDiscardHand: afterDiscard,
+			baseShanten:      turnShanten,
+			shantenGoals:     turnGoals,
+			score:            scoreDiscardCandidate(discardTile, shanten),
+		})
+	}
+	return candidates, nil
+}
+
+func actionCallMeld(a action.Action) (meld.Meld, bool, error) {
+	switch call := a.(type) {
+	case *action.Chii:
+		m, err := meld.NewChii(call.Taken(), call.Consumed(), call.Target())
+		if err != nil {
+			return nil, false, err
+		}
+		return m, true, nil
+	case *action.Pon:
+		m, err := meld.NewPon(call.Taken(), call.Consumed(), call.Target())
+		if err != nil {
+			return nil, false, err
+		}
+		return m, true, nil
+	case *action.CalledKan:
+		m, err := meld.NewCalledKan(call.Taken(), call.Consumed(), call.Target())
+		if err != nil {
+			return nil, false, err
+		}
+		return m, true, nil
+	default:
+		return nil, false, nil
+	}
+}
+
+func callSwapTiles(m meld.Meld) []tile.Tile {
+	switch c := m.(type) {
+	case *meld.Chii:
+		return c.SwapCallTiles()
+	case *meld.Pon:
+		return c.SwapCallTiles()
+	default:
+		return nil
+	}
+}
+
+func isSwapCallTile(t tile.Tile, swapCallTiles []tile.Tile) bool {
+	return slices.ContainsFunc(swapCallTiles, func(s tile.Tile) bool {
+		return t.HasSameSymbol(s)
+	})
+}
+
+// normalizedSelfTurnDiscards preserves CoffeeScript output behavior: when the
+// same exact tile can be discarded from hand or as tsumogiri, keep tsumogiri.
+func normalizedSelfTurnDiscards(actions []action.Action) []*action.Discard {
+	discards := make([]*action.Discard, 0, len(actions))
+	indexByTile := make(map[tile.Tile]int, len(actions))
 	for _, a := range actions {
 		discard, ok := a.(*action.Discard)
 		if !ok {
 			continue
 		}
-
-		afterDiscard, err := h.Discard(discard.Tile())
-		if err != nil {
-			return nil, fmt.Errorf("cannot build self-turn candidate for %s: %w", discard.Tile(), err)
+		if i, ok := indexByTile[discard.Tile()]; ok {
+			if discard.Tsumogiri() {
+				discards[i] = discard
+			}
+			continue
 		}
-		shanten, _ := service.AnalyzeShanten(afterDiscard, service.AllowedExtraTiles(1))
-		if riichi != nil && shanten <= 0 {
-			// Match Manue's riichi candidate filtering: only regular-hand shanten
-			// from AnalyzeShanten is considered here, so Seven Pairs and
-			// Thirteen Orphans do not create riichi candidates.
-			candidates = append(candidates, buildSelfTurnCandidate(riichi, discard.Tile(), h, afterDiscard, shanten, turnGoals, true))
-		}
-		candidates = append(candidates, buildSelfTurnCandidate(discard, discard.Tile(), h, afterDiscard, shanten, turnGoals, false))
+		indexByTile[discard.Tile()] = len(discards)
+		discards = append(discards, discard)
 	}
-	return candidates, nil
+	return discards
 }
 
 func selfTurnHand(self player.PlayerViewer) (*hand.VisibleHand, error) {
@@ -593,17 +694,21 @@ func buildSelfTurnCandidate(
 	discardTile tile.Tile,
 	turnHand *hand.VisibleHand,
 	afterDiscardHand *hand.VisibleHand,
+	baseShanten int,
 	shanten int,
 	goals []service.Goal,
 	riichi bool,
+	scoreAsRiichi bool,
 ) actionCandidate {
 	return actionCandidate{
 		traceKey:         formatDiscardTraceKey(riichi, discardTile),
 		action:           immediateAction,
 		riichi:           riichi,
+		scoreAsRiichi:    scoreAsRiichi,
 		discardTile:      discardTile,
 		turnHand:         turnHand,
 		afterDiscardHand: afterDiscardHand,
+		baseShanten:      baseShanten,
 		shantenGoals:     goals,
 		score:            scoreDiscardCandidate(discardTile, shanten),
 	}
@@ -611,8 +716,6 @@ func buildSelfTurnCandidate(
 
 func scoreDiscardCandidate(discardTile tile.Tile, shanten int) candidateScore {
 	return candidateScore{
-		// Phase 2 scaffold: the full expected-value fields are filled by later
-		// configs/estimator migration. Keep all choices tied except red fallback.
 		avgRank: 0,
 		expPts:  0,
 		shanten: shanten,

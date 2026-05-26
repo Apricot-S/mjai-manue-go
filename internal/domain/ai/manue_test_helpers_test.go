@@ -2,7 +2,11 @@ package ai
 
 import (
 	"fmt"
+	"testing"
 
+	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/round"
+	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/seat"
+	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/tile"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/wind"
 )
 
@@ -79,4 +83,24 @@ func (s stubManueStats) RelativeWinProbs(
 	key := fmt.Sprintf("%s%d,%d,%d", roundWind, roundNumber, selfPosition, otherPosition)
 	winProbs, ok := s.relativeWinProbs[key]
 	return winProbs, ok
+}
+
+func newTestManueAgent(t *testing.T, seed uint64) *ManueAgent {
+	t.Helper()
+	agent, err := NewManueAgent(seed, ManueAgentDeps{
+		Stats:  validStubManueStats(),
+		Danger: stubDangerEstimator{},
+	})
+	if err != nil {
+		t.Fatalf("NewManueAgent() failed: %v", err)
+	}
+	return agent
+}
+
+type stubDangerEstimator struct {
+	prob float64
+}
+
+func (s stubDangerEstimator) EstimateDealInProb(round.StateViewer, seat.Seat, seat.Seat, tile.Tile) (float64, error) {
+	return s.prob, nil
 }

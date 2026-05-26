@@ -537,38 +537,6 @@ func TestWinEstimatesFromTrials_ReturnsErrorWithInvalidTrial(t *testing.T) {
 	}
 }
 
-func TestDealInProb(t *testing.T) {
-	got, err := dealInProb([]dealInEstimate{
-		{winnerID: 1, prob: 0.2},
-		{winnerID: 2, prob: 0.25},
-	})
-	if err != nil {
-		t.Fatalf("dealInProb() failed: %v", err)
-	}
-
-	want := 0.4
-	if !almostEqual(got, want) {
-		t.Errorf("dealInProb() = %v, want %v", got, want)
-	}
-}
-
-func TestDealInProb_ReturnsZeroWithoutEstimates(t *testing.T) {
-	got, err := dealInProb(nil)
-	if err != nil {
-		t.Fatalf("dealInProb() failed: %v", err)
-	}
-	if got != 0 {
-		t.Errorf("dealInProb() = %v, want 0", got)
-	}
-}
-
-func TestDealInProb_ReturnsErrorWithInvalidProb(t *testing.T) {
-	_, err := dealInProb([]dealInEstimate{{winnerID: 1, prob: 1.1}})
-	if err == nil {
-		t.Fatal("dealInProb() succeeded unexpectedly")
-	}
-}
-
 func TestSafeProb(t *testing.T) {
 	got, err := safeProb([]dealInEstimate{
 		{winnerID: 1, prob: 0.2},
@@ -671,7 +639,7 @@ func TestRandomWinScoreDeltaDist(t *testing.T) {
 }
 
 func TestRandomWinScoreDeltaDistFromStats_SelectsDealerPointFreqs(t *testing.T) {
-	got, err := randomWinScoreDeltaDistFromStats(0, 0, stubManueStats{
+	got := randomWinScoreDeltaDistFromStats(0, 0, stubManueStats{
 		numWins:         10,
 		numSelfDrawWins: 4,
 		nonDealerWinPointFreqs: map[string]int{
@@ -683,9 +651,6 @@ func TestRandomWinScoreDeltaDistFromStats_SelectsDealerPointFreqs(t *testing.T) 
 			"total": 1,
 		},
 	})
-	if err != nil {
-		t.Fatalf("randomWinScoreDeltaDistFromStats() failed: %v", err)
-	}
 
 	want := scoreDeltaProbDist{
 		{2000, -2000.0 / 3.0, -2000.0 / 3.0, -2000.0 / 3.0}: 0.4,
@@ -697,7 +662,7 @@ func TestRandomWinScoreDeltaDistFromStats_SelectsDealerPointFreqs(t *testing.T) 
 }
 
 func TestRandomWinScoreDeltaDistFromStats_SelectsNonDealerPointFreqs(t *testing.T) {
-	got, err := randomWinScoreDeltaDistFromStats(1, 0, stubManueStats{
+	got := randomWinScoreDeltaDistFromStats(1, 0, stubManueStats{
 		numWins:         10,
 		numSelfDrawWins: 4,
 		nonDealerWinPointFreqs: map[string]int{
@@ -709,9 +674,6 @@ func TestRandomWinScoreDeltaDistFromStats_SelectsNonDealerPointFreqs(t *testing.
 			"total": 1,
 		},
 	})
-	if err != nil {
-		t.Fatalf("randomWinScoreDeltaDistFromStats() failed: %v", err)
-	}
 
 	want := scoreDeltaProbDist{
 		{-500, 1000, -250, -250}: 0.4,
@@ -722,24 +684,14 @@ func TestRandomWinScoreDeltaDistFromStats_SelectsNonDealerPointFreqs(t *testing.
 	assertScoreDeltaProbDist(t, got, want)
 }
 
-func TestRandomWinScoreDeltaDistFromStats_ReturnsErrorWithInvalidNumWins(t *testing.T) {
-	_, err := randomWinScoreDeltaDistFromStats(0, 0, stubManueStats{})
-	if err == nil {
-		t.Fatal("randomWinScoreDeltaDistFromStats() succeeded unexpectedly")
-	}
-}
-
 func TestWinScoreDeltaDistFromPointsDist(t *testing.T) {
-	got, err := winScoreDeltaDistFromPointsDist(1, 0, stubManueStats{
+	got := winScoreDeltaDistFromPointsDist(1, 0, stubManueStats{
 		numWins:         10,
 		numSelfDrawWins: 4,
 	}, scalarProbDist{
 		1000: 0.25,
 		2000: 0.75,
 	})
-	if err != nil {
-		t.Fatalf("winScoreDeltaDistFromPointsDist() failed: %v", err)
-	}
 
 	want := scoreDeltaProbDist{
 		{-500, 1000, -250, -250}:  0.10,
@@ -754,15 +706,8 @@ func TestWinScoreDeltaDistFromPointsDist(t *testing.T) {
 	assertScoreDeltaProbDist(t, got, want)
 }
 
-func TestWinScoreDeltaDistFromPointsDist_ReturnsErrorWithInvalidNumWins(t *testing.T) {
-	_, err := winScoreDeltaDistFromPointsDist(0, 0, stubManueStats{}, scalarProbDist{1000: 1})
-	if err == nil {
-		t.Fatal("winScoreDeltaDistFromPointsDist() succeeded unexpectedly")
-	}
-}
-
 func TestSelfWinScoreDeltaDistFromEstimate(t *testing.T) {
-	got, err := selfWinScoreDeltaDistFromEstimate(1, 0, stubManueStats{
+	got := selfWinScoreDeltaDistFromEstimate(1, 0, stubManueStats{
 		numWins:         10,
 		numSelfDrawWins: 4,
 	}, winEstimate{
@@ -771,9 +716,6 @@ func TestSelfWinScoreDeltaDistFromEstimate(t *testing.T) {
 			2000: 0.75,
 		},
 	})
-	if err != nil {
-		t.Fatalf("selfWinScoreDeltaDistFromEstimate() failed: %v", err)
-	}
 
 	want := scoreDeltaProbDist{
 		{-500, 1000, -250, -250}:  0.10,
@@ -883,10 +825,7 @@ func TestExpectedRemainingTurns_ReturnsErrorWithOutOfRangeTurn(t *testing.T) {
 }
 
 func TestTenpaiProb_ReturnsOneWithRiichi(t *testing.T) {
-	got, err := tenpaiProb(stubManueStats{}, true, 10, 0)
-	if err != nil {
-		t.Fatalf("tenpaiProb() failed: %v", err)
-	}
+	got := tenpaiProb(stubManueStats{}, true, 10, 0)
 
 	if got != 1.0 {
 		t.Errorf("tenpaiProb() = %v, want 1", got)
@@ -894,14 +833,11 @@ func TestTenpaiProb_ReturnsOneWithRiichi(t *testing.T) {
 }
 
 func TestTenpaiProb_ReturnsYamitenRatio(t *testing.T) {
-	got, err := tenpaiProb(stubManueStats{
+	got := tenpaiProb(stubManueStats{
 		yamitenCounts: map[string]yamitenCount{
 			"10,2": {total: 20, tenpai: 5},
 		},
 	}, false, 10, 2)
-	if err != nil {
-		t.Fatalf("tenpaiProb() failed: %v", err)
-	}
 
 	want := 0.25
 	if got != want {
@@ -910,43 +846,10 @@ func TestTenpaiProb_ReturnsYamitenRatio(t *testing.T) {
 }
 
 func TestTenpaiProb_ReturnsOneWithoutStats(t *testing.T) {
-	got, err := tenpaiProb(stubManueStats{}, false, 10, 2)
-	if err != nil {
-		t.Fatalf("tenpaiProb() failed: %v", err)
-	}
+	got := tenpaiProb(stubManueStats{}, false, 10, 2)
 
 	if got != 1.0 {
 		t.Errorf("tenpaiProb() = %v, want 1", got)
-	}
-}
-
-func TestTenpaiProb_ReturnsErrorWithInvalidYamitenCounts(t *testing.T) {
-	_, err := tenpaiProb(stubManueStats{
-		yamitenCounts: map[string]yamitenCount{
-			"10,2": {total: 0, tenpai: 0},
-		},
-	}, false, 10, 2)
-	if err == nil {
-		t.Fatal("tenpaiProb() succeeded unexpectedly")
-	}
-}
-
-func TestDealInExpPts(t *testing.T) {
-	got, err := dealInExpPts(stubManueStats{avgWinPts: 5500}, 0.8)
-	if err != nil {
-		t.Fatalf("dealInExpPts() failed: %v", err)
-	}
-
-	want := -1100.0
-	if !almostEqual(got, want) {
-		t.Errorf("dealInExpPts() = %v, want %v", got, want)
-	}
-}
-
-func TestDealInExpPts_ReturnsErrorWithInvalidSafeProb(t *testing.T) {
-	_, err := dealInExpPts(stubManueStats{avgWinPts: 5500}, 1.1)
-	if err == nil {
-		t.Fatal("dealInExpPts() succeeded unexpectedly")
 	}
 }
 
@@ -1018,18 +921,6 @@ func TestImmediateDealInScoreDeltaDistFromStats_SelectsNonDealerPointFreqs(t *te
 	assertScoreDeltaProbDist(t, got, want)
 }
 
-func TestImmediateDealInScoreDeltaDistFromStats_ReturnsErrorWithInvalidPointFreqs(t *testing.T) {
-	_, err := immediateDealInScoreDeltaDistFromStats(1, 0, 2, 0.25, stubManueStats{
-		nonDealerWinPointFreqs: map[string]int{
-			"1000":  1,
-			"total": 0,
-		},
-	})
-	if err == nil {
-		t.Fatal("immediateDealInScoreDeltaDistFromStats() succeeded unexpectedly")
-	}
-}
-
 func TestImmediateScoreDeltaDist(t *testing.T) {
 	got := immediateScoreDeltaDist([]scoreDeltaProbDist{
 		{
@@ -1094,46 +985,6 @@ func TestImmediateScoreDeltaDist_ReturnsNoChangeWithoutDealInDists(t *testing.T)
 	got := immediateScoreDeltaDist(nil)
 	want := scoreDeltaProbDist{{}: 1}
 	assertScoreDeltaProbDist(t, got, want)
-}
-
-func TestSafeWinExpPts(t *testing.T) {
-	got, err := safeWinExpPts(0.8, 4000)
-	if err != nil {
-		t.Fatalf("safeWinExpPts() failed: %v", err)
-	}
-
-	want := 3200.0
-	if got != want {
-		t.Errorf("safeWinExpPts() = %v, want %v", got, want)
-	}
-}
-
-func TestSafeWinExpPts_ReturnsErrorWithInvalidSafeProb(t *testing.T) {
-	_, err := safeWinExpPts(-0.1, 4000)
-	if err == nil {
-		t.Fatal("safeWinExpPts() succeeded unexpectedly")
-	}
-}
-
-func TestExhaustiveDrawExpPts(t *testing.T) {
-	got, err := exhaustiveDrawExpPts(0.8, 0.25, 1500)
-	if err != nil {
-		t.Fatalf("exhaustiveDrawExpPts() failed: %v", err)
-	}
-
-	want := 300.0
-	if got != want {
-		t.Errorf("exhaustiveDrawExpPts() = %v, want %v", got, want)
-	}
-}
-
-func TestExhaustiveDrawExpPts_ReturnsErrorWithInvalidProb(t *testing.T) {
-	if _, err := exhaustiveDrawExpPts(1.1, 0.25, 1500); err == nil {
-		t.Fatal("exhaustiveDrawExpPts() succeeded unexpectedly with invalid safe probability")
-	}
-	if _, err := exhaustiveDrawExpPts(0.8, -0.1, 1500); err == nil {
-		t.Fatal("exhaustiveDrawExpPts() succeeded unexpectedly with invalid exhaustive-draw probability")
-	}
 }
 
 func TestRemainingRoundEndProbs(t *testing.T) {
@@ -1272,18 +1123,6 @@ func TestNotenExhaustiveDrawTenpaiProb_AllowsExistingZeroFreq(t *testing.T) {
 	want := 0.5
 	if got != want {
 		t.Errorf("notenExhaustiveDrawTenpaiProb() = %v, want %v", got, want)
-	}
-}
-
-func TestNotenExhaustiveDrawTenpaiProb_ReturnsErrorWithMissingTurnFreq(t *testing.T) {
-	_, err := notenExhaustiveDrawTenpaiProb(stubManueStats{
-		exhaustiveDrawNotenCount: 100,
-		exhaustiveDrawTenpaiTurnFreqs: map[string]int{
-			"16.25": 100,
-		},
-	}, 16)
-	if err == nil {
-		t.Fatal("notenExhaustiveDrawTenpaiProb() succeeded unexpectedly")
 	}
 }
 

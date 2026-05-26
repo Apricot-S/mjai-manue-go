@@ -21,7 +21,6 @@ import (
 
 func TestManueAgent_DecideActionSkeleton(t *testing.T) {
 	self := seat.MustSeat(0)
-	target := seat.MustSeat(1)
 	drawnTile := tile.MustTileFromCode("5p")
 	handDiscard, err := action.NewDiscard(self, tile.MustTileFromCode("1m"), false)
 	if err != nil {
@@ -36,13 +35,6 @@ func TestManueAgent_DecideActionSkeleton(t *testing.T) {
 		t.Fatalf("NewWin() failed: %v", err)
 	}
 	riichi := action.NewRiichi(self)
-	chii, err := action.NewChii(self, target, tile.MustTileFromCode("3m"), [2]tile.Tile{
-		tile.MustTileFromCode("1m"),
-		tile.MustTileFromCode("2m"),
-	})
-	if err != nil {
-		t.Fatalf("NewChii() failed: %v", err)
-	}
 	pass := action.NewPass(self)
 
 	tests := []struct {
@@ -75,7 +67,7 @@ func TestManueAgent_DecideActionSkeleton(t *testing.T) {
 			drawnTile:   &drawnTile,
 			want:        tsumogiriDiscard,
 			decide: func(agent *ManueAgent, actions []action.Action, self player.PlayerViewer) (Decision, error) {
-				return agent.decideSelfTurn(actions, self)
+				return agent.decideSelfTurn(actions, nil, seat.MustSeat(0), self)
 			},
 		},
 		{
@@ -86,43 +78,12 @@ func TestManueAgent_DecideActionSkeleton(t *testing.T) {
 			drawnTile:   nil,
 			want:        riichi,
 			decide: func(agent *ManueAgent, actions []action.Action, self player.PlayerViewer) (Decision, error) {
-				return agent.decideSelfTurn(actions, self)
-			},
-		},
-		{
-			name:        "discard before call",
-			actions:     []action.Action{chii, handDiscard, pass},
-			hand:        hand.CodesToHand([]string{"1m", "2m", "3m", "4m", "5m", "6m", "7m", "8m", "9m", "1p", "1p", "E", "S"}),
-			riichiState: player.NotRiichi,
-			drawnTile:   &drawnTile,
-			want:        handDiscard,
-			decide: func(agent *ManueAgent, actions []action.Action, self player.PlayerViewer) (Decision, error) {
-				return agent.decideSelfTurn(actions, self)
-			},
-		},
-		{
-			name:        "call before pass",
-			actions:     []action.Action{pass, chii},
-			riichiState: player.NotRiichi,
-			drawnTile:   nil,
-			want:        chii,
-			decide: func(agent *ManueAgent, actions []action.Action, self player.PlayerViewer) (Decision, error) {
-				return agent.decideOtherDiscardReaction(actions)
-			},
-		},
-		{
-			name:        "pass only",
-			actions:     []action.Action{pass},
-			riichiState: player.NotRiichi,
-			drawnTile:   nil,
-			want:        pass,
-			decide: func(agent *ManueAgent, actions []action.Action, self player.PlayerViewer) (Decision, error) {
-				return agent.decideOtherDiscardReaction(actions)
+				return agent.decideSelfTurn(actions, nil, seat.MustSeat(0), self)
 			},
 		},
 	}
 
-	agent := NewManueAgent(0)
+	agent := newTestManueAgent(t, 0)
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			decision, err := tt.decide(agent, tt.actions, stubPlayerViewer{
@@ -140,9 +101,15 @@ func TestManueAgent_DecideActionSkeleton(t *testing.T) {
 	}
 }
 
-func TestNewManueAgentWithDeps(t *testing.T) {
-	stats := stubManueStats{numWins: 1}
-	agent := NewManueAgentWithDeps(123, ManueAgentDeps{Stats: stats})
+func TestNewManueAgent(t *testing.T) {
+	stats := validStubManueStats()
+	agent, err := NewManueAgent(123, ManueAgentDeps{
+		Stats:  stats,
+		Danger: stubDangerEstimator{},
+	})
+	if err != nil {
+		t.Fatalf("NewManueAgent() failed: %v", err)
+	}
 	if agent.seed != 123 {
 		t.Errorf("seed = %d, want 123", agent.seed)
 	}
@@ -164,7 +131,7 @@ func TestManueAgent_decideSelfTurn_ReturnsOriginalStyleActionLog(t *testing.T) {
 		t.Fatalf("NewDiscard() failed: %v", err)
 	}
 
-	decision, err := NewManueAgent(0).decideSelfTurn([]action.Action{discard}, stubPlayerViewer{
+	decision, err := newTestManueAgent(t, 0).decideSelfTurn([]action.Action{discard}, nil, seat.MustSeat(0), stubPlayerViewer{
 		hand:        hand.CodesToHand([]string{"1m", "2m", "3m", "4m", "5m", "6m", "7m", "8m", "9m", "1p", "1p", "E", "E", "5m"}),
 		riichiState: player.NotRiichi,
 		drawnTile:   nil,
@@ -194,7 +161,7 @@ func TestManueAgent_decideSelfTurn_ReturnsErrorWithoutTsumogiriAfterRiichiAccept
 	}
 	drawnTile := tile.MustTileFromCode("5p")
 
-	_, err = NewManueAgent(0).decideSelfTurn([]action.Action{handDiscard}, stubPlayerViewer{
+	_, err = newTestManueAgent(t, 0).decideSelfTurn([]action.Action{handDiscard}, nil, seat.MustSeat(0), stubPlayerViewer{
 		riichiState: player.RiichiAccepted,
 		drawnTile:   &drawnTile,
 	})
@@ -278,6 +245,173 @@ func TestManueAgent_getSelfTurnCandidates_BuildsDiscardCandidate(t *testing.T) {
 	}
 }
 
+func TestCandidateShantenUsesThrowableVector(t *testing.T) {
+	got := candidateShanten(
+		tile.MustTileFromCode("1m"),
+		3,
+		[]service.Goal{
+			{Shanten: 2, ThrowableVector: hand.TileCounts34{0: 1}},
+			{Shanten: 1, ThrowableVector: hand.TileCounts34{0: 1}},
+			{Shanten: 0, ThrowableVector: hand.TileCounts34{1: 1}},
+		},
+	)
+	if got != 1 {
+		t.Errorf("candidateShanten() = %d, want 1", got)
+	}
+}
+
+func TestCandidateShantenReturnsBaseForNone(t *testing.T) {
+	got := candidateShanten(tile.MustTileFromCode("?"), 3, nil)
+	if got != 3 {
+		t.Errorf("candidateShanten(?) = %d, want 3", got)
+	}
+}
+
+func TestCandidateShantenReturnsInfinityWhenTileIsNotThrowable(t *testing.T) {
+	got := candidateShanten(
+		tile.MustTileFromCode("1m"),
+		3,
+		[]service.Goal{{Shanten: 0, ThrowableVector: hand.TileCounts34{1: 1}}},
+	)
+	if got != service.InfinityShanten {
+		t.Errorf("candidateShanten() = %d, want InfinityShanten", got)
+	}
+}
+
+func TestNormalizedSelfTurnDiscards_PrefersTsumogiriForSameTile(t *testing.T) {
+	self := seat.MustSeat(0)
+	handDiscard, err := action.NewDiscard(self, tile.MustTileFromCode("5m"), false)
+	if err != nil {
+		t.Fatalf("NewDiscard(hand) failed: %v", err)
+	}
+	tsumogiriDiscard, err := action.NewDiscard(self, tile.MustTileFromCode("5m"), true)
+	if err != nil {
+		t.Fatalf("NewDiscard(tsumogiri) failed: %v", err)
+	}
+	redDiscard, err := action.NewDiscard(self, tile.MustTileFromCode("5mr"), false)
+	if err != nil {
+		t.Fatalf("NewDiscard(red) failed: %v", err)
+	}
+
+	got := normalizedSelfTurnDiscards([]action.Action{
+		handDiscard,
+		action.NewPass(self),
+		redDiscard,
+		tsumogiriDiscard,
+	})
+	if len(got) != 2 {
+		t.Fatalf("len(normalizedSelfTurnDiscards()) = %d, want 2", len(got))
+	}
+	if got[0] != tsumogiriDiscard {
+		t.Errorf("normalizedSelfTurnDiscards()[0] = %v, want tsumogiri discard", got[0])
+	}
+	if got[1] != redDiscard {
+		t.Errorf("normalizedSelfTurnDiscards()[1] = %v, want red discard kept separately", got[1])
+	}
+}
+
+func TestGetOtherDiscardReactionCandidates_BuildsPassAndCallDiscards(t *testing.T) {
+	self := seat.MustSeat(0)
+	target := seat.MustSeat(3)
+	pon, err := action.NewPon(self, target, tile.MustTileFromCode("5p"), [2]tile.Tile{
+		tile.MustTileFromCode("5p"),
+		tile.MustTileFromCode("5p"),
+	})
+	if err != nil {
+		t.Fatalf("NewPon() failed: %v", err)
+	}
+	pass := action.NewPass(self)
+
+	got, err := getOtherDiscardReactionCandidates([]action.Action{pass, pon}, stubPlayerViewer{
+		hand: hand.CodesToHand([]string{
+			"1m", "2m", "3m", "4m", "5m", "6m", "7m",
+			"1p", "2p", "5p", "5p", "5pr", "E",
+		}),
+		riichiState: player.NotRiichi,
+	})
+	if err != nil {
+		t.Fatalf("getOtherDiscardReactionCandidates() failed: %v", err)
+	}
+
+	found := map[string]bool{"none": false, "0.4m": false}
+	for _, candidate := range got {
+		if _, ok := found[candidate.traceKey]; ok {
+			found[candidate.traceKey] = true
+		}
+		if candidate.traceKey == "0.5pr" {
+			t.Errorf("getOtherDiscardReactionCandidates() included kuikae discard %q", candidate.traceKey)
+		}
+		if strings.HasPrefix(candidate.traceKey, "0.") && candidate.action != pon {
+			t.Errorf("call candidate action = %v, want pon", candidate.action)
+		}
+	}
+	for traceKey, ok := range found {
+		if !ok {
+			t.Errorf("getOtherDiscardReactionCandidates() does not contain %q", traceKey)
+		}
+	}
+}
+
+func TestManueAgent_decideOtherDiscardReaction_EvaluatesCallCandidates(t *testing.T) {
+	self := seat.MustSeat(0)
+	target := seat.MustSeat(3)
+	pon, err := action.NewPon(self, target, tile.MustTileFromCode("5p"), [2]tile.Tile{
+		tile.MustTileFromCode("5p"),
+		tile.MustTileFromCode("5p"),
+	})
+	if err != nil {
+		t.Fatalf("NewPon() failed: %v", err)
+	}
+	pass := action.NewPass(self)
+	selfPlayer := stubPlayerViewer{
+		hand: hand.CodesToHand([]string{
+			"1m", "2m", "3m", "4m", "5m", "6m", "7m",
+			"1p", "2p", "5p", "5p", "5pr", "E",
+		}),
+		riichiState: player.NotRiichi,
+	}
+	state := stubCandidateEvaluationStateViewer{
+		turn:         1,
+		roundWind:    wind.East,
+		seatWinds:    [common.NumPlayers]wind.Wind{wind.East, wind.South, wind.West, wind.North},
+		dealer:       self,
+		scores:       [common.NumPlayers]int{25000, 25000, 25000, 25000},
+		startingSeat: self,
+		players: [common.NumPlayers]player.PlayerViewer{
+			selfPlayer,
+			stubPlayerViewer{},
+			stubPlayerViewer{},
+			stubPlayerViewer{},
+		},
+	}
+
+	decision, err := newTestManueAgent(t, 0).decideOtherDiscardReaction(
+		[]action.Action{pass, pon},
+		state,
+		self,
+		selfPlayer,
+	)
+	if err != nil {
+		t.Fatalf("decideOtherDiscardReaction() failed: %v", err)
+	}
+
+	if decision.Action != pass && decision.Action != pon {
+		t.Errorf("Action = %T %[1]v, want pass or pon", decision.Action)
+	}
+	if decision.Log == "" {
+		t.Fatal("Log is empty; reaction candidates were not evaluated")
+	}
+	if !strings.Contains(decision.Log, "none") {
+		t.Errorf("Log = %q, want pass candidate", decision.Log)
+	}
+	if !strings.Contains(decision.Log, "0.") {
+		t.Errorf("Log = %q, want pon discard candidates", decision.Log)
+	}
+	if !strings.Contains(decision.Trace, "decidedKey ") {
+		t.Errorf("Trace = %q, want decidedKey suffix", decision.Trace)
+	}
+}
+
 func TestManueAgent_getSelfTurnCandidates_BuildsRiichiCandidate(t *testing.T) {
 	self := seat.MustSeat(0)
 	riichi := action.NewRiichi(self)
@@ -341,6 +475,45 @@ func TestManueAgent_getSelfTurnCandidates_FiltersNonTenpaiRiichiCandidate(t *tes
 		if candidate.riichi {
 			t.Fatalf("getSelfTurnCandidates() contains riichi candidate unexpectedly: %+v", candidate)
 		}
+	}
+}
+
+func TestManueAgent_getSelfTurnCandidates_RiichiDeclaredScoresDiscardAsRiichi(t *testing.T) {
+	self := seat.MustSeat(0)
+	tenpaiDiscard, err := action.NewDiscard(self, tile.MustTileFromCode("5m"), false)
+	if err != nil {
+		t.Fatalf("NewDiscard(tenpai) failed: %v", err)
+	}
+	nonTenpaiDiscard, err := action.NewDiscard(self, tile.MustTileFromCode("1p"), false)
+	if err != nil {
+		t.Fatalf("NewDiscard(non-tenpai) failed: %v", err)
+	}
+
+	got, err := getSelfTurnCandidates([]action.Action{tenpaiDiscard, nonTenpaiDiscard}, stubPlayerViewer{
+		hand: hand.CodesToHand([]string{
+			"1m", "2m", "3m", "4m", "5m", "6m", "7m", "8m", "9m",
+			"1p", "1p", "E", "E", "5m",
+		}),
+		riichiState: player.RiichiDeclared,
+		drawnTile:   nil,
+	})
+	if err != nil {
+		t.Fatalf("getSelfTurnCandidates() failed: %v", err)
+	}
+	if len(got) != 1 {
+		t.Fatalf("len(getSelfTurnCandidates()) = %d, want 1", len(got))
+	}
+	if got[0].traceKey != "-1.5m" {
+		t.Errorf("traceKey = %q, want -1.5m", got[0].traceKey)
+	}
+	if got[0].riichi {
+		t.Errorf("riichi = true, want false because declaration action is already done")
+	}
+	if !got[0].scoreAsRiichi {
+		t.Errorf("scoreAsRiichi = false, want true")
+	}
+	if got[0].action != tenpaiDiscard {
+		t.Errorf("action = %v, want tenpai discard", got[0].action)
 	}
 }
 
@@ -502,223 +675,6 @@ func TestEvaluateCandidateScoreFromState(t *testing.T) {
 	}
 }
 
-func TestApplyDealInEstimatesToCandidateScore(t *testing.T) {
-	base := candidateScore{
-		winProb: 0.2,
-		shanten: 1,
-	}
-
-	got, safeProb, err := applyDealInEstimatesToCandidateScore(base, []dealInEstimate{
-		{winnerID: 1, prob: 0.2},
-		{winnerID: 2, prob: 0.25},
-	})
-	if err != nil {
-		t.Fatalf("applyDealInEstimatesToCandidateScore() failed: %v", err)
-	}
-
-	if !almostEqual(got.dealInProb, 0.4) {
-		t.Errorf("dealInProb = %v, want 0.4", got.dealInProb)
-	}
-	if !almostEqual(safeProb, 0.6) {
-		t.Errorf("safeProb = %v, want 0.6", safeProb)
-	}
-	if got.winProb != base.winProb {
-		t.Errorf("winProb = %v, want %v", got.winProb, base.winProb)
-	}
-	if got.shanten != base.shanten {
-		t.Errorf("shanten = %v, want %v", got.shanten, base.shanten)
-	}
-}
-
-func TestApplyDealInEstimatesToCandidateScore_ReturnsErrorWithInvalidEstimate(t *testing.T) {
-	_, _, err := applyDealInEstimatesToCandidateScore(candidateScore{}, []dealInEstimate{
-		{winnerID: 1, prob: -0.1},
-	})
-	if err == nil {
-		t.Fatal("applyDealInEstimatesToCandidateScore() succeeded unexpectedly")
-	}
-}
-
-func TestApplyWinEstimateToCandidateScore(t *testing.T) {
-	base := candidateScore{
-		dealInProb: 0.1,
-		shanten:    1,
-	}
-
-	got, err := applyWinEstimateToCandidateScore(base, winEstimate{
-		prob:   0.25,
-		avgPts: 3900,
-	})
-	if err != nil {
-		t.Fatalf("applyWinEstimateToCandidateScore() failed: %v", err)
-	}
-
-	if got.winProb != 0.25 {
-		t.Errorf("winProb = %v, want 0.25", got.winProb)
-	}
-	if got.avgWinPts != 3900 {
-		t.Errorf("avgWinPts = %v, want 3900", got.avgWinPts)
-	}
-	if got.dealInProb != base.dealInProb {
-		t.Errorf("dealInProb = %v, want %v", got.dealInProb, base.dealInProb)
-	}
-	if got.shanten != base.shanten {
-		t.Errorf("shanten = %v, want %v", got.shanten, base.shanten)
-	}
-}
-
-func TestApplyWinEstimateToCandidateScore_ReturnsErrorWithInvalidProb(t *testing.T) {
-	_, err := applyWinEstimateToCandidateScore(candidateScore{}, winEstimate{prob: 1.1})
-	if err == nil {
-		t.Fatal("applyWinEstimateToCandidateScore() succeeded unexpectedly")
-	}
-}
-
-func TestApplyWinEstimatesToCandidates(t *testing.T) {
-	candidates := []actionCandidate{
-		{
-			traceKey: "-1.5m",
-			score: candidateScore{
-				dealInProb: 0.1,
-				shanten:    1,
-			},
-		},
-		{
-			traceKey: "0.5m",
-			score: candidateScore{
-				dealInProb: 0.2,
-				shanten:    0,
-			},
-		},
-	}
-
-	got, err := applyWinEstimatesToCandidates(candidates, map[string]winEstimate{
-		"-1.5m": {prob: 0.25, avgPts: 3900},
-		"0.5m":  {prob: 0.5, avgPts: 8000},
-	})
-	if err != nil {
-		t.Fatalf("applyWinEstimatesToCandidates() failed: %v", err)
-	}
-
-	if !almostEqual(got[0].score.winProb, 0.25) {
-		t.Errorf("got[0].score.winProb = %v, want 0.25", got[0].score.winProb)
-	}
-	if got[0].score.avgWinPts != 3900 {
-		t.Errorf("got[0].score.avgWinPts = %v, want 3900", got[0].score.avgWinPts)
-	}
-	if got[0].score.dealInProb != candidates[0].score.dealInProb {
-		t.Errorf("got[0].score.dealInProb = %v, want %v", got[0].score.dealInProb, candidates[0].score.dealInProb)
-	}
-	if !almostEqual(got[1].score.winProb, 0.5) {
-		t.Errorf("got[1].score.winProb = %v, want 0.5", got[1].score.winProb)
-	}
-	if got[1].score.avgWinPts != 8000 {
-		t.Errorf("got[1].score.avgWinPts = %v, want 8000", got[1].score.avgWinPts)
-	}
-	if candidates[0].score.winProb != 0 {
-		t.Errorf("original candidate winProb = %v, want unchanged 0", candidates[0].score.winProb)
-	}
-}
-
-func TestApplyWinEstimatesToCandidates_ReturnsErrorWithoutPartialResult(t *testing.T) {
-	tests := []struct {
-		name      string
-		estimates map[string]winEstimate
-	}{
-		{
-			name:      "missing estimate",
-			estimates: map[string]winEstimate{},
-		},
-		{
-			name: "invalid estimate",
-			estimates: map[string]winEstimate{
-				"-1.5m": {prob: 1.1},
-			},
-		},
-	}
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			candidates := []actionCandidate{
-				{
-					traceKey: "-1.5m",
-					score: candidateScore{
-						dealInProb: 0.1,
-					},
-				},
-			}
-			got, err := applyWinEstimatesToCandidates(candidates, tt.estimates)
-			if err == nil {
-				t.Fatal("applyWinEstimatesToCandidates() succeeded unexpectedly")
-			}
-			if got != nil {
-				t.Errorf("applyWinEstimatesToCandidates() result = %v, want nil", got)
-			}
-			if candidates[0].score.winProb != 0 {
-				t.Errorf("original candidate winProb = %v, want unchanged 0", candidates[0].score.winProb)
-			}
-		})
-	}
-}
-
-func TestApplyRoundEndProbsToCandidateScore(t *testing.T) {
-	base := candidateScore{
-		winProb:    0.2,
-		dealInProb: 0.1,
-		shanten:    1,
-	}
-
-	got, err := applyRoundEndProbsToCandidateScore(base, 0.3)
-	if err != nil {
-		t.Fatalf("applyRoundEndProbsToCandidateScore() failed: %v", err)
-	}
-
-	if !almostEqual(got.drawProb, 0.24) {
-		t.Errorf("drawProb = %v, want 0.24", got.drawProb)
-	}
-	if !almostEqual(got.othersWinProb, 0.56) {
-		t.Errorf("othersWinProb = %v, want 0.56", got.othersWinProb)
-	}
-	if got.winProb != base.winProb {
-		t.Errorf("winProb = %v, want %v", got.winProb, base.winProb)
-	}
-	if got.dealInProb != base.dealInProb {
-		t.Errorf("dealInProb = %v, want %v", got.dealInProb, base.dealInProb)
-	}
-	if got.shanten != base.shanten {
-		t.Errorf("shanten = %v, want %v", got.shanten, base.shanten)
-	}
-}
-
-func TestApplyRoundEndProbsToCandidateScore_ReturnsErrorWithInvalidProb(t *testing.T) {
-	_, err := applyRoundEndProbsToCandidateScore(candidateScore{winProb: 1.1}, 0.3)
-	if err == nil {
-		t.Fatal("applyRoundEndProbsToCandidateScore() succeeded unexpectedly")
-	}
-}
-
-func TestApplyAveragePtsToCandidateScore(t *testing.T) {
-	base := candidateScore{
-		winProb: 0.2,
-		shanten: 1,
-	}
-
-	got := applyAveragePtsToCandidateScore(base, 3900, 1200)
-
-	if got.avgWinPts != 3900 {
-		t.Errorf("avgWinPts = %v, want 3900", got.avgWinPts)
-	}
-	if got.avgDrawPts != 1200 {
-		t.Errorf("avgDrawPts = %v, want 1200", got.avgDrawPts)
-	}
-	if got.winProb != base.winProb {
-		t.Errorf("winProb = %v, want %v", got.winProb, base.winProb)
-	}
-	if got.shanten != base.shanten {
-		t.Errorf("shanten = %v, want %v", got.shanten, base.shanten)
-	}
-}
-
 func TestCandidateTotalScoreDeltaDist(t *testing.T) {
 	score := candidateScore{
 		winProb:       0.2,
@@ -762,20 +718,18 @@ func TestEvaluateCandidateFromPreparedDists(t *testing.T) {
 		{winnerID: 1, prob: 0.2},
 		{winnerID: 2, prob: 0.25},
 	}
-	dists := candidateScoreDeltaDists{
-		immediateDist: scoreDeltaProbDist{
-			{}: 1,
-		},
-		selfWinDist: scoreDeltaProbDist{
-			{1000, 0, 0, 0}: 1,
-		},
-		exhaustiveDrawDist: scoreDeltaProbDist{
-			{0, 1000, 0, 0}: 1,
-		},
-		otherWinDists: []scoreDeltaProbDist{
-			{{0, 0, 1000, 0}: 1},
-			{{0, 0, 0, 1000}: 1},
-		},
+	immediateDist := scoreDeltaProbDist{
+		{}: 1,
+	}
+	selfWinDist := scoreDeltaProbDist{
+		{1000, 0, 0, 0}: 1,
+	}
+	exhaustiveDrawDist := scoreDeltaProbDist{
+		{0, 1000, 0, 0}: 1,
+	}
+	otherWinDists := []scoreDeltaProbDist{
+		{{0, 0, 1000, 0}: 1},
+		{{0, 0, 0, 1000}: 1},
 	}
 
 	got, err := evaluateCandidateFromPreparedDists(
@@ -787,7 +741,10 @@ func TestEvaluateCandidateFromPreparedDists(t *testing.T) {
 		},
 		0.25,
 		1200,
-		dists,
+		immediateDist,
+		selfWinDist,
+		exhaustiveDrawDist,
+		otherWinDists,
 		stubManueStats{
 			relativeWinProbs: map[string]map[string]float64{
 				"E1,0,1": {"-1000": 0.5, "0": 0.5, "1000": 0.5},
@@ -837,7 +794,10 @@ func TestEvaluateCandidateFromPreparedDists_ReturnsErrorWithInvalidEstimate(t *t
 		winEstimate{},
 		0.25,
 		0,
-		candidateScoreDeltaDists{},
+		nil,
+		nil,
+		nil,
+		nil,
 		stubManueStats{},
 		stubRankStateViewer{},
 		seat.MustSeat(0),
@@ -948,61 +908,6 @@ func TestWinEstimatesForCandidates_ReturnsErrorWithInvalidTrial(t *testing.T) {
 	}
 }
 
-func TestApplyWinEstimateTrialsToCandidates(t *testing.T) {
-	candidates := []actionCandidate{
-		{
-			traceKey: "-1.5m",
-			score: candidateScore{
-				dealInProb: 0.1,
-			},
-		},
-		{
-			traceKey: "0.5m",
-			score: candidateScore{
-				dealInProb: 0.2,
-			},
-		},
-	}
-
-	got, err := applyWinEstimateTrialsToCandidates(
-		candidates,
-		[]map[string]float64{
-			{"-1.5m": 2000},
-			{"0.5m": 5000},
-			{},
-		},
-	)
-	if err != nil {
-		t.Fatalf("applyWinEstimateTrialsToCandidates() failed: %v", err)
-	}
-
-	if !almostEqual(got[0].score.winProb, 1.0/3.0) {
-		t.Errorf("got[0].score.winProb = %v, want %v", got[0].score.winProb, 1.0/3.0)
-	}
-	if got[0].score.avgWinPts != 2000 {
-		t.Errorf("got[0].score.avgWinPts = %v, want 2000", got[0].score.avgWinPts)
-	}
-	if !almostEqual(got[1].score.winProb, 1.0/3.0) {
-		t.Errorf("got[1].score.winProb = %v, want %v", got[1].score.winProb, 1.0/3.0)
-	}
-	if got[1].score.avgWinPts != 5000 {
-		t.Errorf("got[1].score.avgWinPts = %v, want 5000", got[1].score.avgWinPts)
-	}
-	if candidates[0].score.winProb != 0 {
-		t.Errorf("original candidate winProb = %v, want unchanged 0", candidates[0].score.winProb)
-	}
-}
-
-func TestApplyWinEstimateTrialsToCandidates_ReturnsError(t *testing.T) {
-	_, err := applyWinEstimateTrialsToCandidates(
-		[]actionCandidate{{traceKey: "-1.5m"}},
-		[]map[string]float64{{"unknown": 2000}},
-	)
-	if err == nil {
-		t.Fatal("applyWinEstimateTrialsToCandidates() succeeded unexpectedly")
-	}
-}
-
 func TestFilteredWinEstimateGoals(t *testing.T) {
 	tests := []struct {
 		name      string
@@ -1025,9 +930,10 @@ func TestFilteredWinEstimateGoals(t *testing.T) {
 		{
 			name: "riichi keeps only ready goals",
 			candidate: actionCandidate{
-				riichi:      true,
-				discardTile: tile.MustTileFromCode("1m"),
-				score:       candidateScore{shanten: 0},
+				riichi:        true,
+				scoreAsRiichi: true,
+				discardTile:   tile.MustTileFromCode("1m"),
+				score:         candidateScore{shanten: 0},
 				shantenGoals: []service.Goal{
 					{Shanten: 0, ThrowableVector: hand.TileCounts34{0: 1}},
 					{Shanten: 1, ThrowableVector: hand.TileCounts34{0: 1}},
@@ -1039,7 +945,8 @@ func TestFilteredWinEstimateGoals(t *testing.T) {
 			name: "heavy shanten drops extra tile goals",
 			candidate: actionCandidate{
 				discardTile: tile.MustTileFromCode("1m"),
-				score:       candidateScore{shanten: 4},
+				baseShanten: 4,
+				score:       candidateScore{shanten: 1},
 				shantenGoals: []service.Goal{
 					{Shanten: 3, ThrowableVector: hand.TileCounts34{0: 1}},
 					{Shanten: 4, ThrowableVector: hand.TileCounts34{0: 1}},
@@ -1051,9 +958,11 @@ func TestFilteredWinEstimateGoals(t *testing.T) {
 		{
 			name: "riichi and heavy shanten combine",
 			candidate: actionCandidate{
-				riichi:      true,
-				discardTile: tile.MustTileFromCode("1m"),
-				score:       candidateScore{shanten: 4},
+				riichi:        true,
+				scoreAsRiichi: true,
+				discardTile:   tile.MustTileFromCode("1m"),
+				baseShanten:   4,
+				score:         candidateScore{shanten: 1},
 				shantenGoals: []service.Goal{
 					{Shanten: 0, ThrowableVector: hand.TileCounts34{0: 1}},
 					{Shanten: 4, ThrowableVector: hand.TileCounts34{0: 1}},
@@ -1080,24 +989,30 @@ func TestFilteredWinEstimateGoals(t *testing.T) {
 }
 
 func TestScoredWinEstimateGoals(t *testing.T) {
+	turnHand := hand.MustVisibleHand([]tile.Tile{
+		tile.MustTileFromCode("1m"),
+		tile.MustTileFromCode("2m"),
+		tile.MustTileFromCode("3m"),
+		tile.MustTileFromCode("4m"),
+		tile.MustTileFromCode("3p"),
+		tile.MustTileFromCode("4p"),
+		tile.MustTileFromCode("5p"),
+		tile.MustTileFromCode("4s"),
+		tile.MustTileFromCode("5s"),
+		tile.MustTileFromCode("6s"),
+		tile.MustTileFromCode("6s"),
+		tile.MustTileFromCode("7s"),
+		tile.MustTileFromCode("8s"),
+		tile.MustTileFromCode("2s"),
+	})
+	afterDiscardHand, err := turnHand.Discard(tile.MustTileFromCode("1m"))
+	if err != nil {
+		t.Fatalf("Discard(1m) failed: %v", err)
+	}
 	candidate := actionCandidate{
-		discardTile: tile.MustTileFromCode("1m"),
-		turnHand: hand.MustVisibleHand([]tile.Tile{
-			tile.MustTileFromCode("1m"),
-			tile.MustTileFromCode("2m"),
-			tile.MustTileFromCode("3m"),
-			tile.MustTileFromCode("4m"),
-			tile.MustTileFromCode("3p"),
-			tile.MustTileFromCode("4p"),
-			tile.MustTileFromCode("5p"),
-			tile.MustTileFromCode("4s"),
-			tile.MustTileFromCode("5s"),
-			tile.MustTileFromCode("6s"),
-			tile.MustTileFromCode("6s"),
-			tile.MustTileFromCode("7s"),
-			tile.MustTileFromCode("8s"),
-			tile.MustTileFromCode("2s"),
-		}),
+		discardTile:      tile.MustTileFromCode("1m"),
+		turnHand:         turnHand,
+		afterDiscardHand: afterDiscardHand,
 		shantenGoals: []service.Goal{
 			{
 				Blocks: []block.Block{
@@ -1144,7 +1059,7 @@ func TestScoredWinEstimateGoals(t *testing.T) {
 	}
 }
 
-func TestScoredWinEstimateGoalsRequiresAfterDiscardHand(t *testing.T) {
+func TestScoredWinEstimateGoalsRequiresTurnHand(t *testing.T) {
 	_, err := scoredWinEstimateGoals(actionCandidate{}, winEstimateGoalContext{})
 	if err == nil {
 		t.Fatal("scoredWinEstimateGoals() succeeded unexpectedly")
@@ -1181,17 +1096,27 @@ func TestScoredWinEstimateGoalsByKey(t *testing.T) {
 			ThrowableVector: hand.TileCounts34{0: 1},
 		},
 	}
+	afterDiscard1m, err := turnHand.Discard(tile.MustTileFromCode("1m"))
+	if err != nil {
+		t.Fatalf("Discard(1m) failed: %v", err)
+	}
+	afterDiscard2m, err := turnHand.Discard(tile.MustTileFromCode("2m"))
+	if err != nil {
+		t.Fatalf("Discard(2m) failed: %v", err)
+	}
 	candidates := []actionCandidate{
 		{
-			traceKey:     "-1.1m",
-			discardTile:  tile.MustTileFromCode("1m"),
-			turnHand:     turnHand,
-			shantenGoals: goals,
+			traceKey:         "-1.1m",
+			discardTile:      tile.MustTileFromCode("1m"),
+			turnHand:         turnHand,
+			afterDiscardHand: afterDiscard1m,
+			shantenGoals:     goals,
 		},
 		{
-			traceKey:    "-1.2m",
-			discardTile: tile.MustTileFromCode("2m"),
-			turnHand:    turnHand,
+			traceKey:         "-1.2m",
+			discardTile:      tile.MustTileFromCode("2m"),
+			turnHand:         turnHand,
+			afterDiscardHand: afterDiscard2m,
 		},
 	}
 
@@ -1212,6 +1137,77 @@ func TestScoredWinEstimateGoalsByKey(t *testing.T) {
 		t.Fatal("scored goals for -1.2m missing")
 	} else if len(goals) != 0 {
 		t.Errorf("len(scored goals for -1.2m) = %d, want 0", len(goals))
+	}
+}
+
+func TestScoredWinEstimateGoalsByKeyUsesCandidateMelds(t *testing.T) {
+	turnHand := hand.MustVisibleHand([]tile.Tile{
+		tile.MustTileFromCode("2m"),
+		tile.MustTileFromCode("2m"),
+		tile.MustTileFromCode("2m"),
+		tile.MustTileFromCode("3p"),
+		tile.MustTileFromCode("3p"),
+		tile.MustTileFromCode("3p"),
+		tile.MustTileFromCode("4s"),
+		tile.MustTileFromCode("4s"),
+		tile.MustTileFromCode("4s"),
+		tile.MustTileFromCode("9s"),
+		tile.MustTileFromCode("9s"),
+	})
+	goals := []service.Goal{
+		{
+			Blocks: []block.Block{
+				block.MustTriplet(tile.MustTileFromCode("2m")),
+				block.MustTriplet(tile.MustTileFromCode("3p")),
+				block.MustTriplet(tile.MustTileFromCode("4s")),
+				block.MustPair(tile.MustTileFromCode("9s")),
+			},
+			RequiredVector: hand.TileCounts34{0: 1},
+		},
+	}
+	dragonPon := meld.MustPon(
+		tile.MustTileFromCode("F"),
+		[2]tile.Tile{tile.MustTileFromCode("F"), tile.MustTileFromCode("F")},
+		seat.MustSeat(1),
+	)
+	candidates := []actionCandidate{
+		{
+			traceKey:         "none",
+			discardTile:      tile.MustTileFromCode("?"),
+			turnHand:         turnHand,
+			afterDiscardHand: turnHand,
+			shantenGoals:     goals,
+		},
+		{
+			traceKey:         "0.1m",
+			discardTile:      tile.MustTileFromCode("?"),
+			turnHand:         turnHand,
+			afterDiscardHand: turnHand,
+			melds:            []meld.Meld{dragonPon},
+			shantenGoals:     goals,
+		},
+	}
+
+	got, err := scoredWinEstimateGoalsByKey(candidates, winEstimateGoalContext{
+		roundWind: wind.East,
+		seatWind:  wind.South,
+	})
+	if err != nil {
+		t.Fatalf("scoredWinEstimateGoalsByKey() failed: %v", err)
+	}
+
+	if len(got["none"]) != 1 {
+		t.Fatalf("len(scored goals for none) = %d, want 1", len(got["none"]))
+	}
+	if len(got["0.1m"]) != 1 {
+		t.Fatalf("len(scored goals for 0.1m) = %d, want 1", len(got["0.1m"]))
+	}
+	want := float64(service.RonPoints(30, 3, false))
+	if got["0.1m"][0].points != want {
+		t.Errorf("points for 0.1m = %v, want %v", got["0.1m"][0].points, want)
+	}
+	if got["0.1m"][0].points <= got["none"][0].points {
+		t.Errorf("points with candidate melds = %v, want greater than %v", got["0.1m"][0].points, got["none"][0].points)
 	}
 }
 
@@ -1833,6 +1829,13 @@ func TestManueAgent_compareCandidateScore(t *testing.T) {
 			preferBlack: false,
 			want:        0,
 		},
+		{
+			name:        "complete tie returns zero",
+			lhs:         candidateScore{avgRank: 2.0, expPts: 1000},
+			rhs:         candidateScore{avgRank: 2.0, expPts: 1000},
+			preferBlack: false,
+			want:        0,
+		},
 	}
 
 	for _, tt := range tests {
@@ -1845,7 +1848,7 @@ func TestManueAgent_compareCandidateScore(t *testing.T) {
 	}
 }
 
-func TestManueAgent_compareCandidateFallback_PreservesPhase1RiichiPreference(t *testing.T) {
+func TestManueAgent_chooseBestCandidate_DoesNotPreferRiichiOnScoreTie(t *testing.T) {
 	self := seat.MustSeat(0)
 	riichi := action.NewRiichi(self)
 	discard, err := action.NewDiscard(self, tile.MustTileFromCode("5m"), false)
@@ -1853,50 +1856,13 @@ func TestManueAgent_compareCandidateFallback_PreservesPhase1RiichiPreference(t *
 		t.Fatalf("NewDiscard() failed: %v", err)
 	}
 
-	lhs := actionCandidate{action: riichi, riichi: true, discardTile: discard.Tile()}
-	rhs := actionCandidate{action: discard, riichi: false, discardTile: discard.Tile()}
-	if got := compareCandidateFallback(lhs, rhs); got != -1 {
-		t.Errorf("compareCandidateFallback(riichi, discard) = %d, want -1", got)
+	candidates := []actionCandidate{
+		{action: discard, riichi: false, score: candidateScore{avgRank: 2.0, expPts: 1000}},
+		{action: riichi, riichi: true, score: candidateScore{avgRank: 2.0, expPts: 1000}},
 	}
-}
 
-type stubPlayerViewer struct {
-	hand        *hand.VisibleHand
-	riichiState player.RiichiState
-	drawnTile   *tile.Tile
-}
-
-func (p stubPlayerViewer) Hand() (*hand.VisibleHand, bool) {
-	if p.hand == nil {
-		return nil, false
+	got := chooseBestCandidate(candidates, false)
+	if got.action != discard {
+		t.Errorf("chooseBestCandidate() = %T %[1]v, want first tied candidate", got.action)
 	}
-	return p.hand, true
-}
-func (p stubPlayerViewer) HandTiles() []tile.Tile          { return nil }
-func (p stubPlayerViewer) DrawnTile() *tile.Tile           { return p.drawnTile }
-func (p stubPlayerViewer) Melds() []meld.Meld              { return nil }
-func (p stubPlayerViewer) River() []tile.Tile              { return nil }
-func (p stubPlayerViewer) DiscardedTiles() []tile.Tile     { return nil }
-func (p stubPlayerViewer) ExtraSafeTiles() []tile.Tile     { return nil }
-func (p stubPlayerViewer) IsFuriten() bool                 { return false }
-func (p stubPlayerViewer) CanRonBy(*tile.Tile) bool        { return true }
-func (p stubPlayerViewer) RiichiState() player.RiichiState { return p.riichiState }
-func (p stubPlayerViewer) RiichiRiverIndex() int           { return -1 }
-func (p stubPlayerViewer) RiichiDiscardedTilesIndex() int  { return -1 }
-func (p stubPlayerViewer) CanDiscard() bool                { return p.drawnTile != nil }
-func (p stubPlayerViewer) CanChiiPonKan() bool             { return p.drawnTile == nil }
-func (p stubPlayerViewer) IsConcealed() bool               { return true }
-func (p stubPlayerViewer) SwapCallTiles() []tile.Tile      { return nil }
-
-type stubWinEstimateStateViewer struct {
-	turn         float64
-	visibleTiles []tile.Tile
-}
-
-func (s stubWinEstimateStateViewer) VisibleTiles(seat.Seat) tile.Tiles {
-	return s.visibleTiles
-}
-
-func (s stubWinEstimateStateViewer) Turn() float64 {
-	return s.turn
 }

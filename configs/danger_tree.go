@@ -3,6 +3,8 @@ package configs
 import (
 	_ "embed"
 	"encoding/json/v2"
+
+	"github.com/Apricot-S/mjai-manue-go/internal/domain/ai"
 )
 
 // DecisionNode represents a node of a decision tree for danger estimation.
@@ -27,4 +29,32 @@ func LoadDangerTree() (*DecisionNode, error) {
 		return nil, err
 	}
 	return &root, nil
+}
+
+func (n *DecisionNode) LeafProb() (float64, bool) {
+	if n == nil || n.FeatureName != nil {
+		return 0, false
+	}
+	return n.AverageProb, true
+}
+
+func (n *DecisionNode) Feature() (string, bool) {
+	if n == nil || n.FeatureName == nil {
+		return "", false
+	}
+	return *n.FeatureName, true
+}
+
+func (n *DecisionNode) NegativeNode() ai.DangerTreeNode {
+	if n == nil {
+		return nil
+	}
+	return n.Negative
+}
+
+func (n *DecisionNode) PositiveNode() ai.DangerTreeNode {
+	if n == nil {
+		return nil
+	}
+	return n.Positive
 }

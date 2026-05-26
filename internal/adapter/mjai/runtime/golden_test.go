@@ -9,6 +9,7 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/Apricot-S/mjai-manue-go/configs"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/ai"
 )
 
@@ -62,7 +63,7 @@ func TestGoldenStdout(t *testing.T) {
 			var out bytes.Buffer
 			var agent ai.Agent = ai.NewTsumogiriAgent()
 			if strings.HasPrefix(tt.name, "manue_") {
-				agent = ai.NewManueAgent(0)
+				agent = newManueAgentForGoldenTest(t)
 			}
 			err := runJSONLines("tsumogiri", "default", agent, strings.NewReader(input), &out, nil, tt.policy)
 			if err != nil {
@@ -88,6 +89,26 @@ func TestGoldenStdout(t *testing.T) {
 			}
 		})
 	}
+}
+
+func newManueAgentForGoldenTest(t *testing.T) ai.Agent {
+	t.Helper()
+	stats, err := configs.LoadGameStats()
+	if err != nil {
+		t.Fatalf("LoadGameStats() failed: %v", err)
+	}
+	dangerTree, err := configs.LoadDangerTree()
+	if err != nil {
+		t.Fatalf("LoadDangerTree() failed: %v", err)
+	}
+	agent, err := ai.NewManueAgent(0, ai.ManueAgentDeps{
+		Stats:  stats,
+		Danger: ai.NewDangerEstimator(dangerTree),
+	})
+	if err != nil {
+		t.Fatalf("NewManueAgent() failed: %v", err)
+	}
+	return agent
 }
 
 func readGoldenFile(t *testing.T, name string) string {
