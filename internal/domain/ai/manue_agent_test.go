@@ -1,11 +1,11 @@
 package ai_test
 
 import (
+	"slices"
 	"testing"
 
 	"github.com/Apricot-S/mjai-manue-go/configs"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/ai"
-	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/action"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/event"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/seat"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/tile"
@@ -48,7 +48,7 @@ func TestManueAgent_Decide_SelectsLegalSelfTurnAction(t *testing.T) {
 	if actorAction, ok := got.Action.(interface{ Actor() seat.Seat }); ok && actorAction.Actor() != self {
 		t.Errorf("Actor() = %v, want %v", actorAction.Actor(), self)
 	}
-	if !containsActionForTest(legalActions, got.Action) {
+	if !slices.Contains(legalActions, got.Action) {
 		t.Errorf("Action = %T %[1]v, want one of legal actions", got.Action)
 	}
 }
@@ -84,13 +84,4 @@ func newManueAgentForTest(t *testing.T) *ai.ManueAgent {
 		t.Fatalf("NewManueAgent() failed: %v", err)
 	}
 	return agent
-}
-
-func containsActionForTest(actions []action.Action, target action.Action) bool {
-	for _, a := range actions {
-		if a == target {
-			return true
-		}
-	}
-	return false
 }
