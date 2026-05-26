@@ -85,6 +85,22 @@ ManueAgent.Decide
 
 既存 `domain/game` のルール判定を再実装しない。特に合法手、向聴、和了形、役、点数、聴牌判定は `round` / `service` の既存 API を使う。AI 側の不足は「評価のための変換」だけに留める。
 
+### 5.1 現行 Manue 固有コードの扱い
+
+現行 `internal/domain/ai` の Manue 固有コードは補助資料として扱う。再実装時は、次の分類を初期判断にする。流用は仕様に合う場合だけ行い、既存関数の都合で設計を曲げない。
+
+| 分類 | 対象 | 扱い |
+| --- | --- | --- |
+| 維持 | `agent.go`, `tsumogiri_agent.go` | Manue 固有再実装の対象外。Agent interface と TsumogiriAgent は残す。 |
+| 再採用候補 | `manue_candidate_score.go` | 候補比較、score delta 合成、平均順位/期待点への変換は純粋関数として使える。命名と入力 struct は最終設計に合わせて調整する。 |
+| 再採用候補 | `manue_scalar_prob_dist.go`, `manue_score_delta_prob_dist.go`, `manue_ahead_vector_prob_dist.go` | 分布演算は純粋関数として使える。正規化や非正値 drop の仕様は characterization と合わせて維持する。 |
+| 再採用候補 | `manue_win_score.go`, `manue_deal_in_score.go`, `manue_round_end_prob.go`, `manue_round_end_score.go`, `manue_exhaustive_draw_score.go`, `manue_rank.go` | score/rank model の部品として使える。stats interface との接続は新設計側で決める。 |
+| 再採用候補 | `manue_win_estimate_score.go`, `manue_win_trials.go` | Monte Carlo trial 集計と wall/trial helper は純粋関数として使える。乱数列の完全互換は要求しない。 |
+| 再採用候補 | `manue_win_goals.go`, `manue_win_estimator.go` | `service.CalculateFuHan` は CoffeeScript 版 `calculateFan` 相当の移植済み実装として使う。代表ケースは `service` 側と AI 側の goal scoring テストで固定する。 |
+| 条件付き再採用 | `manue_danger.go`, `manue_danger_scene.go`, `manue_danger_tiles.go` | danger tree interface と feature evaluator は使えるが、feature 名ごとの原仕様対応を確認しながら接続する。 |
+| 再設計対象 | `manue_agent.go`, `manue_self_turn_candidates.go`, `manue_call_candidates.go`, `manue_evaluator.go`, `manue_trace.go` | orchestration と Agent 境界は新設計で組み直す。既存実装はテスト fixture と細部確認の補助に留める。 |
+| 再設計対象 | `manue_deps.go`, `manue_stats.go` | deps/stats interface と validation は configs/CLI 接続時に再確認する。外側 concrete type に依存しない方針は維持する。 |
+
 ## 6. 危険度推定
 
 AI package は configs の concrete type に依存せず、danger tree を読むための小さい interface を定義する。
@@ -117,7 +133,7 @@ Scene は `round.StateViewer` から構築する。
 - `service.AnalyzeShanten` の goal と throwable vector を使い、候補ごとの達成可能性を判定する。
 - goal pruning は候補別 shanten ではなく、打牌前/副露後の base shanten を基準にする。
 - 候補別 shanten は原仕様どおり、打牌後の再解析ではなく、その牌を捨てられる goal の最小 shanten とする。`none` は base shanten。
-- 点数は現行 `service.CalculateFuHan` と `service.RonPoints` を使う。原仕様の簡易役計算との差が出る場合は、差分を characterization で確認し、意図的な Go 側改善か互換性問題かを記録する。
+- 点数は現行 `service.CalculateFuHan` と `service.RonPoints` を使う。`CalculateFuHan` は CoffeeScript 版 `calculateFan` 相当の移植済み実装であり、正式な麻雀点数計算へ置き換えない。代表ケースは `service` 側の `TestCalculateFuHan` と、AI 側の goal scoring テストで固定する。
 - 赤ドラは原仕様と同様、候補 hand / meld 内の赤牌のうち goal 構成牌に同種牌が含まれるものだけを scoring 対象にする。
 
 ## 8. Configs と CLI 接続
@@ -177,11 +193,45 @@ wire JSON の `log` field と stderr trace は混ぜない。action golden test 
 
 Agent 判断の characterization は、最終的に mjai JSON Lines から `round.State` を作って action を比較する。純粋関数で十分に固定できるものは、CoffeeScript 実行 fixture へ寄せず、Go の table-driven test で期待値を明示する。
 
-### 10.2 原仕様との差分記録が必要な箇所
+### 10.2 仕様固定フェーズの coverage
+
+実装前の最低ラインは次の状態とする。`Covered` は unit test で Go 側の責務境界を固定済みであることを表す。
+
+| ID | Status | 既存/追加予定テスト | 備考 |
+| --- | --- | --- | --- |
+| OC-001 | Covered | `TestManueAgent_DecideActionSkeleton` | 和了 action が評価前に優先される入口を固定する。 |
+| OC-002 | Covered | `TestManueAgent_DecideActionSkeleton` | リーチ accepted 中の自摸はツモ切り discard を返す。 |
+| OC-006 | Covered | `TestManueAgent_getSelfTurnCandidates_BuildsRiichiCandidate`, `TestManueAgent_getSelfTurnCandidates_FiltersNonTenpaiRiichiCandidate` | reach action ありの候補生成を固定する。 |
+| OC-009 | Covered | `TestGetOtherDiscardReactionCandidates_BuildsPassAndCallDiscards`, `TestManueAgent_decideOtherDiscardReaction_EvaluatesCallCandidates` | `none` と副露後打牌候補を同じ評価経路へ載せる。 |
+| OC-011 | Covered | `TestGetOtherDiscardReactionCandidates_BuildsPassAndCallDiscards` | 喰い替え候補が除外されることを副露候補生成で固定する。 |
+| OC-012 | Covered | `TestManueAgent_dealInEstimates_SafeTileHasZeroDealInProb` | danger scene 単体ではなく、deal-in evaluator 経由で安全牌 shortcut を固定する。 |
+| OC-015 | Covered | `TestCandidateShantenUsesThrowableVector`, `TestCandidateShantenReturnsBaseForNone`, `TestCandidateShantenReturnsInfinityWhenTileIsNotThrowable` | 候補別 shanten が打牌後再解析ではなく throwable vector 由来であることを固定する。 |
+| OC-017 | Covered | `TestExhaustiveDrawProb`, `TestExhaustiveDrawProbOnSelfNoWin` | 流局確率と自分非和了条件付き補正を固定する。 |
+| OC-020 | Covered | `TestManueAgent_compareCandidateScore`, `TestManueAgent_chooseBestCandidate_PrefersBlackTileOnTie`, `TestManueAgent_chooseBestCandidate_DoesNotPreferRiichiOnScoreTie` | 平均順位、期待点、赤牌、走査順の tie-break を固定する。 |
+
+OC-008 は `domain/game` の `TestState_LegalActions_RiichiDeclarationTileKeepsTenpai` で境界を固定済みのため、AI 側では追加しない。
+
+最低ライン外の OC は次の純粋関数/trace テストで固定済みとして扱う。これらは実装順の各段階で回帰防止に使うが、Agent action golden の必須条件にはしない。
+
+| ID | Status | 既存テスト | 備考 |
+| --- | --- | --- | --- |
+| OC-003 | Covered | `TestManueAgent_decideSelfTurn_ReturnsErrorWithoutTsumogiriAfterRiichiAccepted` | リーチ accepted 中にツモ切りがない異常系を固定する。 |
+| OC-004 | Covered | `TestNormalizedSelfTurnDiscards_PrefersTsumogiriForSameTile` | 同一牌候補の正規化を固定する。 |
+| OC-005 | Covered | `TestNormalizedSelfTurnDiscards_PrefersTsumogiriForSameTile`, `TestManueAgent_chooseBestCandidate_PrefersBlackTileOnTie` | 赤 5 と黒 5 を別候補として残し、比較では黒優先を固定する。 |
+| OC-007 | Covered | `TestManueAgent_getSelfTurnCandidates_IncludesRiichiAndDiscardCandidates`, `TestFilteredWinEstimateGoals` | reach 候補と通常 discard 候補が別系統で評価されることを固定する。 |
+| OC-010 | Covered | `TestGetOtherDiscardReactionCandidates_BuildsPassAndCallDiscards`, `TestManueAgent_decideOtherDiscardReaction_EvaluatesCallCandidates` | 副露後打牌は評価用候補であり、選択 action は副露 action のままになることを固定する。 |
+| OC-013 | Covered | `TestTenpaiProb_ReturnsOneWithRiichi`, `TestTenpaiProb_ReturnsYamitenRatio`, `TestTenpaiProb_ReturnsOneWithoutStats` | リーチ者、統計あり非リーチ者、統計欠損の聴牌確率を固定する。 |
+| OC-014 | Covered | `TestImmediateScoreDeltaDist`, `TestImmediateScoreDeltaDistFromStats`, `TestImmediateScoreDeltaDist_ReturnsNoChangeWithoutDealInDists` | 直後放銃分布と無変化 branch 置換を固定する。 |
+| OC-016 | Covered | `TestTrialWinPts`, `TestCandidateTrialWinPts`, `TestWinEstimatesFromTrialTiles` | 複数 goal 達成時に候補ごとの最大 points を採用することを固定する。 |
+| OC-018 | Covered | `TestExhaustiveDrawTenpaiProbs`, `TestExhaustiveDrawScoreDeltaDistFromTenpaiProbs`, `TestFutureExhaustiveDrawScoreDeltaDist` | 流局時聴牌確率と 3000 点授受分布を固定する。 |
+| OC-019 | Covered | `TestAverageRank`, `TestWinProbAgainst`, `TestWinProbFromRelativeScore_UsesStatsWhenAvailable`, `TestWinProbFromRelativeScore_FallsBackToStartingDealerOrder` | 点差分布から順位期待値へ変換する rank model を固定する。 |
+| OC-021 | Covered | `TestManueAgent_formatCandidateTrace`, `TestManueAgent_formatCandidateTrace_FormatsInfinityShanten`, `TestManueAgent_formatDecisionTrace_AppendsDecidedKey` | trace/log は action golden とは分けて文字列形を固定する。 |
+
+### 10.3 原仕様との差分記録が必要な箇所
 
 次は移植時に差分が出やすいため、実装前または最初のテスト追加時に意図を明記する。
 
-- 点数計算: CoffeeScript 版は `calculateFan` の簡易役判定を使うが、Go 側は `service.CalculateFuHan` / `service.RonPoints` を使う。差分が出たら、互換性を優先するか domain/game の正規計算を優先するかをケース単位で記録する。
+- 点数計算: Go 側の `service.CalculateFuHan` は CoffeeScript 版 `calculateFan` 相当の移植済み実装として扱う。正式な麻雀点数計算との差ではなく、オリジナル互換性を `TestCalculateFuHan` と AI 側 goal scoring テストで固定する。
 - 乱数: CoffeeScript 版は `seedRandom("")` で呼び出しごとに同じ乱数列を使う。Go 側は `--seed` と `math/rand/v2` による決定性を優先し、乱数列の完全一致は要求しない。
 - trace/log: CoffeeScript 版は `console.log` と `@log` が混在する。Go 側は stdout へ直接出さず、`Decision.Trace` / metadata として返す。
 - legal actions: CoffeeScript 版の対象外 action は初期実装では選ばない。暗槓、加槓、九種九牌などを扱う場合は別仕様を追加する。

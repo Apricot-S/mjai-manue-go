@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/common"
+	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/round/player"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/seat"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/tile"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/wind"
@@ -274,4 +275,67 @@ func TestManueAgent_evaluateActionCandidate_ReturnsErrorWithMissingWinEstimate(t
 	if !strings.Contains(err.Error(), "missing win estimate") {
 		t.Errorf("evaluateActionCandidate() error = %v, want missing win estimate", err)
 	}
+}
+
+func TestManueAgent_dealInEstimates_SafeTileHasZeroDealInProb(t *testing.T) {
+	self := seat.MustSeat(0)
+	discard := tile.MustTileFromCode("5m")
+	state := stubCandidateEvaluationStateViewer{
+		roundWind:    wind.East,
+		seatWinds:    [common.NumPlayers]wind.Wind{wind.East, wind.South, wind.West, wind.North},
+		dealer:       self,
+		numLeftTiles: 4,
+		safeTiles: [common.NumPlayers]tile.Tiles{
+			nil,
+			{discard},
+			{discard},
+			{discard},
+		},
+		players: [common.NumPlayers]player.PlayerViewer{
+			stubPlayerViewer{},
+			stubPlayerViewer{},
+			stubPlayerViewer{},
+			stubPlayerViewer{},
+		},
+	}
+	agent, err := NewManueAgent(0, ManueAgentDeps{
+		Stats:  validStubManueStats(),
+		Danger: NewDangerEstimator(stubDangerTreeLeaf{prob: 0.75}),
+	})
+	if err != nil {
+		t.Fatalf("NewManueAgent() failed: %v", err)
+	}
+
+	got, err := agent.dealInEstimates(state, self, discard)
+	if err != nil {
+		t.Fatalf("dealInEstimates() failed: %v", err)
+	}
+	if len(got) != common.NumPlayers-1 {
+		t.Fatalf("len(dealInEstimates()) = %d, want %d", len(got), common.NumPlayers-1)
+	}
+	for _, estimate := range got {
+		if estimate.prob != 0 {
+			t.Errorf("deal-in prob for winner %d = %v, want 0 for safe tile", estimate.winnerID, estimate.prob)
+		}
+	}
+}
+
+type stubDangerTreeLeaf struct {
+	prob float64
+}
+
+func (s stubDangerTreeLeaf) LeafProb() (float64, bool) {
+	return s.prob, true
+}
+
+func (s stubDangerTreeLeaf) Feature() (string, bool) {
+	return "", false
+}
+
+func (s stubDangerTreeLeaf) NegativeNode() DangerTreeNode {
+	return nil
+}
+
+func (s stubDangerTreeLeaf) PositiveNode() DangerTreeNode {
+	return nil
 }
