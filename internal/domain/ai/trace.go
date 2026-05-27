@@ -52,7 +52,7 @@ func formatCandidateTrace(candidates []actionCandidate) string {
 		"ryukyokuAvgPt",
 		"shanten",
 	}
-	for i, candidate := range sortedTraceCandidates(candidates) {
+	for i, candidate := range sortedCandidates(candidates) {
 		rows[i+1] = []string{
 			candidate.traceKey,
 			strconv.FormatFloat(candidate.score.averageRank, 'f', 4, 64),

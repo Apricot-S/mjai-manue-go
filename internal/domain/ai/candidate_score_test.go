@@ -38,7 +38,7 @@ func TestChooseBestCandidate_PrefersBlackTileOnTie(t *testing.T) {
 	}
 }
 
-func TestSortedTraceCandidates_PrefersBlackForDisplayOrder(t *testing.T) {
+func TestSortedCandidates_PrefersBlackForOrder(t *testing.T) {
 	red := actionCandidate{
 		traceKey: "-1.5mr",
 		score: candidateScore{
@@ -56,9 +56,9 @@ func TestSortedTraceCandidates_PrefersBlackForDisplayOrder(t *testing.T) {
 		},
 	}
 
-	got := sortedTraceCandidates([]actionCandidate{red, black})
+	got := sortedCandidates([]actionCandidate{red, black})
 	if len(got) != 2 {
-		t.Fatalf("len(sortedTraceCandidates()) = %d, want 2", len(got))
+		t.Fatalf("len(sortedCandidates()) = %d, want 2", len(got))
 	}
 	if got[0].traceKey != black.traceKey {
 		t.Errorf("first traceKey = %q, want black candidate %q", got[0].traceKey, black.traceKey)

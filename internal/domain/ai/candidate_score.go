@@ -40,7 +40,7 @@ func chooseBestCandidate(candidates []actionCandidate, preferBlack bool) actionC
 	return best
 }
 
-func sortedTraceCandidates(candidates []actionCandidate) []actionCandidate {
+func sortedCandidates(candidates []actionCandidate) []actionCandidate {
 	sortedCandidates := slices.Clone(candidates)
 	slices.SortFunc(sortedCandidates, func(lhs, rhs actionCandidate) int {
 		return compareCandidateScore(&lhs.score, &rhs.score, true)
