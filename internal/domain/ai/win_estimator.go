@@ -24,23 +24,7 @@ type winEstimateStateViewer interface {
 	Turn() float64
 }
 
-func candidateTraceKeys(candidates []actionCandidate) ([]string, error) {
-	keys := make([]string, 0, len(candidates))
-	seen := make(map[string]struct{}, len(candidates))
-	for _, candidate := range candidates {
-		if candidate.traceKey == "" {
-			return nil, fmt.Errorf("cannot build candidate keys: trace key must not be empty")
-		}
-		if _, ok := seen[candidate.traceKey]; ok {
-			return nil, fmt.Errorf("cannot build candidate keys: duplicate trace key %q", candidate.traceKey)
-		}
-		seen[candidate.traceKey] = struct{}{}
-		keys = append(keys, candidate.traceKey)
-	}
-	return keys, nil
-}
-
-func winEstimatesForCandidates(candidates []actionCandidate, trials []map[string]float64) (map[string]winEstimate, error) {
+func winEstimatesFromCandidateTrials(candidates []actionCandidate, trials []map[string]float64) (map[string]winEstimate, error) {
 	keys, err := candidateTraceKeys(candidates)
 	if err != nil {
 		return nil, err
@@ -61,7 +45,7 @@ func winEstimatesFromTrialTiles(
 		}
 		trialResults = append(trialResults, points)
 	}
-	return winEstimatesForCandidates(candidates, trialResults)
+	return winEstimatesFromCandidateTrials(candidates, trialResults)
 }
 
 func winEstimatesFromShuffledWall(

@@ -1,6 +1,8 @@
 package ai
 
 import (
+	"fmt"
+
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/action"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/round/player/hand"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/round/player/meld"
@@ -20,4 +22,20 @@ type actionCandidate struct {
 	baseShanten      int
 	shantenGoals     []service.Goal
 	score            candidateScore
+}
+
+func candidateTraceKeys(candidates []actionCandidate) ([]string, error) {
+	keys := make([]string, 0, len(candidates))
+	seen := make(map[string]struct{}, len(candidates))
+	for _, candidate := range candidates {
+		if candidate.traceKey == "" {
+			return nil, fmt.Errorf("cannot build candidate keys: trace key must not be empty")
+		}
+		if _, ok := seen[candidate.traceKey]; ok {
+			return nil, fmt.Errorf("cannot build candidate keys: duplicate trace key %q", candidate.traceKey)
+		}
+		seen[candidate.traceKey] = struct{}{}
+		keys = append(keys, candidate.traceKey)
+	}
+	return keys, nil
 }

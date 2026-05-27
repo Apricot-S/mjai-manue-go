@@ -63,8 +63,8 @@ func TestCandidateTraceKeys_ReturnsErrorWithInvalidKey(t *testing.T) {
 	}
 }
 
-func TestWinEstimatesForCandidates(t *testing.T) {
-	got, err := winEstimatesForCandidates(
+func TestWinEstimatesFromCandidateTrials(t *testing.T) {
+	got, err := winEstimatesFromCandidateTrials(
 		[]actionCandidate{
 			{traceKey: "-1.5m"},
 			{traceKey: "0.5m"},
@@ -76,7 +76,7 @@ func TestWinEstimatesForCandidates(t *testing.T) {
 		},
 	)
 	if err != nil {
-		t.Fatalf("winEstimatesForCandidates() failed: %v", err)
+		t.Fatalf("winEstimatesFromCandidateTrials() failed: %v", err)
 	}
 
 	discardEstimate := got["-1.5m"]
@@ -96,23 +96,23 @@ func TestWinEstimatesForCandidates(t *testing.T) {
 	}
 }
 
-func TestWinEstimatesForCandidates_ReturnsErrorWithInvalidCandidates(t *testing.T) {
-	_, err := winEstimatesForCandidates(
+func TestWinEstimatesFromCandidateTrials_ReturnsErrorWithInvalidCandidates(t *testing.T) {
+	_, err := winEstimatesFromCandidateTrials(
 		[]actionCandidate{{traceKey: ""}},
 		[]map[string]float64{},
 	)
 	if err == nil {
-		t.Fatal("winEstimatesForCandidates() succeeded unexpectedly")
+		t.Fatal("winEstimatesFromCandidateTrials() succeeded unexpectedly")
 	}
 }
 
-func TestWinEstimatesForCandidates_ReturnsErrorWithInvalidTrial(t *testing.T) {
-	_, err := winEstimatesForCandidates(
+func TestWinEstimatesFromCandidateTrials_ReturnsErrorWithInvalidTrial(t *testing.T) {
+	_, err := winEstimatesFromCandidateTrials(
 		[]actionCandidate{{traceKey: "-1.5m"}},
 		[]map[string]float64{{"unknown": 2000}},
 	)
 	if err == nil {
-		t.Fatal("winEstimatesForCandidates() succeeded unexpectedly")
+		t.Fatal("winEstimatesFromCandidateTrials() succeeded unexpectedly")
 	}
 }
 
