@@ -10,6 +10,8 @@ import (
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/tile"
 )
 
+const copiesPerTile = 4
+
 func trialTileCounts(tiles []tile.Tile) hand.TileCounts34 {
 	var counts hand.TileCounts34
 	for _, t := range tiles {
@@ -30,7 +32,7 @@ func wallTilesFromCounts(counts hand.TileCounts34) ([]tile.Tile, error) {
 func unseenWallFromVisibleTiles(visibleTiles []tile.Tile) ([]tile.Tile, error) {
 	var counts hand.TileCounts34
 	for id := range counts {
-		counts[id] = 4
+		counts[id] = copiesPerTile
 	}
 	for _, visible := range visibleTiles {
 		if visible.IsUnknown() {
@@ -39,7 +41,7 @@ func unseenWallFromVisibleTiles(visibleTiles []tile.Tile) ([]tile.Tile, error) {
 		id := visible.RemoveRed().ID()
 		counts[id]--
 		if counts[id] < 0 {
-			return nil, fmt.Errorf("cannot build unseen wall: tile %s is visible more than 4 times", tile.MustTileFromID(id))
+			return nil, fmt.Errorf("cannot build unseen wall: tile %s is visible more than %d times", tile.MustTileFromID(id), copiesPerTile)
 		}
 	}
 	return wallTilesFromCounts(counts)

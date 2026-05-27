@@ -14,13 +14,19 @@ type winEstimateGoal struct {
 	points float64
 }
 
+const (
+	numRedFiveTileTypes = 3
+	winningHandSize     = 14
+	shantenPruneLimit   = 3
+)
+
 func filteredWinEstimateGoals(candidate actionCandidate) []service.Goal {
 	goals := make([]service.Goal, 0, len(candidate.shantenGoals))
 	for _, goal := range candidate.shantenGoals {
 		if candidate.scoreAsRiichi && goal.Shanten > 0 {
 			continue
 		}
-		if candidate.baseShanten > 3 && goal.Shanten > candidate.baseShanten {
+		if candidate.baseShanten > shantenPruneLimit && goal.Shanten > candidate.baseShanten {
 			continue
 		}
 		if !candidate.discardTile.IsUnknown() {
@@ -68,14 +74,14 @@ func scoredWinEstimateGoals(candidate actionCandidate, context winEstimateGoalCo
 }
 
 func scoringHandForGoal(sourceHand *hand.VisibleHand, blocks []block.Block) (*hand.VisibleHand, error) {
-	redCounts := make(map[int]int, 3)
+	redCounts := make(map[int]int, numRedFiveTileTypes)
 	for _, t := range sourceHand.ToTiles() {
 		if t.IsRed() {
 			redCounts[t.RemoveRed().ID()]++
 		}
 	}
 
-	tiles := make([]tile.Tile, 0, 14)
+	tiles := make([]tile.Tile, 0, winningHandSize)
 	for _, b := range blocks {
 		for _, t := range b.ToTiles() {
 			normal := t.RemoveRed()
