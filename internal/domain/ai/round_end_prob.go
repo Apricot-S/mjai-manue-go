@@ -3,6 +3,8 @@ package ai
 import (
 	"fmt"
 	"math"
+
+	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/common"
 )
 
 func exhaustiveDrawProb(stats RoundEndStats, currentTurn float64) (float64, error) {
@@ -27,7 +29,11 @@ func exhaustiveDrawProbOnSelfNoWin(stats RoundEndStats, currentTurn float64) (fl
 	if err != nil {
 		return 0, err
 	}
-	return math.Pow(prob, 3.0/4.0), nil
+	return math.Pow(prob, noSelfWinExhaustiveDrawExponent()), nil
+}
+
+func noSelfWinExhaustiveDrawExponent() float64 {
+	return float64(common.NumPlayers-1) / float64(common.NumPlayers)
 }
 
 func expectedRemainingTurns(stats RoundEndStats, currentTurn float64) (int, error) {

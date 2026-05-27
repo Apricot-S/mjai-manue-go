@@ -4,6 +4,7 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/common"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/round/player"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/seat"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/tile"
@@ -130,7 +131,7 @@ func TestDangerSceneEvaluateOuterPrereachMatchesOriginalDirection(t *testing.T) 
 func TestNewDangerSceneKeepsPrereachTilesEmptyWithoutRiichi(t *testing.T) {
 	self := seat.MustSeat(0)
 	target := seat.MustSeat(1)
-	var players [4]player.PlayerViewer
+	var players [common.NumPlayers]player.PlayerViewer
 	players[self.Index()] = stubPlayerViewer{}
 	players[target.Index()] = stubPlayerViewer{
 		discardedTiles: []tile.Tile{tile.MustTileFromCode("1m")},
@@ -152,7 +153,7 @@ func TestNewDangerSceneKeepsPrereachTilesEmptyWithoutRiichi(t *testing.T) {
 func TestNewDangerSceneUsesTilesThroughRiichiDiscard(t *testing.T) {
 	self := seat.MustSeat(0)
 	target := seat.MustSeat(1)
-	var players [4]player.PlayerViewer
+	var players [common.NumPlayers]player.PlayerViewer
 	players[self.Index()] = stubPlayerViewer{}
 	players[target.Index()] = stubPlayerViewer{
 		discardedTiles: []tile.Tile{

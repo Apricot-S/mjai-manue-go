@@ -1,6 +1,11 @@
 package ai
 
-import "testing"
+import (
+	"math"
+	"testing"
+
+	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/common"
+)
 
 func TestExhaustiveDrawProb(t *testing.T) {
 	got, err := exhaustiveDrawProb(stubManueStats{
@@ -36,9 +41,16 @@ func TestExhaustiveDrawProbOnSelfNoWin(t *testing.T) {
 		t.Fatalf("exhaustiveDrawProbOnSelfNoWin() failed: %v", err)
 	}
 
-	want := 0.35355339059327373
+	want := math.Pow(0.25, float64(common.NumPlayers-1)/float64(common.NumPlayers))
 	if !almostEqual(got, want) {
 		t.Errorf("exhaustiveDrawProbOnSelfNoWin() = %v, want %v", got, want)
+	}
+}
+
+func TestNoSelfWinExhaustiveDrawExponent(t *testing.T) {
+	want := float64(common.NumPlayers-1) / float64(common.NumPlayers)
+	if got := noSelfWinExhaustiveDrawExponent(); got != want {
+		t.Errorf("noSelfWinExhaustiveDrawExponent() = %v, want %v", got, want)
 	}
 }
 

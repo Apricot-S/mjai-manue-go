@@ -3,6 +3,8 @@ package ai
 import (
 	"fmt"
 	"strconv"
+
+	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/common"
 )
 
 // winScoreFactor returns how one win point unit changes all players' scores.
@@ -20,26 +22,40 @@ func winScoreFactor(actorID int, targetID int, dealerID int) scoreDelta {
 
 	if actorID == dealerID {
 		// Dealer self-draw: each non-dealer pays one third.
-		factor := scoreDelta{-1.0 / 3.0, -1.0 / 3.0, -1.0 / 3.0, -1.0 / 3.0}
+		var factor scoreDelta
+		for id := range factor {
+			factor[id] = -dealerSelfDrawPaymentFactor()
+		}
 		factor[actorID] = 1.0
 		return factor
 	}
 
 	// Non-dealer self-draw: the dealer pays half, each other non-dealer pays a quarter.
-	factor := scoreDelta{-1.0 / 4.0, -1.0 / 4.0, -1.0 / 4.0, -1.0 / 4.0}
+	var factor scoreDelta
+	for id := range factor {
+		factor[id] = -nonDealerSelfDrawOtherPaymentFactor()
+	}
 	factor[actorID] = 1.0
 	factor[dealerID] = -1.0 / 2.0
 	return factor
 }
 
+func dealerSelfDrawPaymentFactor() float64 {
+	return 1.0 / float64(common.NumPlayers-1)
+}
+
+func nonDealerSelfDrawOtherPaymentFactor() float64 {
+	return 1.0 / (2.0 * float64(common.NumPlayers-2))
+}
+
 // winScoreFactorDist returns the distribution of score factors for a winner.
 //
 // selfDrawProb is the probability that the win is by self draw. Ron targets are
-// treated as uniformly distributed among the three other players.
+// treated as uniformly distributed among the other players.
 func winScoreFactorDist(actorID int, dealerID int, selfDrawProb float64) scoreDeltaProbDist {
-	dist := make(scoreDeltaProbDist, 4)
-	ronTargetProb := (1.0 - selfDrawProb) / 3.0
-	for targetID := range 4 {
+	dist := make(scoreDeltaProbDist, common.NumPlayers)
+	ronTargetProb := (1.0 - selfDrawProb) / float64(common.NumPlayers-1)
+	for targetID := range common.NumPlayers {
 		var prob float64
 		if targetID == actorID {
 			prob = selfDrawProb

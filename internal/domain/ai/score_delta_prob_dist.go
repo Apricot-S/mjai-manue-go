@@ -1,7 +1,9 @@
 package ai
 
-// scoreDelta is a four-player score change vector.
-type scoreDelta [4]float64
+import "github.com/Apricot-S/mjai-manue-go/internal/domain/game/common"
+
+// scoreDelta is a NumPlayers-length score change vector.
+type scoreDelta [common.NumPlayers]float64
 
 // scoreDeltaProbDist is a probability distribution of score change vectors.
 //

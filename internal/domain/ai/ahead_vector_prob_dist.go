@@ -1,11 +1,13 @@
 package ai
 
-// aheadVector is a four-player 0/1 vector for rank estimation.
+import "github.com/Apricot-S/mjai-manue-go/internal/domain/game/common"
+
+// aheadVector is a NumPlayers-length 0/1 vector for rank estimation.
 //
 // An element is 1 when self is estimated to finish ahead of that player, and 0
 // otherwise. It is separate from scoreDelta because it represents pairwise rank
 // wins, not score changes.
-type aheadVector [4]int
+type aheadVector [common.NumPlayers]int
 
 type aheadVectorProbDist map[aheadVector]float64
 

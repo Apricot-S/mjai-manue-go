@@ -217,9 +217,9 @@ func (e candidateEvaluator) dealInEstimates(
 	return estimates, nil
 }
 
-func currentTenpaiProbs(stats TenpaiEstimatorStats, state round.StateViewer, self seat.Seat) [4]float64 {
+func currentTenpaiProbs(stats TenpaiEstimatorStats, state round.StateViewer, self seat.Seat) [common.NumPlayers]float64 {
 	remainTurns := stateNumRemainTurns(state)
-	var probs [4]float64
+	var probs [common.NumPlayers]float64
 	for i := range common.NumPlayers {
 		playerSeat := seat.MustSeat(i)
 		if playerSeat == self {

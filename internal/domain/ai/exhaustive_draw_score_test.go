@@ -1,6 +1,10 @@
 package ai
 
-import "testing"
+import (
+	"testing"
+
+	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/common"
+)
 
 func TestTenpaiProb_ReturnsOneWithRiichi(t *testing.T) {
 	got := tenpaiProb(stubManueStats{}, true, 10, 0)
@@ -107,15 +111,15 @@ func TestNotenExhaustiveDrawTenpaiProb_ReturnsErrorWithoutFreqs(t *testing.T) {
 }
 
 func TestExhaustiveDrawTenpaiProbs(t *testing.T) {
-	got := exhaustiveDrawTenpaiProbs([4]float64{0, 0.25, 0.5, 1}, 0.4)
-	want := [4]float64{0.4, 0.55, 0.7, 1}
+	got := exhaustiveDrawTenpaiProbs([common.NumPlayers]float64{0, 0.25, 0.5, 1}, 0.4)
+	want := [common.NumPlayers]float64{0.4, 0.55, 0.7, 1}
 	if got != want {
 		t.Errorf("exhaustiveDrawTenpaiProbs() = %v, want %v", got, want)
 	}
 }
 
 func TestRyukyokuScoreDelta(t *testing.T) {
-	got := ryukyokuScoreDelta([4]bool{true, false, true, false})
+	got := ryukyokuScoreDelta([common.NumPlayers]bool{true, false, true, false})
 	want := scoreDelta{1500, -1500, 1500, -1500}
 	if got != want {
 		t.Errorf("ryukyokuScoreDelta() = %v, want %v", got, want)
@@ -123,7 +127,7 @@ func TestRyukyokuScoreDelta(t *testing.T) {
 }
 
 func TestExhaustiveDrawScoreDeltaDistFromTenpaiProbs(t *testing.T) {
-	got := exhaustiveDrawScoreDeltaDistFromTenpaiProbs([4]float64{1, 0, 0.5, 0})
+	got := exhaustiveDrawScoreDeltaDistFromTenpaiProbs([common.NumPlayers]float64{1, 0, 0.5, 0})
 	want := scoreDeltaProbDist{
 		{3000, -1000, -1000, -1000}: 0.5,
 		{1500, -1500, 1500, -1500}:  0.5,
@@ -132,13 +136,13 @@ func TestExhaustiveDrawScoreDeltaDistFromTenpaiProbs(t *testing.T) {
 }
 
 func TestFutureExhaustiveDrawScoreDeltaDist(t *testing.T) {
-	got := futureExhaustiveDrawScoreDeltaDist([4]float64{1, 0, 0.5, 0}, 0.5)
-	want := exhaustiveDrawScoreDeltaDistFromTenpaiProbs([4]float64{1, 0.5, 0.75, 0.5})
+	got := futureExhaustiveDrawScoreDeltaDist([common.NumPlayers]float64{1, 0, 0.5, 0}, 0.5)
+	want := exhaustiveDrawScoreDeltaDistFromTenpaiProbs([common.NumPlayers]float64{1, 0.5, 0.75, 0.5})
 	assertScoreDeltaProbDist(t, got, want)
 }
 
 func TestExhaustiveDrawAvgPts(t *testing.T) {
-	got := exhaustiveDrawAvgPts(0, [4]float64{1, 0, 0.5, 0})
+	got := exhaustiveDrawAvgPts(0, [common.NumPlayers]float64{1, 0, 0.5, 0})
 	want := 2250.0
 	if got != want {
 		t.Errorf("exhaustiveDrawAvgPts() = %v, want %v", got, want)
