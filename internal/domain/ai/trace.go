@@ -35,11 +35,13 @@ func formatCandidateLog(candidates []actionCandidate) string {
 }
 
 func formatCandidateTrace(candidates []actionCandidate) string {
-	if len(candidates) == 0 {
+	n := len(candidates)
+	if n == 0 {
 		return ""
 	}
 
-	rows := [][]string{{
+	rows := make([][]string, n+1)
+	rows[0] = []string{
 		"action",
 		"avgRank",
 		"expPt",
@@ -50,9 +52,9 @@ func formatCandidateTrace(candidates []actionCandidate) string {
 		"avgHoraPt",
 		"ryukyokuAvgPt",
 		"shanten",
-	}}
-	for _, candidate := range sortedTraceCandidates(candidates) {
-		rows = append(rows, []string{
+	}
+	for i, candidate := range sortedTraceCandidates(candidates) {
+		rows[i+1] = []string{
 			candidate.traceKey,
 			strconv.FormatFloat(candidate.score.averageRank, 'f', 4, 64),
 			strconv.FormatFloat(candidate.score.expectedPoints, 'f', 0, 64),
@@ -63,7 +65,7 @@ func formatCandidateTrace(candidates []actionCandidate) string {
 			strconv.FormatFloat(candidate.score.averageWinPoints, 'f', 0, 64),
 			strconv.FormatFloat(candidate.score.exhaustiveDrawAveragePoints, 'f', 0, 64),
 			formatShantenTraceValue(candidate.score.shanten),
-		})
+		}
 	}
 	return formatTraceTable(rows)
 }
