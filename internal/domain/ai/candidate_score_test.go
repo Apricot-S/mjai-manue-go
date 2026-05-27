@@ -56,12 +56,39 @@ func TestSortedCandidates_PrefersBlackForOrder(t *testing.T) {
 		},
 	}
 
-	got := sortedCandidates([]actionCandidate{red, black})
+	got := sortedCandidates([]actionCandidate{red, black}, true)
 	if len(got) != 2 {
 		t.Fatalf("len(sortedCandidates()) = %d, want 2", len(got))
 	}
 	if got[0].traceKey != black.traceKey {
 		t.Errorf("first traceKey = %q, want black candidate %q", got[0].traceKey, black.traceKey)
+	}
+}
+
+func TestSortedCandidates_CanIgnoreBlackPreference(t *testing.T) {
+	red := actionCandidate{
+		traceKey: "-1.5mr",
+		score: candidateScore{
+			averageRank:    2.0,
+			expectedPoints: 1000,
+			red:            true,
+		},
+	}
+	black := actionCandidate{
+		traceKey: "-1.5m",
+		score: candidateScore{
+			averageRank:    2.0,
+			expectedPoints: 1000,
+			red:            false,
+		},
+	}
+
+	got := sortedCandidates([]actionCandidate{red, black}, false)
+	if len(got) != 2 {
+		t.Fatalf("len(sortedCandidates()) = %d, want 2", len(got))
+	}
+	if got[0].traceKey != red.traceKey {
+		t.Errorf("first traceKey = %q, want original first candidate %q", got[0].traceKey, red.traceKey)
 	}
 }
 

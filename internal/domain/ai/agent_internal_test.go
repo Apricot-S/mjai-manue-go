@@ -278,3 +278,45 @@ func TestBuildCandidateDecision(t *testing.T) {
 		t.Errorf("Trace = %q, want selected decidedKey", decision.Trace)
 	}
 }
+
+func TestBuildCandidateDecision_CanIgnoreBlackPreference(t *testing.T) {
+	self := seat.MustSeat(0)
+	redDiscard, err := action.NewDiscard(self, tile.MustTileFromCode("5mr"), false)
+	if err != nil {
+		t.Fatalf("NewDiscard(red) failed: %v", err)
+	}
+	blackDiscard, err := action.NewDiscard(self, tile.MustTileFromCode("5m"), false)
+	if err != nil {
+		t.Fatalf("NewDiscard(black) failed: %v", err)
+	}
+
+	decision := buildCandidateDecision([]actionCandidate{
+		{
+			traceKey:    "-1.5mr",
+			action:      redDiscard,
+			discardTile: redDiscard.Tile(),
+			score: candidateScore{
+				averageRank:    2.0,
+				expectedPoints: 1000,
+				red:            true,
+			},
+		},
+		{
+			traceKey:    "-1.5m",
+			action:      blackDiscard,
+			discardTile: blackDiscard.Tile(),
+			score: candidateScore{
+				averageRank:    2.0,
+				expectedPoints: 1000,
+				red:            false,
+			},
+		},
+	}, false)
+
+	if decision.Action != redDiscard {
+		t.Errorf("Action = %T %[1]v, want first tied red discard when black preference is disabled", decision.Action)
+	}
+	if !strings.Contains(decision.Trace, "decidedKey -1.5mr\n") {
+		t.Errorf("Trace = %q, want selected red decidedKey", decision.Trace)
+	}
+}
