@@ -10,7 +10,7 @@ import (
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/tile"
 )
 
-func TestManueAgent_buildSelfTurnCandidates_BuildsDiscardCandidate(t *testing.T) {
+func TestBuildSelfTurnCandidates_BuildsDiscardCandidate(t *testing.T) {
 	self := seat.MustSeat(0)
 	discard, err := action.NewDiscard(self, tile.MustTileFromCode("5m"), false)
 	if err != nil {
@@ -89,7 +89,7 @@ func TestNormalizedSelfTurnDiscards_PrefersTsumogiriForSameTile(t *testing.T) {
 	}
 }
 
-func TestManueAgent_buildSelfTurnCandidates_BuildsRiichiCandidate(t *testing.T) {
+func TestBuildSelfTurnCandidates_BuildsRiichiCandidate(t *testing.T) {
 	self := seat.MustSeat(0)
 	riichi := action.NewRiichi(self)
 	discard, err := action.NewDiscard(self, tile.MustTileFromCode("5m"), false)
@@ -129,7 +129,7 @@ func TestManueAgent_buildSelfTurnCandidates_BuildsRiichiCandidate(t *testing.T) 
 	}
 }
 
-func TestManueAgent_buildSelfTurnCandidates_FiltersNonTenpaiRiichiCandidate(t *testing.T) {
+func TestBuildSelfTurnCandidates_FiltersNonTenpaiRiichiCandidate(t *testing.T) {
 	self := seat.MustSeat(0)
 	riichi := action.NewRiichi(self)
 	discard, err := action.NewDiscard(self, tile.MustTileFromCode("5m"), false)
@@ -155,7 +155,7 @@ func TestManueAgent_buildSelfTurnCandidates_FiltersNonTenpaiRiichiCandidate(t *t
 	}
 }
 
-func TestManueAgent_buildSelfTurnCandidates_RiichiDeclaredScoresLegalActionsAsRiichi(t *testing.T) {
+func TestBuildSelfTurnCandidates_RiichiDeclaredScoresLegalActionsAsRiichi(t *testing.T) {
 	self := seat.MustSeat(0)
 	tenpaiDiscard, err := action.NewDiscard(self, tile.MustTileFromCode("5m"), false)
 	if err != nil {
@@ -204,7 +204,7 @@ func TestManueAgent_buildSelfTurnCandidates_RiichiDeclaredScoresLegalActionsAsRi
 	}
 }
 
-func TestManueAgent_buildSelfTurnCandidates_IncludesRiichiAndDiscardCandidates(t *testing.T) {
+func TestBuildSelfTurnCandidates_IncludesRiichiAndDiscardCandidates(t *testing.T) {
 	self := seat.MustSeat(0)
 	riichi := action.NewRiichi(self)
 	discard, err := action.NewDiscard(self, tile.MustTileFromCode("5m"), false)

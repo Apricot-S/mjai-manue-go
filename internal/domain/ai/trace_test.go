@@ -11,7 +11,7 @@ import (
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/tile"
 )
 
-func TestManueAgent_formatDiscardTraceKey(t *testing.T) {
+func TestFormatDiscardTraceKey(t *testing.T) {
 	discardTile := tile.MustTileFromCode("5m")
 	if got := formatDiscardTraceKey(false, discardTile); got != "-1.5m" {
 		t.Errorf("formatDiscardTraceKey(false) = %q, want %q", got, "-1.5m")
@@ -21,7 +21,7 @@ func TestManueAgent_formatDiscardTraceKey(t *testing.T) {
 	}
 }
 
-func TestManueAgent_formatCandidateTrace(t *testing.T) {
+func TestFormatCandidateTrace(t *testing.T) {
 	self := seat.MustSeat(0)
 	discard, err := action.NewDiscard(self, tile.MustTileFromCode("5m"), false)
 	if err != nil {
@@ -54,7 +54,7 @@ func TestManueAgent_formatCandidateTrace(t *testing.T) {
 	}
 }
 
-func TestManueAgent_formatCandidateTrace_FormatsInfinityShanten(t *testing.T) {
+func TestFormatCandidateTrace_FormatsInfinityShanten(t *testing.T) {
 	self := seat.MustSeat(0)
 	discard, err := action.NewDiscard(self, tile.MustTileFromCode("5m"), false)
 	if err != nil {
@@ -80,7 +80,7 @@ func TestManueAgent_formatCandidateTrace_FormatsInfinityShanten(t *testing.T) {
 	}
 }
 
-func TestManueAgent_formatDecisionTrace_AppendsDecidedKey(t *testing.T) {
+func TestFormatDecisionTrace_AppendsDecidedKey(t *testing.T) {
 	self := seat.MustSeat(0)
 	discard, err := action.NewDiscard(self, tile.MustTileFromCode("5m"), false)
 	if err != nil {

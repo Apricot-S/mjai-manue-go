@@ -41,7 +41,7 @@ func TestCandidateShantenReturnsInfinityWhenTileIsNotThrowable(t *testing.T) {
 	}
 }
 
-func TestManueAgent_scoreDiscardCandidate_MarksRedDiscard(t *testing.T) {
+func TestScoreDiscardCandidate_MarksRedDiscard(t *testing.T) {
 	redDiscardTile := tile.MustTileFromCode("5mr")
 
 	got := scoreDiscardCandidate(redDiscardTile, 1)

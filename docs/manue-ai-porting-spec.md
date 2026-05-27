@@ -201,13 +201,13 @@ Agent 判断の characterization は、最終的に mjai JSON Lines から `roun
 | --- | --- | --- | --- |
 | OC-001 | Covered | `TestManueAgent_DecideActionSkeleton` | 和了 action が評価前に優先される入口を固定する。 |
 | OC-002 | Covered | `TestManueAgent_DecideActionSkeleton` | リーチ accepted 中の自摸はツモ切り discard を返す。 |
-| OC-006 | Covered | `TestManueAgent_buildSelfTurnCandidates_BuildsRiichiCandidate`, `TestManueAgent_buildSelfTurnCandidates_FiltersNonTenpaiRiichiCandidate` | reach action ありの候補生成を固定する。 |
+| OC-006 | Covered | `TestBuildSelfTurnCandidates_BuildsRiichiCandidate`, `TestBuildSelfTurnCandidates_FiltersNonTenpaiRiichiCandidate` | reach action ありの候補生成を固定する。 |
 | OC-009 | Covered | `TestBuildReactionCandidates_BuildsPassAndCallDiscards`, `TestManueAgent_decideOtherDiscardReaction_EvaluatesCallCandidates` | `none` と副露後打牌候補を同じ評価経路へ載せる。 |
 | OC-011 | Covered | `TestBuildReactionCandidates_BuildsPassAndCallDiscards` | 喰い替え候補が除外されることを副露候補生成で固定する。 |
-| OC-012 | Covered | `TestManueAgent_dealInEstimates_SafeTileHasZeroDealInProb` | danger scene 単体ではなく、deal-in evaluator 経由で安全牌 shortcut を固定する。 |
+| OC-012 | Covered | `TestCandidateEvaluator_dealInEstimates_SafeTileHasZeroDealInProb` | danger scene 単体ではなく、deal-in evaluator 経由で安全牌 shortcut を固定する。 |
 | OC-015 | Covered | `TestCandidateShantenUsesThrowableVector`, `TestCandidateShantenReturnsBaseForNone`, `TestCandidateShantenReturnsInfinityWhenTileIsNotThrowable` | 候補別 shanten が打牌後再解析ではなく throwable vector 由来であることを固定する。 |
 | OC-017 | Covered | `TestExhaustiveDrawProb`, `TestExhaustiveDrawProbOnSelfNoWin` | 流局確率と自分非和了条件付き補正を固定する。 |
-| OC-020 | Covered | `TestManueAgent_compareCandidateScore`, `TestManueAgent_chooseBestCandidate_PrefersBlackTileOnTie`, `TestManueAgent_chooseBestCandidate_DoesNotPreferRiichiOnScoreTie` | 平均順位、期待点、赤牌、走査順の tie-break を固定する。 |
+| OC-020 | Covered | `TestCompareCandidateScore`, `TestChooseBestCandidate_PrefersBlackTileOnTie`, `TestChooseBestCandidate_DoesNotPreferRiichiOnScoreTie` | 平均順位、期待点、赤牌、走査順の tie-break を固定する。 |
 
 OC-008 は `domain/game` の `TestState_LegalActions_RiichiDeclarationTileKeepsTenpai` で境界を固定済みのため、AI 側では追加しない。
 
@@ -217,15 +217,15 @@ OC-008 は `domain/game` の `TestState_LegalActions_RiichiDeclarationTileKeepsT
 | --- | --- | --- | --- |
 | OC-003 | Covered | `TestManueAgent_decideSelfTurn_ReturnsErrorWithoutTsumogiriAfterRiichiAccepted` | リーチ accepted 中にツモ切りがない異常系を固定する。 |
 | OC-004 | Covered | `TestNormalizedSelfTurnDiscards_PrefersTsumogiriForSameTile` | 同一牌候補の正規化を固定する。 |
-| OC-005 | Covered | `TestNormalizedSelfTurnDiscards_PrefersTsumogiriForSameTile`, `TestManueAgent_chooseBestCandidate_PrefersBlackTileOnTie` | 赤 5 と黒 5 を別候補として残し、比較では黒優先を固定する。 |
-| OC-007 | Covered | `TestManueAgent_buildSelfTurnCandidates_IncludesRiichiAndDiscardCandidates`, `TestFilteredWinEstimateGoals` | reach 候補と通常 discard 候補が別系統で評価されることを固定する。 |
+| OC-005 | Covered | `TestNormalizedSelfTurnDiscards_PrefersTsumogiriForSameTile`, `TestChooseBestCandidate_PrefersBlackTileOnTie` | 赤 5 と黒 5 を別候補として残し、比較では黒優先を固定する。 |
+| OC-007 | Covered | `TestBuildSelfTurnCandidates_IncludesRiichiAndDiscardCandidates`, `TestFilteredWinEstimateGoals` | reach 候補と通常 discard 候補が別系統で評価されることを固定する。 |
 | OC-010 | Covered | `TestBuildReactionCandidates_BuildsPassAndCallDiscards`, `TestManueAgent_decideOtherDiscardReaction_EvaluatesCallCandidates` | 副露後打牌は評価用候補であり、選択 action は副露 action のままになることを固定する。 |
 | OC-013 | Covered | `TestTenpaiProb_ReturnsOneWithRiichi`, `TestTenpaiProb_ReturnsYamitenRatio`, `TestTenpaiProb_ReturnsOneWithoutStats` | リーチ者、統計あり非リーチ者、統計欠損の聴牌確率を固定する。 |
 | OC-014 | Covered | `TestImmediateScoreDeltaDist`, `TestImmediateScoreDeltaDistFromStats`, `TestImmediateScoreDeltaDist_ReturnsNoChangeWithoutDealInDists` | 直後放銃分布と無変化 branch 置換を固定する。 |
 | OC-016 | Covered | `TestTrialWinPts`, `TestCandidateTrialWinPts`, `TestWinEstimatesFromTrialTiles` | 複数 goal 達成時に候補ごとの最大 points を採用することを固定する。 |
 | OC-018 | Covered | `TestExhaustiveDrawTenpaiProbs`, `TestExhaustiveDrawScoreDeltaDistFromTenpaiProbs`, `TestFutureExhaustiveDrawScoreDeltaDist` | 流局時聴牌確率と 3000 点授受分布を固定する。 |
 | OC-019 | Covered | `TestAverageRank`, `TestWinProbAgainst`, `TestWinProbFromRelativeScore_UsesStatsWhenAvailable`, `TestWinProbFromRelativeScore_FallsBackToStartingDealerOrder` | 点差分布から順位期待値へ変換する rank model を固定する。 |
-| OC-021 | Covered | `TestManueAgent_formatCandidateTrace`, `TestManueAgent_formatCandidateTrace_FormatsInfinityShanten`, `TestManueAgent_formatDecisionTrace_AppendsDecidedKey` | trace/log は action golden とは分けて文字列形を固定する。 |
+| OC-021 | Covered | `TestFormatCandidateTrace`, `TestFormatCandidateTrace_FormatsInfinityShanten`, `TestFormatDecisionTrace_AppendsDecidedKey` | trace/log は action golden とは分けて文字列形を固定する。 |
 
 ### 10.3 原仕様との差分記録が必要な箇所
 
