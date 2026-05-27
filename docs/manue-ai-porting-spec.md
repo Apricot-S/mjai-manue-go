@@ -92,14 +92,14 @@ ManueAgent.Decide
 | 分類 | 対象 | 扱い |
 | --- | --- | --- |
 | 維持 | `agent.go`, `tsumogiri_agent.go` | Manue 固有再実装の対象外。Agent interface と TsumogiriAgent は残す。 |
-| 再採用候補 | `manue_candidate_score.go` | 候補比較、score delta 合成、平均順位/期待点への変換は純粋関数として使える。命名と入力 struct は最終設計に合わせて調整する。 |
-| 再採用候補 | `manue_scalar_prob_dist.go`, `manue_score_delta_prob_dist.go`, `manue_ahead_vector_prob_dist.go` | 分布演算は純粋関数として使える。正規化や非正値 drop の仕様は characterization と合わせて維持する。 |
-| 再採用候補 | `manue_win_score.go`, `manue_deal_in_score.go`, `manue_round_end_prob.go`, `manue_round_end_score.go`, `manue_exhaustive_draw_score.go`, `manue_rank.go` | score/rank model の部品として使える。stats interface との接続は新設計側で決める。 |
-| 再採用候補 | `manue_win_estimate_score.go`, `manue_win_trials.go` | Monte Carlo trial 集計と wall/trial helper は純粋関数として使える。乱数列の完全互換は要求しない。 |
-| 再採用候補 | `manue_win_goals.go`, `manue_win_estimator.go` | `service.CalculateFuHan` は CoffeeScript 版 `calculateFan` 相当の移植済み実装として使う。代表ケースは `service` 側と AI 側の goal scoring テストで固定する。 |
-| 条件付き再採用 | `manue_danger.go`, `manue_danger_scene.go`, `manue_danger_tiles.go` | danger tree interface と feature evaluator は使えるが、feature 名ごとの原仕様対応を確認しながら接続する。 |
-| 再設計対象 | `manue_agent.go`, `manue_self_turn_candidates.go`, `manue_call_candidates.go`, `manue_evaluator.go`, `manue_trace.go` | orchestration と Agent 境界は新設計で組み直す。既存実装はテスト fixture と細部確認の補助に留める。 |
-| 再設計対象 | `manue_deps.go`, `manue_stats.go` | deps/stats interface と validation は configs/CLI 接続時に再確認する。外側 concrete type に依存しない方針は維持する。 |
+| 再採用候補 | `candidate_score.go` | 候補比較、score delta 合成、平均順位/期待点への変換は純粋関数として使える。命名と入力 struct は最終設計に合わせて調整する。 |
+| 再採用候補 | `scalar_prob_dist.go`, `score_delta_prob_dist.go`, `ahead_vector_prob_dist.go` | 分布演算は純粋関数として使える。正規化や非正値 drop の仕様は characterization と合わせて維持する。 |
+| 再採用候補 | `win_score.go`, `deal_in_score.go`, `round_end_prob.go`, `round_end_score.go`, `exhaustive_draw_score.go`, `rank.go` | score/rank model の部品として使える。stats interface との接続は新設計側で決める。 |
+| 再採用候補 | `win_estimate_score.go`, `win_trials.go` | Monte Carlo trial 集計と wall/trial helper は純粋関数として使える。乱数列の完全互換は要求しない。 |
+| 再採用候補 | `win_goals.go`, `win_estimator.go` | `service.CalculateFuHan` は CoffeeScript 版 `calculateFan` 相当の移植済み実装として使う。代表ケースは `service` 側と AI 側の goal scoring テストで固定する。 |
+| 条件付き再採用 | `danger.go`, `danger_scene.go`, `danger_tiles.go` | danger tree interface と feature evaluator は使えるが、feature 名ごとの原仕様対応を確認しながら接続する。 |
+| 再設計対象 | `manue_agent.go`, `self_turn_candidates.go`, `call_candidates.go`, `evaluator.go`, `trace.go` | orchestration と Agent 境界は新設計で組み直す。既存実装はテスト fixture と細部確認の補助に留める。 |
+| 再設計対象 | `deps.go`, `stats.go` | deps/stats interface と validation は configs/CLI 接続時に再確認する。外側 concrete type に依存しない方針は維持する。 |
 
 ## 6. 危険度推定
 
