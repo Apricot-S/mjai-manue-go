@@ -2,6 +2,7 @@ package ai
 
 import (
 	"fmt"
+	"slices"
 
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/seat"
 )
@@ -37,6 +38,14 @@ func chooseBestCandidate(candidates []actionCandidate, preferBlack bool) actionC
 		}
 	}
 	return best
+}
+
+func sortedTraceCandidates(candidates []actionCandidate) []actionCandidate {
+	sortedCandidates := slices.Clone(candidates)
+	slices.SortFunc(sortedCandidates, func(lhs, rhs actionCandidate) int {
+		return compareCandidateScore(&lhs.score, &rhs.score, true)
+	})
+	return sortedCandidates
 }
 
 func compareCandidateScore(lhs, rhs *candidateScore, preferBlack bool) int {

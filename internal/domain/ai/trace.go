@@ -2,7 +2,6 @@ package ai
 
 import (
 	"fmt"
-	"slices"
 	"strconv"
 	"strings"
 
@@ -68,14 +67,6 @@ func formatCandidateTrace(candidates []actionCandidate) string {
 		}
 	}
 	return formatTraceTable(rows)
-}
-
-func sortedTraceCandidates(candidates []actionCandidate) []actionCandidate {
-	sortedCandidates := slices.Clone(candidates)
-	slices.SortFunc(sortedCandidates, func(lhs, rhs actionCandidate) int {
-		return compareCandidateScore(&lhs.score, &rhs.score, true)
-	})
-	return sortedCandidates
 }
 
 func formatShantenTraceValue(shanten int) string {
