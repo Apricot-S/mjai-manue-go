@@ -10,7 +10,7 @@ import (
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/tile"
 )
 
-func getSelfTurnCandidates(actions []action.Action, self player.PlayerViewer) ([]actionCandidate, error) {
+func buildSelfTurnCandidates(actions []action.Action, self player.PlayerViewer) ([]actionCandidate, error) {
 	h, err := selfTurnHand(self)
 	if err != nil {
 		return nil, fmt.Errorf("cannot build self-turn candidates: %w", err)

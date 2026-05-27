@@ -12,7 +12,7 @@ import (
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/tile"
 )
 
-func getOtherDiscardReactionCandidates(actions []action.Action, self player.PlayerViewer) ([]actionCandidate, error) {
+func buildReactionCandidates(actions []action.Action, self player.PlayerViewer) ([]actionCandidate, error) {
 	h, err := selfTurnHand(self)
 	if err != nil {
 		return nil, fmt.Errorf("cannot build reaction candidates: %w", err)
@@ -44,7 +44,7 @@ func getOtherDiscardReactionCandidates(actions []action.Action, self player.Play
 		if !ok {
 			continue
 		}
-		callCandidates, err := getCallReactionCandidates(callIndex, a, callMeld, h, self.Melds())
+		callCandidates, err := buildCallReactionCandidates(callIndex, a, callMeld, h, self.Melds())
 		if err != nil {
 			return nil, err
 		}
@@ -54,7 +54,7 @@ func getOtherDiscardReactionCandidates(actions []action.Action, self player.Play
 	return candidates, nil
 }
 
-func getCallReactionCandidates(
+func buildCallReactionCandidates(
 	callIndex int,
 	callAction action.Action,
 	callMeld meld.Meld,

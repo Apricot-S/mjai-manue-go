@@ -11,9 +11,9 @@ import (
 )
 
 type ManueAgent struct {
-	seed uint64
-	rng  *rand.Rand
-	deps ManueAgentDeps
+	seed      uint64
+	deps      ManueAgentDeps
+	evaluator candidateEvaluator
 }
 
 func NewManueAgent(seed uint64, deps ManueAgentDeps) (*ManueAgent, error) {
@@ -35,7 +35,8 @@ func NewManueAgent(seed uint64, deps ManueAgentDeps) (*ManueAgent, error) {
 }
 
 func (a *ManueAgent) Reset() {
-	a.rng = rand.New(rand.NewPCG(a.seed, 0))
+	rng := rand.New(rand.NewPCG(a.seed, 0))
+	a.evaluator = newCandidateEvaluator(a.deps.Stats, a.deps.Danger, rng)
 }
 
 func (a *ManueAgent) Decide(request Request) (Decision, error) {
@@ -81,25 +82,14 @@ func (a *ManueAgent) decideSelfTurn(
 		return Decision{}, fmt.Errorf("cannot decide: no tsumogiri discard after riichi accepted")
 	}
 
-	candidates, err := getSelfTurnCandidates(legalActions, self)
+	candidates, err := buildSelfTurnCandidates(legalActions, self)
 	if err != nil {
 		return Decision{}, err
 	}
 	if len(candidates) == 0 {
 		return Decision{}, fmt.Errorf("cannot decide self turn: no self-turn candidate")
 	}
-	candidates, err = a.evaluateActionCandidates(state, selfSeat, candidates)
-	if err != nil {
-		return Decision{}, err
-	}
-
-	candidate := chooseBestCandidate(candidates, true)
-	log := formatCandidateLog(candidates)
-	return Decision{
-		Action: candidate.action,
-		Log:    log,
-		Trace:  formatDecisionTrace(log, &candidate),
-	}, nil
+	return a.decideFromCandidates(state, selfSeat, candidates, true)
 }
 
 func (a *ManueAgent) decideOtherDiscardReaction(
@@ -115,25 +105,37 @@ func (a *ManueAgent) decideOtherDiscardReaction(
 		return Decision{}, fmt.Errorf("cannot decide other discard reaction: self player is required")
 	}
 
-	candidates, err := getOtherDiscardReactionCandidates(legalActions, self)
+	candidates, err := buildReactionCandidates(legalActions, self)
 	if err != nil {
 		return Decision{}, err
 	}
 	if len(candidates) == 0 {
 		return Decision{}, fmt.Errorf("cannot decide other discard reaction: no reaction candidate")
 	}
-	candidates, err = a.evaluateActionCandidates(state, selfSeat, candidates)
+	return a.decideFromCandidates(state, selfSeat, candidates, false)
+}
+
+func (a *ManueAgent) decideFromCandidates(
+	state round.StateViewer,
+	selfSeat seat.Seat,
+	candidates []actionCandidate,
+	preferBlack bool,
+) (Decision, error) {
+	candidates, err := a.evaluator.evaluateCandidates(state, selfSeat, candidates)
 	if err != nil {
 		return Decision{}, err
 	}
+	return buildCandidateDecision(candidates, preferBlack), nil
+}
 
-	candidate := chooseBestCandidate(candidates, false)
+func buildCandidateDecision(candidates []actionCandidate, preferBlack bool) Decision {
+	selected := chooseBestCandidate(candidates, preferBlack)
 	log := formatCandidateLog(candidates)
 	return Decision{
-		Action: candidate.action,
+		Action: selected.action,
 		Log:    log,
-		Trace:  formatDecisionTrace(log, &candidate),
-	}, nil
+		Trace:  formatDecisionTrace(log, &selected),
+	}
 }
 
 func firstActionOfType[T action.Action](actions []action.Action) T {

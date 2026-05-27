@@ -11,7 +11,7 @@ import (
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/tile"
 )
 
-type actionEvaluationContext struct {
+type candidateEvaluationContext struct {
 	stats                         ManueStats
 	state                         round.StateViewer
 	self                          seat.Seat
@@ -22,24 +22,41 @@ type actionEvaluationContext struct {
 	baseTenpaiProbs               [common.NumPlayers]float64
 }
 
-func (a *ManueAgent) evaluateActionCandidates(
+type candidateEvaluator struct {
+	stats  ManueStats
+	danger DangerEstimator
+	rng    *rand.Rand
+	trials int
+}
+
+func newCandidateEvaluator(stats ManueStats, danger DangerEstimator, rng *rand.Rand) candidateEvaluator {
+	return candidateEvaluator{
+		stats:  stats,
+		danger: danger,
+		rng:    rng,
+		trials: defaultWinEstimateTrials,
+	}
+}
+
+const defaultWinEstimateTrials = 1000
+
+func (e candidateEvaluator) evaluateCandidates(
 	state round.StateViewer,
 	self seat.Seat,
 	candidates []actionCandidate,
 ) ([]actionCandidate, error) {
-	stats := a.deps.Stats
-	if stats == nil {
+	if e.stats == nil {
 		return candidates, nil
 	}
 
-	context, err := newActionEvaluationContext(stats, state, self, candidates, a.rng)
+	context, err := e.newEvaluationContext(state, self, candidates)
 	if err != nil {
 		return nil, err
 	}
 
 	updated := make([]actionCandidate, len(candidates))
 	for i, candidate := range candidates {
-		updatedCandidate, err := a.evaluateActionCandidate(context, candidate)
+		updatedCandidate, err := e.evaluateCandidate(context, candidate)
 		if err != nil {
 			return nil, fmt.Errorf("cannot evaluate candidate %q: %w", candidate.traceKey, err)
 		}
@@ -48,13 +65,11 @@ func (a *ManueAgent) evaluateActionCandidates(
 	return updated, nil
 }
 
-func newActionEvaluationContext(
-	stats ManueStats,
+func (e candidateEvaluator) newEvaluationContext(
 	state round.StateViewer,
 	self seat.Seat,
 	candidates []actionCandidate,
-	rng *rand.Rand,
-) (actionEvaluationContext, error) {
+) (candidateEvaluationContext, error) {
 	selfPlayer := state.Player(self)
 	goalContext := winEstimateGoalContext{
 		melds:          selfPlayer.Melds(),
@@ -65,36 +80,36 @@ func newActionEvaluationContext(
 	}
 	goalsByKey, err := scoredWinEstimateGoalsByKey(candidates, goalContext)
 	if err != nil {
-		return actionEvaluationContext{}, err
+		return candidateEvaluationContext{}, err
 	}
-	winEstimates, err := winEstimatesFromState(stats, state, self, candidates, goalsByKey, 1000, rng)
+	winEstimates, err := winEstimatesFromState(e.stats, state, self, candidates, goalsByKey, e.trials, e.rng)
 	if err != nil {
-		return actionEvaluationContext{}, err
+		return candidateEvaluationContext{}, err
 	}
 
-	exhaustiveDrawProbOnSelfNoWin, err := exhaustiveDrawProbOnSelfNoWin(stats, state.Turn())
+	exhaustiveDrawProbOnSelfNoWin, err := exhaustiveDrawProbOnSelfNoWin(e.stats, state.Turn())
 	if err != nil {
-		return actionEvaluationContext{}, err
+		return candidateEvaluationContext{}, err
 	}
-	notenTenpaiProb, err := notenExhaustiveDrawTenpaiProb(stats, state.Turn())
+	notenTenpaiProb, err := notenExhaustiveDrawTenpaiProb(e.stats, state.Turn())
 	if err != nil {
-		return actionEvaluationContext{}, err
+		return candidateEvaluationContext{}, err
 	}
 
-	return actionEvaluationContext{
-		stats:                         stats,
+	return candidateEvaluationContext{
+		stats:                         e.stats,
 		state:                         state,
 		self:                          self,
 		winEstimates:                  winEstimates,
 		exhaustiveDrawProbOnSelfNoWin: exhaustiveDrawProbOnSelfNoWin,
 		notenTenpaiProb:               notenTenpaiProb,
-		otherWinDists:                 otherWinScoreDeltaDists(stats, state, self),
-		baseTenpaiProbs:               currentTenpaiProbs(stats, state, self),
+		otherWinDists:                 otherWinScoreDeltaDists(e.stats, state, self),
+		baseTenpaiProbs:               currentTenpaiProbs(e.stats, state, self),
 	}, nil
 }
 
-func (a *ManueAgent) evaluateActionCandidate(
-	context actionEvaluationContext,
+func (e candidateEvaluator) evaluateCandidate(
+	context candidateEvaluationContext,
 	candidate actionCandidate,
 ) (actionCandidate, error) {
 	winEstimate, ok := context.winEstimates[candidate.traceKey]
@@ -108,7 +123,7 @@ func (a *ManueAgent) evaluateActionCandidate(
 		winEstimate,
 	)
 
-	dealInEstimates, immediateDist, err := a.immediateDealInEvaluation(context, candidate)
+	dealInEstimates, immediateDist, err := e.immediateDealInEvaluation(context, candidate)
 	if err != nil {
 		return actionCandidate{}, err
 	}
@@ -135,15 +150,15 @@ func (a *ManueAgent) evaluateActionCandidate(
 	return candidate, nil
 }
 
-func (a *ManueAgent) immediateDealInEvaluation(
-	context actionEvaluationContext,
+func (e candidateEvaluator) immediateDealInEvaluation(
+	context candidateEvaluationContext,
 	candidate actionCandidate,
 ) ([]dealInEstimate, scoreDeltaProbDist, error) {
 	if candidate.discardTile.IsUnknown() {
 		return nil, immediateScoreDeltaDist(nil), nil
 	}
 
-	dealInEstimates, err := a.dealInEstimates(context.state, context.self, candidate.discardTile)
+	dealInEstimates, err := e.dealInEstimates(context.state, context.self, candidate.discardTile)
 	if err != nil {
 		return nil, scoreDeltaProbDist{}, fmt.Errorf("deal-in estimates: %w", err)
 	}
@@ -160,7 +175,7 @@ func (a *ManueAgent) immediateDealInEvaluation(
 }
 
 func candidateExhaustiveDrawEvaluation(
-	context actionEvaluationContext,
+	context candidateEvaluationContext,
 	candidate actionCandidate,
 ) (scoreDeltaProbDist, float64) {
 	tenpaiProbs := context.baseTenpaiProbs
@@ -173,12 +188,12 @@ func candidateExhaustiveDrawEvaluation(
 		exhaustiveDrawAvgPts(context.self.Index(), exhaustiveDrawTenpaiProbs)
 }
 
-func (a *ManueAgent) dealInEstimates(
+func (e candidateEvaluator) dealInEstimates(
 	state round.StateViewer,
 	self seat.Seat,
 	discard tile.Tile,
 ) ([]dealInEstimate, error) {
-	if a.deps.Danger == nil {
+	if e.danger == nil {
 		return nil, nil
 	}
 	remainTurns := stateNumRemainTurns(state)
@@ -189,8 +204,8 @@ func (a *ManueAgent) dealInEstimates(
 			continue
 		}
 		winnerPlayer := state.Player(winner)
-		tenpai := tenpaiProb(a.deps.Stats, winnerPlayer.RiichiState() != player.NotRiichi, remainTurns, len(winnerPlayer.Melds()))
-		rawProb, err := a.deps.Danger.EstimateDealInProb(state, self, winner, discard)
+		tenpai := tenpaiProb(e.stats, winnerPlayer.RiichiState() != player.NotRiichi, remainTurns, len(winnerPlayer.Melds()))
+		rawProb, err := e.danger.EstimateDealInProb(state, self, winner, discard)
 		if err != nil {
 			return nil, err
 		}

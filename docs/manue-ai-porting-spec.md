@@ -201,9 +201,9 @@ Agent 判断の characterization は、最終的に mjai JSON Lines から `roun
 | --- | --- | --- | --- |
 | OC-001 | Covered | `TestManueAgent_DecideActionSkeleton` | 和了 action が評価前に優先される入口を固定する。 |
 | OC-002 | Covered | `TestManueAgent_DecideActionSkeleton` | リーチ accepted 中の自摸はツモ切り discard を返す。 |
-| OC-006 | Covered | `TestManueAgent_getSelfTurnCandidates_BuildsRiichiCandidate`, `TestManueAgent_getSelfTurnCandidates_FiltersNonTenpaiRiichiCandidate` | reach action ありの候補生成を固定する。 |
-| OC-009 | Covered | `TestGetOtherDiscardReactionCandidates_BuildsPassAndCallDiscards`, `TestManueAgent_decideOtherDiscardReaction_EvaluatesCallCandidates` | `none` と副露後打牌候補を同じ評価経路へ載せる。 |
-| OC-011 | Covered | `TestGetOtherDiscardReactionCandidates_BuildsPassAndCallDiscards` | 喰い替え候補が除外されることを副露候補生成で固定する。 |
+| OC-006 | Covered | `TestManueAgent_buildSelfTurnCandidates_BuildsRiichiCandidate`, `TestManueAgent_buildSelfTurnCandidates_FiltersNonTenpaiRiichiCandidate` | reach action ありの候補生成を固定する。 |
+| OC-009 | Covered | `TestBuildReactionCandidates_BuildsPassAndCallDiscards`, `TestManueAgent_decideOtherDiscardReaction_EvaluatesCallCandidates` | `none` と副露後打牌候補を同じ評価経路へ載せる。 |
+| OC-011 | Covered | `TestBuildReactionCandidates_BuildsPassAndCallDiscards` | 喰い替え候補が除外されることを副露候補生成で固定する。 |
 | OC-012 | Covered | `TestManueAgent_dealInEstimates_SafeTileHasZeroDealInProb` | danger scene 単体ではなく、deal-in evaluator 経由で安全牌 shortcut を固定する。 |
 | OC-015 | Covered | `TestCandidateShantenUsesThrowableVector`, `TestCandidateShantenReturnsBaseForNone`, `TestCandidateShantenReturnsInfinityWhenTileIsNotThrowable` | 候補別 shanten が打牌後再解析ではなく throwable vector 由来であることを固定する。 |
 | OC-017 | Covered | `TestExhaustiveDrawProb`, `TestExhaustiveDrawProbOnSelfNoWin` | 流局確率と自分非和了条件付き補正を固定する。 |
@@ -218,8 +218,8 @@ OC-008 は `domain/game` の `TestState_LegalActions_RiichiDeclarationTileKeepsT
 | OC-003 | Covered | `TestManueAgent_decideSelfTurn_ReturnsErrorWithoutTsumogiriAfterRiichiAccepted` | リーチ accepted 中にツモ切りがない異常系を固定する。 |
 | OC-004 | Covered | `TestNormalizedSelfTurnDiscards_PrefersTsumogiriForSameTile` | 同一牌候補の正規化を固定する。 |
 | OC-005 | Covered | `TestNormalizedSelfTurnDiscards_PrefersTsumogiriForSameTile`, `TestManueAgent_chooseBestCandidate_PrefersBlackTileOnTie` | 赤 5 と黒 5 を別候補として残し、比較では黒優先を固定する。 |
-| OC-007 | Covered | `TestManueAgent_getSelfTurnCandidates_IncludesRiichiAndDiscardCandidates`, `TestFilteredWinEstimateGoals` | reach 候補と通常 discard 候補が別系統で評価されることを固定する。 |
-| OC-010 | Covered | `TestGetOtherDiscardReactionCandidates_BuildsPassAndCallDiscards`, `TestManueAgent_decideOtherDiscardReaction_EvaluatesCallCandidates` | 副露後打牌は評価用候補であり、選択 action は副露 action のままになることを固定する。 |
+| OC-007 | Covered | `TestManueAgent_buildSelfTurnCandidates_IncludesRiichiAndDiscardCandidates`, `TestFilteredWinEstimateGoals` | reach 候補と通常 discard 候補が別系統で評価されることを固定する。 |
+| OC-010 | Covered | `TestBuildReactionCandidates_BuildsPassAndCallDiscards`, `TestManueAgent_decideOtherDiscardReaction_EvaluatesCallCandidates` | 副露後打牌は評価用候補であり、選択 action は副露 action のままになることを固定する。 |
 | OC-013 | Covered | `TestTenpaiProb_ReturnsOneWithRiichi`, `TestTenpaiProb_ReturnsYamitenRatio`, `TestTenpaiProb_ReturnsOneWithoutStats` | リーチ者、統計あり非リーチ者、統計欠損の聴牌確率を固定する。 |
 | OC-014 | Covered | `TestImmediateScoreDeltaDist`, `TestImmediateScoreDeltaDistFromStats`, `TestImmediateScoreDeltaDist_ReturnsNoChangeWithoutDealInDists` | 直後放銃分布と無変化 branch 置換を固定する。 |
 | OC-016 | Covered | `TestTrialWinPts`, `TestCandidateTrialWinPts`, `TestWinEstimatesFromTrialTiles` | 複数 goal 達成時に候補ごとの最大 points を採用することを固定する。 |

@@ -1,11 +1,14 @@
 package ai
 
 import (
+	"math/rand/v2"
 	"strings"
 	"testing"
 
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/common"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/round/player"
+	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/round/player/hand"
+	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/round/service"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/seat"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/tile"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/wind"
@@ -257,27 +260,76 @@ func TestEvaluateCandidateFromComponents_ReturnsErrorWithInvalidEstimate(t *test
 	}
 }
 
-func TestManueAgent_evaluateActionCandidate_ReturnsErrorWithMissingWinEstimate(t *testing.T) {
-	context := actionEvaluationContext{
+func TestCandidateEvaluator_evaluateCandidate_ReturnsErrorWithMissingWinEstimate(t *testing.T) {
+	context := candidateEvaluationContext{
 		stats:        validStubManueStats(),
 		state:        stubCandidateEvaluationStateViewer{},
 		self:         seat.MustSeat(0),
 		winEstimates: map[string]winEstimate{},
 	}
 
-	_, err := newTestManueAgent(t, 0).evaluateActionCandidate(context, actionCandidate{
+	evaluator := candidateEvaluator{
+		stats:  validStubManueStats(),
+		danger: stubDangerEstimator{},
+	}
+	_, err := evaluator.evaluateCandidate(context, actionCandidate{
 		traceKey:    "-1.1m",
 		discardTile: tile.MustTileFromCode("1m"),
 	})
 	if err == nil {
-		t.Fatal("evaluateActionCandidate() succeeded unexpectedly")
+		t.Fatal("evaluateCandidate() succeeded unexpectedly")
 	}
 	if !strings.Contains(err.Error(), "missing win estimate") {
-		t.Errorf("evaluateActionCandidate() error = %v, want missing win estimate", err)
+		t.Errorf("evaluateCandidate() error = %v, want missing win estimate", err)
 	}
 }
 
-func TestManueAgent_dealInEstimates_SafeTileHasZeroDealInProb(t *testing.T) {
+func TestCandidateEvaluator_newEvaluationContext_ReturnsErrorWithInvalidTrialCount(t *testing.T) {
+	discard := tile.MustTileFromCode("1m")
+	var throwable hand.TileCounts34
+	throwable[discard.ID()] = 1
+	evaluator := candidateEvaluator{
+		stats:  validStubManueStats(),
+		danger: stubDangerEstimator{},
+		rng:    rand.New(rand.NewPCG(0, 0)),
+		trials: 0,
+	}
+
+	_, err := evaluator.newEvaluationContext(
+		stubCandidateEvaluationStateViewer{
+			roundWind:    wind.East,
+			seatWinds:    [common.NumPlayers]wind.Wind{wind.East, wind.South, wind.West, wind.North},
+			dealer:       seat.MustSeat(0),
+			numLeftTiles: common.NumPlayers * 4,
+			players: [common.NumPlayers]player.PlayerViewer{
+				stubPlayerViewer{
+					hand: visibleHandFromCodes("1m", "2m", "3m", "4m", "5m", "6m", "7m", "8m", "9m", "1p", "2p", "3p", "4p"),
+				},
+				stubPlayerViewer{},
+				stubPlayerViewer{},
+				stubPlayerViewer{},
+			},
+		},
+		seat.MustSeat(0),
+		[]actionCandidate{{
+			traceKey:    "-1.1m",
+			discardTile: discard,
+			turnHand:    visibleHandFromCodes("1m", "2m", "3m", "4m", "5m", "6m", "7m", "8m", "9m", "1p", "2p", "3p", "4p"),
+			shantenGoals: []service.Goal{{
+				Shanten:         0,
+				ThrowableVector: throwable,
+			}},
+		}},
+	)
+	if err == nil {
+		t.Fatal("newEvaluationContext() succeeded unexpectedly")
+	}
+	if !strings.Contains(err.Error(), "numTries must be positive") {
+		t.Errorf("newEvaluationContext() error = %v, want numTries validation", err)
+	}
+}
+
+func TestCandidateEvaluator_dealInEstimates_SafeTileHasZeroDealInProb(t *testing.T) {
 	self := seat.MustSeat(0)
 	discard := tile.MustTileFromCode("5m")
 	state := stubCandidateEvaluationStateViewer{
@@ -298,15 +350,12 @@ func TestManueAgent_dealInEstimates_SafeTileHasZeroDealInProb(t *testing.T) {
 			stubPlayerViewer{},
 		},
 	}
-	agent, err := NewManueAgent(0, ManueAgentDeps{
-		Stats:  validStubManueStats(),
-		Danger: NewDangerEstimator(stubDangerTreeLeaf{prob: 0.75}),
-	})
-	if err != nil {
-		t.Fatalf("NewManueAgent() failed: %v", err)
+	evaluator := candidateEvaluator{
+		stats:  validStubManueStats(),
+		danger: NewDangerEstimator(stubDangerTreeLeaf{prob: 0.75}),
 	}
 
-	got, err := agent.dealInEstimates(state, self, discard)
+	got, err := evaluator.dealInEstimates(state, self, discard)
 	if err != nil {
 		t.Fatalf("dealInEstimates() failed: %v", err)
 	}
@@ -338,4 +387,12 @@ func (s stubDangerTreeLeaf) NegativeNode() DangerTreeNode {
 
 func (s stubDangerTreeLeaf) PositiveNode() DangerTreeNode {
 	return nil
+}
+
+func visibleHandFromCodes(codes ...string) *hand.VisibleHand {
+	tiles := make([]tile.Tile, 0, len(codes))
+	for _, code := range codes {
+		tiles = append(tiles, tile.MustTileFromCode(code))
+	}
+	return hand.MustVisibleHand(tiles)
 }

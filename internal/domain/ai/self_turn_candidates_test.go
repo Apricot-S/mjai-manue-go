@@ -10,14 +10,14 @@ import (
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/tile"
 )
 
-func TestManueAgent_getSelfTurnCandidates_BuildsDiscardCandidate(t *testing.T) {
+func TestManueAgent_buildSelfTurnCandidates_BuildsDiscardCandidate(t *testing.T) {
 	self := seat.MustSeat(0)
 	discard, err := action.NewDiscard(self, tile.MustTileFromCode("5m"), false)
 	if err != nil {
 		t.Fatalf("NewDiscard() failed: %v", err)
 	}
 
-	got, err := getSelfTurnCandidates([]action.Action{discard}, stubPlayerViewer{
+	got, err := buildSelfTurnCandidates([]action.Action{discard}, stubPlayerViewer{
 		hand: hand.CodesToHand([]string{
 			"1m", "2m", "3m", "4m", "5m", "6m", "7m",
 			"1p", "2p", "3p", "E", "E", "S", "S",
@@ -26,10 +26,10 @@ func TestManueAgent_getSelfTurnCandidates_BuildsDiscardCandidate(t *testing.T) {
 		drawnTile:   nil,
 	})
 	if err != nil {
-		t.Fatalf("getSelfTurnCandidates() failed: %v", err)
+		t.Fatalf("buildSelfTurnCandidates() failed: %v", err)
 	}
 	if len(got) != 1 {
-		t.Fatalf("len(getSelfTurnCandidates()) = %d, want 1", len(got))
+		t.Fatalf("len(buildSelfTurnCandidates()) = %d, want 1", len(got))
 	}
 	if got[0].traceKey != "-1.5m" {
 		t.Errorf("traceKey = %q, want %q", got[0].traceKey, "-1.5m")
@@ -89,7 +89,7 @@ func TestNormalizedSelfTurnDiscards_PrefersTsumogiriForSameTile(t *testing.T) {
 	}
 }
 
-func TestManueAgent_getSelfTurnCandidates_BuildsRiichiCandidate(t *testing.T) {
+func TestManueAgent_buildSelfTurnCandidates_BuildsRiichiCandidate(t *testing.T) {
 	self := seat.MustSeat(0)
 	riichi := action.NewRiichi(self)
 	discard, err := action.NewDiscard(self, tile.MustTileFromCode("5m"), false)
@@ -97,7 +97,7 @@ func TestManueAgent_getSelfTurnCandidates_BuildsRiichiCandidate(t *testing.T) {
 		t.Fatalf("NewDiscard() failed: %v", err)
 	}
 
-	got, err := getSelfTurnCandidates([]action.Action{discard, riichi}, stubPlayerViewer{
+	got, err := buildSelfTurnCandidates([]action.Action{discard, riichi}, stubPlayerViewer{
 		hand: hand.CodesToHand([]string{
 			"1m", "2m", "3m", "4m", "5m", "6m", "7m", "8m", "9m",
 			"1p", "1p", "E", "E", "5m",
@@ -106,7 +106,7 @@ func TestManueAgent_getSelfTurnCandidates_BuildsRiichiCandidate(t *testing.T) {
 		drawnTile:   nil,
 	})
 	if err != nil {
-		t.Fatalf("getSelfTurnCandidates() failed: %v", err)
+		t.Fatalf("buildSelfTurnCandidates() failed: %v", err)
 	}
 	var gotRiichi *actionCandidate
 	for i := range got {
@@ -116,7 +116,7 @@ func TestManueAgent_getSelfTurnCandidates_BuildsRiichiCandidate(t *testing.T) {
 		}
 	}
 	if gotRiichi == nil {
-		t.Fatalf("getSelfTurnCandidates() contains no riichi candidate")
+		t.Fatalf("buildSelfTurnCandidates() contains no riichi candidate")
 	}
 	if gotRiichi.traceKey != "0.5m" {
 		t.Errorf("traceKey = %q, want %q", gotRiichi.traceKey, "0.5m")
@@ -129,7 +129,7 @@ func TestManueAgent_getSelfTurnCandidates_BuildsRiichiCandidate(t *testing.T) {
 	}
 }
 
-func TestManueAgent_getSelfTurnCandidates_FiltersNonTenpaiRiichiCandidate(t *testing.T) {
+func TestManueAgent_buildSelfTurnCandidates_FiltersNonTenpaiRiichiCandidate(t *testing.T) {
 	self := seat.MustSeat(0)
 	riichi := action.NewRiichi(self)
 	discard, err := action.NewDiscard(self, tile.MustTileFromCode("5m"), false)
@@ -137,7 +137,7 @@ func TestManueAgent_getSelfTurnCandidates_FiltersNonTenpaiRiichiCandidate(t *tes
 		t.Fatalf("NewDiscard() failed: %v", err)
 	}
 
-	got, err := getSelfTurnCandidates([]action.Action{discard, riichi}, stubPlayerViewer{
+	got, err := buildSelfTurnCandidates([]action.Action{discard, riichi}, stubPlayerViewer{
 		hand: hand.CodesToHand([]string{
 			"1m", "2m", "3m", "4m", "5m", "6m", "7m",
 			"1p", "2p", "3p", "E", "E", "S", "S",
@@ -146,16 +146,16 @@ func TestManueAgent_getSelfTurnCandidates_FiltersNonTenpaiRiichiCandidate(t *tes
 		drawnTile:   nil,
 	})
 	if err != nil {
-		t.Fatalf("getSelfTurnCandidates() failed: %v", err)
+		t.Fatalf("buildSelfTurnCandidates() failed: %v", err)
 	}
 	for _, candidate := range got {
 		if candidate.riichi {
-			t.Fatalf("getSelfTurnCandidates() contains riichi candidate unexpectedly: %+v", candidate)
+			t.Fatalf("buildSelfTurnCandidates() contains riichi candidate unexpectedly: %+v", candidate)
 		}
 	}
 }
 
-func TestManueAgent_getSelfTurnCandidates_RiichiDeclaredScoresLegalActionsAsRiichi(t *testing.T) {
+func TestManueAgent_buildSelfTurnCandidates_RiichiDeclaredScoresLegalActionsAsRiichi(t *testing.T) {
 	self := seat.MustSeat(0)
 	tenpaiDiscard, err := action.NewDiscard(self, tile.MustTileFromCode("5m"), false)
 	if err != nil {
@@ -166,7 +166,7 @@ func TestManueAgent_getSelfTurnCandidates_RiichiDeclaredScoresLegalActionsAsRiic
 		t.Fatalf("NewDiscard(non-tenpai) failed: %v", err)
 	}
 
-	got, err := getSelfTurnCandidates([]action.Action{tenpaiDiscard, nonTenpaiDiscard}, stubPlayerViewer{
+	got, err := buildSelfTurnCandidates([]action.Action{tenpaiDiscard, nonTenpaiDiscard}, stubPlayerViewer{
 		hand: hand.CodesToHand([]string{
 			"1m", "2m", "3m", "4m", "5m", "6m", "7m", "8m", "9m",
 			"1p", "1p", "E", "E", "5m",
@@ -175,10 +175,10 @@ func TestManueAgent_getSelfTurnCandidates_RiichiDeclaredScoresLegalActionsAsRiic
 		drawnTile:   nil,
 	})
 	if err != nil {
-		t.Fatalf("getSelfTurnCandidates() failed: %v", err)
+		t.Fatalf("buildSelfTurnCandidates() failed: %v", err)
 	}
 	if len(got) != 2 {
-		t.Fatalf("len(getSelfTurnCandidates()) = %d, want 2", len(got))
+		t.Fatalf("len(buildSelfTurnCandidates()) = %d, want 2", len(got))
 	}
 	wantActions := map[action.Action]bool{
 		tenpaiDiscard:    false,
@@ -199,12 +199,12 @@ func TestManueAgent_getSelfTurnCandidates_RiichiDeclaredScoresLegalActionsAsRiic
 	}
 	for action, found := range wantActions {
 		if !found {
-			t.Errorf("getSelfTurnCandidates() did not include %v", action)
+			t.Errorf("buildSelfTurnCandidates() did not include %v", action)
 		}
 	}
 }
 
-func TestManueAgent_getSelfTurnCandidates_IncludesRiichiAndDiscardCandidates(t *testing.T) {
+func TestManueAgent_buildSelfTurnCandidates_IncludesRiichiAndDiscardCandidates(t *testing.T) {
 	self := seat.MustSeat(0)
 	riichi := action.NewRiichi(self)
 	discard, err := action.NewDiscard(self, tile.MustTileFromCode("5m"), false)
@@ -212,7 +212,7 @@ func TestManueAgent_getSelfTurnCandidates_IncludesRiichiAndDiscardCandidates(t *
 		t.Fatalf("NewDiscard() failed: %v", err)
 	}
 
-	got, err := getSelfTurnCandidates([]action.Action{discard, riichi}, stubPlayerViewer{
+	got, err := buildSelfTurnCandidates([]action.Action{discard, riichi}, stubPlayerViewer{
 		hand: hand.CodesToHand([]string{
 			"1m", "2m", "3m", "4m", "5m", "6m", "7m", "8m", "9m",
 			"1p", "1p", "E", "E", "5m",
@@ -221,7 +221,7 @@ func TestManueAgent_getSelfTurnCandidates_IncludesRiichiAndDiscardCandidates(t *
 		drawnTile:   nil,
 	})
 	if err != nil {
-		t.Fatalf("getSelfTurnCandidates() failed: %v", err)
+		t.Fatalf("buildSelfTurnCandidates() failed: %v", err)
 	}
 	wantTraceKeys := map[string]bool{"0.5m": false, "-1.5m": false}
 	for _, candidate := range got {
@@ -231,7 +231,7 @@ func TestManueAgent_getSelfTurnCandidates_IncludesRiichiAndDiscardCandidates(t *
 	}
 	for traceKey, found := range wantTraceKeys {
 		if !found {
-			t.Errorf("getSelfTurnCandidates() does not contain %q", traceKey)
+			t.Errorf("buildSelfTurnCandidates() does not contain %q", traceKey)
 		}
 	}
 }

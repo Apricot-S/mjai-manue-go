@@ -24,7 +24,7 @@ func TestManueAgent_chooseBestCandidate_PrefersBlackTileOnTie(t *testing.T) {
 		t.Fatalf("NewDiscard(black) failed: %v", err)
 	}
 
-	candidates, err := getSelfTurnCandidates([]action.Action{redDiscard, blackDiscard}, stubPlayerViewer{
+	candidates, err := buildSelfTurnCandidates([]action.Action{redDiscard, blackDiscard}, stubPlayerViewer{
 		hand: hand.CodesToHand([]string{
 			"1m", "2m", "3m", "4m", "5m", "5mr", "6m", "7m",
 			"1p", "2p", "3p", "E", "E", "S",
@@ -33,7 +33,7 @@ func TestManueAgent_chooseBestCandidate_PrefersBlackTileOnTie(t *testing.T) {
 		drawnTile:   nil,
 	})
 	if err != nil {
-		t.Fatalf("getSelfTurnCandidates() failed: %v", err)
+		t.Fatalf("buildSelfTurnCandidates() failed: %v", err)
 	}
 	got := chooseBestCandidate(candidates, true)
 	if got.action != blackDiscard {
@@ -129,6 +129,33 @@ func TestManueAgent_formatDecisionTrace_AppendsDecidedKey(t *testing.T) {
 	got := formatDecisionTrace(formatCandidateLog([]actionCandidate{*selected}), selected)
 	if !strings.HasSuffix(got, "\n\n\ndecidedKey -1.5m\n") {
 		t.Errorf("formatDecisionTrace() = %q, want two blank lines before decidedKey suffix", got)
+	}
+}
+
+func TestSortedTraceCandidates_PrefersBlackForDisplayOrder(t *testing.T) {
+	red := actionCandidate{
+		traceKey: "-1.5mr",
+		score: candidateScore{
+			averageRank:    2.0,
+			expectedPoints: 1000,
+			red:            true,
+		},
+	}
+	black := actionCandidate{
+		traceKey: "-1.5m",
+		score: candidateScore{
+			averageRank:    2.0,
+			expectedPoints: 1000,
+			red:            false,
+		},
+	}
+
+	got := sortedTraceCandidates([]actionCandidate{red, black})
+	if len(got) != 2 {
+		t.Fatalf("len(sortedTraceCandidates()) = %d, want 2", len(got))
+	}
+	if got[0].traceKey != black.traceKey {
+		t.Errorf("first traceKey = %q, want black candidate %q", got[0].traceKey, black.traceKey)
 	}
 }
 

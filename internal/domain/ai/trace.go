@@ -39,11 +39,6 @@ func formatCandidateTrace(candidates []actionCandidate) string {
 		return ""
 	}
 
-	sortedCandidates := slices.Clone(candidates)
-	slices.SortFunc(sortedCandidates, func(lhs, rhs actionCandidate) int {
-		return compareCandidateScore(&lhs.score, &rhs.score, true)
-	})
-
 	rows := [][]string{{
 		"action",
 		"avgRank",
@@ -56,7 +51,7 @@ func formatCandidateTrace(candidates []actionCandidate) string {
 		"ryukyokuAvgPt",
 		"shanten",
 	}}
-	for _, candidate := range sortedCandidates {
+	for _, candidate := range sortedTraceCandidates(candidates) {
 		rows = append(rows, []string{
 			candidate.traceKey,
 			strconv.FormatFloat(candidate.score.averageRank, 'f', 4, 64),
@@ -71,6 +66,14 @@ func formatCandidateTrace(candidates []actionCandidate) string {
 		})
 	}
 	return formatTraceTable(rows)
+}
+
+func sortedTraceCandidates(candidates []actionCandidate) []actionCandidate {
+	sortedCandidates := slices.Clone(candidates)
+	slices.SortFunc(sortedCandidates, func(lhs, rhs actionCandidate) int {
+		return compareCandidateScore(&lhs.score, &rhs.score, true)
+	})
+	return sortedCandidates
 }
 
 func formatShantenTraceValue(shanten int) string {

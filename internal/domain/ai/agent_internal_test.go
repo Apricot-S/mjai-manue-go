@@ -113,8 +113,19 @@ func TestNewManueAgent(t *testing.T) {
 	if got := agent.deps.Stats.NumWins(); got != stats.numWins {
 		t.Errorf("deps.Stats.NumWins() = %d, want %d", got, stats.numWins)
 	}
-	if agent.rng == nil {
-		t.Errorf("rng = nil, want initialized rng")
+	if agent.evaluator.rng == nil {
+		t.Errorf("evaluator.rng = nil, want initialized rng")
+	}
+	if agent.evaluator.stats == nil {
+		t.Errorf("evaluator.stats = nil, want stats")
+	}
+	if agent.evaluator.danger == nil {
+		t.Errorf("evaluator.danger = nil, want danger estimator")
+	}
+	firstRand := agent.evaluator.rng.Float64()
+	agent.Reset()
+	if secondRand := agent.evaluator.rng.Float64(); secondRand != firstRand {
+		t.Errorf("Reset() first random value = %v, want %v", secondRand, firstRand)
 	}
 }
 
@@ -220,5 +231,50 @@ func TestManueAgent_decideOtherDiscardReaction_EvaluatesCallCandidates(t *testin
 	}
 	if !strings.Contains(decision.Trace, "decidedKey ") {
 		t.Errorf("Trace = %q, want decidedKey suffix", decision.Trace)
+	}
+}
+
+func TestBuildCandidateDecision(t *testing.T) {
+	self := seat.MustSeat(0)
+	redDiscard, err := action.NewDiscard(self, tile.MustTileFromCode("5mr"), false)
+	if err != nil {
+		t.Fatalf("NewDiscard(red) failed: %v", err)
+	}
+	blackDiscard, err := action.NewDiscard(self, tile.MustTileFromCode("5m"), false)
+	if err != nil {
+		t.Fatalf("NewDiscard(black) failed: %v", err)
+	}
+
+	decision := buildCandidateDecision([]actionCandidate{
+		{
+			traceKey:    "-1.5mr",
+			action:      redDiscard,
+			discardTile: redDiscard.Tile(),
+			score: candidateScore{
+				averageRank:    2.0,
+				expectedPoints: 1000,
+				red:            true,
+			},
+		},
+		{
+			traceKey:    "-1.5m",
+			action:      blackDiscard,
+			discardTile: blackDiscard.Tile(),
+			score: candidateScore{
+				averageRank:    2.0,
+				expectedPoints: 1000,
+				red:            false,
+			},
+		},
+	}, true)
+
+	if decision.Action != blackDiscard {
+		t.Errorf("Action = %T %[1]v, want black discard", decision.Action)
+	}
+	if !strings.Contains(decision.Log, "| action |") {
+		t.Errorf("Log = %q, want candidate table", decision.Log)
+	}
+	if !strings.Contains(decision.Trace, "decidedKey -1.5m\n") {
+		t.Errorf("Trace = %q, want selected decidedKey", decision.Trace)
 	}
 }
