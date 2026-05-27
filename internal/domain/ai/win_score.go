@@ -1,7 +1,6 @@
 package ai
 
 import (
-	"fmt"
 	"strconv"
 
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/common"
@@ -67,28 +66,6 @@ func winScoreFactorDist(actorID int, dealerID int, selfDrawProb float64) scoreDe
 	return newScoreDeltaProbDist(dist)
 }
 
-// winPointsDist returns a probability distribution from win-points frequencies.
-func winPointsDist(pointFreqs map[string]int) (scalarProbDist, error) {
-	totalFreqs := pointFreqs["total"]
-	if totalFreqs <= 0 {
-		return nil, fmt.Errorf("invalid win points frequencies: total must be positive")
-	}
-	totalFreqsFloat := float64(totalFreqs)
-
-	dist := make(map[float64]float64, len(pointFreqs)-1)
-	for points, freq := range pointFreqs {
-		if points == "total" {
-			continue
-		}
-		parsedPoints, err := strconv.ParseFloat(points, 64)
-		if err != nil {
-			return nil, fmt.Errorf("invalid win points frequency key %q: %w", points, err)
-		}
-		dist[parsedPoints] = float64(freq) / totalFreqsFloat
-	}
-	return newScalarProbDist(dist), nil
-}
-
 func winPointsDistFromValidatedStats(pointFreqs map[string]int) scalarProbDist {
 	totalFreqsFloat := float64(pointFreqs["total"])
 	dist := make(map[float64]float64, len(pointFreqs)-1)
@@ -100,24 +77,6 @@ func winPointsDistFromValidatedStats(pointFreqs map[string]int) scalarProbDist {
 		dist[parsedPoints] = float64(freq) / totalFreqsFloat
 	}
 	return newScalarProbDist(dist)
-}
-
-// randomWinScoreDeltaDist returns the score-change distribution for a random
-// win by actorID.
-func randomWinScoreDeltaDist(
-	actorID int,
-	dealerID int,
-	selfDrawProb float64,
-	pointFreqs map[string]int,
-) (scoreDeltaProbDist, error) {
-	pointsDist, err := winPointsDist(pointFreqs)
-	if err != nil {
-		return nil, err
-	}
-	return multiplyScalarScoreDeltaProbDists(
-		pointsDist,
-		winScoreFactorDist(actorID, dealerID, selfDrawProb),
-	), nil
 }
 
 func randomWinScoreDeltaDistFromStats(
@@ -145,13 +104,4 @@ func winScoreDeltaDistFromPointsDist(
 		pointsDist,
 		winScoreFactorDist(actorID, dealerID, float64(stats.NumSelfDrawWins())/float64(stats.NumWins())),
 	)
-}
-
-func selfWinScoreDeltaDistFromEstimate(
-	selfID int,
-	dealerID int,
-	stats WinScoreStats,
-	estimate winEstimate,
-) scoreDeltaProbDist {
-	return winScoreDeltaDistFromPointsDist(selfID, dealerID, stats, estimate.pointsDist)
 }

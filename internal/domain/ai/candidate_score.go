@@ -83,7 +83,7 @@ func evaluateCandidateScore(
 	selfPosition int,
 	opponents []rankOpponent,
 ) candidateScore {
-	score.expectedPoints = expectedPts(selfID, scoreChanges)
+	score.expectedPoints = scoreChanges.expected()[selfID]
 	score.averageRank = averageRank(scoreChanges, selfID, selfScore, selfPosition, opponents)
 	return score
 }
@@ -122,7 +122,7 @@ func candidateTotalScoreDeltaDist(
 		otherWinDists,
 		score.otherWinProb,
 	)
-	return totalScoreDeltaDist(immediateDist, futureDist)
+	return immediateDist.replace(scoreDelta{}, futureDist)
 }
 
 func evaluateCandidateFromComponents(

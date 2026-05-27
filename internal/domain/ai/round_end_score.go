@@ -23,14 +23,3 @@ func futureScoreDeltaDist(
 	}
 	return mergeScoreDeltaProbDists(items)
 }
-
-// totalScoreDeltaDist replaces the no-change branch of immediateDist with the
-// future round-ending distribution. This mirrors Manue's flow where no
-// immediate deal-in means the round continues.
-func totalScoreDeltaDist(immediateDist scoreDeltaProbDist, futureDist scoreDeltaProbDist) scoreDeltaProbDist {
-	return immediateDist.replace(scoreDelta{}, futureDist)
-}
-
-func expectedPts(selfID int, scoreChanges scoreDeltaProbDist) float64 {
-	return scoreChanges.expected()[selfID]
-}

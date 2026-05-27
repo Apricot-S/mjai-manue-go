@@ -116,11 +116,11 @@ func (e candidateEvaluator) evaluateCandidate(
 	if !ok {
 		return actionCandidate{}, fmt.Errorf("missing win estimate")
 	}
-	selfWinDist := selfWinScoreDeltaDistFromEstimate(
+	selfWinDist := winScoreDeltaDistFromPointsDist(
 		context.self.Index(),
 		context.state.Dealer().Index(),
 		context.stats,
-		winEstimate,
+		winEstimate.pointsDist,
 	)
 
 	dealInEstimates, immediateDist, err := e.immediateDealInEvaluation(context, candidate)
