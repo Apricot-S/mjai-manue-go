@@ -434,6 +434,57 @@ func TestWinEstimateAccumulatorSet_MergeReturnsErrorWithInvalidAccumulator(t *te
 	}
 }
 
+func TestWinEstimateAccumulatorSet_MergeReturnsErrorWithMismatchedKeys(t *testing.T) {
+	tests := []struct {
+		name  string
+		other winEstimateAccumulatorSet
+	}{
+		{
+			name: "unknown key",
+			other: winEstimateAccumulatorSet{
+				"discard-1m": {numTries: 1},
+				"unknown":    {numTries: 1},
+			},
+		},
+		{
+			name: "missing key",
+			other: winEstimateAccumulatorSet{
+				"discard-1m": {numTries: 1},
+			},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			accumulators := winEstimateAccumulatorSet{
+				"discard-1m": {
+					numTries:   1,
+					totalWins:  1,
+					totalPts:   1000,
+					pointFreqs: map[float64]int{1000: 1},
+				},
+				"discard-2m": {
+					numTries: 1,
+				},
+			}
+
+			err := accumulators.merge(tt.other)
+			if err == nil {
+				t.Fatal("merge() succeeded unexpectedly")
+			}
+			if accumulators["discard-1m"].numTries != 1 {
+				t.Errorf("discard-1m numTries = %v, want unchanged 1", accumulators["discard-1m"].numTries)
+			}
+			if accumulators["discard-1m"].pointFreqs[1000] != 1 {
+				t.Errorf("discard-1m pointFreqs[1000] = %v, want unchanged 1", accumulators["discard-1m"].pointFreqs[1000])
+			}
+			if accumulators["discard-2m"].numTries != 1 {
+				t.Errorf("discard-2m numTries = %v, want unchanged 1", accumulators["discard-2m"].numTries)
+			}
+		})
+	}
+}
+
 func TestWinEstimateAccumulatorSet_EstimatesReturnsErrorWithInvalidAccumulator(t *testing.T) {
 	accumulators := winEstimateAccumulatorSet{
 		"discard-1m": {

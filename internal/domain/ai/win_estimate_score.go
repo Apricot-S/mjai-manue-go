@@ -137,9 +137,17 @@ func (s winEstimateAccumulatorSet) addTrial(winPtsByKey map[string]float64) erro
 }
 
 func (s winEstimateAccumulatorSet) merge(other winEstimateAccumulatorSet) error {
+	if len(s) != len(other) {
+		return fmt.Errorf("cannot merge win estimate accumulator sets: candidate key count mismatch")
+	}
+
 	merged := make(winEstimateAccumulatorSet, len(other))
 	for key, otherAccumulator := range other {
-		accumulator := s[key].clone()
+		current, ok := s[key]
+		if !ok {
+			return fmt.Errorf("cannot merge win estimate accumulator sets: unknown candidate key %q", key)
+		}
+		accumulator := current.clone()
 		if err := accumulator.merge(otherAccumulator); err != nil {
 			return fmt.Errorf("cannot merge win estimate accumulator for %q: %w", key, err)
 		}
