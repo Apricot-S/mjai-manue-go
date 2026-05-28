@@ -56,7 +56,7 @@ func newDangerScene(state round.StateViewer, self seat.Seat, target seat.Seat) d
 func (s dangerScene) evaluate(feature string, discard tile.Tile) (bool, error) {
 	switch feature {
 	case "anpai":
-		return s.isSafe(discard), nil
+		return containsSameSymbol(s.safeTiles, discard), nil
 	case "tsupai":
 		return discard.IsHonors(), nil
 	case "dora":
@@ -149,10 +149,6 @@ func (s dangerScene) evaluate(feature string, discard tile.Tile) (bool, error) {
 		return evalNeighborPrereach(feature, discard, s.prereachTiles), nil
 	}
 	return false, fmt.Errorf("cannot evaluate danger feature %q", feature)
-}
-
-func (s dangerScene) isSafe(discard tile.Tile) bool {
-	return containsSameSymbol(s.safeTiles, discard)
 }
 
 func evalNumberRange(feature string, target tile.Tile) bool {

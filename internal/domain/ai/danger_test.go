@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/common"
+	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/round"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/round/player"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/seat"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/tile"
@@ -185,4 +186,66 @@ func TestNewDangerSceneUsesTilesThroughRiichiDiscard(t *testing.T) {
 	if got {
 		t.Error("dangerScene.evaluate(prereach_suji) = true, want false for discard after riichi declaration")
 	}
+}
+
+func TestDecisionTreeDangerEstimator_SafeTileSkipsSceneBuild(t *testing.T) {
+	self := seat.MustSeat(0)
+	winner := seat.MustSeat(1)
+	discard := tile.MustTileFromCode("5mr")
+	state := safeOnlyStateViewer{
+		winner:   winner,
+		safeTile: discard.RemoveRed(),
+	}
+	estimator := NewDangerEstimator(stubDangerTreeFeature{
+		feature: "unknown_feature",
+		negative: stubDangerTreeLeaf{
+			prob: 0.25,
+		},
+		positive: stubDangerTreeLeaf{
+			prob: 0.75,
+		},
+	})
+
+	got, err := estimator.EstimateDealInProb(state, self, winner, discard)
+	if err != nil {
+		t.Fatalf("EstimateDealInProb() failed: %v", err)
+	}
+	if got != 0 {
+		t.Errorf("EstimateDealInProb() = %v, want 0 for safe tile", got)
+	}
+}
+
+type safeOnlyStateViewer struct {
+	round.StateViewer
+	winner   seat.Seat
+	safeTile tile.Tile
+}
+
+func (s safeOnlyStateViewer) SafeTiles(playerSeat seat.Seat) tile.Tiles {
+	if playerSeat == s.winner {
+		return tile.Tiles{s.safeTile}
+	}
+	return nil
+}
+
+type stubDangerTreeFeature struct {
+	feature  string
+	negative DangerTreeNode
+	positive DangerTreeNode
+}
+
+func (s stubDangerTreeFeature) LeafProb() (float64, bool) {
+	return 0, false
+}
+
+func (s stubDangerTreeFeature) Feature() (string, bool) {
+	return s.feature, true
+}
+
+func (s stubDangerTreeFeature) NegativeNode() DangerTreeNode {
+	return s.negative
+}
+
+func (s stubDangerTreeFeature) PositiveNode() DangerTreeNode {
+	return s.positive
 }
