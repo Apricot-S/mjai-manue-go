@@ -234,6 +234,45 @@ func TestManueAgent_decideOtherDiscardReaction_EvaluatesCallCandidates(t *testin
 	}
 }
 
+func TestBuildCandidateDecision_ReturnsCallActionForWinningReactionCandidate(t *testing.T) {
+	self := seat.MustSeat(0)
+	target := seat.MustSeat(3)
+	pon, err := action.NewPon(self, target, tile.MustTileFromCode("5p"), [2]tile.Tile{
+		tile.MustTileFromCode("5p"),
+		tile.MustTileFromCode("5p"),
+	})
+	if err != nil {
+		t.Fatalf("NewPon() failed: %v", err)
+	}
+	pass := action.NewPass(self)
+
+	decision := buildCandidateDecision([]actionCandidate{
+		{
+			traceKey: "none",
+			action:   pass,
+			score: candidateScore{
+				averageRank:    2.0,
+				expectedPoints: 1000,
+			},
+		},
+		{
+			traceKey: "0.4m",
+			action:   pon,
+			score: candidateScore{
+				averageRank:    1.9,
+				expectedPoints: 0,
+			},
+		},
+	}, false)
+
+	if decision.Action != pon {
+		t.Errorf("Action = %T %[1]v, want selected call action %T %[2]v", decision.Action, pon)
+	}
+	if !strings.Contains(decision.Trace, "decidedKey 0.4m\n") {
+		t.Errorf("Trace = %q, want selected call candidate trace key", decision.Trace)
+	}
+}
+
 func TestBuildCandidateDecision(t *testing.T) {
 	self := seat.MustSeat(0)
 	redDiscard, err := action.NewDiscard(self, tile.MustTileFromCode("5mr"), false)
