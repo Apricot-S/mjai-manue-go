@@ -17,9 +17,9 @@ func buildSelfTurnCandidates(actions []action.Action, self player.PlayerViewer) 
 	}
 	turnShanten, turnGoals := service.AnalyzeShanten(h, service.AllowedExtraTiles(1))
 
-	// Self-turn candidates currently cover discard and riichi+discard only.
-	// Concealed kan, promoted kan, and kyushukyuhai are intentionally not
-	// selected.
+	// Self-turn candidates cover discard and riichi+discard only.
+	// Match original Manue: concealed kan and promoted kan are intentionally not
+	// selected. Kyushukyuhai is also outside the policy.
 	riichi := firstActionOfType[*action.Riichi](actions)
 	riichiDeclared := self.RiichiState() == player.RiichiDeclared
 	var candidates []actionCandidate

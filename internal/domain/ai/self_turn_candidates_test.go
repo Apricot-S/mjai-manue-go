@@ -57,6 +57,48 @@ func TestBuildSelfTurnCandidates_BuildsDiscardCandidate(t *testing.T) {
 	}
 }
 
+func TestBuildSelfTurnCandidates_IgnoresConcealedAndPromotedKan(t *testing.T) {
+	self := seat.MustSeat(0)
+	discard, err := action.NewDiscard(self, tile.MustTileFromCode("5m"), false)
+	if err != nil {
+		t.Fatalf("NewDiscard() failed: %v", err)
+	}
+	concealedKan, err := action.NewConcealedKan(self, [4]tile.Tile{
+		tile.MustTileFromCode("5m"),
+		tile.MustTileFromCode("5m"),
+		tile.MustTileFromCode("5m"),
+		tile.MustTileFromCode("5m"),
+	})
+	if err != nil {
+		t.Fatalf("NewConcealedKan() failed: %v", err)
+	}
+	promotedKan, err := action.NewPromotedKan(self, tile.MustTileFromCode("7p"), [3]tile.Tile{
+		tile.MustTileFromCode("7p"),
+		tile.MustTileFromCode("7p"),
+		tile.MustTileFromCode("7p"),
+	})
+	if err != nil {
+		t.Fatalf("NewPromotedKan() failed: %v", err)
+	}
+
+	got, err := buildSelfTurnCandidates([]action.Action{discard, concealedKan, promotedKan}, stubPlayerViewer{
+		hand: hand.CodesToHand([]string{
+			"1m", "2m", "3m", "5m", "5m", "5m", "5m",
+			"1p", "2p", "3p", "7p", "7p", "7p", "E",
+		}),
+		riichiState: player.NotRiichi,
+	})
+	if err != nil {
+		t.Fatalf("buildSelfTurnCandidates() failed: %v", err)
+	}
+	if len(got) != 1 {
+		t.Fatalf("len(buildSelfTurnCandidates()) = %d, want 1", len(got))
+	}
+	if got[0].action != discard {
+		t.Errorf("action = %v, want discard action only", got[0].action)
+	}
+}
+
 func TestNormalizedSelfTurnDiscards_PrefersTsumogiriForSameTile(t *testing.T) {
 	self := seat.MustSeat(0)
 	handDiscard, err := action.NewDiscard(self, tile.MustTileFromCode("5m"), false)
