@@ -53,48 +53,6 @@ func TestScoreDeltaProbDist_replace_DropsNonPositiveProbability(t *testing.T) {
 	assertScoreDeltaProbDist(t, got, want)
 }
 
-func TestScoreDeltaProbDist_mapValue(t *testing.T) {
-	dist := newScoreDeltaProbDist(map[scoreDelta]float64{
-		{1000, -1000, 0, 0}:     0.25,
-		{2000, 0, -1000, -1000}: 0.75,
-	})
-
-	gotScalar := dist.mapValueScalar(func(value scoreDelta) float64 {
-		return value[0] - value[1]
-	})
-	assertScalarProbDist(t, gotScalar, scalarProbDist{
-		2000: 1,
-	})
-
-	gotScoreDelta := dist.mapValueScoreDelta(func(value scoreDelta) scoreDelta {
-		return scoreDelta{-value[0], -value[1], -value[2], -value[3]}
-	})
-	assertScoreDeltaProbDist(t, gotScoreDelta, scoreDeltaProbDist{
-		{-1000, 1000, 0, 0}:    0.25,
-		{-2000, 0, 1000, 1000}: 0.75,
-	})
-}
-
-func TestAddScoreDeltaProbDists(t *testing.T) {
-	lhs := newScoreDeltaProbDist(map[scoreDelta]float64{
-		{1000, 0, 0, -1000}: 0.25,
-		{2000, 0, 0, -2000}: 0.75,
-	})
-	rhs := newScoreDeltaProbDist(map[scoreDelta]float64{
-		{0, 500, 0, -500}:   0.4,
-		{0, 1000, 0, -1000}: 0.6,
-	})
-
-	got := addScoreDeltaProbDists(lhs, rhs)
-	want := scoreDeltaProbDist{
-		{1000, 500, 0, -1500}:  0.10,
-		{1000, 1000, 0, -2000}: 0.15,
-		{2000, 500, 0, -2500}:  0.30,
-		{2000, 1000, 0, -3000}: 0.45,
-	}
-	assertScoreDeltaProbDist(t, got, want)
-}
-
 func TestMultiplyScalarScoreDeltaProbDists(t *testing.T) {
 	lhs := newScalarProbDist(map[float64]float64{2: 0.25, 3: 0.75})
 	rhs := newScoreDeltaProbDist(map[scoreDelta]float64{

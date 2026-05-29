@@ -63,59 +63,6 @@ func TestCandidateTraceKeys_ReturnsErrorWithInvalidKey(t *testing.T) {
 	}
 }
 
-func TestWinEstimatesFromCandidateTrials(t *testing.T) {
-	got, err := winEstimatesFromCandidateTrials(
-		[]actionCandidate{
-			{traceKey: "-1.5m"},
-			{traceKey: "0.5m"},
-		},
-		[]map[string]float64{
-			{"-1.5m": 2000},
-			{"0.5m": 5000},
-			{},
-		},
-	)
-	if err != nil {
-		t.Fatalf("winEstimatesFromCandidateTrials() failed: %v", err)
-	}
-
-	discardEstimate := got["-1.5m"]
-	if !almostEqual(discardEstimate.prob, 1.0/3.0) {
-		t.Errorf("discard prob = %v, want %v", discardEstimate.prob, 1.0/3.0)
-	}
-	if discardEstimate.avgPts != 2000 {
-		t.Errorf("discard avgPts = %v, want 2000", discardEstimate.avgPts)
-	}
-
-	riichiEstimate := got["0.5m"]
-	if !almostEqual(riichiEstimate.prob, 1.0/3.0) {
-		t.Errorf("riichi prob = %v, want %v", riichiEstimate.prob, 1.0/3.0)
-	}
-	if riichiEstimate.avgPts != 5000 {
-		t.Errorf("riichi avgPts = %v, want 5000", riichiEstimate.avgPts)
-	}
-}
-
-func TestWinEstimatesFromCandidateTrials_ReturnsErrorWithInvalidCandidates(t *testing.T) {
-	_, err := winEstimatesFromCandidateTrials(
-		[]actionCandidate{{traceKey: ""}},
-		[]map[string]float64{},
-	)
-	if err == nil {
-		t.Fatal("winEstimatesFromCandidateTrials() succeeded unexpectedly")
-	}
-}
-
-func TestWinEstimatesFromCandidateTrials_ReturnsErrorWithInvalidTrial(t *testing.T) {
-	_, err := winEstimatesFromCandidateTrials(
-		[]actionCandidate{{traceKey: "-1.5m"}},
-		[]map[string]float64{{"unknown": 2000}},
-	)
-	if err == nil {
-		t.Fatal("winEstimatesFromCandidateTrials() succeeded unexpectedly")
-	}
-}
-
 func TestFilteredWinEstimateGoals(t *testing.T) {
 	tests := []struct {
 		name      string
@@ -745,78 +692,6 @@ func TestCandidateTrialWinPtsRequiresGoalsForEveryCandidate(t *testing.T) {
 	)
 	if err == nil {
 		t.Fatal("candidateTrialWinPts() succeeded unexpectedly")
-	}
-}
-
-func TestWinEstimatesFromTrialTiles(t *testing.T) {
-	candidates := []actionCandidate{
-		{traceKey: "-1.1m"},
-		{traceKey: "-1.2m"},
-	}
-	goalsByKey := map[string][]winEstimateGoal{
-		"-1.1m": {
-			{
-				Goal: service.Goal{
-					RequiredVector: hand.TileCounts34{0: 1},
-				},
-				points: 1000,
-			},
-			{
-				Goal: service.Goal{
-					RequiredVector: hand.TileCounts34{0: 1, 4: 1},
-				},
-				points: 3900,
-			},
-		},
-		"-1.2m": {
-			{
-				Goal: service.Goal{
-					RequiredVector: hand.TileCounts34{27: 1},
-				},
-				points: 8000,
-			},
-		},
-	}
-
-	got, err := winEstimatesFromTrialTiles(candidates, goalsByKey, [][]tile.Tile{
-		{
-			tile.MustTileFromCode("1m"),
-			tile.MustTileFromCode("5m"),
-		},
-		{
-			tile.MustTileFromCode("E"),
-		},
-		{
-			tile.MustTileFromCode("2m"),
-		},
-	})
-	if err != nil {
-		t.Fatalf("winEstimatesFromTrialTiles() failed: %v", err)
-	}
-
-	first := got["-1.1m"]
-	if first.prob != float64(1)/3 {
-		t.Errorf("first.prob = %v, want %v", first.prob, float64(1)/3)
-	}
-	if first.avgPts != 3900 {
-		t.Errorf("first.avgPts = %v, want 3900", first.avgPts)
-	}
-	if first.expectedPoints != 1300 {
-		t.Errorf("first.expectedPoints = %v, want 1300", first.expectedPoints)
-	}
-	if got := first.pointsDist.expected(); got != 3900 {
-		t.Errorf("first.pointsDist.expected() = %v, want 3900", got)
-	}
-
-	second := got["-1.2m"]
-	if second.prob != float64(1)/3 {
-		t.Errorf("second.prob = %v, want %v", second.prob, float64(1)/3)
-	}
-	if second.avgPts != 8000 {
-		t.Errorf("second.avgPts = %v, want 8000", second.avgPts)
-	}
-	if second.expectedPoints != float64(8000)/3 {
-		t.Errorf("second.expectedPoints = %v, want %v", second.expectedPoints, float64(8000)/3)
 	}
 }
 

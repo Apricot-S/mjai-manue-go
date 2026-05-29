@@ -82,17 +82,6 @@ func exhaustiveDrawScoreDeltaDistFromTenpaiProbs(tenpaiProbs [common.NumPlayers]
 	})
 }
 
-// futureExhaustiveDrawScoreDeltaDist returns the exhaustive-draw score change
-// distribution from current tenpai probabilities. It first adjusts current
-// tenpai probabilities by the chance that currently noten players reach tenpai
-// before exhaustive draw.
-func futureExhaustiveDrawScoreDeltaDist(
-	currentTenpaiProbs [common.NumPlayers]float64,
-	notenTenpaiProb float64,
-) scoreDeltaProbDist {
-	return exhaustiveDrawScoreDeltaDistFromTenpaiProbs(exhaustiveDrawTenpaiProbs(currentTenpaiProbs, notenTenpaiProb))
-}
-
 // exhaustiveDrawAvgPts returns self's expected score change assuming the round
 // ends in an exhaustive draw and tenpaiProbs already represent exhaustive-draw
 // tenpai probabilities.

@@ -24,30 +24,6 @@ type winEstimateStateViewer interface {
 	Turn() float64
 }
 
-func winEstimatesFromCandidateTrials(candidates []actionCandidate, trials []map[string]float64) (map[string]winEstimate, error) {
-	keys, err := candidateTraceKeys(candidates)
-	if err != nil {
-		return nil, err
-	}
-	return winEstimatesFromTrials(keys, trials)
-}
-
-func winEstimatesFromTrialTiles(
-	candidates []actionCandidate,
-	goalsByKey map[string][]winEstimateGoal,
-	trials [][]tile.Tile,
-) (map[string]winEstimate, error) {
-	trialResults := make([]map[string]float64, 0, len(trials))
-	for i, trial := range trials {
-		points, err := candidateTrialWinPts(candidates, goalsByKey, trialTileCounts(trial))
-		if err != nil {
-			return nil, fmt.Errorf("cannot build win estimates from trial %d: %w", i, err)
-		}
-		trialResults = append(trialResults, points)
-	}
-	return winEstimatesFromCandidateTrials(candidates, trialResults)
-}
-
 func winEstimatesFromShuffledWall(
 	candidates []actionCandidate,
 	goalsByKey map[string][]winEstimateGoal,

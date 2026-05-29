@@ -169,16 +169,6 @@ func (s winEstimateAccumulatorSet) estimates() (map[string]winEstimate, error) {
 	return estimates, nil
 }
 
-func winEstimatesFromTrials(keys []string, trials []map[string]float64) (map[string]winEstimate, error) {
-	accumulators := newWinEstimateAccumulatorSet(keys)
-	for _, trial := range trials {
-		if err := accumulators.addTrial(trial); err != nil {
-			return nil, err
-		}
-	}
-	return accumulators.estimates()
-}
-
 func newWinEstimate(
 	numTries int,
 	totalWins int,

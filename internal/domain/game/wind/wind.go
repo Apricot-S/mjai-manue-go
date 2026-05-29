@@ -28,14 +28,6 @@ func NewWind(w string) (Wind, error) {
 	}
 }
 
-func MustWind(w string) Wind {
-	ret, err := NewWind(w)
-	if err != nil {
-		panic(err)
-	}
-	return ret
-}
-
 func (w Wind) String() string {
 	switch w {
 	case East:

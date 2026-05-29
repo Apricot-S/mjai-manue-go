@@ -135,12 +135,6 @@ func TestExhaustiveDrawScoreDeltaDistFromTenpaiProbs(t *testing.T) {
 	assertScoreDeltaProbDist(t, got, want)
 }
 
-func TestFutureExhaustiveDrawScoreDeltaDist(t *testing.T) {
-	got := futureExhaustiveDrawScoreDeltaDist([common.NumPlayers]float64{1, 0, 0.5, 0}, 0.5)
-	want := exhaustiveDrawScoreDeltaDistFromTenpaiProbs([common.NumPlayers]float64{1, 0.5, 0.75, 0.5})
-	assertScoreDeltaProbDist(t, got, want)
-}
-
 func TestExhaustiveDrawAvgPts(t *testing.T) {
 	got := exhaustiveDrawAvgPts(0, [common.NumPlayers]float64{1, 0, 0.5, 0})
 	want := 2250.0

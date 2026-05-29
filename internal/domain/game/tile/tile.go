@@ -110,13 +110,6 @@ func newTileFromValidID(id int) Tile {
 	return tilesByID[id]
 }
 
-func NewTileFromID(id int) (Tile, error) {
-	if id < minTileID || id >= NumTileType38 {
-		return Tile{}, fmt.Errorf("invalid tile id: %d", id)
-	}
-	return newTileFromValidID(id), nil
-}
-
 func MustTileFromID(id int) Tile {
 	if id < minTileID || id >= NumTileType38 {
 		panic(fmt.Sprintf("invalid tile id: %d", id))

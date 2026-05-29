@@ -78,33 +78,6 @@ func (d scoreDeltaProbDist) mapValueScalar(mapper func(scoreDelta) float64) scal
 	return newScalarProbDist(dist)
 }
 
-// mapValueScoreDelta maps score-delta outcomes to other score-delta outcomes
-// while preserving their probabilities. Outcomes with the same mapped value are
-// merged.
-func (d scoreDeltaProbDist) mapValueScoreDelta(mapper func(scoreDelta) scoreDelta) scoreDeltaProbDist {
-	dist := make(scoreDeltaProbDist, len(d))
-	for value, prob := range d {
-		dist[mapper(value)] += prob
-	}
-	return newScoreDeltaProbDist(dist)
-}
-
-// addScoreDeltaProbDists returns the distribution of lhs + rhs, assuming the two
-// score-delta random variables are independent.
-func addScoreDeltaProbDists(lhs, rhs scoreDeltaProbDist) scoreDeltaProbDist {
-	dist := make(scoreDeltaProbDist, len(lhs)*len(rhs))
-	for lhsValue, lhsProb := range lhs {
-		for rhsValue, rhsProb := range rhs {
-			var value scoreDelta
-			for i := range value {
-				value[i] = lhsValue[i] + rhsValue[i]
-			}
-			dist[value] += lhsProb * rhsProb
-		}
-	}
-	return newScoreDeltaProbDist(dist)
-}
-
 // multiplyScalarScoreDeltaProbDists returns the distribution of scalar * vector,
 // assuming the scalar and score-delta random variables are independent.
 func multiplyScalarScoreDeltaProbDists(lhs scalarProbDist, rhs scoreDeltaProbDist) scoreDeltaProbDist {
