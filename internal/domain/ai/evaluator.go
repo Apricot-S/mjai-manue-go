@@ -45,10 +45,6 @@ func (e candidateEvaluator) evaluateCandidates(
 	self seat.Seat,
 	candidates []actionCandidate,
 ) ([]actionCandidate, error) {
-	if e.stats == nil {
-		return candidates, nil
-	}
-
 	context, err := e.newEvaluationContext(state, self, candidates)
 	if err != nil {
 		return nil, err
