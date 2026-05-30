@@ -20,8 +20,8 @@ type ManueStats interface {
 	RoundEndStats
 	DrawTenpaiStats
 	TenpaiEstimatorStats
-	RankStats
 	DealInStats
+	RankStats
 }
 
 type WinScoreStats interface {
@@ -36,6 +36,11 @@ type RoundEndStats interface {
 	ExhaustiveDrawRatio() float64
 }
 
+type DrawTenpaiStats interface {
+	ExhaustiveDrawNotenCount() int
+	ExhaustiveDrawTenpaiTurnFreq(turnKey string) (freq int, ok bool)
+}
+
 type TenpaiEstimatorStats interface {
 	YamitenCounts(remainTurns int, numMelds int) (total int, tenpai int, ok bool)
 }
@@ -46,11 +51,6 @@ type DealInStats interface {
 
 type RankStats interface {
 	RelativeWinProbs(roundWind wind.Wind, roundNumber int, selfPosition int, otherPosition int) (map[string]float64, bool)
-}
-
-type DrawTenpaiStats interface {
-	ExhaustiveDrawNotenCount() int
-	ExhaustiveDrawTenpaiTurnFreq(turnKey string) (freq int, ok bool)
 }
 
 type DangerEstimator interface {
