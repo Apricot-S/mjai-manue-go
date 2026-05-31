@@ -41,18 +41,18 @@ func TestChooseBestCandidate_PrefersBlackTileOnTie(t *testing.T) {
 func TestSortedCandidates_PrefersBlackForOrder(t *testing.T) {
 	red := actionCandidate{
 		traceKey: "-1.5mr",
+		red:      true,
 		score: candidateScore{
 			averageRank:    2.0,
 			expectedPoints: 1000,
-			red:            true,
 		},
 	}
 	black := actionCandidate{
 		traceKey: "-1.5m",
+		red:      false,
 		score: candidateScore{
 			averageRank:    2.0,
 			expectedPoints: 1000,
-			red:            false,
 		},
 	}
 
@@ -68,18 +68,18 @@ func TestSortedCandidates_PrefersBlackForOrder(t *testing.T) {
 func TestSortedCandidates_CanIgnoreBlackPreference(t *testing.T) {
 	red := actionCandidate{
 		traceKey: "-1.5mr",
+		red:      true,
 		score: candidateScore{
 			averageRank:    2.0,
 			expectedPoints: 1000,
-			red:            true,
 		},
 	}
 	black := actionCandidate{
 		traceKey: "-1.5m",
+		red:      false,
 		score: candidateScore{
 			averageRank:    2.0,
 			expectedPoints: 1000,
-			red:            false,
 		},
 	}
 
@@ -92,46 +92,46 @@ func TestSortedCandidates_CanIgnoreBlackPreference(t *testing.T) {
 	}
 }
 
-func TestCompareCandidateScore(t *testing.T) {
+func TestCompareCandidates(t *testing.T) {
 	tests := []struct {
 		name        string
-		lhs         candidateScore
-		rhs         candidateScore
+		lhs         actionCandidate
+		rhs         actionCandidate
 		preferBlack bool
 		want        int
 	}{
 		{
 			name:        "better average rank wins",
-			lhs:         candidateScore{averageRank: 1.9, expectedPoints: 0},
-			rhs:         candidateScore{averageRank: 2.0, expectedPoints: 1000},
+			lhs:         actionCandidate{score: candidateScore{averageRank: 1.9, expectedPoints: 0}},
+			rhs:         actionCandidate{score: candidateScore{averageRank: 2.0, expectedPoints: 1000}},
 			preferBlack: true,
 			want:        -1,
 		},
 		{
 			name:        "higher expected points wins on rank tie",
-			lhs:         candidateScore{averageRank: 2.0, expectedPoints: 1000},
-			rhs:         candidateScore{averageRank: 2.0, expectedPoints: 900},
+			lhs:         actionCandidate{score: candidateScore{averageRank: 2.0, expectedPoints: 1000}},
+			rhs:         actionCandidate{score: candidateScore{averageRank: 2.0, expectedPoints: 900}},
 			preferBlack: true,
 			want:        -1,
 		},
 		{
 			name:        "black tile wins on expected value tie",
-			lhs:         candidateScore{averageRank: 2.0, expectedPoints: 1000, red: false},
-			rhs:         candidateScore{averageRank: 2.0, expectedPoints: 1000, red: true},
+			lhs:         actionCandidate{red: false, score: candidateScore{averageRank: 2.0, expectedPoints: 1000}},
+			rhs:         actionCandidate{red: true, score: candidateScore{averageRank: 2.0, expectedPoints: 1000}},
 			preferBlack: true,
 			want:        -1,
 		},
 		{
 			name:        "red tie ignored when preferBlack is false",
-			lhs:         candidateScore{averageRank: 2.0, expectedPoints: 1000, red: false},
-			rhs:         candidateScore{averageRank: 2.0, expectedPoints: 1000, red: true},
+			lhs:         actionCandidate{red: false, score: candidateScore{averageRank: 2.0, expectedPoints: 1000}},
+			rhs:         actionCandidate{red: true, score: candidateScore{averageRank: 2.0, expectedPoints: 1000}},
 			preferBlack: false,
 			want:        0,
 		},
 		{
 			name:        "complete tie returns zero",
-			lhs:         candidateScore{averageRank: 2.0, expectedPoints: 1000},
-			rhs:         candidateScore{averageRank: 2.0, expectedPoints: 1000},
+			lhs:         actionCandidate{score: candidateScore{averageRank: 2.0, expectedPoints: 1000}},
+			rhs:         actionCandidate{score: candidateScore{averageRank: 2.0, expectedPoints: 1000}},
 			preferBlack: false,
 			want:        0,
 		},
@@ -139,9 +139,9 @@ func TestCompareCandidateScore(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got := compareCandidateScore(&tt.lhs, &tt.rhs, tt.preferBlack)
+			got := compareCandidates(tt.lhs, tt.rhs, tt.preferBlack)
 			if got != tt.want {
-				t.Errorf("compareCandidateScore() = %d, want %d", got, tt.want)
+				t.Errorf("compareCandidates() = %d, want %d", got, tt.want)
 			}
 		})
 	}

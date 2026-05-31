@@ -30,8 +30,9 @@ func buildReactionCandidates(actions []action.Action, self player.PlayerViewer) 
 			turnHand:         h,
 			afterDiscardHand: h,
 			baseShanten:      shanten,
+			shanten:          shanten,
 			shantenGoals:     goals,
-			score:            scoreDiscardCandidate(unknown, shanten),
+			red:              unknown.IsRed(),
 		})
 	}
 
@@ -79,8 +80,9 @@ func buildCallReactionCandidates(
 			turnHand:         turnHand,
 			afterDiscardHand: turnHand,
 			baseShanten:      shanten,
+			shanten:          shanten,
 			shantenGoals:     goals,
-			score:            scoreDiscardCandidate(unknown, shanten),
+			red:              unknown.IsRed(),
 		}}, nil
 	}
 
@@ -103,8 +105,9 @@ func buildCallReactionCandidates(
 			turnHand:         turnHand,
 			afterDiscardHand: afterDiscard,
 			baseShanten:      turnShanten,
+			shanten:          shanten,
 			shantenGoals:     turnGoals,
-			score:            scoreDiscardCandidate(discardTile, shanten),
+			red:              discardTile.IsRed(),
 		})
 	}
 	return candidates, nil

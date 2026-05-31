@@ -22,7 +22,6 @@ func TestEvaluateCandidateScore(t *testing.T) {
 	base := candidateScore{
 		winProb:            0.2,
 		exhaustiveDrawProb: 0.3,
-		shanten:            1,
 	}
 
 	got := evaluateCandidateScore(base, scoreChanges, 0, 25000, 0, []rankOpponent{
@@ -67,9 +66,6 @@ func TestEvaluateCandidateScore(t *testing.T) {
 	if got.exhaustiveDrawProb != base.exhaustiveDrawProb {
 		t.Errorf("exhaustiveDrawProb = %v, want %v", got.exhaustiveDrawProb, base.exhaustiveDrawProb)
 	}
-	if got.shanten != base.shanten {
-		t.Errorf("shanten = %v, want %v", got.shanten, base.shanten)
-	}
 }
 
 func TestEvaluateCandidateScoreFromState(t *testing.T) {
@@ -80,7 +76,6 @@ func TestEvaluateCandidateScoreFromState(t *testing.T) {
 	base := candidateScore{
 		winProb:            0.2,
 		exhaustiveDrawProb: 0.3,
-		shanten:            1,
 	}
 
 	got := evaluateCandidateScoreFromState(
@@ -123,9 +118,6 @@ func TestEvaluateCandidateScoreFromState(t *testing.T) {
 	if got.exhaustiveDrawProb != base.exhaustiveDrawProb {
 		t.Errorf("exhaustiveDrawProb = %v, want %v", got.exhaustiveDrawProb, base.exhaustiveDrawProb)
 	}
-	if got.shanten != base.shanten {
-		t.Errorf("shanten = %v, want %v", got.shanten, base.shanten)
-	}
 }
 
 func TestCandidateTotalScoreDeltaDist(t *testing.T) {
@@ -164,9 +156,7 @@ func TestCandidateTotalScoreDeltaDist(t *testing.T) {
 }
 
 func TestEvaluateCandidateFromComponents(t *testing.T) {
-	score := candidateScore{
-		shanten: 1,
-	}
+	score := candidateScore{}
 	dealInEstimates := []dealInEstimate{
 		{winnerID: 1, prob: 0.2},
 		{winnerID: 2, prob: 0.25},

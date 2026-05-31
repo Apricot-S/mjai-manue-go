@@ -20,7 +20,9 @@ type actionCandidate struct {
 	turnHand         *hand.VisibleHand
 	afterDiscardHand *hand.VisibleHand
 	baseShanten      int
+	shanten          int
 	shantenGoals     []service.Goal
+	red              bool
 	score            candidateScore
 }
 

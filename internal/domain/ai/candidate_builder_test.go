@@ -40,15 +40,3 @@ func TestCandidateShantenReturnsInfinityWhenTileIsNotThrowable(t *testing.T) {
 		t.Errorf("candidateShanten() = %d, want InfinityShanten", got)
 	}
 }
-
-func TestScoreDiscardCandidate_MarksRedDiscard(t *testing.T) {
-	redDiscardTile := tile.MustTileFromCode("5mr")
-
-	got := scoreDiscardCandidate(redDiscardTile, 1)
-	if !got.red {
-		t.Errorf("red = false, want true")
-	}
-	if got.shanten != 1 {
-		t.Errorf("shanten = %d, want 1", got.shanten)
-	}
-}

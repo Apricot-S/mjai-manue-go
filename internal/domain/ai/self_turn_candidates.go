@@ -85,7 +85,8 @@ func buildSelfTurnCandidate(
 		turnHand:         turnHand,
 		afterDiscardHand: afterDiscardHand,
 		baseShanten:      baseShanten,
+		shanten:          shanten,
 		shantenGoals:     goals,
-		score:            scoreDiscardCandidate(discardTile, shanten),
+		red:              discardTile.IsRed(),
 	}
 }

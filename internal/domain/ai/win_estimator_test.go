@@ -73,7 +73,7 @@ func TestFilteredWinEstimateGoals(t *testing.T) {
 			name: "keeps all goals normally",
 			candidate: actionCandidate{
 				discardTile: tile.MustTileFromCode("1m"),
-				score:       candidateScore{shanten: 2},
+				shanten:     2,
 				shantenGoals: []service.Goal{
 					{Shanten: 1, ThrowableVector: hand.TileCounts34{0: 1}},
 					{Shanten: 2, ThrowableVector: hand.TileCounts34{0: 1}},
@@ -88,7 +88,7 @@ func TestFilteredWinEstimateGoals(t *testing.T) {
 				riichi:        true,
 				scoreAsRiichi: true,
 				discardTile:   tile.MustTileFromCode("1m"),
-				score:         candidateScore{shanten: 0},
+				shanten:       0,
 				shantenGoals: []service.Goal{
 					{Shanten: 0, ThrowableVector: hand.TileCounts34{0: 1}},
 					{Shanten: 1, ThrowableVector: hand.TileCounts34{0: 1}},
@@ -101,7 +101,7 @@ func TestFilteredWinEstimateGoals(t *testing.T) {
 			candidate: actionCandidate{
 				discardTile: tile.MustTileFromCode("1m"),
 				baseShanten: 4,
-				score:       candidateScore{shanten: 1},
+				shanten:     1,
 				shantenGoals: []service.Goal{
 					{Shanten: 3, ThrowableVector: hand.TileCounts34{0: 1}},
 					{Shanten: 4, ThrowableVector: hand.TileCounts34{0: 1}},
@@ -117,7 +117,7 @@ func TestFilteredWinEstimateGoals(t *testing.T) {
 				scoreAsRiichi: true,
 				discardTile:   tile.MustTileFromCode("1m"),
 				baseShanten:   4,
-				score:         candidateScore{shanten: 1},
+				shanten:       1,
 				shantenGoals: []service.Goal{
 					{Shanten: 0, ThrowableVector: hand.TileCounts34{0: 1}},
 					{Shanten: 4, ThrowableVector: hand.TileCounts34{0: 1}},

@@ -78,7 +78,7 @@ func formatCandidateTrace(candidates []actionCandidate) string {
 			strconv.FormatFloat(candidate.score.otherWinProb, 'f', 3, 64),
 			strconv.FormatFloat(candidate.score.averageWinPoints, 'f', 0, 64),
 			strconv.FormatFloat(candidate.score.exhaustiveDrawAveragePoints, 'f', 0, 64),
-			formatShantenTraceValue(candidate.score.shanten),
+			formatShantenTraceValue(candidate.shanten),
 		}
 	}
 	return formatTraceTable(rows)

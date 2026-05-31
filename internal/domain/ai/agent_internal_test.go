@@ -295,20 +295,20 @@ func TestBuildCandidateDecision(t *testing.T) {
 			traceKey:    "-1.5mr",
 			action:      redDiscard,
 			discardTile: redDiscard.Tile(),
+			red:         true,
 			score: candidateScore{
 				averageRank:    2.0,
 				expectedPoints: 1000,
-				red:            true,
 			},
 		},
 		{
 			traceKey:    "-1.5m",
 			action:      blackDiscard,
 			discardTile: blackDiscard.Tile(),
+			red:         false,
 			score: candidateScore{
 				averageRank:    2.0,
 				expectedPoints: 1000,
-				red:            false,
 			},
 		},
 	}, true, [common.NumPlayers]float64{0, 0.1, 0.2, 0.3}, self)
@@ -340,20 +340,20 @@ func TestBuildCandidateDecision_CanIgnoreBlackPreference(t *testing.T) {
 			traceKey:    "-1.5mr",
 			action:      redDiscard,
 			discardTile: redDiscard.Tile(),
+			red:         true,
 			score: candidateScore{
 				averageRank:    2.0,
 				expectedPoints: 1000,
-				red:            true,
 			},
 		},
 		{
 			traceKey:    "-1.5m",
 			action:      blackDiscard,
 			discardTile: blackDiscard.Tile(),
+			red:         false,
 			score: candidateScore{
 				averageRank:    2.0,
 				expectedPoints: 1000,
-				red:            false,
 			},
 		},
 	}, false, [common.NumPlayers]float64{0, 0.1, 0.2, 0.3}, self)

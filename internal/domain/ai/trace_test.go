@@ -35,6 +35,7 @@ func TestFormatCandidateTrace(t *testing.T) {
 			action:      discard,
 			riichi:      false,
 			discardTile: discard.Tile(),
+			shanten:     1,
 			score: candidateScore{
 				averageRank:                 2.25,
 				expectedPoints:              1200,
@@ -44,7 +45,6 @@ func TestFormatCandidateTrace(t *testing.T) {
 				otherWinProb:                0.5,
 				averageWinPoints:            3900,
 				exhaustiveDrawAveragePoints: 1000,
-				shanten:                     1,
 			},
 		},
 	})
@@ -68,9 +68,7 @@ func TestFormatCandidateTrace_FormatsInfinityShanten(t *testing.T) {
 			action:      discard,
 			riichi:      false,
 			discardTile: discard.Tile(),
-			score: candidateScore{
-				shanten: service.InfinityShanten,
-			},
+			shanten:     service.InfinityShanten,
 		},
 	})
 	if !strings.Contains(got, "Inf") {
@@ -104,9 +102,7 @@ func TestFormatCandidateLog(t *testing.T) {
 			traceKey:    "-1.5m",
 			action:      discard,
 			discardTile: discard.Tile(),
-			score: candidateScore{
-				shanten: 1,
-			},
+			shanten:     1,
 		},
 	}, [common.NumPlayers]float64{0, 0.125, 0.5, 1}, self)
 	if !strings.Contains(got, "\n\n\ntenpaiProbs:  1: 0.125  2: 0.500  3: 1.000  \n") {
@@ -125,9 +121,7 @@ func TestFormatDecisionTrace_AppendsDecidedKey(t *testing.T) {
 		action:      discard,
 		riichi:      false,
 		discardTile: discard.Tile(),
-		score: candidateScore{
-			shanten: 1,
-		},
+		shanten:     1,
 	}
 
 	got := formatDecisionTrace(formatCandidateLog([]actionCandidate{*selected}, [common.NumPlayers]float64{}, self), selected)

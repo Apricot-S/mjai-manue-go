@@ -176,7 +176,7 @@ func candidateExhaustiveDrawEvaluation(
 ) (scoreDeltaProbDist, float64) {
 	tenpaiProbs := context.baseTenpaiProbs
 	tenpaiProbs[context.self.Index()] = 0
-	if candidate.score.shanten <= 0 {
+	if candidate.shanten <= 0 {
 		tenpaiProbs[context.self.Index()] = 1
 	}
 	exhaustiveDrawTenpaiProbs := exhaustiveDrawTenpaiProbs(tenpaiProbs, context.notenTenpaiProb)

@@ -24,16 +24,12 @@ type candidateScore struct {
 	averageWinPoints float64
 	// exhaustiveDrawAveragePoints is the average exhaustive draw points.
 	exhaustiveDrawAveragePoints float64
-	// shanten is the shanten number.
-	shanten int
-	// red indicates whether the candidate discards a red tile.
-	red bool
 }
 
 func chooseBestCandidate(candidates []actionCandidate, preferBlack bool) actionCandidate {
 	best := candidates[0]
 	for _, candidate := range candidates[1:] {
-		if compareCandidateScore(&candidate.score, &best.score, preferBlack) < 0 {
+		if compareCandidates(candidate, best, preferBlack) < 0 {
 			best = candidate
 		}
 	}
@@ -43,23 +39,14 @@ func chooseBestCandidate(candidates []actionCandidate, preferBlack bool) actionC
 func sortedCandidates(candidates []actionCandidate, preferBlack bool) []actionCandidate {
 	sortedCandidates := slices.Clone(candidates)
 	slices.SortFunc(sortedCandidates, func(lhs, rhs actionCandidate) int {
-		return compareCandidateScore(&lhs.score, &rhs.score, preferBlack)
+		return compareCandidates(lhs, rhs, preferBlack)
 	})
 	return sortedCandidates
 }
 
-func compareCandidateScore(lhs, rhs *candidateScore, preferBlack bool) int {
-	if lhs.averageRank < rhs.averageRank {
-		return -1
-	}
-	if lhs.averageRank > rhs.averageRank {
-		return 1
-	}
-	if lhs.expectedPoints > rhs.expectedPoints {
-		return -1
-	}
-	if lhs.expectedPoints < rhs.expectedPoints {
-		return 1
+func compareCandidates(lhs, rhs actionCandidate, preferBlack bool) int {
+	if result := compareCandidateScore(&lhs.score, &rhs.score); result != 0 {
+		return result
 	}
 	if preferBlack {
 		if !lhs.red && rhs.red {
@@ -72,9 +59,24 @@ func compareCandidateScore(lhs, rhs *candidateScore, preferBlack bool) int {
 	return 0
 }
 
+func compareCandidateScore(lhs, rhs *candidateScore) int {
+	if lhs.averageRank < rhs.averageRank {
+		return -1
+	}
+	if lhs.averageRank > rhs.averageRank {
+		return 1
+	}
+	if lhs.expectedPoints > rhs.expectedPoints {
+		return -1
+	}
+	if lhs.expectedPoints < rhs.expectedPoints {
+		return 1
+	}
+	return 0
+}
+
 // evaluateCandidateScore fills the fields derived from the final score-change
-// distribution while preserving candidate-local estimates such as probabilities
-// and shanten.
+// distribution while preserving candidate-local probability estimates.
 func evaluateCandidateScore(
 	score candidateScore,
 	scoreChanges scoreDeltaProbDist,
