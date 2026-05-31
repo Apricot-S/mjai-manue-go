@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/action"
+	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/common"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/round/service"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/seat"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/tile"
@@ -80,6 +81,39 @@ func TestFormatCandidateTrace_FormatsInfinityShanten(t *testing.T) {
 	}
 }
 
+func TestFormatTenpaiProbsTrace(t *testing.T) {
+	got := formatTenpaiProbsTrace(
+		[common.NumPlayers]float64{0.1, 0.25, 1, 0},
+		seat.MustSeat(1),
+	)
+	want := "tenpaiProbs:  0: 0.100  2: 1.000  3: 0.000  \n"
+	if got != want {
+		t.Errorf("formatTenpaiProbsTrace() = %q, want %q", got, want)
+	}
+}
+
+func TestFormatCandidateLog(t *testing.T) {
+	self := seat.MustSeat(0)
+	discard, err := action.NewDiscard(self, tile.MustTileFromCode("5m"), false)
+	if err != nil {
+		t.Fatalf("NewDiscard() failed: %v", err)
+	}
+
+	got := formatCandidateLog([]actionCandidate{
+		{
+			traceKey:    "-1.5m",
+			action:      discard,
+			discardTile: discard.Tile(),
+			score: candidateScore{
+				shanten: 1,
+			},
+		},
+	}, [common.NumPlayers]float64{0, 0.125, 0.5, 1}, self)
+	if !strings.Contains(got, "\n\n\ntenpaiProbs:  1: 0.125  2: 0.500  3: 1.000  \n") {
+		t.Errorf("formatCandidateLog() = %q, want tenpaiProbs after candidate table", got)
+	}
+}
+
 func TestFormatDecisionTrace_AppendsDecidedKey(t *testing.T) {
 	self := seat.MustSeat(0)
 	discard, err := action.NewDiscard(self, tile.MustTileFromCode("5m"), false)
@@ -96,8 +130,13 @@ func TestFormatDecisionTrace_AppendsDecidedKey(t *testing.T) {
 		},
 	}
 
-	got := formatDecisionTrace(formatCandidateLog([]actionCandidate{*selected}), selected)
-	if !strings.HasSuffix(got, "\n\n\ndecidedKey -1.5m\n") {
-		t.Errorf("formatDecisionTrace() = %q, want two blank lines before decidedKey suffix", got)
+	got := formatDecisionTrace(formatCandidateLog([]actionCandidate{*selected}, [common.NumPlayers]float64{}, self), selected)
+	want := "| action | avgRank | expPt | hojuProb | myHoraProb | ryukyokuProb | otherHoraProb | avgHoraPt | ryukyokuAvgPt | shanten | \n" +
+		"|  -1.5m |  0.0000 |     0 |    0.000 |      0.000 |        0.000 |         0.000 |         0 |             0 |       1 | \n" +
+		"\n\n" +
+		"tenpaiProbs:  1: 0.000  2: 0.000  3: 0.000  \n" +
+		"decidedKey -1.5m\n"
+	if got != want {
+		t.Errorf("formatDecisionTrace() =\n%q\nwant\n%q", got, want)
 	}
 }

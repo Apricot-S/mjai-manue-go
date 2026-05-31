@@ -150,8 +150,14 @@ func TestManueAgent_decideSelfTurn_ReturnsOriginalStyleActionLog(t *testing.T) {
 	if strings.Contains(decision.Log, "decidedKey") {
 		t.Errorf("Log = %q, should not contain decidedKey", decision.Log)
 	}
-	if !strings.HasSuffix(decision.Log, "\n\n\n") {
-		t.Errorf("Log = %q, want original blank-line suffix", decision.Log)
+	if !strings.Contains(decision.Log, "\n\n\ntenpaiProbs:  1: ") {
+		t.Errorf("Log = %q, want tenpaiProbs after metrics table", decision.Log)
+	}
+	if strings.Contains(decision.Log, "0: ") {
+		t.Errorf("Log = %q, should not contain self tenpai probability", decision.Log)
+	}
+	if !strings.HasSuffix(decision.Log, "\n") {
+		t.Errorf("Log = %q, want newline suffix", decision.Log)
 	}
 	if !strings.Contains(decision.Trace, "decidedKey -1.5m\n") {
 		t.Errorf("Trace = %q, want decidedKey", decision.Trace)
@@ -263,7 +269,7 @@ func TestBuildCandidateDecision_ReturnsCallActionForWinningReactionCandidate(t *
 				expectedPoints: 0,
 			},
 		},
-	}, false)
+	}, false, [common.NumPlayers]float64{0, 0.1, 0.2, 0.3}, self)
 
 	if decision.Action != pon {
 		t.Errorf("Action = %T %[1]v, want selected call action %T %[2]v", decision.Action, pon)
@@ -305,7 +311,7 @@ func TestBuildCandidateDecision(t *testing.T) {
 				red:            false,
 			},
 		},
-	}, true)
+	}, true, [common.NumPlayers]float64{0, 0.1, 0.2, 0.3}, self)
 
 	if decision.Action != blackDiscard {
 		t.Errorf("Action = %T %[1]v, want black discard", decision.Action)
@@ -350,7 +356,7 @@ func TestBuildCandidateDecision_CanIgnoreBlackPreference(t *testing.T) {
 				red:            false,
 			},
 		},
-	}, false)
+	}, false, [common.NumPlayers]float64{0, 0.1, 0.2, 0.3}, self)
 
 	if decision.Action != redDiscard {
 		t.Errorf("Action = %T %[1]v, want first tied red discard when black preference is disabled", decision.Action)

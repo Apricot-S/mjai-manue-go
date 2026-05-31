@@ -5,7 +5,9 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/common"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/round/service"
+	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/seat"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/tile"
 )
 
@@ -25,12 +27,25 @@ func formatDecisionTrace(log string, selected *actionCandidate) string {
 	return trace + fmt.Sprintf("decidedKey %s\n", selected.traceKey)
 }
 
-func formatCandidateLog(candidates []actionCandidate) string {
+func formatCandidateLog(candidates []actionCandidate, tenpaiProbs [common.NumPlayers]float64, self seat.Seat) string {
 	trace := formatCandidateTrace(candidates)
 	if trace == "" {
 		return ""
 	}
-	return trace + "\n\n"
+	return trace + "\n\n" + formatTenpaiProbsTrace(tenpaiProbs, self)
+}
+
+func formatTenpaiProbsTrace(tenpaiProbs [common.NumPlayers]float64, self seat.Seat) string {
+	var b strings.Builder
+	b.WriteString("tenpaiProbs:  ")
+	for i := range common.NumPlayers {
+		if seat.MustSeat(i) == self {
+			continue
+		}
+		fmt.Fprintf(&b, "%d: %.3f  ", i, tenpaiProbs[i])
+	}
+	b.WriteString("\n")
+	return b.String()
 }
 
 func formatCandidateTrace(candidates []actionCandidate) string {

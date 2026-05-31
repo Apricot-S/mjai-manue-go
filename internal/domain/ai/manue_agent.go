@@ -5,6 +5,7 @@ import (
 	"math/rand/v2"
 
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/action"
+	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/common"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/round"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/round/player"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/seat"
@@ -125,12 +126,18 @@ func (a *ManueAgent) decideFromCandidates(
 	if err != nil {
 		return Decision{}, err
 	}
-	return buildCandidateDecision(candidates, preferBlack), nil
+	tenpaiProbs := currentTenpaiProbs(a.deps.Stats, state, selfSeat)
+	return buildCandidateDecision(candidates, preferBlack, tenpaiProbs, selfSeat), nil
 }
 
-func buildCandidateDecision(candidates []actionCandidate, preferBlack bool) Decision {
+func buildCandidateDecision(
+	candidates []actionCandidate,
+	preferBlack bool,
+	tenpaiProbs [common.NumPlayers]float64,
+	self seat.Seat,
+) Decision {
 	selected := chooseBestCandidate(candidates, preferBlack)
-	log := formatCandidateLog(candidates)
+	log := formatCandidateLog(candidates, tenpaiProbs, self)
 	return Decision{
 		Action: selected.action,
 		Log:    log,
