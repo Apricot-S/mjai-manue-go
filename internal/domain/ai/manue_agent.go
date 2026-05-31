@@ -51,7 +51,7 @@ func (a *ManueAgent) Decide(request Request) (Decision, error) {
 
 	if win := firstActionOfType[*action.Win](legalActions); win != nil {
 		// Always take a winning action when it is legal.
-		// The current policy does not allow passing on win opportunities.
+		// The policy does not allow passing on win opportunities.
 		return Decision{Action: win}, nil
 	}
 
