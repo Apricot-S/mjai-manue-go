@@ -5,7 +5,6 @@ import (
 	"math/rand/v2"
 
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/round/player/meld"
-	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/round/service"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/seat"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/tile"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/wind"
@@ -78,18 +77,4 @@ func winEstimatesFromState(
 		return nil, err
 	}
 	return winEstimatesFromShuffledWall(candidates, goalsByKey, wall, numDraws, numTries, rng)
-}
-
-func candidateShanten(discardTile tile.Tile, baseShanten int, goals []service.Goal) int {
-	if discardTile.IsUnknown() {
-		return baseShanten
-	}
-	discardID := discardTile.RemoveRed().ID()
-	shanten := service.InfinityShanten
-	for _, goal := range goals {
-		if goal.ThrowableVector[discardID] > 0 && goal.Shanten < shanten {
-			shanten = goal.Shanten
-		}
-	}
-	return shanten
 }
