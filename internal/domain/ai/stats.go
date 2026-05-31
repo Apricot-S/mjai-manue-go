@@ -2,12 +2,14 @@ package ai
 
 import (
 	"fmt"
+	"math"
 	"strconv"
 
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/round"
 )
 
 const numTurnDistributionEntries = 18
+const probSumTolerance = 1e-12
 
 // validateManueStats checks structural invariants of stats before they are used
 // by ManueAgent. The validation assumes stats is immutable; implementations
@@ -92,21 +94,18 @@ func validateRoundEndStats(stats RoundEndStats) error {
 
 	sumProb := 0.0
 	for i, prob := range turnDistribution {
-		if prob < 0.0 {
-			return fmt.Errorf("invalid round end stats: turn distribution probability at %d must be non-negative", i)
+		if math.IsNaN(prob) || prob < 0.0 || prob > 1.0 {
+			return fmt.Errorf("invalid round end stats: turn distribution probability at %d must be between 0 and 1", i)
 		}
 		sumProb += prob
 	}
-	if sumProb <= 0.0 {
-		return fmt.Errorf("invalid round end stats: turn distribution total must be positive")
+	if math.Abs(sumProb-1.0) > probSumTolerance {
+		return fmt.Errorf("invalid round end stats: turn distribution total must be 1")
 	}
 
 	exhaustiveDrawRatio := stats.ExhaustiveDrawRatio()
-	if exhaustiveDrawRatio < 0.0 {
-		return fmt.Errorf("invalid round end stats: exhaustive draw ratio must be non-negative")
-	}
-	if exhaustiveDrawRatio > sumProb {
-		return fmt.Errorf("invalid round end stats: exhaustive draw ratio must not exceed turn distribution total")
+	if math.IsNaN(exhaustiveDrawRatio) || exhaustiveDrawRatio < 0.0 || exhaustiveDrawRatio > 1.0 {
+		return fmt.Errorf("invalid round end stats: exhaustive draw ratio must be between 0 and 1")
 	}
 	return nil
 }

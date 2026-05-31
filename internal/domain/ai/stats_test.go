@@ -101,6 +101,24 @@ func TestValidateRoundEndStats_ReturnsErrorWithNegativeTurnProb(t *testing.T) {
 	}
 }
 
+func TestValidateRoundEndStats_ReturnsErrorWithTooLargeTurnProb(t *testing.T) {
+	stats := validStubManueStats()
+	stats.turnDistribution[1] = 1.1
+
+	if err := validateRoundEndStats(stats); err == nil {
+		t.Fatal("validateRoundEndStats() succeeded unexpectedly")
+	}
+}
+
+func TestValidateRoundEndStats_ReturnsErrorWithInvalidTurnDistributionTotal(t *testing.T) {
+	stats := validStubManueStats()
+	stats.turnDistribution[1] = 0
+
+	if err := validateRoundEndStats(stats); err == nil {
+		t.Fatal("validateRoundEndStats() succeeded unexpectedly")
+	}
+}
+
 func TestValidateRoundEndStats_ReturnsErrorWithInvalidExhaustiveDrawRatio(t *testing.T) {
 	stats := validStubManueStats()
 	stats.exhaustiveDrawRatio = -0.1
@@ -212,7 +230,7 @@ func validStubManueStats() stubManueStats {
 			"3000":  2,
 			"total": 3,
 		},
-		turnDistribution:              fullTurnDistribution(0.01),
+		turnDistribution:              uniformTurnDistribution(),
 		exhaustiveDrawRatio:           0.1,
 		avgWinPointsValue:             5500,
 		exhaustiveDrawNotenCount:      100,
@@ -221,6 +239,10 @@ func validStubManueStats() stubManueStats {
 			"1,0": {total: 10, tenpai: 3},
 		},
 	}
+}
+
+func uniformTurnDistribution() []float64 {
+	return fullTurnDistribution(1.0 / float64(numTurnDistributionEntries))
 }
 
 func fullTurnDistribution(prob float64) []float64 {
