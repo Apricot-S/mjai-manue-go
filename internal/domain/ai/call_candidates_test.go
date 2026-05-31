@@ -39,6 +39,16 @@ func TestBuildReactionCandidates_BuildsPassAndCallDiscards(t *testing.T) {
 		if _, ok := found[candidate.traceKey]; ok {
 			found[candidate.traceKey] = true
 		}
+		switch candidate.traceKey {
+		case "none":
+			if candidate.evaluationGroup != 0 {
+				t.Errorf("evaluationGroup for none = %d, want 0", candidate.evaluationGroup)
+			}
+		case "0.4m":
+			if candidate.evaluationGroup != 1 {
+				t.Errorf("evaluationGroup for 0.4m = %d, want 1", candidate.evaluationGroup)
+			}
+		}
 		if candidate.traceKey == "0.5pr" {
 			t.Errorf("buildReactionCandidates() included kuikae discard %q", candidate.traceKey)
 		}

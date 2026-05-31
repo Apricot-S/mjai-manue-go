@@ -416,6 +416,30 @@ func TestScoredWinEstimateGoalsByKeyUsesCandidateMelds(t *testing.T) {
 	}
 }
 
+func TestCountWinEstimateGoalsByGroup(t *testing.T) {
+	candidates := []actionCandidate{
+		{traceKey: "0.5m", evaluationGroup: 0},
+		{traceKey: "-1.5m", evaluationGroup: 1},
+		{traceKey: "-1.6m", evaluationGroup: 1},
+	}
+	goalsByKey := map[string][]winEstimateGoal{
+		"0.5m":  {{}, {}},
+		"-1.5m": {{}},
+		"-1.6m": {{}, {}, {}},
+	}
+
+	got := countWinEstimateGoalsByGroup(candidates, goalsByKey)
+	want := []int{2, 4}
+	if len(got) != len(want) {
+		t.Fatalf("len(countWinEstimateGoalsByGroup()) = %d, want %d", len(got), len(want))
+	}
+	for i := range want {
+		if got[i] != want[i] {
+			t.Errorf("countWinEstimateGoalsByGroup()[%d] = %d, want %d", i, got[i], want[i])
+		}
+	}
+}
+
 func TestScoredWinEstimateGoalsByKeyWrapsCandidateError(t *testing.T) {
 	_, err := scoredWinEstimateGoalsByKey(
 		[]actionCandidate{{traceKey: "-1.1m"}},

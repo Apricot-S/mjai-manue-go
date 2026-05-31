@@ -16,10 +16,15 @@ type candidateEvaluationContext struct {
 	state                         round.StateViewer
 	self                          seat.Seat
 	winEstimates                  map[string]winEstimate
+	winEstimateGoalCounts         []int
 	exhaustiveDrawProbOnSelfNoWin float64
 	notenTenpaiProb               float64
 	otherWinDists                 []scoreDeltaProbDist
 	baseTenpaiProbs               [common.NumPlayers]float64
+}
+
+type candidateEvaluationSummary struct {
+	winEstimateGoalCounts []int
 }
 
 type candidateEvaluator struct {
@@ -44,21 +49,23 @@ func (e candidateEvaluator) evaluateCandidates(
 	state round.StateViewer,
 	self seat.Seat,
 	candidates []actionCandidate,
-) ([]actionCandidate, error) {
+) ([]actionCandidate, candidateEvaluationSummary, error) {
 	context, err := e.newEvaluationContext(state, self, candidates)
 	if err != nil {
-		return nil, err
+		return nil, candidateEvaluationSummary{}, err
 	}
 
 	updated := make([]actionCandidate, len(candidates))
 	for i, candidate := range candidates {
 		updatedCandidate, err := e.evaluateCandidate(context, candidate)
 		if err != nil {
-			return nil, fmt.Errorf("cannot evaluate candidate %q: %w", candidate.traceKey, err)
+			return nil, candidateEvaluationSummary{}, fmt.Errorf("cannot evaluate candidate %q: %w", candidate.traceKey, err)
 		}
 		updated[i] = updatedCandidate
 	}
-	return updated, nil
+	return updated, candidateEvaluationSummary{
+		winEstimateGoalCounts: context.winEstimateGoalCounts,
+	}, nil
 }
 
 func (e candidateEvaluator) newEvaluationContext(
@@ -78,6 +85,7 @@ func (e candidateEvaluator) newEvaluationContext(
 	if err != nil {
 		return candidateEvaluationContext{}, err
 	}
+	winEstimateGoalCounts := countWinEstimateGoalsByGroup(candidates, goalsByKey)
 	winEstimates, err := winEstimatesFromState(e.stats, state, self, candidates, goalsByKey, e.trials, e.rng)
 	if err != nil {
 		return candidateEvaluationContext{}, err
@@ -97,6 +105,7 @@ func (e candidateEvaluator) newEvaluationContext(
 		state:                         state,
 		self:                          self,
 		winEstimates:                  winEstimates,
+		winEstimateGoalCounts:         winEstimateGoalCounts,
 		exhaustiveDrawProbOnSelfNoWin: exhaustiveDrawProbOnSelfNoWin,
 		notenTenpaiProb:               notenTenpaiProb,
 		otherWinDists:                 otherWinScoreDeltaDists(e.stats, state, self),

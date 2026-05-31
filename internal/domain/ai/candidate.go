@@ -12,6 +12,7 @@ import (
 
 type actionCandidate struct {
 	traceKey         string
+	evaluationGroup  int
 	action           action.Action
 	riichi           bool
 	scoreAsRiichi    bool

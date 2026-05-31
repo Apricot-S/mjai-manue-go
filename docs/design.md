@@ -356,7 +356,7 @@ type Decision struct {
 
 `cmd/mjai-manue` から Manue 本体を動かすため、stats と danger tree は CLI 側で `configs` から読み込み、`ManueAgent` へ deps として渡す。`internal/domain/ai` は `configs` を直接 import せず、stats / danger tree / estimator は用途別の小さい interface で受け取る。一方で局面 observation は `domain/game` 側の `round.ActionStateViewer` / `round.StateViewer` をそのまま使い、AI package 内に同等の state viewer interface を重複定義しない。
 
-`ManueAgent` の再構築では、完成形と異なる独自評価を増やさない。通常手番、副露反応、危険度、和了推定、流局、他家和了、順位期待値は CoffeeScript 版 `getMetricsInternal` と同じ意味の評価値へ寄せる。既に `domain/game` にあるルール判定（合法手、向聴、役、点数、聴牌、和了形）は再実装しない。trace log の action key、表形式、`tenpaiProbs` 出力はオリジナル実装と揃え、内部構造は現行 Go のドメイン語彙へ寄せる。
+`ManueAgent` の再構築では、完成形と異なる独自評価を増やさない。通常手番、副露反応、危険度、和了推定、流局、他家和了、順位期待値は CoffeeScript 版 `getMetricsInternal` と同じ意味の評価値へ寄せる。既に `domain/game` にあるルール判定（合法手、向聴、役、点数、聴牌、和了形）は再実装しない。trace log の action key、表形式、`goals` 件数、`tenpaiProbs` 出力はオリジナル実装と揃え、内部構造は現行 Go のドメイン語彙へ寄せる。
 
 ## 11. 設定ファイル (embed 固定)
 

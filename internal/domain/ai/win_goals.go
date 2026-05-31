@@ -123,3 +123,15 @@ func scoredWinEstimateGoalsByKey(
 	}
 	return goalsByKey, nil
 }
+
+func countWinEstimateGoalsByGroup(candidates []actionCandidate, goalsByKey map[string][]winEstimateGoal) []int {
+	maxGroup := 0
+	for _, candidate := range candidates {
+		maxGroup = max(maxGroup, candidate.evaluationGroup)
+	}
+	counts := make([]int, maxGroup+1)
+	for _, candidate := range candidates {
+		counts[candidate.evaluationGroup] += len(goalsByKey[candidate.traceKey])
+	}
+	return counts
+}

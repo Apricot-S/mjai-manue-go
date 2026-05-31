@@ -22,6 +22,10 @@ func buildSelfTurnCandidates(actions []action.Action, self player.PlayerViewer) 
 	// selected. Kyushukyuhai is also outside the policy.
 	riichi := firstActionOfType[*action.Riichi](actions)
 	riichiDeclared := self.RiichiState() == player.RiichiDeclared
+	discardGroup := 0
+	if riichi != nil {
+		discardGroup = 1
+	}
 	var candidates []actionCandidate
 	for _, discard := range normalizedSelfTurnDiscards(actions) {
 		afterDiscard, err := h.Discard(discard.Tile())
@@ -33,12 +37,34 @@ func buildSelfTurnCandidates(actions []action.Action, self player.PlayerViewer) 
 			// Match Manue's riichi candidate filtering: only regular-hand shanten
 			// from AnalyzeShanten is considered here, so Seven Pairs and
 			// Thirteen Orphans do not create riichi candidates.
-			candidates = append(candidates, buildSelfTurnCandidate(riichi, discard.Tile(), h, afterDiscard, turnShanten, shanten, turnGoals, true, true))
+			candidates = append(candidates, buildSelfTurnCandidate(
+				riichi,
+				discard.Tile(),
+				h,
+				afterDiscard,
+				turnShanten,
+				shanten,
+				turnGoals,
+				true,
+				true,
+				0,
+			))
 		}
 		// After a riichi declaration, domain/game LegalActions already filters
 		// discards to tiles that keep tenpai, so AI does not re-run shanten as a
 		// defensive check here.
-		candidates = append(candidates, buildSelfTurnCandidate(discard, discard.Tile(), h, afterDiscard, turnShanten, shanten, turnGoals, false, riichiDeclared))
+		candidates = append(candidates, buildSelfTurnCandidate(
+			discard,
+			discard.Tile(),
+			h,
+			afterDiscard,
+			turnShanten,
+			shanten,
+			turnGoals,
+			false,
+			riichiDeclared,
+			discardGroup,
+		))
 	}
 	return candidates, nil
 }
@@ -75,9 +101,11 @@ func buildSelfTurnCandidate(
 	goals []service.Goal,
 	riichi bool,
 	scoreAsRiichi bool,
+	evaluationGroup int,
 ) actionCandidate {
 	return actionCandidate{
 		traceKey:         formatDiscardTraceKey(riichi, discardTile),
+		evaluationGroup:  evaluationGroup,
 		action:           immediateAction,
 		riichi:           riichi,
 		scoreAsRiichi:    scoreAsRiichi,

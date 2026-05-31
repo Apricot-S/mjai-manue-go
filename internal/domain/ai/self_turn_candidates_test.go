@@ -163,6 +163,9 @@ func TestBuildSelfTurnCandidates_BuildsRiichiCandidate(t *testing.T) {
 	if gotRiichi.traceKey != "0.5m" {
 		t.Errorf("traceKey = %q, want %q", gotRiichi.traceKey, "0.5m")
 	}
+	if gotRiichi.evaluationGroup != 0 {
+		t.Errorf("riichi evaluationGroup = %d, want 0", gotRiichi.evaluationGroup)
+	}
 	if gotRiichi.action != riichi {
 		t.Errorf("action = %v, want riichi action", gotRiichi.action)
 	}
@@ -269,6 +272,16 @@ func TestBuildSelfTurnCandidates_IncludesRiichiAndDiscardCandidates(t *testing.T
 	for _, candidate := range got {
 		if _, ok := wantTraceKeys[candidate.traceKey]; ok {
 			wantTraceKeys[candidate.traceKey] = true
+		}
+		switch candidate.traceKey {
+		case "0.5m":
+			if candidate.evaluationGroup != 0 {
+				t.Errorf("evaluationGroup for %s = %d, want 0", candidate.traceKey, candidate.evaluationGroup)
+			}
+		case "-1.5m":
+			if candidate.evaluationGroup != 1 {
+				t.Errorf("evaluationGroup for %s = %d, want 1", candidate.traceKey, candidate.evaluationGroup)
+			}
 		}
 	}
 	for traceKey, found := range wantTraceKeys {

@@ -19,12 +19,23 @@ func formatDiscardTraceKey(riichi bool, discardTile tile.Tile) string {
 	return fmt.Sprintf("%d.%s", prefix, discardTile)
 }
 
-func formatDecisionTrace(log string, selected *actionCandidate) string {
-	trace := log
+func formatDecisionTrace(log string, selected *actionCandidate, summary candidateEvaluationSummary) string {
+	var b strings.Builder
+	b.WriteString(formatGoalCountTrace(summary))
+	b.WriteString(log)
 	if selected == nil {
-		return trace
+		return b.String()
 	}
-	return trace + fmt.Sprintf("decidedKey %s\n", selected.traceKey)
+	fmt.Fprintf(&b, "decidedKey %s\n", selected.traceKey)
+	return b.String()
+}
+
+func formatGoalCountTrace(summary candidateEvaluationSummary) string {
+	var b strings.Builder
+	for _, count := range summary.winEstimateGoalCounts {
+		fmt.Fprintf(&b, "goals %d\n", count)
+	}
+	return b.String()
 }
 
 func formatCandidateLog(candidates []actionCandidate, tenpaiProbs [common.NumPlayers]float64, self seat.Seat) string {

@@ -269,7 +269,7 @@ func TestBuildCandidateDecision_ReturnsCallActionForWinningReactionCandidate(t *
 				expectedPoints: 0,
 			},
 		},
-	}, false, [common.NumPlayers]float64{0, 0.1, 0.2, 0.3}, self)
+	}, false, [common.NumPlayers]float64{0, 0.1, 0.2, 0.3}, self, candidateEvaluationSummary{})
 
 	if decision.Action != pon {
 		t.Errorf("Action = %T %[1]v, want selected call action %T %[2]v", decision.Action, pon)
@@ -311,7 +311,7 @@ func TestBuildCandidateDecision(t *testing.T) {
 				expectedPoints: 1000,
 			},
 		},
-	}, true, [common.NumPlayers]float64{0, 0.1, 0.2, 0.3}, self)
+	}, true, [common.NumPlayers]float64{0, 0.1, 0.2, 0.3}, self, candidateEvaluationSummary{})
 
 	if decision.Action != blackDiscard {
 		t.Errorf("Action = %T %[1]v, want black discard", decision.Action)
@@ -356,7 +356,7 @@ func TestBuildCandidateDecision_CanIgnoreBlackPreference(t *testing.T) {
 				expectedPoints: 1000,
 			},
 		},
-	}, false, [common.NumPlayers]float64{0, 0.1, 0.2, 0.3}, self)
+	}, false, [common.NumPlayers]float64{0, 0.1, 0.2, 0.3}, self, candidateEvaluationSummary{})
 
 	if decision.Action != redDiscard {
 		t.Errorf("Action = %T %[1]v, want first tied red discard when black preference is disabled", decision.Action)

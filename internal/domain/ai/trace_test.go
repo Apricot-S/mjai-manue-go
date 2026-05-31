@@ -124,8 +124,14 @@ func TestFormatDecisionTrace_AppendsDecidedKey(t *testing.T) {
 		shanten:     1,
 	}
 
-	got := formatDecisionTrace(formatCandidateLog([]actionCandidate{*selected}, [common.NumPlayers]float64{}, self), selected)
-	want := "| action | avgRank | expPt | hojuProb | myHoraProb | ryukyokuProb | otherHoraProb | avgHoraPt | ryukyokuAvgPt | shanten | \n" +
+	got := formatDecisionTrace(
+		formatCandidateLog([]actionCandidate{*selected}, [common.NumPlayers]float64{}, self),
+		selected,
+		candidateEvaluationSummary{winEstimateGoalCounts: []int{7, 3}},
+	)
+	want := "goals 7\n" +
+		"goals 3\n" +
+		"| action | avgRank | expPt | hojuProb | myHoraProb | ryukyokuProb | otherHoraProb | avgHoraPt | ryukyokuAvgPt | shanten | \n" +
 		"|  -1.5m |  0.0000 |     0 |    0.000 |      0.000 |        0.000 |         0.000 |         0 |             0 |       1 | \n" +
 		"\n\n" +
 		"tenpaiProbs:  1: 0.000  2: 0.000  3: 0.000  \n" +

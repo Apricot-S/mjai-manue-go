@@ -24,6 +24,7 @@ func buildReactionCandidates(actions []action.Action, self player.PlayerViewer) 
 		unknown := tile.MustTileFromCode("?")
 		candidates = append(candidates, actionCandidate{
 			traceKey:         "none",
+			evaluationGroup:  0,
 			action:           pass,
 			discardTile:      unknown,
 			melds:            self.Melds(),
@@ -74,6 +75,7 @@ func buildCallReactionCandidates(
 		shanten, goals := service.AnalyzeShanten(turnHand, service.AllowedExtraTiles(1))
 		return []actionCandidate{{
 			traceKey:         fmt.Sprintf("%d.none", callIndex),
+			evaluationGroup:  callIndex + 1,
 			action:           callAction,
 			discardTile:      unknown,
 			melds:            nextMelds,
@@ -99,6 +101,7 @@ func buildCallReactionCandidates(
 		shanten := candidateShanten(discardTile, turnShanten, turnGoals)
 		candidates = append(candidates, actionCandidate{
 			traceKey:         fmt.Sprintf("%d.%s", callIndex, discardTile),
+			evaluationGroup:  callIndex + 1,
 			action:           callAction,
 			discardTile:      discardTile,
 			melds:            nextMelds,
