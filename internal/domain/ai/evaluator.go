@@ -11,6 +11,8 @@ import (
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/tile"
 )
 
+const defaultWinEstimateTrials = 1000
+
 type candidateEvaluationContext struct {
 	stats                         ManueStats
 	state                         round.StateViewer
@@ -42,8 +44,6 @@ func newCandidateEvaluator(stats ManueStats, danger DangerEstimator, rng *rand.R
 		trials: defaultWinEstimateTrials,
 	}
 }
-
-const defaultWinEstimateTrials = 1000
 
 func (e candidateEvaluator) evaluateCandidates(
 	state round.StateViewer,
