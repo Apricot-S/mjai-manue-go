@@ -47,13 +47,6 @@ func TestExhaustiveDrawProbOnSelfNoWin(t *testing.T) {
 	}
 }
 
-func TestNoSelfWinExhaustiveDrawExponent(t *testing.T) {
-	want := float64(common.NumPlayers-1) / float64(common.NumPlayers)
-	if got := noSelfWinExhaustiveDrawExponent(); got != want {
-		t.Errorf("noSelfWinExhaustiveDrawExponent() = %v, want %v", got, want)
-	}
-}
-
 func TestExpectedRemainingTurns(t *testing.T) {
 	got, err := expectedRemainingTurns(stubManueStats{
 		turnDistribution: []float64{

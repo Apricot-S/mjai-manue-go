@@ -30,11 +30,8 @@ func exhaustiveDrawProbOnSelfNoWin(stats RoundEndStats, currentTurn float64) (fl
 	if err != nil {
 		return 0, err
 	}
-	return math.Pow(prob, noSelfWinExhaustiveDrawExponent()), nil
-}
-
-func noSelfWinExhaustiveDrawExponent() float64 {
-	return float64(common.NumPlayers-1) / float64(common.NumPlayers)
+	const exponent = float64(common.NumPlayers-1) / float64(common.NumPlayers)
+	return math.Pow(prob, exponent), nil
 }
 
 func expectedRemainingTurns(stats RoundEndStats, currentTurn float64) (int, error) {
