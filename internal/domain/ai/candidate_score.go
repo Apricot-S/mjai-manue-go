@@ -75,22 +75,7 @@ func compareCandidateScore(lhs, rhs *candidateScore) int {
 	return 0
 }
 
-// evaluateCandidateScore fills the fields derived from the final score-change
-// distribution while preserving candidate-local probability estimates.
 func evaluateCandidateScore(
-	score candidateScore,
-	scoreChanges scoreDeltaProbDist,
-	selfID int,
-	selfScore float64,
-	selfPosition int,
-	opponents []rankOpponent,
-) candidateScore {
-	score.expectedPoints = scoreChanges.expected()[selfID]
-	score.averageRank = averageRank(scoreChanges, selfID, selfScore, selfPosition, opponents)
-	return score
-}
-
-func evaluateCandidateScoreFromState(
 	score candidateScore,
 	scoreChanges scoreDeltaProbDist,
 	stats RankStats,
@@ -99,14 +84,15 @@ func evaluateCandidateScoreFromState(
 ) candidateScore {
 	scores := state.Scores()
 	startingDealer := state.StartingDealer()
-	return evaluateCandidateScore(
-		score,
+	score.expectedPoints = scoreChanges.expected()[self.Index()]
+	score.averageRank = averageRank(
 		scoreChanges,
 		self.Index(),
 		float64(scores[self.Index()]),
 		self.DistanceFrom(startingDealer),
 		buildRankOpponents(stats, state, self),
 	)
+	return score
 }
 
 func candidateTotalScoreDeltaDist(
@@ -165,5 +151,5 @@ func evaluateCandidateFromComponents(
 		exhaustiveDrawDist,
 		otherWinDists,
 	)
-	return evaluateCandidateScoreFromState(score, scoreChanges, rankStats, state, self), nil
+	return evaluateCandidateScore(score, scoreChanges, rankStats, state, self), nil
 }

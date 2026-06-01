@@ -24,61 +24,7 @@ func TestEvaluateCandidateScore(t *testing.T) {
 		exhaustiveDrawProb: 0.3,
 	}
 
-	got := evaluateCandidateScore(base, scoreChanges, 0, 25000, 0, []rankOpponent{
-		{
-			id:       1,
-			score:    25000,
-			position: 1,
-			winProbs: relativeWinProbTable{
-				"2000":  1.0,
-				"-1000": 0.0,
-			},
-		},
-		{
-			id:       2,
-			score:    24000,
-			position: 2,
-			winProbs: relativeWinProbTable{
-				"2000": 1.0,
-				"500":  1.0,
-			},
-		},
-		{
-			id:       3,
-			score:    26000,
-			position: 3,
-			winProbs: relativeWinProbTable{
-				"0":     0.5,
-				"-1500": 0.0,
-			},
-		},
-	})
-
-	if !almostEqual(got.expectedPoints, -125) {
-		t.Errorf("expectedPoints = %v, want -125", got.expectedPoints)
-	}
-	if !almostEqual(got.averageRank, 2.625) {
-		t.Errorf("averageRank = %v, want 2.625", got.averageRank)
-	}
-	if got.winProb != base.winProb {
-		t.Errorf("winProb = %v, want %v", got.winProb, base.winProb)
-	}
-	if got.exhaustiveDrawProb != base.exhaustiveDrawProb {
-		t.Errorf("exhaustiveDrawProb = %v, want %v", got.exhaustiveDrawProb, base.exhaustiveDrawProb)
-	}
-}
-
-func TestEvaluateCandidateScoreFromState(t *testing.T) {
-	scoreChanges := newScoreDeltaProbDist(map[scoreDelta]float64{
-		{1000, -1000, 0, 0}: 0.25,
-		{-500, 500, 0, 0}:   0.75,
-	})
-	base := candidateScore{
-		winProb:            0.2,
-		exhaustiveDrawProb: 0.3,
-	}
-
-	got := evaluateCandidateScoreFromState(
+	got := evaluateCandidateScore(
 		base,
 		scoreChanges,
 		stubManueStats{
