@@ -48,7 +48,7 @@ func expectedRemainingTurns(stats RoundEndStats, currentTurn float64) (int, erro
 	den := 0.0
 	for i := currentTurnIndex; i < numTurnDistributionEntries; i++ {
 		prob := turnDistribution[i]
-		num += prob * (float64(i) - math.Round(currentTurn) + 0.5)
+		num += prob * (float64(i-currentTurnIndex) + 0.5)
 		den += prob
 	}
 
