@@ -84,7 +84,7 @@ func buildCallReactionCandidates(
 			baseShanten:      shanten,
 			shanten:          shanten,
 			shantenGoals:     goals,
-			red:              unknown.IsRed(),
+			red:              false,
 		}}, nil
 	}
 
