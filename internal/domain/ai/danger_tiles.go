@@ -67,9 +67,9 @@ func sujiTiles(target tile.Tile) []tile.Tile {
 		return nil
 	}
 	result := make([]tile.Tile, 0, 2)
-	for _, n := range []int{target.Number() - 3, target.Number() + 3} {
-		if 1 <= n && n <= 9 {
-			result = append(result, tile.MustTileFromID(target.RemoveRed().ID()+n-target.Number()))
+	for _, offset := range []int{-3, 3} {
+		if suji := target.Next(offset); suji != nil {
+			result = append(result, *suji)
 		}
 	}
 	return result
@@ -113,12 +113,15 @@ func isNChanceOrLess(target tile.Tile, n int, visibleTiles []tile.Tile) bool {
 		return false
 	}
 	for i := 1; i < 3; i++ {
-		kabeNumber := targetNumber + i
+		offset := i
 		if targetNumber >= 5 {
-			kabeNumber = targetNumber - i
+			offset = -i
 		}
-		kabe := tile.MustTileFromID(target.RemoveRed().ID() + kabeNumber - targetNumber)
-		if countSameSymbol(visibleTiles, kabe) >= 4-n {
+		kabe := target.Next(offset)
+		if kabe == nil {
+			continue
+		}
+		if countSameSymbol(visibleTiles, *kabe) >= 4-n {
 			return true
 		}
 	}
@@ -134,10 +137,16 @@ func possibleSujis(target tile.Tile, safeTiles []tile.Tile) []tile.Tile {
 		if n < 1 || n+3 > 9 {
 			continue
 		}
-		first := tile.MustTileFromID(target.RemoveRed().ID() + n - target.Number())
-		second := tile.MustTileFromID(first.ID() + 3)
-		if !containsSameSymbol(safeTiles, first) && !containsSameSymbol(safeTiles, second) {
-			result = append(result, first)
+		first := target.Next(n - target.Number())
+		if first == nil {
+			continue
+		}
+		second := first.Next(3)
+		if second == nil {
+			continue
+		}
+		if !containsSameSymbol(safeTiles, *first) && !containsSameSymbol(safeTiles, *second) {
+			result = append(result, *first)
 		}
 	}
 	return result
@@ -186,19 +195,19 @@ func isOuter(target tile.Tile, tiles []tile.Tile) bool {
 	if target.Number() == 5 {
 		return false
 	}
-	var innerNumbers []int
 	if target.Number() < 5 {
-		for n := target.Number() + 1; n < 6; n++ {
-			innerNumbers = append(innerNumbers, n)
+		for offset := 1; target.Number()+offset <= 5; offset++ {
+			inner := target.Next(offset)
+			if inner != nil && containsSameSymbol(tiles, *inner) {
+				return true
+			}
 		}
 	} else {
-		for n := 5; n < target.Number(); n++ {
-			innerNumbers = append(innerNumbers, n)
-		}
-	}
-	for _, n := range innerNumbers {
-		if containsSameSymbol(tiles, tile.MustTileFromID(target.RemoveRed().ID()+n-target.Number())) {
-			return true
+		for offset := -1; target.Number()+offset >= 5; offset-- {
+			inner := target.Next(offset)
+			if inner != nil && containsSameSymbol(tiles, *inner) {
+				return true
+			}
 		}
 	}
 	return false
@@ -208,17 +217,18 @@ func isNOuterPrereachSutehai(target tile.Tile, n int, tiles []tile.Tile) bool {
 	if !target.IsSuits() || target.Number() == 5 {
 		return false
 	}
-	innerNumber := target.Number() + n
 	if target.Number() >= 5 {
-		innerNumber = target.Number() - n
+		n = -n
 	}
-	if innerNumber < 1 || innerNumber > 9 {
+	inner := target.Next(n)
+	if inner == nil {
 		return false
 	}
+	innerNumber := inner.Number()
 	if (target.Number() >= 5 || innerNumber > 5) && (target.Number() <= 5 || innerNumber < 5) {
 		return false
 	}
-	return containsSameSymbol(tiles, tile.MustTileFromID(target.RemoveRed().ID()+innerNumber-target.Number()))
+	return containsSameSymbol(tiles, *inner)
 }
 
 func isAida4Ken(target tile.Tile, tiles []tile.Tile) bool {
@@ -227,12 +237,16 @@ func isAida4Ken(target tile.Tile, tiles []tile.Tile) bool {
 	}
 	n := target.Number()
 	if 2 <= n && n <= 5 {
-		return containsSameSymbol(tiles, tile.MustTileFromID(target.RemoveRed().ID()-1)) &&
-			containsSameSymbol(tiles, tile.MustTileFromID(target.RemoveRed().ID()+4))
+		low := target.Next(-1)
+		high := target.Next(4)
+		return low != nil && high != nil && containsSameSymbol(tiles, *low) &&
+			containsSameSymbol(tiles, *high)
 	}
 	if 5 <= n && n <= 8 {
-		return containsSameSymbol(tiles, tile.MustTileFromID(target.RemoveRed().ID()-4)) &&
-			containsSameSymbol(tiles, tile.MustTileFromID(target.RemoveRed().ID()+1))
+		low := target.Next(-4)
+		high := target.Next(1)
+		return low != nil && high != nil && containsSameSymbol(tiles, *low) &&
+			containsSameSymbol(tiles, *high)
 	}
 	return false
 }
