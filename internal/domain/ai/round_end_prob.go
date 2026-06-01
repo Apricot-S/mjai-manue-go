@@ -5,6 +5,7 @@ import (
 	"math"
 
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/common"
+	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/round"
 )
 
 func exhaustiveDrawProb(stats RoundEndStats, currentTurn float64) (float64, error) {
@@ -37,11 +38,11 @@ func noSelfWinExhaustiveDrawExponent() float64 {
 }
 
 func expectedRemainingTurns(stats RoundEndStats, currentTurn float64) (int, error) {
-	currentTurnIndex := int(math.Round(currentTurn))
-	if currentTurnIndex < 0 || currentTurnIndex >= numTurnDistributionEntries {
+	if currentTurn < 0 || currentTurn > round.FinalTurn {
 		return 0, fmt.Errorf("cannot estimate expected remaining turns: current turn is out of range")
 	}
 
+	currentTurnIndex := int(math.Round(currentTurn))
 	turnDistribution := stats.TurnDistribution()
 	num := 0.0
 	den := 0.0
@@ -50,6 +51,7 @@ func expectedRemainingTurns(stats RoundEndStats, currentTurn float64) (int, erro
 		num += prob * (float64(i) - math.Round(currentTurn) + 0.5)
 		den += prob
 	}
+
 	if den == 0 {
 		return 0, nil
 	}

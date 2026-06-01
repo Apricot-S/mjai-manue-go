@@ -99,12 +99,42 @@ func TestExpectedRemainingTurns_ReturnsZeroWithoutRemainingTurnProb(t *testing.T
 	}
 }
 
-func TestExpectedRemainingTurns_ReturnsErrorWithOutOfRangeTurn(t *testing.T) {
-	_, err := expectedRemainingTurns(stubManueStats{
+func TestExpectedRemainingTurns_ReturnsZeroAtFinalTurn(t *testing.T) {
+	got, err := expectedRemainingTurns(stubManueStats{
 		turnDistribution: fullTurnDistribution(0.1),
-	}, 18)
-	if err == nil {
-		t.Fatal("expectedRemainingTurns() succeeded unexpectedly")
+	}, 17.5)
+	if err != nil {
+		t.Fatalf("expectedRemainingTurns() failed: %v", err)
+	}
+
+	if got != 0 {
+		t.Errorf("expectedRemainingTurns() = %v, want 0", got)
+	}
+}
+
+func TestExpectedRemainingTurns_ReturnsErrorWithOutOfRangeTurn(t *testing.T) {
+	tests := []struct {
+		name        string
+		currentTurn float64
+	}{
+		{
+			name:        "negative",
+			currentTurn: -0.25,
+		},
+		{
+			name:        "after final turn",
+			currentTurn: 17.75,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			_, err := expectedRemainingTurns(stubManueStats{
+				turnDistribution: fullTurnDistribution(0.1),
+			}, tt.currentTurn)
+			if err == nil {
+				t.Fatal("expectedRemainingTurns() succeeded unexpectedly")
+			}
+		})
 	}
 }
 
