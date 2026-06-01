@@ -33,7 +33,7 @@ func buildReactionCandidates(actions []action.Action, self player.PlayerViewer) 
 			baseShanten:      shanten,
 			shanten:          shanten,
 			shantenGoals:     goals,
-			red:              unknown.IsRed(),
+			red:              false,
 		})
 	}
 
