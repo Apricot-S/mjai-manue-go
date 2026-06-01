@@ -75,26 +75,6 @@ func compareCandidateScore(lhs, rhs *candidateScore) int {
 	return 0
 }
 
-func evaluateCandidateScore(
-	score candidateScore,
-	scoreChanges scoreDeltaProbDist,
-	stats RankStats,
-	state rankStateViewer,
-	self seat.Seat,
-) candidateScore {
-	scores := state.Scores()
-	startingDealer := state.StartingDealer()
-	score.expectedPoints = scoreChanges.expected()[self.Index()]
-	score.averageRank = averageRank(
-		scoreChanges,
-		self.Index(),
-		float64(scores[self.Index()]),
-		self.DistanceFrom(startingDealer),
-		buildRankOpponents(stats, state, self),
-	)
-	return score
-}
-
 func candidateTotalScoreDeltaDist(
 	score candidateScore,
 	immediateDist scoreDeltaProbDist,
@@ -151,5 +131,15 @@ func evaluateCandidateFromComponents(
 		exhaustiveDrawDist,
 		otherWinDists,
 	)
-	return evaluateCandidateScore(score, scoreChanges, rankStats, state, self), nil
+	scores := state.Scores()
+	startingDealer := state.StartingDealer()
+	score.expectedPoints = scoreChanges.expected()[self.Index()]
+	score.averageRank = averageRank(
+		scoreChanges,
+		self.Index(),
+		float64(scores[self.Index()]),
+		self.DistanceFrom(startingDealer),
+		buildRankOpponents(rankStats, state, self),
+	)
+	return score, nil
 }

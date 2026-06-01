@@ -14,58 +14,6 @@ import (
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/wind"
 )
 
-func TestEvaluateCandidateScore(t *testing.T) {
-	scoreChanges := newScoreDeltaProbDist(map[scoreDelta]float64{
-		{1000, -1000, 0, 0}: 0.25,
-		{-500, 500, 0, 0}:   0.75,
-	})
-	base := candidateScore{
-		winProb:            0.2,
-		exhaustiveDrawProb: 0.3,
-	}
-
-	got := evaluateCandidateScore(
-		base,
-		scoreChanges,
-		stubManueStats{
-			relativeWinProbs: map[string]map[string]float64{
-				"E1,0,1": {
-					"2000":  1.0,
-					"-1000": 0.0,
-				},
-				"E1,0,2": {
-					"2000": 1.0,
-					"500":  1.0,
-				},
-				"E1,0,3": {
-					"0":     0.5,
-					"-1500": 0.0,
-				},
-			},
-		},
-		stubRankStateViewer{
-			nextRoundWind:  wind.East,
-			nextRoundNum:   1,
-			scores:         [common.NumPlayers]int{25000, 25000, 24000, 26000},
-			startingDealer: seat.MustSeat(0),
-		},
-		seat.MustSeat(0),
-	)
-
-	if !almostEqual(got.expectedPoints, -125) {
-		t.Errorf("expectedPoints = %v, want -125", got.expectedPoints)
-	}
-	if !almostEqual(got.averageRank, 2.625) {
-		t.Errorf("averageRank = %v, want 2.625", got.averageRank)
-	}
-	if got.winProb != base.winProb {
-		t.Errorf("winProb = %v, want %v", got.winProb, base.winProb)
-	}
-	if got.exhaustiveDrawProb != base.exhaustiveDrawProb {
-		t.Errorf("exhaustiveDrawProb = %v, want %v", got.exhaustiveDrawProb, base.exhaustiveDrawProb)
-	}
-}
-
 func TestCandidateTotalScoreDeltaDist(t *testing.T) {
 	score := candidateScore{
 		winProb:            0.2,
