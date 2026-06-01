@@ -76,7 +76,6 @@ func compareCandidateScore(lhs, rhs *candidateScore) int {
 }
 
 func evaluateCandidateFromComponents(
-	score candidateScore,
 	dealInEstimates []dealInEstimate,
 	winEstimate winEstimate,
 	exhaustiveDrawProbOnSelfNoWin float64,
@@ -89,6 +88,7 @@ func evaluateCandidateFromComponents(
 	state rankStateViewer,
 	self seat.Seat,
 ) (candidateScore, error) {
+	var score candidateScore
 	safeProb, err := safeProb(dealInEstimates)
 	if err != nil {
 		return candidateScore{}, err

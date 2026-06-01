@@ -135,7 +135,6 @@ func (e candidateEvaluator) evaluateCandidate(
 
 	exhaustiveDrawDist, exhaustiveDrawAveragePoints := candidateExhaustiveDrawEvaluation(context, candidate)
 	score, err := evaluateCandidateFromComponents(
-		candidate.score,
 		dealInEstimates,
 		winEstimate,
 		context.exhaustiveDrawProbOnSelfNoWin,

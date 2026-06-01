@@ -15,7 +15,6 @@ import (
 )
 
 func TestEvaluateCandidateFromComponents(t *testing.T) {
-	score := candidateScore{}
 	dealInEstimates := []dealInEstimate{
 		{winnerID: 1, prob: 0.2},
 		{winnerID: 2, prob: 0.25},
@@ -36,7 +35,6 @@ func TestEvaluateCandidateFromComponents(t *testing.T) {
 	}
 
 	got, err := evaluateCandidateFromComponents(
-		score,
 		dealInEstimates,
 		winEstimate{
 			prob:   0.2,
@@ -92,7 +90,6 @@ func TestEvaluateCandidateFromComponents(t *testing.T) {
 
 func TestEvaluateCandidateFromComponents_ReturnsErrorWithInvalidEstimate(t *testing.T) {
 	_, err := evaluateCandidateFromComponents(
-		candidateScore{},
 		[]dealInEstimate{{winnerID: 1, prob: 1.1}},
 		winEstimate{},
 		0.25,
