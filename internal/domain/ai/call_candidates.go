@@ -68,7 +68,6 @@ func buildCallReactionCandidates(
 		return nil, fmt.Errorf("cannot build reaction candidates for call %d: %w", callIndex, err)
 	}
 	nextMelds := append(slices.Clone(baseMelds), callMeld)
-	turnShanten, turnGoals := service.AnalyzeShanten(turnHand, service.AllowedExtraTiles(1))
 
 	if _, ok := callMeld.(*meld.CalledKan); ok {
 		unknown := tile.MustTileFromCode("?")
@@ -88,10 +87,12 @@ func buildCallReactionCandidates(
 		}}, nil
 	}
 
+	turnShanten, turnGoals := service.AnalyzeShanten(turnHand, service.AllowedExtraTiles(1))
 	swapCallTiles := callSwapTiles(callMeld)
 	discardTiles := tile.Tiles(turnHand.ToTiles()).Distinct(func(t tile.Tile) bool {
 		return isSwapCallTile(t, swapCallTiles)
 	})
+
 	candidates := make([]actionCandidate, 0, len(discardTiles))
 	for _, discardTile := range discardTiles {
 		afterDiscard, err := turnHand.Discard(discardTile)
