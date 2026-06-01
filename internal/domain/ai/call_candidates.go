@@ -68,10 +68,10 @@ func buildCallReactionCandidates(
 		return nil, fmt.Errorf("cannot build reaction candidates for call %d: %w", callIndex, err)
 	}
 	nextMelds := append(slices.Clone(baseMelds), callMeld)
+	turnShanten, turnGoals := service.AnalyzeShanten(turnHand, service.AllowedExtraTiles(1))
 
 	if _, ok := callMeld.(*meld.CalledKan); ok {
 		unknown := tile.MustTileFromCode("?")
-		shanten, goals := service.AnalyzeShanten(turnHand, service.AllowedExtraTiles(1))
 		return []actionCandidate{{
 			traceKey:         fmt.Sprintf("%d.none", callIndex),
 			evaluationGroup:  callIndex + 1,
@@ -80,14 +80,13 @@ func buildCallReactionCandidates(
 			melds:            nextMelds,
 			turnHand:         turnHand,
 			afterDiscardHand: turnHand,
-			baseShanten:      shanten,
-			shanten:          shanten,
-			shantenGoals:     goals,
+			baseShanten:      turnShanten,
+			shanten:          turnShanten,
+			shantenGoals:     turnGoals,
 			red:              false,
 		}}, nil
 	}
 
-	turnShanten, turnGoals := service.AnalyzeShanten(turnHand, service.AllowedExtraTiles(1))
 	swapCallTiles := callSwapTiles(callMeld)
 	discardTiles := tile.Tiles(turnHand.ToTiles()).Distinct(func(t tile.Tile) bool {
 		return isSwapCallTile(t, swapCallTiles)
