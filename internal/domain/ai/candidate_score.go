@@ -75,24 +75,6 @@ func compareCandidateScore(lhs, rhs *candidateScore) int {
 	return 0
 }
 
-func candidateTotalScoreDeltaDist(
-	score candidateScore,
-	immediateDist scoreDeltaProbDist,
-	selfWinDist scoreDeltaProbDist,
-	exhaustiveDrawDist scoreDeltaProbDist,
-	otherWinDists []scoreDeltaProbDist,
-) scoreDeltaProbDist {
-	futureDist := futureScoreDeltaDist(
-		selfWinDist,
-		score.winProb,
-		exhaustiveDrawDist,
-		score.exhaustiveDrawProb,
-		otherWinDists,
-		score.otherWinProb,
-	)
-	return immediateDist.replace(scoreDelta{}, futureDist)
-}
-
 func evaluateCandidateFromComponents(
 	score candidateScore,
 	dealInEstimates []dealInEstimate,
@@ -124,13 +106,15 @@ func evaluateCandidateFromComponents(
 	score.exhaustiveDrawProb = exhaustiveDrawProb
 	score.otherWinProb = otherWinProb
 	score.exhaustiveDrawAveragePoints = exhaustiveDrawAveragePoints
-	scoreChanges := candidateTotalScoreDeltaDist(
-		score,
-		immediateDist,
+	futureDist := futureScoreDeltaDist(
 		selfWinDist,
+		score.winProb,
 		exhaustiveDrawDist,
+		score.exhaustiveDrawProb,
 		otherWinDists,
+		score.otherWinProb,
 	)
+	scoreChanges := immediateDist.replace(scoreDelta{}, futureDist)
 	scores := state.Scores()
 	startingDealer := state.StartingDealer()
 	score.expectedPoints = scoreChanges.expected()[self.Index()]

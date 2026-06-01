@@ -14,41 +14,6 @@ import (
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/wind"
 )
 
-func TestCandidateTotalScoreDeltaDist(t *testing.T) {
-	score := candidateScore{
-		winProb:            0.2,
-		exhaustiveDrawProb: 0.3,
-		otherWinProb:       0.4,
-	}
-	immediateDist := scoreDeltaProbDist{
-		{}:            0.75,
-		{-1000, 1000}: 0.25,
-	}
-	selfWinDist := scoreDeltaProbDist{{1000, 0, 0, 0}: 1}
-	exhaustiveDrawDist := scoreDeltaProbDist{{0, 1000, 0, 0}: 1}
-	otherWinDists := []scoreDeltaProbDist{
-		{{0, 0, 1000, 0}: 1},
-		{{0, 0, 0, 1000}: 1},
-	}
-
-	got := candidateTotalScoreDeltaDist(
-		score,
-		immediateDist,
-		selfWinDist,
-		exhaustiveDrawDist,
-		otherWinDists,
-	)
-
-	want := scoreDeltaProbDist{
-		{-1000, 1000}:   0.25,
-		{1000, 0, 0, 0}: 0.15,
-		{0, 1000, 0, 0}: 0.225,
-		{0, 0, 1000, 0}: 0.15,
-		{0, 0, 0, 1000}: 0.15,
-	}
-	assertScoreDeltaProbDist(t, got, want)
-}
-
 func TestEvaluateCandidateFromComponents(t *testing.T) {
 	score := candidateScore{}
 	dealInEstimates := []dealInEstimate{
@@ -56,7 +21,8 @@ func TestEvaluateCandidateFromComponents(t *testing.T) {
 		{winnerID: 2, prob: 0.25},
 	}
 	immediateDist := scoreDeltaProbDist{
-		{}: 1,
+		{}:            0.75,
+		{-1000, 1000}: 0.25,
 	}
 	selfWinDist := scoreDeltaProbDist{
 		{1000, 0, 0, 0}: 1,
@@ -76,7 +42,7 @@ func TestEvaluateCandidateFromComponents(t *testing.T) {
 			prob:   0.2,
 			avgPts: 3900,
 		},
-		0.25,
+		0.375,
 		1200,
 		immediateDist,
 		selfWinDist,
@@ -104,11 +70,11 @@ func TestEvaluateCandidateFromComponents(t *testing.T) {
 	if !almostEqual(got.dealInProb, 0.4) {
 		t.Errorf("dealInProb = %v, want 0.4", got.dealInProb)
 	}
-	if !almostEqual(got.exhaustiveDrawProb, 0.2) {
-		t.Errorf("exhaustiveDrawProb = %v, want 0.2", got.exhaustiveDrawProb)
+	if !almostEqual(got.exhaustiveDrawProb, 0.3) {
+		t.Errorf("exhaustiveDrawProb = %v, want 0.3", got.exhaustiveDrawProb)
 	}
-	if !almostEqual(got.otherWinProb, 0.6) {
-		t.Errorf("otherWinProb = %v, want 0.6", got.otherWinProb)
+	if !almostEqual(got.otherWinProb, 0.5) {
+		t.Errorf("otherWinProb = %v, want 0.5", got.otherWinProb)
 	}
 	if got.averageWinPoints != 3900 {
 		t.Errorf("averageWinPoints = %v, want 3900", got.averageWinPoints)
@@ -116,11 +82,11 @@ func TestEvaluateCandidateFromComponents(t *testing.T) {
 	if got.exhaustiveDrawAveragePoints != 1200 {
 		t.Errorf("exhaustiveDrawAveragePoints = %v, want 1200", got.exhaustiveDrawAveragePoints)
 	}
-	if !almostEqual(got.expectedPoints, 200) {
-		t.Errorf("expectedPoints = %v, want 200", got.expectedPoints)
+	if !almostEqual(got.expectedPoints, -100) {
+		t.Errorf("expectedPoints = %v, want -100", got.expectedPoints)
 	}
-	if !almostEqual(got.averageRank, 2.5) {
-		t.Errorf("averageRank = %v, want 2.5", got.averageRank)
+	if !almostEqual(got.averageRank, 2.625) {
+		t.Errorf("averageRank = %v, want 2.625", got.averageRank)
 	}
 }
 
