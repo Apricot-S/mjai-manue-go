@@ -20,9 +20,14 @@ type candidateEvaluationContext struct {
 	winEstimates                  map[string]winEstimate
 	winEstimateGoalCounts         []int
 	exhaustiveDrawProbOnSelfNoWin float64
-	notenTenpaiProb               float64
+	exhaustiveDrawIfTenpaiNow     exhaustiveDrawEvaluation
+	exhaustiveDrawIfNotenNow      exhaustiveDrawEvaluation
 	otherWinDists                 []scoreDeltaProbDist
-	baseTenpaiProbs               [common.NumPlayers]float64
+}
+
+type exhaustiveDrawEvaluation struct {
+	dist          scoreDeltaProbDist
+	averagePoints float64
 }
 
 type candidateEvaluationSummary struct {
@@ -99,6 +104,7 @@ func (e candidateEvaluator) newEvaluationContext(
 	if err != nil {
 		return candidateEvaluationContext{}, err
 	}
+	baseTenpaiProbs := currentTenpaiProbs(e.stats, state, self)
 
 	return candidateEvaluationContext{
 		stats:                         e.stats,
@@ -107,9 +113,9 @@ func (e candidateEvaluator) newEvaluationContext(
 		winEstimates:                  winEstimates,
 		winEstimateGoalCounts:         winEstimateGoalCounts,
 		exhaustiveDrawProbOnSelfNoWin: exhaustiveDrawProbOnSelfNoWin,
-		notenTenpaiProb:               notenTenpaiProb,
+		exhaustiveDrawIfTenpaiNow:     newExhaustiveDrawEvaluation(baseTenpaiProbs, self, notenTenpaiProb, true),
+		exhaustiveDrawIfNotenNow:      newExhaustiveDrawEvaluation(baseTenpaiProbs, self, notenTenpaiProb, false),
 		otherWinDists:                 otherWinScoreDeltaDists(e.stats, state, self),
-		baseTenpaiProbs:               currentTenpaiProbs(e.stats, state, self),
 	}, nil
 }
 
@@ -133,15 +139,19 @@ func (e candidateEvaluator) evaluateCandidate(
 		return actionCandidate{}, err
 	}
 
-	exhaustiveDrawDist, exhaustiveDrawAveragePoints := candidateExhaustiveDrawEvaluation(context, candidate)
+	exhaustiveDrawEvaluation := context.exhaustiveDrawIfNotenNow
+	if candidate.shanten <= 0 {
+		exhaustiveDrawEvaluation = context.exhaustiveDrawIfTenpaiNow
+	}
+
 	score, err := evaluateCandidateFromComponents(
 		dealInEstimates,
 		winEstimate,
 		context.exhaustiveDrawProbOnSelfNoWin,
-		exhaustiveDrawAveragePoints,
+		exhaustiveDrawEvaluation.averagePoints,
 		immediateDist,
 		selfWinDist,
-		exhaustiveDrawDist,
+		exhaustiveDrawEvaluation.dist,
 		context.otherWinDists,
 		context.stats,
 		context.state,
@@ -178,18 +188,23 @@ func (e candidateEvaluator) immediateDealInEvaluation(
 	return dealInEstimates, immediateDist, nil
 }
 
-func candidateExhaustiveDrawEvaluation(
-	context candidateEvaluationContext,
-	candidate actionCandidate,
-) (scoreDeltaProbDist, float64) {
-	tenpaiProbs := context.baseTenpaiProbs
-	tenpaiProbs[context.self.Index()] = 0
-	if candidate.shanten <= 0 {
-		tenpaiProbs[context.self.Index()] = 1
+func newExhaustiveDrawEvaluation(
+	baseTenpaiProbs [common.NumPlayers]float64,
+	self seat.Seat,
+	notenTenpaiProb float64,
+	selfTenpai bool,
+) exhaustiveDrawEvaluation {
+	tenpaiProbs := baseTenpaiProbs
+	tenpaiProbs[self.Index()] = 0
+	if selfTenpai {
+		tenpaiProbs[self.Index()] = 1
 	}
-	exhaustiveDrawTenpaiProbs := exhaustiveDrawTenpaiProbs(tenpaiProbs, context.notenTenpaiProb)
+	exhaustiveDrawTenpaiProbs := exhaustiveDrawTenpaiProbs(tenpaiProbs, notenTenpaiProb)
 	dist := exhaustiveDrawScoreDeltaDist(exhaustiveDrawTenpaiProbs)
-	return dist, dist.expected()[context.self.Index()]
+	return exhaustiveDrawEvaluation{
+		dist:          dist,
+		averagePoints: dist.expected()[self.Index()],
+	}
 }
 
 func (e candidateEvaluator) dealInEstimates(
