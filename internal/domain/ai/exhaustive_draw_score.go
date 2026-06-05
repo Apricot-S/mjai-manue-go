@@ -64,6 +64,14 @@ func ryukyokuScoreDelta(tenpais [common.NumPlayers]bool) scoreDelta {
 	return delta
 }
 
+func aheadVectorToBoolArray(value aheadVector) [common.NumPlayers]bool {
+	var result [common.NumPlayers]bool
+	for i, v := range value {
+		result[i] = v != 0
+	}
+	return result
+}
+
 // exhaustiveDrawScoreDeltaDistFromTenpaiProbs returns the score change
 // distribution assuming the round ends in an exhaustive draw.
 func exhaustiveDrawScoreDeltaDistFromTenpaiProbs(tenpaiProbs [common.NumPlayers]float64) scoreDeltaProbDist {
@@ -87,12 +95,4 @@ func exhaustiveDrawScoreDeltaDistFromTenpaiProbs(tenpaiProbs [common.NumPlayers]
 // tenpai probabilities.
 func exhaustiveDrawAvgPts(selfID int, tenpaiProbs [common.NumPlayers]float64) float64 {
 	return exhaustiveDrawScoreDeltaDistFromTenpaiProbs(tenpaiProbs).expected()[selfID]
-}
-
-func aheadVectorToBoolArray(value aheadVector) [common.NumPlayers]bool {
-	var result [common.NumPlayers]bool
-	for i, v := range value {
-		result[i] = v != 0
-	}
-	return result
 }
