@@ -134,11 +134,3 @@ func TestExhaustiveDrawScoreDeltaDist(t *testing.T) {
 	}
 	assertScoreDeltaProbDist(t, got, want)
 }
-
-func TestExhaustiveDrawAvgPts(t *testing.T) {
-	got := exhaustiveDrawAvgPts(0, [common.NumPlayers]float64{1, 0, 0.5, 0})
-	want := 2250.0
-	if got != want {
-		t.Errorf("exhaustiveDrawAvgPts() = %v, want %v", got, want)
-	}
-}

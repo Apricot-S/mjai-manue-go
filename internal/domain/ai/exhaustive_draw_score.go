@@ -89,10 +89,3 @@ func exhaustiveDrawScoreDeltaDist(tenpaiProbs [common.NumPlayers]float64) scoreD
 		return ryukyokuScoreDelta(aheadVectorToBoolArray(tenpais))
 	})
 }
-
-// exhaustiveDrawAvgPts returns self's expected score change assuming the round
-// ends in an exhaustive draw and tenpaiProbs already represent exhaustive-draw
-// tenpai probabilities.
-func exhaustiveDrawAvgPts(selfID int, tenpaiProbs [common.NumPlayers]float64) float64 {
-	return exhaustiveDrawScoreDeltaDist(tenpaiProbs).expected()[selfID]
-}
