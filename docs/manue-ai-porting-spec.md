@@ -223,7 +223,7 @@ OC-008 は `domain/game` の `TestState_LegalActions_RiichiDeclarationTileKeepsT
 | OC-013 | Covered | `TestTenpaiProb_ReturnsOneWithRiichi`, `TestTenpaiProb_ReturnsYamitenRatio`, `TestTenpaiProb_ReturnsOneWithoutStats` | リーチ者、統計あり非リーチ者、統計欠損の聴牌確率を固定する。 |
 | OC-014 | Covered | `TestImmediateScoreDeltaDist`, `TestImmediateScoreDeltaDistFromStats`, `TestImmediateScoreDeltaDist_ReturnsNoChangeWithoutDealInDists` | 直後放銃分布と無変化 branch 置換を固定する。 |
 | OC-016 | Covered | `TestTrialWinPts`, `TestCandidateTrialWinPts` | 複数 goal 達成時に候補ごとの最大 points を採用することを固定する。 |
-| OC-018 | Covered | `TestExhaustiveDrawTenpaiProbs`, `TestExhaustiveDrawScoreDeltaDistFromTenpaiProbs` | 流局時聴牌確率と 3000 点授受分布を固定する。 |
+| OC-018 | Covered | `TestExhaustiveDrawTenpaiProbs`, `TestExhaustiveDrawScoreDeltaDist` | 流局時聴牌確率と 3000 点授受分布を固定する。 |
 | OC-019 | Covered | `TestAverageRank`, `TestWinProbAgainst`, `TestWinProbFromRelativeScore_UsesStatsWhenAvailable`, `TestWinProbFromRelativeScore_FallsBackToStartingDealerOrder` | 点差分布から順位期待値へ変換する rank model を固定する。 |
 | OC-021 | Covered | `TestFormatCandidateTrace`, `TestFormatCandidateTrace_FormatsInfinityShanten`, `TestFormatDecisionTrace_AppendsDecidedKey` | trace/log は action golden とは分けて文字列形を固定する。 |
 

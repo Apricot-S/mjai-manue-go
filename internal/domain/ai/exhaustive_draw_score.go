@@ -72,9 +72,9 @@ func aheadVectorToBoolArray(value aheadVector) [common.NumPlayers]bool {
 	return result
 }
 
-// exhaustiveDrawScoreDeltaDistFromTenpaiProbs returns the score change
+// exhaustiveDrawScoreDeltaDist returns the score change
 // distribution assuming the round ends in an exhaustive draw.
-func exhaustiveDrawScoreDeltaDistFromTenpaiProbs(tenpaiProbs [common.NumPlayers]float64) scoreDeltaProbDist {
+func exhaustiveDrawScoreDeltaDist(tenpaiProbs [common.NumPlayers]float64) scoreDeltaProbDist {
 	tenpaisDist := aheadVectorProbDist{{}: 1.0}
 	for playerID, tenpaiProb := range tenpaiProbs {
 		var tenpais aheadVector
@@ -94,5 +94,5 @@ func exhaustiveDrawScoreDeltaDistFromTenpaiProbs(tenpaiProbs [common.NumPlayers]
 // ends in an exhaustive draw and tenpaiProbs already represent exhaustive-draw
 // tenpai probabilities.
 func exhaustiveDrawAvgPts(selfID int, tenpaiProbs [common.NumPlayers]float64) float64 {
-	return exhaustiveDrawScoreDeltaDistFromTenpaiProbs(tenpaiProbs).expected()[selfID]
+	return exhaustiveDrawScoreDeltaDist(tenpaiProbs).expected()[selfID]
 }

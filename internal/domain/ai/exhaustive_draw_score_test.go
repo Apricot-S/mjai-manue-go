@@ -126,8 +126,8 @@ func TestRyukyokuScoreDelta(t *testing.T) {
 	}
 }
 
-func TestExhaustiveDrawScoreDeltaDistFromTenpaiProbs(t *testing.T) {
-	got := exhaustiveDrawScoreDeltaDistFromTenpaiProbs([common.NumPlayers]float64{1, 0, 0.5, 0})
+func TestExhaustiveDrawScoreDeltaDist(t *testing.T) {
+	got := exhaustiveDrawScoreDeltaDist([common.NumPlayers]float64{1, 0, 0.5, 0})
 	want := scoreDeltaProbDist{
 		{3000, -1000, -1000, -1000}: 0.5,
 		{1500, -1500, 1500, -1500}:  0.5,

@@ -188,7 +188,7 @@ func candidateExhaustiveDrawEvaluation(
 		tenpaiProbs[context.self.Index()] = 1
 	}
 	exhaustiveDrawTenpaiProbs := exhaustiveDrawTenpaiProbs(tenpaiProbs, context.notenTenpaiProb)
-	return exhaustiveDrawScoreDeltaDistFromTenpaiProbs(exhaustiveDrawTenpaiProbs),
+	return exhaustiveDrawScoreDeltaDist(exhaustiveDrawTenpaiProbs),
 		exhaustiveDrawAvgPts(context.self.Index(), exhaustiveDrawTenpaiProbs)
 }
 
