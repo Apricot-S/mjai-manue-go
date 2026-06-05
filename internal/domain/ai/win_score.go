@@ -6,6 +6,11 @@ import (
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/common"
 )
 
+const (
+	dealerSelfDrawPaymentFactor         = 1.0 / float64(common.NumPlayers-1)
+	nonDealerSelfDrawOtherPaymentFactor = 1.0 / (2.0 * float64(common.NumPlayers-2))
+)
+
 // winScoreFactor returns how one win point unit changes all players' scores.
 //
 // actorID is the winner. targetID is the winner for self-draw wins, or the
@@ -23,7 +28,7 @@ func winScoreFactor(actorID int, targetID int, dealerID int) scoreDelta {
 		// Dealer self-draw: each non-dealer pays one third.
 		var factor scoreDelta
 		for id := range factor {
-			factor[id] = -dealerSelfDrawPaymentFactor()
+			factor[id] = -dealerSelfDrawPaymentFactor
 		}
 		factor[actorID] = 1.0
 		return factor
@@ -32,19 +37,11 @@ func winScoreFactor(actorID int, targetID int, dealerID int) scoreDelta {
 	// Non-dealer self-draw: the dealer pays half, each other non-dealer pays a quarter.
 	var factor scoreDelta
 	for id := range factor {
-		factor[id] = -nonDealerSelfDrawOtherPaymentFactor()
+		factor[id] = -nonDealerSelfDrawOtherPaymentFactor
 	}
 	factor[actorID] = 1.0
 	factor[dealerID] = -1.0 / 2.0
 	return factor
-}
-
-func dealerSelfDrawPaymentFactor() float64 {
-	return 1.0 / float64(common.NumPlayers-1)
-}
-
-func nonDealerSelfDrawOtherPaymentFactor() float64 {
-	return 1.0 / (2.0 * float64(common.NumPlayers-2))
 }
 
 // winScoreFactorDist returns the distribution of score factors for a winner.
