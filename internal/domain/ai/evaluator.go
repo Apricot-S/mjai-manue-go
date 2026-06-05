@@ -127,7 +127,7 @@ func (e candidateEvaluator) evaluateCandidate(
 	if !ok {
 		return actionCandidate{}, fmt.Errorf("missing win estimate")
 	}
-	selfWinDist := winScoreDeltaDistFromPointsDist(
+	selfWinDist := winScoreDeltaDist(
 		context.self.Index(),
 		context.state.Dealer().Index(),
 		context.stats,
@@ -257,7 +257,7 @@ func otherWinScoreDeltaDists(stats WinScoreStats, state round.StateViewer, self 
 		if actor == self {
 			continue
 		}
-		dists = append(dists, randomWinScoreDeltaDistFromStats(actor.Index(), state.Dealer().Index(), stats))
+		dists = append(dists, randomWinScoreDeltaDist(actor.Index(), state.Dealer().Index(), stats))
 	}
 	return dists
 }

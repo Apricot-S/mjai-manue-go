@@ -54,8 +54,8 @@ func TestWinScoreFactorDist(t *testing.T) {
 	assertScoreDeltaProbDist(t, got, want)
 }
 
-func TestRandomWinScoreDeltaDistFromStats_SelectsDealerPointFreqs(t *testing.T) {
-	got := randomWinScoreDeltaDistFromStats(0, 0, stubManueStats{
+func TestRandomWinScoreDeltaDist_SelectsDealerPointFreqs(t *testing.T) {
+	got := randomWinScoreDeltaDist(0, 0, stubManueStats{
 		numWins:         10,
 		numSelfDrawWins: 4,
 		nonDealerWinPointFreqs: map[string]int{
@@ -77,8 +77,8 @@ func TestRandomWinScoreDeltaDistFromStats_SelectsDealerPointFreqs(t *testing.T) 
 	assertScoreDeltaProbDist(t, got, want)
 }
 
-func TestRandomWinScoreDeltaDistFromStats_SelectsNonDealerPointFreqs(t *testing.T) {
-	got := randomWinScoreDeltaDistFromStats(1, 0, stubManueStats{
+func TestRandomWinScoreDeltaDist_SelectsNonDealerPointFreqs(t *testing.T) {
+	got := randomWinScoreDeltaDist(1, 0, stubManueStats{
 		numWins:         10,
 		numSelfDrawWins: 4,
 		nonDealerWinPointFreqs: map[string]int{
@@ -100,8 +100,8 @@ func TestRandomWinScoreDeltaDistFromStats_SelectsNonDealerPointFreqs(t *testing.
 	assertScoreDeltaProbDist(t, got, want)
 }
 
-func TestWinScoreDeltaDistFromPointsDist(t *testing.T) {
-	got := winScoreDeltaDistFromPointsDist(1, 0, stubManueStats{
+func TestWinScoreDeltaDist(t *testing.T) {
+	got := winScoreDeltaDist(1, 0, stubManueStats{
 		numWins:         10,
 		numSelfDrawWins: 4,
 	}, scalarProbDist{

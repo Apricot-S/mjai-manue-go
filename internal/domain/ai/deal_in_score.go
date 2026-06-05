@@ -54,7 +54,7 @@ func immediateDealInScoreDeltaDistFromStats(
 	if winnerID == dealerID {
 		pointFreqs = stats.DealerWinPointFreqs()
 	}
-	pointsDist := winPointsDistFromValidatedStats(pointFreqs)
+	pointsDist := winPointsDist(pointFreqs)
 	return immediateDealInScoreDeltaDist(winnerID, selfID, dealInProb, pointsDist)
 }
 

@@ -63,7 +63,7 @@ func winScoreFactorDist(actorID int, dealerID int, selfDrawProb float64) scoreDe
 	return newScoreDeltaProbDist(dist)
 }
 
-func winPointsDistFromValidatedStats(pointFreqs map[string]int) scalarProbDist {
+func winPointsDist(pointFreqs map[string]int) scalarProbDist {
 	totalFreqsFloat := float64(pointFreqs["total"])
 	dist := make(map[float64]float64, len(pointFreqs)-1)
 	for points, freq := range pointFreqs {
@@ -76,27 +76,18 @@ func winPointsDistFromValidatedStats(pointFreqs map[string]int) scalarProbDist {
 	return newScalarProbDist(dist)
 }
 
-func randomWinScoreDeltaDistFromStats(
-	actorID int,
-	dealerID int,
-	stats WinScoreStats,
-) scoreDeltaProbDist {
+func randomWinScoreDeltaDist(actorID int, dealerID int, stats WinScoreStats) scoreDeltaProbDist {
 	pointFreqs := stats.NonDealerWinPointFreqs()
 	if actorID == dealerID {
 		pointFreqs = stats.DealerWinPointFreqs()
 	}
 	return multiplyScalarScoreDeltaProbDists(
-		winPointsDistFromValidatedStats(pointFreqs),
+		winPointsDist(pointFreqs),
 		winScoreFactorDist(actorID, dealerID, float64(stats.NumSelfDrawWins())/float64(stats.NumWins())),
 	)
 }
 
-func winScoreDeltaDistFromPointsDist(
-	actorID int,
-	dealerID int,
-	stats WinScoreStats,
-	pointsDist scalarProbDist,
-) scoreDeltaProbDist {
+func winScoreDeltaDist(actorID int, dealerID int, stats WinScoreStats, pointsDist scalarProbDist) scoreDeltaProbDist {
 	return multiplyScalarScoreDeltaProbDists(
 		pointsDist,
 		winScoreFactorDist(actorID, dealerID, float64(stats.NumSelfDrawWins())/float64(stats.NumWins())),
