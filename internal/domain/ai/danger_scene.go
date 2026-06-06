@@ -70,9 +70,9 @@ func (s dangerScene) evaluate(feature string, discard tile.Tile) (bool, error) {
 	case "ryenfonpai":
 		return fanpaiValue(discard, s.roundWind, s.targetWind) >= 2, nil
 	case "fonpai":
-		return discard.IsHonors() && discard.ID() >= tile.MustTileFromCode("E").ID() && discard.ID() <= tile.MustTileFromCode("N").ID(), nil
+		return discard.IsWind(), nil
 	case "sangenpai":
-		return discard == tile.MustTileFromCode("P") || discard == tile.MustTileFromCode("F") || discard == tile.MustTileFromCode("C"), nil
+		return discard.IsDragon(), nil
 	case "bakaze":
 		return windTile(s.roundWind).HasSameSymbol(discard), nil
 	case "jikaze":
