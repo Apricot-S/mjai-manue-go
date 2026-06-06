@@ -26,7 +26,11 @@ const minTileID = 0
 const minSuitsID = minTileID
 const maxSuitsID = minSuitsID + 9*3 - 1
 const minHonorsID = maxSuitsID + 1
-const maxHonorsID = minHonorsID + 4 + 3 - 1
+const minWindID = minHonorsID
+const maxWindID = minWindID + 4 - 1
+const minDragonID = maxWindID + 1
+const maxDragonID = minDragonID + 3 - 1
+const maxHonorsID = maxDragonID
 const minRedID = maxHonorsID + 1
 const maxRedID = minRedID + 2
 const unknownID = maxRedID + 1
@@ -159,6 +163,14 @@ func (t Tile) IsSuits() bool {
 
 func (t Tile) IsHonors() bool {
 	return t.Color() == HonorsColor
+}
+
+func (t Tile) IsWind() bool {
+	return minWindID <= t.ID() && t.ID() <= maxWindID
+}
+
+func (t Tile) IsDragon() bool {
+	return minDragonID <= t.ID() && t.ID() <= maxDragonID
 }
 
 func (t Tile) IsYaochu() bool {

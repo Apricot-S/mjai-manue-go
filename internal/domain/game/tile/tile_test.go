@@ -362,6 +362,92 @@ func TestTile_IsHonors(t *testing.T) {
 	}
 }
 
+func TestTile_IsWind(t *testing.T) {
+	tests := []struct {
+		name string
+		code string
+		want bool
+	}{
+		{
+			name: "9s is not wind",
+			code: "9s",
+			want: false,
+		},
+		{
+			name: "E is wind",
+			code: "E",
+			want: true,
+		},
+		{
+			name: "N is wind",
+			code: "N",
+			want: true,
+		},
+		{
+			name: "P is not wind",
+			code: "P",
+			want: false,
+		},
+		{
+			name: "? is not wind",
+			code: "?",
+			want: false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			ti := tile.MustTileFromCode(tt.code)
+			got := ti.IsWind()
+			if got != tt.want {
+				t.Errorf("IsWind() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestTile_IsDragon(t *testing.T) {
+	tests := []struct {
+		name string
+		code string
+		want bool
+	}{
+		{
+			name: "9s is not dragon",
+			code: "9s",
+			want: false,
+		},
+		{
+			name: "E is not dragon",
+			code: "E",
+			want: false,
+		},
+		{
+			name: "P is dragon",
+			code: "P",
+			want: true,
+		},
+		{
+			name: "C is dragon",
+			code: "C",
+			want: true,
+		},
+		{
+			name: "? is not dragon",
+			code: "?",
+			want: false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			ti := tile.MustTileFromCode(tt.code)
+			got := ti.IsDragon()
+			if got != tt.want {
+				t.Errorf("IsDragon() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
 func TestTile_IsYaochu(t *testing.T) {
 	tests := []struct {
 		name string
