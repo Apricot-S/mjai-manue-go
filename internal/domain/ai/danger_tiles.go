@@ -49,9 +49,10 @@ func fanpaiValue(target tile.Tile, roundWind wind.Wind, targetWind wind.Wind) in
 	if !target.IsHonors() {
 		return 0
 	}
-	if target == tile.MustTileFromCode("P") || target == tile.MustTileFromCode("F") || target == tile.MustTileFromCode("C") {
+	if target.IsDragon() {
 		return 1
 	}
+
 	value := 0
 	if windTile(roundWind).HasSameSymbol(target) {
 		value++
