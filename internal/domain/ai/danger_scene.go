@@ -144,7 +144,7 @@ func (s dangerScene) evaluate(feature string, discard tile.Tile) (bool, error) {
 	}
 	if strings.HasPrefix(feature, "same_type_in_prereach>=") {
 		n, ok := parseFeatureInt(feature, "same_type_in_prereach>=")
-		return ok && countSameColor(s.prereachTiles, discard)+1 >= n, nil
+		return ok && discard.IsSuits() && countSameColor(s.prereachTiles, discard)+1 >= n, nil
 	}
 	if strings.HasPrefix(feature, "+-") && strings.Contains(feature, "_in_prereach_sutehais>=") {
 		return evalNeighborPrereach(feature, discard, s.prereachTiles), nil

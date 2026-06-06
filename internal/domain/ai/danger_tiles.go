@@ -28,9 +28,11 @@ func countSameColor(tiles []tile.Tile, target tile.Tile) int {
 	if !target.IsSuits() {
 		return 0
 	}
+	seenNumbers := [10]bool{}
 	count := 0
 	for _, t := range tiles {
-		if t.IsSuits() && t.Color() == target.Color() {
+		if t.IsSuits() && t.Color() == target.Color() && !seenNumbers[t.Number()] {
+			seenNumbers[t.Number()] = true
 			count++
 		}
 	}

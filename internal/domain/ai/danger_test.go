@@ -129,6 +129,41 @@ func TestDangerSceneEvaluateOuterPrereachMatchesOriginalDirection(t *testing.T) 
 	}
 }
 
+func TestDangerSceneEvaluateSameTypeInPrereachCountsDistinctSuitNumbers(t *testing.T) {
+	scene := dangerScene{
+		prereachTiles: []tile.Tile{
+			tile.MustTileFromCode("5m"),
+			tile.MustTileFromCode("5mr"),
+			tile.MustTileFromCode("7m"),
+			tile.MustTileFromCode("1p"),
+		},
+	}
+
+	got, err := scene.evaluate("same_type_in_prereach>=3", tile.MustTileFromCode("2m"))
+	if err != nil {
+		t.Fatalf("dangerScene.evaluate(same_type_in_prereach>=3) failed: %v", err)
+	}
+	if !got {
+		t.Error("dangerScene.evaluate(same_type_in_prereach>=3) = false, want true for two distinct prereach manzu plus discard")
+	}
+
+	got, err = scene.evaluate("same_type_in_prereach>=4", tile.MustTileFromCode("2m"))
+	if err != nil {
+		t.Fatalf("dangerScene.evaluate(same_type_in_prereach>=4) failed: %v", err)
+	}
+	if got {
+		t.Error("dangerScene.evaluate(same_type_in_prereach>=4) = true, want false because duplicate 5m/5mr counts once")
+	}
+
+	got, err = scene.evaluate("same_type_in_prereach>=1", tile.MustTileFromCode("E"))
+	if err != nil {
+		t.Fatalf("dangerScene.evaluate(same_type_in_prereach>=1 honors) failed: %v", err)
+	}
+	if got {
+		t.Error("dangerScene.evaluate(same_type_in_prereach>=1) = true, want false for honors")
+	}
+}
+
 func TestNewDangerSceneKeepsPrereachTilesEmptyWithoutRiichi(t *testing.T) {
 	self := seat.MustSeat(0)
 	target := seat.MustSeat(1)
