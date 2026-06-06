@@ -110,6 +110,7 @@ func (s dangerScene) evaluate(feature string, discard tile.Tile) (bool, error) {
 	case "aida4ken":
 		return isAida4Ken(discard, s.prereachTiles), nil
 	}
+
 	if strings.HasPrefix(feature, "chances<=") {
 		n, ok := parseFeatureInt(feature, "chances<=")
 		return ok && isNChanceOrLess(discard, n, s.visibleTiles), nil
@@ -148,6 +149,7 @@ func (s dangerScene) evaluate(feature string, discard tile.Tile) (bool, error) {
 	if strings.HasPrefix(feature, "+-") && strings.Contains(feature, "_in_prereach_sutehais>=") {
 		return evalNeighborPrereach(feature, discard, s.prereachTiles), nil
 	}
+
 	return false, fmt.Errorf("cannot evaluate danger feature %q", feature)
 }
 
@@ -177,6 +179,7 @@ func evalNeighborPrereach(feature string, target tile.Tile, tiles []tile.Tile) b
 	if err1 != nil || err2 != nil || !target.IsSuits() {
 		return false
 	}
+
 	count := 0
 	if low := target.Next(-distance); low != nil {
 		count += countSameSymbol(tiles, *low)
