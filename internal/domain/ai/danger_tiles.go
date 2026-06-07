@@ -249,19 +249,20 @@ func isAida4Ken(target tile.Tile, tiles []tile.Tile) bool {
 		return false
 	}
 	n := target.Number()
+	matches := false
 	if 2 <= n && n <= 5 {
 		low := target.Next(-1)
 		high := target.Next(4)
-		return low != nil && high != nil && containsSameSymbol(tiles, *low) &&
+		matches = low != nil && high != nil && containsSameSymbol(tiles, *low) &&
 			containsSameSymbol(tiles, *high)
 	}
 	if 5 <= n && n <= 8 {
 		low := target.Next(-4)
 		high := target.Next(1)
-		return low != nil && high != nil && containsSameSymbol(tiles, *low) &&
+		matches = matches || low != nil && high != nil && containsSameSymbol(tiles, *low) &&
 			containsSameSymbol(tiles, *high)
 	}
-	return false
+	return matches
 }
 
 func windTile(w wind.Wind) tile.Tile {

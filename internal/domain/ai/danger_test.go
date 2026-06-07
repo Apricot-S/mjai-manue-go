@@ -107,6 +107,39 @@ func TestDangerSceneEvaluateChanceFeatureUsesKabeTiles(t *testing.T) {
 	}
 }
 
+func TestDangerSceneEvaluateAida4KenMatchesOriginal(t *testing.T) {
+	scene := dangerScene{
+		prereachTiles: []tile.Tile{
+			tile.MustTileFromCode("1p"),
+			tile.MustTileFromCode("6p"),
+		},
+	}
+
+	wants := map[string]bool{
+		"1p": false,
+		"2p": true,
+		"3p": false,
+		"4p": false,
+		"5p": true,
+		"6p": false,
+		"7p": false,
+		"8p": false,
+		"9p": false,
+		"2m": false,
+	}
+	for code, want := range wants {
+		t.Run(code, func(t *testing.T) {
+			got, err := scene.evaluate("aida4ken", tile.MustTileFromCode(code))
+			if err != nil {
+				t.Fatalf("dangerScene.evaluate(aida4ken) failed: %v", err)
+			}
+			if got != want {
+				t.Errorf("dangerScene.evaluate(aida4ken) = %v, want %v", got, want)
+			}
+		})
+	}
+}
+
 func TestDangerSceneEvaluateOuterPrereachMatchesOriginalDirection(t *testing.T) {
 	scene := dangerScene{
 		prereachTiles: []tile.Tile{tile.MustTileFromCode("4m")},
