@@ -195,24 +195,28 @@ func isOuter(target tile.Tile, tiles []tile.Tile) bool {
 	if !target.IsSuits() {
 		return false
 	}
-	if target.Number() == 5 {
+
+	number := target.Number()
+	if number == 5 {
 		return false
 	}
-	if target.Number() < 5 {
-		for offset := 1; target.Number()+offset <= 5; offset++ {
+
+	if number < 5 {
+		for offset := 1; number+offset <= 5; offset++ {
 			inner := target.Next(offset)
 			if inner != nil && containsSameSymbol(tiles, *inner) {
 				return true
 			}
 		}
 	} else {
-		for offset := -1; target.Number()+offset >= 5; offset-- {
+		for offset := -1; number+offset >= 5; offset-- {
 			inner := target.Next(offset)
 			if inner != nil && containsSameSymbol(tiles, *inner) {
 				return true
 			}
 		}
 	}
+
 	return false
 }
 
