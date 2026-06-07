@@ -221,10 +221,16 @@ func isOuter(target tile.Tile, tiles []tile.Tile) bool {
 }
 
 func isNOuterPrereachSutehai(target tile.Tile, n int, tiles []tile.Tile) bool {
-	if !target.IsSuits() || target.Number() == 5 {
+	if !target.IsSuits() {
 		return false
 	}
-	if target.Number() >= 5 {
+
+	number := target.Number()
+	if number == 5 {
+		return false
+	}
+
+	if number >= 5 {
 		n = -n
 	}
 	inner := target.Next(n)
@@ -232,7 +238,7 @@ func isNOuterPrereachSutehai(target tile.Tile, n int, tiles []tile.Tile) bool {
 		return false
 	}
 	innerNumber := inner.Number()
-	if (target.Number() >= 5 || innerNumber > 5) && (target.Number() <= 5 || innerNumber < 5) {
+	if (number >= 5 || innerNumber > 5) && (number <= 5 || innerNumber < 5) {
 		return false
 	}
 	return containsSameSymbol(tiles, *inner)
