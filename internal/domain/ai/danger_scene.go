@@ -62,7 +62,7 @@ func (s dangerScene) evaluate(feature string, discard tile.Tile) (bool, error) {
 	case "dora":
 		return containsSameSymbol(s.doras, discard), nil
 	case "dora_suji":
-		return isSujiOf(discard, s.doras, false), nil
+		return isSujiOf(discard, s.doras, true), nil
 	case "dora_matagi":
 		return isMatagisujiOf(discard, s.doras, s.safeTiles), nil
 	case "fanpai":
