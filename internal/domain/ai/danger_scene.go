@@ -200,7 +200,7 @@ func parseFeatureInt(feature string, prefix string) (int, bool) {
 }
 
 func leadingFeatureInt(feature string) int {
-	part := strings.SplitN(feature, "_", 2)[0]
+	part, _, _ := strings.Cut(feature, "_")
 	n, _ := strconv.Atoi(part)
 	return n
 }
