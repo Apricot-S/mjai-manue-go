@@ -243,6 +243,77 @@ func TestDangerSceneEvaluateSameTypeInPrereachCountsDistinctSuitNumbers(t *testi
 	}
 }
 
+func TestDangerSceneEvaluateNeighborPrereachMatchesOriginalRange(t *testing.T) {
+	tests := []struct {
+		name          string
+		feature       string
+		discard       string
+		prereachTiles []string
+		want          bool
+	}{
+		{
+			name:          "includes discard itself",
+			feature:       "+-1_in_prereach_sutehais>=1",
+			discard:       "5m",
+			prereachTiles: []string{"5m"},
+			want:          true,
+		},
+		{
+			name:          "distance two includes intermediate numbers",
+			feature:       "+-2_in_prereach_sutehais>=2",
+			discard:       "5m",
+			prereachTiles: []string{"4m", "6m"},
+			want:          true,
+		},
+		{
+			name:          "counts duplicate tiles as one number",
+			feature:       "+-1_in_prereach_sutehais>=2",
+			discard:       "1p",
+			prereachTiles: []string{"2p", "2p"},
+			want:          false,
+		},
+		{
+			name:          "counts distinct numbers",
+			feature:       "+-1_in_prereach_sutehais>=2",
+			discard:       "2p",
+			prereachTiles: []string{"1p", "3p"},
+			want:          true,
+		},
+		{
+			name:          "excludes tiles outside bounded range",
+			feature:       "+-2_in_prereach_sutehais>=2",
+			discard:       "1s",
+			prereachTiles: []string{"3s", "4s"},
+			want:          false,
+		},
+		{
+			name:          "honor has no numbered neighbors",
+			feature:       "+-1_in_prereach_sutehais>=1",
+			discard:       "E",
+			prereachTiles: []string{"E"},
+			want:          false,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			prereachTiles := make([]tile.Tile, 0, len(tt.prereachTiles))
+			for _, code := range tt.prereachTiles {
+				prereachTiles = append(prereachTiles, tile.MustTileFromCode(code))
+			}
+			scene := dangerScene{prereachTiles: prereachTiles}
+
+			got, err := scene.evaluate(tt.feature, tile.MustTileFromCode(tt.discard))
+			if err != nil {
+				t.Fatalf("dangerScene.evaluate(%s) failed: %v", tt.feature, err)
+			}
+			if got != tt.want {
+				t.Errorf("dangerScene.evaluate(%s) = %v, want %v", tt.feature, got, tt.want)
+			}
+		})
+	}
+}
+
 func TestNewDangerSceneKeepsPrereachTilesEmptyWithoutRiichi(t *testing.T) {
 	self := seat.MustSeat(0)
 	target := seat.MustSeat(1)

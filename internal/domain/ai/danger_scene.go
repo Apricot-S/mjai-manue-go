@@ -181,11 +181,12 @@ func evalNeighborPrereach(feature string, target tile.Tile, tiles []tile.Tile) b
 	}
 
 	count := 0
-	if low := target.Next(-distance); low != nil {
-		count += countSameSymbol(tiles, *low)
-	}
-	if high := target.Next(distance); high != nil {
-		count += countSameSymbol(tiles, *high)
+	for offset := -distance; offset <= distance; offset++ {
+		if neighbor := target.Next(offset); neighbor != nil {
+			if containsSameSymbol(tiles, *neighbor) {
+				count++
+			}
+		}
 	}
 	return count >= threshold
 }
