@@ -12,16 +12,16 @@ import (
 )
 
 type dangerScene struct {
-	selfHand        []tile.Tile
-	safeTiles       []tile.Tile
-	visibleTiles    []tile.Tile
-	doras           []tile.Tile
-	roundWind       wind.Wind
-	targetWind      wind.Wind
-	prereachTiles   []tile.Tile
-	earlyReachTiles []tile.Tile
-	lateReachTiles  []tile.Tile
-	reachTiles      []tile.Tile
+	selfHand           []tile.Tile
+	safeTiles          []tile.Tile
+	visibleTiles       []tile.Tile
+	doras              []tile.Tile
+	roundWind          wind.Wind
+	targetWind         wind.Wind
+	prereachTiles      []tile.Tile
+	earlyPrereachTiles []tile.Tile
+	latePrereachTiles  []tile.Tile
+	reachTiles         []tile.Tile
 }
 
 func newDangerScene(state round.StateViewer, self seat.Seat, target seat.Seat) dangerScene {
@@ -40,16 +40,16 @@ func newDangerScene(state round.StateViewer, self seat.Seat, target seat.Seat) d
 	}
 	half := len(prereachTiles) / 2
 	return dangerScene{
-		selfHand:        selfHand,
-		safeTiles:       state.SafeTiles(target),
-		visibleTiles:    state.VisibleTiles(self),
-		doras:           state.Doras(),
-		roundWind:       state.RoundWind(),
-		targetWind:      state.SeatWind(target),
-		prereachTiles:   prereachTiles,
-		earlyReachTiles: prereachTiles[:half],
-		lateReachTiles:  prereachTiles[half:],
-		reachTiles:      reachTiles,
+		selfHand:           selfHand,
+		safeTiles:          state.SafeTiles(target),
+		visibleTiles:       state.VisibleTiles(self),
+		doras:              state.Doras(),
+		roundWind:          state.RoundWind(),
+		targetWind:         state.SeatWind(target),
+		prereachTiles:      prereachTiles,
+		earlyPrereachTiles: prereachTiles[:half],
+		latePrereachTiles:  prereachTiles[half:],
+		reachTiles:         reachTiles,
 	}
 }
 
@@ -88,25 +88,25 @@ func (s dangerScene) evaluate(feature string, discard tile.Tile) (bool, error) {
 	case "urasuji":
 		return isUrasujiOf(discard, s.prereachTiles, s.safeTiles), nil
 	case "early_urasuji":
-		return isUrasujiOf(discard, s.earlyReachTiles, s.safeTiles), nil
+		return isUrasujiOf(discard, s.earlyPrereachTiles, s.safeTiles), nil
 	case "reach_urasuji":
 		return isUrasujiOf(discard, s.reachTiles, s.safeTiles), nil
 	case "matagisuji":
 		return isMatagisujiOf(discard, s.prereachTiles, s.safeTiles), nil
 	case "early_matagisuji":
-		return isMatagisujiOf(discard, s.earlyReachTiles, s.safeTiles), nil
+		return isMatagisujiOf(discard, s.earlyPrereachTiles, s.safeTiles), nil
 	case "late_matagisuji":
-		return isMatagisujiOf(discard, s.lateReachTiles, s.safeTiles), nil
+		return isMatagisujiOf(discard, s.latePrereachTiles, s.safeTiles), nil
 	case "reach_matagisuji":
 		return isMatagisujiOf(discard, s.reachTiles, s.safeTiles), nil
 	case "senkisuji":
 		return isSenkisujiOf(discard, s.prereachTiles, s.safeTiles), nil
 	case "early_senkisuji":
-		return isSenkisujiOf(discard, s.earlyReachTiles, s.safeTiles), nil
+		return isSenkisujiOf(discard, s.earlyPrereachTiles, s.safeTiles), nil
 	case "outer_prereach_sutehai":
 		return isOuter(discard, s.prereachTiles), nil
 	case "outer_early_sutehai":
-		return isOuter(discard, s.earlyReachTiles), nil
+		return isOuter(discard, s.earlyPrereachTiles), nil
 	case "aida4ken":
 		return isAida4Ken(discard, s.prereachTiles), nil
 	}
