@@ -84,6 +84,83 @@ func TestTiles_ContainsUnknown(t *testing.T) {
 	}
 }
 
+func TestTiles_ContainsSameSymbol(t *testing.T) {
+	tests := []struct {
+		name   string
+		tiles  tile.Tiles
+		target tile.Tile
+		want   bool
+	}{
+		{
+			name:   "nil tiles",
+			tiles:  nil,
+			target: tile.MustTileFromCode("5m"),
+			want:   false,
+		},
+		{
+			name:   "different symbol",
+			tiles:  tile.Tiles{tile.MustTileFromCode("5p")},
+			target: tile.MustTileFromCode("5m"),
+			want:   false,
+		},
+		{
+			name:   "same symbol",
+			tiles:  tile.Tiles{tile.MustTileFromCode("5m")},
+			target: tile.MustTileFromCode("5m"),
+			want:   true,
+		},
+		{
+			name:   "red five has same symbol",
+			tiles:  tile.Tiles{tile.MustTileFromCode("5mr")},
+			target: tile.MustTileFromCode("5m"),
+			want:   true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := tt.tiles.ContainsSameSymbol(tt.target)
+			if got != tt.want {
+				t.Errorf("ContainsSameSymbol() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestTiles_CountSameSymbol(t *testing.T) {
+	tests := []struct {
+		name   string
+		tiles  tile.Tiles
+		target tile.Tile
+		want   int
+	}{
+		{
+			name:   "nil tiles",
+			tiles:  nil,
+			target: tile.MustTileFromCode("5m"),
+			want:   0,
+		},
+		{
+			name: "count normal and red five",
+			tiles: tile.Tiles{
+				tile.MustTileFromCode("5m"),
+				tile.MustTileFromCode("5mr"),
+				tile.MustTileFromCode("5p"),
+				tile.MustTileFromCode("5m"),
+			},
+			target: tile.MustTileFromCode("5m"),
+			want:   3,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := tt.tiles.CountSameSymbol(tt.target)
+			if got != tt.want {
+				t.Errorf("CountSameSymbol() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
 func TestTiles_Distinct(t *testing.T) {
 	tests := []struct {
 		name    string

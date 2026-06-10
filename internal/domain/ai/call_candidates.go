@@ -153,7 +153,5 @@ func callSwapTiles(m meld.Meld) []tile.Tile {
 }
 
 func isSwapCallTile(t tile.Tile, swapCallTiles []tile.Tile) bool {
-	return slices.ContainsFunc(swapCallTiles, func(s tile.Tile) bool {
-		return t.HasSameSymbol(s)
-	})
+	return tile.Tiles(swapCallTiles).ContainsSameSymbol(t)
 }

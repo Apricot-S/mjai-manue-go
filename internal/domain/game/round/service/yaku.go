@@ -100,12 +100,8 @@ func countDoras(doraIndicators []tile.Tile, allTiles []tile.Tile) int {
 	}
 
 	numDoras := 0
-	for i := range allTiles {
-		for j := range doras {
-			if doras[j].HasSameSymbol(allTiles[i]) {
-				numDoras++
-			}
-		}
+	for _, dora := range doras {
+		numDoras += tile.Tiles(allTiles).CountSameSymbol(dora)
 	}
 
 	return numDoras
@@ -324,7 +320,7 @@ func pinfuStrict(
 		case *block.Sequence:
 			tiles := b.ToTiles()
 			// Check if the sequence contains the winning tile
-			if !slices.ContainsFunc(tiles, func(t tile.Tile) bool { return t.HasSameSymbol(winningTile) }) {
+			if !tile.Tiles(tiles).ContainsSameSymbol(winningTile) {
 				continue
 			}
 			// The middle (kanchan) wait is not allowed
@@ -574,7 +570,7 @@ func sanankou(
 				continue
 			}
 
-			if slices.ContainsFunc(s.ToTiles(), func(t tile.Tile) bool { return t.HasSameSymbol(winningTile) }) {
+			if tile.Tiles(s.ToTiles()).ContainsSameSymbol(winningTile) {
 				numAnkou++
 				break
 			}

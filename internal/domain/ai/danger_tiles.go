@@ -5,25 +5,6 @@ import (
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/wind"
 )
 
-func containsSameSymbol(tiles []tile.Tile, target tile.Tile) bool {
-	for _, t := range tiles {
-		if t.HasSameSymbol(target) {
-			return true
-		}
-	}
-	return false
-}
-
-func countSameSymbol(tiles []tile.Tile, target tile.Tile) int {
-	count := 0
-	for _, t := range tiles {
-		if t.HasSameSymbol(target) {
-			count++
-		}
-	}
-	return count
-}
-
 func countSameColor(tiles []tile.Tile, target tile.Tile) int {
 	if !target.IsSuits() {
 		return 0
@@ -41,7 +22,7 @@ func countSameColor(tiles []tile.Tile, target tile.Tile) int {
 
 func hasSujiSymbolCount(target tile.Tile, threshold int, tiles []tile.Tile) bool {
 	for _, s := range sujiTiles(target) {
-		if countSameSymbol(tiles, s) >= threshold {
+		if tile.Tiles(tiles).CountSameSymbol(s) >= threshold {
 			return true
 		}
 	}
@@ -86,7 +67,7 @@ func isSujiOf(target tile.Tile, tiles []tile.Tile, weak bool) bool {
 	}
 	matches := 0
 	for _, s := range sujis {
-		if containsSameSymbol(tiles, s) {
+		if tile.Tiles(tiles).ContainsSameSymbol(s) {
 			matches++
 		}
 	}
@@ -101,7 +82,7 @@ func isSujiVisibleNoMoreThan(target tile.Tile, n int, visibleTiles []tile.Tile) 
 		return false
 	}
 	for _, s := range sujiTiles(target) {
-		if countSameSymbol(visibleTiles, s) < n+1 {
+		if tile.Tiles(visibleTiles).CountSameSymbol(s) < n+1 {
 			return true
 		}
 	}
@@ -125,7 +106,7 @@ func isNChanceOrLess(target tile.Tile, n int, visibleTiles []tile.Tile) bool {
 		if kabe == nil {
 			continue
 		}
-		if countSameSymbol(visibleTiles, *kabe) >= 4-n {
+		if tile.Tiles(visibleTiles).CountSameSymbol(*kabe) >= 4-n {
 			return true
 		}
 	}
@@ -149,7 +130,7 @@ func possibleSujis(target tile.Tile, safeTiles []tile.Tile) []tile.Tile {
 		if second == nil {
 			continue
 		}
-		if !containsSameSymbol(safeTiles, *first) && !containsSameSymbol(safeTiles, *second) {
+		if !tile.Tiles(safeTiles).ContainsSameSymbol(*first) && !tile.Tiles(safeTiles).ContainsSameSymbol(*second) {
 			result = append(result, *first)
 		}
 	}
@@ -158,10 +139,10 @@ func possibleSujis(target tile.Tile, safeTiles []tile.Tile) []tile.Tile {
 
 func isUrasujiOf(target tile.Tile, tiles []tile.Tile, safeTiles []tile.Tile) bool {
 	for _, s := range possibleSujis(target, safeTiles) {
-		if low := s.Next(-1); low != nil && containsSameSymbol(tiles, *low) {
+		if low := s.Next(-1); low != nil && tile.Tiles(tiles).ContainsSameSymbol(*low) {
 			return true
 		}
-		if high := s.Next(4); high != nil && containsSameSymbol(tiles, *high) {
+		if high := s.Next(4); high != nil && tile.Tiles(tiles).ContainsSameSymbol(*high) {
 			return true
 		}
 	}
@@ -170,10 +151,10 @@ func isUrasujiOf(target tile.Tile, tiles []tile.Tile, safeTiles []tile.Tile) boo
 
 func isSenkisujiOf(target tile.Tile, tiles []tile.Tile, safeTiles []tile.Tile) bool {
 	for _, s := range possibleSujis(target, safeTiles) {
-		if low := s.Next(-2); low != nil && containsSameSymbol(tiles, *low) {
+		if low := s.Next(-2); low != nil && tile.Tiles(tiles).ContainsSameSymbol(*low) {
 			return true
 		}
-		if high := s.Next(5); high != nil && containsSameSymbol(tiles, *high) {
+		if high := s.Next(5); high != nil && tile.Tiles(tiles).ContainsSameSymbol(*high) {
 			return true
 		}
 	}
@@ -182,10 +163,10 @@ func isSenkisujiOf(target tile.Tile, tiles []tile.Tile, safeTiles []tile.Tile) b
 
 func isMatagisujiOf(target tile.Tile, tiles []tile.Tile, safeTiles []tile.Tile) bool {
 	for _, s := range possibleSujis(target, safeTiles) {
-		if low := s.Next(1); low != nil && containsSameSymbol(tiles, *low) {
+		if low := s.Next(1); low != nil && tile.Tiles(tiles).ContainsSameSymbol(*low) {
 			return true
 		}
-		if high := s.Next(2); high != nil && containsSameSymbol(tiles, *high) {
+		if high := s.Next(2); high != nil && tile.Tiles(tiles).ContainsSameSymbol(*high) {
 			return true
 		}
 	}
@@ -205,14 +186,14 @@ func isOuter(target tile.Tile, tiles []tile.Tile) bool {
 	if number < 5 {
 		for offset := 1; number+offset <= 5; offset++ {
 			inner := target.Next(offset)
-			if inner != nil && containsSameSymbol(tiles, *inner) {
+			if inner != nil && tile.Tiles(tiles).ContainsSameSymbol(*inner) {
 				return true
 			}
 		}
 	} else {
 		for offset := -1; number+offset >= 5; offset-- {
 			inner := target.Next(offset)
-			if inner != nil && containsSameSymbol(tiles, *inner) {
+			if inner != nil && tile.Tiles(tiles).ContainsSameSymbol(*inner) {
 				return true
 			}
 		}
@@ -242,7 +223,7 @@ func isNOuterPrereachSutehai(target tile.Tile, n int, tiles []tile.Tile) bool {
 	if (number >= 5 || innerNumber > 5) && (number <= 5 || innerNumber < 5) {
 		return false
 	}
-	return containsSameSymbol(tiles, *inner)
+	return tile.Tiles(tiles).ContainsSameSymbol(*inner)
 }
 
 func isAida4Ken(target tile.Tile, tiles []tile.Tile) bool {
@@ -254,14 +235,14 @@ func isAida4Ken(target tile.Tile, tiles []tile.Tile) bool {
 	if 2 <= n && n <= 5 {
 		low := target.Next(-1)
 		high := target.Next(4)
-		matches = low != nil && high != nil && containsSameSymbol(tiles, *low) &&
-			containsSameSymbol(tiles, *high)
+		matches = low != nil && high != nil && tile.Tiles(tiles).ContainsSameSymbol(*low) &&
+			tile.Tiles(tiles).ContainsSameSymbol(*high)
 	}
 	if 5 <= n && n <= 8 {
 		low := target.Next(-4)
 		high := target.Next(1)
-		matches = matches || low != nil && high != nil && containsSameSymbol(tiles, *low) &&
-			containsSameSymbol(tiles, *high)
+		matches = matches || low != nil && high != nil && tile.Tiles(tiles).ContainsSameSymbol(*low) &&
+			tile.Tiles(tiles).ContainsSameSymbol(*high)
 	}
 	return matches
 }

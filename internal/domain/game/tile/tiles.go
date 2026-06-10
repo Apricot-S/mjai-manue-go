@@ -38,6 +38,22 @@ func (ts Tiles) ContainsUnknown() bool {
 	})
 }
 
+func (ts Tiles) ContainsSameSymbol(target Tile) bool {
+	return slices.ContainsFunc(ts, func(t Tile) bool {
+		return t.HasSameSymbol(target)
+	})
+}
+
+func (ts Tiles) CountSameSymbol(target Tile) int {
+	count := 0
+	for _, t := range ts {
+		if t.HasSameSymbol(target) {
+			count++
+		}
+	}
+	return count
+}
+
 func (ts Tiles) Distinct(exclude func(Tile) bool) Tiles {
 	ret := slices.Clone(ts)
 	ret.Sort()

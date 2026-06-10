@@ -33,7 +33,7 @@ func (e *DecisionTreeDangerEstimator) EstimateDealInProb(
 		return 0, fmt.Errorf("cannot estimate deal-in probability: danger tree is nil")
 	}
 	discard = discard.RemoveRed()
-	if containsSameSymbol(state.SafeTiles(winner), discard) {
+	if state.SafeTiles(winner).ContainsSameSymbol(discard) {
 		return 0, nil
 	}
 	scene := newDangerScene(state, self, winner)

@@ -48,15 +48,11 @@ func (p *InvisiblePlayer) CanRonBy(winningTile *tile.Tile) bool {
 		return true
 	}
 
-	for _, discardedTile := range p.discardedTiles {
-		if discardedTile.HasSameSymbol(*winningTile) {
-			return false
-		}
+	if tile.Tiles(p.discardedTiles).ContainsSameSymbol(*winningTile) {
+		return false
 	}
-	for _, safeTile := range p.extraSafeTiles {
-		if safeTile.HasSameSymbol(*winningTile) {
-			return false
-		}
+	if tile.Tiles(p.extraSafeTiles).ContainsSameSymbol(*winningTile) {
+		return false
 	}
 	return true
 }

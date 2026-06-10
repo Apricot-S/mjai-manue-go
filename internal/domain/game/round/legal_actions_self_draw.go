@@ -2,7 +2,6 @@ package round
 
 import (
 	"fmt"
-	"slices"
 
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/action"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/common"
@@ -320,7 +319,5 @@ func canDiscardAsRiichiDeclarationTile(p player.Player, discardTile tile.Tile, t
 }
 
 func isSwapCallTile(t tile.Tile, swapCallTiles []tile.Tile) bool {
-	return slices.ContainsFunc(swapCallTiles, func(s tile.Tile) bool {
-		return t.HasSameSymbol(s)
-	})
+	return tile.Tiles(swapCallTiles).ContainsSameSymbol(t)
 }

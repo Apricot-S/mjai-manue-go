@@ -56,11 +56,11 @@ func newDangerScene(state round.StateViewer, self seat.Seat, target seat.Seat) d
 func (s dangerScene) evaluate(feature string, discard tile.Tile) (bool, error) {
 	switch feature {
 	case "anpai":
-		return containsSameSymbol(s.safeTiles, discard), nil
+		return tile.Tiles(s.safeTiles).ContainsSameSymbol(discard), nil
 	case "tsupai":
 		return discard.IsHonors(), nil
 	case "dora":
-		return containsSameSymbol(s.doras, discard), nil
+		return tile.Tiles(s.doras).ContainsSameSymbol(discard), nil
 	case "dora_suji":
 		return isSujiOf(discard, s.doras, true), nil
 	case "dora_matagi":
@@ -117,7 +117,7 @@ func (s dangerScene) evaluate(feature string, discard tile.Tile) (bool, error) {
 	}
 	if strings.HasPrefix(feature, "visible>=") {
 		n, ok := parseFeatureInt(feature, "visible>=")
-		return ok && countSameSymbol(s.visibleTiles, discard) >= n+1, nil
+		return ok && tile.Tiles(s.visibleTiles).CountSameSymbol(discard) >= n+1, nil
 	}
 	if strings.HasPrefix(feature, "suji_visible<=") {
 		n, ok := parseFeatureInt(feature, "suji_visible<=")
@@ -125,7 +125,7 @@ func (s dangerScene) evaluate(feature string, discard tile.Tile) (bool, error) {
 	}
 	if strings.HasPrefix(feature, "in_tehais>=") {
 		n, ok := parseFeatureInt(feature, "in_tehais>=")
-		return ok && countSameSymbol(s.selfHand, discard) >= n, nil
+		return ok && tile.Tiles(s.selfHand).CountSameSymbol(discard) >= n, nil
 	}
 	if strings.HasPrefix(feature, "suji_in_tehais>=") {
 		n, ok := parseFeatureInt(feature, "suji_in_tehais>=")
@@ -183,7 +183,7 @@ func evalNeighborPrereach(feature string, target tile.Tile, tiles []tile.Tile) b
 	count := 0
 	for offset := -distance; offset <= distance; offset++ {
 		if neighbor := target.Next(offset); neighbor != nil {
-			if containsSameSymbol(tiles, *neighbor) {
+			if tile.Tiles(tiles).ContainsSameSymbol(*neighbor) {
 				count++
 			}
 		}

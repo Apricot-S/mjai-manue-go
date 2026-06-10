@@ -2,7 +2,6 @@ package meld
 
 import (
 	"fmt"
-	"slices"
 
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/seat"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/tile"
@@ -26,7 +25,7 @@ func NewPromotedKan(
 	if tiles.ContainsUnknown() {
 		return nil, fmt.Errorf("unknown tile cannot use for Promoted Kan")
 	}
-	if slices.ContainsFunc(tiles, func(t tile.Tile) bool { return !taken.HasSameSymbol(t) }) {
+	if tiles.CountSameSymbol(taken) != 4 {
 		return nil, fmt.Errorf("mismatch taken: %+v, consumed: %+v, added: %+v", taken, consumed, added)
 	}
 	if taken.IsSuits() && taken.Number() == 5 && countRed(tiles) != 1 {

@@ -2,7 +2,6 @@ package meld
 
 import (
 	"fmt"
-	"slices"
 
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/seat"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/tile"
@@ -20,7 +19,7 @@ func NewPon(taken tile.Tile, consumed [2]tile.Tile, target seat.Seat) (*Pon, err
 	if tiles.ContainsUnknown() {
 		return nil, fmt.Errorf("unknown tile cannot use for Pon")
 	}
-	if slices.ContainsFunc(tiles, func(t tile.Tile) bool { return !taken.HasSameSymbol(t) }) {
+	if tiles.CountSameSymbol(taken) != 3 {
 		return nil, fmt.Errorf("mismatch taken: %+v, consumed: %+v", taken, consumed)
 	}
 	if taken.IsSuits() && taken.Number() == 5 && countRed(tiles) > 1 {
