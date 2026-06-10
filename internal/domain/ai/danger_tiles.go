@@ -39,12 +39,13 @@ func countSameColor(tiles []tile.Tile, target tile.Tile) int {
 	return count
 }
 
-func countSujiSymbols(target tile.Tile, tiles []tile.Tile) int {
-	count := 0
+func hasSujiSymbolCount(target tile.Tile, threshold int, tiles []tile.Tile) bool {
 	for _, s := range sujiTiles(target) {
-		count += countSameSymbol(tiles, s)
+		if countSameSymbol(tiles, s) >= threshold {
+			return true
+		}
 	}
-	return count
+	return false
 }
 
 func fanpaiValue(target tile.Tile, roundWind wind.Wind, targetWind wind.Wind) int {

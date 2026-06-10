@@ -129,7 +129,7 @@ func (s dangerScene) evaluate(feature string, discard tile.Tile) (bool, error) {
 	}
 	if strings.HasPrefix(feature, "suji_in_tehais>=") {
 		n, ok := parseFeatureInt(feature, "suji_in_tehais>=")
-		return ok && countSujiSymbols(discard, s.selfHand) >= n, nil
+		return ok && hasSujiSymbolCount(discard, n, s.selfHand), nil
 	}
 	if strings.Contains(feature, "<=n<=") {
 		return evalNumberRange(feature, discard), nil

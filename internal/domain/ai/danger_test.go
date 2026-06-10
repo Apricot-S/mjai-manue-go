@@ -80,6 +80,52 @@ func TestDangerSceneEvaluateVisibilityFeatures(t *testing.T) {
 	}
 }
 
+func TestDangerSceneEvaluateSujiInTehaisCountsEachSujiSeparately(t *testing.T) {
+	tests := []struct {
+		name     string
+		discard  string
+		selfHand []string
+		want     bool
+	}{
+		{
+			name:     "combined suji count does not satisfy threshold",
+			discard:  "5m",
+			selfHand: []string{"2m", "8m"},
+			want:     false,
+		},
+		{
+			name:     "one suji satisfies threshold",
+			discard:  "5m",
+			selfHand: []string{"2m", "2m"},
+			want:     true,
+		},
+		{
+			name:     "honor has no suji",
+			discard:  "E",
+			selfHand: []string{"E", "E"},
+			want:     false,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			selfHand := make([]tile.Tile, 0, len(tt.selfHand))
+			for _, code := range tt.selfHand {
+				selfHand = append(selfHand, tile.MustTileFromCode(code))
+			}
+			scene := dangerScene{selfHand: selfHand}
+
+			got, err := scene.evaluate("suji_in_tehais>=2", tile.MustTileFromCode(tt.discard))
+			if err != nil {
+				t.Fatalf("dangerScene.evaluate(suji_in_tehais>=2) failed: %v", err)
+			}
+			if got != tt.want {
+				t.Errorf("dangerScene.evaluate(suji_in_tehais>=2) = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
 func TestDangerSceneEvaluateChanceFeatureUsesKabeTiles(t *testing.T) {
 	scene := dangerScene{
 		visibleTiles: []tile.Tile{
