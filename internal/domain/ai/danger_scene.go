@@ -114,25 +114,40 @@ func (s dangerScene) evaluate(feature string, discard tile.Tile) (bool, error) {
 		return isAida4Ken(discard, s.preRiichiTiles), nil
 	}
 
-	if strings.HasPrefix(feature, "chances<=") {
-		n, ok := parseFeatureInt(feature, "chances<=")
-		return ok && isNChanceOrLess(discard, n, s.visibleTiles), nil
+	n, matched, err := parseFeatureInt(feature, "chances<=")
+	if err != nil {
+		return false, err
 	}
-	if strings.HasPrefix(feature, "visible>=") {
-		n, ok := parseFeatureInt(feature, "visible>=")
-		return ok && tile.Tiles(s.visibleTiles).CountSameSymbol(discard) >= n+1, nil
+	if matched {
+		return isNChanceOrLess(discard, n, s.visibleTiles), nil
 	}
-	if strings.HasPrefix(feature, "suji_visible<=") {
-		n, ok := parseFeatureInt(feature, "suji_visible<=")
-		return ok && isSujiVisibleNoMoreThan(discard, n, s.visibleTiles), nil
+	n, matched, err = parseFeatureInt(feature, "visible>=")
+	if err != nil {
+		return false, err
 	}
-	if strings.HasPrefix(feature, "in_tehais>=") {
-		n, ok := parseFeatureInt(feature, "in_tehais>=")
-		return ok && tile.Tiles(s.selfHand).CountSameSymbol(discard) >= n, nil
+	if matched {
+		return tile.Tiles(s.visibleTiles).CountSameSymbol(discard) >= n+1, nil
 	}
-	if strings.HasPrefix(feature, "suji_in_tehais>=") {
-		n, ok := parseFeatureInt(feature, "suji_in_tehais>=")
-		return ok && hasSujiSymbolCount(discard, n, s.selfHand), nil
+	n, matched, err = parseFeatureInt(feature, "suji_visible<=")
+	if err != nil {
+		return false, err
+	}
+	if matched {
+		return isSujiVisibleNoMoreThan(discard, n, s.visibleTiles), nil
+	}
+	n, matched, err = parseFeatureInt(feature, "in_tehais>=")
+	if err != nil {
+		return false, err
+	}
+	if matched {
+		return tile.Tiles(s.selfHand).CountSameSymbol(discard) >= n, nil
+	}
+	n, matched, err = parseFeatureInt(feature, "suji_in_tehais>=")
+	if err != nil {
+		return false, err
+	}
+	if matched {
+		return hasSujiSymbolCount(discard, n, s.selfHand), nil
 	}
 	if strings.Contains(feature, "<=n<=") {
 		return evalNumberRange(feature, discard), nil
@@ -145,9 +160,12 @@ func (s dangerScene) evaluate(feature string, discard tile.Tile) (bool, error) {
 		n := leadingFeatureInt(feature)
 		return isNOuterPreRiichiSutehai(discard, -n, s.preRiichiTiles), nil
 	}
-	if strings.HasPrefix(feature, "same_type_in_prereach>=") {
-		n, ok := parseFeatureInt(feature, "same_type_in_prereach>=")
-		return ok && discard.IsSuits() && countSameColor(s.preRiichiTiles, discard)+1 >= n, nil
+	n, matched, err = parseFeatureInt(feature, "same_type_in_prereach>=")
+	if err != nil {
+		return false, err
+	}
+	if matched {
+		return discard.IsSuits() && countSameColor(s.preRiichiTiles, discard)+1 >= n, nil
 	}
 	if strings.HasPrefix(feature, "+-") && strings.Contains(feature, "_in_prereach_sutehais>=") {
 		return evalNeighborPreRiichi(feature, discard, s.preRiichiTiles), nil
@@ -194,12 +212,15 @@ func evalNeighborPreRiichi(feature string, target tile.Tile, tiles []tile.Tile) 
 	return count >= threshold
 }
 
-func parseFeatureInt(feature string, prefix string) (int, bool) {
+func parseFeatureInt(feature string, prefix string) (value int, matched bool, err error) {
 	if !strings.HasPrefix(feature, prefix) {
-		return 0, false
+		return 0, false, nil
 	}
-	n, err := strconv.Atoi(strings.TrimPrefix(feature, prefix))
-	return n, err == nil
+	value, err = strconv.Atoi(strings.TrimPrefix(feature, prefix))
+	if err != nil {
+		return 0, true, fmt.Errorf("parse danger feature %q: %w", feature, err)
+	}
+	return value, true, nil
 }
 
 func leadingFeatureInt(feature string) int {

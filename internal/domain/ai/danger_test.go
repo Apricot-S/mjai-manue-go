@@ -22,6 +22,16 @@ func TestDangerSceneEvaluateReturnsErrorWithUnknownFeature(t *testing.T) {
 	}
 }
 
+func TestDangerSceneEvaluateReturnsErrorWithInvalidFeatureInteger(t *testing.T) {
+	_, err := (dangerScene{}).evaluate("visible>=invalid", tile.MustTileFromCode("5m"))
+	if err == nil {
+		t.Fatal("dangerScene.evaluate() succeeded unexpectedly")
+	}
+	if !strings.Contains(err.Error(), "visible>=invalid") {
+		t.Errorf("dangerScene.evaluate() error = %v, want feature name", err)
+	}
+}
+
 func TestDangerSceneEvaluateKnownFeature(t *testing.T) {
 	got, err := (dangerScene{}).evaluate("sangenpai", tile.MustTileFromCode("P"))
 	if err != nil {
