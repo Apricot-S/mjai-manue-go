@@ -12,16 +12,16 @@ import (
 )
 
 type dangerScene struct {
-	selfHand           []tile.Tile
-	safeTiles          []tile.Tile
-	visibleTiles       []tile.Tile
-	doras              []tile.Tile
-	roundWind          wind.Wind
-	targetWind         wind.Wind
-	prereachTiles      []tile.Tile
-	earlyPrereachTiles []tile.Tile
-	latePrereachTiles  []tile.Tile
-	reachTiles         []tile.Tile
+	selfHand              []tile.Tile
+	safeTiles             []tile.Tile
+	visibleTiles          []tile.Tile
+	doras                 []tile.Tile
+	roundWind             wind.Wind
+	targetWind            wind.Wind
+	prereachTiles         []tile.Tile
+	earlyPrereachTiles    []tile.Tile
+	latePrereachTiles     []tile.Tile
+	reachDeclarationTiles []tile.Tile
 }
 
 func newDangerScene(state round.StateViewer, self seat.Seat, target seat.Seat) dangerScene {
@@ -32,24 +32,24 @@ func newDangerScene(state round.StateViewer, self seat.Seat, target seat.Seat) d
 		selfHand = h.ToTiles()
 	}
 	prereachTiles := []tile.Tile(nil)
-	reachTiles := []tile.Tile(nil)
+	reachDeclarationTiles := []tile.Tile(nil)
 	discardedTiles := targetPlayer.DiscardedTiles()
 	if idx := targetPlayer.RiichiDiscardedTilesIndex(); idx >= 0 && idx < len(discardedTiles) {
 		prereachTiles = discardedTiles[:idx+1]
-		reachTiles = []tile.Tile{discardedTiles[idx]}
+		reachDeclarationTiles = []tile.Tile{discardedTiles[idx]}
 	}
 	half := len(prereachTiles) / 2
 	return dangerScene{
-		selfHand:           selfHand,
-		safeTiles:          state.SafeTiles(target),
-		visibleTiles:       state.VisibleTiles(self),
-		doras:              state.Doras(),
-		roundWind:          state.RoundWind(),
-		targetWind:         state.SeatWind(target),
-		prereachTiles:      prereachTiles,
-		earlyPrereachTiles: prereachTiles[:half],
-		latePrereachTiles:  prereachTiles[half:],
-		reachTiles:         reachTiles,
+		selfHand:              selfHand,
+		safeTiles:             state.SafeTiles(target),
+		visibleTiles:          state.VisibleTiles(self),
+		doras:                 state.Doras(),
+		roundWind:             state.RoundWind(),
+		targetWind:            state.SeatWind(target),
+		prereachTiles:         prereachTiles,
+		earlyPrereachTiles:    prereachTiles[:half],
+		latePrereachTiles:     prereachTiles[half:],
+		reachDeclarationTiles: reachDeclarationTiles,
 	}
 }
 
@@ -82,7 +82,7 @@ func (s dangerScene) evaluate(feature string, discard tile.Tile) (bool, error) {
 	case "weak_suji":
 		return isSujiOf(discard, s.safeTiles, true), nil
 	case "reach_suji":
-		return isSujiOf(discard, s.reachTiles, true), nil
+		return isSujiOf(discard, s.reachDeclarationTiles, true), nil
 	case "prereach_suji":
 		return isSujiOf(discard, s.prereachTiles, false), nil
 	case "urasuji":
@@ -90,7 +90,7 @@ func (s dangerScene) evaluate(feature string, discard tile.Tile) (bool, error) {
 	case "early_urasuji":
 		return isUrasujiOf(discard, s.earlyPrereachTiles, s.safeTiles), nil
 	case "reach_urasuji":
-		return isUrasujiOf(discard, s.reachTiles, s.safeTiles), nil
+		return isUrasujiOf(discard, s.reachDeclarationTiles, s.safeTiles), nil
 	case "matagisuji":
 		return isMatagisujiOf(discard, s.prereachTiles, s.safeTiles), nil
 	case "early_matagisuji":
@@ -98,7 +98,7 @@ func (s dangerScene) evaluate(feature string, discard tile.Tile) (bool, error) {
 	case "late_matagisuji":
 		return isMatagisujiOf(discard, s.latePrereachTiles, s.safeTiles), nil
 	case "reach_matagisuji":
-		return isMatagisujiOf(discard, s.reachTiles, s.safeTiles), nil
+		return isMatagisujiOf(discard, s.reachDeclarationTiles, s.safeTiles), nil
 	case "senkisuji":
 		return isSenkisujiOf(discard, s.prereachTiles, s.safeTiles), nil
 	case "early_senkisuji":
