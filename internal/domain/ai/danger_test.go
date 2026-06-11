@@ -46,6 +46,26 @@ func TestDangerSceneEvaluateRejectsInnerPreRiichiFeatureWithTrailingText(t *test
 	}
 }
 
+func TestDangerSceneEvaluateReturnsErrorWithInvalidOuterPreRiichiInteger(t *testing.T) {
+	_, err := (dangerScene{}).evaluate("invalid_outer_prereach_sutehai", tile.MustTileFromCode("5m"))
+	if err == nil {
+		t.Fatal("dangerScene.evaluate() succeeded unexpectedly")
+	}
+	if !strings.Contains(err.Error(), "invalid_outer_prereach_sutehai") {
+		t.Errorf("dangerScene.evaluate() error = %v, want feature name", err)
+	}
+}
+
+func TestDangerSceneEvaluateReturnsErrorWithInvalidInnerPreRiichiInteger(t *testing.T) {
+	_, err := (dangerScene{}).evaluate("invalid_inner_prereach_sutehai", tile.MustTileFromCode("5m"))
+	if err == nil {
+		t.Fatal("dangerScene.evaluate() succeeded unexpectedly")
+	}
+	if !strings.Contains(err.Error(), "invalid_inner_prereach_sutehai") {
+		t.Errorf("dangerScene.evaluate() error = %v, want feature name", err)
+	}
+}
+
 func TestDangerSceneEvaluateKnownFeature(t *testing.T) {
 	got, err := (dangerScene{}).evaluate("sangenpai", tile.MustTileFromCode("P"))
 	if err != nil {

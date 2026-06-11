@@ -152,12 +152,18 @@ func (s dangerScene) evaluate(feature string, discard tile.Tile) (bool, error) {
 	if strings.Contains(feature, "<=n<=") {
 		return evalNumberRange(feature, discard), nil
 	}
-	if strings.HasSuffix(feature, "_outer_prereach_sutehai") {
-		n := leadingFeatureInt(feature)
+	n, matched, err = parseFeatureIntSuffix(feature, "_outer_prereach_sutehai")
+	if err != nil {
+		return false, err
+	}
+	if matched {
 		return isNOuterPreRiichiSutehai(discard, n, s.preRiichiTiles), nil
 	}
-	if strings.HasSuffix(feature, "_inner_prereach_sutehai") {
-		n := leadingFeatureInt(feature)
+	n, matched, err = parseFeatureIntSuffix(feature, "_inner_prereach_sutehai")
+	if err != nil {
+		return false, err
+	}
+	if matched {
 		return isNOuterPreRiichiSutehai(discard, -n, s.preRiichiTiles), nil
 	}
 	n, matched, err = parseFeatureInt(feature, "same_type_in_prereach>=")
@@ -223,8 +229,13 @@ func parseFeatureInt(feature string, prefix string) (value int, matched bool, er
 	return value, true, nil
 }
 
-func leadingFeatureInt(feature string) int {
-	part, _, _ := strings.Cut(feature, "_")
-	n, _ := strconv.Atoi(part)
-	return n
+func parseFeatureIntSuffix(feature string, suffix string) (value int, matched bool, err error) {
+	if !strings.HasSuffix(feature, suffix) {
+		return 0, false, nil
+	}
+	value, err = strconv.Atoi(strings.TrimSuffix(feature, suffix))
+	if err != nil {
+		return 0, true, fmt.Errorf("parse danger feature %q: %w", feature, err)
+	}
+	return value, true, nil
 }
