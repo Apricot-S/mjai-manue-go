@@ -25,20 +25,23 @@ type dangerScene struct {
 }
 
 func newDangerScene(state round.StateViewer, self seat.Seat, target seat.Seat) dangerScene {
-	selfPlayer := state.Player(self)
-	targetPlayer := state.Player(target)
 	var selfHand []tile.Tile
+	selfPlayer := state.Player(self)
 	if h, ok := selfPlayer.Hand(); ok {
 		selfHand = h.ToTiles()
 	}
-	preRiichiTiles := []tile.Tile(nil)
-	riichiDeclarationTiles := []tile.Tile(nil)
+
+	var preRiichiTiles []tile.Tile
+	var riichiDeclarationTiles []tile.Tile
+	targetPlayer := state.Player(target)
 	discardedTiles := targetPlayer.DiscardedTiles()
 	if idx := targetPlayer.RiichiDiscardedTilesIndex(); idx >= 0 && idx < len(discardedTiles) {
 		preRiichiTiles = discardedTiles[:idx+1]
 		riichiDeclarationTiles = []tile.Tile{discardedTiles[idx]}
 	}
+
 	half := len(preRiichiTiles) / 2
+
 	return dangerScene{
 		selfHand:               selfHand,
 		safeTiles:              state.SafeTiles(target),
