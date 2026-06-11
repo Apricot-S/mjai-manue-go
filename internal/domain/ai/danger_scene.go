@@ -114,35 +114,35 @@ func (s dangerScene) evaluate(feature string, discard tile.Tile) (bool, error) {
 		return isAida4Ken(discard, s.preRiichiTiles), nil
 	}
 
-	n, matched, err := parseFeatureInt(feature, "chances<=")
+	n, matched, err := parseFeatureIntPrefix(feature, "chances<=")
 	if err != nil {
 		return false, err
 	}
 	if matched {
 		return isNChanceOrLess(discard, n, s.visibleTiles), nil
 	}
-	n, matched, err = parseFeatureInt(feature, "visible>=")
+	n, matched, err = parseFeatureIntPrefix(feature, "visible>=")
 	if err != nil {
 		return false, err
 	}
 	if matched {
 		return tile.Tiles(s.visibleTiles).CountSameSymbol(discard) >= n+1, nil
 	}
-	n, matched, err = parseFeatureInt(feature, "suji_visible<=")
+	n, matched, err = parseFeatureIntPrefix(feature, "suji_visible<=")
 	if err != nil {
 		return false, err
 	}
 	if matched {
 		return isSujiVisibleNoMoreThan(discard, n, s.visibleTiles), nil
 	}
-	n, matched, err = parseFeatureInt(feature, "in_tehais>=")
+	n, matched, err = parseFeatureIntPrefix(feature, "in_tehais>=")
 	if err != nil {
 		return false, err
 	}
 	if matched {
 		return tile.Tiles(s.selfHand).CountSameSymbol(discard) >= n, nil
 	}
-	n, matched, err = parseFeatureInt(feature, "suji_in_tehais>=")
+	n, matched, err = parseFeatureIntPrefix(feature, "suji_in_tehais>=")
 	if err != nil {
 		return false, err
 	}
@@ -166,7 +166,7 @@ func (s dangerScene) evaluate(feature string, discard tile.Tile) (bool, error) {
 	if matched {
 		return isNOuterPreRiichiSutehai(discard, -n, s.preRiichiTiles), nil
 	}
-	n, matched, err = parseFeatureInt(feature, "same_type_in_prereach>=")
+	n, matched, err = parseFeatureIntPrefix(feature, "same_type_in_prereach>=")
 	if err != nil {
 		return false, err
 	}
@@ -218,7 +218,7 @@ func evalNeighborPreRiichi(feature string, target tile.Tile, tiles []tile.Tile) 
 	return count >= threshold
 }
 
-func parseFeatureInt(feature string, prefix string) (value int, matched bool, err error) {
+func parseFeatureIntPrefix(feature string, prefix string) (value int, matched bool, err error) {
 	if !strings.HasPrefix(feature, prefix) {
 		return 0, false, nil
 	}
