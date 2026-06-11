@@ -66,6 +66,20 @@ func TestDangerSceneEvaluateReturnsErrorWithInvalidInnerPreRiichiInteger(t *test
 	}
 }
 
+func TestDangerSceneEvaluateReturnsErrorWithInvalidNumberRangeInteger(t *testing.T) {
+	for _, feature := range []string{"invalid<=n<=6", "4<=n<=invalid"} {
+		t.Run(feature, func(t *testing.T) {
+			_, err := (dangerScene{}).evaluate(feature, tile.MustTileFromCode("5m"))
+			if err == nil {
+				t.Fatal("dangerScene.evaluate() succeeded unexpectedly")
+			}
+			if !strings.Contains(err.Error(), feature) {
+				t.Errorf("dangerScene.evaluate() error = %v, want feature name", err)
+			}
+		})
+	}
+}
+
 func TestDangerSceneEvaluateKnownFeature(t *testing.T) {
 	got, err := (dangerScene{}).evaluate("sangenpai", tile.MustTileFromCode("P"))
 	if err != nil {

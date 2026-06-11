@@ -150,7 +150,7 @@ func (s dangerScene) evaluate(feature string, discard tile.Tile) (bool, error) {
 		return hasSujiSymbolCount(discard, n, s.selfHand), nil
 	}
 	if strings.Contains(feature, "<=n<=") {
-		return evalNumberRange(feature, discard), nil
+		return evalNumberRange(feature, discard)
 	}
 	n, matched, err = parseFeatureIntSuffix(feature, "_outer_prereach_sutehai")
 	if err != nil {
@@ -180,20 +180,23 @@ func (s dangerScene) evaluate(feature string, discard tile.Tile) (bool, error) {
 	return false, fmt.Errorf("cannot evaluate danger feature %q", feature)
 }
 
-func evalNumberRange(feature string, target tile.Tile) bool {
+func evalNumberRange(feature string, target tile.Tile) (bool, error) {
 	if !target.IsSuits() {
-		return false
+		return false, nil
 	}
 	parts := strings.Split(feature, "<=n<=")
 	if len(parts) != 2 {
-		return false
+		return false, fmt.Errorf("parse danger feature %q: invalid number range", feature)
 	}
-	minN, err1 := strconv.Atoi(parts[0])
-	maxN, err2 := strconv.Atoi(parts[1])
-	if err1 != nil || err2 != nil {
-		return false
+	minN, err := strconv.Atoi(parts[0])
+	if err != nil {
+		return false, fmt.Errorf("parse danger feature %q minimum: %w", feature, err)
 	}
-	return minN <= target.Number() && target.Number() <= maxN
+	maxN, err := strconv.Atoi(parts[1])
+	if err != nil {
+		return false, fmt.Errorf("parse danger feature %q maximum: %w", feature, err)
+	}
+	return minN <= target.Number() && target.Number() <= maxN, nil
 }
 
 func evalNeighborPreRiichi(feature string, target tile.Tile, tiles []tile.Tile) bool {
