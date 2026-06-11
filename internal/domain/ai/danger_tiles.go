@@ -202,7 +202,7 @@ func isOuter(target tile.Tile, tiles []tile.Tile) bool {
 	return false
 }
 
-func isNOuterPrereachSutehai(target tile.Tile, n int, tiles []tile.Tile) bool {
+func isNOuterPreRiichiSutehai(target tile.Tile, n int, tiles []tile.Tile) bool {
 	if !target.IsSuits() {
 		return false
 	}

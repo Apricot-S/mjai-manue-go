@@ -12,16 +12,16 @@ import (
 )
 
 type dangerScene struct {
-	selfHand              []tile.Tile
-	safeTiles             []tile.Tile
-	visibleTiles          []tile.Tile
-	doras                 []tile.Tile
-	roundWind             wind.Wind
-	targetWind            wind.Wind
-	prereachTiles         []tile.Tile
-	earlyPrereachTiles    []tile.Tile
-	latePrereachTiles     []tile.Tile
-	reachDeclarationTiles []tile.Tile
+	selfHand               []tile.Tile
+	safeTiles              []tile.Tile
+	visibleTiles           []tile.Tile
+	doras                  []tile.Tile
+	roundWind              wind.Wind
+	targetWind             wind.Wind
+	preRiichiTiles         []tile.Tile
+	earlyPreRiichiTiles    []tile.Tile
+	latePreRiichiTiles     []tile.Tile
+	riichiDeclarationTiles []tile.Tile
 }
 
 func newDangerScene(state round.StateViewer, self seat.Seat, target seat.Seat) dangerScene {
@@ -31,25 +31,25 @@ func newDangerScene(state round.StateViewer, self seat.Seat, target seat.Seat) d
 	if h, ok := selfPlayer.Hand(); ok {
 		selfHand = h.ToTiles()
 	}
-	prereachTiles := []tile.Tile(nil)
-	reachDeclarationTiles := []tile.Tile(nil)
+	preRiichiTiles := []tile.Tile(nil)
+	riichiDeclarationTiles := []tile.Tile(nil)
 	discardedTiles := targetPlayer.DiscardedTiles()
 	if idx := targetPlayer.RiichiDiscardedTilesIndex(); idx >= 0 && idx < len(discardedTiles) {
-		prereachTiles = discardedTiles[:idx+1]
-		reachDeclarationTiles = []tile.Tile{discardedTiles[idx]}
+		preRiichiTiles = discardedTiles[:idx+1]
+		riichiDeclarationTiles = []tile.Tile{discardedTiles[idx]}
 	}
-	half := len(prereachTiles) / 2
+	half := len(preRiichiTiles) / 2
 	return dangerScene{
-		selfHand:              selfHand,
-		safeTiles:             state.SafeTiles(target),
-		visibleTiles:          state.VisibleTiles(self),
-		doras:                 state.Doras(),
-		roundWind:             state.RoundWind(),
-		targetWind:            state.SeatWind(target),
-		prereachTiles:         prereachTiles,
-		earlyPrereachTiles:    prereachTiles[:half],
-		latePrereachTiles:     prereachTiles[half:],
-		reachDeclarationTiles: reachDeclarationTiles,
+		selfHand:               selfHand,
+		safeTiles:              state.SafeTiles(target),
+		visibleTiles:           state.VisibleTiles(self),
+		doras:                  state.Doras(),
+		roundWind:              state.RoundWind(),
+		targetWind:             state.SeatWind(target),
+		preRiichiTiles:         preRiichiTiles,
+		earlyPreRiichiTiles:    preRiichiTiles[:half],
+		latePreRiichiTiles:     preRiichiTiles[half:],
+		riichiDeclarationTiles: riichiDeclarationTiles,
 	}
 }
 
@@ -82,33 +82,33 @@ func (s dangerScene) evaluate(feature string, discard tile.Tile) (bool, error) {
 	case "weak_suji":
 		return isSujiOf(discard, s.safeTiles, true), nil
 	case "reach_suji":
-		return isSujiOf(discard, s.reachDeclarationTiles, true), nil
+		return isSujiOf(discard, s.riichiDeclarationTiles, true), nil
 	case "prereach_suji":
-		return isSujiOf(discard, s.prereachTiles, false), nil
+		return isSujiOf(discard, s.preRiichiTiles, false), nil
 	case "urasuji":
-		return isUrasujiOf(discard, s.prereachTiles, s.safeTiles), nil
+		return isUrasujiOf(discard, s.preRiichiTiles, s.safeTiles), nil
 	case "early_urasuji":
-		return isUrasujiOf(discard, s.earlyPrereachTiles, s.safeTiles), nil
+		return isUrasujiOf(discard, s.earlyPreRiichiTiles, s.safeTiles), nil
 	case "reach_urasuji":
-		return isUrasujiOf(discard, s.reachDeclarationTiles, s.safeTiles), nil
+		return isUrasujiOf(discard, s.riichiDeclarationTiles, s.safeTiles), nil
 	case "matagisuji":
-		return isMatagisujiOf(discard, s.prereachTiles, s.safeTiles), nil
+		return isMatagisujiOf(discard, s.preRiichiTiles, s.safeTiles), nil
 	case "early_matagisuji":
-		return isMatagisujiOf(discard, s.earlyPrereachTiles, s.safeTiles), nil
+		return isMatagisujiOf(discard, s.earlyPreRiichiTiles, s.safeTiles), nil
 	case "late_matagisuji":
-		return isMatagisujiOf(discard, s.latePrereachTiles, s.safeTiles), nil
+		return isMatagisujiOf(discard, s.latePreRiichiTiles, s.safeTiles), nil
 	case "reach_matagisuji":
-		return isMatagisujiOf(discard, s.reachDeclarationTiles, s.safeTiles), nil
+		return isMatagisujiOf(discard, s.riichiDeclarationTiles, s.safeTiles), nil
 	case "senkisuji":
-		return isSenkisujiOf(discard, s.prereachTiles, s.safeTiles), nil
+		return isSenkisujiOf(discard, s.preRiichiTiles, s.safeTiles), nil
 	case "early_senkisuji":
-		return isSenkisujiOf(discard, s.earlyPrereachTiles, s.safeTiles), nil
+		return isSenkisujiOf(discard, s.earlyPreRiichiTiles, s.safeTiles), nil
 	case "outer_prereach_sutehai":
-		return isOuter(discard, s.prereachTiles), nil
+		return isOuter(discard, s.preRiichiTiles), nil
 	case "outer_early_sutehai":
-		return isOuter(discard, s.earlyPrereachTiles), nil
+		return isOuter(discard, s.earlyPreRiichiTiles), nil
 	case "aida4ken":
-		return isAida4Ken(discard, s.prereachTiles), nil
+		return isAida4Ken(discard, s.preRiichiTiles), nil
 	}
 
 	if strings.HasPrefix(feature, "chances<=") {
@@ -136,18 +136,18 @@ func (s dangerScene) evaluate(feature string, discard tile.Tile) (bool, error) {
 	}
 	if strings.Contains(feature, "_outer_prereach_sutehai") {
 		n := leadingFeatureInt(feature)
-		return isNOuterPrereachSutehai(discard, n, s.prereachTiles), nil
+		return isNOuterPreRiichiSutehai(discard, n, s.preRiichiTiles), nil
 	}
 	if strings.Contains(feature, "_inner_prereach_sutehai") {
 		n := leadingFeatureInt(feature)
-		return isNOuterPrereachSutehai(discard, -n, s.prereachTiles), nil
+		return isNOuterPreRiichiSutehai(discard, -n, s.preRiichiTiles), nil
 	}
 	if strings.HasPrefix(feature, "same_type_in_prereach>=") {
 		n, ok := parseFeatureInt(feature, "same_type_in_prereach>=")
-		return ok && discard.IsSuits() && countSameColor(s.prereachTiles, discard)+1 >= n, nil
+		return ok && discard.IsSuits() && countSameColor(s.preRiichiTiles, discard)+1 >= n, nil
 	}
 	if strings.HasPrefix(feature, "+-") && strings.Contains(feature, "_in_prereach_sutehais>=") {
-		return evalNeighborPrereach(feature, discard, s.prereachTiles), nil
+		return evalNeighborPreRiichi(feature, discard, s.preRiichiTiles), nil
 	}
 
 	return false, fmt.Errorf("cannot evaluate danger feature %q", feature)
@@ -169,7 +169,7 @@ func evalNumberRange(feature string, target tile.Tile) bool {
 	return minN <= target.Number() && target.Number() <= maxN
 }
 
-func evalNeighborPrereach(feature string, target tile.Tile, tiles []tile.Tile) bool {
+func evalNeighborPreRiichi(feature string, target tile.Tile, tiles []tile.Tile) bool {
 	parts := strings.Split(strings.TrimPrefix(feature, "+-"), "_in_prereach_sutehais>=")
 	if len(parts) != 2 {
 		return false

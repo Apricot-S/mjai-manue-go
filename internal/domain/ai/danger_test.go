@@ -155,7 +155,7 @@ func TestDangerSceneEvaluateChanceFeatureUsesKabeTiles(t *testing.T) {
 
 func TestDangerSceneEvaluateAida4KenMatchesOriginal(t *testing.T) {
 	scene := dangerScene{
-		prereachTiles: []tile.Tile{
+		preRiichiTiles: []tile.Tile{
 			tile.MustTileFromCode("1p"),
 			tile.MustTileFromCode("6p"),
 		},
@@ -186,9 +186,9 @@ func TestDangerSceneEvaluateAida4KenMatchesOriginal(t *testing.T) {
 	}
 }
 
-func TestDangerSceneEvaluateOuterPrereachMatchesOriginalDirection(t *testing.T) {
+func TestDangerSceneEvaluateOuterPreRiichiMatchesOriginalDirection(t *testing.T) {
 	scene := dangerScene{
-		prereachTiles: []tile.Tile{tile.MustTileFromCode("4m")},
+		preRiichiTiles: []tile.Tile{tile.MustTileFromCode("4m")},
 	}
 
 	got, err := scene.evaluate("1_outer_prereach_sutehai", tile.MustTileFromCode("3m"))
@@ -208,9 +208,9 @@ func TestDangerSceneEvaluateOuterPrereachMatchesOriginalDirection(t *testing.T) 
 	}
 }
 
-func TestDangerSceneEvaluateSameTypeInPrereachCountsDistinctSuitNumbers(t *testing.T) {
+func TestDangerSceneEvaluateSameTypeInPreRiichiCountsDistinctSuitNumbers(t *testing.T) {
 	scene := dangerScene{
-		prereachTiles: []tile.Tile{
+		preRiichiTiles: []tile.Tile{
 			tile.MustTileFromCode("5m"),
 			tile.MustTileFromCode("5mr"),
 			tile.MustTileFromCode("7m"),
@@ -243,65 +243,65 @@ func TestDangerSceneEvaluateSameTypeInPrereachCountsDistinctSuitNumbers(t *testi
 	}
 }
 
-func TestDangerSceneEvaluateNeighborPrereachMatchesOriginalRange(t *testing.T) {
+func TestDangerSceneEvaluateNeighborPreRiichiMatchesOriginalRange(t *testing.T) {
 	tests := []struct {
-		name          string
-		feature       string
-		discard       string
-		prereachTiles []string
-		want          bool
+		name           string
+		feature        string
+		discard        string
+		preRiichiTiles []string
+		want           bool
 	}{
 		{
-			name:          "includes discard itself",
-			feature:       "+-1_in_prereach_sutehais>=1",
-			discard:       "5m",
-			prereachTiles: []string{"5m"},
-			want:          true,
+			name:           "includes discard itself",
+			feature:        "+-1_in_prereach_sutehais>=1",
+			discard:        "5m",
+			preRiichiTiles: []string{"5m"},
+			want:           true,
 		},
 		{
-			name:          "distance two includes intermediate numbers",
-			feature:       "+-2_in_prereach_sutehais>=2",
-			discard:       "5m",
-			prereachTiles: []string{"4m", "6m"},
-			want:          true,
+			name:           "distance two includes intermediate numbers",
+			feature:        "+-2_in_prereach_sutehais>=2",
+			discard:        "5m",
+			preRiichiTiles: []string{"4m", "6m"},
+			want:           true,
 		},
 		{
-			name:          "counts duplicate tiles as one number",
-			feature:       "+-1_in_prereach_sutehais>=2",
-			discard:       "1p",
-			prereachTiles: []string{"2p", "2p"},
-			want:          false,
+			name:           "counts duplicate tiles as one number",
+			feature:        "+-1_in_prereach_sutehais>=2",
+			discard:        "1p",
+			preRiichiTiles: []string{"2p", "2p"},
+			want:           false,
 		},
 		{
-			name:          "counts distinct numbers",
-			feature:       "+-1_in_prereach_sutehais>=2",
-			discard:       "2p",
-			prereachTiles: []string{"1p", "3p"},
-			want:          true,
+			name:           "counts distinct numbers",
+			feature:        "+-1_in_prereach_sutehais>=2",
+			discard:        "2p",
+			preRiichiTiles: []string{"1p", "3p"},
+			want:           true,
 		},
 		{
-			name:          "excludes tiles outside bounded range",
-			feature:       "+-2_in_prereach_sutehais>=2",
-			discard:       "1s",
-			prereachTiles: []string{"3s", "4s"},
-			want:          false,
+			name:           "excludes tiles outside bounded range",
+			feature:        "+-2_in_prereach_sutehais>=2",
+			discard:        "1s",
+			preRiichiTiles: []string{"3s", "4s"},
+			want:           false,
 		},
 		{
-			name:          "honor has no numbered neighbors",
-			feature:       "+-1_in_prereach_sutehais>=1",
-			discard:       "E",
-			prereachTiles: []string{"E"},
-			want:          false,
+			name:           "honor has no numbered neighbors",
+			feature:        "+-1_in_prereach_sutehais>=1",
+			discard:        "E",
+			preRiichiTiles: []string{"E"},
+			want:           false,
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			prereachTiles := make([]tile.Tile, 0, len(tt.prereachTiles))
-			for _, code := range tt.prereachTiles {
-				prereachTiles = append(prereachTiles, tile.MustTileFromCode(code))
+			preRiichiTiles := make([]tile.Tile, 0, len(tt.preRiichiTiles))
+			for _, code := range tt.preRiichiTiles {
+				preRiichiTiles = append(preRiichiTiles, tile.MustTileFromCode(code))
 			}
-			scene := dangerScene{prereachTiles: prereachTiles}
+			scene := dangerScene{preRiichiTiles: preRiichiTiles}
 
 			got, err := scene.evaluate(tt.feature, tile.MustTileFromCode(tt.discard))
 			if err != nil {
@@ -314,7 +314,7 @@ func TestDangerSceneEvaluateNeighborPrereachMatchesOriginalRange(t *testing.T) {
 	}
 }
 
-func TestNewDangerSceneKeepsPrereachTilesEmptyWithoutRiichi(t *testing.T) {
+func TestNewDangerSceneKeepsPreRiichiTilesEmptyWithoutRiichi(t *testing.T) {
 	self := seat.MustSeat(0)
 	target := seat.MustSeat(1)
 	var players [common.NumPlayers]player.PlayerViewer
