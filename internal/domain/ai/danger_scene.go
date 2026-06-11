@@ -174,7 +174,7 @@ func (s dangerScene) evaluate(feature string, discard tile.Tile) (bool, error) {
 		return discard.IsSuits() && countSameColor(s.preRiichiTiles, discard)+1 >= n, nil
 	}
 	if strings.HasPrefix(feature, "+-") && strings.Contains(feature, "_in_prereach_sutehais>=") {
-		return evalNeighborPreRiichi(feature, discard, s.preRiichiTiles), nil
+		return evalNeighborPreRiichi(feature, discard, s.preRiichiTiles)
 	}
 
 	return false, fmt.Errorf("cannot evaluate danger feature %q", feature)
@@ -199,15 +199,21 @@ func evalNumberRange(feature string, target tile.Tile) (bool, error) {
 	return minN <= target.Number() && target.Number() <= maxN, nil
 }
 
-func evalNeighborPreRiichi(feature string, target tile.Tile, tiles []tile.Tile) bool {
+func evalNeighborPreRiichi(feature string, target tile.Tile, tiles []tile.Tile) (bool, error) {
+	if !target.IsSuits() {
+		return false, nil
+	}
 	parts := strings.Split(strings.TrimPrefix(feature, "+-"), "_in_prereach_sutehais>=")
 	if len(parts) != 2 {
-		return false
+		return false, fmt.Errorf("parse danger feature %q: invalid neighbor pre-riichi feature", feature)
 	}
-	distance, err1 := strconv.Atoi(parts[0])
-	threshold, err2 := strconv.Atoi(parts[1])
-	if err1 != nil || err2 != nil || !target.IsSuits() {
-		return false
+	distance, err := strconv.Atoi(parts[0])
+	if err != nil {
+		return false, fmt.Errorf("parse danger feature %q distance: %w", feature, err)
+	}
+	threshold, err := strconv.Atoi(parts[1])
+	if err != nil {
+		return false, fmt.Errorf("parse danger feature %q threshold: %w", feature, err)
 	}
 
 	count := 0
@@ -218,7 +224,7 @@ func evalNeighborPreRiichi(feature string, target tile.Tile, tiles []tile.Tile) 
 			}
 		}
 	}
-	return count >= threshold
+	return count >= threshold, nil
 }
 
 func parseFeatureIntPrefix(feature string, prefix string) (value int, matched bool, err error) {

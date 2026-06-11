@@ -80,6 +80,23 @@ func TestDangerSceneEvaluateReturnsErrorWithInvalidNumberRangeInteger(t *testing
 	}
 }
 
+func TestDangerSceneEvaluateReturnsErrorWithInvalidNeighborPreRiichiInteger(t *testing.T) {
+	for _, feature := range []string{
+		"+-invalid_in_prereach_sutehais>=1",
+		"+-1_in_prereach_sutehais>=invalid",
+	} {
+		t.Run(feature, func(t *testing.T) {
+			_, err := (dangerScene{}).evaluate(feature, tile.MustTileFromCode("5m"))
+			if err == nil {
+				t.Fatal("dangerScene.evaluate() succeeded unexpectedly")
+			}
+			if !strings.Contains(err.Error(), feature) {
+				t.Errorf("dangerScene.evaluate() error = %v, want feature name", err)
+			}
+		})
+	}
+}
+
 func TestDangerSceneEvaluateKnownFeature(t *testing.T) {
 	got, err := (dangerScene{}).evaluate("sangenpai", tile.MustTileFromCode("P"))
 	if err != nil {
