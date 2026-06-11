@@ -152,11 +152,11 @@ func (s dangerScene) evaluate(feature string, discard tile.Tile) (bool, error) {
 	if strings.Contains(feature, "<=n<=") {
 		return evalNumberRange(feature, discard), nil
 	}
-	if strings.Contains(feature, "_outer_prereach_sutehai") {
+	if strings.HasSuffix(feature, "_outer_prereach_sutehai") {
 		n := leadingFeatureInt(feature)
 		return isNOuterPreRiichiSutehai(discard, n, s.preRiichiTiles), nil
 	}
-	if strings.Contains(feature, "_inner_prereach_sutehai") {
+	if strings.HasSuffix(feature, "_inner_prereach_sutehai") {
 		n := leadingFeatureInt(feature)
 		return isNOuterPreRiichiSutehai(discard, -n, s.preRiichiTiles), nil
 	}
