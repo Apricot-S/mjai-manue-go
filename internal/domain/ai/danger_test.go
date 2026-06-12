@@ -7,6 +7,7 @@ import (
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/common"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/round"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/round/player"
+	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/round/player/hand"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/seat"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/tile"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/wind"
@@ -198,6 +199,31 @@ func TestDangerSceneEvaluateSujiInTehaisCountsEachSujiSeparately(t *testing.T) {
 				t.Errorf("dangerScene.evaluate(suji_in_tehais>=2) = %v, want %v", got, tt.want)
 			}
 		})
+	}
+}
+
+func TestNewDangerSceneIncludesDrawnTileInSelfHand(t *testing.T) {
+	drawnTile := tile.MustTileFromCode("2m")
+	self := stubPlayerViewer{
+		hand: hand.MustVisibleHand([]tile.Tile{
+			tile.MustTileFromCode("1m"), tile.MustTileFromCode("2m"), tile.MustTileFromCode("3m"),
+			tile.MustTileFromCode("4p"), tile.MustTileFromCode("5p"), tile.MustTileFromCode("6p"),
+			tile.MustTileFromCode("7s"), tile.MustTileFromCode("8s"), tile.MustTileFromCode("9s"),
+			tile.MustTileFromCode("E"), tile.MustTileFromCode("S"), tile.MustTileFromCode("W"),
+			tile.MustTileFromCode("N"),
+		}),
+		drawnTile: &drawnTile,
+	}
+	state := stubStateWithSelf(self)
+
+	got, err := newDangerScene(state, seat.MustSeat(0), seat.MustSeat(1)).evaluate(
+		"in_tehais>=2", drawnTile,
+	)
+	if err != nil {
+		t.Fatalf("dangerScene.evaluate(in_tehais>=2) failed: %v", err)
+	}
+	if !got {
+		t.Error("dangerScene.evaluate(in_tehais>=2) = false, want true including drawn tile")
 	}
 }
 

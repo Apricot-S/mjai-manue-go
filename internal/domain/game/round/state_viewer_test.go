@@ -406,6 +406,7 @@ func TestState_VisibleTiles(t *testing.T) {
 	))
 	player0.TakeFromRiver(tile.MustTileFromCode("1m"))
 	player1.Discard(tile.MustTileFromCode("5p"), false)
+	player0.Draw(tile.MustTileFromCode("6m"))
 
 	tests := []struct {
 		name     string
@@ -425,6 +426,7 @@ func TestState_VisibleTiles(t *testing.T) {
 				tile.MustTileFromCode("1p"), tile.MustTileFromCode("2p"), tile.MustTileFromCode("3p"), tile.MustTileFromCode("4p"),
 				tile.MustTileFromCode("1s"), tile.MustTileFromCode("2s"), tile.MustTileFromCode("3s"), tile.MustTileFromCode("4s"),
 				tile.MustTileFromCode("E"),
+				tile.MustTileFromCode("6m"),
 			},
 		},
 		{

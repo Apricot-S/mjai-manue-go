@@ -126,6 +126,9 @@ func (s *State) VisibleTiles(playerSeat seat.Seat) tile.Tiles {
 	var handTiles tile.Tiles
 	if h, isVisible := s.Player(playerSeat).Hand(); isVisible {
 		handTiles = h.ToTiles()
+		if drawnTile := s.Player(playerSeat).DrawnTile(); drawnTile != nil {
+			handTiles = append(handTiles, *drawnTile)
+		}
 	}
 
 	return slices.Concat(visibleTiles, s.DoraIndicators(), handTiles)

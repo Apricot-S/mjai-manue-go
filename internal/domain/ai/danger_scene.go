@@ -29,6 +29,9 @@ func newDangerScene(state round.StateViewer, self seat.Seat, target seat.Seat) d
 	selfPlayer := state.Player(self)
 	if h, ok := selfPlayer.Hand(); ok {
 		selfHand = h.ToTiles()
+		if drawnTile := selfPlayer.DrawnTile(); drawnTile != nil {
+			selfHand = append(selfHand, *drawnTile)
+		}
 	}
 
 	var preRiichiTiles []tile.Tile
