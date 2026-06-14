@@ -2,7 +2,6 @@ package ai
 
 import (
 	"fmt"
-	"slices"
 
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/seat"
 )
@@ -24,39 +23,6 @@ type candidateScore struct {
 	averageWinPoints float64
 	// exhaustiveDrawAveragePoints is the average exhaustive draw points.
 	exhaustiveDrawAveragePoints float64
-}
-
-func chooseBestCandidate(candidates []actionCandidate, preferBlack bool) actionCandidate {
-	best := candidates[0]
-	for _, candidate := range candidates[1:] {
-		if compareCandidates(candidate, best, preferBlack) < 0 {
-			best = candidate
-		}
-	}
-	return best
-}
-
-func sortedCandidates(candidates []actionCandidate, preferBlack bool) []actionCandidate {
-	sortedCandidates := slices.Clone(candidates)
-	slices.SortFunc(sortedCandidates, func(lhs, rhs actionCandidate) int {
-		return compareCandidates(lhs, rhs, preferBlack)
-	})
-	return sortedCandidates
-}
-
-func compareCandidates(lhs, rhs actionCandidate, preferBlack bool) int {
-	if result := compareCandidateScore(&lhs.score, &rhs.score); result != 0 {
-		return result
-	}
-	if preferBlack {
-		if !lhs.red && rhs.red {
-			return -1
-		}
-		if lhs.red && !rhs.red {
-			return 1
-		}
-	}
-	return 0
 }
 
 func compareCandidateScore(lhs, rhs *candidateScore) int {
