@@ -129,9 +129,9 @@ func (s winEstimateAccumulatorSet) addTrial(winPtsByKey map[string]float64) erro
 			if err := s.addWinTrial(key, points); err != nil {
 				return err
 			}
-			continue
+		} else {
+			s.addNoWinTrial(key)
 		}
-		s.addNoWinTrial(key)
 	}
 	return nil
 }
