@@ -52,6 +52,7 @@ Unlike the original project, this project embeds configuration files at build ti
 - Ported the AI logic from the original implementation while reimplementing the rest in Go.
 - Treats malformed or unexpected input more strictly than the original implementation.
 - Fixed an incorrect shanten number calculation when a hand contains four identical tiles.
+- Fixed win-value estimation for candidate discards so a discarded red five is not counted as a red dora in the future winning hand.
 - Logs more detailed game-state information using Mjai's board-state format.
 
 ## Prerequisites
