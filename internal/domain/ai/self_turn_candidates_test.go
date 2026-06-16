@@ -43,12 +43,6 @@ func TestBuildSelfTurnCandidates_BuildsDiscardCandidate(t *testing.T) {
 	if got[0].discardTile != discard.Tile() {
 		t.Errorf("discardTile = %v, want %v", got[0].discardTile, discard.Tile())
 	}
-	if got[0].turnHand == nil {
-		t.Fatal("turnHand = nil, want self-turn hand")
-	}
-	if got[0].turnHand.Count(tile.MustTileFromCode("5m")) != 1 {
-		t.Errorf("turnHand 5m count = %d, want 1", got[0].turnHand.Count(tile.MustTileFromCode("5m")))
-	}
 	if got[0].afterDiscardHand == nil {
 		t.Fatal("afterDiscardHand = nil, want hand after discard")
 	}

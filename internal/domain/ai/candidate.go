@@ -19,7 +19,6 @@ type actionCandidate struct {
 	scoreAsRiichi    bool
 	discardTile      tile.Tile
 	melds            []meld.Meld
-	turnHand         *hand.VisibleHand
 	afterDiscardHand *hand.VisibleHand
 	baseShanten      int
 	shanten          int

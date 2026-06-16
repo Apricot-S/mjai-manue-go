@@ -40,7 +40,6 @@ func buildSelfTurnCandidates(actions []action.Action, self player.PlayerViewer) 
 			candidates = append(candidates, buildSelfTurnCandidate(
 				riichi,
 				discard.Tile(),
-				h,
 				afterDiscard,
 				turnShanten,
 				shanten,
@@ -56,7 +55,6 @@ func buildSelfTurnCandidates(actions []action.Action, self player.PlayerViewer) 
 		candidates = append(candidates, buildSelfTurnCandidate(
 			discard,
 			discard.Tile(),
-			h,
 			afterDiscard,
 			turnShanten,
 			shanten,
@@ -94,7 +92,6 @@ func normalizedSelfTurnDiscards(actions []action.Action) []*action.Discard {
 func buildSelfTurnCandidate(
 	immediateAction action.Action,
 	discardTile tile.Tile,
-	turnHand *hand.VisibleHand,
 	afterDiscardHand *hand.VisibleHand,
 	baseShanten int,
 	shanten int,
@@ -110,7 +107,6 @@ func buildSelfTurnCandidate(
 		riichi:           riichi,
 		scoreAsRiichi:    scoreAsRiichi,
 		discardTile:      discardTile,
-		turnHand:         turnHand,
 		afterDiscardHand: afterDiscardHand,
 		baseShanten:      baseShanten,
 		shanten:          shanten,

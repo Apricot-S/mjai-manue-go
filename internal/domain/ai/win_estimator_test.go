@@ -166,7 +166,6 @@ func TestScoredWinEstimateGoals(t *testing.T) {
 	}
 	candidate := actionCandidate{
 		discardTile:      tile.MustTileFromCode("1m"),
-		turnHand:         turnHand,
 		afterDiscardHand: afterDiscardHand,
 		shantenGoals: []service.Goal{
 			{
@@ -233,7 +232,6 @@ func TestScoredWinEstimateGoalsBuildsHandFromGoalBlocks(t *testing.T) {
 	})
 	candidate := actionCandidate{
 		discardTile:      tile.MustTileFromCode("?"),
-		turnHand:         turnHand,
 		afterDiscardHand: turnHand,
 		scoreAsRiichi:    true,
 		shantenGoals: []service.Goal{
@@ -299,7 +297,6 @@ func TestScoredWinEstimateGoalsUsesAfterDiscardHandForRedDora(t *testing.T) {
 	throwable[redFive.RemoveRed().ID()] = 1
 	candidate := actionCandidate{
 		discardTile:      redFive,
-		turnHand:         turnHand,
 		afterDiscardHand: afterDiscardHand,
 		scoreAsRiichi:    true,
 		shantenGoals: []service.Goal{{
@@ -407,14 +404,12 @@ func TestScoredWinEstimateGoalsByKey(t *testing.T) {
 		{
 			traceKey:         "-1.1m",
 			discardTile:      tile.MustTileFromCode("1m"),
-			turnHand:         turnHand,
 			afterDiscardHand: afterDiscard1m,
 			shantenGoals:     goals,
 		},
 		{
 			traceKey:         "-1.2m",
 			discardTile:      tile.MustTileFromCode("2m"),
-			turnHand:         turnHand,
 			afterDiscardHand: afterDiscard2m,
 		},
 	}
@@ -473,14 +468,12 @@ func TestScoredWinEstimateGoalsByKeyUsesCandidateMelds(t *testing.T) {
 		{
 			traceKey:         "none",
 			discardTile:      tile.MustTileFromCode("?"),
-			turnHand:         turnHand,
 			afterDiscardHand: turnHand,
 			shantenGoals:     goals,
 		},
 		{
 			traceKey:         "0.1m",
 			discardTile:      tile.MustTileFromCode("?"),
-			turnHand:         turnHand,
 			afterDiscardHand: turnHand,
 			melds:            []meld.Meld{dragonPon},
 			shantenGoals:     goals,
