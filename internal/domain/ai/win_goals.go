@@ -64,14 +64,14 @@ func filteredWinEstimateGoals(candidate actionCandidate) []service.Goal {
 }
 
 func scoredWinEstimateGoals(candidate actionCandidate, context winEstimateGoalContext) ([]winEstimateGoal, error) {
-	if candidate.turnHand == nil {
-		return nil, fmt.Errorf("cannot score win estimate goals: turn hand must not be nil")
+	if candidate.afterDiscardHand == nil {
+		return nil, fmt.Errorf("cannot score win estimate goals: after-discard hand must not be nil")
 	}
 
 	goals := filteredWinEstimateGoals(candidate)
 	scoredGoals := make([]winEstimateGoal, 0, len(goals))
 	for _, goal := range goals {
-		scoringHand, err := scoringHandForGoal(candidate.turnHand, goal.Blocks)
+		scoringHand, err := scoringHandForGoal(candidate.afterDiscardHand, goal.Blocks)
 		if err != nil {
 			return nil, err
 		}

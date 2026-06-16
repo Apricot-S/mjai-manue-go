@@ -215,25 +215,27 @@ func TestScoredWinEstimateGoals(t *testing.T) {
 }
 
 func TestScoredWinEstimateGoalsBuildsHandFromGoalBlocks(t *testing.T) {
+	turnHand := hand.MustVisibleHand([]tile.Tile{
+		tile.MustTileFromCode("5mr"),
+		tile.MustTileFromCode("1m"),
+		tile.MustTileFromCode("1m"),
+		tile.MustTileFromCode("1m"),
+		tile.MustTileFromCode("2p"),
+		tile.MustTileFromCode("3p"),
+		tile.MustTileFromCode("4p"),
+		tile.MustTileFromCode("3s"),
+		tile.MustTileFromCode("4s"),
+		tile.MustTileFromCode("6s"),
+		tile.MustTileFromCode("6s"),
+		tile.MustTileFromCode("6s"),
+		tile.MustTileFromCode("9s"),
+		tile.MustTileFromCode("9s"),
+	})
 	candidate := actionCandidate{
-		discardTile: tile.MustTileFromCode("?"),
-		turnHand: hand.MustVisibleHand([]tile.Tile{
-			tile.MustTileFromCode("5mr"),
-			tile.MustTileFromCode("1m"),
-			tile.MustTileFromCode("1m"),
-			tile.MustTileFromCode("1m"),
-			tile.MustTileFromCode("2p"),
-			tile.MustTileFromCode("3p"),
-			tile.MustTileFromCode("4p"),
-			tile.MustTileFromCode("3s"),
-			tile.MustTileFromCode("4s"),
-			tile.MustTileFromCode("6s"),
-			tile.MustTileFromCode("6s"),
-			tile.MustTileFromCode("6s"),
-			tile.MustTileFromCode("9s"),
-			tile.MustTileFromCode("9s"),
-		}),
-		scoreAsRiichi: true,
+		discardTile:      tile.MustTileFromCode("?"),
+		turnHand:         turnHand,
+		afterDiscardHand: turnHand,
+		scoreAsRiichi:    true,
 		shantenGoals: []service.Goal{
 			{
 				Blocks: []block.Block{
@@ -261,6 +263,98 @@ func TestScoredWinEstimateGoalsBuildsHandFromGoalBlocks(t *testing.T) {
 	wantPoints := service.RonPoints(40, 1, false)
 	if got[0].points != float64(wantPoints) {
 		t.Errorf("scoredWinEstimateGoals()[0].points = %v, want %v", got[0].points, wantPoints)
+	}
+}
+
+func TestScoredWinEstimateGoalsUsesAfterDiscardHandForRedDora(t *testing.T) {
+	redFive := tile.MustTileFromCode("5mr")
+	turnHand := hand.MustVisibleHand([]tile.Tile{
+		tile.MustTileFromCode("3m"),
+		tile.MustTileFromCode("4m"),
+		redFive,
+		tile.MustTileFromCode("2p"),
+		tile.MustTileFromCode("3p"),
+		tile.MustTileFromCode("4p"),
+		tile.MustTileFromCode("3s"),
+		tile.MustTileFromCode("4s"),
+		tile.MustTileFromCode("5s"),
+		tile.MustTileFromCode("6s"),
+		tile.MustTileFromCode("7s"),
+		tile.MustTileFromCode("8s"),
+		tile.MustTileFromCode("E"),
+		tile.MustTileFromCode("E"),
+	})
+	afterDiscardHand, err := turnHand.Discard(redFive)
+	if err != nil {
+		t.Fatalf("Discard(5mr) failed: %v", err)
+	}
+	blocks := []block.Block{
+		block.MustSequence(tile.MustTileFromCode("3m")),
+		block.MustSequence(tile.MustTileFromCode("2p")),
+		block.MustSequence(tile.MustTileFromCode("3s")),
+		block.MustSequence(tile.MustTileFromCode("6s")),
+		block.MustPair(tile.MustTileFromCode("E")),
+	}
+	var throwable hand.TileCounts34
+	throwable[redFive.RemoveRed().ID()] = 1
+	candidate := actionCandidate{
+		discardTile:      redFive,
+		turnHand:         turnHand,
+		afterDiscardHand: afterDiscardHand,
+		scoreAsRiichi:    true,
+		shantenGoals: []service.Goal{{
+			Blocks:          blocks,
+			ThrowableVector: throwable,
+		}},
+	}
+	context := winEstimateGoalContext{
+		roundWind: wind.East,
+		seatWind:  wind.South,
+		dealer:    false,
+	}
+
+	got, err := scoredWinEstimateGoals(candidate, context)
+	if err != nil {
+		t.Fatalf("scoredWinEstimateGoals() failed: %v", err)
+	}
+	if len(got) != 1 {
+		t.Fatalf("len(scoredWinEstimateGoals()) = %d, want 1", len(got))
+	}
+
+	afterDiscardScoringHand, err := scoringHandForGoal(afterDiscardHand, blocks)
+	if err != nil {
+		t.Fatalf("scoringHandForGoal(afterDiscardHand) failed: %v", err)
+	}
+	fu, han, _ := service.CalculateFuHan(
+		afterDiscardScoringHand,
+		blocks,
+		nil,
+		context.roundWind,
+		context.seatWind,
+		nil,
+		candidate.scoreAsRiichi,
+	)
+	wantPoints := service.RonPoints(fu, han, context.dealer)
+	if got[0].points != float64(wantPoints) {
+		t.Errorf("scoredWinEstimateGoals()[0].points = %v, want after-discard points %v", got[0].points, wantPoints)
+	}
+
+	turnScoringHand, err := scoringHandForGoal(turnHand, blocks)
+	if err != nil {
+		t.Fatalf("scoringHandForGoal(turnHand) failed: %v", err)
+	}
+	turnFu, turnHan, _ := service.CalculateFuHan(
+		turnScoringHand,
+		blocks,
+		nil,
+		context.roundWind,
+		context.seatWind,
+		nil,
+		candidate.scoreAsRiichi,
+	)
+	turnHandPoints := service.RonPoints(turnFu, turnHan, context.dealer)
+	if got[0].points == float64(turnHandPoints) {
+		t.Errorf("scoredWinEstimateGoals()[0].points = %v, unexpectedly matched turn-hand points", got[0].points)
 	}
 }
 

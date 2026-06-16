@@ -159,9 +159,10 @@ func TestCandidateEvaluator_newEvaluationContext_ReturnsErrorWithInvalidTrialCou
 		},
 		seat.MustSeat(0),
 		[]actionCandidate{{
-			traceKey:    "-1.1m",
-			discardTile: discard,
-			turnHand:    visibleHandFromCodes("1m", "2m", "3m", "4m", "5m", "6m", "7m", "8m", "9m", "1p", "2p", "3p", "4p"),
+			traceKey:         "-1.1m",
+			discardTile:      discard,
+			turnHand:         visibleHandFromCodes("1m", "2m", "3m", "4m", "5m", "6m", "7m", "8m", "9m", "1p", "2p", "3p", "4p"),
+			afterDiscardHand: visibleHandFromCodes("2m", "3m", "4m", "5m", "6m", "7m", "8m", "9m", "1p", "2p", "3p", "4p"),
 			shantenGoals: []service.Goal{{
 				Shanten:         0,
 				ThrowableVector: throwable,
