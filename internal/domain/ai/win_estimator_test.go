@@ -623,38 +623,14 @@ func TestUnseenWallFromVisibleTilesRejectsInvalidVisibleTiles(t *testing.T) {
 	}
 }
 
-func TestTrialTilesFromWall(t *testing.T) {
-	wall := []tile.Tile{
-		tile.MustTileFromCode("1m"),
-		tile.MustTileFromCode("2m"),
-		tile.MustTileFromCode("3m"),
-	}
-
-	got, err := trialTilesFromWall(wall, 2)
-	if err != nil {
-		t.Fatalf("trialTilesFromWall() failed: %v", err)
-	}
-	want := []tile.Tile{
-		tile.MustTileFromCode("1m"),
-		tile.MustTileFromCode("2m"),
-	}
-	if !reflect.DeepEqual(got, want) {
-		t.Errorf("trialTilesFromWall() = %v, want %v", got, want)
-	}
-
-	got[0] = tile.MustTileFromCode("9m")
-	if wall[0] != tile.MustTileFromCode("1m") {
-		t.Errorf("wall[0] = %s, want unchanged 1m", wall[0])
-	}
-}
-
-func TestTrialTilesFromWallRejectsInvalidNumDraws(t *testing.T) {
+func TestShuffledTrialTileCountsRejectsInvalidNumDraws(t *testing.T) {
 	wall := []tile.Tile{tile.MustTileFromCode("1m")}
-	if _, err := trialTilesFromWall(wall, -1); err == nil {
-		t.Fatal("trialTilesFromWall(-1) succeeded unexpectedly")
+	rng := rand.New(rand.NewPCG(1, 2))
+	if _, err := shuffledTrialTileCounts(wall, -1, rng); err == nil {
+		t.Fatal("shuffledTrialTileCounts(-1) succeeded unexpectedly")
 	}
-	if _, err := trialTilesFromWall(wall, 2); err == nil {
-		t.Fatal("trialTilesFromWall(2) succeeded unexpectedly")
+	if _, err := shuffledTrialTileCounts(wall, 2, rng); err == nil {
+		t.Fatal("shuffledTrialTileCounts(2) succeeded unexpectedly")
 	}
 }
 

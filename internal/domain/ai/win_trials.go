@@ -47,26 +47,19 @@ func unseenWallFromVisibleTiles(visibleTiles []tile.Tile) ([]tile.Tile, error) {
 	return wallTilesFromCounts(counts)
 }
 
-func trialTilesFromWall(wall []tile.Tile, numDraws int) ([]tile.Tile, error) {
+func shuffledTrialTileCounts(wall []tile.Tile, numDraws int, rng *rand.Rand) (hand.TileCounts34, error) {
 	if numDraws < 0 {
-		return nil, fmt.Errorf("cannot build trial tiles: numDraws must be non-negative")
+		return hand.TileCounts34{}, fmt.Errorf("cannot build trial tiles: numDraws must be non-negative")
 	}
 	if numDraws > len(wall) {
-		return nil, fmt.Errorf("cannot build trial tiles: numDraws %d exceeds wall length %d", numDraws, len(wall))
+		return hand.TileCounts34{}, fmt.Errorf("cannot build trial tiles: numDraws %d exceeds wall length %d", numDraws, len(wall))
 	}
-	return slices.Clone(wall[:numDraws]), nil
-}
 
-func shuffledTrialTileCounts(wall []tile.Tile, numDraws int, rng *rand.Rand) (hand.TileCounts34, error) {
 	shuffled := slices.Clone(wall)
 	rng.Shuffle(len(shuffled), func(i, j int) {
 		shuffled[i], shuffled[j] = shuffled[j], shuffled[i]
 	})
-	trialTiles, err := trialTilesFromWall(shuffled, numDraws)
-	if err != nil {
-		return hand.TileCounts34{}, err
-	}
-	return trialTileCounts(trialTiles), nil
+	return trialTileCounts(shuffled[:numDraws]), nil
 }
 
 func canAchieveGoalWithTrialTiles(goal service.Goal, trialTiles hand.TileCounts34) bool {
