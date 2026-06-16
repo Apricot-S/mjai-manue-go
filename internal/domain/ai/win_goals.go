@@ -20,6 +20,29 @@ const (
 	shantenPruneLimit   = 3
 )
 
+var redFiveTiles = [numRedFiveTileTypes]tile.Tile{
+	tile.MustTileFromCode("5mr"),
+	tile.MustTileFromCode("5pr"),
+	tile.MustTileFromCode("5sr"),
+}
+
+var normalFiveTiles = [numRedFiveTileTypes]tile.Tile{
+	redFiveTiles[0].RemoveRed(),
+	redFiveTiles[1].RemoveRed(),
+	redFiveTiles[2].RemoveRed(),
+}
+
+var redFiveIndexesByNormalTileID = func() [tile.NumTileType34]int {
+	indexes := [tile.NumTileType34]int{}
+	for i := range indexes {
+		indexes[i] = -1
+	}
+	for i, normal := range normalFiveTiles {
+		indexes[normal.ID()] = i
+	}
+	return indexes
+}()
+
 func filteredWinEstimateGoals(candidate actionCandidate) []service.Goal {
 	goals := make([]service.Goal, 0, len(candidate.shantenGoals))
 	for _, goal := range candidate.shantenGoals {
@@ -74,20 +97,19 @@ func scoredWinEstimateGoals(candidate actionCandidate, context winEstimateGoalCo
 }
 
 func scoringHandForGoal(sourceHand *hand.VisibleHand, blocks []block.Block) (*hand.VisibleHand, error) {
-	redCounts := make(map[int]int, numRedFiveTileTypes)
-	for _, t := range sourceHand.ToTiles() {
-		if t.IsRed() {
-			redCounts[t.RemoveRed().ID()]++
-		}
+	redCounts := [numRedFiveTileTypes]int{}
+	for i, red := range redFiveTiles {
+		redCounts[i] = sourceHand.Count(red)
 	}
 
 	tiles := make([]tile.Tile, 0, winningHandSize)
 	for _, b := range blocks {
 		for _, t := range b.ToTiles() {
 			normal := t.RemoveRed()
-			if redCounts[normal.ID()] > 0 {
-				tiles = append(tiles, normal.AddRed())
-				redCounts[normal.ID()]--
+			redIndex := redFiveIndexesByNormalTileID[normal.ID()]
+			if redIndex >= 0 && redCounts[redIndex] > 0 {
+				tiles = append(tiles, redFiveTiles[redIndex])
+				redCounts[redIndex]--
 				continue
 			}
 			tiles = append(tiles, normal)
