@@ -71,6 +71,8 @@ func scoredWinEstimateGoals(candidate actionCandidate, context winEstimateGoalCo
 	goals := filteredWinEstimateGoals(candidate)
 	scoredGoals := make([]winEstimateGoal, 0, len(goals))
 	for _, goal := range goals {
+		// Original Manue counts red fives from the turn hand before the candidate discard.
+		// Use the after-discard hand so a discarded red five is not scored as future win value.
 		scoringHand, err := scoringHandForGoal(candidate.afterDiscardHand, goal.Blocks)
 		if err != nil {
 			return nil, err
