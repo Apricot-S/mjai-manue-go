@@ -16,24 +16,35 @@ import (
 func TestGoldenStdout(t *testing.T) {
 	tests := []struct {
 		name   string
+		player string
 		input  string
 		golden string
 		policy jsonLinesPolicy
 	}{
 		{
+			name:   "stdio_join_custom_name",
+			player: "CustomBot",
+			input:  "testdata/tsumogiri/hello.input.mjson",
+			golden: "testdata/tsumogiri/hello_custom_name.stdio.golden",
+			policy: jsonLinesPolicy{},
+		},
+		{
 			name:   "stdio",
+			player: "tsumogiri",
 			input:  "testdata/tsumogiri/self_draw.input.mjson",
 			golden: "testdata/tsumogiri/self_draw.stdio.golden",
 			policy: jsonLinesPolicy{},
 		},
 		{
 			name:   "stdio_two_games",
+			player: "tsumogiri",
 			input:  "testdata/tsumogiri/two_games.input.mjson",
 			golden: "testdata/tsumogiri/two_games.stdio.golden",
 			policy: jsonLinesPolicy{},
 		},
 		{
 			name:   "mjsonp",
+			player: "tsumogiri",
 			input:  "testdata/tsumogiri/self_draw.input.mjson",
 			golden: "testdata/tsumogiri/self_draw.mjsonp.golden",
 			policy: jsonLinesPolicy{
@@ -43,12 +54,14 @@ func TestGoldenStdout(t *testing.T) {
 		},
 		{
 			name:   "manue_stdio_chiihou_phase1",
+			player: "Manue",
 			input:  "testdata/manue/chiihou.input.mjson",
 			golden: "testdata/manue/chiihou.stdio.golden",
 			policy: jsonLinesPolicy{},
 		},
 		{
 			name:   "manue_stdio_double_riichi_phase1",
+			player: "Manue",
 			input:  "testdata/manue/double_riichi.input.mjson",
 			golden: "testdata/manue/double_riichi.stdio.golden",
 			policy: jsonLinesPolicy{},
@@ -65,7 +78,7 @@ func TestGoldenStdout(t *testing.T) {
 			if strings.HasPrefix(tt.name, "manue_") {
 				agent = newManueAgentForGoldenTest(t)
 			}
-			err := runJSONLines("tsumogiri", "default", agent, strings.NewReader(input), &out, nil, tt.policy)
+			err := runJSONLines(tt.player, "default", agent, strings.NewReader(input), &out, nil, tt.policy)
 			if err != nil {
 				t.Fatalf("runJSONLines() failed: %v", err)
 			}
