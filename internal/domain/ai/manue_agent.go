@@ -36,6 +36,11 @@ func NewManueAgent(seed uint64, deps ManueAgentDeps) (*ManueAgent, error) {
 }
 
 func (a *ManueAgent) Reset() {
+	// The original implementation creates seedRandom("") inside getHoraEstimation,
+	// so each win estimation starts from the same random sequence. This port keeps
+	// one deterministic RNG per game instead; Reset is called at start_game. As a
+	// result, the same state, for example South 2, can get different evaluation
+	// values when reached from East 1 than when started directly from that round.
 	rng := rand.New(rand.NewPCG(a.seed, 0))
 	a.evaluator = newCandidateEvaluator(a.deps.Stats, a.deps.Danger, rng)
 }
