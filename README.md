@@ -91,7 +91,7 @@ See [cmd/](cmd/) for more information.
 > [!NOTE]
 > The original README's "仕組み" section was based on an older CoffeeScript implementation and does not match the final implementation being ported. This section has been rewritten based on the final implementation.
 
-For each legal candidate, Manue estimates the following values. These values are included in the bot's debug output.
+For each legal candidate, Manue estimates the following values. These values are included in the bot's trace output, including the response `log` field and stderr logs.
 
 - `myHoraProb` / Win probability
   - The probability that the bot wins the current round after choosing the candidate.
