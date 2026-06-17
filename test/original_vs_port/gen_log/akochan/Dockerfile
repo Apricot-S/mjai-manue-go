@@ -1,8 +1,16 @@
 # syntax=docker/dockerfile:1
 
-FROM ubuntu:noble AS base
+ARG OS_VERSION=trixie
 
-FROM base AS builder
+FROM gcc:15-${OS_VERSION} AS builder
+
+ARG UID=10001
+RUN useradd \
+    --uid "${UID}" \
+    --shell "/usr/sbin/nologin" \
+    --home-dir "/nonexistent" \
+    --no-create-home \
+    appuser
 
 RUN rm -f /etc/apt/apt.conf.d/docker-clean; \
     echo 'Binary::apt::APT::Keep-Downloaded-Packages "true";' > /etc/apt/apt.conf.d/keep-cache
@@ -10,32 +18,37 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
     --mount=type=cache,target=/var/lib/apt,sharing=locked \
     apt-get update && \
     DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
-        ca-certificates \
-        g++ \
-        git-core \
-        libboost-system-dev \
-        make
+        libboost-system1.88-dev
 
 RUN mkdir -p /app && \
-    chown -R ubuntu /app
+    chown -R appuser /app
 
 WORKDIR /app
 
-USER ubuntu
+USER appuser
 
 RUN mkdir build
 RUN git clone --depth=1 https://github.com/critter-mj/akochan.git
 
 RUN --mount=type=bind,source=patch.sh,target=patch.sh \
-    cd ./akochan/ai_src && \
+    cd ./akochan && \
+    /app/patch.sh && \
+    cd ./ai_src && \
     make -f Makefile_Linux && \
     cd ../ && \
-    /app/patch.sh && \
     make -f Makefile_Linux && \
     cp libai.so system.exe setup_match.json setup_mjai.json ../build && \
     cp -r params ../build
 
-FROM base AS final
+FROM debian:${OS_VERSION}-slim AS final
+
+ARG UID=10001
+RUN useradd \
+    --uid "${UID}" \
+    --shell "/usr/sbin/nologin" \
+    --home-dir "/nonexistent" \
+    --no-create-home \
+    appuser
 
 RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
     --mount=type=cache,target=/var/lib/apt,sharing=locked \
@@ -43,13 +56,14 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
     echo 'Binary::apt::APT::Keep-Downloaded-Packages "true";' > /etc/apt/apt.conf.d/keep-cache && \
     apt-get update && \
     DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+        libboost-system1.88.0 \
         libgomp1 && \
     mkdir -p /app && \
-    chown -R ubuntu /app
+    chown -R appuser /app
 
 WORKDIR /app/akochan
 
-USER ubuntu
+USER appuser
 
 COPY --from=builder /app/build /app/akochan
 

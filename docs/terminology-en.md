@@ -59,5 +59,5 @@
   <dd>Rank. An integer between 1 and 4.</dd>
 
   <dt>statistics (stats)</dt>
-  <dd>Statistics collected in advance from game records.</dd>
+  <dd>Statistics collected in advance from game logs.</dd>
 </dl>

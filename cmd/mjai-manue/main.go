@@ -1,59 +1,85 @@
 package main
 
 import (
+	"errors"
 	"flag"
 	"fmt"
-	"log"
+	"io"
 	"os"
 
-	"github.com/Apricot-S/mjai-manue-go/internal/agent"
-	"github.com/Apricot-S/mjai-manue-go/internal/ai"
-	"github.com/Apricot-S/mjai-manue-go/internal/cli"
+	"github.com/Apricot-S/mjai-manue-go/configs"
+	mjairuntime "github.com/Apricot-S/mjai-manue-go/internal/adapter/mjai/runtime"
+	"github.com/Apricot-S/mjai-manue-go/internal/domain/ai"
 )
 
-const defaultName = "Manue020"
+const (
+	defaultName = "Manue030"
+	defaultSeed = uint64(0)
+
+	exitOK           = 0
+	exitRuntimeError = 1
+	exitUsageError   = 2
+)
 
 func main() {
-	var name string
-	flag.StringVar(&name, "name", defaultName, "Player's name")
-	flag.Usage = func() {
-		fmt.Fprintf(os.Stderr, "Usage: %s [--name NAME] [url]\n", os.Args[0])
-		flag.PrintDefaults()
-	}
-	flag.Parse()
+	os.Exit(run(os.Args[1:], os.Stdin, os.Stdout, os.Stderr))
+}
 
-	var rawURL string
-	var usePipe bool
-	args := flag.Args()
-	switch len(args) {
-	case 0:
-		usePipe = true
-	case 1:
-		rawURL = args[0]
-		usePipe = false
-	default:
-		flag.Usage()
-		os.Exit(2)
+func run(args []string, in io.Reader, out io.Writer, errOut io.Writer) int {
+	flags := flag.NewFlagSet("mjai-manue", flag.ContinueOnError)
+	flags.SetOutput(errOut)
+	name := flags.String("name", defaultName, "player name")
+	seed := flags.Uint64("seed", defaultSeed, "random seed")
+	if err := flags.Parse(args); err != nil {
+		return exitUsageError
+	}
+	if flags.NArg() > 1 {
+		fmt.Fprintln(errOut, "too many arguments")
+		return exitUsageError
 	}
 
-	room, err := cli.GetRoom(rawURL)
+	stats, err := configs.LoadGameStats()
 	if err != nil {
-		log.Fatal(err)
+		fmt.Fprintf(errOut, "failed to load game stats: %v\n", err)
+		return exitRuntimeError
 	}
-
-	ai, err := ai.NewManueAIDefault()
+	dangerTree, err := configs.LoadDangerTree()
 	if err != nil {
-		log.Fatalf("failed to create AI: %v", err)
+		fmt.Fprintf(errOut, "failed to load danger tree: %v\n", err)
+		return exitRuntimeError
 	}
-	agent := agent.NewAIAgentDefault(name, room, ai)
+	agent, err := ai.NewManueAgent(*seed, ai.ManueAgentDeps{
+		Stats:  stats,
+		Danger: ai.NewDangerEstimator(dangerTree),
+	})
+	if err != nil {
+		fmt.Fprintln(errOut, err)
+		return exitRuntimeError
+	}
 
-	if usePipe {
-		err = cli.RunPipeMode(agent)
+	if flags.NArg() == 1 {
+		err = mjairuntime.RunTCP(mjairuntime.TCPConfig{
+			Name:  *name,
+			URL:   flags.Arg(0),
+			Agent: agent,
+			Log:   errOut,
+		})
 	} else {
-		err = cli.RunTCPClientMode(rawURL, agent)
+		err = mjairuntime.RunStdio(mjairuntime.StdioConfig{
+			Name:  *name,
+			Room:  "default",
+			Agent: agent,
+			In:    in,
+			Out:   out,
+			Log:   errOut,
+		})
 	}
-
 	if err != nil {
-		log.Fatalf("error running client: %v", err)
+		fmt.Fprintln(errOut, err)
+		if _, ok := errors.AsType[*mjairuntime.UsageError](err); ok {
+			return exitUsageError
+		}
+		return exitRuntimeError
 	}
+	return exitOK
 }
