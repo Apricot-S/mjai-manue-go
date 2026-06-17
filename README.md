@@ -89,7 +89,7 @@ See [cmd/](cmd/) for more information.
 ## How It Works
 
 > [!NOTE]
-> The original README's "仕組み" section was based on an older CoffeeScript implementation and does not match the final implementation being ported. This section has been rewritten based on the final implementation.
+> The original README's "仕組み" section was based on an older CoffeeScript implementation and does not match the [final implementation being ported](https://github.com/gimite/mjai-manue/tree/a6ce6c3c11c44cec79e2f183a63af0d66488fce6). This section has been rewritten based on the final implementation.
 
 For each legal candidate, Manue estimates the following values. These values are included in the bot's trace output, including the response `log` field and stderr logs.
 
