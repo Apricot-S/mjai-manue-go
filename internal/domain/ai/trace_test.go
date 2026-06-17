@@ -29,24 +29,23 @@ func TestFormatCandidateTrace(t *testing.T) {
 		t.Fatalf("NewDiscard() failed: %v", err)
 	}
 
-	got := formatCandidateTrace([]actionCandidate{
-		{
+	got := formatCandidateTrace([]evaluatedActionCandidate{
+		evaluatedCandidateForTest(actionCandidate{
 			traceKey:    "-1.5m",
 			action:      discard,
 			riichi:      false,
 			discardTile: discard.Tile(),
 			shanten:     1,
-			score: candidateScore{
-				averageRank:                 2.25,
-				expectedPoints:              1200,
-				dealInProb:                  0.125,
-				winProb:                     0.25,
-				exhaustiveDrawProb:          0.375,
-				otherWinProb:                0.5,
-				averageWinPoints:            3900,
-				exhaustiveDrawAveragePoints: 1000,
-			},
-		},
+		}, candidateScore{
+			averageRank:                 2.25,
+			expectedPoints:              1200,
+			dealInProb:                  0.125,
+			winProb:                     0.25,
+			exhaustiveDrawProb:          0.375,
+			otherWinProb:                0.5,
+			averageWinPoints:            3900,
+			exhaustiveDrawAveragePoints: 1000,
+		}),
 	})
 	want := "| action | avgRank | expPt | hojuProb | myHoraProb | ryukyokuProb | otherHoraProb | avgHoraPt | ryukyokuAvgPt | shanten | \n" +
 		"|  -1.5m |  2.2500 |  1200 |    0.125 |      0.250 |        0.375 |         0.500 |      3900 |          1000 |       1 | \n"
@@ -62,14 +61,14 @@ func TestFormatCandidateTrace_FormatsInfinityShanten(t *testing.T) {
 		t.Fatalf("NewDiscard() failed: %v", err)
 	}
 
-	got := formatCandidateTrace([]actionCandidate{
-		{
+	got := formatCandidateTrace([]evaluatedActionCandidate{
+		evaluatedCandidateForTest(actionCandidate{
 			traceKey:    "-1.5m",
 			action:      discard,
 			riichi:      false,
 			discardTile: discard.Tile(),
 			shanten:     service.InfinityShanten,
-		},
+		}, candidateScore{}),
 	})
 	if !strings.Contains(got, "Inf") {
 		t.Errorf("formatCandidateTrace() = %q, want it to contain Inf", got)
@@ -97,13 +96,13 @@ func TestFormatCandidateLog(t *testing.T) {
 		t.Fatalf("NewDiscard() failed: %v", err)
 	}
 
-	got := formatCandidateLog([]actionCandidate{
-		{
+	got := formatCandidateLog([]evaluatedActionCandidate{
+		evaluatedCandidateForTest(actionCandidate{
 			traceKey:    "-1.5m",
 			action:      discard,
 			discardTile: discard.Tile(),
 			shanten:     1,
-		},
+		}, candidateScore{}),
 	}, [common.NumPlayers]float64{0, 0.125, 0.5, 1}, self)
 	if !strings.Contains(got, "\n\n\ntenpaiProbs:  1: 0.125  2: 0.500  3: 1.000  \n") {
 		t.Errorf("formatCandidateLog() = %q, want tenpaiProbs after candidate table", got)
@@ -116,17 +115,17 @@ func TestFormatDecisionTrace_AppendsDecidedKey(t *testing.T) {
 	if err != nil {
 		t.Fatalf("NewDiscard() failed: %v", err)
 	}
-	selected := &actionCandidate{
+	selected := evaluatedCandidateForTest(actionCandidate{
 		traceKey:    "-1.5m",
 		action:      discard,
 		riichi:      false,
 		discardTile: discard.Tile(),
 		shanten:     1,
-	}
+	}, candidateScore{})
 
 	got := formatDecisionTrace(
-		formatCandidateLog([]actionCandidate{*selected}, [common.NumPlayers]float64{}, self),
-		selected,
+		formatCandidateLog([]evaluatedActionCandidate{selected}, [common.NumPlayers]float64{}, self),
+		&selected,
 		candidateEvaluationSummary{winEstimateGoalCounts: []int{7, 3}},
 	)
 	want := "goals 7\n" +

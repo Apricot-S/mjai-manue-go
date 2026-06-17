@@ -19,14 +19,14 @@ func formatDiscardTraceKey(riichi bool, discardTile tile.Tile) string {
 	return fmt.Sprintf("%d.%s", prefix, discardTile)
 }
 
-func formatDecisionTrace(log string, selected *actionCandidate, summary candidateEvaluationSummary) string {
+func formatDecisionTrace(log string, selected *evaluatedActionCandidate, summary candidateEvaluationSummary) string {
 	var b strings.Builder
 	b.WriteString(formatGoalCountTrace(summary))
 	b.WriteString(log)
 	if selected == nil {
 		return b.String()
 	}
-	fmt.Fprintf(&b, "decidedKey %s\n", selected.traceKey)
+	fmt.Fprintf(&b, "decidedKey %s\n", selected.candidate.traceKey)
 	return b.String()
 }
 
@@ -38,7 +38,7 @@ func formatGoalCountTrace(summary candidateEvaluationSummary) string {
 	return b.String()
 }
 
-func formatCandidateLog(candidates []actionCandidate, tenpaiProbs [common.NumPlayers]float64, self seat.Seat) string {
+func formatCandidateLog(candidates []evaluatedActionCandidate, tenpaiProbs [common.NumPlayers]float64, self seat.Seat) string {
 	trace := formatCandidateTrace(candidates)
 	if trace == "" {
 		return ""
@@ -59,7 +59,7 @@ func formatTenpaiProbsTrace(tenpaiProbs [common.NumPlayers]float64, self seat.Se
 	return b.String()
 }
 
-func formatCandidateTrace(candidates []actionCandidate) string {
+func formatCandidateTrace(candidates []evaluatedActionCandidate) string {
 	n := len(candidates)
 	if n == 0 {
 		return ""
@@ -80,7 +80,7 @@ func formatCandidateTrace(candidates []actionCandidate) string {
 	}
 	for i, candidate := range sortedCandidates(candidates, true) {
 		rows[i+1] = []string{
-			candidate.traceKey,
+			candidate.candidate.traceKey,
 			strconv.FormatFloat(candidate.score.averageRank, 'f', 4, 64),
 			strconv.FormatFloat(candidate.score.expectedPoints, 'f', 0, 64),
 			strconv.FormatFloat(candidate.score.dealInProb, 'f', 3, 64),
@@ -89,7 +89,7 @@ func formatCandidateTrace(candidates []actionCandidate) string {
 			strconv.FormatFloat(candidate.score.otherWinProb, 'f', 3, 64),
 			strconv.FormatFloat(candidate.score.averageWinPoints, 'f', 0, 64),
 			strconv.FormatFloat(candidate.score.exhaustiveDrawAveragePoints, 'f', 0, 64),
-			formatShantenTraceValue(candidate.shanten),
+			formatShantenTraceValue(candidate.candidate.shanten),
 		}
 	}
 	return formatTraceTable(rows)

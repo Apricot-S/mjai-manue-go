@@ -122,16 +122,16 @@ func (a *ManueAgent) decideFromCandidates(
 	candidates []actionCandidate,
 	preferBlack bool,
 ) (Decision, error) {
-	candidates, summary, err := a.evaluator.evaluateCandidates(state, selfSeat, candidates)
+	evaluatedCandidates, summary, err := a.evaluator.evaluateCandidates(state, selfSeat, candidates)
 	if err != nil {
 		return Decision{}, err
 	}
 	tenpaiProbs := currentTenpaiProbs(a.deps.Stats, state, selfSeat)
-	return buildCandidateDecision(candidates, preferBlack, tenpaiProbs, selfSeat, summary), nil
+	return buildCandidateDecision(evaluatedCandidates, preferBlack, tenpaiProbs, selfSeat, summary), nil
 }
 
 func buildCandidateDecision(
-	candidates []actionCandidate,
+	candidates []evaluatedActionCandidate,
 	preferBlack bool,
 	tenpaiProbs [common.NumPlayers]float64,
 	self seat.Seat,
@@ -140,7 +140,7 @@ func buildCandidateDecision(
 	selected := chooseBestCandidate(candidates, preferBlack)
 	log := formatCandidateLog(candidates, tenpaiProbs, self)
 	return Decision{
-		Action: selected.action,
+		Action: selected.candidate.action,
 		Log:    log,
 		Trace:  formatDecisionTrace(log, &selected, summary),
 	}

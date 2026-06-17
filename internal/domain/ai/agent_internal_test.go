@@ -252,23 +252,21 @@ func TestBuildCandidateDecision_ReturnsCallActionForWinningReactionCandidate(t *
 	}
 	pass := action.NewPass(self)
 
-	decision := buildCandidateDecision([]actionCandidate{
-		{
+	decision := buildCandidateDecision([]evaluatedActionCandidate{
+		evaluatedCandidateForTest(actionCandidate{
 			traceKey: "none",
 			action:   pass,
-			score: candidateScore{
-				averageRank:    2.0,
-				expectedPoints: 1000,
-			},
-		},
-		{
+		}, candidateScore{
+			averageRank:    2.0,
+			expectedPoints: 1000,
+		}),
+		evaluatedCandidateForTest(actionCandidate{
 			traceKey: "0.4m",
 			action:   pon,
-			score: candidateScore{
-				averageRank:    1.9,
-				expectedPoints: 0,
-			},
-		},
+		}, candidateScore{
+			averageRank:    1.9,
+			expectedPoints: 0,
+		}),
 	}, false, [common.NumPlayers]float64{0, 0.1, 0.2, 0.3}, self, candidateEvaluationSummary{})
 
 	if decision.Action != pon {
@@ -290,27 +288,25 @@ func TestBuildCandidateDecision(t *testing.T) {
 		t.Fatalf("NewDiscard(black) failed: %v", err)
 	}
 
-	decision := buildCandidateDecision([]actionCandidate{
-		{
+	decision := buildCandidateDecision([]evaluatedActionCandidate{
+		evaluatedCandidateForTest(actionCandidate{
 			traceKey:    "-1.5mr",
 			action:      redDiscard,
 			discardTile: redDiscard.Tile(),
 			red:         true,
-			score: candidateScore{
-				averageRank:    2.0,
-				expectedPoints: 1000,
-			},
-		},
-		{
+		}, candidateScore{
+			averageRank:    2.0,
+			expectedPoints: 1000,
+		}),
+		evaluatedCandidateForTest(actionCandidate{
 			traceKey:    "-1.5m",
 			action:      blackDiscard,
 			discardTile: blackDiscard.Tile(),
 			red:         false,
-			score: candidateScore{
-				averageRank:    2.0,
-				expectedPoints: 1000,
-			},
-		},
+		}, candidateScore{
+			averageRank:    2.0,
+			expectedPoints: 1000,
+		}),
 	}, true, [common.NumPlayers]float64{0, 0.1, 0.2, 0.3}, self, candidateEvaluationSummary{})
 
 	if decision.Action != blackDiscard {
@@ -335,27 +331,25 @@ func TestBuildCandidateDecision_CanIgnoreBlackPreference(t *testing.T) {
 		t.Fatalf("NewDiscard(black) failed: %v", err)
 	}
 
-	decision := buildCandidateDecision([]actionCandidate{
-		{
+	decision := buildCandidateDecision([]evaluatedActionCandidate{
+		evaluatedCandidateForTest(actionCandidate{
 			traceKey:    "-1.5mr",
 			action:      redDiscard,
 			discardTile: redDiscard.Tile(),
 			red:         true,
-			score: candidateScore{
-				averageRank:    2.0,
-				expectedPoints: 1000,
-			},
-		},
-		{
+		}, candidateScore{
+			averageRank:    2.0,
+			expectedPoints: 1000,
+		}),
+		evaluatedCandidateForTest(actionCandidate{
 			traceKey:    "-1.5m",
 			action:      blackDiscard,
 			discardTile: blackDiscard.Tile(),
 			red:         false,
-			score: candidateScore{
-				averageRank:    2.0,
-				expectedPoints: 1000,
-			},
-		},
+		}, candidateScore{
+			averageRank:    2.0,
+			expectedPoints: 1000,
+		}),
 	}, false, [common.NumPlayers]float64{0, 0.1, 0.2, 0.3}, self, candidateEvaluationSummary{})
 
 	if decision.Action != redDiscard {

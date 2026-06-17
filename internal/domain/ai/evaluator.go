@@ -54,21 +54,21 @@ func (e candidateEvaluator) evaluateCandidates(
 	state round.StateViewer,
 	self seat.Seat,
 	candidates []actionCandidate,
-) ([]actionCandidate, candidateEvaluationSummary, error) {
+) ([]evaluatedActionCandidate, candidateEvaluationSummary, error) {
 	context, err := e.newEvaluationContext(state, self, candidates)
 	if err != nil {
 		return nil, candidateEvaluationSummary{}, err
 	}
 
-	updated := make([]actionCandidate, len(candidates))
+	evaluated := make([]evaluatedActionCandidate, len(candidates))
 	for i, candidate := range candidates {
-		updatedCandidate, err := e.evaluateCandidate(context, candidate)
+		evaluatedCandidate, err := e.evaluateCandidate(context, candidate)
 		if err != nil {
 			return nil, candidateEvaluationSummary{}, fmt.Errorf("cannot evaluate candidate %q: %w", candidate.traceKey, err)
 		}
-		updated[i] = updatedCandidate
+		evaluated[i] = evaluatedCandidate
 	}
-	return updated, candidateEvaluationSummary{
+	return evaluated, candidateEvaluationSummary{
 		winEstimateGoalCounts: context.winEstimateGoalCounts,
 	}, nil
 }
@@ -122,10 +122,10 @@ func (e candidateEvaluator) newEvaluationContext(
 func (e candidateEvaluator) evaluateCandidate(
 	context candidateEvaluationContext,
 	candidate actionCandidate,
-) (actionCandidate, error) {
+) (evaluatedActionCandidate, error) {
 	winEstimate, ok := context.winEstimates[candidate.traceKey]
 	if !ok {
-		return actionCandidate{}, fmt.Errorf("missing win estimate")
+		return evaluatedActionCandidate{}, fmt.Errorf("missing win estimate")
 	}
 	selfWinDist := winScoreDeltaDist(
 		context.self.Index(),
@@ -136,7 +136,7 @@ func (e candidateEvaluator) evaluateCandidate(
 
 	dealInEstimates, immediateDist, err := e.immediateDealInEvaluation(context, candidate)
 	if err != nil {
-		return actionCandidate{}, err
+		return evaluatedActionCandidate{}, err
 	}
 
 	exhaustiveDrawEvaluation := context.exhaustiveDrawIfNotenNow
@@ -158,10 +158,12 @@ func (e candidateEvaluator) evaluateCandidate(
 		context.self,
 	)
 	if err != nil {
-		return actionCandidate{}, err
+		return evaluatedActionCandidate{}, err
 	}
-	candidate.score = score
-	return candidate, nil
+	return evaluatedActionCandidate{
+		candidate: candidate,
+		score:     score,
+	}, nil
 }
 
 func (e candidateEvaluator) immediateDealInEvaluation(

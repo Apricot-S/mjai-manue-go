@@ -32,106 +32,109 @@ func TestChooseBestCandidate_PrefersBlackTileOnTie(t *testing.T) {
 	if err != nil {
 		t.Fatalf("buildSelfTurnCandidates() failed: %v", err)
 	}
-	got := chooseBestCandidate(candidates, true)
-	if got.action != blackDiscard {
+	evaluated := make([]evaluatedActionCandidate, 0, len(candidates))
+	for _, candidate := range candidates {
+		evaluated = append(evaluated, evaluatedCandidateForTest(candidate, candidateScore{
+			averageRank:    2.0,
+			expectedPoints: 1000,
+		}))
+	}
+	got := chooseBestCandidate(evaluated, true)
+	if got.candidate.action != blackDiscard {
 		t.Errorf("chooseBestCandidate() = %v, want black discard", got)
 	}
 }
 
 func TestSortedCandidates_PrefersBlackForOrder(t *testing.T) {
-	red := actionCandidate{
+	red := evaluatedCandidateForTest(actionCandidate{
 		traceKey: "-1.5mr",
 		red:      true,
-		score: candidateScore{
-			averageRank:    2.0,
-			expectedPoints: 1000,
-		},
-	}
-	black := actionCandidate{
+	}, candidateScore{
+		averageRank:    2.0,
+		expectedPoints: 1000,
+	})
+	black := evaluatedCandidateForTest(actionCandidate{
 		traceKey: "-1.5m",
 		red:      false,
-		score: candidateScore{
-			averageRank:    2.0,
-			expectedPoints: 1000,
-		},
-	}
+	}, candidateScore{
+		averageRank:    2.0,
+		expectedPoints: 1000,
+	})
 
-	got := sortedCandidates([]actionCandidate{red, black}, true)
+	got := sortedCandidates([]evaluatedActionCandidate{red, black}, true)
 	if len(got) != 2 {
 		t.Fatalf("len(sortedCandidates()) = %d, want 2", len(got))
 	}
-	if got[0].traceKey != black.traceKey {
-		t.Errorf("first traceKey = %q, want black candidate %q", got[0].traceKey, black.traceKey)
+	if got[0].candidate.traceKey != black.candidate.traceKey {
+		t.Errorf("first traceKey = %q, want black candidate %q", got[0].candidate.traceKey, black.candidate.traceKey)
 	}
 }
 
 func TestSortedCandidates_CanIgnoreBlackPreference(t *testing.T) {
-	red := actionCandidate{
+	red := evaluatedCandidateForTest(actionCandidate{
 		traceKey: "-1.5mr",
 		red:      true,
-		score: candidateScore{
-			averageRank:    2.0,
-			expectedPoints: 1000,
-		},
-	}
-	black := actionCandidate{
+	}, candidateScore{
+		averageRank:    2.0,
+		expectedPoints: 1000,
+	})
+	black := evaluatedCandidateForTest(actionCandidate{
 		traceKey: "-1.5m",
 		red:      false,
-		score: candidateScore{
-			averageRank:    2.0,
-			expectedPoints: 1000,
-		},
-	}
+	}, candidateScore{
+		averageRank:    2.0,
+		expectedPoints: 1000,
+	})
 
-	got := sortedCandidates([]actionCandidate{red, black}, false)
+	got := sortedCandidates([]evaluatedActionCandidate{red, black}, false)
 	if len(got) != 2 {
 		t.Fatalf("len(sortedCandidates()) = %d, want 2", len(got))
 	}
-	if got[0].traceKey != red.traceKey {
-		t.Errorf("first traceKey = %q, want original first candidate %q", got[0].traceKey, red.traceKey)
+	if got[0].candidate.traceKey != red.candidate.traceKey {
+		t.Errorf("first traceKey = %q, want original first candidate %q", got[0].candidate.traceKey, red.candidate.traceKey)
 	}
 }
 
 func TestCompareCandidates(t *testing.T) {
 	tests := []struct {
 		name        string
-		lhs         actionCandidate
-		rhs         actionCandidate
+		lhs         evaluatedActionCandidate
+		rhs         evaluatedActionCandidate
 		preferBlack bool
 		want        int
 	}{
 		{
 			name:        "better average rank wins",
-			lhs:         actionCandidate{score: candidateScore{averageRank: 1.9, expectedPoints: 0}},
-			rhs:         actionCandidate{score: candidateScore{averageRank: 2.0, expectedPoints: 1000}},
+			lhs:         evaluatedCandidateForTest(actionCandidate{}, candidateScore{averageRank: 1.9, expectedPoints: 0}),
+			rhs:         evaluatedCandidateForTest(actionCandidate{}, candidateScore{averageRank: 2.0, expectedPoints: 1000}),
 			preferBlack: true,
 			want:        -1,
 		},
 		{
 			name:        "higher expected points wins on rank tie",
-			lhs:         actionCandidate{score: candidateScore{averageRank: 2.0, expectedPoints: 1000}},
-			rhs:         actionCandidate{score: candidateScore{averageRank: 2.0, expectedPoints: 900}},
+			lhs:         evaluatedCandidateForTest(actionCandidate{}, candidateScore{averageRank: 2.0, expectedPoints: 1000}),
+			rhs:         evaluatedCandidateForTest(actionCandidate{}, candidateScore{averageRank: 2.0, expectedPoints: 900}),
 			preferBlack: true,
 			want:        -1,
 		},
 		{
 			name:        "black tile wins on expected value tie",
-			lhs:         actionCandidate{red: false, score: candidateScore{averageRank: 2.0, expectedPoints: 1000}},
-			rhs:         actionCandidate{red: true, score: candidateScore{averageRank: 2.0, expectedPoints: 1000}},
+			lhs:         evaluatedCandidateForTest(actionCandidate{red: false}, candidateScore{averageRank: 2.0, expectedPoints: 1000}),
+			rhs:         evaluatedCandidateForTest(actionCandidate{red: true}, candidateScore{averageRank: 2.0, expectedPoints: 1000}),
 			preferBlack: true,
 			want:        -1,
 		},
 		{
 			name:        "red tie ignored when preferBlack is false",
-			lhs:         actionCandidate{red: false, score: candidateScore{averageRank: 2.0, expectedPoints: 1000}},
-			rhs:         actionCandidate{red: true, score: candidateScore{averageRank: 2.0, expectedPoints: 1000}},
+			lhs:         evaluatedCandidateForTest(actionCandidate{red: false}, candidateScore{averageRank: 2.0, expectedPoints: 1000}),
+			rhs:         evaluatedCandidateForTest(actionCandidate{red: true}, candidateScore{averageRank: 2.0, expectedPoints: 1000}),
 			preferBlack: false,
 			want:        0,
 		},
 		{
 			name:        "complete tie returns zero",
-			lhs:         actionCandidate{score: candidateScore{averageRank: 2.0, expectedPoints: 1000}},
-			rhs:         actionCandidate{score: candidateScore{averageRank: 2.0, expectedPoints: 1000}},
+			lhs:         evaluatedCandidateForTest(actionCandidate{}, candidateScore{averageRank: 2.0, expectedPoints: 1000}),
+			rhs:         evaluatedCandidateForTest(actionCandidate{}, candidateScore{averageRank: 2.0, expectedPoints: 1000}),
 			preferBlack: false,
 			want:        0,
 		},
@@ -155,13 +158,20 @@ func TestChooseBestCandidate_DoesNotPreferRiichiOnScoreTie(t *testing.T) {
 		t.Fatalf("NewDiscard() failed: %v", err)
 	}
 
-	candidates := []actionCandidate{
-		{action: discard, riichi: false, score: candidateScore{averageRank: 2.0, expectedPoints: 1000}},
-		{action: riichi, riichi: true, score: candidateScore{averageRank: 2.0, expectedPoints: 1000}},
+	candidates := []evaluatedActionCandidate{
+		evaluatedCandidateForTest(actionCandidate{action: discard, riichi: false}, candidateScore{averageRank: 2.0, expectedPoints: 1000}),
+		evaluatedCandidateForTest(actionCandidate{action: riichi, riichi: true}, candidateScore{averageRank: 2.0, expectedPoints: 1000}),
 	}
 
 	got := chooseBestCandidate(candidates, false)
-	if got.action != discard {
-		t.Errorf("chooseBestCandidate() = %T %[1]v, want first tied candidate", got.action)
+	if got.candidate.action != discard {
+		t.Errorf("chooseBestCandidate() = %T %[1]v, want first tied candidate", got.candidate.action)
+	}
+}
+
+func evaluatedCandidateForTest(candidate actionCandidate, score candidateScore) evaluatedActionCandidate {
+	return evaluatedActionCandidate{
+		candidate: candidate,
+		score:     score,
 	}
 }

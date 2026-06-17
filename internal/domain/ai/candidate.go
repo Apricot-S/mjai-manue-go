@@ -24,10 +24,14 @@ type actionCandidate struct {
 	shanten          int
 	shantenGoals     []service.Goal
 	red              bool
-	score            candidateScore
 }
 
-func chooseBestCandidate(candidates []actionCandidate, preferBlack bool) actionCandidate {
+type evaluatedActionCandidate struct {
+	candidate actionCandidate
+	score     candidateScore
+}
+
+func chooseBestCandidate(candidates []evaluatedActionCandidate, preferBlack bool) evaluatedActionCandidate {
 	best := candidates[0]
 	for _, candidate := range candidates[1:] {
 		if compareCandidates(candidate, best, preferBlack) < 0 {
@@ -37,23 +41,23 @@ func chooseBestCandidate(candidates []actionCandidate, preferBlack bool) actionC
 	return best
 }
 
-func sortedCandidates(candidates []actionCandidate, preferBlack bool) []actionCandidate {
+func sortedCandidates(candidates []evaluatedActionCandidate, preferBlack bool) []evaluatedActionCandidate {
 	sortedCandidates := slices.Clone(candidates)
-	slices.SortFunc(sortedCandidates, func(lhs, rhs actionCandidate) int {
+	slices.SortFunc(sortedCandidates, func(lhs, rhs evaluatedActionCandidate) int {
 		return compareCandidates(lhs, rhs, preferBlack)
 	})
 	return sortedCandidates
 }
 
-func compareCandidates(lhs, rhs actionCandidate, preferBlack bool) int {
+func compareCandidates(lhs, rhs evaluatedActionCandidate, preferBlack bool) int {
 	if result := compareCandidateScore(&lhs.score, &rhs.score); result != 0 {
 		return result
 	}
 	if preferBlack {
-		if !lhs.red && rhs.red {
+		if !lhs.candidate.red && rhs.candidate.red {
 			return -1
 		}
-		if lhs.red && !rhs.red {
+		if lhs.candidate.red && !rhs.candidate.red {
 			return 1
 		}
 	}
