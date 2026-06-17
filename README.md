@@ -54,6 +54,7 @@ Unlike the original project, this project embeds configuration files at build ti
 - Fixed an incorrect shanten number calculation when a hand contains four identical tiles.
 - Fixed win-value estimation for candidate discards so a discarded red five is not counted as a red dora in the future winning hand.
 - Logs more detailed game-state information using Mjai's board-state format.
+- Uses deterministic random numbers, but does not reproduce the original implementation's random sequence exactly.
 
 ## Prerequisites
 
