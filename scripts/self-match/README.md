@@ -60,7 +60,10 @@ Most bundled tile images are based on free Mahjong assets by Mahjong kingdom., I
 `blank.png` and red five images are modified versions of the Mahjong kingdom assets
 bundled with Mjai ([gimite/mjai](https://github.com/gimite/mjai)).
 
-Mahjong kingdom., Inc states that the assets may be used freely, that contact
-is not required, that links or source attribution are appreciated, that
-modification and redistribution are allowed, and that copyright is not waived.
-Keep this source link when publishing generated logs.
+Mahjong kingdom., Inc states that:
+
+- the assets may be used freely;
+- contact is not required;
+- links or source attribution are appreciated;
+- modification and redistribution are allowed; and
+- copyright is not waived.
