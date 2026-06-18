@@ -128,7 +128,7 @@ The candidate with the smallest `avgRank` is selected. If multiple candidates ha
 - Reactions to another player's discard are represented as pass candidates and call candidates.
 - For chii and pon, Manue also evaluates the possible discard after the call.
 - These decisions are selected by the same `avgRank` method.
-- Winning actions are always taken when legal.
+- Winning actions are always taken when legal, including Seven Pairs and Thirteen Orphans wins.
 - Concealed kan, promoted kan, and kyushukyuhai are not selected.
 
 ## Credits
