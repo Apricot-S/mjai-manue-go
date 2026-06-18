@@ -34,6 +34,10 @@ mjai-manue --name "ManueGo" mjsonp://example.com:11600/default
 mjai-tsumogiri mjsonp://example.com:11600/room
 ```
 
+`--name <PLAYER_NAME>` sets the player name sent in the Mjai `join` message.
+For example, `mjai-manue --name "ManueGo"` responds to `hello` with
+`{"type":"join","name":"ManueGo","room":"default"}` in stdio mode.
+
 ## Modes
 
 ### stdio mode

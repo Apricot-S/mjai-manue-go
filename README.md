@@ -54,6 +54,7 @@ Unlike the original project, this project embeds configuration files at build ti
 - Fixed an incorrect shanten number calculation when a hand contains four identical tiles.
 - Fixed win-value estimation for candidate discards so a discarded red five is not counted as a red dora in the future winning hand.
 - Logs more detailed game-state information using Mjai's board-state format.
+- Uses deterministic random numbers, but does not reproduce the original implementation's random sequence exactly.
 
 ## Prerequisites
 
@@ -88,13 +89,47 @@ See [cmd/](cmd/) for more information.
 ## How It Works
 
 > [!NOTE]
-> The original README's "仕組み" section was based on an older CoffeeScript implementation and does not match the final implementation being ported. This section has been rewritten based on the final implementation.
+> The original README's "仕組み" section was based on an older CoffeeScript implementation and does not match the [final implementation being ported](https://github.com/gimite/mjai-manue/tree/a6ce6c3c11c44cec79e2f183a63af0d66488fce6). This section has been rewritten based on the final implementation.
 
-(TODO)
+For each legal candidate, Manue estimates the following values. These values are included in the bot's trace output, including the response `log` field and stderr logs.
 
-The discard that minimizes this avgRank is selected.
+- `myHoraProb` / Win probability
+  - The probability that the bot wins the current round after choosing the candidate.
+  - Estimated by Monte Carlo simulation. The bot first computes the tiles needed to complete each candidate hand, then shuffles the unseen wall and checks whether the randomly drawn tiles can satisfy one of those winning hands.
+  - Seven Pairs and Thirteen Orphans are not considered.
+  - Runs 1000 trials per decision.
+- `avgHoraPt` / Average win points
+  - The average point value when the bot wins.
+  - Estimated together with `myHoraProb`, using the hand value of the winning hands reached in the Monte Carlo trials.
+- `hojuProb` / Deal-in probability
+  - The probability that the candidate immediately deals into another player's ron.
+  - Estimated per opponent from that opponent's tenpai probability and a decision-tree danger model trained from tile-safety features such as honors, suji, dora, and discard patterns.
+- `ryukyokuProb` / Exhaustive draw probability
+  - The probability that the round ends in an exhaustive draw if the bot does not win.
+  - Estimated from statistical round-end data and the current turn.
+- `ryukyokuAvgPt` / Average exhaustive draw points
+  - The bot's average score delta when the round ends in an exhaustive draw.
+  - Estimated from current tenpai probabilities and exhaustive-draw tenpai statistics.
+- `otherHoraProb` / Other players' win probability
+  - The probability mass left after the bot's win and exhaustive draw probabilities.
+  - It is distributed across the other players' possible wins.
+- `expPt` / Expected points
+  - The bot's expected score delta for the round.
+  - Computed by combining immediate deal-in, the bot's own win, exhaustive draw, and other-player win score-change distributions.
+- `avgRank` / Average rank
+  - The bot's expected final rank after applying the candidate's score-change distribution.
+  - Computed from current scores, seat order, the next round, and statistical pairwise rank probabilities.
 
-Decisions such as "whether to call or not" and "whether to declare Riichi or not" are also made in a similar method.
+The candidate with the smallest `avgRank` is selected. If multiple candidates have the same `avgRank`, Manue chooses the one with the larger `expPt`.
+
+### Candidate Selection
+
+- Self-turn decisions are represented as discard candidates and, when legal, riichi-plus-discard candidates.
+- Reactions to another player's discard are represented as pass candidates and call candidates.
+- For chii and pon, Manue also evaluates the possible discard after the call.
+- These decisions are selected by the same `avgRank` method.
+- Winning actions are always taken when legal, including Seven Pairs and Thirteen Orphans wins.
+- Concealed kan, promoted kan, and kyushukyuhai are not selected.
 
 ## Credits
 
