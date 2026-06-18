@@ -26,22 +26,19 @@ The default output directory is `scripts/self-match/out`. You can override the r
 | `GAME_TYPE` | `tonnan`  | mjai game type passed to the server.                |
 | `PORT`      | `11600`   | mjai server port.                                   |
 
-## Prepare assets
+## Bundled images
 
-Put Mahjong Kingdom tile images in `scripts/self-match/images` before running `replace_assets.py`.
-
-The required file names are:
+Tile images are bundled in `scripts/self-match/images`. The required file names are:
 
 - `blank.png`
 - `p_<tile>_1.gif` and `p_<tile>_3.gif` for normal tiles and tile backs
-- `p_ms5r_1.png`, `p_ms5r_3.png`, `p_ps5r_1.png`, `p_ps5r_3.png`,
-  `p_ss5r_1.png`, and `p_ss5r_3.png` for red fives
+- `p_ms5r_1.png`, `p_ms5r_3.png`, `p_ps5r_1.png`, `p_ps5r_3.png`, `p_ss5r_1.png`, and `p_ss5r_3.png` for red fives
 
 Run `replace_assets.py` once to get a complete missing-file list if the directory is incomplete.
 
-## Replace viewer assets
+## Replace viewer images
 
-After generating a log, rewrite the generated viewer to use local assets:
+After generating a log, rewrite the generated viewer to use local images:
 
 ```powershell
 python scripts\self-match\replace_assets.py scripts\self-match\out\<log>.html
@@ -58,9 +55,12 @@ faces, tile backs, and `blank.png`.
 
 ## Asset source
 
-Use Mahjong Kingdom's free Mahjong assets:
+Most bundled tile images are based on Mahjong Kingdom's free Mahjong assets:
 
 <https://mj-king.net/sozai/>
+
+`blank.png` and red five images are modified versions of the Mahjong Kingdom
+assets bundled with Mjai ([gimite/mjai](https://github.com/gimite/mjai)).
 
 Mahjong Kingdom states that the assets may be used freely, that contact is not
 required, that links or source attribution are appreciated, that modification
