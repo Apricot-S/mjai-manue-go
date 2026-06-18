@@ -12,20 +12,22 @@ import (
 )
 
 type Driver struct {
-	name  string
-	room  string
-	agent ai.Agent
-	bot   *application.Bot
-	ended bool
-	log   io.Writer
+	name       string
+	room       string
+	fallbackID int
+	agent      ai.Agent
+	bot        *application.Bot
+	ended      bool
+	log        io.Writer
 }
 
-func NewDriver(name string, room string, agent ai.Agent, log io.Writer) *Driver {
+func NewDriver(name string, room string, fallbackID int, agent ai.Agent, log io.Writer) *Driver {
 	return &Driver{
-		name:  name,
-		room:  room,
-		agent: agent,
-		log:   log,
+		name:       name,
+		room:       room,
+		fallbackID: fallbackID,
+		agent:      agent,
+		log:        log,
 	}
 }
 
@@ -34,7 +36,11 @@ func (d *Driver) Handle(msg inbound.Message) (outbound.Message, error) {
 	case *inbound.Hello:
 		return outbound.NewJoin(d.name, d.room), nil
 	case *inbound.StartGame:
-		self, err := seat.NewSeat(msg.ID)
+		id := d.fallbackID
+		if msg.ID != nil {
+			id = *msg.ID
+		}
+		self, err := seat.NewSeat(id)
 		if err != nil {
 			return nil, err
 		}

@@ -37,6 +37,36 @@ func TestRun_NameFlag(t *testing.T) {
 	}
 }
 
+func TestRun_IDFlagAllowsStartGameWithoutID(t *testing.T) {
+	in := strings.NewReader(`{"type":"start_game"}` + "\n")
+	var out strings.Builder
+	var errOut strings.Builder
+
+	got := run([]string{"--id", "2"}, in, &out, &errOut)
+	if got != exitOK {
+		t.Fatalf("run() = %d, want %d; stderr = %q", got, exitOK, errOut.String())
+	}
+	if out.String() != "" {
+		t.Errorf("stdout = %q, want empty", out.String())
+	}
+}
+
+func TestRun_InvalidIDFlagReturnsUsageError(t *testing.T) {
+	var out strings.Builder
+	var errOut strings.Builder
+
+	got := run([]string{"--id", "4"}, strings.NewReader(""), &out, &errOut)
+	if got != exitUsageError {
+		t.Fatalf("run() = %d, want %d; stderr = %q", got, exitUsageError, errOut.String())
+	}
+	if out.String() != "" {
+		t.Errorf("stdout = %q, want empty", out.String())
+	}
+	if !strings.Contains(errOut.String(), "invalid player seat: 4") {
+		t.Errorf("stderr = %q, want invalid player seat", errOut.String())
+	}
+}
+
 func TestRun_TooManyArguments(t *testing.T) {
 	var out strings.Builder
 	var errOut strings.Builder
