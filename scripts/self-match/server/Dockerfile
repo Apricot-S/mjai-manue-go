@@ -32,7 +32,6 @@ WORKDIR /app
 
 USER appuser
 
-COPY ./run_server.sh .
-RUN chmod +x /app/run_server.sh
+COPY --chmod=755 ./run_server.sh .
 
 ENTRYPOINT ["/app/run_server.sh"]

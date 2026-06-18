@@ -32,8 +32,7 @@ RUN useradd \
 WORKDIR /app
 
 COPY --from=builder /usr/local/bin/mjai-manue /usr/local/bin/mjai-manue
-COPY scripts/self-match/manue/run_manue.sh .
-RUN chmod +x /app/run_manue.sh
+COPY --chmod=755 scripts/self-match/manue/run_manue.sh .
 
 USER appuser
 
