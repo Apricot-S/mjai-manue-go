@@ -90,9 +90,9 @@ paiToImageUrl = function(pai, pose) {
     if (pose === void 0) {
       pose = 1;
     }
-    return "http://gimite.net/mjai/images/p_" + name + "_" + pose + "." + ext;
+    return resourceDir + "/images/p_" + name + "_" + pose + "." + ext;
   } else {
-    return "http://gimite.net/mjai/images/blank.png";
+    return resourceDir + "/images/blank.png";
   }
 };
 
