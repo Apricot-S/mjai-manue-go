@@ -1,0 +1,66 @@
+services:
+  server:
+    build:
+      context: ./server
+    volumes:
+      - ${LOG_DIR:-./out}:/log_dir
+    environment:
+      HOST: server
+      PORT: ${PORT:-11600}
+      ROOM: ${ROOM:-default}
+      GAME_TYPE: ${GAME_TYPE:-tonnan}
+      NUM_GAMES: ${NUM_GAMES:-1}
+    ports:
+      - "${PORT:-11600}:${PORT:-11600}"
+
+  manue0:
+    build:
+      context: ../..
+      dockerfile: scripts/self-match/manue/Dockerfile
+    depends_on:
+      - server
+    environment:
+      HOST: server
+      PORT: ${PORT:-11600}
+      ROOM: ${ROOM:-default}
+      NUM_GAMES: ${NUM_GAMES:-1}
+      NAME: ManueGo0
+
+  manue1:
+    build:
+      context: ../..
+      dockerfile: scripts/self-match/manue/Dockerfile
+    depends_on:
+      - server
+    environment:
+      HOST: server
+      PORT: ${PORT:-11600}
+      ROOM: ${ROOM:-default}
+      NUM_GAMES: ${NUM_GAMES:-1}
+      NAME: ManueGo1
+
+  manue2:
+    build:
+      context: ../..
+      dockerfile: scripts/self-match/manue/Dockerfile
+    depends_on:
+      - server
+    environment:
+      HOST: server
+      PORT: ${PORT:-11600}
+      ROOM: ${ROOM:-default}
+      NUM_GAMES: ${NUM_GAMES:-1}
+      NAME: ManueGo2
+
+  manue3:
+    build:
+      context: ../..
+      dockerfile: scripts/self-match/manue/Dockerfile
+    depends_on:
+      - server
+    environment:
+      HOST: server
+      PORT: ${PORT:-11600}
+      ROOM: ${ROOM:-default}
+      NUM_GAMES: ${NUM_GAMES:-1}
+      NAME: ManueGo3
