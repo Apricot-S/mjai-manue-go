@@ -5,7 +5,7 @@ import (
 
 	"github.com/Apricot-S/mjai-manue-go/internal/adapter/mjai/inbound"
 	"github.com/Apricot-S/mjai-manue-go/internal/adapter/mjai/outbound"
-	"github.com/Apricot-S/mjai-manue-go/internal/adapter/mjai/runtime"
+	mjairuntime "github.com/Apricot-S/mjai-manue-go/internal/adapter/mjai/runtime"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/ai"
 )
 
@@ -31,7 +31,7 @@ func TestDriver_HandleHello(t *testing.T) {
 func TestDriver_HandleStartGameCreatesBotWithoutOutput(t *testing.T) {
 	driver := mjairuntime.NewDriver("tsumogiri", "default", 0, ai.NewTsumogiriAgent(), nil)
 
-	msg, err := driver.Handle(&inbound.StartGame{Type: "start_game", ID: intPtr(0)})
+	msg, err := driver.Handle(&inbound.StartGame{Type: "start_game", ID: new(0)})
 	if err != nil {
 		t.Fatalf("Handle() failed: %v", err)
 	}
@@ -44,13 +44,13 @@ func TestDriver_HandleStartGameResetsAgent(t *testing.T) {
 	agent := &recordingAgent{}
 	driver := mjairuntime.NewDriver("manue", "default", 0, agent, nil)
 
-	if _, err := driver.Handle(&inbound.StartGame{Type: "start_game", ID: intPtr(0)}); err != nil {
+	if _, err := driver.Handle(&inbound.StartGame{Type: "start_game", ID: new(0)}); err != nil {
 		t.Fatalf("Handle(first start_game) failed: %v", err)
 	}
 	if _, err := driver.Handle(&inbound.EndGame{Type: "end_game"}); err != nil {
 		t.Fatalf("Handle(end_game) failed: %v", err)
 	}
-	if _, err := driver.Handle(&inbound.StartGame{Type: "start_game", ID: intPtr(1)}); err != nil {
+	if _, err := driver.Handle(&inbound.StartGame{Type: "start_game", ID: new(1)}); err != nil {
 		t.Fatalf("Handle(second start_game) failed: %v", err)
 	}
 
@@ -80,7 +80,7 @@ func TestDriver_Ended(t *testing.T) {
 		t.Error("Ended() = true before start_game, want false")
 	}
 
-	if _, err := driver.Handle(&inbound.StartGame{Type: "start_game", ID: intPtr(0)}); err != nil {
+	if _, err := driver.Handle(&inbound.StartGame{Type: "start_game", ID: new(0)}); err != nil {
 		t.Fatalf("Handle(start_game) failed: %v", err)
 	}
 	if driver.Ended() {
@@ -94,7 +94,7 @@ func TestDriver_Ended(t *testing.T) {
 		t.Error("Ended() = false after end_game, want true")
 	}
 
-	if _, err := driver.Handle(&inbound.StartGame{Type: "start_game", ID: intPtr(0)}); err != nil {
+	if _, err := driver.Handle(&inbound.StartGame{Type: "start_game", ID: new(0)}); err != nil {
 		t.Fatalf("Handle(second start_game) failed: %v", err)
 	}
 	if driver.Ended() {
@@ -104,7 +104,7 @@ func TestDriver_Ended(t *testing.T) {
 
 func TestDriver_HandleEventAfterEndGame(t *testing.T) {
 	driver := mjairuntime.NewDriver("tsumogiri", "default", 0, ai.NewTsumogiriAgent(), nil)
-	if _, err := driver.Handle(&inbound.StartGame{Type: "start_game", ID: intPtr(0)}); err != nil {
+	if _, err := driver.Handle(&inbound.StartGame{Type: "start_game", ID: new(0)}); err != nil {
 		t.Fatalf("Handle(start_game) failed: %v", err)
 	}
 	if _, err := driver.Handle(&inbound.EndGame{Type: "end_game"}); err != nil {
@@ -135,7 +135,7 @@ func TestDriver_HandleStartGameUsesFallbackIDWhenIDIsMissing(t *testing.T) {
 func TestDriver_HandleStartGamePrefersMessageID(t *testing.T) {
 	driver := mjairuntime.NewDriver("tsumogiri", "default", 4, ai.NewTsumogiriAgent(), nil)
 
-	if _, err := driver.Handle(&inbound.StartGame{Type: "start_game", ID: intPtr(1)}); err != nil {
+	if _, err := driver.Handle(&inbound.StartGame{Type: "start_game", ID: new(1)}); err != nil {
 		t.Fatalf("Handle(start_game with id) failed: %v", err)
 	}
 }
@@ -143,7 +143,7 @@ func TestDriver_HandleStartGamePrefersMessageID(t *testing.T) {
 func TestDriver_HandleStartGameDoesNotCarryMessageIDToNextGame(t *testing.T) {
 	driver := mjairuntime.NewDriver("tsumogiri", "default", 4, ai.NewTsumogiriAgent(), nil)
 
-	if _, err := driver.Handle(&inbound.StartGame{Type: "start_game", ID: intPtr(1)}); err != nil {
+	if _, err := driver.Handle(&inbound.StartGame{Type: "start_game", ID: new(1)}); err != nil {
 		t.Fatalf("Handle(first start_game) failed: %v", err)
 	}
 	if _, err := driver.Handle(&inbound.EndGame{Type: "end_game"}); err != nil {
@@ -172,8 +172,4 @@ func (a *recordingAgent) Reset() {
 
 func (*recordingAgent) Decide(ai.Request) (ai.Decision, error) {
 	return ai.Decision{}, nil
-}
-
-func intPtr(v int) *int {
-	return &v
 }
