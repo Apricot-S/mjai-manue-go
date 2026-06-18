@@ -34,14 +34,12 @@ Tile images are bundled in `scripts/self-match/images`. The required file names 
 - `p_<tile>_1.gif` and `p_<tile>_3.gif` for normal tiles and tile backs
 - `p_ms5r_1.png`, `p_ms5r_3.png`, `p_ps5r_1.png`, `p_ps5r_3.png`, `p_ss5r_1.png`, and `p_ss5r_3.png` for red fives
 
-Run `replace_assets.py` once to get a complete missing-file list if the directory is incomplete.
-
 ## Replace viewer images
 
 After generating a log, rewrite the generated viewer to use local images:
 
-```powershell
-python scripts\self-match\replace_assets.py scripts\self-match\out\<log>.html
+```sh
+python scripts/self-match/replace_assets.py scripts/self-match/out/<log>.html
 ```
 
 The script copies `scripts/self-match/images` into the generated
@@ -55,14 +53,14 @@ faces, tile backs, and `blank.png`.
 
 ## Asset source
 
-Most bundled tile images are based on Mahjong Kingdom's free Mahjong assets:
+Most bundled tile images are based on free Mahjong assets by Mahjong kingdom., Inc:
 
 <https://mj-king.net/sozai/>
 
-`blank.png` and red five images are modified versions of the Mahjong Kingdom
-assets bundled with Mjai ([gimite/mjai](https://github.com/gimite/mjai)).
+`blank.png` and red five images are modified versions of the Mahjong kingdom assets
+bundled with Mjai ([gimite/mjai](https://github.com/gimite/mjai)).
 
-Mahjong Kingdom states that the assets may be used freely, that contact is not
-required, that links or source attribution are appreciated, that modification
-and redistribution are allowed, and that copyright is not waived. Keep this
-source link when publishing generated logs.
+Mahjong kingdom., Inc states that the assets may be used freely, that contact
+is not required, that links or source attribution are appreciated, that
+modification and redistribution are allowed, and that copyright is not waived.
+Keep this source link when publishing generated logs.
