@@ -1,6 +1,9 @@
 #!/usr/bin/env python3
 
-"""Copy local viewer images and rewrite generated mjai HTML to use them."""
+"""Copy local viewer images.
+
+Rewrite generated mjai HTML to use copied local resources.
+"""
 
 import argparse
 import re
@@ -21,14 +24,30 @@ RED_TILE_NAMES = ("ms5r", "ps5r", "ss5r")
 POSES = (1, 3)
 
 
+class ResourceDirectoryNotFoundError(ValueError):
+    def __init__(self, html_path: Path) -> None:
+        super().__init__(
+            f"could not determine resource directory for {html_path}",
+        )
+
+
+class MissingImagesError(FileNotFoundError):
+    def __init__(self, image_dir: Path, missing: list[str]) -> None:
+        details = "\n".join(f"  {name}" for name in missing)
+        super().__init__(f"missing required images in {image_dir}:\n{details}")
+
+
+class ArchivePlayerNotFoundError(FileNotFoundError):
+    def __init__(self, js_path: Path) -> None:
+        super().__init__(f"archive_player.js not found: {js_path}")
+
+
 def required_asset_names() -> list[str]:
     names = ["blank.png"]
     for tile in TILE_NAMES:
-        for pose in POSES:
-            names.append(f"p_{tile}_{pose}.gif")
+        names.extend(f"p_{tile}_{pose}.gif" for pose in POSES)
     for tile in RED_TILE_NAMES:
-        for pose in POSES:
-            names.append(f"p_{tile}_{pose}.png")
+        names.extend(f"p_{tile}_{pose}.png" for pose in POSES)
     return sorted(names)
 
 
@@ -42,7 +61,7 @@ def resource_dir_for(html_path: Path) -> Path:
     if len(candidates) == 1:
         return candidates[0]
 
-    raise ValueError(f"could not determine resource directory for {html_path}")
+    raise ResourceDirectoryNotFoundError(html_path)
 
 
 def copy_images(image_dir: Path, dest_dir: Path) -> None:
@@ -53,10 +72,7 @@ def copy_images(image_dir: Path, dest_dir: Path) -> None:
     ]
 
     if missing:
-        details = "\n".join(f"  {name}" for name in missing)
-        raise FileNotFoundError(
-            f"missing required images in {image_dir}:\n{details}"
-        )
+        raise MissingImagesError(image_dir, missing)
 
     dest_dir.mkdir(parents=True, exist_ok=True)
     for name in required_asset_names():
@@ -77,9 +93,19 @@ def rewrite_archive_player(js_path: Path) -> None:
     js_path.write_text(text, encoding="utf-8", newline="\n")
 
 
+def archive_player_path(resource_dir: Path) -> Path:
+    js_path = resource_dir / "js" / "archive_player.js"
+    if not js_path.is_file():
+        raise ArchivePlayerNotFoundError(js_path)
+    return js_path
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(
-        description="Copy self-match viewer images and rewrite generated mjai HTML resources.",
+        description=(
+            "Copy self-match viewer images and rewrite generated mjai HTML "
+            "resources."
+        ),
     )
     parser.add_argument("html", type=Path, help="generated .html file")
     parser.add_argument(
@@ -99,12 +125,10 @@ def main() -> int:
 
     try:
         resource_dir = resource_dir_for(html_path)
-        js_path = resource_dir / "js" / "archive_player.js"
-        if not js_path.is_file():
-            raise FileNotFoundError(f"archive_player.js not found: {js_path}")
+        js_path = archive_player_path(resource_dir)
         copy_images(image_dir, resource_dir / "images")
         rewrite_archive_player(js_path)
-    except Exception as exc:
+    except (OSError, ValueError) as exc:
         print(f"replace_assets.py: {exc}", file=sys.stderr)
         return 1
 
