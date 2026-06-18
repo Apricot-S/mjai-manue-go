@@ -2,14 +2,11 @@
 
 """Copy local viewer images and rewrite generated mjai HTML to use them."""
 
-from __future__ import annotations
-
 import argparse
 import re
 import shutil
 import sys
 from pathlib import Path
-
 
 SCRIPT_DIR = Path(__file__).resolve().parent
 DEFAULT_IMAGE_DIR = SCRIPT_DIR / "images"
@@ -49,10 +46,17 @@ def resource_dir_for(html_path: Path) -> Path:
 
 
 def copy_images(image_dir: Path, dest_dir: Path) -> None:
-    missing = [name for name in required_asset_names() if not (image_dir / name).is_file()]
+    missing = [
+        name
+        for name in required_asset_names()
+        if not (image_dir / name).is_file()
+    ]
+
     if missing:
         details = "\n".join(f"  {name}" for name in missing)
-        raise FileNotFoundError(f"missing required images in {image_dir}:\n{details}")
+        raise FileNotFoundError(
+            f"missing required images in {image_dir}:\n{details}"
+        )
 
     dest_dir.mkdir(parents=True, exist_ok=True)
     for name in required_asset_names():
@@ -61,7 +65,9 @@ def copy_images(image_dir: Path, dest_dir: Path) -> None:
 
 def rewrite_archive_player(js_path: Path) -> None:
     text = js_path.read_text(encoding="utf-8")
-    old_tile = '"http://gimite.net/mjai/images/p_" + name + "_" + pose + "." + ext'
+    old_tile = (
+        '"http://gimite.net/mjai/images/p_" + name + "_" + pose + "." + ext'
+    )
     new_tile = 'resourceDir + "/images/p_" + name + "_" + pose + "." + ext'
     old_blank = '"http://gimite.net/mjai/images/blank.png"'
     new_blank = 'resourceDir + "/images/blank.png"'
@@ -73,7 +79,7 @@ def rewrite_archive_player(js_path: Path) -> None:
 
 def main() -> int:
     parser = argparse.ArgumentParser(
-        description="Copy self-match viewer images and rewrite generated mjai HTML resources."
+        description="Copy self-match viewer images and rewrite generated mjai HTML resources.",
     )
     parser.add_argument("html", type=Path, help="generated .html file")
     parser.add_argument(
