@@ -14,10 +14,10 @@ Run:
 
 ```sh
 # stdio mode
-mjai-manue [--name <PLAYER_NAME>] [--seed <INT>]
+mjai-manue [--name <PLAYER_NAME>] [--id <ID>] [--seed <INT>]
 
 # mjsonp TCP client mode
-mjai-manue [--name <PLAYER_NAME>] [--seed <INT>] mjsonp://example.com:11600/default
+mjai-manue [--name <PLAYER_NAME>] [--id <ID>] [--seed <INT>] mjsonp://example.com:11600/default
 ```
 
 The default player name is `"Manue030"`.

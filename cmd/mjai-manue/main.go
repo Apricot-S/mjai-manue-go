@@ -10,6 +10,7 @@ import (
 	"github.com/Apricot-S/mjai-manue-go/configs"
 	mjairuntime "github.com/Apricot-S/mjai-manue-go/internal/adapter/mjai/runtime"
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/ai"
+	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/seat"
 )
 
 const (
@@ -29,12 +30,17 @@ func run(args []string, in io.Reader, out io.Writer, errOut io.Writer) int {
 	flags := flag.NewFlagSet("mjai-manue", flag.ContinueOnError)
 	flags.SetOutput(errOut)
 	name := flags.String("name", defaultName, "player name")
+	id := flags.Int("id", 0, "fallback player id used when start_game omits id")
 	seed := flags.Uint64("seed", defaultSeed, "random seed")
 	if err := flags.Parse(args); err != nil {
 		return exitUsageError
 	}
 	if flags.NArg() > 1 {
 		fmt.Fprintln(errOut, "too many arguments")
+		return exitUsageError
+	}
+	if _, err := seat.NewSeat(*id); err != nil {
+		fmt.Fprintln(errOut, err)
 		return exitUsageError
 	}
 
@@ -59,19 +65,21 @@ func run(args []string, in io.Reader, out io.Writer, errOut io.Writer) int {
 
 	if flags.NArg() == 1 {
 		err = mjairuntime.RunTCP(mjairuntime.TCPConfig{
-			Name:  *name,
-			URL:   flags.Arg(0),
-			Agent: agent,
-			Log:   errOut,
+			Name:       *name,
+			URL:        flags.Arg(0),
+			FallbackID: *id,
+			Agent:      agent,
+			Log:        errOut,
 		})
 	} else {
 		err = mjairuntime.RunStdio(mjairuntime.StdioConfig{
-			Name:  *name,
-			Room:  "default",
-			Agent: agent,
-			In:    in,
-			Out:   out,
-			Log:   errOut,
+			Name:       *name,
+			Room:       "default",
+			FallbackID: *id,
+			Agent:      agent,
+			In:         in,
+			Out:        out,
+			Log:        errOut,
 		})
 	}
 	if err != nil {

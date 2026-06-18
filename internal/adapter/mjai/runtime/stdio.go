@@ -7,14 +7,15 @@ import (
 )
 
 type StdioConfig struct {
-	Name  string
-	Room  string
-	Agent ai.Agent
-	In    io.Reader
-	Out   io.Writer
-	Log   io.Writer
+	Name       string
+	Room       string
+	FallbackID int
+	Agent      ai.Agent
+	In         io.Reader
+	Out        io.Writer
+	Log        io.Writer
 }
 
 func RunStdio(cfg StdioConfig) error {
-	return runJSONLines(cfg.Name, cfg.Room, cfg.Agent, cfg.In, cfg.Out, cfg.Log, jsonLinesPolicy{})
+	return runJSONLines(cfg.Name, cfg.Room, cfg.FallbackID, cfg.Agent, cfg.In, cfg.Out, cfg.Log, jsonLinesPolicy{})
 }

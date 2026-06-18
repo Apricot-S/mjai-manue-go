@@ -11,10 +11,11 @@ import (
 )
 
 type TCPConfig struct {
-	Name  string
-	URL   string
-	Agent ai.Agent
-	Log   io.Writer
+	Name       string
+	URL        string
+	FallbackID int
+	Agent      ai.Agent
+	Log        io.Writer
 }
 
 type UsageError struct {
@@ -51,7 +52,7 @@ func RunTCP(cfg TCPConfig) error {
 		_ = logLine(cfg.Log, "closed")
 	}()
 
-	return runJSONLines(cfg.Name, endpoint.room, cfg.Agent, conn, conn, cfg.Log, jsonLinesPolicy{
+	return runJSONLines(cfg.Name, endpoint.room, cfg.FallbackID, cfg.Agent, conn, conn, cfg.Log, jsonLinesPolicy{
 		respondNoneOnNoReaction: true,
 		stopOnEndGame:           true,
 	})

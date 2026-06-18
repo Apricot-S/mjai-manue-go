@@ -81,7 +81,7 @@ go install github.com/Apricot-S/mjai-manue-go/cmd/mjai-manue@latest
 ## Usage
 
 ```sh
-mjai-manue [--name <PLAYER_NAME>] [--seed <INT>] [<URL>]
+mjai-manue [--name <PLAYER_NAME>] [--id <ID>] [--seed <INT>] [<URL>]
 ```
 
 See [cmd/](cmd/) for more information.

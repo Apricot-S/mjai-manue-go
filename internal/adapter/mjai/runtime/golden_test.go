@@ -92,7 +92,7 @@ func TestGoldenStdout(t *testing.T) {
 			if strings.HasPrefix(tt.name, "manue_") {
 				agent = newManueAgentForGoldenTest(t)
 			}
-			err := runJSONLines(tt.player, "default", agent, strings.NewReader(input), &out, nil, tt.policy)
+			err := runJSONLines(tt.player, "default", 0, agent, strings.NewReader(input), &out, nil, tt.policy)
 			if err != nil {
 				t.Fatalf("runJSONLines() failed: %v", err)
 			}
