@@ -19,12 +19,12 @@ type jsonLinesPolicy struct {
 // transport-level differences: stdio is sparse, while mjsonp TCP must ack every
 // non-terminal server message and stops immediately after end_game. EOF is a
 // normal transport shutdown for both stdio and mjsonp TCP.
-func runJSONLines(name string, room string, agent ai.Agent, in io.Reader, out io.Writer, log io.Writer, policy jsonLinesPolicy) error {
+func runJSONLines(name string, room string, fallbackID int, agent ai.Agent, in io.Reader, out io.Writer, log io.Writer, policy jsonLinesPolicy) error {
 	r := bufio.NewScanner(in)
 	w := bufio.NewWriter(out)
 	defer w.Flush()
 
-	driver := NewDriver(name, room, agent, log)
+	driver := NewDriver(name, room, fallbackID, agent, log)
 	for r.Scan() {
 		stop, err := handleJSONLine(r.Bytes(), w, driver, log, policy)
 		if err != nil {

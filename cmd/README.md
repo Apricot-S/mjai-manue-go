@@ -23,11 +23,11 @@ go install github.com/Apricot-S/mjai-manue-go/cmd/mjai-tsumogiri@latest
 
 ```sh
 # Basic format
-<APP_NAME> [--name <PLAYER_NAME>] [<URL>]
+<APP_NAME> [--name <PLAYER_NAME>] [--id <ID>] [<URL>]
 
 # stdio mode
 mjai-manue
-mjai-tsumogiri --name "SimpleBot"
+mjai-tsumogiri --name "SimpleBot" --id 1
 
 # mjsonp TCP client mode
 mjai-manue --name "ManueGo" mjsonp://example.com:11600/default
@@ -37,6 +37,9 @@ mjai-tsumogiri mjsonp://example.com:11600/room
 `--name <PLAYER_NAME>` sets the player name sent in the Mjai `join` message.
 For example, `mjai-manue --name "ManueGo"` responds to `hello` with
 `{"type":"join","name":"ManueGo","room":"default"}` in stdio mode.
+
+`--id <ID>` sets the fallback player ID used when an input `start_game` message omits `id`, such as when analyzing game logs.
+If `start_game` includes `id`, that message value takes precedence. The default fallback ID is `0` (starting dealer).
 
 ## Modes
 
