@@ -97,14 +97,13 @@ For each legal candidate, Manue estimates the following values. These values are
   - The probability that the bot wins the current round after choosing the candidate.
   - Estimated by Monte Carlo simulation. The bot first computes the tiles needed to complete each candidate hand, then shuffles the unseen wall and checks whether the randomly drawn tiles can satisfy one of those winning goals.
   - Seven Pairs and Thirteen Orphans are not considered.
-  - The current implementation runs 1000 trials per decision.
+  - Runs 1000 trials per decision.
 - `avgHoraPt` / Average win points
   - The average point value when the bot wins.
   - Estimated together with `myHoraProb`, using the hand value of the winning goals reached in the Monte Carlo trials.
 - `hojuProb` / Deal-in probability
   - The probability that the candidate immediately deals into another player's ron.
   - Estimated per opponent from that opponent's tenpai probability and a decision-tree danger model trained from tile-safety features such as honors, suji, dora, and discard patterns.
-  - Genbutsu against an opponent has zero deal-in probability against that opponent.
 - `ryukyokuProb` / Exhaustive draw probability
   - The probability that the round ends in an exhaustive draw if the bot does not win.
   - Estimated from statistical round-end data and the current turn.
