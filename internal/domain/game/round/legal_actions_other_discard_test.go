@@ -254,7 +254,6 @@ func TestState_LegalActions_AfterRiichiAcceptedReturnsNoActions(t *testing.T) {
 	hands[3] = ponHandForLegalActionsTest("W", "W")
 	s := mustNewRoundStateForTest(t, hands)
 	riichiActor := seat.MustSeat(0)
-	callActor := seat.MustSeat(3)
 	declarationTile := tile.MustTileFromCode("W")
 
 	if err := s.Apply(event.NewDraw(riichiActor, tile.MustTileFromCode("S"))); err != nil {
@@ -265,9 +264,6 @@ func TestState_LegalActions_AfterRiichiAcceptedReturnsNoActions(t *testing.T) {
 	}
 	if err := s.Apply(event.NewDiscard(riichiActor, declarationTile, false)); err != nil {
 		t.Fatalf("Apply(Discard) failed: %v", err)
-	}
-	if err := s.Apply(event.NewPon(callActor, riichiActor, declarationTile, [2]tile.Tile{declarationTile, declarationTile})); err != nil {
-		t.Fatalf("Apply(Pon) failed: %v", err)
 	}
 	if err := s.Apply(event.NewRiichiAccepted(riichiActor, nil, nil)); err != nil {
 		t.Fatalf("Apply(RiichiAccepted) failed: %v", err)

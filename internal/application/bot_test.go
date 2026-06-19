@@ -138,6 +138,17 @@ func TestBot_Process_ReachAcceptedDoesNotRepeatDeclarationTileCall(t *testing.T)
 	if got.Kind() != application.ReactionNone {
 		t.Fatalf("Kind() = %v, want %v; action = %T", got.Kind(), application.ReactionNone, got.Action())
 	}
+
+	if _, err := bot.Process(event.NewPon(self, riichiActor, declarationTile, [2]tile.Tile{declarationTile, declarationTile})); err != nil {
+		t.Fatalf("Process(Pon) failed: %v", err)
+	}
+	got, err = bot.Process(event.NewDiscard(self, tile.MustTileFromCode("9p"), false))
+	if err != nil {
+		t.Fatalf("Process(self Discard) failed: %v", err)
+	}
+	if got.Kind() != application.ReactionNone {
+		t.Fatalf("Kind() after self discard = %v, want %v", got.Kind(), application.ReactionNone)
+	}
 }
 
 func TestBot_Process_DoraAfterCalledKanReplacementDrawDoesNotDiscard(t *testing.T) {
