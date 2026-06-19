@@ -35,9 +35,11 @@ func (s *State) calculateLegalActions(playerSeat seat.Seat) ([]action.Action, er
 		return nil, fmt.Errorf("cannot list legal actions: player %d is invisible", playerSeat.Index())
 	}
 
-	if s.pendingDiscard == nil || *s.pendingDiscard != playerSeat {
+	if s.pendingDiscard == nil {
 		return s.legalActionsOnOtherDiscard(playerSeat, visiblePlayer)
 	}
-
+	if *s.pendingDiscard != playerSeat {
+		return nil, nil
+	}
 	return s.legalActionsOnSelfDraw(playerSeat, visiblePlayer)
 }
