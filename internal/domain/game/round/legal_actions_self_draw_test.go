@@ -364,6 +364,42 @@ func TestState_LegalActions_IncludesTsumoWinLastTile(t *testing.T) {
 	}
 }
 
+func TestState_LegalActions_AfterDoraReturnsNoActions(t *testing.T) {
+	hands := newValidHands()
+	hands[1] = calledKanHandForLegalActionsTest("E", "E", "E")
+	s := mustNewRoundStateForTest(t, hands)
+	target := seat.MustSeat(0)
+	actor := seat.MustSeat(1)
+	kanTile := tile.MustTileFromCode("E")
+
+	if err := s.Apply(event.NewDraw(target, kanTile)); err != nil {
+		t.Fatalf("Apply(Draw) failed: %v", err)
+	}
+	if err := s.Apply(event.NewDiscard(target, kanTile, true)); err != nil {
+		t.Fatalf("Apply(Discard) failed: %v", err)
+	}
+	if err := s.Apply(event.NewCalledKan(actor, target, kanTile, [3]tile.Tile{kanTile, kanTile, kanTile})); err != nil {
+		t.Fatalf("Apply(CalledKan) failed: %v", err)
+	}
+	if err := s.Apply(event.NewDraw(actor, tile.MustTileFromCode("W"))); err != nil {
+		t.Fatalf("Apply(replacement Draw) failed: %v", err)
+	}
+	if err := s.Apply(event.NewDora(tile.MustTileFromCode("6p"))); err != nil {
+		t.Fatalf("Apply(Dora) failed: %v", err)
+	}
+
+	for i := range common.NumPlayers {
+		playerSeat := seat.MustSeat(i)
+		got, err := s.LegalActions(playerSeat)
+		if err != nil {
+			t.Fatalf("LegalActions(%d) failed: %v", i, err)
+		}
+		if len(got) != 0 {
+			t.Errorf("LegalActions(%d) = %v, want empty after Dora", i, got)
+		}
+	}
+}
+
 func TestState_LegalActions_IncludesPromotedKan(t *testing.T) {
 	s := newStateBeforePromotedKanForTest(t, 10, 0)
 	actor := seat.MustSeat(3)
