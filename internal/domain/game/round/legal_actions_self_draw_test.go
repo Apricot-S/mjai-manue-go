@@ -384,6 +384,13 @@ func TestState_LegalActions_AfterDoraReturnsNoActions(t *testing.T) {
 	if err := s.Apply(event.NewDraw(actor, tile.MustTileFromCode("W"))); err != nil {
 		t.Fatalf("Apply(replacement Draw) failed: %v", err)
 	}
+	got, err := s.LegalActions(actor)
+	if err != nil {
+		t.Fatalf("LegalActions(actor) failed: %v", err)
+	}
+	if !containsDiscard(got, "W", true) {
+		t.Fatalf("LegalActions(actor) = %v, want replacement tile discard before Dora", got)
+	}
 	if err := s.Apply(event.NewDora(tile.MustTileFromCode("6p"))); err != nil {
 		t.Fatalf("Apply(Dora) failed: %v", err)
 	}
@@ -397,6 +404,9 @@ func TestState_LegalActions_AfterDoraReturnsNoActions(t *testing.T) {
 		if len(got) != 0 {
 			t.Errorf("LegalActions(%d) = %v, want empty after Dora", i, got)
 		}
+	}
+	if err := s.Apply(event.NewDiscard(actor, tile.MustTileFromCode("W"), true)); err != nil {
+		t.Fatalf("Apply(replacement Discard) failed after Dora: %v", err)
 	}
 }
 
