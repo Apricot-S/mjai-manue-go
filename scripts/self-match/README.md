@@ -46,11 +46,6 @@ The script copies `scripts/self-match/images` into the generated
 `<log>.html.files/images` directory and rewrites
 `<log>.html.files/js/archive_player.js`.
 
-The generated mjai viewer only references tile images. CSS has no image URLs,
-and the HTML body only contains `img` templates. Actual image URLs are produced
-by `paiToImageUrl()` in `archive_player.js`, so the bundled assets are tile
-faces, tile backs, and `blank.png`.
-
 ## Asset source
 
 Most bundled tile images are based on free Mahjong assets by Mahjong kingdom., Inc:
