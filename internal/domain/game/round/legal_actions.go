@@ -39,6 +39,11 @@ func (s *State) calculateLegalActions(playerSeat seat.Seat) ([]action.Action, er
 	}
 
 	if s.pendingDiscard == nil {
+		// After open kan, the bot must choose a discard on the replacement draw,
+		// even though the server publishes the dora event before the discard event.
+		if s.pendingKanActor != nil && *s.pendingKanActor == playerSeat && s.kanProgress == noKanProgress && s.pendingDoraReveals > 0 {
+			return s.legalActionsOnSelfDraw(playerSeat, visiblePlayer)
+		}
 		return s.legalActionsOnOtherDiscard(playerSeat, visiblePlayer)
 	}
 	if *s.pendingDiscard != playerSeat {

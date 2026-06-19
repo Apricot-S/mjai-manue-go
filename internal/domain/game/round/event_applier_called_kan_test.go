@@ -196,7 +196,6 @@ func TestState_Apply_CalledKan_AllowsDoraAfterReplacementTileDraw(t *testing.T) 
 	if err := s.Apply(event.NewDraw(actor, replacementTile)); err != nil {
 		t.Fatalf("Apply(Draw) failed: %v", err)
 	}
-
 	if err := s.Apply(event.NewDora(doraIndicator)); err != nil {
 		t.Fatalf("Apply(Dora) failed: %v", err)
 	}
@@ -206,13 +205,14 @@ func TestState_Apply_CalledKan_AllowsDoraAfterReplacementTileDraw(t *testing.T) 
 	}
 }
 
-func TestState_Apply_CalledKan_AllowsDiscardAfterDoraReveal(t *testing.T) {
+func TestState_Apply_CalledKan_AllowsDoraBeforeReplacementTileDiscard(t *testing.T) {
 	s := mustNewRoundStateForTest(t, calledKanHandsForTest())
 	actor := seat.MustSeat(3)
 	target := seat.MustSeat(0)
 	taken := tile.MustTileFromCode("E")
 	consumed := [3]tile.Tile{taken, taken, taken}
 	replacementTile := tile.MustTileFromCode("W")
+	doraIndicator := tile.MustTileFromCode("6p")
 
 	if err := s.Apply(event.NewDraw(target, taken)); err != nil {
 		t.Fatalf("Apply(Draw) failed: %v", err)
@@ -226,14 +226,16 @@ func TestState_Apply_CalledKan_AllowsDiscardAfterDoraReveal(t *testing.T) {
 	if err := s.Apply(event.NewDraw(actor, replacementTile)); err != nil {
 		t.Fatalf("Apply(Draw) failed: %v", err)
 	}
-	if err := s.Apply(event.NewDora(tile.MustTileFromCode("6p"))); err != nil {
+	if err := s.Apply(event.NewDora(doraIndicator)); err != nil {
 		t.Fatalf("Apply(Dora) failed: %v", err)
 	}
-
 	if err := s.Apply(event.NewDiscard(actor, replacementTile, true)); err != nil {
 		t.Fatalf("Apply(Discard) failed: %v", err)
 	}
 
+	if got := s.DoraIndicators(); len(got) != 2 || got[1] != doraIndicator {
+		t.Fatalf("DoraIndicators() = %v, want appended %v", got, doraIndicator)
+	}
 	if got := s.Player(actor).River(); len(got) != 1 || got[0] != replacementTile {
 		t.Fatalf("actor River() = %v, want [%v]", got, replacementTile)
 	}

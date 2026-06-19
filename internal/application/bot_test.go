@@ -151,10 +151,11 @@ func TestBot_Process_ReachAcceptedDoesNotRepeatDeclarationTileCall(t *testing.T)
 	}
 }
 
-func TestBot_Process_DoraAfterCalledKanReplacementDrawDoesNotDiscard(t *testing.T) {
+func TestBot_Process_CalledKanReplacementDrawKeepsDiscardAcrossDora(t *testing.T) {
 	self := seat.MustSeat(1)
 	target := seat.MustSeat(0)
 	kanTile := tile.MustTileFromCode("E")
+	replacementTile := tile.MustTileFromCode("W")
 	hands := newValidHands()
 	hands[1] = calledKanHandForApplicationTest("E", "E", "E")
 	bot := application.NewBot(self, firstLegalActionAgent{}, nil)
@@ -176,10 +177,19 @@ func TestBot_Process_DoraAfterCalledKanReplacementDrawDoesNotDiscard(t *testing.
 	if _, err := bot.Process(event.NewCalledKan(self, target, kanTile, [3]tile.Tile{kanTile, kanTile, kanTile})); err != nil {
 		t.Fatalf("Process(CalledKan) failed: %v", err)
 	}
-	if got, err := bot.Process(event.NewDraw(self, tile.MustTileFromCode("W"))); err != nil {
+	replacementReaction, err := bot.Process(event.NewDraw(self, replacementTile))
+	if err != nil {
 		t.Fatalf("Process(replacement Draw) failed: %v", err)
-	} else if got.Kind() != application.ReactionNone {
-		t.Fatalf("replacement Draw Kind() = %v, want %v", got.Kind(), application.ReactionNone)
+	}
+	if replacementReaction.Kind() != application.ReactionAction {
+		t.Fatalf("replacement Draw Kind() = %v, want %v", replacementReaction.Kind(), application.ReactionAction)
+	}
+	discard, ok := replacementReaction.Action().(*action.Discard)
+	if !ok {
+		t.Fatalf("Action() = %T, want *action.Discard", replacementReaction.Action())
+	}
+	if discard.Actor() != self {
+		t.Fatalf("Discard actor = %v, want %v", discard.Actor(), self)
 	}
 
 	got, err := bot.Process(event.NewDora(tile.MustTileFromCode("6p")))
@@ -188,6 +198,9 @@ func TestBot_Process_DoraAfterCalledKanReplacementDrawDoesNotDiscard(t *testing.
 	}
 	if got.Kind() != application.ReactionNone {
 		t.Fatalf("Kind() = %v, want %v; action = %T", got.Kind(), application.ReactionNone, got.Action())
+	}
+	if _, err := bot.Process(event.NewDiscard(self, discard.Tile(), discard.Tsumogiri())); err != nil {
+		t.Fatalf("Process(replacement Discard) failed: %v", err)
 	}
 }
 
