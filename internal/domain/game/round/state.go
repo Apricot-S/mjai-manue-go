@@ -60,6 +60,7 @@ type State struct {
 	winTarget               *seat.Seat
 	winActors               [common.NumPlayers]bool
 	lastActor               *seat.Seat
+	legalActionsSuppressed  bool
 	players                 [common.NumPlayers]player.Player
 	legalActionsCache       map[seat.Seat][]action.Action
 }

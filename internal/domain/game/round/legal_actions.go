@@ -29,6 +29,9 @@ func (s *State) calculateLegalActions(playerSeat seat.Seat) ([]action.Action, er
 	if s.roundEnded {
 		return nil, nil
 	}
+	if s.legalActionsSuppressed {
+		return nil, nil
+	}
 
 	visiblePlayer, ok := s.players[playerSeat.Index()].(*player.VisiblePlayer)
 	if !ok {
