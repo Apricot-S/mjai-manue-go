@@ -1,0 +1,52 @@
+x-manue-common: &manue-common
+  image: mjai-manue-go-self-match-manue:local
+  depends_on:
+    - server
+
+x-manue-environment: &manue-environment
+  HOST: server
+  PORT: ${PORT:-11600}
+  ROOM: ${ROOM:-default}
+  NUM_GAMES: ${NUM_GAMES:-1}
+
+services:
+  server:
+    build:
+      context: ./server
+    volumes:
+      - ${LOG_DIR:-./out}:/log_dir
+    environment:
+      HOST: server
+      PORT: ${PORT:-11600}
+      ROOM: ${ROOM:-default}
+      GAME_TYPE: ${GAME_TYPE:-tonnan}
+      NUM_GAMES: ${NUM_GAMES:-1}
+    ports:
+      - "${PORT:-11600}:${PORT:-11600}"
+
+  manue0:
+    <<: *manue-common
+    build:
+      context: ../..
+      dockerfile: scripts/self-match/manue/Dockerfile
+    environment:
+      <<: *manue-environment
+      NAME: ManueGo0
+
+  manue1:
+    <<: *manue-common
+    environment:
+      <<: *manue-environment
+      NAME: ManueGo1
+
+  manue2:
+    <<: *manue-common
+    environment:
+      <<: *manue-environment
+      NAME: ManueGo2
+
+  manue3:
+    <<: *manue-common
+    environment:
+      <<: *manue-environment
+      NAME: ManueGo3

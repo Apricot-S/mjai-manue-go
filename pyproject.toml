@@ -1,0 +1,42 @@
+[dependency-groups]
+dev = [
+    { include-group = "lint" },
+    { include-group = "typing" },
+]
+lint = [
+    "ruff>=0.15.17,<0.16",
+]
+typing = [
+    "ty>=0.0.50",
+]
+
+[tool.uv]
+package = false
+
+[tool.ruff]
+line-length = 79
+
+[tool.ruff.lint]
+select = ["ALL"]
+ignore = [
+    "D", # pydocstyle
+
+    "C901",    # complex-structure
+    "ANN002",  # missing-type-args
+    "ANN003",  # missing-type-kwargs
+    "TD002",   # missing-todo-author
+    "TD003",   # missing-todo-link
+    "PLR0911", # too-many-return-statements
+    "PLR0912", # too-many-branches
+    "PLR0913", # too-many-arguments
+    "PLR0915", # too-many-statements
+
+    "T201",    # print
+]
+
+[tool.ruff.lint.pycodestyle]
+max-doc-length = 72
+ignore-overlong-task-comments = true
+
+[tool.ruff.lint.pydocstyle]
+convention = "google"
