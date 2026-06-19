@@ -1,6 +1,6 @@
 # Manue AI Porting Specification
 
-この文書は CoffeeScript 版 Manue AI を Go へ移植するための設計仕様である。原仕様は `docs/manue-ai-original-spec.md` を一次資料とし、本書では現行 `domain/game` と `application` へ接続するための責務分割だけを定める。
+この文書は CoffeeScript 版 Manue AI を Go へ移植するための設計仕様である。原仕様は `.agents/manue-ai-original-spec.md` を一次資料とし、本書では現行 `domain/game` と `application` へ接続するための責務分割だけを定める。
 
 ## 1. 境界と方針
 
@@ -171,12 +171,12 @@ wire JSON の `log` field と stderr trace は混ぜない。action golden test 
 - 確率分布、流局点、順位期待値は小さい人工 stats で期待値を固定する。
 - Agent 判断は private field を直接壊さず、mjai JSON Lines から `round.State` を構築して action を比較する。
 - runtime golden は action のみ比較する。trace/log は別 fixture にする。
-- Characterization は `docs/manue-ai-original-spec.md` のケース候補を優先する。
+- Characterization は `.agents/manue-ai-original-spec.md` のケース候補を優先する。
 - 最終確認は PowerShell で `$env:GOEXPERIMENT='jsonv2'; go test ./...` を実行する。
 
 ### 10.1 Characterization の移植先
 
-`docs/manue-ai-original-spec.md` の OC-* は、Go 側では次の粒度へ落とす。
+`.agents/manue-ai-original-spec.md` の OC-* は、Go 側では次の粒度へ落とす。
 
 | Original ID | Go 側テスト粒度 | 比較対象 |
 | --- | --- | --- |

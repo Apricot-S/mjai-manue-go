@@ -6,12 +6,12 @@
 
 ### 1.1 参照資料
 
-- `docs/README.md`: docs 配下の文書の役割と分割方針。
-- `docs/board-state-output.md`: 盤面状態出力の実装状況と Ruby 版 `mjai` の参照抜粋。
-- `docs/manue-ai-original-spec.md`: CoffeeScript 版 Manue AI ロジックの原仕様。
-- `docs/manue-ai-porting-spec.md`: Manue AI を Go へ移植するための責務分割と接続仕様。
-- `docs/manue-ai-porting-plan.md`: Manue AI 再実装の作業順。
-- `docs/terminology-en.md`: CoffeeScript 版 `mjai-manue` 由来の英語用語集。
+- `.agents/README.md`: .agents 配下の文書の役割と分割方針。
+- `.agents/board-state-output.md`: 盤面状態出力の実装状況と Ruby 版 `mjai` の参照抜粋。
+- `.agents/manue-ai-original-spec.md`: CoffeeScript 版 Manue AI ロジックの原仕様。
+- `.agents/manue-ai-porting-spec.md`: Manue AI を Go へ移植するための責務分割と接続仕様。
+- `.agents/manue-ai-porting-plan.md`: Manue AI 再実装の作業順。
+- `.agents/terminology-en.md`: CoffeeScript 版 `mjai-manue` 由来の英語用語集。
 
 - 本プロジェクトは https://github.com/gimite/mjai-manue (CoffeeScript版) を Go に移植する。
 - 設計・開発では Eric Evans / Vaughn Vernon の DDD の考え方と、t-wada の TDD を取り入れる。
@@ -355,7 +355,7 @@ type Decision struct {
 
 現状、`internal/domain/ai/` にはツモ切り Agent と ManueAgent の途中実装が存在する。Manue 固有コードは新規設計で再実装する。既存コードは使える純粋関数が見つかった場合だけ流用し、流用のために設計を曲げない。`agent.go` と `tsumogiri_agent.go` は破棄対象外とする。
 
-`mjai-manue` の CoffeeScript 版ロジック移植では、`reference/repositories/mjai-manue-original/coffee/manue_ai.coffee` をロジックの一次資料とする。原仕様は `docs/manue-ai-original-spec.md`、Go 移植用の責務分割と接続仕様は `docs/manue-ai-porting-spec.md`、実装順は `docs/manue-ai-porting-plan.md` に置く。以前 main ブランチで移植した Go 実装（`reference/repositories/mjai-manue-go-main/internal/ai/`）は補助資料としてのみ参照する。
+`mjai-manue` の CoffeeScript 版ロジック移植では、`reference/repositories/mjai-manue-original/coffee/manue_ai.coffee` をロジックの一次資料とする。原仕様は `.agents/manue-ai-original-spec.md`、Go 移植用の責務分割と接続仕様は `.agents/manue-ai-porting-spec.md`、実装順は `.agents/manue-ai-porting-plan.md` に置く。以前 main ブランチで移植した Go 実装（`reference/repositories/mjai-manue-go-main/internal/ai/`）は補助資料としてのみ参照する。
 
 `cmd/mjai-manue` から Manue 本体を動かすため、stats と danger tree は CLI 側で `configs` から読み込み、`ManueAgent` へ deps として渡す。`internal/domain/ai` は `configs` を直接 import せず、stats / danger tree / estimator は用途別の小さい interface で受け取る。一方で局面 observation は `domain/game` 側の `round.ActionStateViewer` / `round.StateViewer` をそのまま使い、AI package 内に同等の state viewer interface を重複定義しない。
 
@@ -386,7 +386,7 @@ type Decision struct {
 - golden test は、基盤追加時点では最小 fixture に留める。以後は「runtime 仕様を広げる時」と「AI ロジックを移植する時」に、その差分で壊れ得る代表ケースを少数追加する。
   - runtime 仕様では、stdio と mjsonp の差分（`NoReaction`、同期応答用 `none`、actor 付き `Pass`、`end_game` 無応答）や、outbound action 種別（`dahai` / `reach` / `hora` / `pon` / `chi` / 各種 kan / `kyushukyuhai`）を固定する。
   - stdio では `end_game` 後も EOF まで入力を読み続けるため、同一 JSON Lines stream 内で次の `start_game` を受け取り、別 id のゲームにも応答できることを golden test で固定する。
-  - AI ロジックでは、`docs/manue-ai-original-spec.md` の characterization ケース候補を優先して fixture を追加する。例: 打牌評価、リーチ判断、副露判断、和了判断、見送り判断。
+  - AI ロジックでは、`.agents/manue-ai-original-spec.md` の characterization ケース候補を優先して fixture を追加する。例: 打牌評価、リーチ判断、副露判断、和了判断、見送り判断。
   - `mjai-manue` の移植テストは、局面を private field の上書きで無理に作らず、原則として mjai JSON Lines 入力から `round.State` を構築して action golden を比較する。局面の意味を fixture に閉じ込められるため、現行 `round.State` の invariant を壊さずに移植差分を確認できる。
   - ただし、合法手集合の分類や優先順位のように state 構築を必要としない小さい純粋判断は、AI package 内の単体テストで固定する。golden test は「入力列から最終的にどの protocol action が出るか」を見る結合寄りのテスト、単体テストは「同じ合法手集合ならどの action を選ぶか」を見るテストとして役割を分ける。
   - 不正 JSON、空行、開始前 event などのエラー系は golden ではなく通常の単体テストで固定する。
@@ -443,12 +443,12 @@ type Decision struct {
    - 盤面出力は protocol output と混ぜず、必要な範囲で stderr 側の golden test を分ける。
 
 6. **Manue AI 再実装前の仕様化（完了）**
-   - CoffeeScript 版 `manue_ai.coffee` の原仕様を `docs/manue-ai-original-spec.md` に記録する。
-   - Go 移植用の責務分割と接続仕様を `docs/manue-ai-porting-spec.md` に記録する。
-   - `docs/manue-ai-porting-plan.md` は実装順だけに縮小する。
+   - CoffeeScript 版 `manue_ai.coffee` の原仕様を `.agents/manue-ai-original-spec.md` に記録する。
+   - Go 移植用の責務分割と接続仕様を `.agents/manue-ai-porting-spec.md` に記録する。
+   - `.agents/manue-ai-porting-plan.md` は実装順だけに縮小する。
 
 7. **CoffeeScript 版ロジックの再移植**
-   - `docs/manue-ai-original-spec.md` と `docs/manue-ai-porting-spec.md` を一次資料として Manue 固有コードを再実装する。
+   - `.agents/manue-ai-original-spec.md` と `.agents/manue-ai-porting-spec.md` を一次資料として Manue 固有コードを再実装する。
    - `agent.go` と `tsumogiri_agent.go` は維持し、Manue 固有コードだけを整理対象にする。
    - 候補生成、候補評価、危険度推定、和了推定、流局、他家和了、順位期待値、trace を段階的に接続する。
    - 既存の `shanten` / `tenpai` / `win` / `yaku` / `point` service を再利用し、必要な不足だけを追加する。

@@ -1,13 +1,13 @@
 # Manue AI Porting Plan
 
-この文書は CoffeeScript 版 Manue AI を Go へ再実装する作業順だけを扱う。原仕様は `docs/manue-ai-original-spec.md`、Go 移植用の責務分割と接続仕様は `docs/manue-ai-porting-spec.md` を一次資料にする。
+この文書は CoffeeScript 版 Manue AI を Go へ再実装する作業順だけを扱う。原仕様は `.agents/manue-ai-original-spec.md`、Go 移植用の責務分割と接続仕様は `.agents/manue-ai-porting-spec.md` を一次資料にする。
 
 ## 1. 前提
 
 - `reference/repositories/mjai-manue-original/coffee/manue_ai.coffee` を AI ロジックの一次資料にする。
 - 過去 Go 実装と現行 `internal/domain/ai` の Manue 固有コードは補助資料に留める。
 - `agent.go` と `tsumogiri_agent.go` は維持する。Manue 固有コードだけを再実装対象にする。
-- docs cleanup は AI 再実装の前提作業であり、実装しながら仕様を後追いで書く進め方には戻さない。
+- .agents cleanup は AI 再実装の前提作業であり、実装しながら仕様を後追いで書く進め方には戻さない。
 
 ## 2. 実装順
 
@@ -17,8 +17,8 @@
    - これは仕様固定のための準備であり、既存実装への流用前提にはしない。
 
 1. **仕様固定**
-   - `docs/manue-ai-original-spec.md` の characterization ケース候補を、実装前にテスト候補へ落とし込む。
-   - 原仕様と Go 移植仕様の差分が必要な箇所は、実装前に `docs/manue-ai-porting-spec.md` へ理由付きで追記する。
+   - `.agents/manue-ai-original-spec.md` の characterization ケース候補を、実装前にテスト候補へ落とし込む。
+   - 原仕様と Go 移植仕様の差分が必要な箇所は、実装前に `.agents/manue-ai-porting-spec.md` へ理由付きで追記する。
 
 2. **Manue 固有コードの整理**
    - 現行 `internal/domain/ai` の Manue 固有実装を、仕様に合う純粋関数と破棄対象へ分ける。
