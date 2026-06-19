@@ -66,6 +66,49 @@ func TestState_LegalActions_PendingDiscard(t *testing.T) {
 	}
 }
 
+func TestState_LegalActions_OtherPlayerCannotReactToStaleDiscardDuringSelfDraw(t *testing.T) {
+	hands := newValidHands()
+	hands[1] = ponHandForLegalActionsTest("6p", "6p")
+	s := mustNewRoundStateForTest(t, hands)
+	staleDiscarder := seat.MustSeat(3)
+	actor := seat.MustSeat(1)
+	staleDiscard := tile.MustTileFromCode("6p")
+
+	for _, step := range []struct {
+		actor     seat.Seat
+		draw      tile.Tile
+		discard   tile.Tile
+		tsumogiri bool
+	}{
+		{actor: seat.MustSeat(0), draw: tile.MustTileFromCode("E"), discard: tile.MustTileFromCode("E"), tsumogiri: true},
+		{actor: seat.MustSeat(1), draw: tile.MustTileFromCode("S"), discard: tile.MustTileFromCode("S"), tsumogiri: true},
+		{actor: seat.MustSeat(2), draw: tile.MustTileFromCode("W"), discard: tile.MustTileFromCode("W"), tsumogiri: true},
+		{actor: staleDiscarder, draw: staleDiscard, discard: staleDiscard, tsumogiri: true},
+		{actor: seat.MustSeat(0), draw: tile.MustTileFromCode("N"), discard: tile.MustTileFromCode("N"), tsumogiri: true},
+		{actor: seat.MustSeat(1), draw: tile.MustTileFromCode("P"), discard: tile.MustTileFromCode("P"), tsumogiri: true},
+		{actor: seat.MustSeat(2), draw: tile.MustTileFromCode("F"), discard: tile.MustTileFromCode("F"), tsumogiri: true},
+	} {
+		if err := s.Apply(event.NewDraw(step.actor, step.draw)); err != nil {
+			t.Fatalf("Apply(Draw %d %s) failed: %v", step.actor.Index(), step.draw, err)
+		}
+		if err := s.Apply(event.NewDiscard(step.actor, step.discard, step.tsumogiri)); err != nil {
+			t.Fatalf("Apply(Discard %d %s) failed: %v", step.actor.Index(), step.discard, err)
+		}
+	}
+
+	if err := s.Apply(event.NewDraw(staleDiscarder, tile.MustTileFromCode("9m"))); err != nil {
+		t.Fatalf("Apply(stale discarder Draw) failed: %v", err)
+	}
+
+	got, err := s.LegalActions(actor)
+	if err != nil {
+		t.Fatalf("LegalActions() failed: %v", err)
+	}
+	if len(got) != 0 {
+		t.Fatalf("LegalActions() = %v, want empty while another player is pending discard", got)
+	}
+}
+
 func TestState_LegalActions_IncludesRiichi(t *testing.T) {
 	hands := newValidHands()
 	hands[0] = riichiReadyHandForTest()
