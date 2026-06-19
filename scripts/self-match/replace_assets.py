@@ -24,24 +24,6 @@ RED_TILE_NAMES = ("ms5r", "ps5r", "ss5r")
 POSES = (1, 3)
 
 
-class ResourceDirectoryNotFoundError(ValueError):
-    def __init__(self, html_path: Path) -> None:
-        super().__init__(
-            f"could not determine resource directory for {html_path}",
-        )
-
-
-class MissingImagesError(FileNotFoundError):
-    def __init__(self, image_dir: Path, missing: list[str]) -> None:
-        details = "\n".join(f"  {name}" for name in missing)
-        super().__init__(f"missing required images in {image_dir}:\n{details}")
-
-
-class ArchivePlayerNotFoundError(FileNotFoundError):
-    def __init__(self, js_path: Path) -> None:
-        super().__init__(f"archive_player.js not found: {js_path}")
-
-
 def required_asset_names() -> list[str]:
     names = ["blank.png"]
     for tile in TILE_NAMES:
@@ -61,7 +43,8 @@ def resource_dir_for(html_path: Path) -> Path:
     if len(candidates) == 1:
         return candidates[0]
 
-    raise ResourceDirectoryNotFoundError(html_path)
+    msg = f"could not determine resource directory for {html_path}"
+    raise ValueError(msg)
 
 
 def copy_images(image_dir: Path, dest_dir: Path) -> None:
@@ -72,7 +55,9 @@ def copy_images(image_dir: Path, dest_dir: Path) -> None:
     ]
 
     if missing:
-        raise MissingImagesError(image_dir, missing)
+        details = "\n".join(f"  {name}" for name in missing)
+        msg = f"missing required images in {image_dir}:\n{details}"
+        raise FileNotFoundError(msg)
 
     dest_dir.mkdir(parents=True, exist_ok=True)
     for name in required_asset_names():
@@ -96,7 +81,8 @@ def rewrite_archive_player(js_path: Path) -> None:
 def archive_player_path(resource_dir: Path) -> Path:
     js_path = resource_dir / "js" / "archive_player.js"
     if not js_path.is_file():
-        raise ArchivePlayerNotFoundError(js_path)
+        msg = f"archive_player.js not found: {js_path}"
+        raise FileNotFoundError(msg)
     return js_path
 
 
