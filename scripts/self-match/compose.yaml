@@ -1,3 +1,14 @@
+x-manue-common: &manue-common
+  image: mjai-manue-go-self-match-manue:local
+  depends_on:
+    - server
+
+x-manue-environment: &manue-environment
+  HOST: server
+  PORT: ${PORT:-11600}
+  ROOM: ${ROOM:-default}
+  NUM_GAMES: ${NUM_GAMES:-1}
+
 services:
   server:
     build:
@@ -14,53 +25,28 @@ services:
       - "${PORT:-11600}:${PORT:-11600}"
 
   manue0:
+    <<: *manue-common
     build:
       context: ../..
       dockerfile: scripts/self-match/manue/Dockerfile
-    depends_on:
-      - server
     environment:
-      HOST: server
-      PORT: ${PORT:-11600}
-      ROOM: ${ROOM:-default}
-      NUM_GAMES: ${NUM_GAMES:-1}
+      <<: *manue-environment
       NAME: ManueGo0
 
   manue1:
-    build:
-      context: ../..
-      dockerfile: scripts/self-match/manue/Dockerfile
-    depends_on:
-      - server
+    <<: *manue-common
     environment:
-      HOST: server
-      PORT: ${PORT:-11600}
-      ROOM: ${ROOM:-default}
-      NUM_GAMES: ${NUM_GAMES:-1}
+      <<: *manue-environment
       NAME: ManueGo1
 
   manue2:
-    build:
-      context: ../..
-      dockerfile: scripts/self-match/manue/Dockerfile
-    depends_on:
-      - server
+    <<: *manue-common
     environment:
-      HOST: server
-      PORT: ${PORT:-11600}
-      ROOM: ${ROOM:-default}
-      NUM_GAMES: ${NUM_GAMES:-1}
+      <<: *manue-environment
       NAME: ManueGo2
 
   manue3:
-    build:
-      context: ../..
-      dockerfile: scripts/self-match/manue/Dockerfile
-    depends_on:
-      - server
+    <<: *manue-common
     environment:
-      HOST: server
-      PORT: ${PORT:-11600}
-      ROOM: ${ROOM:-default}
-      NUM_GAMES: ${NUM_GAMES:-1}
+      <<: *manue-environment
       NAME: ManueGo3
