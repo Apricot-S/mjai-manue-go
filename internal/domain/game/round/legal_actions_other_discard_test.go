@@ -248,6 +248,39 @@ func TestState_LegalActions_OnOtherDiscardExcludesPonAfterRiichiAccepted(t *test
 	}
 }
 
+func TestState_LegalActions_AfterRiichiAcceptedReturnsNoActions(t *testing.T) {
+	hands := newValidHands()
+	hands[0] = riichiReadyHandForTest()
+	hands[3] = ponHandForLegalActionsTest("W", "W")
+	s := mustNewRoundStateForTest(t, hands)
+	riichiActor := seat.MustSeat(0)
+	declarationTile := tile.MustTileFromCode("W")
+
+	if err := s.Apply(event.NewDraw(riichiActor, tile.MustTileFromCode("S"))); err != nil {
+		t.Fatalf("Apply(Draw) failed: %v", err)
+	}
+	if err := s.Apply(event.NewRiichi(riichiActor)); err != nil {
+		t.Fatalf("Apply(Riichi) failed: %v", err)
+	}
+	if err := s.Apply(event.NewDiscard(riichiActor, declarationTile, false)); err != nil {
+		t.Fatalf("Apply(Discard) failed: %v", err)
+	}
+	if err := s.Apply(event.NewRiichiAccepted(riichiActor, nil, nil)); err != nil {
+		t.Fatalf("Apply(RiichiAccepted) failed: %v", err)
+	}
+
+	for i := range common.NumPlayers {
+		actor := seat.MustSeat(i)
+		got, err := s.LegalActions(actor)
+		if err != nil {
+			t.Fatalf("LegalActions(%d) failed: %v", i, err)
+		}
+		if len(got) != 0 {
+			t.Errorf("LegalActions(%d) = %v, want empty after RiichiAccepted", i, got)
+		}
+	}
+}
+
 func TestState_LegalActions_OnOtherDiscardIncludesCalledKan(t *testing.T) {
 	hands := newValidHands()
 	hands[1] = calledKanHandForLegalActionsTest("E", "E", "E")

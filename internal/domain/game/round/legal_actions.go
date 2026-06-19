@@ -29,15 +29,25 @@ func (s *State) calculateLegalActions(playerSeat seat.Seat) ([]action.Action, er
 	if s.roundEnded {
 		return nil, nil
 	}
+	if s.legalActionsSuppressed {
+		return nil, nil
+	}
 
 	visiblePlayer, ok := s.players[playerSeat.Index()].(*player.VisiblePlayer)
 	if !ok {
 		return nil, fmt.Errorf("cannot list legal actions: player %d is invisible", playerSeat.Index())
 	}
 
-	if s.pendingDiscard == nil || *s.pendingDiscard != playerSeat {
+	if s.pendingDiscard == nil {
+		// After open kan, the bot must choose a discard on the replacement draw,
+		// even though the server publishes the dora event before the discard event.
+		if s.pendingKanActor != nil && *s.pendingKanActor == playerSeat && s.kanProgress == noKanProgress && s.pendingDoraReveals > 0 {
+			return s.legalActionsOnSelfDraw(playerSeat, visiblePlayer)
+		}
 		return s.legalActionsOnOtherDiscard(playerSeat, visiblePlayer)
 	}
-
+	if *s.pendingDiscard != playerSeat {
+		return nil, nil
+	}
 	return s.legalActionsOnSelfDraw(playerSeat, visiblePlayer)
 }

@@ -63,8 +63,18 @@ func (s *State) Apply(ev event.Event) error {
 	if _, ok := ev.(*event.Win); !ok {
 		s.flushPendingExtraSafeDiscard(pendingExtraSafeDiscard)
 	}
+	s.legalActionsSuppressed = suppressLegalActionsAfterEvent(ev)
 	s.legalActionsCache = nil
 	return nil
+}
+
+func suppressLegalActionsAfterEvent(ev event.Event) bool {
+	switch ev.(type) {
+	case *event.Dora, *event.RiichiAccepted:
+		return true
+	default:
+		return false
+	}
 }
 
 func (s *State) applyDraw(ev *event.Draw) error {
