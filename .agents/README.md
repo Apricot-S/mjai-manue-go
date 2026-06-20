@@ -7,15 +7,12 @@
 - `design.md`: 全体設計の一次資料。ゴール/非ゴール、NFR、レイヤ責務、ユースケース、主要インタフェース案、テスト戦略を集約する。
 - `board-state-output.md`: 盤面状態出力の実装計画と Ruby 版 `mjai` の参照抜粋。実装が安定したら、恒久仕様は `design.md` に残し、この計画メモは縮小または削除する。
 - `performance-improvement-candidates.md`: 実装効率化候補の調査メモ。向聴計算、和了形判定、合法手列挙、牌変換などの改善案と検証方針をまとめる。
-- `manue-ai-original-spec.md`: CoffeeScript 版 `manue_ai.coffee` の原仕様。Go 向けの設計変更を入れず、呼び出し構造、候補生成、評価値、選択規則、乱数、trace を記録する。
-- `manue-ai-porting-spec.md`: Manue AI を Go へ移植するための設計仕様。純粋関数、依存データ、orchestration、`domain/game` との接続点を整理する。
-- `manue-ai-porting-plan.md`: Manue AI 再実装の作業順。仕様や設計判断は上記 2 文書へ分離し、この文書には実装順とテスト方針だけを置く。
-- `manue-deps.md`: `ManueAgent` の stats / estimator / config 依存を小さい interface として整理する方針メモ。
 - `terminology-en.md`: CoffeeScript 版 `mjai-manue` 由来の英語用語集。移植元コードの語彙確認に使う補助資料。
+- `archive/`: 完了済みフェーズの詳細メモ。AI 本体移植時の原仕様・移植仕様・監査メモなど、通常の実装作業では読まない資料を置く。
 
 ## 分割方針
 
-`design.md` は全体方針と境界を集約する。AI ロジックのように詳細仕様が大きい領域は、専用文書を一次資料にし、`design.md` からリンクする。
+`design.md` は全体方針と境界を集約する。tools 実装のように詳細仕様が大きい領域は、必要になった時点で専用文書を一次資料にし、`design.md` からリンクする。
 
 ただし、次のいずれかに該当したら分割を検討する。
 

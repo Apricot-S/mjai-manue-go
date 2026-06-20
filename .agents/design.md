@@ -8,18 +8,16 @@
 
 - `.agents/README.md`: .agents 配下の文書の役割と分割方針。
 - `.agents/board-state-output.md`: 盤面状態出力の実装状況と Ruby 版 `mjai` の参照抜粋。
-- `.agents/manue-ai-original-spec.md`: CoffeeScript 版 Manue AI ロジックの原仕様。
-- `.agents/manue-ai-porting-spec.md`: Manue AI を Go へ移植するための責務分割と接続仕様。
-- `.agents/manue-ai-porting-plan.md`: Manue AI 再実装の作業順。
 - `.agents/terminology-en.md`: CoffeeScript 版 `mjai-manue` 由来の英語用語集。
+- `.agents/archive/`: 完了済みフェーズの詳細メモ。AI 本体移植の原仕様・移植仕様・監査メモは通常参照から外し、必要時のみ確認する。
 
-- 本プロジェクトは https://github.com/gimite/mjai-manue (CoffeeScript版) を Go に移植する。
+- 本プロジェクトは <https://github.com/gimite/mjai-manue> (CoffeeScript版) を Go に移植する。
 - 設計・開発では Eric Evans / Vaughn Vernon の DDD の考え方と、t-wada の TDD を取り入れる。
 - 利用形態は CLI。
 - 外部通信は以下をサポート対象とする。
   - mjai オリジナルプロトコル (TCP: `mjsonp://...`)（`mjai-tsumogiri` で実装済み）
   - stdio（`mjai-tsumogiri` で実装済み）
-  - RiichiLab リニューアル後プロトコル (https://riichi.dev/docs/protocol) は将来の bridge コマンドで対応（WebSocket ↔ stdio 変換 + token 付与）
+  - RiichiLab リニューアル後プロトコル (<https://riichi.dev/docs/protocol>) は将来の bridge コマンドで対応（WebSocket ↔ stdio 変換 + token 付与）
 - 実装済み mjai メッセージ仕様は adapter codec とその単体テストで固定する。
 
 ## 2. ゴール / 非ゴール
@@ -31,18 +29,17 @@
 - mjai サーバの固定ルール: **天鳳四人東南喰赤**（固定。ルール切替はしない）。
 - バイナリは別コマンド:
   - `mjai-tsumogiri`: 実装済みのモック / 最小AI（常にツモ切り）
-  - `mjai-manue`: 本体（CoffeeScript版ロジック移植対象。CLI と周辺配線は整備済みだが、Manue 固有 AI ロジックは再実装対象）
+  - `mjai-manue`: 本体（CoffeeScript版ロジック移植済み。CLI、runtime 配線、stats / danger tree 接続を含む）
+  - `tools/`: `configs/` に埋め込む統計 JSON / danger tree を game log から生成する補助コマンド群
 
 ### 2.2 非ゴール (今回の設計範囲外)
 
-- `tools/` 配下の各種統計生成ツールの設計・実装詳細
 - `test/` 配下の original-vs-port 比較フレームワークの設計・運用詳細（必要時にのみ実行する想定）
 
 ### 2.3 公開 README の扱い
 
-`README.md` / `cmd/README.md` / `cmd/mjai-manue/README.md` は、将来の完成形を先行して示す利用者向けドキュメントとして扱う。
-そのため、現時点で `mjai-manue` 本体が未実装でも、README を逐次実装状況へ同期する作業は原則として行わない。
-コーディングエージェントが現状実装を判断する場合は、本設計書の「現状コードの把握」「実装計画」と実ファイルを一次情報とし、README の完成形記述だけを根拠に実装済みと判断しない。
+`README.md` / `cmd/README.md` / `cmd/mjai-manue/README.md` / `tools/README.md` は利用者向けドキュメントとして扱う。
+コーディングエージェントが現状実装を判断する場合は、本設計書の「現状コードの把握」「実装計画」と実ファイルを一次情報とする。tools の実装を進める場合は、実装差分に合わせて `tools/*/README.md` も更新する。
 
 ## 3. 品質特性 (NFR)
 
@@ -113,10 +110,11 @@ flowchart LR
 - `internal/application/` に Bot と入力への反応（`NoReaction` / `Action`）が実装されている。現状の action 判定は `round.State.LegalActions(selfID)` が空かどうかを参照する。`LegalActions` は自摸後・副露後など `pendingDiscard` が立つ局面の打牌候補、自摸和了、ロン、ポン、チー、大明槓、見送り候補まで実装済み。Agent へ渡す観測は `round.ActionStateViewer` として、局面 view と合法手一覧の両方を含む。
 - `internal/domain/ai/` に Agent インタフェースとツモ切り Agent が実装されている。ツモ切り Agent は drawn tile がある場合に `Discard(tsumogiri=true)`、ない場合に `Pass` を返す。
 - `cmd/mjai-tsumogiri/` に、stdio / mjsonp TCP client を切り替えて最小AIを起動する `package main` 実装が存在する。現状の共通フラグは `--name` / `--id` で、`--seed` はない。
-- `cmd/mjai-manue/` は CLI と runtime 配線を持つ。`--name` / `--id` / `--seed` / stdio / mjsonp TCP client、stats / danger tree の load、Agent 生成動線は整備済み。ただし `internal/domain/ai` の Manue 固有ロジックは途中実装に引っ張られた構造が残っているため、CoffeeScript 版の原仕様化と Go 移植仕様化を先に行ったうえで再実装する。
+- `cmd/mjai-manue/` は CLI と runtime 配線を持つ。`--name` / `--id` / `--seed` / stdio / mjsonp TCP client、stats / danger tree の load、Agent 生成動線、Manue 固有 AI ロジックは実装済み。
 - `configs/` は JSON を build 時 embed して読み出す実装がある（`encoding/json/v2` 前提）。
+- `tools/` は README とサブディレクトリ構成だけが現行側にあり、Go 実装は未移植。対象は `dump_game_stats` / `dump_light_game_stats` / `postprocess_light_game_stats` / `print_game_stats` / `estimate_danger`。
 
-本設計書は、上記の既存資産を活用し、`mjai-manue` の Manue 固有 AI ロジックと RiichiLab bridge を段階的に足していく前提で進める。
+本設計書は、上記の既存資産を活用し、未移植の `tools/` と RiichiLab bridge を段階的に足していく前提で進める。
 
 ## 6. ユースケース
 
@@ -351,20 +349,32 @@ type Decision struct {
 ### 10.2 実装フェーズ
 
 1. `mjai-tsumogiri`: 最小AI（常にツモ切り、鳴き/立直はしない等の単純方針）
-2. `mjai-manue`: CoffeeScript版のロジックを移植し、入力→出力一致を狙う
+2. `mjai-manue`: CoffeeScript版のロジックを移植済み。入力→出力一致を狙う方針は維持する。
 
-現状、`internal/domain/ai/` にはツモ切り Agent と ManueAgent の途中実装が存在する。Manue 固有コードは新規設計で再実装する。既存コードは使える純粋関数が見つかった場合だけ流用し、流用のために設計を曲げない。`agent.go` と `tsumogiri_agent.go` は破棄対象外とする。
+`internal/domain/ai/` にはツモ切り Agent と ManueAgent が存在する。Manue 固有コードは CoffeeScript 版の評価値へ寄せ、既に `domain/game` にあるルール判定（合法手、向聴、役、点数、聴牌、和了形）を再実装しない方針で維持する。
 
-`mjai-manue` の CoffeeScript 版ロジック移植では、`reference/repositories/mjai-manue-original/coffee/manue_ai.coffee` をロジックの一次資料とする。原仕様は `.agents/manue-ai-original-spec.md`、Go 移植用の責務分割と接続仕様は `.agents/manue-ai-porting-spec.md`、実装順は `.agents/manue-ai-porting-plan.md` に置く。以前 main ブランチで移植した Go 実装（`reference/repositories/mjai-manue-go-main/internal/ai/`）は補助資料としてのみ参照する。
+AI 本体移植時の詳細メモは `.agents/archive/` に退避済み。通常の実装では本設計書と実ファイルを一次情報とし、差分監査や過去判断の確認が必要な場合だけ archive を参照する。以前 main ブランチで移植した Go 実装（`reference/repositories/mjai-manue-go-main/internal/ai/`）は補助資料としてのみ参照する。
 
 `cmd/mjai-manue` から Manue 本体を動かすため、stats と danger tree は CLI 側で `configs` から読み込み、`ManueAgent` へ deps として渡す。`internal/domain/ai` は `configs` を直接 import せず、stats / danger tree / estimator は用途別の小さい interface で受け取る。一方で局面 observation は `domain/game` 側の `round.ActionStateViewer` / `round.StateViewer` をそのまま使い、AI package 内に同等の state viewer interface を重複定義しない。
 
-`ManueAgent` の再構築では、完成形と異なる独自評価を増やさない。通常手番、副露反応、危険度、和了推定、流局、他家和了、順位期待値は CoffeeScript 版 `getMetricsInternal` と同じ意味の評価値へ寄せる。既に `domain/game` にあるルール判定（合法手、向聴、役、点数、聴牌、和了形）は再実装しない。trace log の action key、表形式、`goals` 件数、`tenpaiProbs` 出力はオリジナル実装と揃え、内部構造は現行 Go のドメイン語彙へ寄せる。
+`ManueAgent` の保守では、完成形と異なる独自評価を増やさない。通常手番、副露反応、危険度、和了推定、流局、他家和了、順位期待値は CoffeeScript 版 `getMetricsInternal` と同じ意味の評価値へ寄せる。trace log の action key、表形式、`goals` 件数、`tenpaiProbs` 出力はオリジナル実装と揃え、内部構造は現行 Go のドメイン語彙へ寄せる。
 
 ## 11. 設定ファイル (embed 固定)
 
 - `configs/` にある JSON は build 時に embed する。
 - 実行時にパス差し替えはしない（ただし開発中に差し替えたい場合はビルド前に置換）。
+
+### 11.1 tools 生成物
+
+`tools/` は `configs/` に置く生成物を作る開発者向けコマンド群として扱う。通常の `mjai-manue` 実行時依存にはしない。
+
+- `dump_game_stats`: game log から `game_stats.json` を生成する。
+- `print_game_stats`: `game_stats.json` を人間が確認しやすい形式で表示する。
+- `dump_light_game_stats`: game log から round-level の中間統計を生成する。
+- `postprocess_light_game_stats`: 中間統計から `light_game_stats.json` を生成する。
+- `estimate_danger`: game log から放銃危険度推定用の `danger_tree.all.json` を生成する。
+
+tools 実装では、外部ファイル形式・大量ログ走査・進捗出力・診断出力を `tools` package / command に閉じ込める。`internal/domain` には牌譜ファイルや集計 CLI の都合を持ち込まず、必要な麻雀状態遷移・合法手・判定だけを既存 domain API から利用する。生成 JSON の schema は `configs` の loader と AI が読む構造を一次情報とし、変更する場合は loader / fixtures / README を同じ差分で更新する。
 
 ## 12. テスト戦略 (TDD)
 
@@ -386,8 +396,9 @@ type Decision struct {
 - golden test は、基盤追加時点では最小 fixture に留める。以後は「runtime 仕様を広げる時」と「AI ロジックを移植する時」に、その差分で壊れ得る代表ケースを少数追加する。
   - runtime 仕様では、stdio と mjsonp の差分（`NoReaction`、同期応答用 `none`、actor 付き `Pass`、`end_game` 無応答）や、outbound action 種別（`dahai` / `reach` / `hora` / `pon` / `chi` / 各種 kan / `kyushukyuhai`）を固定する。
   - stdio では `end_game` 後も EOF まで入力を読み続けるため、同一 JSON Lines stream 内で次の `start_game` を受け取り、別 id のゲームにも応答できることを golden test で固定する。
-  - AI ロジックでは、`.agents/manue-ai-original-spec.md` の characterization ケース候補を優先して fixture を追加する。例: 打牌評価、リーチ判断、副露判断、和了判断、見送り判断。
-  - `mjai-manue` の移植テストは、局面を private field の上書きで無理に作らず、原則として mjai JSON Lines 入力から `round.State` を構築して action golden を比較する。局面の意味を fixture に閉じ込められるため、現行 `round.State` の invariant を壊さずに移植差分を確認できる。
+  - AI ロジックでは、過去の characterization ケースを確認する必要がある場合だけ `.agents/archive/manue-ai-original-spec.md` を参照する。例: 打牌評価、リーチ判断、副露判断、和了判断、見送り判断。
+  - `mjai-manue` の回帰テストは、局面を private field の上書きで無理に作らず、原則として mjai JSON Lines 入力から `round.State` を構築して action golden を比較する。局面の意味を fixture に閉じ込められるため、現行 `round.State` の invariant を壊さずに差分を確認できる。
+  - `tools/` の生成物は、小さい log fixture で schema と代表値を固定する。大量ログを必要とする精度確認は通常テストへ入れず、必要時の手動検証に留める。
   - ただし、合法手集合の分類や優先順位のように state 構築を必要としない小さい純粋判断は、AI package 内の単体テストで固定する。golden test は「入力列から最終的にどの protocol action が出るか」を見る結合寄りのテスト、単体テストは「同じ合法手集合ならどの action を選ぶか」を見るテストとして役割を分ける。
   - 不正 JSON、空行、開始前 event などのエラー系は golden ではなく通常の単体テストで固定する。
   - 長い半荘ログを大量に golden 化することは避ける。失敗時の原因特定が重くなるため、長大な差分確認は `original-vs-port` 比較に寄せる。
@@ -403,62 +414,50 @@ type Decision struct {
 - Python / `riichienv` は開発者向けの optional dependency とし、通常の Go ビルドや RiichiLab 接続実行には要求しない。
 - 手順の詳細は riichi.dev の local testing ドキュメントを一次情報とし、このリポジトリには起動方法と前提条件のみを記載する。
 
-## 13. 実装計画 (2026-04-30 再計画)
+## 13. 実装計画 (2026-06-20 再計画)
 
 ### 13.1 完了済みの土台
 
-- `mjai-tsumogiri` の CLI、stdio / mjsonp TCP client runtime、mjai inbound/outbound codec の最小系は実装済み。
+- `mjai-tsumogiri` の CLI、stdio / mjsonp TCP client runtime、mjai inbound/outbound codec は実装済み。
+- `cmd/mjai-manue`、`ManueAgent`、stats / danger tree の load と deps 注入、seed reset は実装済み。
 - `application.Bot`、`Reaction`、`domain/ai.Agent`、`TsumogiriAgent` は実装済み。
-- `round.State` の開始、`tsumo` / `dahai` / `reach` / `reach_accepted` / 副露・カン / `dora` / 和了（`Win`）/ 流局（`DrawRound`）適用、盤面状態出力は実装中。
-- mjai inbound event は、局進行メッセージの domain event 化と `round.State.Apply` の受け入れを実装済み。
-- 牌・手牌・副露・向聴・聴牌・和了・役・点数など、`mjai-manue` の判断に使う基礎ドメインサービスは一部実装済み。
+- `round.State` の状態遷移、盤面状態出力、`LegalActions(playerID)` は実装済み。
+- 牌・手牌・副露・向聴・聴牌・和了・役・点数など、`mjai-manue` の判断に使う基礎ドメインサービスは実装済み。
 - `configs/` の JSON embed と `encoding/json/v2` 前提のテスト運用は実装済み。
+- AI 本体移植時の詳細資料は `.agents/archive/` に退避済み。
 
 ### 13.2 優先実装順
 
-1. **現状仕様の整合（完了）**
-   - `README.md` / `cmd/README.md` / `cmd/mjai-manue/README.md` は完成形を先行して示すため、未実装状態との逐次同期は行わない。コーディングエージェント向けの実装状況は本設計書と `AGENTS.md` に集約する。
-   - `mjai-tsumogiri` の現行仕様（`--name`、URL 省略時 stdio、mjsonp URL 指定時 TCP、stderr trace/盤面出力）を設計書とテストで固定する。
+1. **資料整理（完了）**
+   - AI 移植前提の作業メモを `.agents/archive/` に退避し、通常参照する資料から外す。
+   - `AGENTS.md` / `.agents/README.md` / 本設計書を、AI 本体完了後の tools 実装フェーズへ更新する。
 
-2. **mjai inbound event の拡充（完了）**
-   - `reach` / `reach_accepted` / `pon` / `chi` / `ankan` / `kakan` / `daiminkan` / `dora` / `hora` / `ryukyoku` を domain event 化し、`round.State.Apply` で状態遷移に反映する。domain event 名は `hora` を `Win`、`ryukyoku` を `DrawRound` とする。
-   - `end_kyoku` / `end_game` のような lifecycle message は application/runtime で扱い、局内状態に不要な情報は domain に持ち込まない。
-   - 各 message type は inbound codec の単体テストで固定し、未知 type / 不正 field は error にする。
+2. **tools 参照元の棚卸し**
+   - CoffeeScript 版 `coffee/dump_game_stats.coffee` / `dump_light_game_stats.coffee` / `postprocess_light_game_stats.coffee` / `print_game_stats.coffee` / `danger_estimator.coffee` と、過去 Go 実装 `reference/repositories/mjai-manue-go-main/tools/` を比較する。
+   - 現行 `configs` loader と AI が実際に読む field を確認し、生成 JSON の互換性テストを先に固定する。
 
-3. **outbound action の拡充（完了）**
-   - domain action と outbound codec に `pass` / `reach` / `hora` / `pon` / `chi` / 各種 kan などを追加する。
-   - `none` は同期応答専用（`type` のみ）とし、明示見送りの `Pass` は actor を持つ別 outbound 型として wire type `none` へ変換する。
-   - `log` は application の decision metadata として扱い、mjai 固有の JSON field へは outbound codec で反映する。
-   - mjsonp runtime は `NoReaction` を同期応答 `none` に変換し、stdio は sparse output のままにする。
+3. **shared log/archive 読み取り基盤**
+   - 過去 Go 実装の `tools/shared` を参考に、game log / archive 入力を tools 側で読み取る共通処理を実装する。
+   - I/O、glob、圧縮形式、進捗・診断出力は tools 側に閉じ込め、domain へ持ち込まない。
 
-4. **Action timing と合法手列挙（完了）**
-   - `round.State` もしくは domain service に `LegalActions(playerID)` 相当を追加し、Agent へ渡す obs に局面 view と合法手一覧の両方を含める。
-   - 自摸後の打牌/リーチ/ツモ和了、他家打牌後のロン/ポン/チー/カン/見送りを、`possible_actions` に依存せず State から算出する。
-   - `application.Bot` は `LegalActions(selfID)` が空でない場合に Agent を呼ぶ。
-   - `Pass` は行動機会がある場合だけ合法手に含める。`NoReaction` とは引き続き分離する。
+4. **game stats 系 tools**
+   - `dump_game_stats` を実装し、`configs.LoadGameStats()` が読める JSON を生成する。
+   - `print_game_stats` を実装し、生成 JSON の目視確認を容易にする。
+   - 小さい fixture で出力 schema と代表値を固定する。
 
-5. **ゴールデンテスト基盤**
-   - mjson / JSON Lines 入力から「出力 action のみ」を比較するテスト基盤を追加する。
-   - まず `mjai-tsumogiri` で stdio sparse output と mjsonp 同期応答の差を固定する。
-   - 盤面出力は protocol output と混ぜず、必要な範囲で stderr 側の golden test を分ける。
+5. **light game stats 系 tools**
+   - `dump_light_game_stats` で round-level の中間統計を生成する。
+   - `postprocess_light_game_stats` で `light_game_stats.json` を生成し、`configs` 側の読み取り互換を確認する。
 
-6. **Manue AI 再実装前の仕様化（完了）**
-   - CoffeeScript 版 `manue_ai.coffee` の原仕様を `.agents/manue-ai-original-spec.md` に記録する。
-   - Go 移植用の責務分割と接続仕様を `.agents/manue-ai-porting-spec.md` に記録する。
-   - `.agents/manue-ai-porting-plan.md` は実装順だけに縮小する。
+6. **danger tree 系 tools**
+   - `estimate_danger` を実装し、`danger_tree.all.json` を生成する。
+   - bit vector / scene extraction / confidence interval / tree generation は純粋ロジックとして単体テストを置き、重いログ処理は fixture を絞る。
 
-7. **CoffeeScript 版ロジックの再移植**
-   - `.agents/manue-ai-original-spec.md` と `.agents/manue-ai-porting-spec.md` を一次資料として Manue 固有コードを再実装する。
-   - `agent.go` と `tsumogiri_agent.go` は維持し、Manue 固有コードだけを整理対象にする。
-   - 候補生成、候補評価、危険度推定、和了推定、流局、他家和了、順位期待値、trace を段階的に接続する。
-   - 既存の `shanten` / `tenpai` / `win` / `yaku` / `point` service を再利用し、必要な不足だけを追加する。
-   - original-vs-port 比較は CI には入れず、差分調査の補助として使う。
+7. **ドキュメントと検証**
+   - 各 `tools/*/README.md` を実装済み CLI のフラグ・入出力・生成物に合わせて更新する。
+   - Go コード変更時は `go fix ./...`、`go vet ./...`、必要に応じて `GOEXPERIMENT=jsonv2` 付き `go test ./...` を実行する。
 
 8. **RiichiLab bridge**
-   - `mjai-manue` と stdio sparse output が安定した後に実装する。
+   - tools 実装が落ち着いた後に実装する。
    - `request_action` は bridge 側の出力タイミング調整に閉じ込め、domain/application へ転送しない。
    - `possible_actions` は入力にあっても信頼せず、合法手は State から算出する。
-
-9. **仕上げ**
-   - 完成形として先行している README 群と、実装状況を示す設計書・エージェント向け文書の役割分担を保ったまま、必要な補足だけを更新する。
-   - `GOEXPERIMENT=jsonv2` 前提の `go test ./...` を通し、必要に応じて package 単位のテストと benchmark を追加する。
