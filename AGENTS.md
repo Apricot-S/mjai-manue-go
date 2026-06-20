@@ -8,11 +8,12 @@
 - `.agents/design.md`: 全体方針（ゴール/非ゴール、NFR、DDD/レイヤ、ユースケース、現状実装、実装計画、テスト戦略）
 - `.agents/board-state-output.md`: 盤面状態出力の実装状況と移植元参照（恒久仕様は `.agents/design.md` に反映）
 - `.agents/terminology-en.md`: 移植元コードの英語用語を確認する補助資料
+- `.agents/archive/`: 完了済みフェーズの詳細メモ。AI 本体移植の経緯確認が必要な場合だけ参照する。
 
 ## 参照実装
 
 - `reference/repositories/mjai-manue-go-main/`: main merge 済みの過去 Go 実装。参照専用。必要な実装方針や差分確認に使う。
-- `reference/repositories/mjai-manue-original/`: CoffeeScript 版オリジナル。参照専用。移植元挙動・命名・AI ロジック確認に使う。
+- `reference/repositories/mjai-manue-original/`: CoffeeScript 版オリジナル。参照専用。移植元挙動・命名・tools ロジック確認に使う。
 - `reference/` 配下は編集しない。変更が必要な場合は現行コードへ反映し、参照元はそのままにする。
 
 ## 実装ルール（設計書の要点）
@@ -22,14 +23,15 @@
   - `internal/application/`: ユースケース（受信→状態適用→意思決定→送信のオーケストレーション）
   - `internal/adapter/`: 具体 I/O（mjai TCP/stdio runtime、JSON codec 等）。外部プロトコル差分は ACL で吸収する。
   - `cmd/`: CLI エントリ。フラグ解析、Agent 選択、runtime 起動、終了コード変換のみ。
-- 現在実装済みの CLI は `cmd/mjai-tsumogiri`。`cmd/mjai-manue` は README のみ先行しており、本体実装は今後の計画対象。
-- `README.md` / `cmd/README.md` / `cmd/mjai-manue/README.md` は、あえて完成形を先行して記載している利用者向け文書。実装状況と逐次同期する作業は行わず、現状判断は `.agents/design.md` と実ファイルを根拠にする。
+- 現在実装済みの CLI は `cmd/mjai-tsumogiri` と `cmd/mjai-manue`。AI 本体移植は完了済みで、次の主作業は未移植の `tools/` 配下の Go 実装。
+- `README.md` / `cmd/README.md` / `cmd/mjai-manue/README.md` / `tools/README.md` は利用者向け文書。現状判断は `.agents/design.md` と実ファイルを根拠にし、tools 実装の進捗は必要に応じて `tools/*/README.md` と同期する。
 - stdout は **プロトコル出力専用**。ログ/エラーは stderr（`.agents/design.md` の I/O 安全性）。
 - 入力が空行・不正 JSON の場合は **エラー終了**（継続しない）。
 - 送信はメッセージ単位で必ず flush する（透過性）。
 - `--seed` を持つコマンドでは乱数を決定的にする（決定性）。現行 `mjai-tsumogiri` は乱数を使わず、`--seed` も持たない。
 - `ai.Request` の `Round` は AI 分野でいう observation（obs）として扱う。legal actions は外側から別フィールドで渡すのではなく、obs（現状は `round.ActionStateViewer`）に含める設計を維持する。
 - `round.State` / `EventApplier` / `LegalActions` は現状を最終形として扱う。責務分割目的での追加 struct/service 化は、間接参照が増えて読みにくくなるため原則行わない。
+- `tools/` 配下の実装では、参照元 CoffeeScript と過去 Go 実装を補助にしつつ、現行の `internal/domain` / `configs` の型と責務境界に寄せる。大量ログ処理の I/O は `tools` 側に閉じ込め、`domain` にファイル形式や集計 CLI の都合を持ち込まない。
 
 ## ドキュメント更新の運用
 
