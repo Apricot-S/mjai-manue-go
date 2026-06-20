@@ -79,7 +79,7 @@ AI 側では `ai.DangerTreeNode` として読み、`feature_name == null` を le
    - 空行・不正 JSON の扱いは runtime と同じく error を基本にする。過去 Go 実装は空行を skip していたため、互換性が必要かは実装時に明示する。
    - Archive は `[]paths` を保持せず、`PlayPaths(paths, handlers)` で受け取る。進捗表示は `OnFileDone` callback を使って CLI 側で管理し、JSON 生成 stdout を汚さない。
 
-2. `postprocess_light_game_stats`
+2. `postprocess_light_game_stats`（実装済み）
    - domain 依存がなく、`configs.LightGameStats` の schema 互換を最初に固定しやすい。
    - 小さい `scoreStats` fixture で `winProbsMap` を golden 化する。
 
