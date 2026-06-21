@@ -91,7 +91,7 @@ AI 側では `ai.DangerTreeNode` として読み、`feature_name == null` を le
    - `start_game` / `start_kyoku` / `hora` / `ryukyoku` / `end_game` の score 推移だけを使うため、`dump_game_stats` より先に実装する。
    - chicha からの相対席 `0..3` と `E1..S4` key を固定する。
 
-5. `dump_game_stats`
+5. `dump_game_stats`（実装済み）
    - `round.State` と tenpai 判定を使うため、shared の state 更新を先に固める。
    - `yamitenStats`、`ryukyokuTenpaiStat` は off-by-one が出やすいので小さい fixture で代表ケースを固定する。
 
@@ -99,7 +99,7 @@ AI 側では `ai.DangerTreeNode` として読み、`feature_name == null` を le
    - サブコマンドは `dump_tree_json` までの生成経路を優先する。
    - tool 本体の一次参照は `reference/repositories/mjai-manue-original/tools/estimate_danger.rb` とする。`coffee/danger_estimator.coffee` は Scene feature 判定の補助参照としてのみ使う。
    - Scene は現行 `internal/domain/ai` の danger scene と似ているが、オリジナル tool と微妙に判定が異なる箇所がある。`estimate_danger` 移植では現行 AI 側へ寄せず、オリジナル tool の判定差分をそのまま再現する。
-   - Scene 差分の背景確認には https://github.com/gimite/mjai-manue/issues/2 を参照する。
+   - Scene 差分の背景確認には <https://github.com/gimite/mjai-manue/issues/2> を参照する。
    - `interesting_graph` は gnuplot 依存があるため optional とし、通常テスト対象から外す。
 
 ## 5. 受け入れ条件
