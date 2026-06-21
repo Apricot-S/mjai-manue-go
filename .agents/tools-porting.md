@@ -87,7 +87,7 @@ AI 側では `ai.DangerTreeNode` として読み、`feature_name == null` を le
    - domain 依存は turn range だけ。必要なら定数を tool 側へ閉じ込める。
    - `configs.GameStats` の読み取り互換を確認する smoke test を置く。
 
-4. `dump_light_game_stats`
+4. `dump_light_game_stats`（実装済み）
    - `start_game` / `start_kyoku` / `hora` / `ryukyoku` / `end_game` の score 推移だけを使うため、`dump_game_stats` より先に実装する。
    - chicha からの相対席 `0..3` と `E1..S4` key を固定する。
 
