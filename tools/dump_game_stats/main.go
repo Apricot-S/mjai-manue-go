@@ -214,8 +214,8 @@ func buildOutput(
 	drawTenpai *drawTenpaiCounter,
 ) *configs.GameStats {
 	turnDistribution := make([]float64, maxTurn)
-	for i, freq := range basic.numTurnFreqs {
-		if basic.numRounds > 0 {
+	if basic.numRounds > 0 {
+		for i, freq := range basic.numTurnFreqs {
 			turnDistribution[i] = float64(freq) / float64(basic.numRounds)
 		}
 	}
