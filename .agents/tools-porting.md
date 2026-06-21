@@ -83,7 +83,7 @@ AI 側では `ai.DangerTreeNode` として読み、`feature_name == null` を le
    - domain 依存がなく、`configs.LightGameStats` の schema 互換を最初に固定しやすい。
    - 小さい `scoreStats` fixture で `winProbsMap` を golden 化する。
 
-3. `print_game_stats`
+3. `print_game_stats`（実装済み）
    - domain 依存は turn range だけ。必要なら定数を tool 側へ閉じ込める。
    - `configs.GameStats` の読み取り互換を確認する smoke test を置く。
 
