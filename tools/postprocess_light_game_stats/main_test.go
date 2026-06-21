@@ -14,8 +14,8 @@ import (
 func TestComputeRatios(t *testing.T) {
 	got, err := computeRatios(scoreStats{
 		"E1,0": {
-			"-100": 1,
-			"100":  3,
+			-100: 1,
+			100:  3,
 		},
 	})
 	if err != nil {
@@ -30,14 +30,34 @@ func TestComputeRatios(t *testing.T) {
 	}
 }
 
-func TestComputeRatiosRejectsInvalidScoreKey(t *testing.T) {
-	_, err := computeRatios(scoreStats{
-		"E1,0": {
-			"bad": 1,
-		},
-	})
-	if err == nil {
-		t.Fatal("computeRatios() succeeded unexpectedly")
+func TestLoadStatsFromFileReadsOriginalJSONKeys(t *testing.T) {
+	path := filepath.Join(t.TempDir(), "score_stats.json")
+	data := []byte(`{"scoreStats":{"E1,0":{"-100":1,"100":3}}}`)
+	if err := os.WriteFile(path, data, 0o600); err != nil {
+		t.Fatalf("failed to write input: %v", err)
+	}
+
+	got, err := loadStatsFromFile(path)
+	if err != nil {
+		t.Fatalf("loadStatsFromFile() error = %v", err)
+	}
+	if got.ScoreStats["E1,0"][-100] != 1 {
+		t.Errorf("scoreStats[E1,0][-100] = %d, want 1", got.ScoreStats["E1,0"][-100])
+	}
+	if got.ScoreStats["E1,0"][100] != 3 {
+		t.Errorf("scoreStats[E1,0][100] = %d, want 3", got.ScoreStats["E1,0"][100])
+	}
+}
+
+func TestLoadStatsFromFileRejectsInvalidScoreKey(t *testing.T) {
+	path := filepath.Join(t.TempDir(), "score_stats.json")
+	data := []byte(`{"scoreStats":{"E1,0":{"bad":1}}}`)
+	if err := os.WriteFile(path, data, 0o600); err != nil {
+		t.Fatalf("failed to write input: %v", err)
+	}
+
+	if _, err := loadStatsFromFile(path); err == nil {
+		t.Fatal("loadStatsFromFile() succeeded unexpectedly")
 	}
 }
 
@@ -91,11 +111,11 @@ func completeScoreStatsForTest() scoreStats {
 	for _, roundName := range rounds {
 		for position := range 4 {
 			key := roundName + "," + strconv.Itoa(position)
-			stats[key] = map[string]float64{"0": 1}
+			stats[key] = map[int]int{0: 1}
 		}
 	}
-	stats["E1,0"] = map[string]float64{"100": 1, "-100": 1}
-	stats["E1,1"] = map[string]float64{"100": 1, "-100": 1}
+	stats["E1,0"] = map[int]int{100: 1, -100: 1}
+	stats["E1,1"] = map[int]int{100: 1, -100: 1}
 	return stats
 }
 

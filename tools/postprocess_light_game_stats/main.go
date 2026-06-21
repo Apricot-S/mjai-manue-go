@@ -13,7 +13,7 @@ import (
 	"github.com/Apricot-S/mjai-manue-go/configs"
 )
 
-type scoreStats = map[string]map[string]float64
+type scoreStats = map[string]map[int]int
 
 type input struct {
 	ScoreStats scoreStats `json:"scoreStats"`
@@ -39,7 +39,7 @@ func loadStatsFromFile(path string) (*input, error) {
 func computeRatios(stats scoreStats) (ratiosMap, error) {
 	result := make(ratiosMap)
 	for key, freqs := range stats {
-		total := 0.0
+		total := 0
 		for _, freq := range freqs {
 			total += freq
 		}
@@ -48,12 +48,8 @@ func computeRatios(stats scoreStats) (ratiosMap, error) {
 		}
 
 		entry := make(ratiosMapEntry)
-		for scoreDiffStr, freq := range freqs {
-			scoreDiff, err := strconv.Atoi(scoreDiffStr)
-			if err != nil {
-				return nil, fmt.Errorf("invalid score key %q: %w", scoreDiffStr, err)
-			}
-			entry[scoreDiff] = freq / total
+		for scoreDiff, freq := range freqs {
+			entry[scoreDiff] = float64(freq) / float64(total)
 		}
 		result[key] = entry
 	}
