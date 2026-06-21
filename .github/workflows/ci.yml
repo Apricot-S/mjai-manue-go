@@ -27,7 +27,7 @@ jobs:
           go-version-file: go.mod
 
       - name: Format check
-        run: cargo fmt -- --check
+        run: gofmt -d
 
   lint:
     runs-on: ubuntu-latest
