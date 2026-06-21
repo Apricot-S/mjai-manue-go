@@ -12,7 +12,7 @@ import (
 	"github.com/schollz/progressbar/v3"
 )
 
-type scoreStats = map[string]map[string]int
+type scoreStats = map[string]map[int]int
 
 type output struct {
 	ScoreStats scoreStats `json:"scoreStats"`
@@ -93,9 +93,9 @@ func (c *scoreCounter) finishGame() {
 			// Mjai logs treated by this tool use player 0 as chicha, so playerID is the relative seat position.
 			key := fmt.Sprintf("%s,%d", snapshot.name, playerID)
 			if _, ok := c.stats[key]; !ok {
-				c.stats[key] = make(map[string]int)
+				c.stats[key] = make(map[int]int)
 			}
-			c.stats[key][fmt.Sprintf("%d", scoreDiff)]++
+			c.stats[key][scoreDiff]++
 		}
 	}
 }

@@ -4,6 +4,7 @@ import (
 	"encoding/json/v2"
 	"os"
 	"path/filepath"
+	"strings"
 	"testing"
 
 	"github.com/Apricot-S/mjai-manue-go/internal/adapter/mjai/inbound"
@@ -33,10 +34,10 @@ func TestScoreCounter(t *testing.T) {
 		}
 	}
 
-	assertFreq(t, counter.stats, "E1,0", "1000", 1)
-	assertFreq(t, counter.stats, "E1,1", "-1000", 1)
-	assertFreq(t, counter.stats, "E1,2", "0", 1)
-	assertFreq(t, counter.stats, "E1,3", "0", 1)
+	assertFreq(t, counter.stats, "E1,0", 1000, 1)
+	assertFreq(t, counter.stats, "E1,1", -1000, 1)
+	assertFreq(t, counter.stats, "E1,2", 0, 1)
+	assertFreq(t, counter.stats, "E1,3", 0, 1)
 }
 
 func TestRun(t *testing.T) {
@@ -46,20 +47,27 @@ func TestRun(t *testing.T) {
 		t.Fatalf("run() error = %v", err)
 	}
 
-	assertFreq(t, got.ScoreStats, "E1,0", "2000", 1)
-	assertFreq(t, got.ScoreStats, "E1,1", "-2000", 1)
-	assertFreq(t, got.ScoreStats, "E2,0", "1000", 1)
-	assertFreq(t, got.ScoreStats, "E2,1", "-1000", 1)
+	assertFreq(t, got.ScoreStats, "E1,0", 2000, 1)
+	assertFreq(t, got.ScoreStats, "E1,1", -2000, 1)
+	assertFreq(t, got.ScoreStats, "E2,0", 1000, 1)
+	assertFreq(t, got.ScoreStats, "E2,1", -1000, 1)
 
 	data, err := json.Marshal(got)
 	if err != nil {
 		t.Fatalf("failed to marshal output: %v", err)
 	}
+	if !jsontextContains(data, `"2000":1`) {
+		t.Errorf("marshaled output = %s, want original-compatible string score key", data)
+	}
 	var decoded output
 	if err := json.Unmarshal(data, &decoded); err != nil {
 		t.Fatalf("failed to unmarshal output: %v", err)
 	}
-	assertFreq(t, decoded.ScoreStats, "E1,0", "2000", 1)
+	assertFreq(t, decoded.ScoreStats, "E1,0", 2000, 1)
+}
+
+func jsontextContains(data []byte, fragment string) bool {
+	return strings.Contains(string(data), fragment)
 }
 
 func TestRunRejectsNoMatches(t *testing.T) {
@@ -68,10 +76,10 @@ func TestRunRejectsNoMatches(t *testing.T) {
 	}
 }
 
-func assertFreq(t *testing.T, stats scoreStats, key string, scoreDiff string, want int) {
+func assertFreq(t *testing.T, stats scoreStats, key string, scoreDiff int, want int) {
 	t.Helper()
 	if got := stats[key][scoreDiff]; got != want {
-		t.Errorf("stats[%q][%q] = %d, want %d", key, scoreDiff, got, want)
+		t.Errorf("stats[%q][%d] = %d, want %d", key, scoreDiff, got, want)
 	}
 }
 
