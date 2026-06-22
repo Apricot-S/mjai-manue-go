@@ -102,6 +102,21 @@ AI 側では `ai.DangerTreeNode` として読み、`feature_name == null` を le
    - Scene 差分の背景確認には <https://github.com/gimite/mjai-manue/issues/2> を参照する。
    - `interesting_graph` は gnuplot 依存があるため optional とし、通常テスト対象から外す。
 
+### 4.1 `estimate_danger` PR 分割計画
+
+`estimate_danger` は PR 単位を小さく保つため、1 PR につきサブコマンドを 1 つだけ有効化する。共通コードは、その PR のサブコマンド実行に必要な最小範囲だけ同梱する。後続サブコマンド用の実装を先に書いた場合は、通常 PR へ混ぜず、別 branch などに退避してから必要な PR へ順に取り込む。
+
+| PR | サブコマンド | 目的 | 進捗 |
+| --- | --- | --- | --- |
+| 1 | `extract` | Mjai log から feature gob を生成する。Scene は `internal/domain/ai/danger_scene.go` コピーを起点に Ruby tool 差分だけ修正し、Ruby 版と CoffeeScript/runtime 版との差分が別物であることをコメントに残す。 | 実装済み |
+| 2 | `tree` | `features.gob` から probability 集計と `configs.DecisionNode` 互換の決定木 gob を生成する。 | 未着手 |
+| 3 | `dump_tree_json` | tree gob を `configs/danger_tree.all.json` 互換 JSON へ変換する。 | 未着手 |
+| 4 | `dump_tree` | 保存済み tree gob を text tree として表示する。 | 未着手 |
+| 5 | `single` | feature ごとの true/false 危険率、信頼区間、sample 数を表示する。 | 未着手 |
+| 6 | `interesting` | Ruby の interesting criteria を移植し、必要に応じて probability map gob を保存する。 | 未着手 |
+| 7 | `benchmark` | `interesting` と同じ criteria builder で probability map 作成までを実行する。 | 未着手 |
+| 8 | `interesting_graph` | `interesting` の probability gob から points / plot / png / html を生成する。gnuplot 依存のため通常テスト対象外。 | 未着手 |
+
 ## 5. 受け入れ条件
 
 - `go run ./tools/<name>` が README の usage と一致する。
