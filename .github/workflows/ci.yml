@@ -13,6 +13,9 @@ on:
 permissions:
   contents: read
 
+env:
+  GOEXPERIMENT: jsonv2
+
 jobs:
   fmt:
     runs-on: ubuntu-latest
