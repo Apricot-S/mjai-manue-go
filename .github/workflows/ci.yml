@@ -27,7 +27,8 @@ jobs:
           go-version-file: go.mod
 
       - name: Format check
-        run: gofmt -d
+        run: |
+          test -z "$(gofmt -l .)"
 
   lint:
     runs-on: ubuntu-latest
