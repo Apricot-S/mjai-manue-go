@@ -259,7 +259,7 @@ func (s dangerScene) evaluate(feature string, discard tile.Tile) (bool, error) {
 	case "reach_urasuji":
 		return isUrasujiOf(discard, s.riichiDeclarationTiles, s.safeTiles), nil
 	case "urasuji_of_5":
-		fives := slices.DeleteFunc(s.preRiichiTiles, func(t tile.Tile) bool {
+		fives := slices.DeleteFunc(slices.Clone(s.preRiichiTiles), func(t tile.Tile) bool {
 			return !t.IsSuits() || t.Number() != 5
 		})
 		// Ruby training tool defines urasuji_of_5; CoffeeScript/runtime does not.
