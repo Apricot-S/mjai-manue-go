@@ -113,14 +113,7 @@ func NewScene(state round.StateViewer, self seat.Seat, target seat.Seat, discard
 	// CoffeeScript/runtime estimates from a live hand and does not need this
 	// training-only adjustment.
 	ds.selfHand = append(ds.selfHand, discard)
-	candidates := tile.Tiles(ds.selfHand).Distinct(func(t tile.Tile) bool {
-		return tile.Tiles(ds.safeTiles).ContainsSameSymbol(t)
-	})
-	for i := range candidates {
-		candidates[i] = candidates[i].RemoveRed()
-	}
-	candidates = candidates.Distinct(nil)
-	return &Scene{dangerScene: ds, candidates: candidates}
+	return &Scene{dangerScene: ds, candidates: candidateTiles(ds.selfHand, ds.safeTiles)}
 }
 
 func NewSceneFromParams(
@@ -128,13 +121,13 @@ func NewSceneFromParams(
 	roundWind, targetWind wind.Wind,
 ) *Scene {
 	ds := dangerScene{
-		selfHand:       removeReds(selfHand),
-		safeTiles:      removeReds(safeTiles),
-		visibleTiles:   removeReds(visibleTiles),
-		doras:          removeReds(doras),
+		selfHand:       slices.Clone(selfHand),
+		safeTiles:      slices.Clone(safeTiles),
+		visibleTiles:   slices.Clone(visibleTiles),
+		doras:          slices.Clone(doras),
 		roundWind:      roundWind,
 		targetWind:     targetWind,
-		preRiichiTiles: removeReds(preRiichiTiles),
+		preRiichiTiles: slices.Clone(preRiichiTiles),
 	}
 	half := len(ds.preRiichiTiles) / 2
 	ds.earlyPreRiichiTiles = ds.preRiichiTiles[:half]
@@ -142,18 +135,17 @@ func NewSceneFromParams(
 	if len(ds.preRiichiTiles) > 0 {
 		ds.riichiDeclarationTiles = []tile.Tile{ds.preRiichiTiles[len(ds.preRiichiTiles)-1]}
 	}
-	candidates := tile.Tiles(ds.selfHand).Distinct(func(t tile.Tile) bool {
-		return tile.Tiles(ds.safeTiles).ContainsSameSymbol(t)
-	})
-	return &Scene{dangerScene: ds, candidates: candidates}
+	return &Scene{dangerScene: ds, candidates: candidateTiles(ds.selfHand, ds.safeTiles)}
 }
 
-func removeReds(ts []tile.Tile) tile.Tiles {
-	ret := make(tile.Tiles, len(ts))
-	for i, t := range ts {
-		ret[i] = t.RemoveRed()
+func candidateTiles(selfHand []tile.Tile, safeTiles []tile.Tile) tile.Tiles {
+	candidates := tile.Tiles(selfHand).Distinct(func(t tile.Tile) bool {
+		return tile.Tiles(safeTiles).ContainsSameSymbol(t)
+	})
+	for i := range candidates {
+		candidates[i] = candidates[i].RemoveRed()
 	}
-	return ret
+	return candidates.Distinct(nil)
 }
 
 func (s *Scene) Candidates() tile.Tiles {
@@ -163,7 +155,7 @@ func (s *Scene) Candidates() tile.Tiles {
 func (s *Scene) FeatureVector(discard tile.Tile) (*BitVector, error) {
 	boolArray := make([]bool, len(defaultFeatureNames))
 	for i, name := range defaultFeatureNames {
-		value, err := s.evaluate(name, discard.RemoveRed())
+		value, err := s.evaluate(name, discard)
 		if err != nil {
 			return nil, err
 		}
