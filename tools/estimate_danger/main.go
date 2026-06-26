@@ -17,6 +17,7 @@ type Options struct {
 	Output         string
 	MinGap         float64
 	Filter         string
+	FilterSet      bool
 	ExcludePlayers stringListFlag
 }
 
@@ -65,6 +66,11 @@ func parseOptions(action string, args []string) (*Options, []string, error) {
 	if err := fs.Parse(args); err != nil {
 		return nil, nil, fmt.Errorf("failed to parse flags: %w", err)
 	}
+	fs.Visit(func(f *flag.Flag) {
+		if f.Name == "filter" {
+			opts.FilterSet = true
+		}
+	})
 
 	// Convert min_gap from percent to decimal
 	opts.MinGap = opts.MinGap / 100.0
@@ -100,7 +106,7 @@ func runExtract(paths []string, opts *Options, w io.Writer) error {
 	}
 
 	var listener Listener = nil
-	if opts.Filter != "" {
+	if opts.FilterSet {
 		listener = NewDumpListener(opts.Filter)
 	}
 

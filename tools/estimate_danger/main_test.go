@@ -25,3 +25,39 @@ func TestParseOptionsExtractExcludePlayers(t *testing.T) {
 		t.Errorf("paths = %v, want %v", paths, wantPaths)
 	}
 }
+
+func TestParseOptionsExtractEmptyFilterIsSet(t *testing.T) {
+	opts, paths, err := parseOptions("extract", []string{
+		"-o", "features.gob",
+		"-filter", "",
+		"logs/game.mjson",
+	})
+	if err != nil {
+		t.Fatalf("parseOptions() error = %v", err)
+	}
+
+	if !opts.FilterSet {
+		t.Error("FilterSet = false, want true")
+	}
+	if opts.Filter != "" {
+		t.Errorf("Filter = %q, want empty string", opts.Filter)
+	}
+	wantPaths := []string{"logs/game.mjson"}
+	if !reflect.DeepEqual(paths, wantPaths) {
+		t.Errorf("paths = %v, want %v", paths, wantPaths)
+	}
+}
+
+func TestParseOptionsExtractFilterUnset(t *testing.T) {
+	opts, _, err := parseOptions("extract", []string{
+		"-o", "features.gob",
+		"logs/game.mjson",
+	})
+	if err != nil {
+		t.Fatalf("parseOptions() error = %v", err)
+	}
+
+	if opts.FilterSet {
+		t.Error("FilterSet = true, want false")
+	}
+}
