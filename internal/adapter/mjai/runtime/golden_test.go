@@ -80,6 +80,20 @@ func TestGoldenStdout(t *testing.T) {
 			golden: "testdata/manue/kokushimusou_ron.stdio.golden",
 			policy: jsonLinesPolicy{},
 		},
+		{
+			name:   "manue_stdio_temporary_furiten_self_turn_continues",
+			player: "Manue",
+			input:  "testdata/manue/temporary_furiten_self_turn_continues.input.mjson",
+			golden: "testdata/manue/temporary_furiten_self_turn_continues.stdio.golden",
+			policy: jsonLinesPolicy{},
+		},
+		{
+			name:   "manue_stdio_temporary_furiten_continues_after_pon_skip",
+			player: "Manue",
+			input:  "testdata/manue/temporary_furiten_continues_after_pon_skip.input.mjson",
+			golden: "testdata/manue/temporary_furiten_continues_after_pon_skip.stdio.golden",
+			policy: jsonLinesPolicy{},
+		},
 	}
 
 	for _, tt := range tests {
