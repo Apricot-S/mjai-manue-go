@@ -65,6 +65,11 @@ Optional Flags
   Start processing from the specified file
 - `-n <NUMBER>`  
   Limit the number of files to process
+- `-exclude_player <PLAYER_NAME>`  
+  Exclude rounds where the specified player declares Riichi. This flag may be specified multiple times.
+
+> [!TIP]
+> The original implementation excluded `ASAPIN` and `（≧▽≦）` from danger training data.
 
 ### What It Does
 
@@ -94,6 +99,9 @@ go run ./tools/estimate_danger extract -o features.gob -start logs/game_050.mjso
 
 # Specify filter conditions (only filters the standard output display, does not affect data extraction)
 go run ./tools/estimate_danger extract -o features.gob -filter "hit:1&suji:0" logs/*.mjson
+
+# Exclude multiple players from training data
+go run ./tools/estimate_danger extract -o features.gob -exclude_player ASAPIN -exclude_player "（≧▽≦）" logs/*.mjson
 ```
 
 ## single
