@@ -160,9 +160,12 @@ func (e *extractor) onEvent(ev event.Event, state round.StateViewer) error {
 func (e *extractor) onRiichiAccepted(ev *event.RiichiAccepted, state round.StateViewer) error {
 	actor := ev.Actor()
 	if actor.Index() < len(e.names) && slices.Contains(excludedPlayers, e.names[actor.Index()]) {
+		// Logs from known non-standard players were excluded from the danger training data.
 		e.skip = true
 	}
 	if e.reacher != nil {
+		// The danger tree is trained only from scenes with exactly one riichi player.
+		// Once a second riichi is accepted, skip the whole round.
 		e.skip = true
 	}
 	if e.skip {
