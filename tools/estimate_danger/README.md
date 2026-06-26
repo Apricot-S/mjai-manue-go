@@ -590,3 +590,7 @@ go run ./tools/estimate_danger dump_tree_json -o danger_tree.all.json decision_t
     }
 }
 ```
+
+## References
+
+[統計による麻雀危険牌分析 - namespace gimite](https://gimite.net/pukiwiki/index.php?%E7%B5%B1%E8%A8%88%E3%81%AB%E3%82%88%E3%82%8B%E9%BA%BB%E9%9B%80%E5%8D%B1%E9%99%BA%E7%89%8C%E5%88%86%E6%9E%90)
