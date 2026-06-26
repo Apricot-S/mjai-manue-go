@@ -184,12 +184,19 @@ func (e *extractor) onRiichiAccepted(ev *event.RiichiAccepted, state round.State
 
 func (e *extractor) onDiscard(ev *event.Discard, state round.StateViewer) error {
 	if e.skip || e.reacher == nil || ev.Actor() == *e.reacher {
+		// Extract only discard choices made by non-riichi players after exactly
+		// one opponent has accepted riichi.
 		return nil
 	}
 	if state.Player(ev.Actor()).RiichiState() == player.RiichiAccepted {
+		// After a player riichi, their later discards are forced and are not
+		// useful choice samples.
 		return nil
 	}
 
+	// Archive callbacks observe the state after the discard has been applied.
+	// NewScene adds ev.Tile() back to the actor hand to reconstruct the choice
+	// set that existed just before this discard.
 	scene := NewScene(state, ev.Actor(), *e.reacher, ev.Tile())
 	if e.verbose {
 		fmt.Fprintf(e.logger, "reacher: %d\n", e.reacher.Index())
