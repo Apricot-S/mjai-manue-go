@@ -30,12 +30,11 @@ type Listener interface {
 
 const batchSize = 100
 
-var excludedPlayers = []string{"ASAPIN", "（≧▽≦）"}
-
 type extractor struct {
-	listener Listener
-	verbose  bool
-	logger   io.Writer
+	listener       Listener
+	verbose        bool
+	logger         io.Writer
+	excludePlayers []string
 
 	encoder      *gob.Encoder
 	storedKyokus []StoredKyoku
@@ -48,7 +47,14 @@ type extractor struct {
 	names        []string
 }
 
-func ExtractFeaturesFromFiles(paths []string, outputPath string, listener Listener, verbose bool, logger io.Writer) error {
+func ExtractFeaturesFromFiles(
+	paths []string,
+	outputPath string,
+	listener Listener,
+	verbose bool,
+	logger io.Writer,
+	excludePlayers []string,
+) error {
 	out, err := os.Create(outputPath)
 	if err != nil {
 		return fmt.Errorf("failed to open output file: %w", err)
@@ -56,10 +62,11 @@ func ExtractFeaturesFromFiles(paths []string, outputPath string, listener Listen
 	defer out.Close()
 
 	e := &extractor{
-		listener: listener,
-		verbose:  verbose,
-		logger:   logger,
-		encoder:  gob.NewEncoder(out),
+		listener:       listener,
+		verbose:        verbose,
+		logger:         logger,
+		excludePlayers: slices.Clone(excludePlayers),
+		encoder:        gob.NewEncoder(out),
 	}
 
 	if err := e.encoder.Encode(MetaData{FeatureNames: FeatureNames()}); err != nil {
@@ -159,8 +166,8 @@ func (e *extractor) onEvent(ev event.Event, state round.StateViewer) error {
 
 func (e *extractor) onRiichiAccepted(ev *event.RiichiAccepted, state round.StateViewer) error {
 	actor := ev.Actor()
-	if actor.Index() < len(e.names) && slices.Contains(excludedPlayers, e.names[actor.Index()]) {
-		// Logs from known non-standard players were excluded from the danger training data.
+	if actor.Index() < len(e.names) && slices.Contains(e.excludePlayers, e.names[actor.Index()]) {
+		// Excluded players are omitted from the danger training data.
 		e.skip = true
 	}
 	if e.reacher != nil {
