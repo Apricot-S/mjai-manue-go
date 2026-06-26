@@ -210,8 +210,9 @@ func (e *extractor) onDiscard(ev *event.Discard, state round.StateViewer) error 
 	}
 
 	storedScene := StoredScene{}
-	candidates := make([]CandidateInfo, 0, len(scene.Candidates()))
-	for _, candidate := range scene.Candidates() {
+	sceneCandidates := scene.Candidates()
+	candidates := make([]CandidateInfo, 0, len(sceneCandidates))
+	for _, candidate := range sceneCandidates {
 		hit := e.waits.Has(candidate)
 		featureVector, err := scene.FeatureVector(candidate)
 		if err != nil {

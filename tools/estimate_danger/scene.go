@@ -149,7 +149,8 @@ func candidateTiles(selfHand []tile.Tile, safeTiles []tile.Tile) tile.Tiles {
 }
 
 func (s *Scene) Candidates() tile.Tiles {
-	return slices.Clone(s.candidates)
+	// Callers treat candidates as read-only; avoid cloning for every discard.
+	return s.candidates
 }
 
 func (s *Scene) FeatureVector(discard tile.Tile) (*BitVector, error) {
