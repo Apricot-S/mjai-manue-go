@@ -57,7 +57,7 @@ func parseOptions(action string, args []string) (*Options, []string, error) {
 		fs.StringVar(&opts.Output, "o", "", "output filepath")
 		fs.Float64Var(&opts.MinGap, "min_gap", 0.0, "minimum gap percentage")
 	case "dump_tree":
-		// not implemented yet
+		// no options
 	case "dump_tree_json":
 		fs.StringVar(&opts.Output, "o", "", "output filepath")
 	default:
@@ -126,6 +126,15 @@ func runTree(path string, opts *Options, w io.Writer) error {
 	return DumpDecisionTree(root, opts.Output)
 }
 
+func runDumpTree(path string, w io.Writer) error {
+	root, err := LoadDecisionTree(path)
+	if err != nil {
+		return err
+	}
+	RenderDecisionTree(w, root, "all", 0)
+	return nil
+}
+
 func runDumpTreeJSON(path string, opts *Options) error {
 	if opts.Output == "" {
 		return fmt.Errorf("-o is missing")
@@ -164,9 +173,11 @@ func main() {
 		runErr = runExtract(paths, opts, w)
 	case "tree":
 		runErr = runTree(paths[0], opts, w)
+	case "dump_tree":
+		runErr = runDumpTree(paths[0], w)
 	case "dump_tree_json":
 		runErr = runDumpTreeJSON(paths[0], opts)
-	case "single", "interesting", "interesting_graph", "benchmark", "dump_tree":
+	case "single", "interesting", "interesting_graph", "benchmark":
 		runErr = fmt.Errorf("%s is not implemented yet", action)
 	default:
 		runErr = fmt.Errorf("unknown action: %s", action)

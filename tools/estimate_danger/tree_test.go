@@ -131,3 +131,40 @@ func TestDumpDecisionTreeJSONWritesConfigsCompatibleJSON(t *testing.T) {
 		t.Errorf("DumpDecisionTreeJSON() = %#v, want %#v", &got, root)
 	}
 }
+
+func TestRunDumpTreeRendersSavedTree(t *testing.T) {
+	featureName := "safe"
+	root := &configs.DecisionNode{
+		AverageProb:  0.25,
+		ConfInterval: [2]float64{0.1, 0.4},
+		NumSamples:   8,
+		FeatureName:  &featureName,
+		Negative: &configs.DecisionNode{
+			AverageProb:  0.5,
+			ConfInterval: [2]float64{0.2, 0.8},
+			NumSamples:   4,
+		},
+		Positive: &configs.DecisionNode{
+			AverageProb:  0.0,
+			ConfInterval: [2]float64{0.0, 0.1},
+			NumSamples:   4,
+		},
+	}
+
+	treePath := filepath.Join(t.TempDir(), "tree.gob")
+	if err := DumpDecisionTree(root, treePath); err != nil {
+		t.Fatalf("DumpDecisionTree() error = %v", err)
+	}
+
+	var out bytes.Buffer
+	if err := runDumpTree(treePath, &out); err != nil {
+		t.Fatalf("runDumpTree() error = %v", err)
+	}
+
+	want := "all : 25.00 [10.00, 40.00] (8 samples)\n" +
+		"  safe = true : 0.00 [0.00, 10.00] (4 samples)\n" +
+		"  safe = false : 50.00 [20.00, 80.00] (4 samples)\n"
+	if got := out.String(); got != want {
+		t.Errorf("runDumpTree() output = %q, want %q", got, want)
+	}
+}
