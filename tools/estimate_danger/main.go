@@ -54,7 +54,8 @@ func parseOptions(action string, args []string) (*Options, []string, error) {
 	case "benchmark":
 		// not implemented yet
 	case "tree":
-		// not implemented yet
+		fs.StringVar(&opts.Output, "o", "", "output filepath")
+		fs.Float64Var(&opts.MinGap, "min_gap", 0.0, "minimum gap percentage")
 	case "dump_tree":
 		// not implemented yet
 	case "dump_tree_json":
@@ -113,6 +114,18 @@ func runExtract(paths []string, opts *Options, w io.Writer) error {
 	return ExtractFeaturesFromFiles(paths, opts.Output, listener, opts.Verbose, w, opts.ExcludePlayers)
 }
 
+func runTree(path string, opts *Options, w io.Writer) error {
+	root, err := GenerateDecisionTree(path, w, opts.MinGap)
+	if err != nil {
+		return err
+	}
+	RenderDecisionTree(w, root, "all", 0)
+	if opts.Output == "" {
+		return nil
+	}
+	return DumpDecisionTree(root, opts.Output)
+}
+
 func main() {
 	if len(os.Args) < 2 {
 		fmt.Fprintln(os.Stderr, "missing action argument")
@@ -136,7 +149,9 @@ func main() {
 	switch action {
 	case "extract":
 		runErr = runExtract(paths, opts, w)
-	case "single", "interesting", "interesting_graph", "benchmark", "tree", "dump_tree", "dump_tree_json":
+	case "tree":
+		runErr = runTree(paths[0], opts, w)
+	case "single", "interesting", "interesting_graph", "benchmark", "dump_tree", "dump_tree_json":
 		runErr = fmt.Errorf("%s is not implemented yet", action)
 	default:
 		runErr = fmt.Errorf("unknown action: %s", action)
