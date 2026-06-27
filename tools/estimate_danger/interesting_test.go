@@ -82,6 +82,13 @@ func TestCalculateInterestingProbabilities(t *testing.T) {
 	}
 }
 
+func TestRunBenchmark(t *testing.T) {
+	featuresPath := writeMinimalFeaturesFileForTest(t)
+	if err := RunBenchmark(featuresPath); err != nil {
+		t.Fatalf("RunBenchmark() error = %v", err)
+	}
+}
+
 func writeMinimalFeaturesFileForTest(t *testing.T) string {
 	t.Helper()
 

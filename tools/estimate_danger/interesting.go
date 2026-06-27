@@ -159,3 +159,15 @@ func CalculateInterestingProbabilities(featuresPath string, w io.Writer) (map[st
 	criteria := buildInterestingCriteria()
 	return CalculateProbabilities(w, storedKyokus, featureNames, criteria)
 }
+
+func RunBenchmark(featuresPath string) error {
+	featureNames := FeatureNames()
+	storedKyokus, err := LoadStoredKyokus(featuresPath, featureNames)
+	if err != nil {
+		return err
+	}
+
+	criteria := buildInterestingCriteria()
+	_, err = CreateKyokuProbsMap(storedKyokus, featureNames, criteria)
+	return err
+}
