@@ -171,13 +171,15 @@ func main() {
 	switch action {
 	case "extract":
 		runErr = runExtract(paths, opts, w)
+	case "single":
+		runErr = CalculateSingleProbabilities(paths[0], w)
 	case "tree":
 		runErr = runTree(paths[0], opts, w)
 	case "dump_tree":
 		runErr = runDumpTree(paths[0], w)
 	case "dump_tree_json":
 		runErr = runDumpTreeJSON(paths[0], opts)
-	case "single", "interesting", "interesting_graph", "benchmark":
+	case "interesting", "interesting_graph", "benchmark":
 		runErr = fmt.Errorf("%s is not implemented yet", action)
 	default:
 		runErr = fmt.Errorf("unknown action: %s", action)
