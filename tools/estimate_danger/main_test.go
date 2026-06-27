@@ -61,3 +61,25 @@ func TestParseOptionsExtractFilterUnset(t *testing.T) {
 		t.Error("FilterSet = true, want false")
 	}
 }
+
+func TestParseOptionsTree(t *testing.T) {
+	opts, paths, err := parseOptions("tree", []string{
+		"-o", "tree.gob",
+		"-min_gap", "2.5",
+		"features.gob",
+	})
+	if err != nil {
+		t.Fatalf("parseOptions() error = %v", err)
+	}
+
+	if opts.Output != "tree.gob" {
+		t.Errorf("Output = %q, want tree.gob", opts.Output)
+	}
+	if opts.MinGap != 0.025 {
+		t.Errorf("MinGap = %v, want 0.025", opts.MinGap)
+	}
+	wantPaths := []string{"features.gob"}
+	if !reflect.DeepEqual(paths, wantPaths) {
+		t.Errorf("paths = %v, want %v", paths, wantPaths)
+	}
+}
