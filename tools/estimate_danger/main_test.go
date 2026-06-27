@@ -1,8 +1,14 @@
 package main
 
 import (
+	"bytes"
+	"encoding/gob"
+	"os"
+	"path/filepath"
 	"reflect"
 	"testing"
+
+	"github.com/Apricot-S/mjai-manue-go/configs"
 )
 
 func TestParseOptionsExtractExcludePlayers(t *testing.T) {
@@ -74,6 +80,24 @@ func TestParseOptionsSingle(t *testing.T) {
 	}
 }
 
+func TestParseOptionsInteresting(t *testing.T) {
+	opts, paths, err := parseOptions("interesting", []string{
+		"-o", "interesting.gob",
+		"features.gob",
+	})
+	if err != nil {
+		t.Fatalf("parseOptions() error = %v", err)
+	}
+
+	if opts.Output != "interesting.gob" {
+		t.Errorf("Output = %q, want interesting.gob", opts.Output)
+	}
+	wantPaths := []string{"features.gob"}
+	if !reflect.DeepEqual(paths, wantPaths) {
+		t.Errorf("paths = %v, want %v", paths, wantPaths)
+	}
+}
+
 func TestParseOptionsTree(t *testing.T) {
 	opts, paths, err := parseOptions("tree", []string{
 		"-o", "tree.gob",
@@ -123,5 +147,30 @@ func TestParseOptionsDumpTreeJSON(t *testing.T) {
 	wantPaths := []string{"tree.gob"}
 	if !reflect.DeepEqual(paths, wantPaths) {
 		t.Errorf("paths = %v, want %v", paths, wantPaths)
+	}
+}
+
+func TestRunInterestingDumpsProbabilities(t *testing.T) {
+	dir := t.TempDir()
+	featuresPath := writeMinimalFeaturesFileForTest(t)
+	outputPath := filepath.Join(dir, "interesting.gob")
+
+	var out bytes.Buffer
+	if err := runInteresting(featuresPath, &Options{Output: outputPath}, &out); err != nil {
+		t.Fatalf("runInteresting() error = %v", err)
+	}
+
+	f, err := os.Open(outputPath)
+	if err != nil {
+		t.Fatalf("Open() error = %v", err)
+	}
+	defer f.Close()
+
+	var got map[string]*configs.DecisionNode
+	if err := gob.NewDecoder(f).Decode(&got); err != nil {
+		t.Fatalf("Decode() error = %v", err)
+	}
+	if len(got) == 0 {
+		t.Fatal("dumped probabilities are empty")
 	}
 }

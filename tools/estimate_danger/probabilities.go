@@ -242,3 +242,17 @@ func CalculateProbabilities(
 
 	return results, nil
 }
+
+func DumpProbabilities(probs map[string]*configs.DecisionNode, outputPath string) error {
+	f, err := os.Create(outputPath)
+	if err != nil {
+		return fmt.Errorf("failed to open output file: %w", err)
+	}
+	defer f.Close()
+
+	encoder := gob.NewEncoder(f)
+	if err := encoder.Encode(probs); err != nil {
+		return fmt.Errorf("failed to encode probabilities file: %w", err)
+	}
+	return nil
+}
