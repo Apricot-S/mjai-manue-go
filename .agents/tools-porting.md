@@ -110,7 +110,7 @@ AI 側では `ai.DangerTreeNode` として読み、`feature_name == null` を le
 | --- | --- | --- | --- |
 | 1 | `extract` | Mjai log から feature gob を生成する。Scene は `internal/domain/ai/danger_scene.go` コピーを起点に Ruby tool 差分だけ修正し、Ruby 版と CoffeeScript/runtime 版との差分が別物であることをコメントに残す。 | 実装済み |
 | 2 | `tree` | `features.gob` から probability 集計と `configs.DecisionNode` 互換の決定木 gob を生成する。 | 実装済み |
-| 3 | `dump_tree_json` | tree gob を `configs/danger_tree.all.json` 互換 JSON へ変換する。 | 未着手 |
+| 3 | `dump_tree_json` | tree gob を `configs/danger_tree.all.json` 互換 JSON へ変換する。 | 実装済み |
 | 4 | `dump_tree` | 保存済み tree gob を text tree として表示する。 | 未着手 |
 | 5 | `single` | feature ごとの true/false 危険率、信頼区間、sample 数を表示する。 | 未着手 |
 | 6 | `interesting` | Ruby の interesting criteria を移植し、必要に応じて probability map gob を保存する。 | 未着手 |

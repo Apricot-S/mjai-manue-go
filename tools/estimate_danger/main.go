@@ -59,7 +59,7 @@ func parseOptions(action string, args []string) (*Options, []string, error) {
 	case "dump_tree":
 		// not implemented yet
 	case "dump_tree_json":
-		// not implemented yet
+		fs.StringVar(&opts.Output, "o", "", "output filepath")
 	default:
 		return nil, nil, fmt.Errorf("unknown action: %s", action)
 	}
@@ -126,6 +126,19 @@ func runTree(path string, opts *Options, w io.Writer) error {
 	return DumpDecisionTree(root, opts.Output)
 }
 
+func runDumpTreeJSON(path string, opts *Options) error {
+	if opts.Output == "" {
+		return fmt.Errorf("-o is missing")
+	}
+
+	root, err := LoadDecisionTree(path)
+	if err != nil {
+		return err
+	}
+
+	return DumpDecisionTreeJSON(root, opts.Output)
+}
+
 func main() {
 	if len(os.Args) < 2 {
 		fmt.Fprintln(os.Stderr, "missing action argument")
@@ -151,7 +164,9 @@ func main() {
 		runErr = runExtract(paths, opts, w)
 	case "tree":
 		runErr = runTree(paths[0], opts, w)
-	case "single", "interesting", "interesting_graph", "benchmark", "dump_tree", "dump_tree_json":
+	case "dump_tree_json":
+		runErr = runDumpTreeJSON(paths[0], opts)
+	case "single", "interesting", "interesting_graph", "benchmark", "dump_tree":
 		runErr = fmt.Errorf("%s is not implemented yet", action)
 	default:
 		runErr = fmt.Errorf("unknown action: %s", action)

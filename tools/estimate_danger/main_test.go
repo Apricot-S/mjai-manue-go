@@ -83,3 +83,21 @@ func TestParseOptionsTree(t *testing.T) {
 		t.Errorf("paths = %v, want %v", paths, wantPaths)
 	}
 }
+
+func TestParseOptionsDumpTreeJSON(t *testing.T) {
+	opts, paths, err := parseOptions("dump_tree_json", []string{
+		"-o", "danger_tree.all.json",
+		"tree.gob",
+	})
+	if err != nil {
+		t.Fatalf("parseOptions() error = %v", err)
+	}
+
+	if opts.Output != "danger_tree.all.json" {
+		t.Errorf("Output = %q, want danger_tree.all.json", opts.Output)
+	}
+	wantPaths := []string{"tree.gob"}
+	if !reflect.DeepEqual(paths, wantPaths) {
+		t.Errorf("paths = %v, want %v", paths, wantPaths)
+	}
+}

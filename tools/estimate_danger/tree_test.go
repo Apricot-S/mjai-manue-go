@@ -2,7 +2,13 @@ package main
 
 import (
 	"bytes"
+	"encoding/json/v2"
+	"os"
+	"path/filepath"
+	"reflect"
 	"testing"
+
+	"github.com/Apricot-S/mjai-manue-go/configs"
 )
 
 func TestGenerateDecisionTreeImplSplitsByLargestGap(t *testing.T) {
@@ -50,5 +56,78 @@ func TestGenerateDecisionTreeImplSplitsByLargestGap(t *testing.T) {
 	}
 	if got := root.Positive.AverageProb; got != 0.0 {
 		t.Errorf("root.Positive.AverageProb = %v, want 0", got)
+	}
+}
+
+func TestDumpAndLoadDecisionTreeRoundTrip(t *testing.T) {
+	featureName := "safe"
+	root := &configs.DecisionNode{
+		AverageProb:  0.25,
+		ConfInterval: [2]float64{0.1, 0.4},
+		NumSamples:   8,
+		FeatureName:  &featureName,
+		Negative: &configs.DecisionNode{
+			AverageProb:  0.5,
+			ConfInterval: [2]float64{0.2, 0.8},
+			NumSamples:   4,
+		},
+		Positive: &configs.DecisionNode{
+			AverageProb:  0.0,
+			ConfInterval: [2]float64{0.0, 0.1},
+			NumSamples:   4,
+		},
+	}
+
+	dir := t.TempDir()
+	treePath := filepath.Join(dir, "tree.gob")
+	if err := DumpDecisionTree(root, treePath); err != nil {
+		t.Fatalf("DumpDecisionTree() error = %v", err)
+	}
+
+	loaded, err := LoadDecisionTree(treePath)
+	if err != nil {
+		t.Fatalf("LoadDecisionTree() error = %v", err)
+	}
+
+	if !reflect.DeepEqual(loaded, root) {
+		t.Errorf("LoadDecisionTree() = %#v, want %#v", loaded, root)
+	}
+}
+
+func TestDumpDecisionTreeJSONWritesConfigsCompatibleJSON(t *testing.T) {
+	featureName := "safe"
+	root := &configs.DecisionNode{
+		AverageProb:  0.25,
+		ConfInterval: [2]float64{0.1, 0.4},
+		NumSamples:   8,
+		FeatureName:  &featureName,
+		Negative: &configs.DecisionNode{
+			AverageProb:  0.5,
+			ConfInterval: [2]float64{0.2, 0.8},
+			NumSamples:   4,
+		},
+		Positive: &configs.DecisionNode{
+			AverageProb:  0.0,
+			ConfInterval: [2]float64{0.0, 0.1},
+			NumSamples:   4,
+		},
+	}
+
+	jsonPath := filepath.Join(t.TempDir(), "danger_tree.all.json")
+	if err := DumpDecisionTreeJSON(root, jsonPath); err != nil {
+		t.Fatalf("DumpDecisionTreeJSON() error = %v", err)
+	}
+
+	b, err := os.ReadFile(jsonPath)
+	if err != nil {
+		t.Fatalf("ReadFile() error = %v", err)
+	}
+	var got configs.DecisionNode
+	if err := json.Unmarshal(b, &got); err != nil {
+		t.Fatalf("json.Unmarshal() error = %v", err)
+	}
+
+	if !reflect.DeepEqual(&got, root) {
+		t.Errorf("DumpDecisionTreeJSON() = %#v, want %#v", &got, root)
 	}
 }

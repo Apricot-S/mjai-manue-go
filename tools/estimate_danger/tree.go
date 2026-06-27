@@ -3,6 +3,7 @@ package main
 import (
 	"cmp"
 	"encoding/gob"
+	"encoding/json/v2"
 	"fmt"
 	"io"
 	"maps"
@@ -221,6 +222,34 @@ func DumpDecisionTree(node *configs.DecisionNode, outputPath string) error {
 	encoder := gob.NewEncoder(f)
 	if err := encoder.Encode(node); err != nil {
 		return fmt.Errorf("failed to encode tree file: %w", err)
+	}
+	return nil
+}
+
+func LoadDecisionTree(treePath string) (*configs.DecisionNode, error) {
+	f, err := os.Open(treePath)
+	if err != nil {
+		return nil, fmt.Errorf("failed to open tree file: %w", err)
+	}
+	defer f.Close()
+
+	decoder := gob.NewDecoder(f)
+	var node configs.DecisionNode
+	if err := decoder.Decode(&node); err != nil {
+		return nil, fmt.Errorf("failed to decode tree file: %w", err)
+	}
+	return &node, nil
+}
+
+func DumpDecisionTreeJSON(root *configs.DecisionNode, outputPath string) error {
+	f, err := os.Create(outputPath)
+	if err != nil {
+		return fmt.Errorf("failed to open output file: %w", err)
+	}
+	defer f.Close()
+
+	if err := json.MarshalWrite(f, root, json.Deterministic(true)); err != nil {
+		return fmt.Errorf("failed to encode tree to JSON: %w", err)
 	}
 	return nil
 }
