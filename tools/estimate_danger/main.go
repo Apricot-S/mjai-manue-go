@@ -48,7 +48,7 @@ func parseOptions(action string, args []string) (*Options, []string, error) {
 	case "single":
 		// no options
 	case "interesting":
-		// not implemented yet
+		fs.StringVar(&opts.Output, "o", "", "output filepath")
 	case "interesting_graph":
 		// not implemented yet
 	case "benchmark":
@@ -114,6 +114,17 @@ func runExtract(paths []string, opts *Options, w io.Writer) error {
 	return ExtractFeaturesFromFiles(paths, opts.Output, listener, opts.Verbose, w, opts.ExcludePlayers)
 }
 
+func runInteresting(path string, opts *Options, w io.Writer) error {
+	probs, err := CalculateInterestingProbabilities(path, w)
+	if err != nil {
+		return err
+	}
+	if opts.Output == "" {
+		return nil
+	}
+	return DumpProbabilities(probs, opts.Output)
+}
+
 func runTree(path string, opts *Options, w io.Writer) error {
 	root, err := GenerateDecisionTree(path, w, opts.MinGap)
 	if err != nil {
@@ -173,13 +184,15 @@ func main() {
 		runErr = runExtract(paths, opts, w)
 	case "single":
 		runErr = CalculateSingleProbabilities(paths[0], w)
+	case "interesting":
+		runErr = runInteresting(paths[0], opts, w)
 	case "tree":
 		runErr = runTree(paths[0], opts, w)
 	case "dump_tree":
 		runErr = runDumpTree(paths[0], w)
 	case "dump_tree_json":
 		runErr = runDumpTreeJSON(paths[0], opts)
-	case "interesting", "interesting_graph", "benchmark":
+	case "interesting_graph", "benchmark":
 		runErr = fmt.Errorf("%s is not implemented yet", action)
 	default:
 		runErr = fmt.Errorf("unknown action: %s", action)
