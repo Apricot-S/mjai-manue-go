@@ -2,7 +2,7 @@
 
 ARG OS_VERSION=trixie
 
-FROM gcc:15-${OS_VERSION} AS builder
+FROM gcc:16-${OS_VERSION} AS builder
 
 ARG UID=10001
 RUN useradd \

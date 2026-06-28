@@ -1,3 +1,17 @@
+x-akochan-service: &akochan-service
+  image: akochan:latest
+  depends_on:
+    - server
+  environment:
+    PORT: ${PORT:-11600}
+    NUM_GAMES: ${NUM_GAMES:-1}
+
+x-mjai-environment: &mjai-environment
+  HOST: server
+  ROOM: ${ROOM:-default}
+  PORT: ${PORT:-11600}
+  NUM_GAMES: ${NUM_GAMES:-1}
+
 services:
   server:
     build:
@@ -5,47 +19,26 @@ services:
     volumes:
       - ${LOG_DIR:-../log_dir}:/log_dir
     environment:
-      HOST: server
-      PORT: 11600
-      ROOM: default
-      GAME_TYPE: tonnan
-      NUM_GAMES: ${NUM_GAMES:-1}
+      <<: *mjai-environment
+      GAME_TYPE: ${GAME_TYPE:-tonnan}
     ports:
-      - "11600:11600"
+      - "${PORT:-11600}:${PORT:-11600}"
 
   manue:
-    build: 
+    build:
       context: ./manue
     depends_on:
       - server
     environment:
-      HOST: server
-      PORT: 11600
-      ROOM: default
-      NUM_GAMES: ${NUM_GAMES:-1}
+      <<: *mjai-environment
 
   akochan1:
+    <<: *akochan-service
     build:
       context: ./akochan
-    image: akochan:latest
-    depends_on:
-      - server
-    environment:
-      PORT: 11600
-      NUM_GAMES: ${NUM_GAMES:-1}
 
   akochan2:
-    image: akochan:latest
-    depends_on:
-      - server
-    environment:
-      PORT: 11600
-      NUM_GAMES: ${NUM_GAMES:-1}
+    <<: *akochan-service
 
   akochan3:
-    image: akochan:latest
-    depends_on:
-      - server
-    environment:
-      PORT: 11600
-      NUM_GAMES: ${NUM_GAMES:-1}
+    <<: *akochan-service
