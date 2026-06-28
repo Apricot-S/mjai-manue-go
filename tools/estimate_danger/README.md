@@ -289,7 +289,7 @@ go run ./tools/estimate_danger interesting_graph interesting_probs.gob
 
 ### Sample Output
 
-![interesting_graph.sample](interesting_graph.sample.png)
+![interesting_graph.sample](https://raw.githubusercontent.com/Apricot-S/mjai-manue-go/main/tools/estimate_danger/interesting_graph.sample.png)
 
 ## benchmark
 

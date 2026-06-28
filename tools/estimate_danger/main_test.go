@@ -98,6 +98,18 @@ func TestParseOptionsInteresting(t *testing.T) {
 	}
 }
 
+func TestParseOptionsInterestingGraph(t *testing.T) {
+	_, paths, err := parseOptions("interesting_graph", []string{"interesting.gob"})
+	if err != nil {
+		t.Fatalf("parseOptions() error = %v", err)
+	}
+
+	wantPaths := []string{"interesting.gob"}
+	if !reflect.DeepEqual(paths, wantPaths) {
+		t.Errorf("paths = %v, want %v", paths, wantPaths)
+	}
+}
+
 func TestParseOptionsBenchmark(t *testing.T) {
 	_, paths, err := parseOptions("benchmark", []string{"features.gob"})
 	if err != nil {
