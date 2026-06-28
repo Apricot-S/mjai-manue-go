@@ -1,0 +1,15 @@
+{"type":"start_game","gametype":"tonpu","id":1,"names":["A","Manue","C","D"]}
+{"type":"start_kyoku","bakaze":"E","kyoku":1,"honba":0,"kyotaku":0,"oya":0,"dora_marker":"1m","tehais":[["?","?","?","?","?","?","?","?","?","?","?","?","?"],["1m","2m","3m","1s","2s","3s","4m","4m","7p","7p","9s","E","E"],["?","?","?","?","?","?","?","?","?","?","?","?","?"],["?","?","?","?","?","?","?","?","?","?","?","?","?"]],"scores":[25000,25000,25000,25000]}
+{"type":"tsumo","actor":0,"pai":"?"}
+{"type":"dahai","actor":0,"pai":"7p","tsumogiri":false}
+{"type":"pon","actor":1,"target":0,"pai":"7p","consumed":["7p","7p"]}
+{"type":"dahai","actor":1,"pai":"9s","tsumogiri":false}
+{"type":"tsumo","actor":2,"pai":"?"}
+{"type":"dahai","actor":2,"pai":"4m","tsumogiri":true}
+{"type":"tsumo","actor":3,"pai":"?"}
+{"type":"dahai","actor":3,"pai":"9p","tsumogiri":false}
+{"type":"tsumo","actor":0,"pai":"?"}
+{"type":"dahai","actor":0,"pai":"P","tsumogiri":true}
+{"type":"pon","actor":2,"target":0,"pai":"P","consumed":["P","P"]}
+{"type":"dahai","actor":2,"pai":"E","tsumogiri":false}
+{"type":"end_game","scores":[25000,25000,25000,25000]}

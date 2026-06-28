@@ -65,6 +65,11 @@ Optional Flags
   Start processing from the specified file
 - `-n <NUMBER>`  
   Limit the number of files to process
+- `-exclude_player <PLAYER_NAME>`  
+  Exclude rounds where the specified player declares Riichi. This flag may be specified multiple times.
+
+> [!TIP]
+> The original implementation excluded `ASAPIN` and `（≧▽≦）` from danger training data.
 
 ### What It Does
 
@@ -94,6 +99,9 @@ go run ./tools/estimate_danger extract -o features.gob -start logs/game_050.mjso
 
 # Specify filter conditions (only filters the standard output display, does not affect data extraction)
 go run ./tools/estimate_danger extract -o features.gob -filter "hit:1&suji:0" logs/*.mjson
+
+# Exclude multiple players from training data
+go run ./tools/estimate_danger extract -o features.gob -exclude_player ASAPIN -exclude_player "（≧▽≦）" logs/*.mjson
 ```
 
 ## single
@@ -136,28 +144,25 @@ go run ./tools/estimate_danger single features.gob
 ### Sample Output
 
 ```txt
-map[anpai:false]
-  9.01 [8.65, 9.75] (545 samples)
-
 map[tsupai:false]
-  9.44 [9.06, 10.21] (545 samples)
+  9.91 [9.47, 10.70] (545 samples)
 
 map[tsupai:true]
-  3.07 [2.07, 4.65] (490 samples)
+  3.25 [2.20, 4.83] (490 samples)
 
 map[suji:false]
-  9.64 [9.15, 10.50] (545 samples)
+  10.35 [9.79, 11.27] (545 samples)
 
 ...
 
 map[bakaze:true]
-  1.56 [0.00, 4.64] (192 samples)
+  1.56 [0.00, 4.12] (192 samples)
 
 map[jikaze:false]
-  9.08 [8.70, 9.83] (545 samples)
+  9.59 [9.18, 10.35] (545 samples)
 
 map[jikaze:true]
-  0.00 [0.00, 2.11] (188 samples)
+  0.00 [0.00, 1.58] (188 samples)
 
 ```
 
@@ -284,7 +289,7 @@ go run ./tools/estimate_danger interesting_graph interesting_probs.gob
 
 ### Sample Output
 
-![interesting_graph.sample](interesting_graph.sample.png)
+![interesting_graph.sample](https://raw.githubusercontent.com/Apricot-S/mjai-manue-go/main/tools/estimate_danger/interesting_graph.sample.png)
 
 ## benchmark
 
@@ -385,60 +390,67 @@ go run ./tools/estimate_danger tree -o decision_tree.gob -min_gap 2.0 features.g
 ```txt
 :generate_decision_tree, main.Criterion{}
 map[]
-  9.01 [8.65, 9.74] (545 samples)
+  9.52 [9.11, 10.28] (545 samples)
 
-map[anpai:false]
-  9.01 [8.67, 9.72] (545 samples)
-
-...
-
-"matagisuji", 0.005008593482568255
-"senkisuji", -0.016123104870598315
-"suji_visible<=3", 0.04216014640822681
+map[tsupai:false]
+  9.91 [9.47, 10.70] (545 samples)
 
 ...
 
-"suji_in_tehais>=3", 0.00048345349694561834
-"+-2_in_prereach_sutehais>=2", 0.010061817156363381
-"1_inner_prereach_sutehai", -0.0004900895548952955
+map[jikaze:true]
+  0.00 [0.00, 1.58] (188 samples)
+
+"urasuji", -0.001675325879822595
+"early_matagisuji", -0.03464279327432544
+"in_tehais>=3", -0.015295870962580158
+
+...
+
+"reach_suji", -0.001332990614191551
+"suji_visible<=0", 0.002270726335719772
+"jikaze", 0.07603688493950164
 :max_name, "jikaze"
-all : 9.01 [8.65, 9.74] (545 samples)
+all : 9.52 [9.11, 10.28] (545 samples)
   jikaze = true : 0.00 [0.00, 1.58] (188 samples)
-  jikaze = false : 9.08 [8.63, 9.84] (545 samples)
+  jikaze = false : 9.59 [9.18, 10.35] (545 samples)
 :generate_decision_tree, main.Criterion{"jikaze":false}
-map[anpai:false jikaze:false]
-  9.08 [8.71, 9.84] (545 samples)
+map[jikaze:false tsupai:false]
+  9.91 [9.47, 10.70] (545 samples)
+
+map[jikaze:false tsupai:true]
+  3.51 [2.34, 5.25] (472 samples)
 
 ...
 
-"visible>=3", -0.01935483870967742
-"ryenfonpai", -0.02054794520547945
-"dora", -0.02247191011235955
-"in_tehais>=2", -0.018404907975460124
-"bakaze", -0.02054794520547945
+map[bakaze:true jikaze:true]
+  0.00 [0.00, 6.52] (44 samples)
+
 "visible>=1", -0.07317073170731707
-"in_tehais>=3", -0.016216216216216217
+"in_tehais>=3", -0.016304347826086956
+"bakaze", -0.02054794520547945
+"ryenfonpai", -0.02054794520547945
 "visible>=2", -0.02912621359223301
+"dora", -0.016853932584269662
+"visible>=3", -0.01935483870967742
+"in_tehais>=2", -0.02
 :max_name, ""
-all : 9.01 [8.65, 9.74] (545 samples)
+all : 9.52 [9.11, 10.28] (545 samples)
   jikaze = true : 0.00 [0.00, 1.58] (188 samples)
-  jikaze = false : 9.08 [8.63, 9.84] (545 samples)
-    fonpai = true : 2.20 [1.18, 3.89] (380 samples)
-    fonpai = false : 9.27 [8.90, 9.98] (545 samples)
-      chances<=0 = true : 2.99 [1.87, 4.95] (290 samples)
-        suji_visible<=1 = true : 1.07 [0.42, 2.75] (223 samples)
-        suji_visible<=1 = false : 6.28 [4.02, 10.19] (197 samples)
-      chances<=0 = false : 9.45 [9.03, 10.22] (545 samples)
-        sangenpai = true : 3.13 [1.82, 5.06] (358 samples)
-        sangenpai = false : 9.66 [9.25, 10.45] (545 samples)
-          suji = true : 4.33 [3.27, 5.93] (471 samples)
-          suji = false : 10.51 [9.90, 11.39] (545 samples)
-            +-2_in_prereach_sutehais>=1 = true : 7.83 [6.98, 9.12] (544 samples)
-              reach_suji = true : 0.00 [0.00, 5.00] (58 samples)
-              reach_suji = false : 7.95 [7.11, 9.13] (544 samples)
-            +-2_in_prereach_sutehais>=1 = false : 13.37 [12.04, 15.15] (514 samples)
-              visible>=3 = true : 2.97 [0.76, 7.47] (130 samples)
-              visible>=3 = false : 13.53 [12.15, 15.46] (513 samples)
+  jikaze = false : 9.59 [9.18, 10.35] (545 samples)
+    fonpai = true : 2.35 [1.29, 4.15] (380 samples)
+      dora = false : 1.47 [0.69, 3.03] (376 samples)
+      dora = true : 16.67 [7.69, 34.62] (24 samples)
+    fonpai = false : 9.76 [9.34, 10.52] (545 samples)
+      fanpai = true : 3.28 [1.91, 5.52] (358 samples)
+      fanpai = false : 9.91 [9.47, 10.70] (545 samples)
+        suji = true : 4.97 [3.86, 6.46] (492 samples)
+        suji = false : 10.96 [10.32, 11.97] (545 samples)
+          chances<=0 = true : 3.05 [1.51, 5.61] (245 samples)
+          chances<=0 = false : 11.19 [10.53, 12.22] (545 samples)
+            reach_matagisuji = true : 5.80 [3.88, 8.33] (386 samples)
+            reach_matagisuji = false : 11.74 [11.01, 12.79] (545 samples)
+              +-2_in_prereach_sutehais>=2 = true : 6.25 [4.38, 8.62] (313 samples)
+              +-2_in_prereach_sutehais>=2 = false : 12.10 [11.26, 13.34] (545 samples)
 ```
 
 ## dump_tree
@@ -582,3 +594,7 @@ go run ./tools/estimate_danger dump_tree_json -o danger_tree.all.json decision_t
     }
 }
 ```
+
+## References
+
+[統計による麻雀危険牌分析 - namespace gimite](https://gimite.net/pukiwiki/index.php?%E7%B5%B1%E8%A8%88%E3%81%AB%E3%82%88%E3%82%8B%E9%BA%BB%E9%9B%80%E5%8D%B1%E9%99%BA%E7%89%8C%E5%88%86%E6%9E%90)
