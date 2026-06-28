@@ -1,6 +1,6 @@
 # Tools Porting Notes
 
-この文書は、未移植の `tools/` を現行 Go 実装へ移植するための棚卸しメモである。恒久方針は `.agents/design.md` を一次資料とし、この文書は実装順・参照元・受け入れ条件を整理する。
+この文書は、`tools/` を現行 Go 実装へ移植した際の棚卸しメモである。恒久方針は `.agents/design.md` を一次資料とし、この文書は実装順・参照元・受け入れ条件の履歴を整理する。
 
 ## 1. 対象
 
@@ -95,7 +95,7 @@ AI 側では `ai.DangerTreeNode` として読み、`feature_name == null` を le
    - `round.State` と tenpai 判定を使うため、shared の state 更新を先に固める。
    - `yamitenStats`、`ryukyokuTenpaiStat` は off-by-one が出やすいので小さい fixture で代表ケースを固定する。
 
-6. `estimate_danger`
+6. `estimate_danger`（実装済み）
    - サブコマンドは `dump_tree_json` までの生成経路を優先する。
    - tool 本体の一次参照は `reference/repositories/mjai-manue-original/tools/estimate_danger.rb` とする。`coffee/danger_estimator.coffee` は Scene feature 判定の補助参照としてのみ使う。
    - Scene は現行 `internal/domain/ai` の danger scene と似ているが、オリジナル tool と微妙に判定が異なる箇所がある。`estimate_danger` 移植では現行 AI 側へ寄せず、オリジナル tool の判定差分をそのまま再現する。
