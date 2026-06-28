@@ -7,6 +7,7 @@
 - `.agents/README.md`: `.agents` 配下の文書の役割と分割方針
 - `.agents/design.md`: 全体方針（ゴール/非ゴール、NFR、DDD/レイヤ、ユースケース、現状実装、実装計画、テスト戦略）
 - `.agents/board-state-output.md`: 盤面状態出力の実装状況と移植元参照（恒久仕様は `.agents/design.md` に反映）
+- `.agents/tools-porting.md`: `tools/` Go 移植の完了済み棚卸しメモ。生成物 schema、参照元、受け入れ条件の確認に使う。
 - `.agents/terminology-en.md`: 移植元コードの英語用語を確認する補助資料
 - `.agents/archive/`: 完了済みフェーズの詳細メモ。AI 本体移植の経緯確認が必要な場合だけ参照する。
 
@@ -23,15 +24,19 @@
   - `internal/application/`: ユースケース（受信→状態適用→意思決定→送信のオーケストレーション）
   - `internal/adapter/`: 具体 I/O（mjai TCP/stdio runtime、JSON codec 等）。外部プロトコル差分は ACL で吸収する。
   - `cmd/`: CLI エントリ。フラグ解析、Agent 選択、runtime 起動、終了コード変換のみ。
-- 現在実装済みの CLI は `cmd/mjai-tsumogiri` と `cmd/mjai-manue`。AI 本体移植は完了済みで、次の主作業は未移植の `tools/` 配下の Go 実装。
-- `README.md` / `cmd/README.md` / `cmd/mjai-manue/README.md` / `tools/README.md` は利用者向け文書。現状判断は `.agents/design.md` と実ファイルを根拠にし、tools 実装の進捗は必要に応じて `tools/*/README.md` と同期する。
+- 現在実装済みの CLI は `cmd/mjai-tsumogiri` と `cmd/mjai-manue`。AI 本体移植と `tools/` 配下の Go 移植は完了済み。
+- 次の主作業は、RiichiLab 用ブリッジ、`log` フィールドを JSON object に変換するラッパースクリプト、Original-vs-Port Testing Framework。
+- `README.md` / `cmd/README.md` / `cmd/mjai-manue/README.md` / `tools/README.md` は利用者向け文書。現状判断は `.agents/design.md` と実ファイルを根拠にし、tools の CLI 仕様を変更する場合は必要に応じて `tools/*/README.md` と同期する。
 - stdout は **プロトコル出力専用**。ログ/エラーは stderr（`.agents/design.md` の I/O 安全性）。
 - 入力が空行・不正 JSON の場合は **エラー終了**（継続しない）。
 - 送信はメッセージ単位で必ず flush する（透過性）。
 - `--seed` を持つコマンドでは乱数を決定的にする（決定性）。現行 `mjai-tsumogiri` は乱数を使わず、`--seed` も持たない。
 - `ai.Request` の `Round` は AI 分野でいう observation（obs）として扱う。legal actions は外側から別フィールドで渡すのではなく、obs（現状は `round.ActionStateViewer`）に含める設計を維持する。
 - `round.State` / `EventApplier` / `LegalActions` は現状を最終形として扱う。責務分割目的での追加 struct/service 化は、間接参照が増えて読みにくくなるため原則行わない。
-- `tools/` 配下の実装では、参照元 CoffeeScript と過去 Go 実装を補助にしつつ、現行の `internal/domain` / `configs` の型と責務境界に寄せる。大量ログ処理の I/O は `tools` 側に閉じ込め、`domain` にファイル形式や集計 CLI の都合を持ち込まない。
+- `tools/` 配下を保守する場合は、参照元 CoffeeScript と過去 Go 実装を補助にしつつ、現行の `internal/domain` / `configs` の型と責務境界に寄せる。大量ログ処理の I/O は `tools` 側に閉じ込め、`domain` にファイル形式や集計 CLI の都合を持ち込まない。
+- RiichiLab bridge は、本体 AI を直接 RiichiLab プロトコルに寄せず、WebSocket と stdio JSON Lines の変換・token 付与・`request_action` のタイミング調整を bridge 側へ閉じ込める。`cmd/` に Go アプリケーションを増やすか、`scripts/` に Python スクリプトを追加するかは実装前に再検討する。
+- `log` フィールド JSON 化は mjai-manue 本体に組み込まず、出力を書き換える外部ラッパーとして追加する。本体の CLI オプションを増やさず、後処理の参考実装としても使える形を優先する。
+- Original-vs-Port Testing Framework は通常 CI へ無理に組み込まず、差分調査・移植確認用の開発者向け検証基盤として設計する。
 
 ## ドキュメント更新の運用
 
