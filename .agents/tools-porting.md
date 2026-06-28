@@ -114,7 +114,7 @@ AI 側では `ai.DangerTreeNode` として読み、`feature_name == null` を le
 | 4 | `dump_tree` | 保存済み tree gob を text tree として表示する。 | 実装済み |
 | 5 | `single` | feature ごとの true/false 危険率、信頼区間、sample 数を表示する。 | 実装済み |
 | 6 | `interesting` | Ruby の interesting criteria を移植し、必要に応じて probability map gob を保存する。 | 実装済み |
-| 7 | `benchmark` | `interesting` と同じ criteria builder で probability map 作成までを実行する。 | 未着手 |
+| 7 | `benchmark` | `interesting` と同じ criteria builder で probability map 作成までを実行する。 | 実装済み |
 | 8 | `interesting_graph` | `interesting` の probability gob から points / plot / png / html を生成する。gnuplot 依存のため通常テスト対象外。 | 未着手 |
 
 ## 5. 受け入れ条件

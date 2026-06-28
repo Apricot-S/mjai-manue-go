@@ -52,7 +52,7 @@ func parseOptions(action string, args []string) (*Options, []string, error) {
 	case "interesting_graph":
 		// not implemented yet
 	case "benchmark":
-		// not implemented yet
+		// no options
 	case "tree":
 		fs.StringVar(&opts.Output, "o", "", "output filepath")
 		fs.Float64Var(&opts.MinGap, "min_gap", 0.0, "minimum gap percentage")
@@ -186,13 +186,15 @@ func main() {
 		runErr = CalculateSingleProbabilities(paths[0], w)
 	case "interesting":
 		runErr = runInteresting(paths[0], opts, w)
+	case "benchmark":
+		runErr = RunBenchmark(paths[0])
 	case "tree":
 		runErr = runTree(paths[0], opts, w)
 	case "dump_tree":
 		runErr = runDumpTree(paths[0], w)
 	case "dump_tree_json":
 		runErr = runDumpTreeJSON(paths[0], opts)
-	case "interesting_graph", "benchmark":
+	case "interesting_graph":
 		runErr = fmt.Errorf("%s is not implemented yet", action)
 	default:
 		runErr = fmt.Errorf("unknown action: %s", action)

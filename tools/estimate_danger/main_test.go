@@ -98,6 +98,18 @@ func TestParseOptionsInteresting(t *testing.T) {
 	}
 }
 
+func TestParseOptionsBenchmark(t *testing.T) {
+	_, paths, err := parseOptions("benchmark", []string{"features.gob"})
+	if err != nil {
+		t.Fatalf("parseOptions() error = %v", err)
+	}
+
+	wantPaths := []string{"features.gob"}
+	if !reflect.DeepEqual(paths, wantPaths) {
+		t.Errorf("paths = %v, want %v", paths, wantPaths)
+	}
+}
+
 func TestParseOptionsTree(t *testing.T) {
 	opts, paths, err := parseOptions("tree", []string{
 		"-o", "tree.gob",
