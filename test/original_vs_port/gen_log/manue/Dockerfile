@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:1
 
-ARG NODE_VERSION=22
+ARG NODE_VERSION=24
 ARG OS_VERSION=trixie
 
 FROM node:${NODE_VERSION}-${OS_VERSION} AS downloader
