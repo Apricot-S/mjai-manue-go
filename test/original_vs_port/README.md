@@ -61,14 +61,14 @@ With the top-level directory of this repository as the current directory, run:
 go run ./test/original_vs_port/compare ./test/original_vs_port/log_dir/*.mjson > <OUTPUT_FILEPATH> 2>/dev/null
 ```
 
-Useful options:
+Options:
 
 - `--player-name <NAME>`  
   The original player name to compare (default: `Manue014`).
 - `--seed <SEED>`  
-  The Go port seed (default: `0`). This makes the port deterministic, but does not reproduce the original CoffeeScript random sequence.
+  The Go port seed (default: `0`). This does not reproduce the original CoffeeScript random sequence.
 - `--limit <NUMBER>`  
-  Maximum number of mismatch details to print. `0` means unlimited.
+  Maximum number of mismatch details to print (default: `0`). `0` means unlimited.
 - `--show-matches`  
   Also print matched decisions.
 - `<LOG_GLOB_PATTERNS>`  
