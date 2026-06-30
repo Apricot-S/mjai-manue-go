@@ -24,6 +24,8 @@ type comparer struct {
 	log  io.Writer
 }
 
+const mismatchSeparatorWidth = 122
+
 func (c *comparer) compareFile(path string) (summary, error) {
 	agent, err := ai.NewManueAgent(c.cfg.seed, c.deps)
 	if err != nil {
@@ -241,25 +243,25 @@ func (fc *fileComparer) recordMismatch(lineNo int, original normalizedAction, po
 
 	fmt.Fprintf(fc.parent.out, "mismatch: %s:%d: %s\n", fc.path, lineNo, reason)
 	if !isZeroAction(original) {
-		fmt.Fprintf(fc.parent.out, "original: %s\n", mustActionJSON(original))
+		fmt.Fprintf(fc.parent.out, "original action: %s\n", mustActionJSON(original))
 	} else {
-		fmt.Fprintln(fc.parent.out, "original: <none>")
+		fmt.Fprintln(fc.parent.out, "original action: <none>")
 	}
 	if port != nil {
-		fmt.Fprintf(fc.parent.out, "port:     %s\n", mustActionJSON(*port))
+		fmt.Fprintf(fc.parent.out, "port action:     %s\n", mustActionJSON(*port))
 	} else {
-		fmt.Fprintln(fc.parent.out, "port:     <none>")
-	}
-	if fc.lastLog != "" {
-		fmt.Fprintf(fc.parent.out, "original log:\n%s\n", fc.lastLog)
+		fmt.Fprintln(fc.parent.out, "port action:     <none>")
 	}
 	if fc.lastBoard != "" {
 		fmt.Fprintf(fc.parent.out, "board:\n%s", fc.lastBoard)
 	}
-	if fc.lastTrace != "" {
-		fmt.Fprintf(fc.parent.out, "trace:\n%s", fc.lastTrace)
+	if fc.lastLog != "" {
+		fmt.Fprintf(fc.parent.out, "original log:\n%s\n", fc.lastLog)
 	}
-	fmt.Fprintln(fc.parent.out, strings.Repeat("-", 80))
+	if fc.lastTrace != "" {
+		fmt.Fprintf(fc.parent.out, "port trace log:\n%s", fc.lastTrace)
+	}
+	fmt.Fprintln(fc.parent.out, strings.Repeat("=", mismatchSeparatorWidth))
 }
 
 func (fc *fileComparer) captureOriginalLog(raw []byte) {
