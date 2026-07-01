@@ -52,7 +52,7 @@ func TestFileComparer_FlushPendingNonNoneBeforeNonSelfReportsMismatch(t *testing
 		action: normalizedAction{Type: "dahai", Actor: new(1), Pai: "5m", Tsumogiri: new(false)},
 	}
 
-	if err := fc.flushPendingBeforeNonSelf(11); err != nil {
+	if err := fc.flushPendingBeforeNonSelf(11, normalizedAction{Type: "dora"}, false); err != nil {
 		t.Fatalf("flushPendingBeforeNonSelf() failed: %v", err)
 	}
 
@@ -98,7 +98,7 @@ func TestFileComparer_FlushPendingNoneCountsImplicitPass(t *testing.T) {
 		action: normalizedAction{Type: "none", Actor: new(1)},
 	}
 
-	if err := fc.flushPendingBeforeNonSelf(11); err != nil {
+	if err := fc.flushPendingBeforeNonSelf(11, normalizedAction{Type: "dora"}, false); err != nil {
 		t.Fatalf("flushPendingBeforeNonSelf() failed: %v", err)
 	}
 
@@ -107,6 +107,159 @@ func TestFileComparer_FlushPendingNoneCountsImplicitPass(t *testing.T) {
 	}
 	if fc.fileSummary.decisions != 1 || fc.fileSummary.matches != 0 || fc.fileSummary.implicitPasses != 1 || fc.fileSummary.mismatches != 0 {
 		t.Errorf("summary = %+v, want 1 implicit pass only", fc.fileSummary)
+	}
+}
+
+func TestFileComparer_FlushPendingChiPreemptedByHigherPriorityActionDoesNotMismatch(t *testing.T) {
+	tests := []normalizedAction{
+		{Type: "pon", Actor: new(2), Target: new(0), Pai: "3m", Consumed: []string{"3m", "3m"}},
+		{Type: "daiminkan", Actor: new(2), Target: new(0), Pai: "3m", Consumed: []string{"3m", "3m", "3m"}},
+		{Type: "hora", Actor: new(2), Target: new(0), Pai: "3m"},
+	}
+
+	for _, original := range tests {
+		t.Run(original.Type, func(t *testing.T) {
+			var out bytes.Buffer
+			fc := newTestFileComparer(&out, 0)
+			fc.pending = &pendingAction{
+				line:   10,
+				action: normalizedAction{Type: "chi", Actor: new(1), Target: new(0), Pai: "3m", Consumed: []string{"1m", "2m"}},
+			}
+
+			if err := fc.flushPendingBeforeNonSelf(11, original, true); err != nil {
+				t.Fatalf("flushPendingBeforeNonSelf() failed: %v", err)
+			}
+
+			if fc.pending != nil {
+				t.Error("pending action was not cleared")
+			}
+			if fc.fileSummary.decisions != 0 || fc.fileSummary.matches != 0 || fc.fileSummary.implicitPasses != 0 || fc.fileSummary.mismatches != 0 {
+				t.Errorf("summary = %+v, want no counted decision", fc.fileSummary)
+			}
+			if out.String() != "" {
+				t.Errorf("output = %q, want empty", out.String())
+			}
+		})
+	}
+}
+
+func TestFileComparer_FlushPendingPonPreemptedByOtherHoraDoesNotMismatch(t *testing.T) {
+	var out bytes.Buffer
+	fc := newTestFileComparer(&out, 0)
+	fc.pending = &pendingAction{
+		line:   10,
+		action: normalizedAction{Type: "pon", Actor: new(1), Target: new(0), Pai: "3m", Consumed: []string{"3m", "3m"}},
+	}
+
+	if err := fc.flushPendingBeforeNonSelf(11, normalizedAction{Type: "hora", Actor: new(2), Target: new(0), Pai: "3m"}, true); err != nil {
+		t.Fatalf("flushPendingBeforeNonSelf() failed: %v", err)
+	}
+
+	if fc.pending != nil {
+		t.Error("pending action was not cleared")
+	}
+	if fc.fileSummary.decisions != 0 || fc.fileSummary.matches != 0 || fc.fileSummary.implicitPasses != 0 || fc.fileSummary.mismatches != 0 {
+		t.Errorf("summary = %+v, want no counted decision", fc.fileSummary)
+	}
+	if out.String() != "" {
+		t.Errorf("output = %q, want empty", out.String())
+	}
+}
+
+func TestFileComparer_FlushPendingDaiminkanPreemptedByOtherHoraDoesNotMismatch(t *testing.T) {
+	var out bytes.Buffer
+	fc := newTestFileComparer(&out, 0)
+	fc.pending = &pendingAction{
+		line:   10,
+		action: normalizedAction{Type: "daiminkan", Actor: new(1), Target: new(0), Pai: "3m", Consumed: []string{"3m", "3m", "3m"}},
+	}
+
+	if err := fc.flushPendingBeforeNonSelf(11, normalizedAction{Type: "hora", Actor: new(2), Target: new(0), Pai: "3m"}, true); err != nil {
+		t.Fatalf("flushPendingBeforeNonSelf() failed: %v", err)
+	}
+
+	if fc.pending != nil {
+		t.Error("pending action was not cleared")
+	}
+	if fc.fileSummary.decisions != 0 || fc.fileSummary.matches != 0 || fc.fileSummary.implicitPasses != 0 || fc.fileSummary.mismatches != 0 {
+		t.Errorf("summary = %+v, want no counted decision", fc.fileSummary)
+	}
+	if out.String() != "" {
+		t.Errorf("output = %q, want empty", out.String())
+	}
+}
+
+func TestFileComparer_FlushPendingPonBeforeOtherDaiminkanStillReportsMismatch(t *testing.T) {
+	var out bytes.Buffer
+	fc := newTestFileComparer(&out, 0)
+	fc.pending = &pendingAction{
+		line:   10,
+		action: normalizedAction{Type: "pon", Actor: new(1), Target: new(0), Pai: "3m", Consumed: []string{"3m", "3m"}},
+	}
+
+	if err := fc.flushPendingBeforeNonSelf(11, normalizedAction{Type: "daiminkan", Actor: new(2), Target: new(0), Pai: "3m", Consumed: []string{"3m", "3m", "3m"}}, true); err != nil {
+		t.Fatalf("flushPendingBeforeNonSelf() failed: %v", err)
+	}
+
+	if fc.pending != nil {
+		t.Error("pending action was not cleared")
+	}
+	if fc.fileSummary.decisions != 1 || fc.fileSummary.matches != 0 || fc.fileSummary.implicitPasses != 0 || fc.fileSummary.mismatches != 1 {
+		t.Errorf("summary = %+v, want 1 mismatch only", fc.fileSummary)
+	}
+	if !strings.Contains(out.String(), "Go port returned an action, but original did not take it") {
+		t.Errorf("output = %q, want mismatch reason", out.String())
+	}
+}
+
+func TestFileComparer_FlushPendingHoraWaitsForSelfHoraAfterOtherHora(t *testing.T) {
+	var out bytes.Buffer
+	fc := newTestFileComparer(&out, 0)
+	fc.pending = &pendingAction{
+		line:   10,
+		action: normalizedAction{Type: "hora", Actor: new(1), Target: new(0), Pai: "3m"},
+	}
+
+	if err := fc.flushPendingBeforeNonSelf(11, normalizedAction{Type: "hora", Actor: new(2), Target: new(0), Pai: "3m"}, true); err != nil {
+		t.Fatalf("flushPendingBeforeNonSelf() failed: %v", err)
+	}
+	if fc.pending == nil {
+		t.Fatal("pending action was cleared before later self hora")
+	}
+
+	fc.compareOriginalSelfAction(12, normalizedAction{Type: "hora", Actor: new(1), Target: new(0), Pai: "3m"})
+
+	if fc.pending != nil {
+		t.Error("pending action was not cleared")
+	}
+	if fc.fileSummary.decisions != 1 || fc.fileSummary.matches != 1 || fc.fileSummary.implicitPasses != 0 || fc.fileSummary.mismatches != 0 {
+		t.Errorf("summary = %+v, want 1 direct match only", fc.fileSummary)
+	}
+	if out.String() != "" {
+		t.Errorf("output = %q, want empty", out.String())
+	}
+}
+
+func TestFileComparer_FlushPendingPreemptionRequiresSameOpportunity(t *testing.T) {
+	var out bytes.Buffer
+	fc := newTestFileComparer(&out, 0)
+	fc.pending = &pendingAction{
+		line:   10,
+		action: normalizedAction{Type: "chi", Actor: new(1), Target: new(0), Pai: "3m", Consumed: []string{"1m", "2m"}},
+	}
+
+	if err := fc.flushPendingBeforeNonSelf(11, normalizedAction{Type: "pon", Actor: new(2), Target: new(3), Pai: "3m", Consumed: []string{"3m", "3m"}}, true); err != nil {
+		t.Fatalf("flushPendingBeforeNonSelf() failed: %v", err)
+	}
+
+	if fc.pending != nil {
+		t.Error("pending action was not cleared")
+	}
+	if fc.fileSummary.decisions != 1 || fc.fileSummary.matches != 0 || fc.fileSummary.implicitPasses != 0 || fc.fileSummary.mismatches != 1 {
+		t.Errorf("summary = %+v, want 1 mismatch only", fc.fileSummary)
+	}
+	if !strings.Contains(out.String(), "Go port returned an action, but original did not take it") {
+		t.Errorf("output = %q, want mismatch reason", out.String())
 	}
 }
 

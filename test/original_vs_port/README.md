@@ -55,6 +55,8 @@ The comparison is action-only by default. It ignores fields such as `log`, while
 
 The final summary reports direct action `matches` separately from `implicit_passes`, where an implicit pass is a Go port `none` action inferred as matching an original log that omits an explicit pass action.
 
+When the Go port chooses a call action that the server would not realize because another player has a higher-priority declaration for the same discard, the comparer does not report it as a mismatch. Specifically, other players' `pon` / `daiminkan` / `hora` suppress a pending Go `chi`, and other players' `hora` suppresses a pending Go `pon` / `daiminkan`. For double ron ordering, a pending Go `hora` is kept across another player's earlier `hora` for the same discard so it can match the later self `hora`.
+
 ### Usage
 
 With the top-level directory of this repository as the current directory, run:
