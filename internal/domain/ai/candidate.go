@@ -12,11 +12,19 @@ import (
 )
 
 type actionCandidate struct {
-	traceKey         string
-	evaluationGroup  int
-	action           action.Action
-	riichi           bool
-	scoreAsRiichi    bool
+	traceKey        string
+	evaluationGroup int
+	action          action.Action
+	// riichi means this candidate immediately declares riichi before the discard.
+	// It corresponds to original Manue's reachMode="now" action candidate.
+	riichi bool
+	// scoreAsRiichi means future win values should include the riichi yaku when
+	// the candidate is still closed. This models original Manue's reachMode
+	// scoring: "now" and "default" add riichi, while "never" does not.
+	scoreAsRiichi bool
+	// pruneToTenpai means non-tenpai goals are removed before win estimation.
+	// This is separate from scoreAsRiichi because original reachMode="default"
+	// scores future riichi but still keeps non-tenpai improvement goals.
 	pruneToTenpai    bool
 	discardTile      tile.Tile
 	melds            []meld.Meld

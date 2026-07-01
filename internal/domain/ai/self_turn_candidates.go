@@ -26,6 +26,11 @@ func buildSelfTurnCandidates(actions []action.Action, self player.PlayerViewer) 
 	if riichi != nil {
 		discardGroup = 1
 	}
+	// Original Manue's ordinary self-turn evaluation uses reachMode="default":
+	// closed future wins get riichi yaku, but goals are not pruned to tenpai.
+	// When an immediate riichi action exists, the paired non-riichi discard
+	// candidate is the reachMode="never" alternative, so it must not score
+	// future riichi.
 	defaultScoresAsRiichi := riichi == nil
 	var candidates []actionCandidate
 	for _, discard := range normalizedSelfTurnDiscards(actions) {
@@ -62,6 +67,9 @@ func buildSelfTurnCandidates(actions []action.Action, self player.PlayerViewer) 
 			shanten,
 			turnGoals,
 			false,
+			// riichiDeclared is reachMode="now"; defaultScoresAsRiichi is
+			// reachMode="default". The remaining immediate-riichi alternative
+			// is reachMode="never" and therefore scores without riichi.
 			riichiDeclared || defaultScoresAsRiichi,
 			riichiDeclared,
 			discardGroup,
