@@ -17,6 +17,7 @@ type actionCandidate struct {
 	action           action.Action
 	riichi           bool
 	scoreAsRiichi    bool
+	pruneToTenpai    bool
 	discardTile      tile.Tile
 	melds            []meld.Meld
 	afterDiscardHand *hand.VisibleHand

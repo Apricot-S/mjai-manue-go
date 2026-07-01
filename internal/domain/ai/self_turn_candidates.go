@@ -26,6 +26,7 @@ func buildSelfTurnCandidates(actions []action.Action, self player.PlayerViewer) 
 	if riichi != nil {
 		discardGroup = 1
 	}
+	defaultScoresAsRiichi := riichi == nil
 	var candidates []actionCandidate
 	for _, discard := range normalizedSelfTurnDiscards(actions) {
 		afterDiscard, err := h.Discard(discard.Tile())
@@ -46,6 +47,7 @@ func buildSelfTurnCandidates(actions []action.Action, self player.PlayerViewer) 
 				turnGoals,
 				true,
 				true,
+				true,
 				0,
 			))
 		}
@@ -60,6 +62,7 @@ func buildSelfTurnCandidates(actions []action.Action, self player.PlayerViewer) 
 			shanten,
 			turnGoals,
 			false,
+			riichiDeclared || defaultScoresAsRiichi,
 			riichiDeclared,
 			discardGroup,
 		))
@@ -98,6 +101,7 @@ func buildSelfTurnCandidate(
 	goals []service.Goal,
 	riichi bool,
 	scoreAsRiichi bool,
+	pruneToTenpai bool,
 	evaluationGroup int,
 ) actionCandidate {
 	return actionCandidate{
@@ -106,6 +110,7 @@ func buildSelfTurnCandidate(
 		action:           immediateAction,
 		riichi:           riichi,
 		scoreAsRiichi:    scoreAsRiichi,
+		pruneToTenpai:    pruneToTenpai,
 		discardTile:      discardTile,
 		afterDiscardHand: afterDiscardHand,
 		baseShanten:      baseShanten,

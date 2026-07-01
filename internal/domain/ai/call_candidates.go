@@ -32,6 +32,7 @@ func buildReactionCandidates(actions []action.Action, self player.PlayerViewer) 
 			baseShanten:      shanten,
 			shanten:          shanten,
 			shantenGoals:     goals,
+			scoreAsRiichi:    true,
 			red:              false,
 		})
 	}
