@@ -61,6 +61,11 @@ With the top-level directory of this repository as the current directory, run:
 go run ./test/original_vs_port/compare ./test/original_vs_port/log_dir/*.mjson > <OUTPUT_FILEPATH> 2>/dev/null
 ```
 
+Arguments:
+
+- `<LOG_GLOB_PATTERNS>`  
+  Log file patterns to compare (e.g., `./test/original_vs_port/log_dir/*.mjson`).
+
 Options:
 
 - `--player-name <NAME>`  
@@ -71,8 +76,6 @@ Options:
   Maximum number of mismatch details to print (default: `0`). `0` means unlimited.
 - `--show-matches`  
   Also print matched decisions.
-- `<LOG_GLOB_PATTERNS>`  
-  Log file patterns to compare (e.g., `./test/original_vs_port/log_dir/*.mjson`).
 
 Exit codes:
 
