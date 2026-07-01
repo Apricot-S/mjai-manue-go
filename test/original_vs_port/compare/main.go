@@ -56,8 +56,8 @@ func run(args []string, out io.Writer, errOut io.Writer) int {
 			fmt.Fprintf(out, "error: %s: %v\n", path, err)
 		}
 	}
-	fmt.Fprintf(out, "summary: files=%d decisions=%d matches=%d mismatches=%d errors=%d\n",
-		s.files, s.decisions, s.matches, s.mismatches, s.errors)
+	fmt.Fprintf(out, "summary: files=%d decisions=%d matches=%d implicit_passes=%d mismatches=%d errors=%d\n",
+		s.files, s.decisions, s.matches, s.implicitPasses, s.mismatches, s.errors)
 	if s.errors > 0 {
 		return exitRunError
 	}

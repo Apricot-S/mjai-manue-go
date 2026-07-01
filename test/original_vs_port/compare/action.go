@@ -36,13 +36,16 @@ func normalizeRawAction(raw []byte) (normalizedAction, bool, error) {
 		action.Target = intPtrFromMap(m, "target")
 		action.Pai, _ = m["pai"].(string)
 		action.Consumed = stringSliceFromMap(m, "consumed")
+		slices.Sort(action.Consumed)
 	case "ankan":
 		action.Actor = intPtrFromMap(m, "actor")
 		action.Consumed = stringSliceFromMap(m, "consumed")
+		slices.Sort(action.Consumed)
 	case "kakan":
 		action.Actor = intPtrFromMap(m, "actor")
 		action.Pai, _ = m["pai"].(string)
 		action.Consumed = stringSliceFromMap(m, "consumed")
+		slices.Sort(action.Consumed)
 	case "hora":
 		action.Actor = intPtrFromMap(m, "actor")
 		action.Target = intPtrFromMap(m, "target")

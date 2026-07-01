@@ -53,6 +53,8 @@ Outputs differences and the final summary as a text report to standard output. G
 
 The comparison is action-only by default. It ignores fields such as `log`, while using the Go port's board rendering and trace output as context in mismatch reports.
 
+The final summary reports direct action `matches` separately from `implicit_passes`, where an implicit pass is a Go port `none` action inferred as matching an original log that omits an explicit pass action.
+
 ### Usage
 
 With the top-level directory of this repository as the current directory, run:

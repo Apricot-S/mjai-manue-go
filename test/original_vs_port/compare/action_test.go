@@ -39,3 +39,43 @@ func TestNormalizeRawAction_RepresentativeActions(t *testing.T) {
 		})
 	}
 }
+
+func TestNormalizeRawAction_SortsOrderInsensitiveConsumed(t *testing.T) {
+	a, comparable, err := normalizeRawAction([]byte(`{"type":"pon","actor":1,"target":0,"pai":"5m","consumed":["5mr","5m"]}`))
+	if err != nil {
+		t.Fatalf("normalizeRawAction() first action failed: %v", err)
+	}
+	if !comparable {
+		t.Fatal("normalizeRawAction() first action comparable = false, want true")
+	}
+	b, comparable, err := normalizeRawAction([]byte(`{"type":"pon","actor":1,"target":0,"pai":"5m","consumed":["5m","5mr"]}`))
+	if err != nil {
+		t.Fatalf("normalizeRawAction() second action failed: %v", err)
+	}
+	if !comparable {
+		t.Fatal("normalizeRawAction() second action comparable = false, want true")
+	}
+	if !actionsEqual(a, b) {
+		t.Errorf("actionsEqual() = false, want true: %+v vs %+v", a, b)
+	}
+}
+
+func TestNormalizeRawAction_SortsChiConsumed(t *testing.T) {
+	a, comparable, err := normalizeRawAction([]byte(`{"type":"chi","actor":1,"target":0,"pai":"3m","consumed":["1m","2m"]}`))
+	if err != nil {
+		t.Fatalf("normalizeRawAction() first action failed: %v", err)
+	}
+	if !comparable {
+		t.Fatal("normalizeRawAction() first action comparable = false, want true")
+	}
+	b, comparable, err := normalizeRawAction([]byte(`{"type":"chi","actor":1,"target":0,"pai":"3m","consumed":["2m","1m"]}`))
+	if err != nil {
+		t.Fatalf("normalizeRawAction() second action failed: %v", err)
+	}
+	if !comparable {
+		t.Fatal("normalizeRawAction() second action comparable = false, want true")
+	}
+	if !actionsEqual(a, b) {
+		t.Errorf("actionsEqual() = false, want true: %+v vs %+v", a, b)
+	}
+}

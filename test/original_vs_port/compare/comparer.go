@@ -99,7 +99,7 @@ func (fc *fileComparer) processLine(lineNo int, raw []byte, agent ai.Agent) erro
 	}
 	if originalComparable && original.Actor != nil && *original.Actor == fc.self {
 		fc.compareOriginalSelfAction(lineNo, original)
-	} else if err := fc.flushPendingBeforeNonSelf(lineNo, originalComparable); err != nil {
+	} else if err := fc.flushPendingBeforeNonSelf(lineNo); err != nil {
 		return err
 	}
 
@@ -197,7 +197,7 @@ func (fc *fileComparer) compareOriginalSelfAction(lineNo int, original normalize
 	fc.recordMismatch(lineNo, original, &pending.action, "action mismatch")
 }
 
-func (fc *fileComparer) flushPendingBeforeNonSelf(lineNo int, comparable bool) error {
+func (fc *fileComparer) flushPendingBeforeNonSelf(lineNo int) error {
 	if fc.pending == nil {
 		return nil
 	}
@@ -205,16 +205,14 @@ func (fc *fileComparer) flushPendingBeforeNonSelf(lineNo int, comparable bool) e
 	fc.pending = nil
 	if pending.action.Type == "none" {
 		fc.fileSummary.decisions++
-		fc.fileSummary.matches++
+		fc.fileSummary.implicitPasses++
 		if fc.parent.cfg.showMatch {
 			fmt.Fprintf(fc.parent.out, "match: %s:%d implicit pass %s\n", fc.path, lineNo, mustActionJSON(pending.action))
 		}
 		return nil
 	}
-	if comparable {
-		fc.fileSummary.decisions++
-		fc.recordMismatch(lineNo, normalizedAction{}, &pending.action, "Go port returned an action, but original did not take it")
-	}
+	fc.fileSummary.decisions++
+	fc.recordMismatch(lineNo, normalizedAction{}, &pending.action, "Go port returned an action, but original did not take it")
 	return nil
 }
 
@@ -226,7 +224,7 @@ func (fc *fileComparer) flushPendingAtEOF() error {
 	fc.pending = nil
 	if pending.action.Type == "none" {
 		fc.fileSummary.decisions++
-		fc.fileSummary.matches++
+		fc.fileSummary.implicitPasses++
 		return nil
 	}
 	fc.fileSummary.decisions++
