@@ -91,3 +91,43 @@ GOEXPERIMENT=jsonv2 go test ./test/original_vs_port/compare
 Result:
 
 The package tests passed when run outside the sandbox. The first sandboxed run failed because the Go build cache under `AppData\Local\go-build` was not accessible.
+
+## Follow-up Review: 2026-07-01
+
+Scope: re-review after fixes for the findings above.
+
+### Status
+
+- P1 non-`none` pending action false negative: resolved.
+  - `flushPendingBeforeNonSelf` now reports a mismatch for any pending non-`none` action, regardless of whether the next original line is itself comparable.
+  - `flushPendingAtEOF` still reports a pending non-`none` action as a mismatch.
+  - Direct tests were added for both paths.
+- P2 implicit `none` counted as normal match: mostly resolved.
+  - Implicit passes are now counted separately as `implicit_passes`, so the summary no longer merges inferred pass matches into direct `matches`.
+  - Residual risk remains: the comparer still does not validate that the previous event was actually a legal explicit-pass opportunity. This is acceptable as a manual investigation tool if `implicit_passes` is treated as inferred evidence rather than direct equality.
+- P2 `consumed` order false positives: resolved.
+  - `normalizeRawAction` now sorts `consumed` for chi/pon/kan actions before comparison.
+  - Tests cover order-insensitive consumed comparison, including chi.
+- P2 comparer behavior test gap: resolved for the high-risk paths.
+  - Tests now cover direct match, non-`none` pending mismatch before non-self input, non-`none` pending mismatch at EOF, implicit pass counting, original action without Go pending action, mismatch detail limiting, and summary aggregation.
+
+### Additional Findings
+
+No additional blocking findings were found in this pass.
+
+### Residual QA Notes
+
+- Consider adding an end-to-end fixture test for a tiny mjson stream once a stable fixture is available. The current direct `fileComparer` tests cover the risky state transitions, but an integration-style test would also protect the `processLine` ordering around `ParseMessage`, original action normalization, bot processing, and pending flush.
+- If `implicit_passes` becomes a decision-quality metric rather than only an investigation aid, add validation that the pending `none` follows an event where explicit pass is a legal action. Without that, spurious `none` responses remain visible but not classified as mismatches.
+
+### Verification
+
+Command:
+
+```sh
+GOEXPERIMENT=jsonv2 go test ./test/original_vs_port/compare
+```
+
+Result:
+
+The package tests passed when run outside the sandbox. The sandboxed run failed again because the Go build cache under `AppData\Local\go-build` was not accessible.
