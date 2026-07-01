@@ -44,9 +44,21 @@ func TestBuildReactionCandidates_BuildsPassAndCallDiscards(t *testing.T) {
 			if candidate.evaluationGroup != 0 {
 				t.Errorf("evaluationGroup for none = %d, want 0", candidate.evaluationGroup)
 			}
+			if !candidate.scoreAsRiichi {
+				t.Errorf("scoreAsRiichi for none = false, want true for default future riichi scoring")
+			}
+			if candidate.pruneToTenpai {
+				t.Errorf("pruneToTenpai for none = true, want false for default mode")
+			}
 		case "0.4m":
 			if candidate.evaluationGroup != 1 {
 				t.Errorf("evaluationGroup for 0.4m = %d, want 1", candidate.evaluationGroup)
+			}
+			if candidate.scoreAsRiichi {
+				t.Errorf("scoreAsRiichi for 0.4m = true, want false after calling")
+			}
+			if candidate.pruneToTenpai {
+				t.Errorf("pruneToTenpai for 0.4m = true, want false for default mode")
 			}
 		}
 		if candidate.traceKey == "0.5pr" {

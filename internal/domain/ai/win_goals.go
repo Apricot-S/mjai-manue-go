@@ -46,7 +46,7 @@ var redFiveIndexesByNormalTileID = func() [tile.NumTileType34]int {
 func filteredWinEstimateGoals(candidate actionCandidate) []service.Goal {
 	goals := make([]service.Goal, 0, len(candidate.shantenGoals))
 	for _, goal := range candidate.shantenGoals {
-		if candidate.scoreAsRiichi && goal.Shanten > 0 {
+		if candidate.pruneToTenpai && goal.Shanten > 0 {
 			continue
 		}
 		if candidate.baseShanten > shantenPruneLimit && goal.Shanten > candidate.baseShanten {
@@ -77,6 +77,7 @@ func scoredWinEstimateGoals(candidate actionCandidate, context winEstimateGoalCo
 		if err != nil {
 			return nil, err
 		}
+		scoreAsRiichi := candidate.scoreAsRiichi && len(context.melds) == 0
 		fu, han, _ := service.CalculateFuHan(
 			scoringHand,
 			goal.Blocks,
@@ -84,7 +85,7 @@ func scoredWinEstimateGoals(candidate actionCandidate, context winEstimateGoalCo
 			context.roundWind,
 			context.seatWind,
 			context.doraIndicators,
-			candidate.scoreAsRiichi,
+			scoreAsRiichi,
 		)
 		points := service.RonPoints(fu, han, context.dealer)
 		if points <= 0 {

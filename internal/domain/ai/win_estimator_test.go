@@ -87,6 +87,7 @@ func TestFilteredWinEstimateGoals(t *testing.T) {
 			candidate: actionCandidate{
 				riichi:        true,
 				scoreAsRiichi: true,
+				pruneToTenpai: true,
 				discardTile:   tile.MustTileFromCode("1m"),
 				shanten:       0,
 				shantenGoals: []service.Goal{
@@ -95,6 +96,19 @@ func TestFilteredWinEstimateGoals(t *testing.T) {
 				},
 			},
 			want: []int{0},
+		},
+		{
+			name: "default future riichi does not prune non-ready goals",
+			candidate: actionCandidate{
+				scoreAsRiichi: true,
+				discardTile:   tile.MustTileFromCode("1m"),
+				shanten:       1,
+				shantenGoals: []service.Goal{
+					{Shanten: 0, ThrowableVector: hand.TileCounts34{0: 1}},
+					{Shanten: 1, ThrowableVector: hand.TileCounts34{0: 1}},
+				},
+			},
+			want: []int{0, 1},
 		},
 		{
 			name: "heavy shanten drops extra tile goals",
@@ -115,6 +129,7 @@ func TestFilteredWinEstimateGoals(t *testing.T) {
 			candidate: actionCandidate{
 				riichi:        true,
 				scoreAsRiichi: true,
+				pruneToTenpai: true,
 				discardTile:   tile.MustTileFromCode("1m"),
 				baseShanten:   4,
 				shanten:       1,
@@ -140,6 +155,103 @@ func TestFilteredWinEstimateGoals(t *testing.T) {
 				}
 			}
 		})
+	}
+}
+
+func TestScoredWinEstimateGoals_DefaultFutureRiichiScoresClosedNoYakuGoal(t *testing.T) {
+	turnHand := hand.MustVisibleHand([]tile.Tile{
+		tile.MustTileFromCode("1m"),
+		tile.MustTileFromCode("2m"),
+		tile.MustTileFromCode("3m"),
+		tile.MustTileFromCode("2p"),
+		tile.MustTileFromCode("3p"),
+		tile.MustTileFromCode("4p"),
+		tile.MustTileFromCode("5s"),
+		tile.MustTileFromCode("6s"),
+		tile.MustTileFromCode("7s"),
+		tile.MustTileFromCode("7s"),
+		tile.MustTileFromCode("8s"),
+		tile.MustTileFromCode("9s"),
+		tile.MustTileFromCode("P"),
+		tile.MustTileFromCode("P"),
+	})
+	blocks := []block.Block{
+		block.MustSequence(tile.MustTileFromCode("1m")),
+		block.MustSequence(tile.MustTileFromCode("2p")),
+		block.MustSequence(tile.MustTileFromCode("5s")),
+		block.MustSequence(tile.MustTileFromCode("7s")),
+		block.MustPair(tile.MustTileFromCode("P")),
+	}
+	candidate := actionCandidate{
+		discardTile:      tile.MustTileFromCode("?"),
+		afterDiscardHand: turnHand,
+		scoreAsRiichi:    true,
+		shantenGoals: []service.Goal{{
+			Blocks: blocks,
+		}},
+	}
+
+	got, err := scoredWinEstimateGoals(candidate, winEstimateGoalContext{
+		roundWind: wind.East,
+		seatWind:  wind.South,
+		dealer:    false,
+	})
+	if err != nil {
+		t.Fatalf("scoredWinEstimateGoals() failed: %v", err)
+	}
+	if len(got) != 1 {
+		t.Fatalf("len(scoredWinEstimateGoals()) = %d, want 1", len(got))
+	}
+	want := float64(service.RonPoints(40, 1, false))
+	if got[0].points != want {
+		t.Errorf("scoredWinEstimateGoals()[0].points = %v, want future-riichi points %v", got[0].points, want)
+	}
+}
+
+func TestScoredWinEstimateGoals_DefaultFutureRiichiDoesNotScoreOpenGoal(t *testing.T) {
+	turnHand := hand.MustVisibleHand([]tile.Tile{
+		tile.MustTileFromCode("1m"),
+		tile.MustTileFromCode("2m"),
+		tile.MustTileFromCode("3m"),
+		tile.MustTileFromCode("5p"),
+		tile.MustTileFromCode("6p"),
+		tile.MustTileFromCode("7p"),
+		tile.MustTileFromCode("7s"),
+		tile.MustTileFromCode("8s"),
+		tile.MustTileFromCode("9s"),
+		tile.MustTileFromCode("P"),
+		tile.MustTileFromCode("P"),
+	})
+	openPon := meld.MustPon(
+		tile.MustTileFromCode("2s"),
+		[2]tile.Tile{tile.MustTileFromCode("2s"), tile.MustTileFromCode("2s")},
+		seat.MustSeat(1),
+	)
+	candidate := actionCandidate{
+		traceKey:         "open",
+		discardTile:      tile.MustTileFromCode("?"),
+		afterDiscardHand: turnHand,
+		melds:            []meld.Meld{openPon},
+		scoreAsRiichi:    true,
+		shantenGoals: []service.Goal{{
+			Blocks: []block.Block{
+				block.MustSequence(tile.MustTileFromCode("1m")),
+				block.MustSequence(tile.MustTileFromCode("5p")),
+				block.MustSequence(tile.MustTileFromCode("7s")),
+				block.MustPair(tile.MustTileFromCode("P")),
+			},
+		}},
+	}
+
+	got, err := scoredWinEstimateGoalsByKey([]actionCandidate{candidate}, winEstimateGoalContext{
+		roundWind: wind.East,
+		seatWind:  wind.South,
+	})
+	if err != nil {
+		t.Fatalf("scoredWinEstimateGoalsByKey() failed: %v", err)
+	}
+	if len(got["open"]) != 0 {
+		t.Errorf("len(scored goals) = %d, want 0 because open default mode must not get riichi yaku", len(got["open"]))
 	}
 }
 
