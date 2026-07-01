@@ -78,8 +78,8 @@ Go port 修正前:
 - `internal/domain/ai/candidate.go` に `pruneToTenpai` を追加し、立直加点とテンパイ絞り込みを分離した。
 - `internal/domain/ai/self_turn_candidates.go` で、通常局面の打牌候補を `scoreAsRiichi=true, pruneToTenpai=false` にした。
 - 即立直/立直済みは `scoreAsRiichi=true, pruneToTenpai=true`、立直可能時の通常打牌は `scoreAsRiichi=false, pruneToTenpai=false` とした。
-- `internal/domain/ai/call_candidates.go` では、副露を pass する `none` 候補だけ default 評価として `scoreAsRiichi=true` にした。実際に chi/pon/daiminkan した後の候補は、以後立直できないため `scoreAsRiichi=false` とする。
-- original は `goal.furos.length > 0` の場合に立直役の食い下がり翻 `kuiFan=0` で抑止する。Go port も `len(context.melds) == 0` のときだけ立直加点することで、互換寄りに合わせた。
+- `internal/domain/ai/call_candidates.go` では、副露を pass する `none` 候補だけ default 評価として `scoreAsRiichi=true` にした。original は実際に chi/pon/daiminkan した後の候補にも `reachMode="default"` を渡すが、`addYaku` が `goal.furos.length > 0` の場合に立直役を 0 翻にするため、実効的には立直加点されない。Go port ではその実効挙動を `scoreAsRiichi=false` として直接表現する。
+- original は `goal.furos.length > 0` の場合に立直役の食い下がり翻 `kuiFan=0` で抑止する。Go port も `len(context.melds) == 0` のときだけ立直加点することで、実効挙動を合わせた。
 
 original 側のバグ候補:
 

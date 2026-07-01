@@ -22,6 +22,8 @@ func buildReactionCandidates(actions []action.Action, self player.PlayerViewer) 
 	if pass := firstActionOfType[*action.Pass](actions); pass != nil {
 		shanten, goals := service.AnalyzeShanten(h, service.AllowedExtraTiles(1))
 		unknown := tile.MustTileFromCode("?")
+		// Passing the call keeps the hand closed, so it can still use original
+		// Manue's reachMode="default" future-riichi scoring.
 		candidates = append(candidates, actionCandidate{
 			traceKey:         "none",
 			evaluationGroup:  0,
@@ -70,6 +72,9 @@ func buildCallReactionCandidates(
 	nextMelds := append(slices.Clone(baseMelds), callMeld)
 	turnShanten, turnGoals := service.AnalyzeShanten(turnHand, service.AllowedExtraTiles(1))
 
+	// Original Manue passes reachMode="default" to call candidates, but addYaku
+	// gives riichi 0 han when the goal has furos. Represent that effective
+	// scoring directly by leaving scoreAsRiichi false after chi/pon/daiminkan.
 	if _, ok := callMeld.(*meld.CalledKan); ok {
 		unknown := tile.MustTileFromCode("?")
 		return []actionCandidate{{
