@@ -37,6 +37,12 @@ func TestBuildSelfTurnCandidates_BuildsDiscardCandidate(t *testing.T) {
 	if got[0].riichi {
 		t.Errorf("riichi = true, want false")
 	}
+	if !got[0].scoreAsRiichi {
+		t.Errorf("scoreAsRiichi = false, want true for default future riichi scoring")
+	}
+	if got[0].pruneToTenpai {
+		t.Errorf("pruneToTenpai = true, want false for default mode")
+	}
 	if got[0].action != discard {
 		t.Errorf("action = %v, want original discard action", got[0].action)
 	}
@@ -160,6 +166,12 @@ func TestBuildSelfTurnCandidates_BuildsRiichiCandidate(t *testing.T) {
 	if gotRiichi.evaluationGroup != 0 {
 		t.Errorf("riichi evaluationGroup = %d, want 0", gotRiichi.evaluationGroup)
 	}
+	if !gotRiichi.scoreAsRiichi {
+		t.Errorf("riichi scoreAsRiichi = false, want true")
+	}
+	if !gotRiichi.pruneToTenpai {
+		t.Errorf("riichi pruneToTenpai = false, want true")
+	}
 	if gotRiichi.action != riichi {
 		t.Errorf("action = %v, want riichi action", gotRiichi.action)
 	}
@@ -230,6 +242,9 @@ func TestBuildSelfTurnCandidates_RiichiDeclaredScoresLegalActionsAsRiichi(t *tes
 		if !candidate.scoreAsRiichi {
 			t.Errorf("scoreAsRiichi = false for %q, want true", candidate.traceKey)
 		}
+		if !candidate.pruneToTenpai {
+			t.Errorf("pruneToTenpai = false for %q, want true", candidate.traceKey)
+		}
 		if _, ok := wantActions[candidate.action]; !ok {
 			t.Errorf("action = %v, want one of legal-action inputs", candidate.action)
 			continue
@@ -272,9 +287,21 @@ func TestBuildSelfTurnCandidates_IncludesRiichiAndDiscardCandidates(t *testing.T
 			if candidate.evaluationGroup != 0 {
 				t.Errorf("evaluationGroup for %s = %d, want 0", candidate.traceKey, candidate.evaluationGroup)
 			}
+			if !candidate.scoreAsRiichi {
+				t.Errorf("scoreAsRiichi for %s = false, want true", candidate.traceKey)
+			}
+			if !candidate.pruneToTenpai {
+				t.Errorf("pruneToTenpai for %s = false, want true", candidate.traceKey)
+			}
 		case "-1.5m":
 			if candidate.evaluationGroup != 1 {
 				t.Errorf("evaluationGroup for %s = %d, want 1", candidate.traceKey, candidate.evaluationGroup)
+			}
+			if candidate.scoreAsRiichi {
+				t.Errorf("scoreAsRiichi for %s = true, want false for reachMode=never", candidate.traceKey)
+			}
+			if candidate.pruneToTenpai {
+				t.Errorf("pruneToTenpai for %s = true, want false for reachMode=never", candidate.traceKey)
 			}
 		}
 	}
