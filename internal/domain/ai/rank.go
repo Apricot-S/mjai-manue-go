@@ -136,7 +136,7 @@ func winProbFromRelativeScore(
 	otherPosition int,
 ) float64 {
 	if winProbs != nil {
-		if prob, ok := winProbs[strconv.FormatFloat(relativeScore, 'f', 0, 64)]; ok {
+		if prob, ok := winProbs[strconv.FormatFloat(relativeScore, 'f', -1, 64)]; ok {
 			return prob
 		}
 	}
