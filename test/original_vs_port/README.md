@@ -14,6 +14,8 @@ Docker Compose configuration and related scripts for generating game logs. It ru
 - manue
   - The original mjai-manue (1 instance).
   - Connects to the server to play matches.
+  - The Docker image patches original `getHoraFactorsDist(actor)` so random
+    opponent wins assign self-draw probability to the winning actor.
 - akochan1 / akochan2 / akochan3
   - Existing mjai clients (3 instances) used as opponents.
   - Connect to the server to play matches.

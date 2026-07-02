@@ -35,6 +35,12 @@ RUN npm install -g coffeescript@1.12.7
 
 COPY --from=downloader /app /app
 
+# Patch only getHoraFactorsDist(actor). getScoreChangesDistOnHora(metric) has
+# the same expression, but there @player() is the winner and the expression is
+# already correct.
+RUN sed -i '/getHoraFactorsDist: (actor) ->/,/return new ProbDist(m)/ s/target == @player()/target == actor/' \
+    /app/mjai-manue/coffee/manue_ai.coffee
+
 USER node
 
 COPY ./run_manue.sh .
