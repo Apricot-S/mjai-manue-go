@@ -48,12 +48,16 @@ This makes the bot usable with inputs that contain the game events but omit serv
 
 Unlike the original project, this project embeds configuration files at build time. The installed binary can run on its own without depending on files in the repository checkout.
 
+### Bug Fixes
+
+- Fixed an incorrect shanten number calculation when a hand contains four identical tiles.
+- Fixed win-value estimation for candidate discards so a discarded red five is not counted as a red dora in the future winning hand.
+- Fixed random other-player win score-change estimation so the self-draw probability is assigned to the winning player, not always to this bot.
+
 ### Other Differences
 
 - Ported the AI logic from the original implementation while reimplementing the rest in Go.
 - Treats malformed or unexpected input more strictly than the original implementation.
-- Fixed an incorrect shanten number calculation when a hand contains four identical tiles.
-- Fixed win-value estimation for candidate discards so a discarded red five is not counted as a red dora in the future winning hand.
 - Logs more detailed game-state information using Mjai's board-state format.
 - Uses deterministic random numbers, but does not reproduce the original implementation's random sequence exactly.
 
