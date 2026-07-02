@@ -1,6 +1,6 @@
 # Original-vs-Port 差分調査レポート
 
-日付: 2026-07-01
+日付: 2026-07-02
 
 対象:
 
@@ -43,13 +43,20 @@ GOEXPERIMENT=jsonv2 go vet ./...
    - しかし compare ではほとんど変化がなく、残った 13% 程度の不一致の主因ではなさそう。
    - 最近接和了形集合を「現在手牌から必要牌を補って到達できる和了形集合」と定義するなら、手元にない牌を 2 枚引く対子も含める Go port 側のほうが自然。ここは original の過小列挙を直したバグ修正扱いとし、Go port の挙動を維持する。
 
-3. **Monte Carlo 乱数のライフサイクルが original と Go port で異なる。**
+3. **他家和了時の点棒変化分布で、original 側に target 確率の割り当てバグらしい挙動を確認した。**
+   - `zzz_before_fix_bug.txt` の mismatch ログを同一 action 同士で集計すると、`myHoraProb` は正負に割れる一方、`expPt` は 813 行中 812 行で Go port が高い。
+   - ブロック平均でも 74/74 ブロックで Go port の `expPt` が高く、候補固有の和了確率ではなく、候補共通の将来局結果分布が疑わしい。
+   - original の `getHoraFactorsDist(actor)` は、他家 `actor` の和了分布を作るとき、ツモ確率を `target == actor` ではなく `target == @player()` に割り当てている。
+   - その結果、他家ツモと「自分がそのその他家に放銃する」分岐の確率が入れ替わり、original は自分の期待点を過小評価しやすい。
+   - Go port は `targetID == actorID` をツモとして扱っており、麻雀ルール上はこちらが正しい。これは Go port の移植ミスではなく、original バグ修正由来の差分と見るのが妥当。
+
+4. **Monte Carlo 乱数のライフサイクルが original と Go port で異なる。**
    - original は `getHoraEstimation` のたびに `seedRandom("")` を作り直す。
    - Go port は `start_game` ごとに PCG を 1 つ作り、以後の意思決定で使い回す。
    - このため Go port の評価値は「同じ局面に直接到達した場合」と「東1局から順に到達した場合」で変わり得る。original は少なくとも和了推定単位では毎回同じ乱数列を使う。
    - これは移植ミス候補として高優先度。compare で CoffeeScript 版との一致率を見るなら、Go 側も original 互換の乱数ライフサイクルにする必要がある。
 
-4. **赤5を捨てる候補の将来和了価値で、Go port は original のバグらしい挙動を直している。**
+5. **赤5を捨てる候補の将来和了価値で、Go port は original のバグらしい挙動を直している。**
    - original は `calculateFan(goal, tehais, reachMode)` に、候補打牌前の手牌 `tehais` を渡す。
    - そのため赤5を捨てた候補でも、将来和了の赤ドラ評価にその赤5が残る可能性がある。
    - Go port は `afterDiscardHand` から評価用手牌を作り、捨てた赤5を将来価値から除外している。
@@ -115,7 +122,56 @@ Go port:
 - 最近接和了形集合の定義としては、現在手牌から必要牌を補って到達できる和了形を含めるのが自然であり、手元にない牌を 2 枚引く対子も除外しないほうがよい。
 - Go port の挙動を維持し、original との差分は original の過小列挙を補ったバグ修正扱いとする。
 
-### 2. 乱数の差分
+### 2. `zzz_before_fix_bug.txt` の評価値差分集計
+
+`zzz_before_fix_bug.txt` の追加観察:
+
+- 同一 action が original / Go port の両方に出ている評価行 813 件を集計した。
+- `myHoraProb` 差分は平均 `+0.0015`、正 318 件 / 負 349 件 / 同値 146 件で、常に Go port が高いわけではない。
+- 一方、`expPt` 差分は平均 `+521`、中央値 `+563`、正 812 件 / 負 1 件だった。
+- mismatch ブロック単位でも、共通候補を持つ 74 ブロックすべてで Go port の平均 `expPt` が高かった。
+
+このため、残差分の主因候補は `myHoraProb` 単体ではなく、将来局結果の点棒変化分布、特に候補共通で混ざる「他家和了」の扱いである。
+
+### 2.1 他家和了時の target 確率割り当て差分
+
+original:
+
+- `reference/repositories/mjai-manue-original/coffee/manue_ai.coffee:432` 付近の `getRandomHoraScoreChangesDist(actor)` が、他家 `actor` のランダム和了時の点棒変化分布を作る。
+- `reference/repositories/mjai-manue-original/coffee/manue_ai.coffee:444` 付近の `getHoraFactorsDist(actor)` で、各 `target` に確率を割り当てる。
+- その確率は `prob = (if target == @player() then tsumoHoraProb else (1 - tsumoHoraProb) / 3)` になっている。
+- これは自分の和了評価 `getScoreChangesDistOnHora` では正しいが、他家 `actor` の和了評価では不自然。ツモ確率を割り当てるべき target は `@player()` ではなく `actor` である。
+
+影響:
+
+- `actor != @player()` の場合、original は「他家のツモ」と「自分がそのその他家へ放銃」の確率を入れ替える。
+- 自分が支払う額は、他家ツモなら通常 `1/4` または `1/2`、自分の放銃なら `1` である。
+- そのため original は他家和了時の自分の失点を過大に見積もり、`expPt` と `avgRank` を悪く出しやすい。
+- `zzz_before_fix_bug.txt` で Go port の `expPt` がほぼ常に高いこと、しかし `myHoraProb` は一方向に偏っていないことと整合する。
+
+Go port:
+
+- `internal/domain/ai/win_score.go:51` の `winScoreFactorDist(actorID, dealerID, selfDrawProb)` は、`targetID == actorID` をツモとして扱う。
+- `targetID != actorID` はロン対象として一様に割り当てる。
+- 麻雀ルール上はこちらが自然であり、Go port 側を original に合わせて壊すべきではない。
+
+方針:
+
+- この差分は original 互換性だけを見る compare では mismatch の原因になる。
+- ただし AI の評価としては Go port 側が正しいため、バグ修正扱いの既知差分として分類するのがよい。
+- original 完全互換モードを別途作る場合だけ、`getHoraFactorsDist` の target 割り当てバグを再現する互換オプションを検討する。
+
+`gen_log` 側の original patch 後の確認:
+
+- `test/original_vs_port/gen_log/manue/Dockerfile` で、Docker image 内の original `getHoraFactorsDist(actor)` だけを `target == actor` に修正した。
+- 同じ式を持つ `getScoreChangesDistOnHora(metric)` は、自分の和了専用で `@player()` が和了者なので修正していない。
+- `zzz_after_fix_bug.txt` の summary は `files=1 decisions=223 matches=159 implicit_passes=35 mismatches=29 errors=0`。
+- 同一 action が original / Go port の両方に出ている評価行 263 件では、`expPt` 差分は平均 `+11`、中央値 `+1`、正 133 件 / 負 113 件 / 同値 17 件になった。
+- ブロック平均でも、共通候補を持つ 26 ブロック中、正 14 件 / 負 12 件まで戻った。
+- したがって、patch 前に見えていた「Go port の `expPt` がほぼ常に高い」一方向オフセットは、この target 確率差分で説明できる可能性が高い。
+- 残りの 29 mismatch は、打牌差 25 件、鳴き vs pass 4 件、赤5絡み 1 件で、`expPt` の系統的な上振れとは別要因として扱う。
+
+### 3. 乱数の差分
 
 original:
 
@@ -136,7 +192,7 @@ Go port:
 - Go port は候補群をまとめて評価するため候補間の試行共有はあるが、ゲーム内の過去意思決定で RNG が進む。
 - 1000 試行の Monte Carlo 評価なので、近い候補では乱数列差だけで `averageRank` / `expectedPoints` の順位が入れ替わる。
 
-### 3. 赤5評価の差分
+### 4. 赤5評価の差分
 
 original:
 
@@ -157,7 +213,7 @@ Go port:
 - 逆に、赤5を残す候補と赤5を打つ候補の順位が original と Go port で入れ替わる可能性がある。
 - これは shallow copy というより、original の評価入力が候補打牌前の手牌のままになっている設計/実装バグ候補。
 
-### 4. compare 側の水増し可能性
+### 5. compare 側の水増し可能性
 
 compare は action の意味を正規化して比較しているため、`log` や `consumed` の順序差は主因ではなさそう。
 
@@ -171,7 +227,7 @@ compare は action の意味を正規化して比較しているため、`log` �
 - ユーザーの「打牌が異なる」が、牌そのものの差なのか `tsumogiri` 差なのかは、現在の summary だけでは分からない。
 - 20% の内訳確認には、mismatch を `type差` / `pai差` / `tsumogiriのみ差` / `red 5絡み` / `鳴き差` に分類する後処理が必要。
 
-### 5. original の shallow copy / 破壊的変更候補
+### 6. original の shallow copy / 破壊的変更候補
 
 確認した範囲では、主要な打牌判断経路で shallow copy が即座に大量差分を生む証拠は薄い。
 
@@ -194,22 +250,27 @@ compare は action の意味を正規化して比較しているため、`log` �
    - `reach` 直後の打牌差。
    - `chi` / `pon` 後の打牌差。
 
-2. Go port の実験ブランチで RNG を「評価ごとに reset」して compare する。
+2. 他家和了 target 確率差分を compare で分類できるようにする。
+   - Go port の正しい分布を維持する場合、original バグ修正由来の既知差分として扱う。
+   - 完全互換検証をしたい場合だけ、一時的な互換モードで `targetID == selfID` をツモ扱いにする A/B 実験を行う。
+
+3. Go port の実験ブランチで RNG を「評価ごとに reset」して compare する。
    - まず PCG のまま `evaluateCandidates` または `winEstimatesFromState` 単位で reset。
    - これで mismatch が大きく減るなら、主因は RNG ライフサイクル。
    - まだ多い場合は `seed-random` 互換 RNG か、original のシャッフル順そのものを移植する必要がある。
 
-3. 赤5評価を original 互換に戻した実験版で compare する。
+4. 赤5評価を original 互換に戻した実験版で compare する。
    - `afterDiscardHand` ではなく候補打牌前の手牌で赤ドラ評価する互換モードを一時的に試す。
    - 赤5絡み mismatch が減るなら、差分は original バグ修正由来。
 
-4. 方針を決める。
-   - 「original 完全互換」を重視するなら、RNG と赤5評価バグも互換に寄せる。
-   - 「Go port として妥当な AI」を重視するなら、赤5評価修正は維持し、compare では許容差分として分類・除外できるようにする。
+5. 方針を決める。
+   - 「original 完全互換」を重視するなら、他家和了 target 確率、RNG、赤5評価バグも互換に寄せる。
+   - 「Go port として妥当な AI」を重視するなら、他家和了 target 確率と赤5評価の修正は維持し、compare では許容差分として分類・除外できるようにする。
 
 ## 推奨する次アクション
 
 - compare に `--classify-mismatches` 相当の集計を追加する。
+- 他家和了 target 確率の互換モードを A/B 実験し、`expPt` の一方向オフセットが消えるか確認する。
 - 乱数 reset の A/B 実験を小さい差分で行う。
 - 赤5評価の互換モードを実験し、赤5絡み mismatch の減少量を見る。
 - その結果をもとに `.agents/design.md` の「同一入力 -> 同一出力」の扱いを、bug-compatible にするのか、known divergence を許容するのか明記する。
