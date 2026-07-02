@@ -127,6 +127,25 @@ func TestState_LegalActions_IncludesRiichi(t *testing.T) {
 	}
 }
 
+func TestState_LegalActions_IncludesRiichiWithMinimumPoints(t *testing.T) {
+	hands := newValidHands()
+	hands[0] = riichiReadyHandForTest()
+	s := mustNewRoundStateForTest(t, hands)
+	actor := seat.MustSeat(0)
+	s.scores[actor.Index()] = minScoreForRiichi
+	if err := s.Apply(event.NewDraw(actor, tile.MustTileFromCode("S"))); err != nil {
+		t.Fatalf("Apply(Draw) failed: %v", err)
+	}
+
+	got, err := s.LegalActions(actor)
+	if err != nil {
+		t.Fatalf("LegalActions() failed: %v", err)
+	}
+	if !containsRiichi(got, actor) {
+		t.Error("LegalActions() does not contain Riichi, want Riichi with exactly 1000 points")
+	}
+}
+
 func TestState_LegalActions_ExcludesRiichi(t *testing.T) {
 	tests := []struct {
 		name  string
@@ -156,6 +175,21 @@ func TestState_LegalActions_ExcludesRiichi(t *testing.T) {
 					t.Fatalf("Apply(Draw) failed: %v", err)
 				}
 				s.numLeftTiles = common.NumPlayers - 1
+				return s, actor
+			},
+		},
+		{
+			name: "not enough points",
+			setup: func(t *testing.T) (*State, seat.Seat) {
+				t.Helper()
+				hands := newValidHands()
+				hands[0] = riichiReadyHandForTest()
+				s := mustNewRoundStateForTest(t, hands)
+				actor := seat.MustSeat(0)
+				s.scores[actor.Index()] = minScoreForRiichi - 1
+				if err := s.Apply(event.NewDraw(actor, tile.MustTileFromCode("S"))); err != nil {
+					t.Fatalf("Apply(Draw) failed: %v", err)
+				}
 				return s, actor
 			},
 		},
