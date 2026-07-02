@@ -16,6 +16,8 @@ Docker Compose configuration and related scripts for generating game logs. It ru
   - Connects to the server to play matches.
   - The Docker image patches original `getHoraFactorsDist(actor)` so random
     opponent wins assign self-draw probability to the winning actor.
+  - It also raises original win-estimation Monte Carlo trials from `1000` to
+    `10000` to reduce comparison noise.
 - akochan1 / akochan2 / akochan3
   - Existing mjai clients (3 instances) used as opponents.
   - Connect to the server to play matches.
