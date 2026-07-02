@@ -168,6 +168,17 @@ func TestWinProbFromRelativeScore_UsesStatsWhenAvailable(t *testing.T) {
 	}
 }
 
+func TestWinProbFromRelativeScore_DoesNotRoundFractionalScoreToStatsKey(t *testing.T) {
+	winProbs := relativeWinProbTable{
+		"1000": 0.75,
+	}
+
+	got := winProbFromRelativeScore(999.6, winProbs, 1, 0)
+	if got != 1 {
+		t.Errorf("winProbFromRelativeScore() = %v, want 1", got)
+	}
+}
+
 func TestWinProbFromRelativeScore_FallsBackToStartingDealerOrder(t *testing.T) {
 	tests := []struct {
 		name          string

@@ -99,7 +99,7 @@ func (fc *fileComparer) processLine(lineNo int, raw []byte, agent ai.Agent) erro
 	}
 	if originalComparable && original.Actor != nil && *original.Actor == fc.self {
 		fc.compareOriginalSelfAction(lineNo, original)
-	} else if err := fc.flushPendingBeforeNonSelf(lineNo); err != nil {
+	} else if err := fc.flushPendingBeforeNonSelf(lineNo, original, originalComparable); err != nil {
 		return err
 	}
 
@@ -197,11 +197,20 @@ func (fc *fileComparer) compareOriginalSelfAction(lineNo int, original normalize
 	fc.recordMismatch(lineNo, original, &pending.action, "action mismatch")
 }
 
-func (fc *fileComparer) flushPendingBeforeNonSelf(lineNo int) error {
+func (fc *fileComparer) flushPendingBeforeNonSelf(lineNo int, original normalizedAction, originalComparable bool) error {
 	if fc.pending == nil {
 		return nil
 	}
 	pending := fc.pending
+
+	if originalComparable && shouldKeepPendingForLaterSelfAction(pending.action, original) {
+		return nil
+	}
+	if originalComparable && isPreemptedByHigherPriorityAction(pending.action, original) {
+		fc.pending = nil
+		return nil
+	}
+
 	fc.pending = nil
 	if pending.action.Type == "none" {
 		fc.fileSummary.decisions++
@@ -214,6 +223,35 @@ func (fc *fileComparer) flushPendingBeforeNonSelf(lineNo int) error {
 	fc.fileSummary.decisions++
 	fc.recordMismatch(lineNo, normalizedAction{}, &pending.action, "Go port returned an action, but original did not take it")
 	return nil
+}
+
+func shouldKeepPendingForLaterSelfAction(pending, original normalizedAction) bool {
+	return pending.Type == "hora" && original.Type == "hora" && sameActionOpportunity(pending, original)
+}
+
+func isPreemptedByHigherPriorityAction(pending, original normalizedAction) bool {
+	if !sameActionOpportunity(pending, original) {
+		return false
+	}
+
+	switch pending.Type {
+	case "chi":
+		return original.Type == "pon" || original.Type == "daiminkan" || original.Type == "hora"
+	case "pon", "daiminkan":
+		return original.Type == "hora"
+	default:
+		return false
+	}
+}
+
+func sameActionOpportunity(a, b normalizedAction) bool {
+	if a.Target == nil || b.Target == nil || !intPtrEqual(a.Target, b.Target) {
+		return false
+	}
+	if a.Pai != "" && b.Pai != "" && a.Pai != b.Pai {
+		return false
+	}
+	return true
 }
 
 func (fc *fileComparer) flushPendingAtEOF() error {

@@ -27,7 +27,7 @@ func TestAnalyzeShanten(t *testing.T) {
 			wantGoalsCount: 4,
 		},
 		{
-			name:           "empty : An empty hand is one step away from being a pair wait -> Shanten number: 1",
+			name:           "empty hand is one step away from every pair wait",
 			codes:          nil,
 			wantShanten:    1,
 			wantGoalsCount: 34,

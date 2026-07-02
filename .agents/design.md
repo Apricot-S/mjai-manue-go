@@ -292,6 +292,7 @@ type Decision struct {
 - チー候補は喰い替え制約を反映する。チー後に残る手牌がすべて喰い替え牌になる場合、そのチーは直後に合法打牌を選べないため `LegalActions` に含めない。
 - 将来的に tools で「4人全員の合法手」を観測したい場合、`LegalActions(playerID)` を 0..3 で呼び出せばよい（必要なら `LegalActionsAll()` を追加する）。
 - `Pass`（見送り）は **副露・和了が可能な局面に限って** `LegalActions` に含める（常に含めない）。
+- 立直候補は、通常の門前聴牌・次巡あり等の条件に加えて、宣言時点の持ち点が **1000 点以上** の場合だけ `LegalActions` に含める。
 
 #### どこで legal actions を計算するか（DDD的な置き場）
 
@@ -387,6 +388,7 @@ tools 実装では、外部ファイル形式・大量ログ走査・進捗出�
 - 比較単位は original 側プレイヤー（デフォルト `Manue014`）の意思決定 action とし、`dahai` / `reach` / `hora` / `pon` / `chi` / 各種 kan / `kyushukyuhai` / 明示見送りを対象にする。他家 action は状態更新に使うが一致判定対象にはしない。
 - Go port は外部プロセスとして起動せず、`configs`、`ManueAgent`、`application.Bot`、mjai inbound/outbound codec を直接組み立てる。牌譜 I/O、glob、比較レポートの都合は `test/original_vs_port/compare` に閉じ込め、`domain` へ持ち込まない。
 - 比較は JSON 文字列の完全一致ではなく、`type` / `actor` / `target` / `pai` / `consumed` / `tsumogiri` / `reason` など action の意味を表す field を正規化して行う。副露 action の `consumed` は action の意味として順序非依存に扱う。`log` や stderr trace は一致判定から外し、差分レポートの説明情報としてのみ使う。
+- Go port が同一捨て牌に対して `chi` / `pon` / `daiminkan` / `hora` を返しても、他家の高優先 action が牌譜上で実現した場合は、その pending action を偽陽性として mismatch にしない。`chi` は他家 `pon` / `daiminkan` / `hora`、`pon` / `daiminkan` は他家 `hora` に抑止される。ダブロン順序では、他家 `hora` が先に出た後の self `hora` と比較できるよう self の pending `hora` を保持する。
 - exit code は、差分なし `0`、差分あり `1`、入力または処理エラー `2` とする。最終 summary には files / decisions / matches / implicit_passes / mismatches / errors を出す。`matches` は original self action と Go port action の直接一致、`implicit_passes` は original log に明示 pass が出ない局面で Go port の `none` を推定一致として数えたものとして分ける。
 
 ### 12.4 riichienv 自己対戦テスト
