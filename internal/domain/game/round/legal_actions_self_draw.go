@@ -22,6 +22,8 @@ const maxNumActionsOnSelfDraw = 13 + 1 + 1 + 1
 // Example: a 14-tile hand can contain three different four-of-a-kind groups.
 const maxKanCandidates = 3
 
+const minScoreForRiichi = 1000
+
 func (s *State) legalActionsOnSelfDraw(playerSeat seat.Seat, p *player.VisiblePlayer) ([]action.Action, error) {
 	if !p.CanDiscard() {
 		return nil, fmt.Errorf("cannot list discard actions: player %d cannot discard", playerSeat.Index())
@@ -100,7 +102,7 @@ func (s *State) legalActionsOnSelfDraw(playerSeat seat.Seat, p *player.VisiblePl
 		}
 	}
 
-	if s.canRiichi(p) {
+	if s.canRiichi(playerSeat, p) {
 		actions = append(actions, action.NewRiichi(playerSeat))
 	}
 
@@ -271,8 +273,11 @@ func (s *State) legalPromotedKanActions(playerSeat seat.Seat, p *player.VisibleP
 	return actions, nil
 }
 
-func (s *State) canRiichi(p *player.VisiblePlayer) bool {
+func (s *State) canRiichi(playerSeat seat.Seat, p *player.VisiblePlayer) bool {
 	if p.RiichiState() != player.NotRiichi {
+		return false
+	}
+	if s.scores[playerSeat.Index()] < minScoreForRiichi {
 		return false
 	}
 	if p.DrawnTile() == nil {
