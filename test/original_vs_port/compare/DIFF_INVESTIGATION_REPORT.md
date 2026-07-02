@@ -161,6 +161,16 @@ Go port:
 - ただし AI の評価としては Go port 側が正しいため、バグ修正扱いの既知差分として分類するのがよい。
 - original 完全互換モードを別途作る場合だけ、`getHoraFactorsDist` の target 割り当てバグを再現する互換オプションを検討する。
 
+`gen_log` 側の original patch 後の確認:
+
+- `test/original_vs_port/gen_log/manue/Dockerfile` で、Docker image 内の original `getHoraFactorsDist(actor)` だけを `target == actor` に修正した。
+- 同じ式を持つ `getScoreChangesDistOnHora(metric)` は、自分の和了専用で `@player()` が和了者なので修正していない。
+- `zzz_after_fix_bug.txt` の summary は `files=1 decisions=223 matches=159 implicit_passes=35 mismatches=29 errors=0`。
+- 同一 action が original / Go port の両方に出ている評価行 263 件では、`expPt` 差分は平均 `+11`、中央値 `+1`、正 133 件 / 負 113 件 / 同値 17 件になった。
+- ブロック平均でも、共通候補を持つ 26 ブロック中、正 14 件 / 負 12 件まで戻った。
+- したがって、patch 前に見えていた「Go port の `expPt` がほぼ常に高い」一方向オフセットは、この target 確率差分で説明できる可能性が高い。
+- 残りの 29 mismatch は、打牌差 25 件、鳴き vs pass 4 件、赤5絡み 1 件で、`expPt` の系統的な上振れとは別要因として扱う。
+
 ### 3. 乱数の差分
 
 original:
