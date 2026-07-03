@@ -41,6 +41,11 @@ COPY --from=downloader /app /app
 RUN sed -i '/getHoraFactorsDist: (actor) ->/,/return new ProbDist(m)/ s/target == @player()/target == actor/' \
     /app/mjai-manue/coffee/manue_ai.coffee
 
+# Uncomment this when reducing Monte Carlo noise for original-vs-port
+# investigation is more important than runtime.
+# RUN sed -i 's/numTries = 1000/numTries = 10000/' \
+#     /app/mjai-manue/coffee/manue_ai.coffee
+
 USER node
 
 COPY ./run_manue.sh .

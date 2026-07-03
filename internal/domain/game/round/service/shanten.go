@@ -163,6 +163,13 @@ func analyzeShantenInternal(
 			pairDistance := max(targetVector[i]+2-currentVector[i], 0)
 			newShanten := currentShanten + pairDistance
 
+			// Unlike the original CoffeeScript implementation, keep pair goals
+			// with pairDistance == 2. A nearest winning-hand set is defined by
+			// the number of missing tiles from the current hand to each complete
+			// hand, so a pair made by drawing two currently absent tiles is still
+			// a valid goal when its shanten number is within the search bound.
+			// This intentionally creates more goals than the original and can
+			// affect Monte Carlo win estimates between the original and the port.
 			if newShanten <= upperbound+allowedExtraTiles {
 				goalVector := *targetVector
 				goalVector[i] += 2
