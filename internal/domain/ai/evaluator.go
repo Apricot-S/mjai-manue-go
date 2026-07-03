@@ -11,7 +11,7 @@ import (
 	"github.com/Apricot-S/mjai-manue-go/internal/domain/game/tile"
 )
 
-const defaultWinEstimateTrials = 10000
+const defaultWinEstimateTrials = 1000
 
 type candidateEvaluationContext struct {
 	stats                         ManueStats

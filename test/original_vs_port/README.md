@@ -16,11 +16,17 @@ Docker Compose configuration and related scripts for generating game logs. It ru
   - Connects to the server to play matches.
   - The Docker image patches original `getHoraFactorsDist(actor)` so random
     opponent wins assign self-draw probability to the winning actor.
-  - It also raises original win-estimation Monte Carlo trials from `1000` to
-    `10000` to reduce comparison noise.
 - akochan1 / akochan2 / akochan3
   - Existing mjai clients (3 instances) used as opponents.
   - Connect to the server to play matches.
+
+> [!TIP]
+> To reduce decision differences caused by Monte Carlo noise, temporarily
+> increase the win-estimation trial count in both implementations before
+> regenerating logs and running `compare`. In the original, enable and adjust
+> the commented `numTries` patch in `gen_log/manue/Dockerfile`; in the Go port,
+> adjust `defaultWinEstimateTrials`. Raising the count to `10000` was enough to
+> substantially reduce noise in one investigation.
 
 ### Log Output
 
