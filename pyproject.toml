@@ -4,10 +4,10 @@ dev = [
     { include-group = "typing" },
 ]
 lint = [
-    "ruff>=0.15.17,<0.16",
+    "ruff>=0.15.20,<0.16",
 ]
 typing = [
-    "ty>=0.0.50",
+    "ty>=0.0.56",
 ]
 
 [tool.uv]
