@@ -51,6 +51,7 @@ Unlike the original project, this project embeds configuration files at build ti
 ### Bug Fixes
 
 - Fixed an incorrect shanten number calculation when a hand contains four identical tiles.
+- In shanten calculation, kept nearest winning-hand goals that require drawing two currently absent tiles for a pair, which the original excludes.
 - Fixed win-value estimation for candidate discards so a discarded red five is not counted as a red dora in the future winning hand.
 - Fixed random other-player win score-change estimation so the self-draw probability is assigned to the winning player, not always to this bot.
 

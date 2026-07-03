@@ -20,6 +20,14 @@ Docker Compose configuration and related scripts for generating game logs. It ru
   - Existing mjai clients (3 instances) used as opponents.
   - Connect to the server to play matches.
 
+> [!TIP]
+> To reduce decision differences caused by Monte Carlo noise, temporarily
+> increase the win-estimation trial count in both implementations before
+> regenerating logs and running `compare`. In the original, enable and adjust
+> the commented `numTries` patch in `gen_log/manue/Dockerfile`; in the Go port,
+> adjust `defaultWinEstimateTrials`. Raising the count to `10000` was enough to
+> substantially reduce noise in one investigation.
+
 ### Log Output
 
 - After each game, the server outputs a game log in mjson (JSON Lines) format.
