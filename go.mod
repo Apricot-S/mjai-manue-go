@@ -2,7 +2,7 @@ module github.com/Apricot-S/mjai-manue-go
 
 go 1.26.1
 
-require github.com/schollz/progressbar/v3 v3.19.0
+require github.com/schollz/progressbar/v3 v3.19.1
 
 require (
 	github.com/mitchellh/colorstring v0.0.0-20190213212951-d06e56a500db // indirect
