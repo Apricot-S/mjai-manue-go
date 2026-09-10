@@ -55,7 +55,7 @@
 9. **CLI 接続と検証**
    - `cmd/mjai-manue` から stats と danger tree を load し、deps validation 済みの `ManueAgent` を生成する。
    - action golden と characterization test を追加する。
-   - PowerShell で `$env:GOEXPERIMENT='jsonv2'; go test ./...` を実行する。
+   - PowerShell で `go test ./...` を実行する。
 
 ## 3. テスト方針
 

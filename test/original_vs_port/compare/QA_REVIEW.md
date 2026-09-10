@@ -85,7 +85,7 @@ Add tests for:
 Command:
 
 ```sh
-GOEXPERIMENT=jsonv2 go test ./test/original_vs_port/compare
+go test ./test/original_vs_port/compare
 ```
 
 Result:
@@ -125,7 +125,7 @@ No additional blocking findings were found in this pass.
 Command:
 
 ```sh
-GOEXPERIMENT=jsonv2 go test ./test/original_vs_port/compare
+go test ./test/original_vs_port/compare
 ```
 
 Result:

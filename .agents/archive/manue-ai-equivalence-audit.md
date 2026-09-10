@@ -13,7 +13,7 @@
 - Go 一次対象: `internal/domain/ai/*.go` の production file 全体
 - Go 補助対象: `internal/domain/game/round` の `LegalActions` / viewer、`internal/domain/game/round/service` の向聴・点数・役判定、`cmd/mjai-manue` の seed/config 接続
 - 補助参照: `reference/repositories/mjai-manue-go-main/`。判断根拠ではなく、過去移植の差分理解に限る。
-- 検証コマンド: `$env:GOEXPERIMENT='jsonv2'; go test ./...`
+- 検証コマンド: `go test ./...`
 - 検証結果: pass
 
 ## 2. CoffeeScript 原仕様の分解

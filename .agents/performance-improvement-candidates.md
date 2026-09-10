@@ -319,7 +319,7 @@ Status: 改善済み。`sanshokuDoujun` / `ikkiTsuukan` / `sanshokuDoukou` は n
 - 既存テスト:
 
 ```powershell
-$env:GOEXPERIMENT='jsonv2'; go test ./...
+go test ./...
 ```
 
 - 向聴計算の性能比較:

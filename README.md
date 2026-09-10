@@ -66,8 +66,7 @@ Unlike the original project, this project embeds configuration files at build ti
 
 This project (including all tools under [tools/](tools/)) requires:
 
-- [Go 1.26 or later](https://go.dev/dl/)
-- Environment variable `GOEXPERIMENT=jsonv2` enabled when building, installing or running with `go run`
+- [Go 1.27 or later](https://go.dev/dl/)
 
 ## Installation
 
