@@ -775,22 +775,16 @@ func TestCanAchieveGoalWithTrialTiles(t *testing.T) {
 func TestTrialWinPts(t *testing.T) {
 	goals := []winEstimateGoal{
 		{
-			Goal: service.Goal{
-				RequiredVector: hand.TileCounts34{0: 1},
-			},
-			points: 1000,
+			RequiredVector: hand.TileCounts34{0: 1},
+			points:         1000,
 		},
 		{
-			Goal: service.Goal{
-				RequiredVector: hand.TileCounts34{0: 1, 4: 1},
-			},
-			points: 2000,
+			RequiredVector: hand.TileCounts34{0: 1, 4: 1},
+			points:         2000,
 		},
 		{
-			Goal: service.Goal{
-				RequiredVector: hand.TileCounts34{27: 1},
-			},
-			points: 8000,
+			RequiredVector: hand.TileCounts34{27: 1},
+			points:         8000,
 		},
 	}
 
@@ -825,10 +819,8 @@ func TestTrialWinPts(t *testing.T) {
 func TestTrialWinPtsRejectsNonPositivePoints(t *testing.T) {
 	_, _, err := trialWinPts([]winEstimateGoal{
 		{
-			Goal: service.Goal{
-				RequiredVector: hand.TileCounts34{0: 1},
-			},
-			points: 0,
+			RequiredVector: hand.TileCounts34{0: 1},
+			points:         0,
 		},
 	}, trialTileCounts([]tile.Tile{tile.MustTileFromCode("1m")}))
 	if err == nil {
@@ -845,24 +837,18 @@ func TestCandidateTrialWinPts(t *testing.T) {
 	goalsByKey := map[string][]winEstimateGoal{
 		"-1.1m": {
 			{
-				Goal: service.Goal{
-					RequiredVector: hand.TileCounts34{0: 1},
-				},
-				points: 1000,
+				RequiredVector: hand.TileCounts34{0: 1},
+				points:         1000,
 			},
 			{
-				Goal: service.Goal{
-					RequiredVector: hand.TileCounts34{0: 1, 4: 1},
-				},
-				points: 3900,
+				RequiredVector: hand.TileCounts34{0: 1, 4: 1},
+				points:         3900,
 			},
 		},
 		"-1.2m": {
 			{
-				Goal: service.Goal{
-					RequiredVector: hand.TileCounts34{27: 1},
-				},
-				points: 8000,
+				RequiredVector: hand.TileCounts34{27: 1},
+				points:         8000,
 			},
 		},
 		"0.3m": {},
@@ -901,10 +887,8 @@ func TestWinEstimatesFromShuffledWall(t *testing.T) {
 	goalsByKey := map[string][]winEstimateGoal{
 		"-1.1m": {
 			{
-				Goal: service.Goal{
-					RequiredVector: hand.TileCounts34{0: 1, 4: 1},
-				},
-				points: 3900,
+				RequiredVector: hand.TileCounts34{0: 1, 4: 1},
+				points:         3900,
 			},
 		},
 	}
@@ -967,10 +951,8 @@ func TestWinEstimatesFromState(t *testing.T) {
 	goalsByKey := map[string][]winEstimateGoal{
 		"-1.1m": {
 			{
-				Goal: service.Goal{
-					RequiredVector: hand.TileCounts34{0: 1},
-				},
-				points: 1000,
+				RequiredVector: hand.TileCounts34{0: 1},
+				points:         1000,
 			},
 		},
 	}

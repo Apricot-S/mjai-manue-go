@@ -1,6 +1,6 @@
 module github.com/Apricot-S/mjai-manue-go
 
-go 1.26.1
+go 1.27.1
 
 require github.com/schollz/progressbar/v3 v3.19.1
 

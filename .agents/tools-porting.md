@@ -122,4 +122,4 @@ AI 側では `ai.DangerTreeNode` として読み、`feature_name == null` を le
 - `go run ./tools/<name>` が README の usage と一致する。
 - stdout は生成物または表示結果専用、進捗・診断は stderr。
 - 生成 JSON は `encoding/json/v2` で現行 `configs` 型へ unmarshal できる。
-- Go コードを追加した差分では `go fix ./...`、`go vet ./...`、必要に応じて `GOEXPERIMENT=jsonv2` 付き `go test ./...` を実行する。
+- Go コードを追加した差分では `go fix ./...`、`go vet ./...`、`go test ./...` を実行する。

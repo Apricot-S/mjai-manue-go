@@ -1,4 +1,4 @@
-FROM mcr.microsoft.com/devcontainers/go:2-1.26-trixie
+FROM mcr.microsoft.com/devcontainers/go:2-1.27-trixie
 
 COPY --from=ghcr.io/astral-sh/uv:0.11 /uv /uvx /bin/
 

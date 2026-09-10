@@ -359,7 +359,7 @@ tools 実装では、外部ファイル形式・大量ログ走査・進捗出�
 
 - `domain` の純粋ロジック（牌/向聴/役/点数等）はテーブル駆動で単体テストする。
 - ランダムが絡む場合はデフォルト seed `0`、または `--seed` と同等の seed 固定で決定的にする。
-- `encoding/json/v2` を使うテスト（例: `adapter/mjai/inbound` や `configs`）を実行する際は、実験機能のため `GOEXPERIMENT=jsonv2` を有効化する。
+- `encoding/json/v2` を使うテスト（例: `adapter/mjai/inbound` や `configs`）も、通常の `go test ./...` で実行する。
 
 ### 12.2 ゴールデンテスト（プロトコル入出力）
 
@@ -443,7 +443,7 @@ tools 実装では、外部ファイル形式・大量ログ走査・進捗出�
 
 7. **ドキュメントと検証（完了）**
    - 各 `tools/*/README.md` を実装済み CLI のフラグ・入出力・生成物に合わせて更新する。
-   - Go コード変更時は `go fix ./...`、`go vet ./...`、必要に応じて `GOEXPERIMENT=jsonv2` 付き `go test ./...` を実行する。
+   - Go コード変更時は `go fix ./...`、`go vet ./...`、`go test ./...` を実行する。
 
 8. **Original-vs-Port Testing Framework**
    - `test/original_vs_port/compare` に、CoffeeScript 版 original の参加牌譜を現行 Go port でリプレイして action 差分を調査する開発者向け CLI を作成する。

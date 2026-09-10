@@ -1,13 +1,11 @@
 # syntax=docker/dockerfile:1
 
-ARG GO_VERSION=1.26
+ARG GO_VERSION=1.27
 ARG OS_VERSION=trixie
 
 FROM golang:${GO_VERSION}-${OS_VERSION} AS builder
 
 WORKDIR /src
-
-ENV GOEXPERIMENT=jsonv2
 
 RUN --mount=type=cache,target=/go/pkg/mod \
     --mount=type=bind,source=go.sum,target=go.sum \

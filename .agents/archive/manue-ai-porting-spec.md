@@ -172,7 +172,7 @@ wire JSON の `log` field と stderr trace は混ぜない。action golden test 
 - Agent 判断は private field を直接壊さず、mjai JSON Lines から `round.State` を構築して action を比較する。
 - runtime golden は action のみ比較する。trace/log は別 fixture にする。
 - Characterization は `.agents/manue-ai-original-spec.md` のケース候補を優先する。
-- 最終確認は PowerShell で `$env:GOEXPERIMENT='jsonv2'; go test ./...` を実行する。
+- 最終確認は PowerShell で `go test ./...` を実行する。
 
 ### 10.1 Characterization の移植先
 
