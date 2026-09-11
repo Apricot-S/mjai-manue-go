@@ -380,6 +380,98 @@ func TestState_LegalActions_OnOtherDiscardExcludesCalledKanOnFifthKan(t *testing
 	}
 }
 
+func TestState_LegalActions_AfterFourthKanExcludesCallsOnFourKanAbortiveDraw(t *testing.T) {
+	target := seat.MustSeat(0)
+	actor := seat.MustSeat(1)
+	caller, err := player.NewVisiblePlayer(maxOtherDiscardActionsHandForLegalActionsTest())
+	if err != nil {
+		t.Fatalf("player.NewVisiblePlayer() failed: %v", err)
+	}
+	players := [common.NumPlayers]player.Player{
+		playerWithKansForFourKanTest(t, fourKanTestHand(), []string{"E"}, "4m"),
+		caller,
+		playerWithKansForFourKanTest(t, fourKanTestHand(), []string{"E"}, "9p"),
+		playerWithKansForFourKanTest(t, fourKanTestHand(), []string{"E", "S"}, "9p"),
+	}
+	s := NewStateForTest(
+		wind.East,
+		1,
+		0,
+		0,
+		[common.NumPlayers]int{25000, 25000, 25000, 25000},
+		target,
+		target,
+		tile.Tiles{tile.MustTileFromCode("1m")},
+		10,
+		players,
+	)
+	s.numKans = maxNumKan
+	s.lastActor = &target
+
+	got, err := s.LegalActions(actor)
+	if err != nil {
+		t.Fatalf("LegalActions() failed: %v", err)
+	}
+	if !containsWin(got, actor, target, "4m") {
+		t.Error("LegalActions() does not contain Ron after the fourth kan by multiple players")
+	}
+	if !containsPass(got, actor) {
+		t.Error("LegalActions() does not contain Pass when Ron is available")
+	}
+	if containsChii(got, actor, target, "4m", [2]string{"2m", "3m"}) {
+		t.Error("LegalActions() contains Chii after the fourth kan by multiple players")
+	}
+	if containsPon(got, actor, target, "4m", [2]string{"4m", "4m"}) {
+		t.Error("LegalActions() contains Pon after the fourth kan by multiple players")
+	}
+	if containsCalledKan(got, actor, target, "4m", [3]string{"4m", "4m", "4m"}) {
+		t.Error("LegalActions() contains CalledKan after the fourth kan by multiple players")
+	}
+}
+
+func TestState_LegalActions_AfterFourthKanIncludesCallsWhenAllKansBelongToOnePlayer(t *testing.T) {
+	target := seat.MustSeat(0)
+	actor := seat.MustSeat(1)
+	caller, err := player.NewVisiblePlayer(maxOtherDiscardActionsHandForLegalActionsTest())
+	if err != nil {
+		t.Fatalf("player.NewVisiblePlayer() failed: %v", err)
+	}
+	players := [common.NumPlayers]player.Player{
+		playerWithKansForFourKanTest(t, fourKanTestHand(), []string{"E", "S", "W", "P"}, "4m"),
+		caller,
+		player.NewInvisiblePlayer(),
+		player.NewInvisiblePlayer(),
+	}
+	s := NewStateForTest(
+		wind.East,
+		1,
+		0,
+		0,
+		[common.NumPlayers]int{25000, 25000, 25000, 25000},
+		target,
+		target,
+		tile.Tiles{tile.MustTileFromCode("1m")},
+		10,
+		players,
+	)
+	s.numKans = maxNumKan
+	s.lastActor = &target
+
+	got, err := s.LegalActions(actor)
+	if err != nil {
+		t.Fatalf("LegalActions() failed: %v", err)
+	}
+	if !containsChii(got, actor, target, "4m", [2]string{"2m", "3m"}) {
+		t.Error("LegalActions() does not contain Chii after four kans by one player")
+	}
+	if !containsPon(got, actor, target, "4m", [2]string{"4m", "4m"}) {
+		t.Error("LegalActions() does not contain Pon after four kans by one player")
+	}
+	if containsCalledKan(got, actor, target, "4m", [3]string{"4m", "4m", "4m"}) {
+		t.Error("LegalActions() contains a fifth kan")
+	}
+}
+
 func TestState_LegalActions_OnOtherDiscardIncludesChii(t *testing.T) {
 	hands := newValidHands()
 	hands[1] = chiiHandForLegalActionsTest("2m", "3m")
@@ -704,6 +796,52 @@ func calledKanHandForLegalActionsTest(firstCode, secondCode, thirdCode string) [
 		tile.MustTileFromCode("3s"),
 		tile.MustTileFromCode("9p"),
 	}
+}
+
+func fourKanTestHand() [common.InitHandSize]tile.Tile {
+	return [common.InitHandSize]tile.Tile{
+		tile.MustTileFromCode("E"), tile.MustTileFromCode("E"), tile.MustTileFromCode("E"),
+		tile.MustTileFromCode("S"), tile.MustTileFromCode("S"), tile.MustTileFromCode("S"),
+		tile.MustTileFromCode("W"), tile.MustTileFromCode("W"), tile.MustTileFromCode("W"),
+		tile.MustTileFromCode("P"), tile.MustTileFromCode("P"), tile.MustTileFromCode("P"),
+		tile.MustTileFromCode("1m"),
+	}
+}
+
+func playerWithKansForFourKanTest(
+	t *testing.T,
+	handTiles [common.InitHandSize]tile.Tile,
+	kanCodes []string,
+	lastReplacementDiscardCode string,
+) player.Player {
+	t.Helper()
+
+	p, err := player.NewVisiblePlayer(handTiles)
+	if err != nil {
+		t.Fatalf("player.NewVisiblePlayer() failed: %v", err)
+	}
+	for i, code := range kanCodes {
+		kanTile := tile.MustTileFromCode(code)
+		kan := meld.MustCalledKan(
+			kanTile,
+			[3]tile.Tile{kanTile, kanTile, kanTile},
+			seat.MustSeat(3),
+		)
+		if err := p.CalledKan(*kan); err != nil {
+			t.Fatalf("CalledKan(%s) failed: %v", code, err)
+		}
+		replacementDiscard := tile.MustTileFromCode("9p")
+		if i == len(kanCodes)-1 {
+			replacementDiscard = tile.MustTileFromCode(lastReplacementDiscardCode)
+		}
+		if err := p.Draw(replacementDiscard); err != nil {
+			t.Fatalf("Draw() after CalledKan(%s) failed: %v", code, err)
+		}
+		if err := p.Discard(replacementDiscard, true); err != nil {
+			t.Fatalf("Discard() after CalledKan(%s) failed: %v", code, err)
+		}
+	}
+	return p
 }
 
 func chiiHandForLegalActionsTest(firstCode, secondCode string) [common.InitHandSize]tile.Tile {
