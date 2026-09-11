@@ -39,6 +39,12 @@ func (s *State) legalActionsOnOtherDiscard(playerSeat seat.Seat, p *player.Visib
 		}
 		actions = append(actions, a)
 	}
+	if s.isFourKanAbortiveDraw() {
+		if len(actions) > 0 {
+			actions = append(actions, action.NewPass(playerSeat))
+		}
+		return actions, nil
+	}
 
 	chiis, err := s.legalChiiActions(playerSeat, p, *targetSeat, discardedTile)
 	if err != nil {
@@ -285,4 +291,24 @@ func (s *State) ronWinEvent() service.WinEvent {
 		return service.LastTile
 	}
 	return service.NoEvent
+}
+
+func (s *State) isFourKanAbortiveDraw() bool {
+	if s.numKans != maxNumKan {
+		return false
+	}
+
+	for _, p := range s.players {
+		playerKans := 0
+		for _, m := range p.Melds() {
+			switch m.(type) {
+			case *meld.CalledKan, *meld.ConcealedKan, *meld.PromotedKan:
+				playerKans++
+			}
+		}
+		if playerKans == maxNumKan {
+			return false
+		}
+	}
+	return true
 }
